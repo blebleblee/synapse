@@ -96,3 +96,51 @@ Here are all the available subtopics in this learning module organized by catego
 - **West Coast vs East Coast Synthesis** (`music_production/modular_synthesis/02_west_coast_vs_east_coast_synthesis/`)
 - **Complex Oscillators and Wavefolding** (`music_production/modular_synthesis/03_complex_oscillators_and_wavefolding/`)
 - **Generative Patching and Clock Dividers** (`music_production/modular_synthesis/04_generative_patching_and_clock_dividers/`)
+
+### Creative Software: Adobe Creative Suite
+- **Photoshop Raster Manipulation and Layers** (`creative_software/adobe_creative_cloud/01_photoshop_raster_manipulation_and_layers/`)
+- **Illustrator Vector Paths and Typography** (`creative_software/adobe_creative_cloud/02_illustrator_vector_paths_and_typography/`)
+- **Premiere Pro Video Cutting and Storytelling** (`creative_software/adobe_creative_cloud/03_premiere_pro_video_cutting_and_storytelling/`)
+- **After Effects Motion Graphics and Keyframing** (`creative_software/adobe_creative_cloud/04_after_effects_motion_graphics_and_keyframing/`)
+
+### Creative Software: Ableton Live DAW
+- **Session View vs Arrangement View Workflow** (`creative_software/ableton_live/01_session_view_vs_arrangement_view_workflow/`)
+- **MIDI Sequencing Drum Racks and Grooves** (`creative_software/ableton_live/02_midi_sequencing_drum_racks_and_grooves/`)
+- **Audio Warping Sampling and Slicing** (`creative_software/ableton_live/03_audio_warping_sampling_and_slicing/`)
+- **Audio Effects Racks and Live Performance** (`creative_software/ableton_live/04_audio_effects_racks_and_live_performance/`)
+
+### Creative Software: Apple Logic Pro DAW
+- **Project Templates Signal Routing and Busses** (`creative_software/logic_pro/01_project_templates_signal_routing_and_busses/`)
+- **Quick Sampler and Drum Machine Designer** (`creative_software/logic_pro/02_quick_sampler_and_drum_machine_designer/`)
+- **Flex Time and Flex Pitch Correction** (`creative_software/logic_pro/03_flex_time_and_flex_pitch_correction/`)
+- **Spatial Audio and Dolby Atmos Mixing** (`creative_software/logic_pro/04_spatial_audio_and_dolby_atmos_mixing/`)
+
+### Creative Software: Steinberg Cubase Pro
+- **MIDI Logical Editor and Expression Maps** (`creative_software/cubase/01_midi_logical_editor_and_expression_maps/`)
+- **VariAudio Pitch Editing and Quantization** (`creative_software/cubase/02_variaudio_pitch_editing_and_quantization/`)
+- **Channel Strip EQ and VCA Fader Grouping** (`creative_software/cubase/03_channel_strip_eq_and_vca_fader_grouping/`)
+- **Orchestral Template Building and Stem Export** (`creative_software/cubase/04_orchestral_template_building_and_stem_export/`)
+
+### Visual Media: Graphic Design and Branding
+- **Principles of Layout Hierarchy and Grid Systems** (`visual_media/graphic_design/01_principles_of_layout_hierarchy_and_grid_systems/`)
+- **Color Psychology Harmonies and Color Spaces** (`visual_media/graphic_design/02_color_psychology_harmonies_and_color_spaces/`)
+- **Typography Classification Kerning and Pairing** (`visual_media/graphic_design/03_typography_classification_kerning_and_pairing/`)
+- **Brand Identity Systems and Style Guides** (`visual_media/graphic_design/04_brand_identity_systems_and_style_guides/`)
+
+### Visual Media: Photography and Lighting
+- **Exposure Triangle Aperture Shutter and ISO** (`visual_media/photography/01_exposure_triangle_aperture_shutter_and_iso/`)
+- **Depth of Field and Focal Length Compression** (`visual_media/photography/02_depth_of_field_and_focal_length_compression/`)
+- **Natural and Artificial Lighting Ratios** (`visual_media/photography/03_natural_and_artificial_lighting_ratios/`)
+- **RAW Color Grading and Lightroom Workflows** (`visual_media/photography/04_raw_color_grading_and_lightroom_workflows/`)
+
+### Visual Media: Cinematic Video Production
+- **Cinematic Framing Camera Angles and Movement** (`visual_media/video_production/01_cinematic_framing_camera_angles_and_movement/`)
+- **Three Point Lighting and Cinematography** (`visual_media/video_production/02_three_point_lighting_and_cinematography/`)
+- **Production Audio Lavaliers and Boom Mics** (`visual_media/video_production/03_production_audio_lavaliers_and_boom_mics/`)
+- **Color Grading Log Footage and LUTs** (`visual_media/video_production/04_color_grading_log_footage_and_luts/`)
+
+### Visual Media: Content Creation and Broadcasting
+- **Narrative Storytelling and Video Hooks** (`visual_media/content_creation/01_narrative_storytelling_and_video_hooks/`)
+- **Podcasting Audio Mastering and Interviews** (`visual_media/content_creation/02_podcasting_audio_mastering_and_interviews/`)
+- **Livestreaming OBS and Multitrack Broadcast** (`visual_media/content_creation/03_livestreaming_obs_and_multitrack_broadcast/`)
+- **Distribution and Audience Engagement** (`visual_media/content_creation/04_distribution_and_audience_engagement/`)
