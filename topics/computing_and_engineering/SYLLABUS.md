@@ -56,6 +56,7 @@ Here are all the available subtopics in this learning module organized by catego
 - **Distributed Systems** (`infrastructure_and_ops/distributed_systems/`)
 - **Core Infrastructure** (`infrastructure_and_ops/infrastructure/`)
 - **Kubernetes Ecosystem** (`infrastructure_and_ops/kubernetes/`)
+- **SUSE Harvester HCI** (`infrastructure_and_ops/harvester/`)
 - **Linux Kernel & Systems** (`infrastructure_and_ops/linux/`)
 - **Computer Networking** (`infrastructure_and_ops/networking/`)
 - **Observability & Telemetry** (`infrastructure_and_ops/observability/`)
