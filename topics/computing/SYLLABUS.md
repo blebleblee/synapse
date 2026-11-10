@@ -202,3 +202,8 @@ Here are all the available subtopics in this learning module organized by catego
 - **End to End Testing with Playwright** (`software/quality_assurance/02_end_to_end_testing_with_playwright/`)
 - **API Mocking and Contract Testing** (`software/quality_assurance/03_api_mocking_and_contract_testing/`)
 - **CI CD Test Automation and Chaos Engineering** (`software/quality_assurance/04_ci_cd_test_automation_and_chaos_engineering/`)
+
+### Software: Technological Frontiers and Hardware Limits
+- **Moores Law and Silicon Lithography Limits** (`software/technological_frontiers/01_moores_law_and_silicon_lithography_limits/`)
+- **Technological Singularity and AGI Trajectories** (`software/technological_frontiers/02_technological_singularity_and_agi_trajectories/`)
+- **Brain Computer Interfaces Neuralink and ECoG** (`software/technological_frontiers/03_brain_computer_interfaces_neuralink_and_ecog/`)

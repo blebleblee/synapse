@@ -52,3 +52,13 @@
 - **Distance Management and Striking Fundamentals** (`lifestyle/self_defence/02_distance_management_and_striking_fundamentals/`)
 - **Close Quarters Grappling and Takedown Defense** (`lifestyle/self_defence/03_close_quarters_grappling_and_takedown_defense/`)
 - **Escapes from Ground Positions and Pinning** (`lifestyle/self_defence/04_escapes_from_ground_positions_and_pinning/`)
+
+### Physiology: Neurobiology and Altered Cognitive States
+- **Neuroplasticity Synaptogenesis and Pruning** (`physiology/neurobiology_and_altered_states/01_neuroplasticity_synaptogenesis_and_pruning/`)
+- **Synesthesia and Cross Modal Sensory Wiring** (`physiology/neurobiology_and_altered_states/02_synesthesia_and_cross_modal_sensory_wiring/`)
+- **Sleep Paralysis and Hypnagogic Hallucinations** (`physiology/neurobiology_and_altered_states/03_sleep_paralysis_and_hypnagogic_hallucinations/`)
+- **Tourette Syndrome and Basal Ganglia Pathology** (`physiology/neurobiology_and_altered_states/04_tourette_syndrome_and_basal_ganglia_pathology/`)
+- **Cryptophasia and Twin Autonomous Languages** (`physiology/neurobiology_and_altered_states/05_cryptophasia_and_twin_autonomous_languages/`)
+- **Hypnosis Trance States and Suggestibility** (`physiology/neurobiology_and_altered_states/06_hypnosis_trance_states_and_suggestibility/`)
+- **Near Death Experiences and Cerebral Hypoxia** (`physiology/neurobiology_and_altered_states/07_near_death_experiences_and_cerebral_hypoxia/`)
+- **Past Life Regressions Cryptomnesia and Suggestion** (`physiology/neurobiology_and_altered_states/08_past_life_regressions_cryptomnesia_and_suggestion/`)

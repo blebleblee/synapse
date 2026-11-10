@@ -51,3 +51,11 @@ Here are all the available subtopics in this learning module organized by catego
 - **Combinatorics** (`discrete_math/combinatorics/`)
 - **Discrete Mathematics** (`discrete_math/discrete_mathematics/`)
 - **Set Theory** (`discrete_math/set_theory/`)
+
+### Discrete Math: Foundational Paradoxes and Millennium Problems
+- **Godels Incompleteness Theorems and Arithmetization** (`discrete_math/foundational_paradoxes_and_problems/01_godels_incompleteness_theorems_and_arithmetization/`)
+- **Banach Tarski Paradox and Axiom of Choice** (`discrete_math/foundational_paradoxes_and_problems/02_banach_tarski_paradox_and_axiom_of_choice/`)
+- **Infinite Hotel Paradox and Transfinite Cardinals** (`discrete_math/foundational_paradoxes_and_problems/03_infinite_hotel_paradox_and_transfinite_cardinals/`)
+- **Prime Numbers and Riemann Hypothesis** (`discrete_math/foundational_paradoxes_and_problems/04_prime_numbers_and_riemann_hypothesis/`)
+- **P vs NP Problem and Computational Complexity** (`discrete_math/foundational_paradoxes_and_problems/05_p_vs_np_problem_and_computational_complexity/`)
+- **Monty Hall Problem and Bayesian Probability** (`discrete_math/foundational_paradoxes_and_problems/06_monty_hall_problem_and_bayesian_probability/`)

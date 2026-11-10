@@ -102,3 +102,28 @@ Here are all the available subtopics in this learning module organized by catego
 - **Habit Loops Cues Routines and Friction** (`cognitive_skills/motivation_and_habits/02_habit_loops_cues_routines_and_friction/`)
 - **Deep Work and Flow State Cultivation** (`cognitive_skills/motivation_and_habits/03_deep_work_and_flow_state_cultivation/`)
 - **Recovering from Burnout and Sustainable Pacing** (`cognitive_skills/motivation_and_habits/04_recovering_from_burnout_and_sustainable_pacing/`)
+
+### History: Historical Mysteries and Ancient Enigmas
+- **Bronze Age Collapse and Sea Peoples** (`history/historical_mysteries_and_enigmas/01_bronze_age_collapse_and_sea_peoples/`)
+- **Gobekli Tepe and Neolithic Revolution** (`history/historical_mysteries_and_enigmas/02_gobekli_tepe_and_neolithic_revolution/`)
+- **Antikythera Mechanism and Hellenistic Gearing** (`history/historical_mysteries_and_enigmas/03_antikythera_mechanism_and_hellenistic_gearing/`)
+- **Library of Alexandria and Lost Knowledge** (`history/historical_mysteries_and_enigmas/04_library_of_alexandria_and_lost_knowledge/`)
+- **Inca Quipus and Knot Record Keeping** (`history/historical_mysteries_and_enigmas/05_inca_quipus_and_knot_record_keeping/`)
+- **Voynich Manuscript and Unsolved Paleography** (`history/historical_mysteries_and_enigmas/06_voynich_manuscript_and_unsolved_paleography/`)
+- **Indus Valley Script and Harappan Epigraphy** (`history/historical_mysteries_and_enigmas/07_indus_valley_script_and_harappan_epigraphy/`)
+- **Dancing Plague of 1518 and Mass Psychogenic Illness** (`history/historical_mysteries_and_enigmas/08_dancing_plague_of_1518_and_mass_psychogenic_illness/`)
+- **Great Emu War and Australian Cull Campaign** (`history/historical_mysteries_and_enigmas/09_great_emu_war_and_australian_cull_campaign/`)
+
+### Cognitive Skills: Psychological Phenomena and Cognitive Biases
+- **Dunning Kruger Effect and Metacognitive Competence** (`cognitive_skills/psychological_phenomena_and_biases/01_dunning_kruger_effect_and_metacognitive_competence/`)
+- **Cognitive Dissonance and Belief Rationalization** (`cognitive_skills/psychological_phenomena_and_biases/02_cognitive_dissonance_and_belief_rationalization/`)
+- **Bystander Effect and Diffusion of Responsibility** (`cognitive_skills/psychological_phenomena_and_biases/03_bystander_effect_and_diffusion_of_responsibility/`)
+- **Placebo Effect and Endogenous Neurochemistry** (`cognitive_skills/psychological_phenomena_and_biases/04_placebo_effect_and_endogenous_neurochemistry/`)
+- **Mandela Effect and Confabulation** (`cognitive_skills/psychological_phenomena_and_biases/05_mandela_effect_and_confabulation/`)
+- **False Memory Syndrome and Memory Reconsolidation** (`cognitive_skills/psychological_phenomena_and_biases/06_false_memory_syndrome_and_memory_reconsolidation/`)
+
+### Games and Puzzles: Texas Holdem Poker Strategy
+- **Texas Holdem Rules and Hand Rankings** (`games_and_puzzles/texas_holdem_poker/01_texas_holdem_rules_and_hand_rankings/`)
+- **Preflop Ranges and Positional Advantage** (`games_and_puzzles/texas_holdem_poker/02_preflop_ranges_and_positional_advantage/`)
+- **Postflop Pot Odds and Equity Calculations** (`games_and_puzzles/texas_holdem_poker/03_postflop_pot_odds_and_equity_calculations/`)
+- **Bluffing and GTO Bet Sizing Polarization** (`games_and_puzzles/texas_holdem_poker/04_bluffing_and_gto_bet_sizing_polarization/`)
