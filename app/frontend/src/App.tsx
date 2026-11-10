@@ -7,7 +7,6 @@ import { SearchModal } from './components/SearchModal';
 import { GraphModal } from './components/GraphModal';
 import { SettingsModal, DEFAULT_SETTINGS, type AppSettings } from './components/SettingsModal';
 import { FlashcardStudyModal } from './components/FlashcardStudyModal';
-import { AIExpandModal } from './components/AIExpandModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import './App.css';
@@ -32,8 +31,6 @@ export function App() {
   const [graphOpen, setGraphOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [flashcardModalOpen, setFlashcardModalOpen] = useState(false);
-  const [aiExpandOpen, setAiExpandOpen] = useState(false);
-  const [aiExpandInitialPath, setAiExpandInitialPath] = useState('');
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('synapse_app_settings');
@@ -374,10 +371,6 @@ export function App() {
         onOpenSettings={() => setSettingsOpen(true)}
         onDeleteTopic={handleDeleteTopic}
         onRenameTopic={handleRenameTopic}
-        onOpenAIExpand={(p) => {
-          setAiExpandInitialPath(p || '');
-          setAiExpandOpen(true);
-        }}
       />
 
       <div className="center-workspace-column">
@@ -445,16 +438,6 @@ export function App() {
         onClose={() => setFlashcardModalOpen(false)}
         topicPath={selectedPath || ''}
         topicTitle={topicDetails?.subtopic.replace(/_/g, ' ') || 'Flashcard Deck'}
-      />
-
-      <AIExpandModal
-        isOpen={aiExpandOpen}
-        onClose={() => setAiExpandOpen(false)}
-        initialPath={aiExpandInitialPath}
-        onSuccess={(firstUnitPath) => {
-          fetchTree();
-          loadTopic(firstUnitPath, currentLevel);
-        }}
       />
     </div>
   );

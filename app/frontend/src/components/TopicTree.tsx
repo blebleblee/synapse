@@ -23,8 +23,7 @@ import {
   Edit2,
   Trash2,
   X,
-  Activity,
-  Sparkles
+  Activity
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -38,7 +37,6 @@ interface TopicTreeProps {
   onOpenSettings: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
   onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
-  onOpenAIExpand?: (initialPath?: string) => void;
 }
 
 const DOMAIN_ORDER = [
@@ -66,7 +64,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenSettings,
   onDeleteTopic,
   onRenameTopic,
-  onOpenAIExpand,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('az');
@@ -276,13 +273,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             <Settings size={14} />
           </button>
           <button
-            className="icon-btn"
-            onClick={() => onOpenAIExpand && onOpenAIExpand()}
-            title="AI Curriculum Auto-Expander"
-          >
-            <Sparkles size={14} style={{ color: 'var(--accent-gold)' }} />
-          </button>
-          <button
             className="btn-primary-sm"
             onClick={() => setShowAddModal(true)}
             title="Add New Topic/Course"
@@ -310,9 +300,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             onChange={(e) => setSortMode(e.target.value as any)}
             className="sort-select"
           >
-            <option value="az">A to Z</option>
-            <option value="progress">Progress</option>
-            <option value="default">Domain Order</option>
+            <option value="az">A to Z (Alphabetical)</option>
+            <option value="default">Curriculum Order</option>
+            <option value="progress">Progress (Most Studied)</option>
           </select>
         </div>
       </div>
@@ -489,18 +479,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                       <span className="course-progress">
                                         {completedUnits}/{units.length}
                                       </span>
-                                      {onOpenAIExpand && (
-                                        <button
-                                          className="action-mini-btn"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            onOpenAIExpand(`${discKey}/${courseSlug}`);
-                                          }}
-                                          title={`AI Auto-Populate / Expand ${courseSlug}`}
-                                        >
-                                          <Sparkles size={11} style={{ color: 'var(--accent-gold)' }} />
-                                        </button>
-                                      )}
                                       {onDeleteTopic && (
                                         <button
                                           className="action-mini-btn delete"

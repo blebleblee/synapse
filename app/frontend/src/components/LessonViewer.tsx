@@ -13,11 +13,7 @@ import {
   FileText,
   Volume2,
   VolumeX,
-  Columns,
-  ZoomIn,
-  ZoomOut,
-  X,
-  Maximize2
+  Columns
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -126,10 +122,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [bilingualSplit, setBilingualSplit] = useState<boolean>(() => {
     return localStorage.getItem('synapse_bilingual_split') === 'true';
   });
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const [lightboxSvg, setLightboxSvg] = useState<string | null>(null);
-  const [lightboxZoom, setLightboxZoom] = useState(1);
-
   const [dependencies, setDependencies] = useState<{
     prerequisites: { id: string; label: string; domain: string }[];
     unlocks: { id: string; label: string; domain: string }[];
@@ -195,30 +187,10 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
 
-    // 1. Executable code block runner
+    // Executable sandbox code block runner
     const runBtn = target.closest('.btn-run-code') as HTMLElement | null;
     if (runBtn && runBtn.dataset.code) {
       onRunInTerminal(runBtn.dataset.code);
-      return;
-    }
-
-    // 2. Zoomable Image Lightbox
-    const imgEl = target.closest('img') as HTMLImageElement | null;
-    if (imgEl && imgEl.src) {
-      setLightboxImage(imgEl.src);
-      setLightboxSvg(null);
-      setLightboxZoom(1);
-      return;
-    }
-
-    // 3. Zoomable Mermaid Vector Diagram Lightbox
-    const svgEl = target.closest('.mermaid svg') as SVGElement | null;
-    if (svgEl) {
-      const serializer = new XMLSerializer();
-      setLightboxSvg(serializer.serializeToString(svgEl));
-      setLightboxImage(null);
-      setLightboxZoom(1);
-      return;
     }
   };
 
@@ -529,32 +501,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           />
         )}
       </div>
-
-      {/* Lightbox Modal for Images and Vector Diagrams */}
-      {(lightboxImage || lightboxSvg) && (
-        <div className="lightbox-backdrop" onClick={() => { setLightboxImage(null); setLightboxSvg(null); }}>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <div className="lightbox-toolbar">
-              <button className="icon-btn" onClick={() => setLightboxZoom((z) => Math.min(z + 0.25, 3))} title="Zoom In">
-                <ZoomIn size={16} />
-              </button>
-              <button className="icon-btn" onClick={() => setLightboxZoom((z) => Math.max(z - 0.25, 0.5))} title="Zoom Out">
-                <ZoomOut size={16} />
-              </button>
-              <button className="icon-btn" onClick={() => setLightboxZoom(1)} title="Reset Zoom">
-                <Maximize2 size={16} />
-              </button>
-              <button className="icon-btn" onClick={() => { setLightboxImage(null); setLightboxSvg(null); }} title="Close Lightbox">
-                <X size={16} />
-              </button>
-            </div>
-            <div className="lightbox-body" style={{ transform: `scale(${lightboxZoom})`, transformOrigin: 'center center', transition: 'transform 0.15s ease-out' }}>
-              {lightboxImage && <img src={lightboxImage} alt="Diagram High-Res View" className="lightbox-img" />}
-              {lightboxSvg && <div className="lightbox-svg-container" dangerouslySetInnerHTML={{ __html: lightboxSvg }} />}
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 };

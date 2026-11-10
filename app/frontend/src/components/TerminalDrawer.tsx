@@ -10,7 +10,9 @@ import {
   RefreshCw,
   Maximize2,
   Minimize2,
-  Layers
+  Layers,
+  HelpCircle,
+  X
 } from 'lucide-react';
 
 export interface TerminalDrawerHandle {
@@ -31,6 +33,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const [isMaximized, setIsMaximized] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(260);
   const [terminalEnv, setTerminalEnv] = useState<'host' | 'docker' | 'k8s'>('host');
+  const [showSetupGuide, setShowSetupGuide] = useState(false);
   const isDraggingRef = useRef(false);
 
   const connectWs = (env = terminalEnv) => {
@@ -234,6 +237,18 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
               <option value="k8s">Kubernetes Pod (k3s Cluster)</option>
             </select>
           </div>
+
+          <button
+            className={`btn-setup-guide ${showSetupGuide ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowSetupGuide((prev) => !prev);
+            }}
+            title="Setup Guide for Rancher Desktop & k3s"
+          >
+            <HelpCircle size={12} />
+            <span>Setup Guide</span>
+          </button>
         </div>
 
         <div className="terminal-actions" onClick={(e) => e.stopPropagation()}>
@@ -258,6 +273,29 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
           </button>
         </div>
       </div>
+
+      {showSetupGuide && (
+        <div className="terminal-setup-banner">
+          <div className="setup-banner-header">
+            <strong>Rancher Desktop & k3s Sandbox Setup Guide</strong>
+            <button className="icon-btn" onClick={() => setShowSetupGuide(false)}><X size={12} /></button>
+          </div>
+          <div className="setup-banner-grid">
+            <div className="setup-col">
+              <h5>🐳 Linux Sandbox (Docker / Rancher)</h5>
+              <p>1. Install via Homebrew: <code>brew install --cask rancher</code></p>
+              <p>2. In Preferences &rarr; Container Engine, select <strong>dockerd (moby)</strong>.</p>
+              <p>3. Verify socket is active: <code>docker info</code></p>
+            </div>
+            <div className="setup-col">
+              <h5>☸️ Kubernetes Pod (k3s Cluster)</h5>
+              <p>1. In Rancher Desktop &rarr; Preferences &rarr; Kubernetes, enable k3s.</p>
+              <p>2. Wait for cluster status to reach <strong>Running</strong>.</p>
+              <p>3. Test cluster node connectivity: <code>kubectl get nodes</code></p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="terminal-body" ref={containerRef} style={{ display: isOpen ? 'block' : 'none' }} />
     </div>

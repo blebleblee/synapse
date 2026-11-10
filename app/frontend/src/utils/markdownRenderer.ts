@@ -13,8 +13,13 @@ mermaid.initialize({
 export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
   if (!rawMarkdown) return '';
 
+  // Strip redundant diagram meta-headers
+  let processed = rawMarkdown
+    .replace(/^###?\s*(?:Ascii diagram|Mermaid flowchart|ASCII Architecture|System Diagram)[\s:]*$/gim, '')
+    .trim();
+
   // 1. Process display math: $$...$$
-  let processed = rawMarkdown.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     try {
       return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false })}</div>`;
     } catch {
