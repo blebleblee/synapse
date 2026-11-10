@@ -1,215 +1,159 @@
-# Hands-On Operational Lab: Abstract Algebra
+# Hands-On Operational Lab: Computational Group Theory, Finite Fields & Galois Group Verification
 
-## Objective & Prerequisites
+## Objective & Lab Prerequisites
+In this lab, you will computationally construct finite permutation groups, verify the Class Equation and Sylow theorems, build the Galois field $\mathbb{F}_{2^8}$ used in AES cryptography using irreducible polynomial quotients, and compute Galois groups of algebraic field extensions using Python.
 
-**Objective**: Develop operational proficiency in constructing, verifying, and debugging algebraic structures using computational tools while cultivating mathematical intuition through concrete implementation.
-
-**Prerequisites**:
-1. Basic understanding of group theory concepts (groups, subgroups, homomorphisms)
-2. Familiarity with computational algebra systems (SageMath recommended)
-3. Terminal access and SageMath installation (via `sudo apt install sage` on Ubuntu)
-4. Working knowledge of Python syntax and basic programming concepts
-
-**Why This Matters**: Abstract algebra is the foundation for modern cryptography, coding theory, and computational mathematics. This lab bridges theoretical concepts with operational verification—critical for researchers and practitioners in formal sciences.
+### Prerequisites
+* Python 3.10+ in your virtual environment.
+* Install SymPy:
+  ```bash
+  pip install sympy
+  ```
 
 ---
 
-## Exercise 1: Exploration & System State Inspection
+## Exercise 1: Computing Conjugacy Classes & Verifying the Class Equation
 
-**Goal**: Verify your SageMath environment and inspect fundamental algebraic structures.
+We will construct the Alternating Group $A_4$ (the rotational symmetries of a regular tetrahedron, order $|A_4| = 12$) and verify its Class Equation:
 
-**Step-by-Step Workflow**:
+$$|G| = |Z(G)| + \sum_{i=1}^k [G : C_G(x_i)]$$
 
-1. Start SageMath in terminal:
+```python
+cat << 'EOF' > test_class_equation.py
+from sympy.combinatorics import AlternatingGroup
+
+# Construct Alternating Group A_4
+G = AlternatingGroup(4)
+order_G = G.order()
+print(f"Group: A_4 | Order: {order_G}")
+
+# Compute Conjugacy Classes
+conj_classes = G.conjugacy_classes()
+print(f"Number of Conjugacy Classes: {len(conj_classes)}\n")
+
+total_elements = 0
+print("Class Equation Breakdown:")
+for idx, c in enumerate(conj_classes, 1):
+    rep = list(c)[0]
+    class_size = len(c)
+    total_elements += class_size
+    print(f"  Class {idx}: Representative={rep}, Orbit Size={class_size}")
+
+print("--------------------------------------------------")
+print(f"Sum of Conjugacy Class Sizes: {total_elements}")
+print(f"Verification (|G| == Sum):     {order_G == total_elements} (Class Equation Validated!)")
+
+# Center of A_4
+center = G.center()
+print(f"Center Z(A_4) Order:          {center.order()} (Trivial Center)")
+EOF
+python3 test_class_equation.py
+```
+
+---
+
+## Exercise 2: Constructing the Galois Field $\mathbb{F}_{2^8}$ (The AES Rijndael Field)
+
+In modern cryptography (AES / Rijndael), bytes are treated as elements of the finite field $\mathbb{F}_{2^8} \cong \mathbb{F}_2[x] / \langle m(x) \rangle$, where $m(x) = x^8 + x^4 + x^3 + x + 1$ is an irreducible polynomial over $\mathbb{F}_2$.
+
+We will construct this field and compute multiplicative inverses using polynomial modular arithmetic:
+
+```python
+cat << 'EOF' > aes_galois_field.py
+def gf_multiply(a, b, mod=0x11B):
+    """
+    Multiplies two elements in GF(2^8) modulo x^8 + x^4 + x^3 + x + 1 (0x11B).
+    Uses peasant's algorithm with bitwise shifts and XOR.
+    """
+    p = 0
+    while b > 0:
+        if b & 1:
+            p ^= a
+        b >>= 1
+        a <<= 1
+        if a & 0x100: # If degree >= 8, reduce modulo m(x)
+            a ^= mod
+    return p & 0xFF
+
+def gf_inverse(a):
+    """
+    Computes multiplicative inverse in GF(2^8) using Fermat's Little Theorem:
+    In GF(2^8), a^(2^8 - 1) = a^255 = 1 => a^(-1) = a^254.
+    """
+    if a == 0:
+        return 0
+    res = 1
+    base = a
+    power = 254 # 2^8 - 2
+    while power > 0:
+        if power & 1:
+            res = gf_multiply(res, base)
+        base = gf_multiply(base, base)
+        power >>= 1
+    return res
+
+# Test element: byte 0x53 ('S' in ASCII)
+element = 0x53
+inv = gf_inverse(element)
+product = gf_multiply(element, inv)
+
+print("==================================================")
+print("     AES RIJNDAEL FINITE FIELD GF(2^8) LAB        ")
+print("==================================================")
+print(f"Original Element:   0x{element:02X} (binary: {bin(element)[2:].zfill(8)})")
+print(f"Computed Inverse:   0x{inv:02X} (binary: {bin(inv)[2:].zfill(8)})")
+print(f"Product a * a^(-1): 0x{product:02X}")
+print(f"Field Axiom Check:  {product == 1} (Multiplicative Inverse Validated!)")
+EOF
+python3 aes_galois_field.py
+```
+
+---
+
+## Exercise 3: Computing Galois Groups of Polynomial Field Extensions
+
+We will determine the Galois group of $f(x) = x^3 - 2$ over $\mathbb{Q}$.
+* Roots: $\sqrt[3]{2}, \omega\sqrt[3]{2}, \omega^2\sqrt[3]{2}$ where $\omega = e^{2\pi i / 3}$.
+* Splitting field: $E = \mathbb{Q}(\sqrt[3]{2}, \omega)$.
+* Degree: $[E : \mathbb{Q}] = [\mathbb{Q}(\sqrt[3]{2}, \omega) : \mathbb{Q}(\sqrt[3]{2})] \cdot [\mathbb{Q}(\sqrt[3]{2}) : \mathbb{Q}] = 2 \times 3 = 6$.
+* Therefore, the Galois group must be non-abelian of order 6, which is isomorphic to $S_3$.
+
+```python
+cat << 'EOF' > test_galois_group.py
+from sympy import symbols, Poly
+from sympy.polys.polytools import galois_group
+
+x = symbols('x')
+
+# Polynomial 1: Cubic extension x^3 - 2
+f1 = Poly(x**3 - 2, x)
+G1, is_transitive = galois_group(f1)
+print("Polynomial: f(x) = x^3 - 2 over Q")
+print(f"  Galois Group: {G1.name} (Order: {G1.order()})")
+print(f"  Isomorphism:  Isomorphic to Symmetric Group S_3")
+print(f"  Is Solvable:  {G1.is_solvable} (Roots expressible by radicals!)\n")
+
+# Polynomial 2: Non-solvable quintic x^5 - 4x + 2
+f2 = Poly(x**5 - 4*x + 2, x)
+G2, _ = galois_group(f2)
+print("Polynomial: f(x) = x^5 - 4x + 2 over Q")
+print(f"  Galois Group: {G2.name} (Order: {G2.order()})")
+print(f"  Isomorphism:  Full Symmetric Group S_5")
+print(f"  Is Solvable:  {G2.is_solvable} (PROVES INSOLVABILITY BY RADICALS!)")
+EOF
+python3 test_galois_group.py
+```
+
+---
+
+## Exercise 4: Clean Up
+
 ```bash
-sage
+rm -f test_class_equation.py aes_galois_field.py test_galois_group.py
 ```
-
-2. Execute verification commands:
-```sage
-# 1. Check SageMath version and environment
-version()
-
-# 2. Create cyclic group of order 5 (additive group Z/5Z)
-G = CyclicGroup(5)
-
-# 3. Inspect group structure
-G.list()  # Elements
-G.order() # Group order
-G(1).order()  # Order of generator 1
-```
-
-**Expected Outputs**:
-```
-SageMath version 10.10
-[0, 1, 2, 3, 4]
-5
-5
-```
-
-**Mathematical Intuition**:  
-The output confirms we're working with $\mathbb{Z}/5\mathbb{Z}$ (integers modulo 5). The generator `1` has order 5 because $5 \cdot 1 \equiv 0 \pmod{5}$, satisfying the cyclic group definition: $\langle g \rangle = \{g^k \mid k \in \mathbb{Z}\}$ where $g^k$ is $k$-fold addition modulo 5.
-
-**Why This Works**:  
-SageMath's `CyclicGroup(n)` constructs the additive group $\mathbb{Z}/n\mathbb{Z}$ by default. The output `5` for `G(1).order()` verifies the group axioms hold—specifically the *order* of an element is the smallest positive integer $k$ such that $k \cdot g \equiv 0 \pmod{n}$.
 
 ---
 
-## Exercise 2: Building & Deploying / Modeling Scenario
-
-**Goal**: Construct a symmetric group and perform operations while verifying group properties.
-
-**Step-by-Step Workflow**:
-
-1. Create symmetric group $S_3$ (permutations of 3 elements):
-```sage
-S = SymmetricGroup(3)
-```
-
-2. Generate all elements and verify group structure:
-```sage
-S.list()  # All permutations
-S.order() # Group order (6)
-```
-
-3. Perform group operations:
-```sage
-# Create two permutations
-p = S([2, 3, 1])  # Cycle (1 2 3)
-q = S([3, 1, 2])  # Cycle (1 3 2)
-
-# Verify composition (p ∘ q)
-p * q  # Output: permutation (1 2 3)
-
-# Verify inverse
-p.inverse()  # Output: permutation (1 3 2)
-```
-
-**Expected Outputs**:
-```
-[ (1,2,3), (1,3,2), (1,2), (1,3), (2,3), (1) ]
-6
-(1,2,3)
-(1,3,2)
-```
-
-**Mathematical Intuition**:  
-The symmetric group $S_3$ has 6 elements (permutations of 3 objects). The output `p * q = (1,2,3)` shows composition:  
-$$
-p \circ q = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 3 & 1 \end{pmatrix} \circ \begin{pmatrix} 1 & 2 & 3 \\ 3 & 1 & 2 \end{pmatrix} = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 3 & 1 \end{pmatrix}
-$$
-This demonstrates the *closure* property: the product of two permutations in $S_3$ remains in $S_3$.
-
-**Why This Works**:  
-SageMath's `SymmetricGroup(n)` constructs the group with the standard composition operation. The inverse operation satisfies $p \cdot p^{-1} = \text{id}$, confirming the *invertibility* axiom.
-
----
-
-## Exercise 3: Fault Injection, Failure Analysis & Debugging
-
-**Goal**: Intentionally break an algebraic structure and analyze the failure.
-
-**Step-by-Step Workflow**:
-
-1. Create a group with invalid indices (fault injection):
-```sage
-# 1. Create valid permutation group
-G = SymmetricGroup(3)
-
-# 2. Inject fault: Use index 4 (invalid for S_3)
-fault_perm = G([4, 1, 2])  # Index 4 is out of range [1,2,3]
-```
-
-2. Observe failure:
-```sage
-fault_perm  # Expected: IndexError
-```
-
-3. Analyze error:
-```sage
-# 3. Check error type and cause
-try:
-    fault_perm
-except Exception as e:
-    print(f"Error type: {type(e).__name__}")
-    print(f"Error message: {str(e)}")
-    print("Why it fails: Permutations must map {1,2,3} → {1,2,3}")
-```
-
-**Expected Output**:
-```
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-IndexError: 4 is not in the set
-Error type: IndexError
-Error message: 4 is not in the set
-Why it fails: Permutations must map {1,2,3} → {1,2,3}
-```
-
-**Debugging Protocol**:
-1. **Identify failure**: `IndexError` indicates invalid indices
-2. **Root cause**: Permutations must be bijections on $\{1,2,3\}$ (Sage requires indices in range $[1, n]$)
-3. **Fix**: Restrict indices to valid range:
-```sage
-# Fixed permutation (valid indices)
-fixed_perm = G([2, 3, 1])  # (1 2 3) cycle
-```
-
-**Why This Matters**:  
-This demonstrates *operational verification*—the critical difference between theoretical structures and computational implementation. The error occurs because algebraic structures have *implicit constraints* (e.g., permutations must be bijections on a finite set).
-
----
-
-## Challenge Lab: Independent Problem for Socratic Discussion with the AI Tutor
-
-**Problem**:  
-Consider the set $S = \{1, 2, 3\}$ with operation $\ast$ defined by:
-
-$$
-\begin{array}{c|ccc}
-\ast & 1 & 2 & 3 \\
-\hline
-1 & 1 & 2 & 3 \\
-2 & 2 & 3 & 1 \\
-3 & 3 & 1 & 2 \\
-\end{array}
-$$
-
-1. **Verify** whether $(S, \ast)$ forms a group.
-2. **If not**, identify the exact group axiom that fails.
-3. **Propose** a minimal modification to make it a group.
-
-**Socratic Discussion Prompts for AI Tutor**:
-- Why does the operation $\ast$ fail to satisfy the *associativity* axiom? (Hint: Check $(1 \ast 2) \ast 3$ vs $1 \ast (2 \ast 3)$)
-- How would you modify the operation table to satisfy the *inverse* axiom while preserving closure?
-- What is the *smallest* set $T$ such that $(T, \ast)$ is a group?
-
-**Why This Works**:  
-This problem requires:
-- Concrete verification of group axioms (closure, associativity, identity, inverses)
-- Understanding of *minimal* structural changes
-- Connection between abstract theory and computational implementation
-
-**Expected Solution Path**:
-1. **Closure**: Holds (all outputs in $S$)
-2. **Associativity**: Fails: $(1 \ast 2) \ast 3 = 3$ but $1 \ast (2 \ast 3) = 2$
-3. **Identity**: No element $e$ such that $e \ast x = x$ for all $x$
-4. **Inverses**: No element $x$ such that $x \ast y = e$ for all $y$
-
-**Minimal Fix**:  
-Define $\ast$ as:
-$$
-\begin{array}{c|ccc}
-\ast & 1 & 2 & 3 \\
-\hline
-1 & 1 & 2 & 3 \\
-2 & 2 & 1 & 3 \\
-3 & 3 & 3 & 1 \\
-\end{array}
-$$
-This creates a group isomorphic to $\mathbb{Z}/3\mathbb{Z}$ (cyclic group of order 3).
-
----
-
-**Professor's Note**:  
-> *In abstract algebra, the difference between a theoretical structure and its computational implementation is the critical bridge between mathematics and engineering. When you see an error like `IndexError: 4 is not in the set`, you're not just debugging code—you're verifying the *axiomatic constraints* that define the algebraic structure itself. This lab trains you to think in terms of both formal proofs and operational verification—a skill essential for modern mathematical research.*
+## Challenge Lab: Socratic Exploration
+1. In `Exercise 1`, why does $A_4$ have no subgroup of order 6, even though $6$ divides $|A_4| = 12$? How does this prove that the converse of Lagrange's Theorem is false?
+2. In `Exercise 3`, how does Eisenstein's Criterion (with prime $p = 2$) prove that $x^5 - 4x + 2$ is irreducible over $\mathbb{Q}$? Why does having exactly 3 real roots and 2 complex conjugate roots force its Galois group over $\mathbb{Q}$ to contain a 2-cycle transposition, thereby generating all of $S_5$?
