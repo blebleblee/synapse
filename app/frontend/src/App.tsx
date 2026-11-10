@@ -23,7 +23,7 @@ export function App() {
   const [isChatting, setIsChatting] = useState(false);
   const [isCompilingGuide, setIsCompilingGuide] = useState(false);
   const [isRegeneratingSummary, setIsRegeneratingSummary] = useState(false);
-  const [chatHistory, setChatHistory] = useState<{ [key: string]: ChatMessage[] }>({});
+  const [unifiedChatHistory, setUnifiedChatHistory] = useState<ChatMessage[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(true);
@@ -86,15 +86,6 @@ export function App() {
         setTopicDetails(data);
         setSelectedPath(query);
         setCurrentLevel(level);
-
-        // Restore persistent chat history if available
-        if (data.chat_history && data.chat_history.length > 0) {
-          const chatKey = `${query}/${level}`;
-          setChatHistory((prev) => ({
-            ...prev,
-            [chatKey]: data.chat_history,
-          }));
-        }
 
         // Only override tab when opening a new topic, NOT when switching levels
         if (!preserveTab) {
@@ -199,17 +190,9 @@ export function App() {
   };
 
   const handleSendMessage = async (msg: string) => {
-    if (!selectedPath || !topicDetails) return;
-
-    const chatKey = `${selectedPath}/${currentLevel}`;
-    const currentHistory = chatHistory[chatKey] || [];
     const newStudentMsg: ChatMessage = { role: 'student', content: msg };
-    const updatedHistory = [...currentHistory, newStudentMsg];
-
-    setChatHistory((prev) => ({
-      ...prev,
-      [chatKey]: updatedHistory,
-    }));
+    const updatedHistory = [...unifiedChatHistory, newStudentMsg];
+    setUnifiedChatHistory(updatedHistory);
 
     setIsChatting(true);
     try {
@@ -217,7 +200,7 @@ export function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: selectedPath,
+          query: selectedPath || 'computing/infrastructure/kubernetes/01_control_plane_and_etcd',
           message: msg,
           history: updatedHistory,
         }),
@@ -226,10 +209,7 @@ export function App() {
       if (res.ok) {
         const data = await res.json();
         const newTutorMsg: ChatMessage = { role: 'tutor', content: data.reply };
-        setChatHistory((prev) => ({
-          ...prev,
-          [chatKey]: [...updatedHistory, newTutorMsg],
-        }));
+        setUnifiedChatHistory([...updatedHistory, newTutorMsg]);
       }
     } catch (err) {
       console.error('Chat error:', err);
@@ -341,7 +321,6 @@ export function App() {
     }
   };
 
-  const activeChatKey = selectedPath ? `${selectedPath}/${currentLevel}` : '';
   const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
 
   return (
@@ -384,9 +363,10 @@ export function App() {
 
         <TutorChat
           topic={topicDetails}
-          history={activeChatKey ? chatHistory[activeChatKey] || [] : []}
+          history={unifiedChatHistory}
           isChatting={isChatting}
           onSendMessage={handleSendMessage}
+          onClearChat={() => setUnifiedChatHistory([])}
         />
       </div>
 

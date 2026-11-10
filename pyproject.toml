@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synapse"
+version = "1.0.0"
+description = "Synapse — AI-Native Engineering & Polymath Workbench"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "websockets>=13.0",
+    "pydantic>=2.9.0",
+    "requests>=2.32.0"
+]
+
+[project.scripts]
+synapse = "learning_engine.cli:main"
+learning = "learning_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["learning_engine*"]

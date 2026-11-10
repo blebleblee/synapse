@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
-import { Send, Bot, User, MessageSquare, Lightbulb, BookmarkCheck } from 'lucide-react';
+import { Send, Bot, User, MessageSquare, Lightbulb, RotateCcw, Volume2 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
+import { speakText } from '../utils/speech';
 
 interface TutorChatProps {
   topic: TopicDetails | null;
   history: ChatMessage[];
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
+  onClearChat?: () => void;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -15,6 +17,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   history,
   isChatting,
   onSendMessage,
+  onClearChat,
 }) => {
   const [input, setInput] = useState('');
   const [chatWidth, setChatWidth] = useState<number>(() => {
@@ -59,21 +62,21 @@ export const TutorChat: React.FC<TutorChatProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isChatting || !topic) return;
+    if (!input.trim() || isChatting) return;
     const msg = input.trim();
     setInput('');
     await onSendMessage(msg);
   };
 
   const handleSuggestionClick = (prompt: string) => {
-    if (!isChatting && topic) {
+    if (!isChatting) {
       onSendMessage(prompt);
     }
   };
 
   const personaRole = topic?.persona
     ? topic.persona.split('**')[1] || 'Domain Expert & Socratic Mentor'
-    : 'Domain Expert & Socratic Mentor';
+    : 'Universal Socratic Mentor';
 
   return (
     <aside className="chat-sidebar" style={{ width: `${chatWidth}px` }}>
@@ -100,20 +103,29 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         </div>
 
         <div className="chat-header-actions">
-          <div className="autosave-badge" title="All discussions are automatically saved to disk and versioned in Git">
-            <BookmarkCheck size={12} className="autosave-icon" />
-            <span>Auto-Saved</span>
-          </div>
+          {history.length > 0 && onClearChat && (
+            <button
+              className="btn-secondary-sm"
+              onClick={onClearChat}
+              title="Start a new Socratic dialogue"
+            >
+              <RotateCcw size={11} />
+              <span>New Chat</span>
+            </button>
+          )}
         </div>
       </div>
 
       <div className="chat-messages">
         {history.length === 0 ? (
           <div className="chat-empty">
-            <MessageSquare size={36} className="chat-empty-icon" />
-            <h3>Socratic Inquiry</h3>
+            <div className="chat-empty-header">
+              <MessageSquare size={28} className="chat-empty-icon" />
+              <h3>Socratic Inquiry</h3>
+            </div>
             <p>
               Ask deep questions, test operational edge-cases, or request counter-examples.
+              {topic ? ` Current context: ${topic.subtopic.replace(/_/g, ' ')}.` : ' Open any topic to explore with context.'}
             </p>
 
             <div className="chat-suggestions">
@@ -122,19 +134,19 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               </span>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick("Explain the core architectural invariants and where this commonly breaks in production.")}
+                onClick={() => handleSuggestionClick(topic ? `What are the core architectural invariants of ${topic.subtopic.replace(/_/g, ' ')} and where does it break in production?` : "Explain the core architectural invariants of modern distributed systems.")}
               >
                 Explain the core architectural invariants and failure modes
               </button>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick("Give me a challenging real-world debugging scenario to test my mental model.")}
+                onClick={() => handleSuggestionClick(topic ? `Give me a challenging real-world debugging scenario on ${topic.subtopic.replace(/_/g, ' ')} to test my mental model.` : "Give me a challenging real-world debugging scenario to test my mental model.")}
               >
                 Give me a challenging real-world debugging scenario
               </button>
               <button
                 className="suggestion-chip"
-                onClick={() => handleSuggestionClick("What are the subtle misconceptions most engineers have about this topic?")}
+                onClick={() => handleSuggestionClick(topic ? `What are the subtle misconceptions most engineers have about ${topic.subtopic.replace(/_/g, ' ')}?` : "What are the subtle misconceptions most engineers have about this topic?")}
               >
                 What are the subtle misconceptions most engineers have?
               </button>
@@ -144,16 +156,27 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           history.map((msg, idx) => (
             <div key={idx} className={`chat-bubble ${msg.role}`}>
               <div className="bubble-header">
-                {msg.role === 'student' ? (
-                  <>
-                    <User size={13} />
-                    <span>You</span>
-                  </>
-                ) : (
-                  <>
-                    <Bot size={13} />
-                    <span>Tutor</span>
-                  </>
+                <div className="bubble-author">
+                  {msg.role === 'student' ? (
+                    <>
+                      <User size={13} />
+                      <span>You</span>
+                    </>
+                  ) : (
+                    <>
+                      <Bot size={13} />
+                      <span>Tutor</span>
+                    </>
+                  )}
+                </div>
+                {msg.role === 'tutor' && (
+                  <button
+                    className="bubble-audio-btn"
+                    onClick={() => speakText(msg.content)}
+                    title="Listen to this response (TTS)"
+                  >
+                    <Volume2 size={12} />
+                  </button>
                 )}
               </div>
               <div
@@ -183,15 +206,15 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       <form className="chat-input-bar" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder={topic ? "Ask a question, test an edge-case, or discuss..." : "Select a topic first..."}
+          placeholder={topic ? `Ask about ${topic.subtopic.replace(/_/g, ' ')} or test an edge-case...` : "Ask a question or test an edge-case..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={!topic || isChatting}
+          disabled={isChatting}
         />
         <button
           type="submit"
           className="send-btn"
-          disabled={!input.trim() || isChatting || !topic}
+          disabled={!input.trim() || isChatting}
           title="Send inquiry (Enter)"
         >
           <Send size={15} />

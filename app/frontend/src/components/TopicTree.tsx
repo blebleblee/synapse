@@ -64,7 +64,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onRenameTopic,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
+  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('az');
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({});
   const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({});
   const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({});
@@ -296,9 +296,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             onChange={(e) => setSortMode(e.target.value as any)}
             className="sort-select"
           >
-            <option value="default">Default</option>
             <option value="az">A to Z</option>
             <option value="progress">Progress</option>
+            <option value="default">Domain Order</option>
           </select>
         </div>
       </div>

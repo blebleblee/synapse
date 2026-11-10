@@ -147,90 +147,19 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <span className="crumb-subtopic">{topic.subtopic.replace(/_/g, ' ')}</span>
         </div>
 
-        <div className="header-actions">
-          {/* User Competence Mastery Selector */}
-          <div className="mastery-selector">
-            <Award size={13} className={`mastery-icon ${masteryState}`} />
-            <select
-              value={masteryState}
-              onChange={(e) => onUpdateMastery(e.target.value)}
-              className={`mastery-select ${masteryState}`}
-            >
-              <option value="not_started">Not Started</option>
-              <option value="studying">Studying</option>
-              <option value="lab_verified">Lab Verified</option>
-              <option value="mastered">Mastered</option>
-            </select>
-          </div>
-
-          <button
-            className={`btn-secondary-sm ${isSpeakingVoice ? 'active-voice' : ''}`}
-            onClick={handleToggleVoice}
-            disabled={!rawMarkdown}
-            title={isSpeakingVoice ? 'Stop audio' : 'Listen to this lesson (Speech Synthesis)'}
+        {/* User Competence Mastery Selector on Right */}
+        <div className="mastery-selector">
+          <Award size={13} className={`mastery-icon ${masteryState}`} />
+          <select
+            value={masteryState}
+            onChange={(e) => onUpdateMastery(e.target.value)}
+            className={`mastery-select ${masteryState}`}
           >
-            {isSpeakingVoice ? <VolumeX size={13} className="voice-pulse" /> : <Volume2 size={13} />}
-            <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
-          </button>
-
-          <button
-            className="btn-secondary-sm"
-            onClick={onOpenFlashcards}
-            title="Interactive in-app spaced repetition flashcards"
-          >
-            <Layers size={13} />
-            <span>Study Cards</span>
-          </button>
-
-          <button
-            className="btn-secondary-sm"
-            onClick={onDownloadFlashcards}
-            title="Download Anki spaced-repetition flashcards (.csv)"
-          >
-            <Layers size={13} />
-            <span>Anki</span>
-          </button>
-
-          <button
-            className="btn-secondary-sm"
-            onClick={onDownloadHandbook}
-            title={`Export complete ${topic.domain} handbook (.md)`}
-          >
-            <Download size={13} />
-            <span>Handbook</span>
-          </button>
-
-          <button
-            className="btn-secondary-sm"
-            onClick={onCompileGuide}
-            disabled={isCompiling}
-            title="Compile mastered summary guide to artifacts/"
-          >
-            <FileCheck2 size={13} />
-            <span>{isCompiling ? 'Compiling...' : 'Guide'}</span>
-          </button>
-
-          {activeTab === 'summary' ? (
-            <button
-              className="btn-secondary-sm"
-              onClick={onRegenerateSummary}
-              disabled={isRegeneratingSummary}
-              title="Regenerate summary with latest discussion session insights"
-            >
-              <RefreshCw size={13} className={isRegeneratingSummary ? 'spin' : ''} />
-              <span>{isRegeneratingSummary ? 'Updating Summary...' : 'Update Summary'}</span>
-            </button>
-          ) : (
-            <button
-              className="btn-secondary-sm"
-              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
-              disabled={isGenerating}
-              title="Regenerate this level"
-            >
-              <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
-              <span>{isGenerating ? 'Generating...' : 'Regen'}</span>
-            </button>
-          )}
+            <option value="not_started">Not Started</option>
+            <option value="studying">Studying</option>
+            <option value="lab_verified">Lab Verified</option>
+            <option value="mastered">Mastered</option>
+          </select>
         </div>
       </header>
 
@@ -260,7 +189,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             onClick={() => setActiveTab('lesson')}
           >
             <GraduationCap size={14} />
-            <span>In-Depth Lesson</span>
+            <span>Lesson</span>
             {topic.lesson && <span className="tab-dot" />}
           </button>
 
@@ -269,7 +198,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             onClick={() => setActiveTab('labs')}
           >
             <FlaskConical size={14} />
-            <span>Operational Labs</span>
+            <span>Labs</span>
             {topic.labs && <span className="tab-dot" />}
           </button>
 
@@ -278,29 +207,100 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             onClick={() => setActiveTab('quiz')}
           >
             <HelpCircle size={14} />
-            <span>Socratic Quiz</span>
+            <span>Quiz</span>
           </button>
         </div>
 
-        {/* Persistent Difficulty Level Selector on the right */}
-        <div
-          className={`nav-level-selector ${activeTab === 'summary' ? 'summary-dimmed' : ''}`}
-          title={activeTab === 'summary' ? 'Executive summary covers all tiers' : 'Select difficulty tier'}
-        >
-          <span className="levels-label">
-            <Gauge size={12} /> Tier:
-          </span>
-          <div className="level-pills">
-            {['beginner', 'intermediate', 'advanced'].map((lvl) => (
-              <button
-                key={lvl}
-                className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
-                onClick={() => onSelectLevel(lvl)}
-                disabled={activeTab === 'summary'}
-              >
-                {lvl.toUpperCase()}
-              </button>
-            ))}
+        <div className="tabs-actions-group">
+          <button
+            className={`nav-action-btn ${isSpeakingVoice ? 'active-voice' : ''}`}
+            onClick={handleToggleVoice}
+            disabled={!rawMarkdown}
+            title={isSpeakingVoice ? 'Stop audio playback' : 'Listen to this section (Speech Synthesis)'}
+          >
+            {isSpeakingVoice ? <VolumeX size={12} className="voice-pulse" /> : <Volume2 size={12} />}
+            <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
+          </button>
+
+          <button
+            className="nav-action-btn"
+            onClick={onOpenFlashcards}
+            title="Interactive in-app spaced repetition flashcards"
+          >
+            <Layers size={12} />
+            <span>Study Cards</span>
+          </button>
+
+          <button
+            className="nav-action-btn"
+            onClick={onDownloadHandbook}
+            title={`Export complete ${topic.domain} handbook (.md)`}
+          >
+            <Download size={12} />
+            <span>Book</span>
+          </button>
+
+          <button
+            className="nav-action-btn"
+            onClick={onDownloadFlashcards}
+            title="Download Anki spaced-repetition flashcards (.csv)"
+          >
+            <Layers size={12} />
+            <span>Anki</span>
+          </button>
+
+          <button
+            className="nav-action-btn"
+            onClick={onCompileGuide}
+            disabled={isCompiling}
+            title="Compile mastered summary guide to artifacts/"
+          >
+            <FileCheck2 size={12} />
+            <span>{isCompiling ? 'Compiling...' : 'Guide'}</span>
+          </button>
+
+          {activeTab === 'summary' ? (
+            <button
+              className="nav-action-btn"
+              onClick={onRegenerateSummary}
+              disabled={isRegeneratingSummary}
+              title="Regenerate summary with latest discussion session insights"
+            >
+              <RefreshCw size={12} className={isRegeneratingSummary ? 'spin' : ''} />
+              <span>Update</span>
+            </button>
+          ) : (
+            <button
+              className="nav-action-btn"
+              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
+              disabled={isGenerating}
+              title="Regenerate this level"
+            >
+              <RefreshCw size={12} className={isGenerating ? 'spin' : ''} />
+              <span>Regen</span>
+            </button>
+          )}
+
+          {/* Persistent Difficulty Level Selector */}
+          <div
+            className={`nav-level-selector ${activeTab === 'summary' ? 'summary-dimmed' : ''}`}
+            title={activeTab === 'summary' ? 'Executive summary covers all tiers' : 'Select difficulty tier'}
+          >
+            <span className="levels-label">
+              <Gauge size={12} /> Tier:
+            </span>
+            <div className="level-pills">
+              {['beginner', 'intermediate', 'advanced'].map((lvl) => (
+                <button
+                  key={lvl}
+                  className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
+                  onClick={() => onSelectLevel(lvl)}
+                  disabled={activeTab === 'summary'}
+                >
+                  {lvl.toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

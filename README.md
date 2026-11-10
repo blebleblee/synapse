@@ -50,40 +50,42 @@ Synapse operates across a multi-node Ollama cluster load-balancing between local
 
 ---
 
-## 4. CLI Command Reference (`bin/learning`)
+## 4. CLI Command Reference (`synapse`)
+
+The CLI is registered as a standard command `synapse` (also accessible via `./bin/synapse`):
 
 ```bash
 # Launch the Web Workbench (UI + Socratic Chat + PTY Sandbox Terminal)
-bin/learning serve
-bin/learning serve --daemon --port 8000   # Background daemon mode
-bin/learning stop                         # Stop daemon
+synapse serve
+synapse serve --daemon --port 8000   # Background daemon mode
+synapse stop                         # Stop daemon
 
 # Curriculum Status & Inspection
-bin/learning status                       # View completion stats across all 11 domains
-bin/learning tree                         # Print hierarchical tree with [FLB] status badges
-bin/learning tree --domain computing
+synapse status                       # View completion stats across all 11 domains
+synapse tree                         # Print hierarchical tree with [FLB] status badges
+synapse tree --domain computing
 
 # Navigation & Search
-bin/learning search "eBPF verifier"       # Full-text regex search with highlighted context
-bin/learning graph                        # Display 39-edge cross-disciplinary prerequisite DAG
-bin/learning lint                         # Audit files for depth, section headers, and placeholders
+synapse search "eBPF verifier"       # Full-text regex search with highlighted context
+synapse graph                        # Display 39-edge cross-disciplinary prerequisite DAG
+synapse lint                         # Audit files for depth, section headers, and placeholders
 
-# Export & Spaced Repetition
-bin/learning export formal_sciences       # Compile entire domain into a single-file Markdown handbook
-bin/learning flashcards ebpf              # Generate Anki active-recall CSV deck
+# Export & In-App Spaced Repetition
+synapse export formal_sciences       # Compile entire domain into a single-file Markdown handbook
+synapse flashcards ebpf              # Generate Anki active-recall CSV deck
 
 # User Competence Tracking
-bin/learning mastery                      # View personal mastery counts and percentages
-bin/learning mastery computing/infrastructure/kubernetes/01_control_plane_and_etcd --set mastered
+synapse mastery                      # View personal mastery counts and percentages
+synapse mastery computing/infrastructure/kubernetes/01_control_plane_and_etcd --set mastered
 
 # Adversarial Quality & Hallucination Audit
-bin/learning review kubernetes/01_control_plane_and_etcd --model deepseek-r1:32b
-bin/learning review ebpf/01_virtual_machine_and_isa --fix   # Auto-fix detected errors
+synapse review kubernetes/01_control_plane_and_etcd --model deepseek-r1:32b
+synapse review ebpf/01_virtual_machine_and_isa --fix   # Auto-fix detected errors
 
 # Creation & Socratic Terminal
-bin/learning add computing infrastructure kubernetes/09_service_mesh --title "Service Mesh Architecture"
-bin/learning generate kubernetes/01_control_plane_and_etcd  # Generate units via cluster
-bin/learning chat ebpf                                     # Interactive terminal Socratic mentor
+synapse add computing infrastructure kubernetes/09_service_mesh --title "Service Mesh Architecture"
+synapse generate kubernetes/01_control_plane_and_etcd  # Generate units via cluster
+synapse chat ebpf                                     # Interactive terminal Socratic mentor
 ```
 
 ---
