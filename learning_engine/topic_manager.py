@@ -24,9 +24,10 @@ DOMAIN_ORDER = [
     "formal_sciences",
     "natural_sciences",
     "arts",
+    "languages",
+    "humanities",
     "business",
-    "economics",
-    "humanities"
+    "economics"
 ]
 
 def list_domains() -> List[str]:

@@ -12,7 +12,8 @@ import {
   FlaskConical,
   Palette,
   Hammer,
-  ArrowUpDown
+  ArrowUpDown,
+  Languages
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -33,9 +34,10 @@ const DOMAIN_ORDER = [
   'formal_sciences',
   'natural_sciences',
   'arts',
+  'languages',
+  'humanities',
   'business',
   'economics',
-  'humanities',
 ];
 
 export const TopicTree: React.FC<TopicTreeProps> = ({
@@ -91,6 +93,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         return <Coins size={16} className="domain-icon" />;
       case 'arts':
         return <Palette size={16} className="domain-icon" />;
+      case 'languages':
+        return <Languages size={16} className="domain-icon" />;
       default:
         return <Folder size={16} className="domain-icon" />;
     }
