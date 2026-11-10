@@ -13,7 +13,8 @@ import {
   Palette,
   Hammer,
   ArrowUpDown,
-  Languages
+  Languages,
+  Settings
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -24,6 +25,7 @@ interface TopicTreeProps {
   onAddSubtopic: (domain: string, category: string, subtopic: string, title?: string) => Promise<void>;
   onOpenSearch: () => void;
   onOpenGraph: () => void;
+  onOpenSettings: () => void;
 }
 
 const DOMAIN_ORDER = [
@@ -47,6 +49,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onAddSubtopic,
   onOpenSearch,
   onOpenGraph,
+  onOpenSettings,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
@@ -158,12 +161,14 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         const rateB = getDomainCompletion(ddataB).rate;
         return rateB - rateA;
       }
-      // default curated order
+      // default established order
       const idxA = DOMAIN_ORDER.indexOf(a);
       const idxB = DOMAIN_ORDER.indexOf(b);
       return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
     });
   }, [tree, sortMode]);
+
+  const cleanTerm = searchTerm.trim().toLowerCase();
 
   return (
     <aside className="tree-sidebar">
@@ -190,6 +195,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <button className="icon-btn" onClick={onOpenGraph} title="Prerequisite Learning DAG">
             <GitBranch size={14} />
           </button>
+          <button className="icon-btn" onClick={onOpenSettings} title="Workbench Settings">
+            <Settings size={14} />
+          </button>
           <button
             className="btn-primary-sm"
             onClick={() => setShowAddModal(true)}
@@ -200,7 +208,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
       </div>
 
-      {/* Search & Interactive Sort Controls */}
+      {/* Search & Sort Controls */}
       <div className="search-filter-row">
         <div className="search-box">
           <Search size={14} className="search-icon" />
@@ -218,8 +226,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             onChange={(e) => setSortMode(e.target.value as any)}
             className="sort-select"
           >
-            <option value="default">Curated</option>
-            <option value="az">A → Z</option>
+            <option value="default">Default</option>
+            <option value="az">A to Z</option>
             <option value="progress">Progress</option>
           </select>
         </div>
@@ -227,13 +235,34 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
       <div className="tree-content">
         {sortedDomainEntries.map(([domain, ddata]) => {
-          const isDomainOpen = openDomains[domain] || searchTerm.length > 0;
           const disciplines = ddata.disciplines || {};
 
           let sortedDisciplines = Object.entries(disciplines);
           if (sortMode === 'az') {
             sortedDisciplines.sort(([a], [b]) => a.localeCompare(b));
           }
+
+          // Filter check for domain
+          const domainMatches = cleanTerm === '' || domain.toLowerCase().includes(cleanTerm);
+
+          const matchingDisciplines = sortedDisciplines.filter(([disc, discData]) => {
+            if (cleanTerm === '' || domainMatches || disc.toLowerCase().includes(cleanTerm)) return true;
+            const courses = discData.courses || {};
+            return Object.entries(courses).some(([courseSlug, cData]: [string, any]) => {
+              if (courseSlug.toLowerCase().includes(cleanTerm)) return true;
+              const units = Object.values(cData.units || {}) as UnitNode[];
+              return units.some((u) =>
+                u.display_name.toLowerCase().includes(cleanTerm) ||
+                u.rel_path.toLowerCase().includes(cleanTerm)
+              );
+            });
+          });
+
+          if (cleanTerm !== '' && matchingDisciplines.length === 0) {
+            return null;
+          }
+
+          const isDomainOpen = openDomains[domain] || cleanTerm.length > 0;
 
           return (
             <div key={domain} className="domain-group">
@@ -249,9 +278,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
               {isDomainOpen && (
                 <div className="domain-categories">
-                  {sortedDisciplines.map(([disc, discData]) => {
+                  {matchingDisciplines.map(([disc, discData]) => {
                     const discKey = `${domain}/${disc}`;
-                    const isDiscOpen = openDisciplines[discKey] || searchTerm.length > 0;
                     const courses = discData.courses || {};
 
                     let sortedCourses = Object.entries(courses);
@@ -266,6 +294,23 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                         return compB - compA;
                       });
                     }
+
+                    const discMatches = cleanTerm === '' || domainMatches || disc.toLowerCase().includes(cleanTerm);
+
+                    const matchingCourses = sortedCourses.filter(([courseSlug, cData]) => {
+                      if (cleanTerm === '' || discMatches || courseSlug.toLowerCase().includes(cleanTerm)) return true;
+                      const units = Object.values(cData.units || {}) as UnitNode[];
+                      return units.some((u) =>
+                        u.display_name.toLowerCase().includes(cleanTerm) ||
+                        u.rel_path.toLowerCase().includes(cleanTerm)
+                      );
+                    });
+
+                    if (cleanTerm !== '' && matchingCourses.length === 0) {
+                      return null;
+                    }
+
+                    const isDiscOpen = openDisciplines[discKey] || cleanTerm.length > 0;
 
                     return (
                       <div key={discKey} className="category-group">
@@ -282,13 +327,24 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
                         {isDiscOpen && (
                           <div className="subtopic-list">
-                            {sortedCourses.map(([courseSlug, cData]) => {
+                            {matchingCourses.map(([courseSlug, cData]) => {
                               const courseKey = `${discKey}/${courseSlug}`;
-                              const isCourseOpen = openCourses[courseKey] || searchTerm.length > 0;
                               let units = Object.values(cData.units || {}) as UnitNode[];
 
                               if (sortMode === 'az') {
                                 units = [...units].sort((a, b) => a.display_name.localeCompare(b.display_name));
+                              }
+
+                              const courseMatches = cleanTerm === '' || discMatches || courseSlug.toLowerCase().includes(cleanTerm);
+
+                              const matchingUnits = units.filter((u) =>
+                                courseMatches ||
+                                u.display_name.toLowerCase().includes(cleanTerm) ||
+                                u.rel_path.toLowerCase().includes(cleanTerm)
+                              );
+
+                              if (cleanTerm !== '' && matchingUnits.length === 0) {
+                                return null;
                               }
 
                               if (units.length === 1 && units[0].unit === 'core') {
@@ -308,6 +364,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                 );
                               }
 
+                              const isCourseOpen = openCourses[courseKey] || cleanTerm.length > 0;
                               const completedUnits = units.filter((u) => u.status.complete).length;
 
                               return (
@@ -327,7 +384,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
                                   {isCourseOpen && (
                                     <div className="course-units-list">
-                                      {units.map((unitNode) => {
+                                      {matchingUnits.map((unitNode) => {
                                         const isSelected = selectedSubtopic === unitNode.rel_path;
                                         return (
                                           <div
