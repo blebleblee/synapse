@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import {
   BookOpen,
   FlaskConical,
@@ -11,11 +11,14 @@ import {
   Award,
   Layers,
   Download,
-  FileText
+  FileText,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
 import { SocraticQuizView } from './SocraticQuizView';
+import { speakText, stopSpeaking } from '../utils/speech';
 
 interface LessonViewerProps {
   topic: TopicDetails | null;
@@ -37,6 +40,7 @@ interface LessonViewerProps {
   onDownloadHandbook: () => void;
   onRegenerateSummary: () => Promise<void>;
   isRegeneratingSummary: boolean;
+  onOpenFlashcards: () => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -59,8 +63,28 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onDownloadHandbook,
   onRegenerateSummary,
   isRegeneratingSummary,
+  onOpenFlashcards,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
+
+  useEffect(() => {
+    stopSpeaking();
+    setIsSpeakingVoice(false);
+  }, [topic?.path, activeTab, currentLevel]);
+
+  const handleToggleVoice = () => {
+    if (isSpeakingVoice) {
+      stopSpeaking();
+      setIsSpeakingVoice(false);
+    } else if (rawMarkdown) {
+      speakText(
+        rawMarkdown,
+        () => setIsSpeakingVoice(true),
+        () => setIsSpeakingVoice(false)
+      );
+    }
+  };
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
@@ -138,6 +162,25 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               <option value="mastered">Mastered</option>
             </select>
           </div>
+
+          <button
+            className={`btn-secondary-sm ${isSpeakingVoice ? 'active-voice' : ''}`}
+            onClick={handleToggleVoice}
+            disabled={!rawMarkdown}
+            title={isSpeakingVoice ? 'Stop audio' : 'Listen to this lesson (Speech Synthesis)'}
+          >
+            {isSpeakingVoice ? <VolumeX size={13} className="voice-pulse" /> : <Volume2 size={13} />}
+            <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
+          </button>
+
+          <button
+            className="btn-secondary-sm"
+            onClick={onOpenFlashcards}
+            title="Interactive in-app spaced repetition flashcards"
+          >
+            <Layers size={13} />
+            <span>Study Cards</span>
+          </button>
 
           <button
             className="btn-secondary-sm"

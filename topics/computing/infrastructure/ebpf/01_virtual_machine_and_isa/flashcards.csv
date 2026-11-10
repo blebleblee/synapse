@@ -1,0 +1,9 @@
+#separator:Comma,#html:true,#tags:computing infrastructure/ebpf 01_virtual_machine_and_isa
+What is the primary role of the eBPF in-kernel verifier?,"To statically prove memory safety, type consistency, and termination via DAG analysis before JIT compilation.",computing::01_virtual_machine_and_isa
+How does eBPF enable sandboxed execution in the Linux kernel?,"eBPF uses a bytecode validator to ensure safety and termination, followed by in-kernel JIT compilation to execute bytecode at native speed.",computing::01_virtual_machine_and_isa
+What is the purpose of the R0 register in eBPF?,R0 stores the return value of helper function calls and determines the verdict when exiting the eBPF program.,computing::01_virtual_machine_and_isa
+What does R1 contain when an eBPF program starts?,"R1 contains the pointer to the program's context structure, such as `struct xdp_md *` for XDP or `struct __sk_buff *` for TC.",computing::01_virtual_machine_and_isa
+Which eBPF registers are callee-saved?,Registers R6 through R9 are callee-saved and preserved across in-kernel helper calls.,computing::01_virtual_machine_and_isa
+What is the role of R10 in eBPF?,"R10 is a read-only stack frame pointer that points to the base of the eBPF program's local stack frame, which is fixed at 512 bytes.",computing::01_virtual_machine_and_isa
+What happens if an eBPF program attempts to write to R10?,The verifier immediately rejects any instruction attempting to write to R10 with an -EACCES error.,computing::01_virtual_machine_and_isa
+What is the size of the eBPF program's stack?,The eBPF program's stack size is fixed at exactly 512 bytes.,computing::01_virtual_machine_and_isa

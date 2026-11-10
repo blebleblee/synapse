@@ -69,3 +69,9 @@ Here are all the available subtopics in this learning module organized by catego
 - **Arcade Restoration** (`retro_gaming/arcade_restoration/`)
 - **Speedrunning** (`retro_gaming/speedrunning/`)
 - **Glitch Mechanics** (`retro_gaming/glitch_mechanics/`)
+
+### Metalworking: Precision CNC Machining
+- **G-Code and Coordinate Systems** (`metalworking/cnc_machining/01_g_code_and_coordinate_systems/`)
+- **Feeds Speeds and Chip Load Calculation** (`metalworking/cnc_machining/02_feeds_speeds_and_chip_load_calculation/`)
+- **Toolpaths Pocketing and Contouring** (`metalworking/cnc_machining/03_toolpaths_pocketing_and_contouring/`)
+- **Workholding Tolerances and Metrology** (`metalworking/cnc_machining/04_workholding_tolerances_and_metrology/`)

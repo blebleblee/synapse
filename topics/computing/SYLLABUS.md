@@ -106,3 +106,15 @@ Here are all the available subtopics in this learning module organized by catego
 - **Prompt Engineering and Spec-Driven Dev** (`ai/vibe_coding/01_prompt_engineering_and_specs/`)
 - **Agentic Workflows and Tool Calling** (`ai/vibe_coding/02_agentic_workflows_and_tools/`)
 - **Evaluation Loops and Benchmarking** (`ai/vibe_coding/03_evaluation_loops_and_benchmarks/`)
+
+### Infrastructure: Linux Device Drivers
+- **Kernel Module Lifecycle and Kbuild** (`infrastructure/linux_device_drivers/01_kernel_module_lifecycle_and_kbuild/`)
+- **Character Device Drivers and cdev** (`infrastructure/linux_device_drivers/02_character_device_drivers_and_cdev/`)
+- **ioctl and Memory Mapping mmap** (`infrastructure/linux_device_drivers/03_ioctl_and_memory_mapping_mmap/`)
+- **Interrupt Handling and Bottom Halves** (`infrastructure/linux_device_drivers/04_interrupt_handling_and_bottom_halves/`)
+
+### Software: Systems Programming in Rust
+- **Memory Layout Ownership and Lifetimes** (`software/rust_systems/01_memory_layout_ownership_and_lifetimes/`)
+- **Concurrency Threads and Message Passing** (`software/rust_systems/02_concurrency_threads_and_channel_passing/`)
+- **Unsafe Rust Raw Pointers and FFI** (`software/rust_systems/03_unsafe_rust_raw_pointers_and_ffi/`)
+- **Async Runtimes and Tokio Internals** (`software/rust_systems/04_async_runtimes_and_tokio_internals/`)

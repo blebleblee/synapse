@@ -31,21 +31,26 @@ def generate_initial_summary(domain: str, category: str, subtopic_id: str, subto
             if fpath.exists():
                 context.append(fpath.read_text(encoding="utf-8")[:1500])
 
-    prompt = f"""You are synthesizing an Executive Summary for '{subtopic_title}'.
+    prompt = f"""You are writing an Executive Summary textbook chapter for '{subtopic_title}'.
 Domain: '{domain.replace('_', ' ').title()}' | Category: '{category.replace('_', ' ').title()}'.
 
-Write an authoritative, high-density SUMMARY.md covering:
+CRITICAL STYLE MANDATE:
+- Write in continuous, articulate narrative book prose (O'Reilly / MIT Press textbook style).
+- DO NOT use lazy bullet-point lists for conceptual explanations. Use full, flowing paragraphs.
+- Build cause-and-effect reasoning explaining the fundamental 'why' and architectural trade-offs.
+
+Structure:
 # Executive Summary: {subtopic_title}
-## 1. Core Invariants & Mental Model (The fundamental 'why' and essential intuition)
-## 2. Key Architecture & Mechanisms (High-level data structures, protocols, or formulas)
-## 3. Practical Use Cases & Production Relevance
-## 4. Synthesis of Discussions & Key Takeaways (Initial study overview)
-## 5. Next Steps & Recommended Exploration
+## 1. Core Invariants & Mental Model (In-depth narrative explaining the problem space and theoretical foundation)
+## 2. Key Architecture & Mechanisms (Detailed prose detailing component interaction, protocols, or formulas)
+## 3. Practical Applications & Production Relevance (Rich exposition of real-world use cases)
+## 4. Synthesis of Discussions & Key Takeaways (Overview of conceptual insights)
+## 5. Next Steps & Recommended Milestones
 
 Curriculum Excerpts:
 {"".join(context)[:5000] if context else "Foundational curriculum module."}
 
-Output clean, comprehensive Markdown only."""
+Output clean, publication-grade Markdown only."""
 
     summary_text = provider.generate(prompt, system_instruction=persona).strip()
     out_file = subtopic_dir / "SUMMARY.md"
@@ -78,14 +83,17 @@ def regenerate_summary(query: str, provider_type: Optional[str] = None, model: O
     prompt = f"""You are updating and regenerating the Executive SUMMARY.md for '{subtopic_title}'.
 Domain: '{domain.replace('_', ' ').title()}' | Category: '{cat.replace('_', ' ').title()}'.
 
-Synthesize both the formal curriculum knowledge AND all insights, breakthroughs, student questions, and corrections from the discussion session logs below into an authoritative, living summary.
+CRITICAL STYLE MANDATE:
+- Write in continuous, articulate narrative book prose (O'Reilly / MIT Press textbook style).
+- DO NOT write in lazy slide-deck bullet-point lists. Use full, flowing paragraphs.
+- Synthesize both the formal curriculum knowledge AND all insights, student questions, and breakthroughs from the discussion logs into a cohesive, readable chapter.
 
 Structure:
 # Executive Summary: {subtopic_title}
-## 1. Core Invariants & Mental Model (Foundational intuition and theoretical grounding)
-## 2. Key Architecture, Mechanisms & Derivations (Essential technical design and protocols)
-## 3. Practical Applications & Production Best Practices
-## 4. Discussion Insights & Breakthrough Takeaways (Synthesizing questions explored with the AI tutor)
+## 1. Core Invariants & Mental Model (In-depth narrative explaining the foundational intuition and theory)
+## 2. Key Architecture, Mechanisms & Derivations (Flowing paragraphs detailing technical design and protocols)
+## 3. Practical Applications & Production Best Practices (Concrete real-world engineering context)
+## 4. Discussion Insights & Breakthrough Takeaways (Synthesizing questions and answers explored with the AI tutor)
 ## 5. Mastery Review & Next Milestones
 
 Curriculum Knowledge:
@@ -94,7 +102,7 @@ Curriculum Knowledge:
 Discussion Session Transcripts:
 {"".join(session_parts)[:4000] if session_parts else "No active discussion sessions logged yet."}
 
-Output clean, comprehensive Markdown only."""
+Output clean, publication-grade Markdown only."""
 
     provider = get_provider(provider_type=provider_type, model=model, domain=domain)
     summary_text = provider.generate(prompt, system_instruction=persona).strip()

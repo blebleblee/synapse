@@ -1,6 +1,6 @@
 """
 LLM Provider Abstraction & Multi-Host Ollama Cluster
-Supports clustered Ollama nodes (localhost, studio.2464.cz, custom nodes) and Google Gemini.
+Supports clustered Ollama nodes (localhost, remote nodes, custom clusters) and Google Gemini.
 """
 
 import os
@@ -11,8 +11,7 @@ import itertools
 from typing import Optional, Dict, Any, List, Tuple
 
 DEFAULT_OLLAMA_HOSTS = [
-    "http://localhost:11434",
-    "http://studio.2464.cz:11434"
+    "http://localhost:11434"
 ]
 
 def get_configured_hosts() -> List[str]:

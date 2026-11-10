@@ -2,7 +2,7 @@
 """
 Automated Clustered Curriculum Generator
 Parallelizes multi-tier lesson generation across all available Ollama cluster nodes
-(localhost, studio.2464.cz, and any configured remote machines).
+(localhost, configured remote machines, and cloud providers).
 """
 
 import sys

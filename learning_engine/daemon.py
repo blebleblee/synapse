@@ -70,14 +70,14 @@ def stop_daemon() -> bool:
 def generate_service_files():
     DEPLOY_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 1. Systemd Service (Linux Homelab / studio.2464.cz)
+    # 1. Systemd Service (Linux Homelab)
     systemd_content = f"""[Unit]
 Description=AI Learning Workbench Service
 After=network.target
 
 [Service]
 Type=simple
-User={os.environ.get('USER', 'radovan.varga')}
+User={os.environ.get('USER', 'synapse')}
 WorkingDirectory={WORKSPACE_ROOT}
 ExecStart={sys.executable} -m uvicorn app.backend.main:app --host 0.0.0.0 --port 8000
 Restart=always
@@ -95,7 +95,7 @@ WantedBy=multi-user.target
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>cz.2464.learning.workbench</string>
+    <string>com.synapse.workbench</string>
     <key>ProgramArguments</key>
     <array>
         <string>{sys.executable}</string>
@@ -120,5 +120,6 @@ WantedBy=multi-user.target
 </dict>
 </plist>
 """
-    (DEPLOY_DIR / "cz.2464.learning.workbench.plist").write_text(launchd_content, encoding="utf-8")
+    plist_path = DEPLOY_DIR / "com.synapse.workbench.plist"
+    plist_path.write_text(launchd_content, encoding="utf-8")
     print(f"[✔] Generated service files in {DEPLOY_DIR.relative_to(WORKSPACE_ROOT)}/")

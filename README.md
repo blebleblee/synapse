@@ -44,7 +44,7 @@ Every leaf study unit is calibrated to a **2–3 hour evening session** and cont
 
 Synapse operates across a multi-node Ollama cluster load-balancing between local and homelab machines with model parity:
 - **Node 1 (Local):** `http://localhost:11434` (`qwen2.5-coder:32b`, `deepseek-r1:32b`)
-- **Node 2 (Studio):** `http://studio.2464.cz:11434` (`qwen2.5-coder:32b`)
+- **Node 2 (Remote Homelab):** `http://homelab.local:11434` (`qwen2.5-coder:32b`)
 - **Cloud Fallback:** Optional Google Gemini API integration.
 - **Adversarial Peer Review:** Cross-model auditor (`deepseek-r1:32b`) audits generated units for hallucinations, wrong flags, and placeholders.
 
@@ -128,8 +128,8 @@ docker compose -f deploy/docker-compose.yml up -d
 
 ### Install as macOS Service (Launchd)
 ```bash
-cp deploy/cz.2464.learning.workbench.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/cz.2464.learning.workbench.plist
+cp deploy/com.synapse.workbench.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.synapse.workbench.plist
 ```
 
 ### Install as Linux Service (Systemd)
@@ -143,5 +143,4 @@ sudo systemctl enable --now learning-workbench
 
 ## 7. Git & Version Control
 
-All generated lessons, summaries, flashcards, and discussion session debriefs are automatically committed and synchronized with your Gitea repository at:
-**[https://gitea.2464.cz/ai/learning](https://gitea.2464.cz/ai/learning)**.
+All generated lessons, summaries, flashcards, and discussion session debriefs are automatically committed and synchronized with your upstream Git repository configured as `origin`.

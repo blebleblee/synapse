@@ -213,7 +213,19 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
 
     return target_dir
 
+def sanitize_rel_path(rel_path: str) -> Path:
+    clean = rel_path.strip().replace("\\", "/").strip("/")
+    target = (TOPICS_DIR / clean).resolve()
+    if not target.is_relative_to(TOPICS_DIR.resolve()):
+        raise ValueError(f"Path traversal detected or invalid path: '{rel_path}'")
+    return target
+
 def delete_subtopic(rel_path: str) -> bool:
+    try:
+        target_dir = sanitize_rel_path(rel_path)
+    except ValueError:
+        return False
+
     clean_rel = rel_path.strip("/")
     parts = clean_rel.split("/")
     if len(parts) < 2:
@@ -221,7 +233,6 @@ def delete_subtopic(rel_path: str) -> bool:
 
     domain = parts[0]
     sub_rel = "/".join(parts[1:])
-    target_dir = TOPICS_DIR / domain / sub_rel
 
     import shutil
     if target_dir.exists():
@@ -256,6 +267,11 @@ def delete_subtopic(rel_path: str) -> bool:
     return True
 
 def rename_subtopic(rel_path: str, new_title: str) -> bool:
+    try:
+        sanitize_rel_path(rel_path)
+    except ValueError:
+        return False
+
     clean_rel = rel_path.strip("/")
     parts = clean_rel.split("/")
     if len(parts) < 2:

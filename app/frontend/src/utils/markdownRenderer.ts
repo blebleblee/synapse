@@ -22,7 +22,7 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
     }
   });
 
-  // 2. Process inline math: $...$ (ensure not preceded/followed by digits or spaces)
+  // 2. Process inline math: $...$
   processed = processed.replace(/(?<!\\)\$([^\$\n]+?)\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
@@ -31,7 +31,7 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
     }
   });
 
-  // 3. Custom marked renderer for mermaid and executable code blocks
+  // 3. Custom marked renderer for mermaid and executable sandbox code blocks
   const renderer = new marked.Renderer();
 
   renderer.code = function ({ text, lang }) {
@@ -44,14 +44,14 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
       </div>`;
     }
 
-    const isShell = ['bash', 'sh', 'zsh', 'shell'].includes(language);
+    const isExecutable = ['bash', 'sh', 'zsh', 'shell', 'python', 'c', 'rust'].includes(language);
     const escapedCode = text
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
 
-    const runBtn = isShell
-      ? `<button class="btn-run-code" data-code="${escapedCode}" title="Execute in Integrated Terminal">
-          <span class="btn-icon">▶</span> Run in Terminal
+    const runBtn = isExecutable
+      ? `<button class="btn-run-code" data-code="${escapedCode}" title="Execute in Sandbox Terminal (Docker / k8s / Host)">
+          <span class="btn-icon">▶</span> Run in Sandbox
         </button>`
       : '';
 

@@ -22,7 +22,9 @@ def load_mastery_data() -> Dict[str, Any]:
     return {}
 
 def save_mastery_data(data: Dict[str, Any]):
-    MASTERY_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    tmp_file = MASTERY_FILE.with_suffix(".tmp")
+    tmp_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    tmp_file.replace(MASTERY_FILE)
 
 def get_subtopic_mastery(subtopic_path: str) -> str:
     data = load_mastery_data()

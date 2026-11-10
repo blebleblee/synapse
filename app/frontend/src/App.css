@@ -1893,3 +1893,234 @@ body, html, #root {
   margin-top: 4px;
   display: block;
 }
+
+/* Voice Playback Active Pulse */
+.btn-secondary-sm.active-voice {
+  background-color: rgba(79, 143, 255, 0.15);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.voice-pulse {
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); color: var(--accent-gold); }
+  100% { transform: scale(1); }
+}
+
+/* Flashcard Spaced Repetition Modal */
+.flashcard-modal-card {
+  max-width: 680px;
+  width: 90%;
+  background-color: var(--bg-secondary);
+}
+
+.flashcard-header-icon {
+  color: var(--accent-blue);
+}
+
+.flashcard-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.flashcard-empty-state, .flashcard-completed-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 14px;
+}
+
+.award-icon {
+  color: var(--accent-gold);
+}
+
+.flashcard-study-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.flashcard-progress-bar {
+  height: 4px;
+  background-color: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.flashcard-progress-fill {
+  height: 100%;
+  background-color: var(--accent-blue);
+  transition: width 0.3s ease;
+}
+
+.flashcard-counter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.hint-pill {
+  font-size: 10px;
+  background-color: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+}
+
+/* 3D Flip Card */
+.flashcard-viewport {
+  perspective: 1000px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 240px;
+}
+
+.flashcard-3d-card {
+  width: 100%;
+  min-height: 240px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.flashcard-3d-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backface-visibility: hidden;
+  border-radius: 6px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--border-color);
+}
+
+.flashcard-front {
+  background-color: var(--bg-primary);
+  border-color: #2b313f;
+}
+
+.flashcard-back {
+  background-color: #12151c;
+  border-color: var(--accent-blue);
+  transform: rotateY(180deg);
+}
+
+.card-face-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.card-face-tag.answer {
+  color: var(--accent-blue);
+}
+
+.card-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 18px 0;
+  text-align: left;
+}
+
+.flip-prompt {
+  font-size: 11px;
+  color: var(--text-muted);
+  align-self: flex-end;
+}
+
+/* SM-2 Recall Rating Buttons */
+.flashcard-rating-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.rate-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.rate-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rate-interval {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.rate-again {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.rate-again:hover {
+  background-color: rgba(239, 68, 68, 0.22);
+}
+
+.rate-hard {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--accent-orange);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+.rate-hard:hover {
+  background-color: rgba(245, 158, 11, 0.22);
+}
+
+.rate-good {
+  background-color: rgba(79, 143, 255, 0.12);
+  color: var(--accent-blue);
+  border-color: rgba(79, 143, 255, 0.25);
+}
+.rate-good:hover {
+  background-color: rgba(79, 143, 255, 0.22);
+}
+
+.rate-easy {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: var(--accent-green);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.rate-easy:hover {
+  background-color: rgba(16, 185, 129, 0.22);
+}
+
+.flashcard-actions-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}

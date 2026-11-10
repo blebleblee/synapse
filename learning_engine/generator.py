@@ -1,15 +1,23 @@
 """
-Progressive Multi-Level Lesson and Content Generator
-Generates Beginner, Intermediate, and Advanced tiers for any subtopic
-where each level strictly builds upon the knowledge of the previous level.
+Curriculum Generation Engine (Progressive 3-Tier Model)
+Generates Beginner -> Intermediate -> Advanced content units.
+Enforces human, narrative book-like prose (O'Reilly / MIT Press textbook style)
+and strictly bans lazy slide-deck bullet point lists.
 """
 
 from pathlib import Path
-from typing import Dict, Any, Optional
-from .models import LLMProvider, get_provider
-from .topic_manager import get_domain_persona
+from typing import Optional, Dict, Any
+from .models import get_provider, LLMProvider
+from .topic_manager import get_domain_persona, LEVELS
 
-LEVELS = ["beginner", "intermediate", "advanced"]
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
+- This is a masterclass textbook chapter, NOT a slide-deck presentation or outline.
+- STRICTLY AVOID endless bullet-point lists. Write in rich, articulated, flowing paragraphs of narrative prose.
+- Connect concepts through deep exposition, historical context, and cause-and-effect mechanical reasoning.
+- Write like an authoritative technical author (e.g. O'Reilly, MIT Press, No Starch Press): articulate, human, intellectually rigorous, and engaging.
+- Use lists ONLY when providing sequential step-by-step CLI commands in labs or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose."""
 
 def generate_subtopic_content(
     domain: str,
@@ -20,14 +28,10 @@ def generate_subtopic_content(
     force: bool = False,
     level: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    Generates Beginner, Intermediate, and Advanced tiers in subtopic_dir.
-    Each tier contains FOUNDATION.md, LESSON.md, and LABS.md.
-    """
     if not provider:
         provider = get_provider(domain=domain)
 
-    system_instruction = get_domain_persona(domain)
+    system_instruction = get_domain_persona(domain) + "\n\n" + BOOK_STYLE_DIRECTIVE
     subtopic_title = subtopic_id.replace("_", " ").title()
     domain_title = domain.replace("_", " ").title()
     category_title = category.replace("_", " ").title()
@@ -44,52 +48,55 @@ def generate_subtopic_content(
         foundation_path = lvl_dir / "FOUNDATION.md"
         if not foundation_path.exists() or force:
             if lvl == "beginner":
-                prompt = f"""Write the BEGINNER FOUNDATION guide for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+                prompt = f"""Write the BEGINNER FOUNDATION textbook chapter for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Beginners with zero prior experience in this specific topic.
-Goal: Build an unshakeable intuitive mental model and clear foundational vocabulary.
+Target Audience: Beginners seeking an intuitive, unshakeable mental model.
+Goal: Build intuition from first principles using compelling narrative exposition and visual diagrams.
 
 Structure:
 # Beginner Foundation: {subtopic_title}
-## 1. Everyday Intuition & First Principles (Simple, high-impact analogies explaining why this exists)
-## 2. Foundational Vocabulary & Glossary (6-8 fundamental terms defined simply with examples)
+## 1. The Core Mental Model & First Principles (An engaging narrative explaining why this concept exists and what fundamental problem it solves)
+## 2. Foundational Architecture & Mechanics (Flowing paragraphs detailing how components interact)
 ## 3. Visual System Flow (Clean ASCII diagram and Mermaid flowchart of the basic workflow)
-## 4. Common Beginner Misconceptions & Mental Traps
-## 5. Socratic Discussion Starters (Basic questions to explore with your AI tutor)
+## 4. Subtle Misconceptions & Mental Traps (Common false assumptions analyzed in depth)
+## 5. Socratic Discussion Inquiries (Deep conceptual questions to explore with your AI mentor)
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
             elif lvl == "intermediate":
-                prompt = f"""Write the INTERMEDIATE FOUNDATION guide for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+                prompt = f"""Write the INTERMEDIATE FOUNDATION textbook chapter for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Engineers and practitioners who already understand beginner concepts and need architectural depth.
-Goal: Expand beyond the basics into system design, standard design patterns, and formal taxonomies.
+Target Audience: Practicing engineers and scholars expanding into systems architecture and production design.
+Goal: Deepen the mental model into multi-component interaction, formal taxonomies, and architectural trade-offs.
 
 Structure:
 # Intermediate Foundation: {subtopic_title}
-## 1. Architectural Mental Model (Assumes beginner concepts; focuses on production architecture)
-## 2. Systems Taxonomy & Component Protocols (Standard interfaces, protocols, and data models)
+## 1. Architectural Invariants & Design Principles (Deep narrative prose exploring production architecture)
+## 2. Systems Protocols, Data Contracts & Wire Formats (Exposition of standard interfaces and protocols)
 ## 3. Multi-Component Interaction Flow (Detailed ASCII and Mermaid sequence diagram)
-## 4. Architectural Trade-offs & Production Pitfalls
-## 5. Socratic Discussion Starters (Questions bridging architecture to low-level implementation)
+## 4. Architectural Trade-offs & Production Failure Modes (Prose analysis of failure domains)
+## 5. Socratic Discussion Inquiries (Bridging high-level architecture to low-level implementation)
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
             else: # advanced
-                prompt = f"""Write the ADVANCED FOUNDATION guide for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+                prompt = f"""Write the ADVANCED FOUNDATION textbook chapter for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Staff Engineers, Security Researchers, and Theoretical Specialists.
-Goal: Invariant analysis, formal mathematical/kernel frameworks, and extreme edge-case theory.
+Target Audience: Principal Architects, Kernel Developers, and Security Researchers.
+Goal: Graduate-level mathematical proofs, hardware invariants, CPU execution semantics, and formal state machines.
 
 Structure:
 # Advanced Foundation: {subtopic_title}
-## 1. Theoretical Invariants & Formal Frameworks (Formal proofs, kernel or physical invariants)
-## 2. Low-Level Invariant Taxonomy (Deep registers, memory models, hardware constraints, or axiomatic definitions)
-## 3. Micro-Architecture & Concurrency Dynamics (Mermaid and ASCII state machines / cache / race condition diagrams)
-## 4. Subtle Failure Modes & Boundary Conditions
-## 5. Master Socratic Inquiries (Research-grade discussion questions)
+## 1. Formal Mathematical Axioms & Hardware Invariants (Rigorous narrative grounding)
+## 2. Kernel & CPU Execution Semantics (Deep exposition of memory models and synchronization)
+## 3. State Machine & Execution Invariants (Mermaid state diagram and ASCII register/memory layout)
+## 4. Boundary Conditions & Catastrophic Failure Modes
+## 5. Research-Grade Socratic Inquiries
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
 
             content = provider.generate(prompt, system_instruction=system_instruction)
@@ -102,52 +109,55 @@ Output publication-grade Markdown only."""
         lesson_path = lvl_dir / "LESSON.md"
         if not lesson_path.exists() or force:
             if lvl == "beginner":
-                prompt = f"""Write the BEGINNER LESSON on '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+                prompt = f"""Write the BEGINNER TECHNICAL LESSON on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Beginners learning the fundamentals.
-Goal: Clear, step-by-step technical breakdown of basic mechanics with simple working examples.
+Target Audience: Beginners learning the concrete mechanics.
+Goal: In-depth technical breakdown written as an authoritative book chapter with complete working code or configuration.
 
 Structure:
 # Beginner Technical Lesson: {subtopic_title}
-## 1. Core Mechanics & Basic Principles (How it works under the hood at a fundamental level)
-## 2. Step-by-Step Component Breakdown
-## 3. First Working Implementation (Complete, clean, commented starter code or configuration)
-## 4. What Can Go Wrong (Simple common mistakes and how to spot them)
-## 5. Key Takeaways & Review Checklist
+## 1. Core Mechanics & Execution Flow (How it operates under the hood, explained in rich paragraphs)
+## 2. In-Depth Component Breakdown (Narrative exploration of each mechanism)
+## 3. Working Implementation (Exhaustive, fully documented, compilable starter code or configuration)
+## 4. Diagnosis & Common Pitfalls (Detailed prose explaining common bugs and remediation)
+## 5. Conceptual Synthesis & Master Takeaways
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
             elif lvl == "intermediate":
-                prompt = f"""Write the INTERMEDIATE LESSON on '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+                prompt = f"""Write the INTERMEDIATE TECHNICAL LESSON on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Practitioners building production systems.
-Goal: Production-grade implementation, standard design patterns, and operational robustness.
+Target Audience: Practitioners building enterprise systems.
+Goal: Production-grade implementation, architectural invariants, and high-load performance characteristics.
 
 Structure:
 # Intermediate Technical Lesson: {subtopic_title}
-## 1. Production Architecture & Invariant Mechanisms
-## 2. Data Structures, Protocols & Wire Formats
-## 3. Full Production Implementation (Enterprise-grade, zero-placeholder code or manifests)
-## 4. Performance Tuning, Scaling & Edge Cases
-## 5. Architectural Summary & Production Checklist
+## 1. Production Mechanics & Invariant Guarantees (Rigorous narrative exposition)
+## 2. Protocol Internals, Data Layout & Wire Invariants
+## 3. Complete Production Implementation (Enterprise-grade, zero-placeholder code or manifests)
+## 4. Performance Tuning, Latency Profiles & Boundary Conditions
+## 5. Architectural Synthesis & Production Playbook
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
             else: # advanced
                 prompt = f"""Write the ADVANCED TECHNICAL LESSON on '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Principal Architects, Kernel Developers, and Security Researchers.
-Goal: Deep low-level mechanics, CPU/kernel/hardware invariants, formal proofs, and extreme failure domains.
+Target Audience: Principal Engineers, Kernel Specialists, and Systems Researchers.
+Goal: Low-level mechanics, hardware registers, kernel memory management, formal proofs, and race condition mitigations.
 
 Structure:
 # Advanced Technical Lesson: {subtopic_title}
-## 1. Low-Level Internals & Deep Theory (Hardware registers, kernel memory, formal proofs)
-## 2. Critical Data Structures, Byte-Level Encodings & Invariants
-## 3. High-Value Advanced Code / Proof Implementation (Exhaustive, production-hardened)
-## 4. Extreme Failure Domains, Race Conditions, Memory Corruption & Mitigation
-## 5. Mastery Invariants & Executive Summary
+## 1. Low-Level Internals & Theoretical Grounding (In-depth prose on hardware registers, kernel memory, or proofs)
+## 2. Critical Data Structures, Byte-Level Encodings & Memory Layouts
+## 3. Hardened Production Code / Formal Proof (Exhaustive, fully implemented with zero placeholders)
+## 4. Extreme Failure Domains, Race Conditions & Memory Safety Analysis
+## 5. Invariant Synthesis & Systems Summary
 
+Remember: Write in continuous, articulate book prose. Avoid bullet point lists for explanations.
 Output publication-grade Markdown only."""
 
             content = provider.generate(prompt, system_instruction=system_instruction)
@@ -159,51 +169,23 @@ Output publication-grade Markdown only."""
         # 3. LABS.md
         labs_path = lvl_dir / "LABS.md"
         if not labs_path.exists() or force:
-            if lvl == "beginner":
-                prompt = f"""Write the BEGINNER HANDS-ON LAB for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
+            prompt = f"""Write the {lvl.upper()} HANDS-ON OPERATIONAL LAB for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target: A gentle, guided hands-on lab verifying basic environment and executing first commands.
-
-Structure:
-# Beginner Hands-On Lab: {subtopic_title}
-## Objective & Prerequisites
-## Exercise 1: Environment Setup & Sanity Check (Exact commands to verify tools)
-## Exercise 2: Your First Working Experiment (Step-by-step guided instructions with expected outputs)
-## Exercise 3: Inspecting Basic State (Reading logs or simple outputs)
-## Challenge Exercise (Simple self-test for beginners)
-
-Output clean, executable Markdown only."""
-            elif lvl == "intermediate":
-                prompt = f"""Write the INTERMEDIATE HANDS-ON LAB for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
-
-Target: A realistic production deployment and operational troubleshooting lab.
+Target Audience: Hands-on practitioner at {lvl} level.
+Goal: Concrete terminal lab with real commands, step-by-step verification, failure reproduction, and diagnostic analysis.
 
 Structure:
-# Intermediate Operational Lab: {subtopic_title}
-## Objective & Prerequisites
-## Exercise 1: Advanced Environment Configuration & Diagnostics
-## Exercise 2: Building & Deploying a Production Scenario (Multi-step operational workflow)
-## Exercise 3: Troubleshooting Standard Failure Modes
-## Challenge Exercise (Real-world operational scenario)
+# Hands-On Operational Lab: {subtopic_title} ({lvl.upper()})
+## Objective & Prerequisites (Exact tools, dependencies, and environment setup)
+## Exercise 1: Environment Verification & Basic State Inspection
+## Exercise 2: Hands-On Implementation & Live Execution
+## Exercise 3: Deliberate Failure Injection & Diagnostic Isolation
+## Exercise 4: Clean Up & Verification
+## Socratic Challenge Questions (Thought experiments testing deep operational understanding)
 
-Output clean, executable Markdown only."""
-            else: # advanced
-                prompt = f"""Write the ADVANCED HANDS-ON LAB for '{subtopic_title}'.
-Domain: '{domain_title}' | Category: '{category_title}'.
-
-Target: A high-level debugging, fault injection, and low-level diagnostic lab.
-
-Structure:
-# Advanced Operational Lab: {subtopic_title}
-## Objective & Deep Prerequisites
-## Exercise 1: Low-Level State Inspection (Hardware/kernel registers, debuggers, memory dumps)
-## Exercise 2: Advanced Scenario & Performance Stress Testing
-## Exercise 3: Intentional Fault Injection & Root-Cause Crash Analysis
-## Master Challenge Exercise (Research-grade problem)
-
-Output clean, executable Markdown only."""
+Rules: Provide full, runnable commands, configurations, or manifests with zero placeholders.
+Output publication-grade Markdown only."""
 
             content = provider.generate(prompt, system_instruction=system_instruction)
             labs_path.write_text(content.strip() + "\n", encoding="utf-8")

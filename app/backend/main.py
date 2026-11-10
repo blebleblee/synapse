@@ -176,6 +176,37 @@ def download_flashcards(query: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.get("/api/flashcards/deck")
+def get_flashcards_deck(query: str):
+    target = resolve_subtopic(query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{query}' not found")
+
+    domain, cat, sub, sub_path = target
+    csv_file = sub_path / "flashcards.csv"
+    if not csv_file.exists():
+        try:
+            csv_file = generate_flashcards(query)
+        except Exception:
+            pass
+
+    import csv
+    cards = []
+    if csv_file.exists():
+        with open(csv_file, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            idx = 0
+            for row in reader:
+                if not row or row[0].startswith("#"):
+                    continue
+                front = row[0]
+                back = row[1] if len(row) > 1 else ""
+                tag = row[2] if len(row) > 2 else ""
+                cards.append({"id": idx, "front": front, "back": back, "tag": tag})
+                idx += 1
+
+    return {"topic": sub.replace("_", " ").title(), "cards": cards}
+
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),

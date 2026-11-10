@@ -138,7 +138,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, ollamaHost: e.target.value })}
                 placeholder="http://localhost:11434"
               />
-              <span className="field-hint">Cluster nodes: localhost:11434 or studio.2464.cz:11434</span>
+              <span className="field-hint">e.g. http://localhost:11434 or http://homelab.local:11434</span>
             </div>
 
             <div className="settings-row-2col">
