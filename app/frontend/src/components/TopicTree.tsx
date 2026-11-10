@@ -24,6 +24,19 @@ interface TopicTreeProps {
   onOpenGraph: () => void;
 }
 
+const DOMAIN_ORDER = [
+  'computing',
+  'engineering',
+  'motorsports',
+  'crafts',
+  'formal_sciences',
+  'natural_sciences',
+  'arts',
+  'business',
+  'economics',
+  'humanities',
+];
+
 export const TopicTree: React.FC<TopicTreeProps> = ({
   tree,
   selectedSubtopic,
@@ -159,7 +172,13 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       </div>
 
       <div className="tree-content">
-        {Object.entries(tree).map(([domain, ddata]) => {
+        {Object.entries(tree)
+          .sort(([a], [b]) => {
+            const idxA = DOMAIN_ORDER.indexOf(a);
+            const idxB = DOMAIN_ORDER.indexOf(b);
+            return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
+          })
+          .map(([domain, ddata]) => {
           const isDomainOpen = openDomains[domain] || searchTerm.length > 0;
           const disciplines = ddata.disciplines || {};
 

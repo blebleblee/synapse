@@ -1,17 +1,21 @@
 :root {
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
-  --border-color: #30363d;
-  --border-focus: #58a6ff;
-  --text-primary: #c9d1d9;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
-  --accent-blue: #58a6ff;
-  --accent-green: #3fb950;
-  --accent-orange: #d29922;
-  --accent-red: #ff7b72;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --bg-primary: #0c0d0f;
+  --bg-secondary: #131417;
+  --bg-tertiary: #1a1c21;
+  --bg-elevated: #22242a;
+  --border-color: #242730;
+  --border-subtle: #1c1e24;
+  --border-focus: #cfa858;
+  --text-primary: #e6e8ed;
+  --text-secondary: #9da2af;
+  --text-muted: #5e6270;
+  --accent-gold: #cfa858;
+  --accent-blue: #4f8ac9;
+  --accent-cyan: #3caab5;
+  --accent-green: #2fa872;
+  --accent-orange: #d9883b;
+  --accent-red: #c94f4f;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
@@ -210,9 +214,10 @@ body, html, #root {
 }
 
 .subtopic-item.selected {
-  background-color: #1f6feb26;
-  color: var(--accent-blue);
+  background-color: rgba(207, 168, 88, 0.12);
+  color: #f4d896;
   font-weight: 500;
+  border-left: 2px solid var(--accent-gold);
 }
 
 .subtopic-title {
@@ -226,25 +231,29 @@ body, html, #root {
 .badge {
   font-family: var(--font-mono);
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: 2px;
   letter-spacing: 0.5px;
+  border: 1px solid transparent;
 }
 
 .badge-complete {
-  background-color: #238636;
-  color: #fff;
+  background-color: #14241b;
+  color: #3fb97a;
+  border-color: #1f422e;
 }
 
 .badge-partial {
-  background-color: #9e6a03;
-  color: #fff;
+  background-color: #262013;
+  color: #dfaa4c;
+  border-color: #42341b;
 }
 
 .badge-empty {
-  background-color: #30363d;
-  color: var(--text-muted);
+  background-color: #17181c;
+  color: #555964;
+  border-color: #242730;
 }
 
 /* Center Panel: Lesson Viewer */
@@ -307,22 +316,24 @@ body, html, #root {
   color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
   cursor: pointer;
+  letter-spacing: 0.5px;
   transition: all 0.15s;
 }
 
 .level-pill-btn:hover {
   color: var(--text-primary);
-  border-color: var(--accent-blue);
+  border-color: #3b3f4c;
 }
 
 .level-pill-btn.active {
-  background-color: #1f6feb33;
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
+  background-color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: #0c0d0f;
+  font-weight: 700;
 }
 
 .crumb-domain {
@@ -340,7 +351,7 @@ body, html, #root {
 }
 
 .crumb-subtopic {
-  color: var(--accent-blue);
+  color: var(--accent-gold);
   font-weight: 600;
   text-transform: capitalize;
 }
@@ -359,12 +370,12 @@ body, html, #root {
   align-items: center;
   gap: 6px;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 5px 12px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s;
   position: relative;
@@ -376,16 +387,17 @@ body, html, #root {
 }
 
 .tab-btn.active {
-  background-color: var(--bg-secondary);
-  color: var(--accent-blue);
+  background-color: var(--bg-tertiary);
+  border-color: #2e323e;
+  color: #f4d896;
   font-weight: 600;
 }
 
 .tab-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background-color: var(--accent-green);
+  background-color: var(--accent-gold);
 }
 
 .viewer-scroll-body {
@@ -816,59 +828,79 @@ body, html, #root {
 
 /* Common UI Elements */
 .btn-primary {
-  background-color: #238636;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
+  background-color: var(--accent-gold);
+  color: #0c0d0f;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: background 0.15s;
+  gap: 6px;
+  letter-spacing: 0.3px;
+  transition: all 0.15s;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #2ea043;
+  background-color: #deb464;
 }
 
 .btn-primary-sm {
-  background-color: #238636;
-  color: #fff;
+  background-color: var(--accent-gold);
+  color: #0c0d0f;
   border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
+  border-radius: 3px;
+  padding: 3px 8px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-primary-sm:hover:not(:disabled) {
+  background-color: #deb464;
 }
 
 .btn-secondary {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
+  border-radius: 3px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-elevated);
+  border-color: #383b45;
 }
 
 .btn-secondary-sm {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 4px 8px;
+  border-radius: 3px;
+  padding: 3px 8px;
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-secondary-sm:hover {
+  background-color: var(--bg-elevated);
+  border-color: #383b45;
 }
 
 .icon-btn {

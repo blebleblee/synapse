@@ -16,8 +16,22 @@ LEVELS = ["beginner", "intermediate", "advanced"]
 def get_topics_dir() -> Path:
     return TOPICS_DIR
 
+DOMAIN_ORDER = [
+    "computing",
+    "engineering",
+    "motorsports",
+    "crafts",
+    "formal_sciences",
+    "natural_sciences",
+    "arts",
+    "business",
+    "economics",
+    "humanities"
+]
+
 def list_domains() -> List[str]:
-    return [d.name for d in TOPICS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    raw = [d.name for d in TOPICS_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    return sorted(raw, key=lambda d: DOMAIN_ORDER.index(d) if d in DOMAIN_ORDER else 999)
 
 def get_domain_persona(domain: str) -> str:
     gemini_md = TOPICS_DIR / domain / "GEMINI.md"
