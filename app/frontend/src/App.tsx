@@ -75,7 +75,7 @@ export function App() {
     }
   };
 
-  const loadTopic = async (query: string, level = currentLevel) => {
+  const loadTopic = async (query: string, level = currentLevel, preserveTab = false) => {
     setIsLoadingTopic(true);
     try {
       const res = await fetch(`/api/topic?query=${encodeURIComponent(query)}&level=${level}`);
@@ -94,15 +94,17 @@ export function App() {
           }));
         }
 
-        // Pick initial active tab based on what exists
-        if (data.summary) {
-          setActiveTab('summary');
-        } else if (data.foundation) {
-          setActiveTab('foundation');
-        } else if (data.lesson) {
-          setActiveTab('lesson');
-        } else if (data.labs) {
-          setActiveTab('labs');
+        // Only override tab when opening a new topic, NOT when switching levels
+        if (!preserveTab) {
+          if (data.summary) {
+            setActiveTab('summary');
+          } else if (data.foundation) {
+            setActiveTab('foundation');
+          } else if (data.lesson) {
+            setActiveTab('lesson');
+          } else if (data.labs) {
+            setActiveTab('labs');
+          }
         }
       }
     } catch (err) {
@@ -115,9 +117,6 @@ export function App() {
   useEffect(() => {
     fetchTree();
     fetchStatus();
-
-    // Auto-select ebpf as initial showcase topic
-    loadTopic('computing_and_engineering/infrastructure_and_ops/ebpf', 'beginner');
   }, []);
 
   const handleGenerate = async (query: string, force = false, level = currentLevel) => {
@@ -157,7 +156,7 @@ export function App() {
   const handleSelectLevel = (level: string) => {
     setCurrentLevel(level);
     if (selectedPath) {
-      loadTopic(selectedPath, level);
+      loadTopic(selectedPath, level, true);
     }
   };
 

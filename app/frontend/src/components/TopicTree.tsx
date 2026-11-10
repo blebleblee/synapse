@@ -6,15 +6,20 @@ import {
   Plus,
   GitBranch,
   BookOpen,
-  Cpu,
-  Coins,
+  Terminal,
+  Wrench,
+  Gauge,
+  Hammer,
   Binary,
   FlaskConical,
   Palette,
-  Hammer,
-  ArrowUpDown,
   Languages,
-  Settings
+  Briefcase,
+  TrendingUp,
+  ArrowUpDown,
+  Settings,
+  ChevronsDownUp,
+  ChevronsUpDown
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -53,21 +58,43 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
-  const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({
-    computing: true,
-  });
-  const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({
-    'computing/infrastructure': true,
-  });
-  const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({
-    'computing/infrastructure/kubernetes': true,
-  });
+  const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({});
+  const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({});
+  const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({});
+  const [allExpanded, setAllExpanded] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addDomain, setAddDomain] = useState('computing');
   const [addCategory, setAddCategory] = useState('');
   const [addSubtopicId, setAddSubtopicId] = useState('');
   const [addTitle, setAddTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const toggleAll = () => {
+    if (allExpanded) {
+      setOpenDomains({});
+      setOpenDisciplines({});
+      setOpenCourses({});
+      setAllExpanded(false);
+    } else {
+      const nextDomains: { [k: string]: boolean } = {};
+      const nextDiscs: { [k: string]: boolean } = {};
+      const nextCourses: { [k: string]: boolean } = {};
+      for (const [d, ddata] of Object.entries(tree)) {
+        nextDomains[d] = true;
+        for (const [disc, discData] of Object.entries(ddata.disciplines || {})) {
+          const discKey = `${d}/${disc}`;
+          nextDiscs[discKey] = true;
+          for (const courseSlug of Object.keys(discData.courses || {})) {
+            nextCourses[`${discKey}/${courseSlug}`] = true;
+          }
+        }
+      }
+      setOpenDomains(nextDomains);
+      setOpenDisciplines(nextDiscs);
+      setOpenCourses(nextCourses);
+      setAllExpanded(true);
+    }
+  };
 
   const toggleDomain = (domain: string) => {
     setOpenDomains((prev) => ({ ...prev, [domain]: !prev[domain] }));
@@ -84,20 +111,27 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   const getDomainIcon = (domain: string) => {
     switch (domain) {
       case 'computing':
-        return <Cpu size={16} className="domain-icon" />;
+        return <Terminal size={16} className="domain-icon" />;
       case 'engineering':
+        return <Wrench size={16} className="domain-icon" />;
+      case 'motorsports':
+        return <Gauge size={16} className="domain-icon" />;
+      case 'crafts':
         return <Hammer size={16} className="domain-icon" />;
       case 'formal_sciences':
         return <Binary size={16} className="domain-icon" />;
       case 'natural_sciences':
         return <FlaskConical size={16} className="domain-icon" />;
-      case 'business':
-      case 'economics':
-        return <Coins size={16} className="domain-icon" />;
       case 'arts':
         return <Palette size={16} className="domain-icon" />;
       case 'languages':
         return <Languages size={16} className="domain-icon" />;
+      case 'humanities':
+        return <BookOpen size={16} className="domain-icon" />;
+      case 'business':
+        return <Briefcase size={16} className="domain-icon" />;
+      case 'economics':
+        return <TrendingUp size={16} className="domain-icon" />;
       default:
         return <Folder size={16} className="domain-icon" />;
     }
@@ -189,6 +223,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <span className="brand-title">Synapse</span>
         </div>
         <div className="sidebar-header-actions">
+          <button className="icon-btn" onClick={toggleAll} title={allExpanded ? "Collapse All Sections" : "Expand All Sections"}>
+            {allExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
+          </button>
           <button className="icon-btn" onClick={onOpenSearch} title="Full-Text Search (Cmd+K)">
             <Search size={14} />
           </button>
