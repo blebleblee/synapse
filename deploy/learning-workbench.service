@@ -1,0 +1,15 @@
+[Unit]
+Description=AI Learning Workbench Service
+After=network.target
+
+[Service]
+Type=simple
+User=radovan.varga
+WorkingDirectory=/Users/radovan.varga/repos/learning
+ExecStart=/opt/homebrew/opt/python@3.15/bin/python3.15 -m uvicorn app.backend.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+Environment=PATH=/Users/radovan.varga/repos/learning/.venv/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target

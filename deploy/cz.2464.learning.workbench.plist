@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>cz.2464.learning.workbench</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/opt/python@3.15/bin/python3.15</string>
+        <string>-m</string>
+        <string>uvicorn</string>
+        <string>app.backend.main:app</string>
+        <string>--host</string>
+        <string>127.0.0.1</string>
+        <string>--port</string>
+        <string>8000</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/radovan.varga/repos/learning</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/radovan.varga/repos/learning/workbench.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/radovan.varga/repos/learning/workbench.log</string>
+</dict>
+</plist>

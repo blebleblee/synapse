@@ -35,6 +35,8 @@ from learning_engine.topic_manager import (
 )
 from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import get_provider, OllamaProvider
+from learning_engine.search import search_curriculum
+from learning_engine.graph import get_prerequisite_graph
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
 
@@ -118,6 +120,14 @@ def get_status():
 @app.get("/api/tree")
 def get_tree():
     return get_topic_tree()
+
+@app.get("/api/search")
+def api_search(q: str = Query(..., min_length=2)):
+    return {"results": search_curriculum(q)}
+
+@app.get("/api/graph")
+def api_graph():
+    return get_prerequisite_graph()
 
 @app.get("/api/topic")
 def get_topic_details(

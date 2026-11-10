@@ -3,6 +3,8 @@ import { TopicTree } from './components/TopicTree';
 import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
 import { TerminalDrawer } from './components/TerminalDrawer';
+import { SearchModal } from './components/SearchModal';
+import { GraphModal } from './components/GraphModal';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
 import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import './App.css';
@@ -23,6 +25,8 @@ export function App() {
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(true);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [graphOpen, setGraphOpen] = useState(false);
 
   const terminalRef = useRef<TerminalDrawerHandle>(null);
 
@@ -253,6 +257,8 @@ export function App() {
           selectedSubtopic={selectedPath}
           onSelectSubtopic={(q) => loadTopic(q, currentLevel)}
           onAddSubtopic={handleAddSubtopic}
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenGraph={() => setGraphOpen(true)}
         />
 
         <LessonViewer
@@ -286,6 +292,18 @@ export function App() {
         ref={terminalRef}
         isOpen={terminalOpen}
         onToggle={() => setTerminalOpen((prev) => !prev)}
+      />
+
+      <SearchModal
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelectTopic={(path, lvl) => loadTopic(path, lvl || currentLevel)}
+      />
+
+      <GraphModal
+        isOpen={graphOpen}
+        onClose={() => setGraphOpen(false)}
+        onSelectTopic={(path) => loadTopic(path, currentLevel)}
       />
     </div>
   );

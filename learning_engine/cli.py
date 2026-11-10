@@ -1,6 +1,6 @@
 """
 Learning Workspace CLI
-Interactive management for curricula, multi-tier lesson generation, and tutor sessions.
+Interactive management for curricula, multi-tier lesson generation, search, linting, and export.
 """
 
 import sys
@@ -15,6 +15,11 @@ from .topic_manager import (
 )
 from .models import get_provider, OllamaProvider
 from .generator import generate_subtopic_content
+from .search import search_curriculum
+from .graph import get_prerequisite_graph
+from .linter import lint_curriculum
+from .exporter import export_handbook
+from .daemon import start_daemon, stop_daemon, generate_service_files
 
 def format_status_badge(status: dict) -> str:
     f = "F" if status["has_foundation"] else "."
@@ -87,7 +92,7 @@ def cmd_add(args):
 
         if args.generate:
             print("[*] Generating learning units (Foundation, Lesson, Labs)...")
-            provider = get_provider(provider_type=args.provider, model=args.model)
+            provider = get_provider(provider_type=args.provider, model=args.model, domain=args.domain)
             results = generate_subtopic_content(args.domain, args.category, args.subtopic, path, provider=provider)
             print(f"[✔] Generation results: {results}")
 
@@ -119,17 +124,13 @@ def cmd_generate(args):
     print(f"[*] Directory:       {sub_path}")
     print("==================================================")
 
-    provider = get_provider(provider_type=args.provider, model=args.model)
+    provider = get_provider(provider_type=args.provider, model=args.model, domain=domain)
     print(f"[*] Active LLM Provider: {provider.__class__.__name__} (Model: {getattr(provider, 'model', 'default')})")
+    print(f"[*] Target Level: {args.level or 'ALL (Beginner, Intermediate, Advanced)'}")
     print("[*] Generating Foundation, Lesson, and Labs...")
 
-    results = generate_subtopic_content(domain, cat, sub, sub_path, provider=provider, force=args.force)
-
-    for item, generated in results.items():
-        status = "Created" if generated else "Already Exists (skipped)"
-        print(f"  - {item.upper()}.md: {status}")
-
-    print(f"\n[✔] Learning module ready at: {sub_path}")
+    results = generate_subtopic_content(domain, cat, sub, sub_path, provider=provider, force=args.force, level=args.level)
+    print(f"\n[✔] Learning modules updated at: {sub_path}")
 
 def cmd_chat(args):
     target = resolve_subtopic(args.query)
@@ -148,7 +149,7 @@ def cmd_chat(args):
             context_parts.append(f"\n--- {fname} ---\n" + fpath.read_text(encoding="utf-8")[:3000])
 
     system_instruction = persona + "\n\n" + "\n".join(context_parts)
-    provider = get_provider(provider_type=args.provider, model=args.model)
+    provider = get_provider(provider_type=args.provider, model=args.model, domain=domain)
 
     print("==================================================")
     print(f"   Socratic Tutor Session: {sub.replace('_', ' ').title()}")
@@ -175,7 +176,55 @@ def cmd_chat(args):
             print("\n[*] Exiting tutor session.")
             break
 
+def cmd_search(args):
+    results = search_curriculum(args.query, max_results=args.limit)
+    print(f"\nSearch results for '{args.query}' ({len(results)} matches):\n")
+    for idx, r in enumerate(results, 1):
+        print(f"{idx:2d}. {r['path']} ({r['level']}) -> {r['section']}")
+        print(f"    {r['snippet']}\n")
+
+def cmd_graph(args):
+    graph = get_prerequisite_graph()
+    print(f"\nPrerequisite Learning DAG ({graph['node_count']} nodes, {graph['edge_count']} dependency edges):\n")
+    for e in graph["edges"]:
+        print(f"  {e['source']}  ──►  {e['target']}")
+    print()
+
+def cmd_lint(args):
+    report = lint_curriculum(domain_filter=args.domain or "")
+    print("==================================================")
+    print("       CURRICULUM CONTENT QUALITY LINT REPORT     ")
+    print("==================================================")
+    print(f"  Files Scanned:       {report['scanned_files']}")
+    print(f"  Errors:              {report['error_count']}")
+    print(f"  Warnings:            {report['warning_count']}")
+    print(f"  Status:              {'PASSED (Clean)' if report['passed'] else 'FAILED'}")
+    print("==================================================")
+
+    if report["issues"]:
+        print("Issues Found:")
+        for iss in report["issues"][:15]:
+            sev = "[!]" if iss["severity"] == "warning" else "[✘]"
+            print(f"  {sev} {iss['file']}: {iss['message']}")
+        if len(report["issues"]) > 15:
+            print(f"  ... and {len(report['issues']) - 15} more issues.")
+
+def cmd_export(args):
+    out_file = export_handbook(domain=args.domain, level=args.level)
+    print(f"[✔] Successfully exported {args.domain} handbook to: {out_file}")
+
+def cmd_stop(args):
+    stop_daemon()
+
 def cmd_serve(args):
+    if args.daemon:
+        start_daemon(host=args.host or "127.0.0.1", port=args.port or 8000)
+        return
+
+    if args.service:
+        generate_service_files()
+        return
+
     import uvicorn
     host = args.host or "127.0.0.1"
     port = args.port or 8000
@@ -196,8 +245,14 @@ def main():
     p_serve = subparsers.add_parser("serve", help="Launch the integrated Web Workbench (UI + Backend + Terminal)")
     p_serve.add_argument("--port", "-p", type=int, default=8000, help="Port to listen on (default: 8000)")
     p_serve.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)")
+    p_serve.add_argument("--daemon", "-d", action="store_true", help="Run server as a background daemon process")
+    p_serve.add_argument("--service", action="store_true", help="Generate systemd and launchd service files")
     p_serve.add_argument("--reload", "-r", action="store_true", help="Enable auto-reload for development")
     p_serve.set_defaults(func=cmd_serve)
+
+    # stop
+    p_stop = subparsers.add_parser("stop", help="Stop running background workbench daemon")
+    p_stop.set_defaults(func=cmd_stop)
 
     # status
     p_status = subparsers.add_parser("status", help="Show workspace curriculum completion stats")
@@ -208,10 +263,31 @@ def main():
     p_tree.add_argument("--domain", "-d", help="Filter by specific domain name")
     p_tree.set_defaults(func=cmd_tree)
 
+    # search
+    p_search = subparsers.add_parser("search", help="Full-text search across all generated curriculum units")
+    p_search.add_argument("query", help="Search keyword(s)")
+    p_search.add_argument("--limit", "-l", type=int, default=10, help="Max results to return")
+    p_search.set_defaults(func=cmd_search)
+
+    # graph
+    p_graph = subparsers.add_parser("graph", help="Display prerequisite learning dependency DAG")
+    p_graph.set_defaults(func=cmd_graph)
+
+    # lint
+    p_lint = subparsers.add_parser("lint", help="Lint curriculum files for depth, structure, and placeholders")
+    p_lint.add_argument("--domain", "-d", help="Filter by specific domain name")
+    p_lint.set_defaults(func=cmd_lint)
+
+    # export
+    p_export = subparsers.add_parser("export", help="Compile a domain into a cohesive printable Markdown handbook")
+    p_export.add_argument("domain", help="Domain to export (e.g. computing, formal_sciences)")
+    p_export.add_argument("--level", "-l", choices=["beginner", "intermediate", "advanced"], help="Filter by difficulty level")
+    p_export.set_defaults(func=cmd_export)
+
     # add
     p_add = subparsers.add_parser("add", help="Add a new subtopic to a domain")
-    p_add.add_argument("domain", help="Target domain (e.g. computing_and_engineering)")
-    p_add.add_argument("category", help="Target category (e.g. infrastructure_and_ops)")
+    p_add.add_argument("domain", help="Target domain (e.g. computing)")
+    p_add.add_argument("category", help="Target category (e.g. infrastructure)")
     p_add.add_argument("subtopic", help="Subtopic slug (e.g. ebpf)")
     p_add.add_argument("--title", "-t", help="Readable display title")
     p_add.add_argument("--generate", "-g", action="store_true", help="Immediately generate content units")
@@ -221,11 +297,12 @@ def main():
 
     # generate
     p_gen = subparsers.add_parser("generate", help="Generate Foundation, Lesson, and Labs for a subtopic")
-    p_gen.add_argument("query", nargs="?", default=None, help="Subtopic name or path (e.g. 'linux' or 'infrastructure_and_ops/linux')")
+    p_gen.add_argument("query", nargs="?", default=None, help="Subtopic name or path (e.g. 'linux' or 'infrastructure/linux')")
+    p_gen.add_argument("--level", "-l", choices=["beginner", "intermediate", "advanced"], help="Target specific level")
     p_gen.add_argument("--all", "-a", action="store_true", help="Generate all missing units across the entire curriculum")
     p_gen.add_argument("--force", "-f", action="store_true", help="Overwrite existing files")
     p_gen.add_argument("--provider", "-p", choices=["ollama", "gemini"], help="LLM Provider")
-    p_gen.add_argument("--model", "-m", help="Specific model name (e.g. qwen3:4b, llama3.1:8b)")
+    p_gen.add_argument("--model", "-m", help="Specific model name (e.g. qwen2.5-coder:32b)")
     p_gen.set_defaults(func=cmd_generate)
 
     # chat

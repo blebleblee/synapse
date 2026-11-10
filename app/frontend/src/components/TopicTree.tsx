@@ -4,6 +4,7 @@ import {
   FolderOpen,
   Search,
   Plus,
+  GitBranch,
   Cpu,
   Coins,
   Binary,
@@ -18,6 +19,8 @@ interface TopicTreeProps {
   selectedSubtopic: string | null;
   onSelectSubtopic: (query: string) => void;
   onAddSubtopic: (domain: string, category: string, subtopic: string, title?: string) => Promise<void>;
+  onOpenSearch: () => void;
+  onOpenGraph: () => void;
 }
 
 export const TopicTree: React.FC<TopicTreeProps> = ({
@@ -25,6 +28,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   selectedSubtopic,
   onSelectSubtopic,
   onAddSubtopic,
+  onOpenSearch,
+  onOpenGraph,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({
@@ -106,14 +111,21 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <div className="brand-dot" />
           <span className="brand-title">Learning Workbench</span>
         </div>
-        <button
-          className="btn-primary-sm"
-          onClick={() => setShowAddModal(true)}
-          title="Add New Topic/Subtopic"
-        >
-          <Plus size={14} />
-          <span>New Topic</span>
-        </button>
+        <div className="sidebar-header-actions">
+          <button className="icon-btn" onClick={onOpenSearch} title="Full-Text Search (Cmd+K)">
+            <Search size={14} />
+          </button>
+          <button className="icon-btn" onClick={onOpenGraph} title="Prerequisite Learning DAG">
+            <GitBranch size={14} />
+          </button>
+          <button
+            className="btn-primary-sm"
+            onClick={() => setShowAddModal(true)}
+            title="Add New Topic/Subtopic"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
       </div>
 
       <div className="search-box">
