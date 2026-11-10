@@ -3,6 +3,7 @@
 Here are all the available subtopics in this learning module organized by category:
 
 ### Hardware And Circuits
+- **Computer Architecture, CPU Caches & Assembly (x86/ARM)** (`hardware_and_circuits/computer_architecture_and_assembly/`)
 
 - **Active Components** (`hardware_and_circuits/active_components/`)
 - **Analog Circuit Design** (`hardware_and_circuits/analog_design/`)
@@ -28,6 +29,7 @@ Here are all the available subtopics in this learning module organized by catego
 - **Hardware Troubleshooting** (`hardware_and_circuits/troubleshooting/`)
 
 ### Software Engineering
+- **Low-Level Systems Programming in C and Rust** (`software_engineering/systems_programming/`)
 - **Game Design Architecture & Mechanics** (`software_engineering/game_design_and_mechanics/`)
 - **Game Emulation Architecture & Virtual Machines** (`software_engineering/game_emulation_internals/`)
 
@@ -45,6 +47,7 @@ Here are all the available subtopics in this learning module organized by catego
 - **Modern Web Development** (`software_engineering/web_development/`)
 
 ### Infrastructure And Ops
+- **Linux Kernel Internals & Device Driver Engineering** (`infrastructure_and_ops/linux_kernel_and_drivers/`)
 - **Extended Berkeley Packet Filter (eBPF)** (`infrastructure_and_ops/ebpf/`)
 
 - **Infrastructure Automation** (`infrastructure_and_ops/automation/`)
@@ -68,6 +71,9 @@ Here are all the available subtopics in this learning module organized by catego
 - **MLOps & Model Lifecycle** (`data_and_ai/mlops/`)
 
 ### Security
+- **Software-Defined Radio (SDR) & RF Security** (`security/software_defined_radio/`)
+- **Automotive Cybersecurity, CAN Bus & Telemetry** (`security/automotive_cybersecurity/`)
+- **Hardware Hacking, JTAG/UART Probing & Firmware Dumping** (`security/hardware_hacking/`)
 - **Network Security, Telemetry & Defense** (`security/network_security_and_defense/`)
 - **Software Exploitation Mechanics & Defenses** (`security/software_exploitation_and_defense/`)
 - **Vulnerability Research & Memory Safety** (`security/vulnerability_research/`)

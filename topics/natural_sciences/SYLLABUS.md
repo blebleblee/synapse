@@ -3,6 +3,7 @@
 Here are all the available subtopics in this learning module organized by category:
 
 ### Physics
+- **Aerodynamics, Fluid Dynamics & Flight Mechanics** (`physics/aerodynamics_and_flight_dynamics/`)
 
 - **Astrophysics & Cosmology** (`physics/astrophysics/`)
 - **Classical Mechanics** (`physics/classical_mechanics/`)

@@ -3,6 +3,8 @@
 Here are all the available subtopics in this learning module organized by category:
 
 ### Music
+- **Modular Synthesis, Control Voltage & Eurorack Patching** (`music/modular_synthesis/`)
+- **Audio DSP & Plugin Architecture (VST/AU & Filters)** (`music/audio_dsp_and_plugins/`)
 - **Audio Effects, DSP & Dynamics Processing** (`music/audio_effects_and_processing/`)
 - **MIDI Protocol, MPE & Hardware Sequencing** (`music/midi_and_sequencing/`)
 - **Orchestral Composition & Symphony Scoring** (`music/orchestral_composition/`)

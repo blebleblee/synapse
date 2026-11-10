@@ -64,3 +64,9 @@ Here are all the available subtopics in this learning module organized by catego
 - **Arcade Systems, JAMMA & CRT Mechanics** (`retro_gaming/arcade_mechanics_and_restoration/`)
 
 - **Retro Console Hardware (8-bit & 16-bit Systems)** (`retro_gaming/retro_console_hardware/`)
+
+
+### Metalworking
+- **Precision Machining, Lathes, Mills & CNC G-Code** (`metalworking/machining_and_cnc/`)
+
+- **Metal Fabrication, TIG/MIG Welding & Structural Joints** (`metalworking/welding_and_metal_fabrication/`)
