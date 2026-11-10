@@ -3,6 +3,9 @@
 Here are all the available subtopics in this learning module organized by category:
 
 ### Music
+- **Audio Effects, DSP & Dynamics Processing** (`music/audio_effects_and_processing/`)
+- **MIDI Protocol, MPE & Hardware Sequencing** (`music/midi_and_sequencing/`)
+- **Orchestral Composition & Symphony Scoring** (`music/orchestral_composition/`)
 
 - **Acoustics & Psychoacoustics** (`music/acoustics/`)
 - **Audio Engineering & Recording** (`music/audio_engineering/`)

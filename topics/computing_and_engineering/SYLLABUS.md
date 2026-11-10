@@ -28,6 +28,8 @@ Here are all the available subtopics in this learning module organized by catego
 - **Hardware Troubleshooting** (`hardware_and_circuits/troubleshooting/`)
 
 ### Software Engineering
+- **Game Design Architecture & Mechanics** (`software_engineering/game_design_and_mechanics/`)
+- **Game Emulation Architecture & Virtual Machines** (`software_engineering/game_emulation_internals/`)
 
 - **Software Architecture** (`software_engineering/architecture/`)
 - **Compiler Design** (`software_engineering/compilers/`)
@@ -66,6 +68,10 @@ Here are all the available subtopics in this learning module organized by catego
 - **MLOps & Model Lifecycle** (`data_and_ai/mlops/`)
 
 ### Security
+- **Network Security, Telemetry & Defense** (`security/network_security_and_defense/`)
+- **Software Exploitation Mechanics & Defenses** (`security/software_exploitation_and_defense/`)
+- **Vulnerability Research & Memory Safety** (`security/vulnerability_research/`)
+- **Web Application Security & OWASP Defenses** (`security/web_security/`)
 
 - **Applied Cryptography** (`security/cryptography/`)
 - **Ethical Hacking & Penetration Testing** (`security/ethical_hacking/`)

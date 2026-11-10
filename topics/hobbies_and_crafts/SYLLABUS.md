@@ -48,3 +48,19 @@ Here are all the available subtopics in this learning module organized by catego
 - **Post-Processing & Finishing** (`3d_printing/post_processing/`)
 - **Resin (SLA/MSLA) Printing** (`3d_printing/resin_printers/`)
 - **Slicing Optimization (Supports, Infill, Walls)** (`3d_printing/slicing_techniques/`)
+
+
+### Automotive And Motorsports
+- **Vehicle Maintenance, Wrenching & Diagnostics** (`automotive_and_motorsports/vehicle_diagnostics_and_maintenance/`)
+- **Motorcycle Riding Dynamics & Roadcraft** (`automotive_and_motorsports/motorcycle_riding_dynamics/`)
+- **High-Performance Driving & Vehicle Dynamics** (`automotive_and_motorsports/performance_driving/`)
+- **Motorcycle Mechanics & Powertrains** (`automotive_and_motorsports/motorcycle_mechanics/`)
+
+- **Automotive Engineering & Car Mechanics** (`automotive_and_motorsports/car_mechanics/`)
+
+
+### Retro Gaming
+- **Speedrunning, Glitch Mechanics & Memory Inspection** (`retro_gaming/speedrunning_and_glitch_mechanics/`)
+- **Arcade Systems, JAMMA & CRT Mechanics** (`retro_gaming/arcade_mechanics_and_restoration/`)
+
+- **Retro Console Hardware (8-bit & 16-bit Systems)** (`retro_gaming/retro_console_hardware/`)
