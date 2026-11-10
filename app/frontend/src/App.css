@@ -364,6 +364,22 @@ body, html, #root {
   text-transform: capitalize;
 }
 
+.crumb-domain.clickable,
+.crumb-category.clickable {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.crumb-domain.clickable:hover {
+  color: var(--accent-gold);
+  text-decoration: underline;
+}
+
+.crumb-category.clickable:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
 .crumb-sep {
   color: var(--text-muted);
 }
@@ -976,6 +992,12 @@ body, html, #root {
   border-bottom: 1px solid var(--border-color);
 }
 
+.terminal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .terminal-title {
   display: flex;
   align-items: center;
@@ -990,15 +1012,23 @@ body, html, #root {
 .terminal-env-selector {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 2px 8px;
 }
 
+.env-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .env-icon {
-  color: var(--accent-blue);
+  color: var(--accent-gold);
 }
 
 .env-select {
@@ -1767,7 +1797,7 @@ body, html, #root {
 }
 
 .course-icon {
-  color: var(--accent-blue);
+  color: var(--accent-gold);
 }
 
 .course-title {

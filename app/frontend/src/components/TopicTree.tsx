@@ -22,7 +22,8 @@ import {
   ChevronsUpDown,
   Edit2,
   Trash2,
-  X
+  X,
+  Activity
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -45,6 +46,7 @@ const DOMAIN_ORDER = [
   'crafts',
   'formal_sciences',
   'natural_sciences',
+  'health_sciences',
   'arts',
   'languages',
   'humanities',
@@ -136,6 +138,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         return <Binary size={16} className="domain-icon" />;
       case 'natural_sciences':
         return <FlaskConical size={16} className="domain-icon" />;
+      case 'health_sciences':
+        return <Activity size={16} className="domain-icon" />;
       case 'arts':
         return <Palette size={16} className="domain-icon" />;
       case 'languages':

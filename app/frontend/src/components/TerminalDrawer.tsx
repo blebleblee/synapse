@@ -212,25 +212,28 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       )}
 
       <div className="terminal-header" onClick={onToggle}>
-        <div className="terminal-title">
-          <TerminalIcon size={15} className="terminal-icon" />
-          <span>Terminal Sandbox</span>
-          <span className={`status-dot ${connected ? 'online' : 'offline'}`} title={connected ? 'Connected' : 'Disconnected'} />
-        </div>
+        <div className="terminal-header-left">
+          <div className="terminal-title">
+            <TerminalIcon size={15} className="terminal-icon" />
+            <span>Terminal</span>
+            <span className={`status-dot ${connected ? 'online' : 'offline'}`} title={connected ? 'Connected' : 'Disconnected'} />
+          </div>
 
-        {/* Environment Profile Selector */}
-        <div className="terminal-env-selector" onClick={(e) => e.stopPropagation()}>
-          <Layers size={13} className="env-icon" />
-          <select
-            value={terminalEnv}
-            onChange={(e) => handleEnvChange(e.target.value as any)}
-            className="env-select"
-            title="Switch execution environment"
-          >
-            <option value="host">Host Shell (Local)</option>
-            <option value="docker">Linux Sandbox (Docker / Rancher)</option>
-            <option value="k8s">Kubernetes Pod (k3s Cluster)</option>
-          </select>
+          {/* Labeled Environment Profile Selector on the Left */}
+          <div className="terminal-env-selector" onClick={(e) => e.stopPropagation()}>
+            <span className="env-label">Environment:</span>
+            <Layers size={13} className="env-icon" />
+            <select
+              value={terminalEnv}
+              onChange={(e) => handleEnvChange(e.target.value as any)}
+              className="env-select"
+              title="Switch execution environment"
+            >
+              <option value="host">Host Shell (Local)</option>
+              <option value="docker">Linux Sandbox (Docker / Rancher)</option>
+              <option value="k8s">Kubernetes Pod (k3s Cluster)</option>
+            </select>
+          </div>
         </div>
 
         <div className="terminal-actions" onClick={(e) => e.stopPropagation()}>

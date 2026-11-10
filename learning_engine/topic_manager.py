@@ -23,6 +23,7 @@ DOMAIN_ORDER = [
     "crafts",
     "formal_sciences",
     "natural_sciences",
+    "health_sciences",
     "arts",
     "languages",
     "humanities",

@@ -239,6 +239,37 @@ export function App() {
     }
   };
 
+  const handleNavigateBreadcrumb = (type: 'domain' | 'category' | 'subtopic', path: string) => {
+    for (const [domain, ddata] of Object.entries(tree)) {
+      if (type === 'domain' && domain === path) {
+        for (const discData of Object.values(ddata.disciplines || {})) {
+          for (const cData of Object.values((discData as any).courses || {})) {
+            const units = Object.values((cData as any).units || {});
+            if (units.length > 0) {
+              loadTopic((units[0] as any).rel_path, currentLevel);
+              return;
+            }
+          }
+        }
+      }
+      if (type === 'category') {
+        for (const [disc, discData] of Object.entries(ddata.disciplines || {})) {
+          for (const [courseSlug, cData] of Object.entries((discData as any).courses || {})) {
+            const courseKey = `${domain}/${disc}/${courseSlug}`;
+            const discKey = `${domain}/${disc}`;
+            if (path === courseKey || path === discKey) {
+              const units = Object.values((cData as any).units || {});
+              if (units.length > 0) {
+                loadTopic((units[0] as any).rel_path, currentLevel);
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
   const handleRefreshQuiz = async () => {
     if (!selectedPath) return;
 
@@ -360,6 +391,7 @@ export function App() {
           isRegeneratingSummary={isRegeneratingSummary}
           onOpenFlashcards={() => setFlashcardModalOpen(true)}
           targetLanguage={settings.language}
+          onNavigateBreadcrumb={handleNavigateBreadcrumb}
         />
 
         <TutorChat

@@ -42,6 +42,7 @@ interface LessonViewerProps {
   isRegeneratingSummary: boolean;
   onOpenFlashcards: () => void;
   targetLanguage?: string;
+  onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -66,6 +67,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   isRegeneratingSummary,
   onOpenFlashcards,
   targetLanguage,
+  onNavigateBreadcrumb,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
@@ -177,11 +179,25 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     <main className="lesson-viewer">
       <header className="viewer-header">
         <div className="breadcrumbs">
-          <span className="crumb-domain">{topic.domain.replace(/_/g, ' ')}</span>
+          <span
+            className="crumb-domain clickable"
+            onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('domain', topic.domain)}
+            title={`Browse ${topic.domain.replace(/_/g, ' ')}`}
+          >
+            {topic.domain.replace(/_/g, ' ')}
+          </span>
           <span className="crumb-sep">/</span>
-          <span className="crumb-category">{topic.category.replace(/_/g, ' ')}</span>
+          <span
+            className="crumb-category clickable"
+            onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('category', `${topic.domain}/${topic.category}`)}
+            title={`Browse ${topic.category.replace(/_/g, ' ')}`}
+          >
+            {topic.category.replace(/_/g, ' ')}
+          </span>
           <span className="crumb-sep">/</span>
-          <span className="crumb-subtopic">{topic.subtopic.replace(/_/g, ' ')}</span>
+          <span className="crumb-subtopic">
+            {topic.subtopic.replace(/_/g, ' ')}
+          </span>
         </div>
 
         {/* User Competence Mastery Selector on Right */}
