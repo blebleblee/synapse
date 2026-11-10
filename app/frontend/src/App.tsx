@@ -12,6 +12,7 @@ export function App() {
   const [, setStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
+  const [currentLevel, setCurrentLevel] = useState<string>('beginner');
   const [activeTab, setActiveTab] = useState<'foundation' | 'lesson' | 'labs' | 'quiz'>('foundation');
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -49,14 +50,15 @@ export function App() {
     }
   };
 
-  const loadTopic = async (query: string) => {
+  const loadTopic = async (query: string, level = currentLevel) => {
     setIsLoadingTopic(true);
     try {
-      const res = await fetch(`/api/topic?query=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/topic?query=${encodeURIComponent(query)}&level=${level}`);
       if (res.ok) {
         const data = await res.json();
         setTopicDetails(data);
         setSelectedPath(query);
+        setCurrentLevel(level);
 
         // Pick initial active tab based on what exists
         if (data.foundation) {
@@ -79,19 +81,19 @@ export function App() {
     fetchStatus();
 
     // Auto-select ebpf as initial showcase topic
-    loadTopic('computing_and_engineering/infrastructure_and_ops/ebpf');
+    loadTopic('computing_and_engineering/infrastructure_and_ops/ebpf', 'beginner');
   }, []);
 
-  const handleGenerate = async (query: string, force = false) => {
+  const handleGenerate = async (query: string, force = false, level = currentLevel) => {
     setIsGenerating(true);
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, force }),
+        body: JSON.stringify({ query, force, level }),
       });
       if (res.ok) {
-        await loadTopic(query);
+        await loadTopic(query, level);
         await fetchTree();
         await fetchStatus();
       }
@@ -112,20 +114,28 @@ export function App() {
       await fetchTree();
       await fetchStatus();
       const newRel = `${domain}/${category}/${subtopic}`;
-      await loadTopic(newRel);
+      await loadTopic(newRel, 'beginner');
+    }
+  };
+
+  const handleSelectLevel = (level: string) => {
+    setCurrentLevel(level);
+    if (selectedPath) {
+      loadTopic(selectedPath, level);
     }
   };
 
   const handleSendMessage = async (msg: string) => {
     if (!selectedPath || !topicDetails) return;
 
-    const currentHistory = chatHistory[selectedPath] || [];
+    const chatKey = `${selectedPath}/${currentLevel}`;
+    const currentHistory = chatHistory[chatKey] || [];
     const newStudentMsg: ChatMessage = { role: 'student', content: msg };
     const updatedHistory = [...currentHistory, newStudentMsg];
 
     setChatHistory((prev) => ({
       ...prev,
-      [selectedPath]: updatedHistory,
+      [chatKey]: updatedHistory,
     }));
 
     setIsChatting(true);
@@ -145,7 +155,7 @@ export function App() {
         const newTutorMsg: ChatMessage = { role: 'tutor', content: data.reply };
         setChatHistory((prev) => ({
           ...prev,
-          [selectedPath]: [...updatedHistory, newTutorMsg],
+          [chatKey]: [...updatedHistory, newTutorMsg],
         }));
       }
     } catch (err) {
@@ -157,7 +167,8 @@ export function App() {
 
   const handleSaveSession = async () => {
     if (!selectedPath) return;
-    const history = chatHistory[selectedPath] || [];
+    const chatKey = `${selectedPath}/${currentLevel}`;
+    const history = chatHistory[chatKey] || [];
     if (history.length === 0) return;
 
     setIsSavingSession(true);
@@ -202,6 +213,7 @@ export function App() {
   const handleRefreshQuiz = async () => {
     if (!selectedPath) return;
 
+    const quizKey = `${selectedPath}/${currentLevel}`;
     setIsLoadingQuiz(true);
     try {
       const res = await fetch('/api/quiz', {
@@ -213,7 +225,7 @@ export function App() {
         const data = await res.json();
         setQuizQuestions((prev) => ({
           ...prev,
-          [selectedPath]: data.questions || [],
+          [quizKey]: data.questions || [],
         }));
       }
     } catch (err) {
@@ -230,7 +242,8 @@ export function App() {
     }
   };
 
-  const currentQuiz = selectedPath ? quizQuestions[selectedPath] || [] : [];
+  const activeChatKey = selectedPath ? `${selectedPath}/${currentLevel}` : '';
+  const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
 
   return (
     <div className="workbench-layout">
@@ -238,7 +251,7 @@ export function App() {
         <TopicTree
           tree={tree}
           selectedSubtopic={selectedPath}
-          onSelectSubtopic={loadTopic}
+          onSelectSubtopic={(q) => loadTopic(q, currentLevel)}
           onAddSubtopic={handleAddSubtopic}
         />
 
@@ -250,6 +263,8 @@ export function App() {
           onRunInTerminal={handleRunInTerminal}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          currentLevel={currentLevel}
+          onSelectLevel={handleSelectLevel}
           quizQuestions={currentQuiz}
           isLoadingQuiz={isLoadingQuiz}
           onRefreshQuiz={handleRefreshQuiz}
@@ -259,7 +274,7 @@ export function App() {
 
         <TutorChat
           topic={topicDetails}
-          history={selectedPath ? chatHistory[selectedPath] || [] : []}
+          history={activeChatKey ? chatHistory[activeChatKey] || [] : []}
           isChatting={isChatting}
           onSendMessage={handleSendMessage}
           onSaveSession={handleSaveSession}

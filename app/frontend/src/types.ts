@@ -35,6 +35,8 @@ export interface TopicDetails {
   subtopic: string;
   path: string;
   persona: string;
+  level: string;
+  available_levels: string[];
   foundation: string;
   lesson: string;
   labs: string;

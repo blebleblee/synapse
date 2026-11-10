@@ -120,7 +120,10 @@ def get_tree():
     return get_topic_tree()
 
 @app.get("/api/topic")
-def get_topic_details(query: str = Query(..., description="Subtopic query e.g. 'ebpf' or 'computing_and_engineering/infrastructure_and_ops/ebpf'")):
+def get_topic_details(
+    query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
+    level: Optional[str] = Query("beginner", description="Difficulty level: beginner, intermediate, advanced")
+):
     target = resolve_subtopic(query)
     if not target:
         raise HTTPException(status_code=404, detail=f"Topic '{query}' not found")
@@ -128,18 +131,35 @@ def get_topic_details(query: str = Query(..., description="Subtopic query e.g. '
     domain, cat, sub, sub_path = target
     persona = get_domain_persona(domain)
 
+    # Check available levels
+    available_levels = []
+    for lvl in ["beginner", "intermediate", "advanced"]:
+        if (sub_path / lvl).exists() and any((sub_path / lvl).glob("*.md")):
+            available_levels.append(lvl)
+
+    selected_level = (level or "beginner").lower()
+    target_dir = sub_path / selected_level if (sub_path / selected_level).exists() else sub_path
+
     foundation = ""
     lesson = ""
     labs = ""
 
-    if (sub_path / "FOUNDATION.md").exists():
+    if (target_dir / "FOUNDATION.md").exists():
+        foundation = (target_dir / "FOUNDATION.md").read_text(encoding="utf-8")
+    elif (sub_path / "FOUNDATION.md").exists():
         foundation = (sub_path / "FOUNDATION.md").read_text(encoding="utf-8")
-    if (sub_path / "LESSON.md").exists():
+
+    if (target_dir / "LESSON.md").exists():
+        lesson = (target_dir / "LESSON.md").read_text(encoding="utf-8")
+    elif (sub_path / "LESSON.md").exists():
         lesson = (sub_path / "LESSON.md").read_text(encoding="utf-8")
-    if (sub_path / "LABS.md").exists():
+
+    if (target_dir / "LABS.md").exists():
+        labs = (target_dir / "LABS.md").read_text(encoding="utf-8")
+    elif (sub_path / "LABS.md").exists():
         labs = (sub_path / "LABS.md").read_text(encoding="utf-8")
 
-    # If lesson is not in root, check artifacts folder
+    # If lesson is not found, check artifacts folder
     if not lesson and (sub_path / "artifacts").exists():
         artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
         if artifacts:
@@ -151,6 +171,8 @@ def get_topic_details(query: str = Query(..., description="Subtopic query e.g. '
         "subtopic": sub,
         "path": str(sub_path.relative_to(WORKSPACE_ROOT)),
         "persona": persona,
+        "level": selected_level,
+        "available_levels": available_levels or ["beginner", "intermediate", "advanced"],
         "foundation": foundation,
         "lesson": lesson,
         "labs": labs,

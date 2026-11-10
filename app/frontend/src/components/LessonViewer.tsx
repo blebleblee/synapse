@@ -6,7 +6,8 @@ import {
   HelpCircle,
   Sparkles,
   RefreshCw,
-  FileCheck2
+  FileCheck2,
+  Gauge
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -16,10 +17,12 @@ interface LessonViewerProps {
   topic: TopicDetails | null;
   isLoading: boolean;
   isGenerating: boolean;
-  onGenerate: (query: string, force?: boolean) => void;
+  onGenerate: (query: string, force?: boolean, level?: string) => void;
   onRunInTerminal: (command: string) => void;
   activeTab: 'foundation' | 'lesson' | 'labs' | 'quiz';
   setActiveTab: (tab: 'foundation' | 'lesson' | 'labs' | 'quiz') => void;
+  currentLevel: string;
+  onSelectLevel: (level: string) => void;
   quizQuestions: QuizQuestion[];
   isLoadingQuiz: boolean;
   onRefreshQuiz: () => void;
@@ -35,6 +38,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onRunInTerminal,
   activeTab,
   setActiveTab,
+  currentLevel,
+  onSelectLevel,
   quizQuestions,
   isLoadingQuiz,
   onRefreshQuiz,
@@ -84,7 +89,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
         <h2>Select a Topic from the Tree</h2>
-        <p>Explore over 250 structured subtopics across Computing, Math, Sciences, and Arts.</p>
+        <p>Explore over 280 structured subtopics across Computing, Math, Sciences, and Arts.</p>
       </div>
     );
   }
@@ -115,15 +120,33 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
 
           <button
             className="btn-secondary-sm"
-            onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true)}
+            onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
             disabled={isGenerating}
-            title="Regenerate all 3 units"
+            title="Regenerate this level"
           >
             <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
             <span>{isGenerating ? 'Generating...' : 'Regenerate'}</span>
           </button>
         </div>
       </header>
+
+      {/* Progressive Difficulty Level Selector Bar */}
+      <div className="levels-bar">
+        <span className="levels-label">
+          <Gauge size={13} /> Mastery Level:
+        </span>
+        <div className="level-pills">
+          {['beginner', 'intermediate', 'advanced'].map((lvl) => (
+            <button
+              key={lvl}
+              className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
+              onClick={() => onSelectLevel(lvl)}
+            >
+              {lvl.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="tabs-bar">
         <button
@@ -165,7 +188,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>
         {activeTab === 'quiz' ? (
           <SocraticQuizView
-            subtopicTitle={topic.subtopic.replace(/_/g, ' ')}
+            subtopicTitle={`${topic.subtopic.replace(/_/g, ' ')} (${currentLevel.toUpperCase()})`}
             questions={quizQuestions}
             isLoading={isLoadingQuiz}
             onRefreshQuiz={onRefreshQuiz}
@@ -173,23 +196,23 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         ) : !hasAnyContent ? (
           <div className="viewer-missing-card">
             <Sparkles size={36} className="missing-icon" />
-            <h3>No Content Generated Yet</h3>
+            <h3>No Content Generated for {currentLevel.toUpperCase()} Level</h3>
             <p>
-              This topic is structured in the curriculum but needs Foundation, Technical Lesson, and Lab guides.
+              Generate the {currentLevel} tier (Foundation, Lesson, and Labs) designed to build upon earlier concepts.
             </p>
             <button
               className="btn-primary"
-              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`)}
+              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, false, currentLevel)}
               disabled={isGenerating}
             >
               <Sparkles size={16} />
-              <span>{isGenerating ? 'Synthesizing Units with AI...' : 'Generate Learning Units Now'}</span>
+              <span>{isGenerating ? `Synthesizing ${currentLevel} Units...` : `Generate ${currentLevel.toUpperCase()} Units Now`}</span>
             </button>
           </div>
         ) : !rawMarkdown ? (
           <div className="viewer-missing-card">
-            <h3>This unit is missing</h3>
-            <p>You can generate or regenerate this topic module using the button in the top right.</p>
+            <h3>This unit is missing in {currentLevel} tier</h3>
+            <p>You can generate this unit using the Regenerate button above.</p>
           </div>
         ) : (
           <article

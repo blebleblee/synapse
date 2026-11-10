@@ -274,6 +274,57 @@ body, html, #root {
   font-size: 12px;
 }
 
+/* Mastery Level Bar */
+.levels-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.levels-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.level-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.level-pill-btn {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.level-pill-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.level-pill-btn.active {
+  background-color: #1f6feb33;
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
 .crumb-domain {
   color: var(--text-muted);
   text-transform: capitalize;

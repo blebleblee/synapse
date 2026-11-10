@@ -23,14 +23,32 @@ def get_domain_persona(domain: str) -> str:
     return "You are an expert educator and technical mentor."
 
 def scan_subtopic_status(subtopic_dir: Path) -> Dict[str, Any]:
-    has_foundation = (subtopic_dir / "FOUNDATION.md").exists()
-    has_lesson = (subtopic_dir / "LESSON.md").exists()
-    has_labs = (subtopic_dir / "LABS.md").exists()
+    levels = ["beginner", "intermediate", "advanced"]
+    level_status = {}
 
-    # Check for legacy artifacts if standard LESSON.md is not present
-    artifacts_dir = subtopic_dir / "artifacts"
-    if not has_lesson and artifacts_dir.exists():
-        has_lesson = any(artifacts_dir.glob("lesson_*.md"))
+    for lvl in levels:
+        lvl_dir = subtopic_dir / lvl
+        f = (lvl_dir / "FOUNDATION.md").exists()
+        l = (lvl_dir / "LESSON.md").exists()
+        b = (lvl_dir / "LABS.md").exists()
+        level_status[lvl] = {
+            "has_foundation": f,
+            "has_lesson": l,
+            "has_labs": b,
+            "complete": (f and l and b)
+        }
+
+    # Backward compatibility with root files
+    root_f = (subtopic_dir / "FOUNDATION.md").exists()
+    root_l = (subtopic_dir / "LESSON.md").exists()
+    root_b = (subtopic_dir / "LABS.md").exists()
+
+    has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f
+    has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l
+    has_labs = any(s["has_labs"] for s in level_status.values()) or root_b
+
+    is_leveled_complete = all(s["complete"] for s in level_status.values())
+    is_root_complete = (root_f and root_l and root_b)
 
     all_files = [f.name for f in subtopic_dir.iterdir() if f.is_file() and not f.name.startswith(".")]
 
@@ -38,7 +56,8 @@ def scan_subtopic_status(subtopic_dir: Path) -> Dict[str, Any]:
         "has_foundation": has_foundation,
         "has_lesson": has_lesson,
         "has_labs": has_labs,
-        "complete": (has_foundation and has_lesson and has_labs),
+        "complete": is_leveled_complete or is_root_complete,
+        "levels": level_status,
         "file_count": len(all_files),
         "files": all_files
     }
