@@ -1,13 +1,16 @@
-import React, { useMemo } from 'react';
-import { marked } from 'marked';
+import React, { useMemo, useRef, useEffect } from 'react';
 import {
   BookOpen,
   FlaskConical,
   GraduationCap,
+  HelpCircle,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  FileCheck2
 } from 'lucide-react';
-import type { TopicDetails } from '../types';
+import type { TopicDetails, QuizQuestion } from '../types';
+import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
+import { SocraticQuizView } from './SocraticQuizView';
 
 interface LessonViewerProps {
   topic: TopicDetails | null;
@@ -15,8 +18,13 @@ interface LessonViewerProps {
   isGenerating: boolean;
   onGenerate: (query: string, force?: boolean) => void;
   onRunInTerminal: (command: string) => void;
-  activeTab: 'foundation' | 'lesson' | 'labs';
-  setActiveTab: (tab: 'foundation' | 'lesson' | 'labs') => void;
+  activeTab: 'foundation' | 'lesson' | 'labs' | 'quiz';
+  setActiveTab: (tab: 'foundation' | 'lesson' | 'labs' | 'quiz') => void;
+  quizQuestions: QuizQuestion[];
+  isLoadingQuiz: boolean;
+  onRefreshQuiz: () => void;
+  onCompileGuide: () => void;
+  isCompiling: boolean;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -27,7 +35,14 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onRunInTerminal,
   activeTab,
   setActiveTab,
+  quizQuestions,
+  isLoadingQuiz,
+  onRefreshQuiz,
+  onCompileGuide,
+  isCompiling,
 }) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
     if (activeTab === 'foundation') return topic.foundation;
@@ -38,10 +53,15 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
 
   const htmlContent = useMemo(() => {
     if (!rawMarkdown) return '';
-    return marked.parse(rawMarkdown) as string;
+    return renderMarkdownWithMathAndMermaid(rawMarkdown);
   }, [rawMarkdown]);
 
-  // Attach event listener to rendered markdown for interactive code block execution
+  useEffect(() => {
+    if (contentRef.current) {
+      renderMermaidDiagramsInElement(contentRef.current);
+    }
+  }, [htmlContent, activeTab]);
+
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     const runBtn = target.closest('.btn-run-code') as HTMLElement | null;
@@ -85,6 +105,16 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         <div className="header-actions">
           <button
             className="btn-secondary-sm"
+            onClick={onCompileGuide}
+            disabled={isCompiling}
+            title="Compile mastered summary guide to artifacts/"
+          >
+            <FileCheck2 size={13} />
+            <span>{isCompiling ? 'Compiling...' : 'Compile Guide'}</span>
+          </button>
+
+          <button
+            className="btn-secondary-sm"
             onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true)}
             disabled={isGenerating}
             title="Regenerate all 3 units"
@@ -122,10 +152,25 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <span>Operational Labs</span>
           {topic.labs && <span className="tab-dot" />}
         </button>
+
+        <button
+          className={`tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
+          onClick={() => setActiveTab('quiz')}
+        >
+          <HelpCircle size={14} />
+          <span>Socratic Quiz</span>
+        </button>
       </div>
 
-      <div className="viewer-scroll-body" onClick={handleContentClick}>
-        {!hasAnyContent ? (
+      <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>
+        {activeTab === 'quiz' ? (
+          <SocraticQuizView
+            subtopicTitle={topic.subtopic.replace(/_/g, ' ')}
+            questions={quizQuestions}
+            isLoading={isLoadingQuiz}
+            onRefreshQuiz={onRefreshQuiz}
+          />
+        ) : !hasAnyContent ? (
           <div className="viewer-missing-card">
             <Sparkles size={36} className="missing-icon" />
             <h3>No Content Generated Yet</h3>

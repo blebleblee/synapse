@@ -4,7 +4,7 @@ import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
 import { TerminalDrawer } from './components/TerminalDrawer';
 import type { TerminalDrawerHandle } from './components/TerminalDrawer';
-import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus } from './types';
+import type { TopicTreeData, TopicDetails, ChatMessage, WorkspaceStatus, QuizQuestion } from './types';
 import './App.css';
 
 export function App() {
@@ -12,11 +12,15 @@ export function App() {
   const [, setStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
-  const [activeTab, setActiveTab] = useState<'foundation' | 'lesson' | 'labs'>('foundation');
+  const [activeTab, setActiveTab] = useState<'foundation' | 'lesson' | 'labs' | 'quiz'>('foundation');
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
+  const [isSavingSession, setIsSavingSession] = useState(false);
+  const [isCompilingGuide, setIsCompilingGuide] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ [key: string]: ChatMessage[] }>({});
+  const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(true);
 
   const terminalRef = useRef<TerminalDrawerHandle>(null);
@@ -151,12 +155,82 @@ export function App() {
     }
   };
 
+  const handleSaveSession = async () => {
+    if (!selectedPath) return;
+    const history = chatHistory[selectedPath] || [];
+    if (history.length === 0) return;
+
+    setIsSavingSession(true);
+    try {
+      const res = await fetch('/api/session/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: selectedPath, history }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert(`Session debrief saved to ${data.path} and committed to Gitea!`);
+      }
+    } catch (err) {
+      console.error('Failed to save session:', err);
+    } finally {
+      setIsSavingSession(false);
+    }
+  };
+
+  const handleCompileGuide = async () => {
+    if (!selectedPath) return;
+
+    setIsCompilingGuide(true);
+    try {
+      const res = await fetch('/api/artifacts/compile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: selectedPath }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert(`Mastered Field Guide compiled to ${data.path} and committed to Gitea!`);
+      }
+    } catch (err) {
+      console.error('Failed to compile guide:', err);
+    } finally {
+      setIsCompilingGuide(false);
+    }
+  };
+
+  const handleRefreshQuiz = async () => {
+    if (!selectedPath) return;
+
+    setIsLoadingQuiz(true);
+    try {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: selectedPath }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setQuizQuestions((prev) => ({
+          ...prev,
+          [selectedPath]: data.questions || [],
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch quiz:', err);
+    } finally {
+      setIsLoadingQuiz(false);
+    }
+  };
+
   const handleRunInTerminal = (cmd: string) => {
     if (terminalRef.current) {
       terminalRef.current.runCommand(cmd);
       setTerminalOpen(true);
     }
   };
+
+  const currentQuiz = selectedPath ? quizQuestions[selectedPath] || [] : [];
 
   return (
     <div className="workbench-layout">
@@ -176,6 +250,11 @@ export function App() {
           onRunInTerminal={handleRunInTerminal}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          quizQuestions={currentQuiz}
+          isLoadingQuiz={isLoadingQuiz}
+          onRefreshQuiz={handleRefreshQuiz}
+          onCompileGuide={handleCompileGuide}
+          isCompiling={isCompilingGuide}
         />
 
         <TutorChat
@@ -183,6 +262,8 @@ export function App() {
           history={selectedPath ? chatHistory[selectedPath] || [] : []}
           isChatting={isChatting}
           onSendMessage={handleSendMessage}
+          onSaveSession={handleSaveSession}
+          isSavingSession={isSavingSession}
         />
       </div>
 

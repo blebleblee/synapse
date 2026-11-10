@@ -47,6 +47,14 @@ export interface ChatMessage {
   timestamp?: string;
 }
 
+export interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
 export interface WorkspaceStatus {
   domains: number;
   categories: number;

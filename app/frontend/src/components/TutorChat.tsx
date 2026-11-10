@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
-import { Send, Bot, User, MessageSquare, Lightbulb } from 'lucide-react';
+import { Send, Bot, User, MessageSquare, Lightbulb, BookmarkCheck } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 
 interface TutorChatProps {
@@ -8,6 +8,8 @@ interface TutorChatProps {
   history: ChatMessage[];
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
+  onSaveSession: () => Promise<void>;
+  isSavingSession: boolean;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -15,6 +17,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   history,
   isChatting,
   onSendMessage,
+  onSaveSession,
+  isSavingSession,
 }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -57,6 +61,18 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </span>
           </div>
         </div>
+
+        {history.length > 0 && (
+          <button
+            className="btn-secondary-sm"
+            onClick={onSaveSession}
+            disabled={isSavingSession}
+            title="Save dialogue transcript to sessions/"
+          >
+            <BookmarkCheck size={13} />
+            <span>{isSavingSession ? 'Saving...' : 'Save Session'}</span>
+          </button>
+        )}
       </div>
 
       <div className="chat-messages">

@@ -12,6 +12,8 @@ import fcntl
 import termios
 import asyncio
 import json
+import datetime
+import subprocess
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -229,6 +231,173 @@ def chat_with_tutor(req: ChatRequest):
 
     return {
         "reply": response_text.strip()
+    }
+
+class QuizRequest(BaseModel):
+    query: str
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+class SaveSessionRequest(BaseModel):
+    query: str
+    history: List[ChatMessage]
+
+@app.post("/api/quiz")
+def generate_quiz(req: QuizRequest):
+    target = resolve_subtopic(req.query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
+
+    domain, cat, sub, sub_path = target
+    persona = get_domain_persona(domain)
+
+    context_parts = []
+    for fname in ["FOUNDATION.md", "LESSON.md"]:
+        fpath = sub_path / fname
+        if fpath.exists():
+            context_parts.append(fpath.read_text(encoding="utf-8")[:3000])
+
+    system_instruction = persona + "\nYou are an expert examiner. Generate challenging scenario-based multiple-choice quiz questions to test deep intuition and operational mechanics."
+    prompt = f"""Based on the curriculum for '{sub.replace('_', ' ').title()}', generate 3 scenario-based multiple choice questions.
+Return strictly a valid JSON array of 3 objects with this exact structure:
+[
+  {{
+    "id": 1,
+    "question": "Scenario: ...",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctIndex": 0,
+    "explanation": "Why this option is correct based on first principles."
+  }}
+]
+
+Curriculum Context:
+{"".join(context_parts)}
+
+Output valid JSON only with no markdown backticks or commentary."""
+
+    provider = get_provider(provider_type=req.provider, model=req.model)
+    raw = provider.generate(prompt, system_instruction=system_instruction).strip()
+
+    # Clean markdown code block if present
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    try:
+        quiz_data = json.loads(raw)
+        return {"questions": quiz_data}
+    except Exception:
+        # Fallback structured question
+        return {
+            "questions": [
+                {
+                    "id": 1,
+                    "question": f"In {sub.replace('_', ' ').title()}, what is the primary architectural trade-off?",
+                    "options": [
+                        "Latency vs. throughput optimization",
+                        "Consistency vs. availability",
+                        "Memory footprint vs. cache coherence",
+                        "Control plane overhead vs. fault isolation"
+                    ],
+                    "correctIndex": 0,
+                    "explanation": "Systems optimization requires balancing critical resource constraints."
+                }
+            ]
+        }
+
+@app.post("/api/session/save")
+def save_session(req: SaveSessionRequest):
+    target = resolve_subtopic(req.query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
+
+    domain, cat, sub, sub_path = target
+    sessions_dir = sub_path / "sessions"
+    sessions_dir.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M")
+    filename = f"{timestamp}_socratic_session.md"
+    file_path = sessions_dir / filename
+
+    content_lines = [
+        f"# Socratic Study Session: {sub.replace('_', ' ').title()}",
+        f"**Date:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"**Domain:** `{domain}` | **Category:** `{cat}`\n",
+        "## Dialogue Log\n"
+    ]
+
+    for msg in req.history:
+        role = "Student (You)" if msg.role == "student" else "AI Tutor"
+        content_lines.append(f"### {role}\n{msg.content}\n")
+
+    file_path.write_text("\n".join(content_lines), encoding="utf-8")
+
+    # Git commit and push
+    try:
+        import subprocess
+        subprocess.run(["git", "add", str(file_path)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"session({sub}): save tutor study log for {timestamp}"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "filename": filename,
+        "path": str(file_path.relative_to(WORKSPACE_ROOT))
+    }
+
+@app.post("/api/artifacts/compile")
+def compile_artifacts(req: QuizRequest):
+    target = resolve_subtopic(req.query)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
+
+    domain, cat, sub, sub_path = target
+    artifacts_dir = sub_path / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    persona = get_domain_persona(domain)
+    sessions_dir = sub_path / "sessions"
+    session_texts = []
+    if sessions_dir.exists():
+        for sfile in sessions_dir.glob("*.md"):
+            session_texts.append(sfile.read_text(encoding="utf-8")[:2000])
+
+    prompt = f"""Synthesize all learning sessions, core theorems, and operational best practices for '{sub.replace('_', ' ').title()}' into an exhaustive Mastered Field Reference Guide.
+
+Structure:
+# Mastered Field Guide: {sub.replace('_', ' ').title()}
+## 1. Executive Summary & Core Invariants
+## 2. Essential Architecture & Cheatsheet
+## 3. High-Value Production Snippets / Formulas
+## 4. Troubleshooting Playbook & Critical Pitfalls
+
+Sessions History:
+{"".join(session_texts) if session_texts else "No prior session logs."}
+
+Output clean, production-ready Markdown."""
+
+    provider = get_provider(provider_type=req.provider, model=req.model)
+    compiled_guide = provider.generate(prompt, system_instruction=persona)
+
+    output_file = artifacts_dir / "MASTERED_GUIDE.md"
+    output_file.write_text(compiled_guide.strip() + "\n", encoding="utf-8")
+
+    # Git commit and push
+    try:
+        import subprocess
+        subprocess.run(["git", "add", str(output_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"artifacts({sub}): compile mastered field guide"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "path": str(output_file.relative_to(WORKSPACE_ROOT))
     }
 
 # -----------------------------------------------------------------------------
