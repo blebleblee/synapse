@@ -207,6 +207,59 @@ def get_flashcards_deck(query: str):
 
     return {"topic": sub.replace("_", " ").title(), "cards": cards}
 
+import hashlib
+
+class TranslateRequest(BaseModel):
+    text: str
+    target_lang: str
+    model: Optional[str] = None
+
+LANGUAGE_NAMES = {
+    "cs": "Czech (Čeština)",
+    "de": "German (Deutsch)",
+    "es": "Spanish (Español)",
+    "ru": "Russian (Русский)",
+    "en": "English"
+}
+
+@app.post("/api/translate")
+def api_translate_content(req: TranslateRequest):
+    if req.target_lang == "en" or not req.text.strip():
+        return {"translated": req.text, "cached": True}
+
+    lang_name = LANGUAGE_NAMES.get(req.target_lang, req.target_lang)
+
+    cache_dir = WORKSPACE_ROOT / ".cache" / "translations"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    text_hash = hashlib.sha256((req.text + req.target_lang).encode("utf-8")).hexdigest()
+    cache_file = cache_dir / f"{text_hash}_{req.target_lang}.md"
+
+    if cache_file.exists():
+        return {"translated": cache_file.read_text(encoding="utf-8"), "cached": True}
+
+    prompt = f"""You are an expert technical translator and polyglot philologist.
+Translate the following technical curriculum text into {lang_name}.
+
+CRITICAL INVARIANTS:
+1. DO NOT translate or modify code blocks (```...```). Keep all code, manifests, and CLI commands 100% identical.
+2. DO NOT translate or modify KaTeX math equations ($...$ and $$...$$). Keep all mathematical notation 100% identical.
+3. DO NOT translate Mermaid diagrams (```mermaid...```).
+4. Translate all technical explanations and narrative prose with high fidelity and natural grammatical precision.
+5. Output clean Markdown only with no preamble or wrapping.
+
+Text to translate:
+\"\"\"
+{req.text}
+\"\"\""""
+
+    try:
+        provider = get_provider(model=req.model)
+        translated_text = provider.generate(prompt).strip()
+        cache_file.write_text(translated_text + "\n", encoding="utf-8")
+        return {"translated": translated_text, "cached": False}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),

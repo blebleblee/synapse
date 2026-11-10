@@ -6,6 +6,7 @@ __pycache__/
 *.log
 *.pid
 *.egg-info/
+.cache/
 
 # Node & Frontend Dependencies
 node_modules/

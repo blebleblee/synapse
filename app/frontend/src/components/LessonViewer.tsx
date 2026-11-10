@@ -41,6 +41,7 @@ interface LessonViewerProps {
   onRegenerateSummary: () => Promise<void>;
   isRegeneratingSummary: boolean;
   onOpenFlashcards: () => void;
+  targetLanguage?: string;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -64,27 +65,17 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onRegenerateSummary,
   isRegeneratingSummary,
   onOpenFlashcards,
+  targetLanguage,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
+  const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     stopSpeaking();
     setIsSpeakingVoice(false);
   }, [topic?.path, activeTab, currentLevel]);
-
-  const handleToggleVoice = () => {
-    if (isSpeakingVoice) {
-      stopSpeaking();
-      setIsSpeakingVoice(false);
-    } else if (rawMarkdown) {
-      speakText(
-        rawMarkdown,
-        () => setIsSpeakingVoice(true),
-        () => setIsSpeakingVoice(false)
-      );
-    }
-  };
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
@@ -95,10 +86,56 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return '';
   }, [topic, activeTab]);
 
+  useEffect(() => {
+    if (!targetLanguage || targetLanguage === 'en' || !rawMarkdown) {
+      setTranslatedMarkdown(null);
+      setIsTranslating(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsTranslating(true);
+
+    fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: rawMarkdown, target_lang: targetLanguage }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.translated) {
+          setTranslatedMarkdown(data.translated);
+        }
+      })
+      .catch((err) => console.error('Translation error:', err))
+      .finally(() => {
+        if (isMounted) setIsTranslating(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [rawMarkdown, targetLanguage]);
+
+  const activeMarkdown = (targetLanguage && targetLanguage !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
+
+  const handleToggleVoice = () => {
+    if (isSpeakingVoice) {
+      stopSpeaking();
+      setIsSpeakingVoice(false);
+    } else if (activeMarkdown) {
+      speakText(
+        activeMarkdown,
+        () => setIsSpeakingVoice(true),
+        () => setIsSpeakingVoice(false)
+      );
+    }
+  };
+
   const htmlContent = useMemo(() => {
-    if (!rawMarkdown) return '';
-    return renderMarkdownWithMathAndMermaid(rawMarkdown);
-  }, [rawMarkdown]);
+    if (!activeMarkdown) return '';
+    return renderMarkdownWithMathAndMermaid(activeMarkdown);
+  }, [activeMarkdown]);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -212,6 +249,12 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         </div>
 
         <div className="tabs-actions-group">
+          {targetLanguage && targetLanguage !== 'en' && (
+            <span className={`nav-lang-badge ${isTranslating ? 'translating' : ''}`} title="AI translation active">
+              🌐 {targetLanguage.toUpperCase()}{isTranslating ? '...' : ''}
+            </span>
+          )}
+
           <button
             className={`nav-action-btn ${isSpeakingVoice ? 'active-voice' : ''}`}
             onClick={handleToggleVoice}

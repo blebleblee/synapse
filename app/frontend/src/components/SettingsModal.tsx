@@ -5,6 +5,7 @@ export interface AppSettings {
   theme: 'studio' | 'titanium' | 'monokai' | 'nordic';
   fontSize: 'compact' | 'standard' | 'large';
   readerWidth: 'full' | 'constrained';
+  language: 'en' | 'cs' | 'de' | 'es' | 'ru';
   ollamaHost: string;
   primaryModel: string;
   reviewerModel: string;
@@ -15,6 +16,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'studio',
   fontSize: 'standard',
   readerWidth: 'full',
+  language: 'en',
   ollamaHost: 'http://localhost:11434',
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
@@ -121,6 +123,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <option value="constrained">Comfortable Column (960px)</option>
                 </select>
               </div>
+            </div>
+
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label>Reading Language (AI On-The-Fly Translation)</label>
+              <select
+                value={formData.language || 'en'}
+                onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
+              >
+                <option value="en">English (Original Source)</option>
+                <option value="cs">Czech (Čeština)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="es">Spanish (Español)</option>
+                <option value="ru">Russian (Русский)</option>
+              </select>
+              <span className="field-hint">Translates lesson prose on the fly while preserving all math formulas, code blocks, and diagrams.</span>
             </div>
           </div>
 

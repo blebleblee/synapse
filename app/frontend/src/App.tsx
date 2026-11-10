@@ -359,6 +359,7 @@ export function App() {
           onRegenerateSummary={handleRegenerateSummary}
           isRegeneratingSummary={isRegeneratingSummary}
           onOpenFlashcards={() => setFlashcardModalOpen(true)}
+          targetLanguage={settings.language}
         />
 
         <TutorChat
