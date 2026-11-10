@@ -130,6 +130,31 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const [lightboxSvg, setLightboxSvg] = useState<string | null>(null);
   const [lightboxZoom, setLightboxZoom] = useState(1);
 
+  const [dependencies, setDependencies] = useState<{
+    prerequisites: { id: string; label: string; domain: string }[];
+    unlocks: { id: string; label: string; domain: string }[];
+  }>({ prerequisites: [], unlocks: [] });
+
+  useEffect(() => {
+    if (!topic?.path) return;
+    let isMounted = true;
+    fetch(`/api/topic/dependencies?query=${encodeURIComponent(topic.path)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data) {
+          setDependencies({
+            prerequisites: data.prerequisites || [],
+            unlocks: data.unlocks || [],
+          });
+        }
+      })
+      .catch((err) => console.error('Failed to load topic dependencies:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, [topic?.path]);
+
   const activeMarkdown = (targetLanguage && targetLanguage !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
 
   const handleToggleVoice = () => {
@@ -419,6 +444,43 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       </div>
 
       <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>
+        {/* In-Lesson Real-Time Dependency Navigation Bar */}
+        {(dependencies.prerequisites.length > 0 || dependencies.unlocks.length > 0) && (
+          <div className="in-lesson-deps-bar">
+            {dependencies.prerequisites.length > 0 && (
+              <div className="deps-group prereqs">
+                <span className="deps-label">Prerequisite:</span>
+                {dependencies.prerequisites.map((p) => (
+                  <button
+                    key={p.id}
+                    className="dep-chip prereq-chip"
+                    onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', p.id)}
+                    title={`Prerequisite topic: ${p.label}`}
+                  >
+                    <span>⬅ {p.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {dependencies.unlocks.length > 0 && (
+              <div className="deps-group unlocks">
+                <span className="deps-label">Unlocks:</span>
+                {dependencies.unlocks.map((u) => (
+                  <button
+                    key={u.id}
+                    className="dep-chip unlock-chip"
+                    onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('subtopic', u.id)}
+                    title={`Unlocked next: ${u.label}`}
+                  >
+                    <span>{u.label} ➡</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'quiz' ? (
           <SocraticQuizView
             subtopicTitle={`${topic.subtopic.replace(/_/g, ' ')} (${currentLevel.toUpperCase()})`}

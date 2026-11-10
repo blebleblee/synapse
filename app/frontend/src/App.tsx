@@ -243,6 +243,11 @@ export function App() {
   };
 
   const handleNavigateBreadcrumb = (type: 'domain' | 'category' | 'subtopic', path: string) => {
+    if (type === 'subtopic') {
+      loadTopic(path, currentLevel);
+      return;
+    }
+
     for (const [domain, ddata] of Object.entries(tree)) {
       if (type === 'domain' && domain === path) {
         for (const discData of Object.values(ddata.disciplines || {})) {

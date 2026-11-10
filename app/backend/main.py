@@ -40,7 +40,7 @@ from learning_engine.topic_manager import (
 from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import get_provider, OllamaProvider
 from learning_engine.search import search_curriculum
-from learning_engine.graph import get_prerequisite_graph
+from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
 from learning_engine.mastery import set_subtopic_mastery, load_mastery_data, get_mastery_summary, get_subtopic_mastery
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
@@ -136,6 +136,10 @@ def api_search(q: str = Query(..., min_length=2)):
 @app.get("/api/graph")
 def api_graph():
     return get_prerequisite_graph()
+
+@app.get("/api/topic/dependencies")
+def api_topic_dependencies(query: str = Query(..., description="Relative path of topic to find dependencies for")):
+    return get_topic_dependencies(query)
 
 class MasteryUpdateRequest(BaseModel):
     path: str

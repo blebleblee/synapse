@@ -1665,6 +1665,170 @@ body, html, #root {
   overflow: hidden;
 }
 
+.visual-dag-modal {
+  width: 95% !important;
+  max-width: 1200px !important;
+  height: 88vh !important;
+}
+
+.dag-stats-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  background-color: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+.dag-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-toggle-pills {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.view-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-pill-btn.active {
+  background-color: var(--accent-gold);
+  color: #0d0f12;
+}
+
+.cy-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.visual-canvas-content {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.cytoscape-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cytoscape-container {
+  width: 100%;
+  height: 100%;
+  background-color: #0b0d10;
+}
+
+.dag-node-inspector {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 320px;
+  background-color: rgba(21, 24, 31, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+  z-index: 10;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inspector-domain {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.inspector-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.inspector-path {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+  word-break: break-all;
+}
+
+.inspector-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: var(--bg-tertiary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+}
+
+.stat-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.inspector-nav-btn {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  margin-top: 4px;
+}
+
 .graph-title-box {
   display: flex;
   align-items: center;
@@ -2600,4 +2764,60 @@ body, html, #root {
   white-space: pre-wrap;
   max-height: 220px;
   overflow-y: auto;
+}
+
+/* In-Lesson Dependency Navigation Bar */
+.in-lesson-deps-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.deps-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.deps-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.dep-chip {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+}
+
+.dep-chip:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--accent-gold);
+  color: var(--text-primary);
+}
+
+.prereq-chip {
+  border-left: 2px solid var(--accent-blue);
+}
+
+.unlock-chip {
+  border-right: 2px solid var(--accent-green);
 }
