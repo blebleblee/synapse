@@ -21,6 +21,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const [personaExpanded, setPersonaExpanded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [chatWidth, setChatWidth] = useState<number>(() => {
     const saved = localStorage.getItem('synapse_chat_width');
     return saved ? parseInt(saved, 10) : 480;
@@ -36,30 +37,37 @@ export const TutorChat: React.FC<TutorChatProps> = ({
     scrollToBottom();
   }, [history, isChatting]);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!isDraggingRef.current) return;
-      const newWidth = window.innerWidth - e.clientX;
-      if (newWidth >= 320 && newWidth <= window.innerWidth * 0.6) {
+      const newWidth = window.innerWidth - moveEvent.clientX;
+      if (newWidth >= 280 && newWidth <= window.innerWidth * 0.75) {
         setChatWidth(newWidth);
       }
     };
 
     const handleMouseUp = () => {
-      if (isDraggingRef.current) {
-        isDraggingRef.current = false;
-        document.body.style.cursor = '';
-        localStorage.setItem('synapse_chat_width', chatWidth.toString());
-      }
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      setChatWidth((curr) => {
+        localStorage.setItem('synapse_chat_width', curr.toString());
+        return curr;
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [chatWidth]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,12 +91,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
     <aside className="chat-sidebar" style={{ width: `${chatWidth}px` }}>
       {/* Draggable Vertical Resize Handle */}
       <div
-        className="chat-resize-handle"
-        onMouseDown={(e) => {
-          e.preventDefault();
-          isDraggingRef.current = true;
-          document.body.style.cursor = 'ew-resize';
-        }}
+        className={`chat-resize-handle ${isDragging ? 'active' : ''}`}
+        onMouseDown={handleMouseDown}
         title="Drag to resize AI chat panel"
       />
 

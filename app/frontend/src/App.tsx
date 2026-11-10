@@ -364,23 +364,23 @@ export function App() {
 
   return (
     <div className="workbench-layout">
-      <div className="workbench-main-row">
-        <TopicTree
-          tree={tree}
-          selectedSubtopic={selectedPath}
-          onSelectSubtopic={(q) => loadTopic(q, currentLevel)}
-          onAddSubtopic={handleAddSubtopic}
-          onOpenSearch={() => setSearchOpen(true)}
-          onOpenGraph={() => setGraphOpen(true)}
-          onOpenSettings={() => setSettingsOpen(true)}
-          onDeleteTopic={handleDeleteTopic}
-          onRenameTopic={handleRenameTopic}
-          onOpenAIExpand={(p) => {
-            setAiExpandInitialPath(p || '');
-            setAiExpandOpen(true);
-          }}
-        />
+      <TopicTree
+        tree={tree}
+        selectedSubtopic={selectedPath}
+        onSelectSubtopic={(q) => loadTopic(q, currentLevel)}
+        onAddSubtopic={handleAddSubtopic}
+        onOpenSearch={() => setSearchOpen(true)}
+        onOpenGraph={() => setGraphOpen(true)}
+        onOpenSettings={() => setSettingsOpen(true)}
+        onDeleteTopic={handleDeleteTopic}
+        onRenameTopic={handleRenameTopic}
+        onOpenAIExpand={(p) => {
+          setAiExpandInitialPath(p || '');
+          setAiExpandOpen(true);
+        }}
+      />
 
+      <div className="center-workspace-column">
         <LessonViewer
           topic={topicDetails}
           isLoading={isLoadingTopic}
@@ -406,19 +406,19 @@ export function App() {
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
         />
 
-        <TutorChat
-          topic={topicDetails}
-          history={unifiedChatHistory}
-          isChatting={isChatting}
-          onSendMessage={handleSendMessage}
-          onClearChat={() => setUnifiedChatHistory([])}
+        <TerminalDrawer
+          ref={terminalRef}
+          isOpen={terminalOpen}
+          onToggle={() => setTerminalOpen((prev) => !prev)}
         />
       </div>
 
-      <TerminalDrawer
-        ref={terminalRef}
-        isOpen={terminalOpen}
-        onToggle={() => setTerminalOpen((prev) => !prev)}
+      <TutorChat
+        topic={topicDetails}
+        history={unifiedChatHistory}
+        isChatting={isChatting}
+        onSendMessage={handleSendMessage}
+        onClearChat={() => setUnifiedChatHistory([])}
       />
 
       <SearchModal

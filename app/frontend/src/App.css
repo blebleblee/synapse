@@ -34,20 +34,45 @@ body, html, #root {
   overflow: hidden;
 }
 
-/* Master Workbench Layout */
+/* Master Workbench Layout: Full-Height Sidebars with Center-Docked Terminal */
 .workbench-layout {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
-.workbench-main-row {
+.center-workspace-column {
+  flex: 1;
   display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.center-workspace-column .lesson-viewer {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  border-right: none;
+}
+
+.center-workspace-column .terminal-drawer {
+  width: 100%;
+  border-right: none;
+  flex-shrink: 0;
+}
+
+.center-workspace-column .terminal-drawer.maximized {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100% !important;
+  z-index: 100;
 }
 
 /* Left Sidebar: Topic Tree */
@@ -55,6 +80,8 @@ body, html, #root {
   width: 310px;
   min-width: 260px;
   max-width: 400px;
+  height: 100vh;
+  flex: 0 0 auto;
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   display: flex;
@@ -205,7 +232,7 @@ body, html, #root {
 }
 
 .category-icon {
-  color: var(--text-muted);
+  color: var(--accent-gold);
 }
 
 .category-label {
@@ -755,14 +782,16 @@ body, html, #root {
 
 /* Right Sidebar: AI Tutor Chat */
 .chat-sidebar {
-  width: 440px;
-  min-width: 360px;
-  max-width: 540px;
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 280px;
+  max-width: 80vw;
   background-color: var(--bg-secondary);
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100vh;
 }
 
 .chat-header {
@@ -2039,19 +2068,19 @@ body, html, #root {
 /* Chat Draggable Resize Handle */
 .chat-resize-handle {
   position: absolute;
-  left: 0;
+  left: -4px;
   top: 0;
   bottom: 0;
-  width: 5px;
+  width: 8px;
   cursor: ew-resize;
   background-color: transparent;
   transition: background-color 0.15s;
-  z-index: 10;
+  z-index: 50;
 }
 
 .chat-resize-handle:hover,
-.chat-resize-handle:active {
-  background-color: var(--accent-blue);
+.chat-resize-handle.active {
+  background-color: var(--accent-gold);
 }
 
 /* Color Scheme Themes */

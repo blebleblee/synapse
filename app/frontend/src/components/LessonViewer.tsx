@@ -248,25 +248,11 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     <main className="lesson-viewer">
       <header className="viewer-header">
         <div className="breadcrumbs">
-          <span
-            className="crumb-domain clickable"
-            onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('domain', topic.domain)}
-            title={`Browse ${topic.domain.replace(/_/g, ' ')}`}
-          >
-            {topic.domain.replace(/_/g, ' ')}
-          </span>
+          <span className="crumb-domain">{topic.domain.replace(/_/g, ' ')}</span>
           <span className="crumb-sep">/</span>
-          <span
-            className="crumb-category clickable"
-            onClick={() => onNavigateBreadcrumb && onNavigateBreadcrumb('category', `${topic.domain}/${topic.category}`)}
-            title={`Browse ${topic.category.replace(/_/g, ' ')}`}
-          >
-            {topic.category.replace(/_/g, ' ')}
-          </span>
+          <span className="crumb-category">{topic.category.replace(/_/g, ' ')}</span>
           <span className="crumb-sep">/</span>
-          <span className="crumb-subtopic">
-            {topic.subtopic.replace(/_/g, ' ')}
-          </span>
+          <span className="crumb-subtopic">{topic.subtopic.replace(/_/g, ' ')}</span>
         </div>
 
         {/* Top Right: Difficulty Tier Selector + Mastery Selector */}
@@ -280,7 +266,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 disabled={activeTab === 'summary'}
                 title={activeTab === 'summary' ? 'Summary covers all tiers' : `Switch difficulty tier to ${lvl}`}
               >
-                {lvl.slice(0, 3).toUpperCase()}
+                {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
               </button>
             ))}
           </div>
@@ -307,6 +293,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <button
             className={`tab-btn ${activeTab === 'summary' ? 'active' : ''}`}
             onClick={() => setActiveTab('summary')}
+            title="Executive cross-tier curriculum summary and discussion insights"
           >
             <FileText size={14} />
             <span>Summary</span>
@@ -316,6 +303,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <button
             className={`tab-btn ${activeTab === 'foundation' ? 'active' : ''}`}
             onClick={() => setActiveTab('foundation')}
+            title="Theoretical foundation, mental models, and formal invariants"
           >
             <BookOpen size={14} />
             <span>Foundation</span>
@@ -325,6 +313,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <button
             className={`tab-btn ${activeTab === 'lesson' ? 'active' : ''}`}
             onClick={() => setActiveTab('lesson')}
+            title="In-depth technical lesson with code and step-by-step mechanics"
           >
             <GraduationCap size={14} />
             <span>Lesson</span>
@@ -334,6 +323,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <button
             className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
             onClick={() => setActiveTab('labs')}
+            title="Hands-on operational lab exercises and terminal verification"
           >
             <FlaskConical size={14} />
             <span>Labs</span>
@@ -343,6 +333,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           <button
             className={`tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
             onClick={() => setActiveTab('quiz')}
+            title="Socratic multiple-choice comprehension check"
           >
             <HelpCircle size={14} />
             <span>Quiz</span>
