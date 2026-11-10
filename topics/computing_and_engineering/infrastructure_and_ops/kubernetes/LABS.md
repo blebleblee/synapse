@@ -1,262 +1,245 @@
-# Hands-On Operational Lab: Kubernetes
+# Hands-On Operational Lab: Kubernetes Microservice Deployment, Zero-Downtime Rollouts & Diagnostic Debugging
 
-## Objective & Prerequisites
+## Objective & Lab Prerequisites
+In this lab, you will deploy a hardened microservice with zero-downtime rolling updates, inspect control plane reconciliation mechanisms, intentionally induce real-world failure domains (`CrashLoopBackOff`, `OOMKilled`), and isolate root-cause events using standard Kubernetes diagnostics.
 
-**Objective**: Gain hands-on experience with Kubernetes by building, deploying, and debugging a production-grade application while understanding the underlying system mechanics (node scheduling, pod lifecycle, network policies, and failure recovery).
-
-**Prerequisites**:
-- Linux environment (Ubuntu 22.04 LTS recommended)
-- `minikube` v1.28+ installed (`minikube version` should show ≥1.28)
-- `kubectl` v1.28+ installed
-- Basic understanding of Docker concepts
-- 2GB+ RAM (for minikube)
-- **Critical Safety Note**: Always run `minikube stop` after lab completion to prevent resource leaks
-
-> 💡 *Why this matters*: Kubernetes operates at the kernel level (cgroups, namespaces, cgroups v2) and requires understanding of how pods map to physical nodes. This lab avoids abstract concepts by focusing on observable system states.
+### Prerequisites
+* A running Kubernetes cluster (e.g., Rancher Desktop, Minikube, Kind, or a bare-metal K3s/RKE2 cluster).
+* `kubectl` configured with cluster administrator privileges.
+* Verify cluster connectivity before beginning:
+  ```bash
+  kubectl cluster-info
+  kubectl get nodes -o wide
+  ```
 
 ---
 
-## Exercise 1: Exploration & System State Inspection
+## Exercise 1: Cluster State & API Discovery
 
-*Verify your cluster's operational state with explicit verification commands and expected outputs.*
+Inspect the exposed API surface and control plane state machine:
 
-### Step 1: Confirm cluster health
 ```bash
-minikube status
-```
-**Expected Output**:
-```
-minikube: running
-cluster: minikube
-nodes: 1
-docker: 24.0.7
-kubectl: 1.28.0
-```
+# 1. Discover all registered API groups, versions, and whether resources are namespaced
+kubectl api-resources --sort-by=name
 
-### Step 2: Inspect node scheduling mechanics
-```bash
-kubectl get nodes -o wide
-```
-**Expected Output**:
-```
-NAME       STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OSIMAGE              KERNEL
-minikube   Ready    <none>   10m  v1.28.0   192.168.49.2   <none>       ubuntu@22.04.3        5.15.0-103-generic
-```
-*Why this matters*: The `INTERNAL-IP` shows the node's physical address (not virtual). Kubernetes uses this for pod scheduling decisions.
+# 2. Inspect the raw OpenAPI schema definition for PodSpecs
+kubectl explain pod.spec.containers.securityContext
 
-### Step 3: Verify kubelet process (critical for node health)
-```bash
-minikube ssh -- sudo ps aux | grep kubelet
-```
-**Expected Output**:
-```
-root      1234     0.1  0.5  1234567  523456 ?        S    10:15   0:00 /usr/local/bin/kubelet --address=192.168.49.2 --pod-ip=192.168.49.2 --kubeconfig=/etc/kubernetes/kubeconfig --cert-dir=/etc/kubernetes/pki
-```
-*Why this matters*: The kubelet is the node agent that communicates with the control plane. Its presence confirms the node is operational.
+# 3. Check node allocatable resources vs physical capacity
+kubectl describe nodes | grep -A 8 "Allocatable:"
 
-### Step 4: Check container runtime status
-```bash
-minikube ssh -- sudo systemctl status docker
+# 4. Create an isolated lab namespace
+kubectl create namespace k8s-deep-dive
+kubectl config set-context --current --namespace=k8s-deep-dive
 ```
-**Expected Output**:
-```
-● docker.service - Docker Container Engine
-     Loaded: loaded (/lib/systemd/system/docker.service; enabled; preset: enabled)
-     Active: active (running) since Mon 2024-03-11 10:15:22 UTC
-```
-*Why this matters*: Docker is the container runtime that executes pods. Its status affects pod scheduling.
-
-> ✅ **Verification**: All outputs confirm your cluster is healthy and ready for deployment.
 
 ---
 
-## Exercise 2: Building & Deploying / Modeling Scenario
+## Exercise 2: Zero-Downtime Deployment & Canary Rollout
 
-*Deploy a production-grade Python web service with proper resource constraints and liveness probes.*
+### Step 1: Deploy the Microservice Manifest
 
-### Step 1: Create Dockerfile (infrastructure as code)
-```dockerfile
-# Dockerfile for production-grade Python app
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
-```
-
-### Step 2: Create requirements.txt (infrastructure as code)
-```text
-flask==2.3.2
-gunicorn==20.1.0
-```
-
-### Step 3: Build and push to local registry (reproducible)
 ```bash
-minikube docker-env  # Sets up Docker for minikube
-docker build -t python-web:1.0 .
-docker tag python-web:1.0 docker.io/library/python-web:1.0
-```
-
-### Step 4: Create Kubernetes deployment manifest (infrastructure as code)
-```yaml
-# deployment.yaml
+cat << 'EOF' | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-web
+  name: echo-service
+  namespace: k8s-deep-dive
+  labels:
+    app: echo-service
 spec:
-  replicas: 2
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
-      app: python-web
+      app: echo-service
   template:
     metadata:
       labels:
-        app: python-web
+        app: echo-service
     spec:
       containers:
-      - name: python-web
-        image: docker.io/library/python-web:1.0
-        ports:
-        - containerPort: 8000
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 15
+        - name: echo
+          image: hashicorp/http-echo:0.2.3
+          args:
+            - "-text=v1.0.0-production"
+            - "-listen=:5678"
+          ports:
+            - containerPort: 5678
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5678
+            initialDelaySeconds: 2
+            periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-service
+  namespace: k8s-deep-dive
+spec:
+  type: ClusterIP
+  selector:
+    app: echo-service
+  ports:
+    - port: 80
+      targetPort: 5678
+EOF
 ```
 
-### Step 5: Deploy to cluster (interactive workflow)
+### Step 2: Validate Pod Lifecycle & EndpointSlice Registration
+
 ```bash
-kubectl apply -f deployment.yaml
+# Verify all 4 replicas are Running and Ready
+kubectl get pods -l app=echo-service -o wide
+
+# Inspect the EndpointSlice controller's mapping of Pod IPs to Service IP
+kubectl get endpointslices -l kubernetes.io/service-name=echo-service -o yaml
 ```
 
-### Step 6: Verify deployment status
+### Step 3: Execute a Live Zero-Downtime Rolling Update
+
 ```bash
-kubectl get pods -l app=python-web
-```
-**Expected Output**:
-```
-NAME                         READY   STATUS    RESTARTS   AGE
-python-web-7d9f8b8c4b-5qj4k  2/2     Running   0          15s
-python-web-7d9f8b8c4b-9z2l5  2/2     Running   0          15s
+# Trigger an image update with a new version flag
+kubectl set args deployment/echo-service echo="-text=v2.0.0-canary" "-listen=:5678"
+
+# Monitor the rollout in real-time
+kubectl rollout status deployment/echo-service
+
+# Check rollout history and revisions
+kubectl rollout history deployment/echo-service
 ```
 
-### Step 7: Check resource usage (critical for production)
-```bash
-kubectl top pods -l app=python-web
-```
-**Expected Output**:
-```
-NAME                         CPU(cores)   MEMORY(bytes)
-python-web-7d9f8b8c4b-5qj4k  150m         350Mi
-python-web-7d9f8b8c4b-9z2l5  120m         320Mi
-```
-*Why this matters*: The liveness/readiness probes ensure the application stays healthy. The `150m` CPU shows the pod is using 150m of CPU (as expected).
-
-> ✅ **Verification**: All outputs confirm the deployment is healthy and meeting resource constraints.
+Observe how `maxUnavailable: 0` ensured existing pods continued serving traffic while new pods passed their `readinessProbe` before old pods were sent `SIGTERM`.
 
 ---
 
-## Exercise 3: Fault Injection, Failure Analysis & Debugging
+## Exercise 3: Inducing and Debugging `CrashLoopBackOff`
 
-*Simulate a failure and analyze the self-healing mechanism.*
+We will deliberately induce a configuration failure to inspect how the `kubelet` detects and records crashing containers.
 
-### Step 1: Inject failure (simulating pod crash)
+### Step 1: Deploy a Crashing Container
+
 ```bash
-kubectl delete pod -l app=python-web --force
+cat << 'EOF' | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crash-demo
+  namespace: k8s-deep-dive
+spec:
+  restartPolicy: Always
+  containers:
+    - name: failing-app
+      image: alpine:3.19
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Booting payment validation subsystem..."
+          sleep 2
+          echo "FATAL: Database connection timeout (ECONNREFUSED 10.0.0.1:5432)" >&2
+          exit 1
+EOF
 ```
-*Why this matters*: This simulates a pod crash (common in production). Kubernetes will automatically recreate the pod.
 
-### Step 2: Observe self-healing
+### Step 2: Diagnose the Failure with Event and Log Inspection
+
 ```bash
-kubectl get pods -l app=python-web -w
-```
-**Expected Output**:
-```
-NAME                         READY   STATUS    RESTARTS   AGE
-python-web-7d9f8b8c4b-5qj4k  2/2     Running   0          15s
-python-web-7d9f8b8c4b-9z2l5  2/2     Running   0          15s
-python-web-7d9f8b8c4b-5qj4k  0/2     CrashLoopBackOff   1          12s
-python-web-7d9f8b8c4b-9z2l5  2/2     Running   0          12s
-python-web-7d9f8b8c4b-5qj4k  2/2     Running   1          10s
-```
-*Why this matters*: The `CrashLoopBackOff` state shows the pod failed its liveness probe. Kubernetes automatically restarts it.
+# 1. Watch the pod state transition to CrashLoopBackOff
+kubectl get pod crash-demo -w
 
-### Step 3: Analyze failure root cause
-```bash
-kubectl describe pod -l app=python-web
-```
-**Expected Output** (partial):
-```
-Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  10s   default-scheduler  Successfully assigned default/python-web-7d9f8b8c4b-5qj4k to minikube
-  Normal  Pulled     5s    kubelet            Container image docker.io/library/python-web:1.0 already present
-  Normal  Created    5s    kubelet            Created container python-web
-  Normal  Started    5s    kubelet            Started container python-web
-  Warning FailedScheduling  2s   default-scheduler  0/1 nodes are available: 1 node(s) had insufficient cpu (100m).
-  Warning FailedScheduling  2s   default-scheduler  0/1 nodes are available: 1 node(s) had insufficient memory (512Mi).
-```
-*Why this matters*: The `FailedScheduling` events show the node ran out of resources. Kubernetes uses the `resources.limits` to enforce this.
+# 2. Inspect the Pod's lifecycle events
+kubectl describe pod crash-demo | grep -A 10 "Events:"
 
-### Step 4: Verify recovery
-```bash
-kubectl get pods -l app=python-web -w
-```
-**Expected Output**:
-```
-NAME                         READY   STATUS    RESTARTS   AGE
-python-web-7d9f8b8c4b-5qj4k  2/2     Running   1          15s
-python-web-7d9f8b8c4b-9z2l5  2/2     Running   0          15s
-```
-*Why this matters*: Kubernetes automatically recreated the pod after the node recovered.
+# Notice the Back-off restarting failed container event emitted by kubelet
 
-> ✅ **Verification**: The cluster self-healed without manual intervention.
+# 3. Read the crash logs from the previous failed execution instance
+kubectl logs crash-demo --previous
+```
 
 ---
 
-## Challenge Lab: Independent Problem for Socratic Discussion with the AI Tutor
+## Exercise 4: Inducing and Debugging `OOMKilled` (Exit Code 137)
 
-**Problem**:  
-*Your cluster is experiencing high latency (500ms+ response times) for the `python-web` service. The `kubectl top pods` shows 100% CPU usage on the node. Analyze the root cause using the following tools:*
-1. `kubectl describe pod` (for the failing pod)
-2. `minikube ssh` (to check kernel-level metrics)
-3. `strace` (to trace system calls)
+Now we will examine how Linux kernel cgroups enforce memory limits when container memory consumption exceeds boundaries.
 
-**Socratic Questions for Discussion**:
-1. Why does `kubectl top pods` show 100% CPU usage but the pod is still "Running"?
-2. What kernel metrics would indicate a CPU bottleneck (hint: `top` in minikube)?
-3. How would you modify the deployment to prevent this failure?
-4. What happens if you don't set `livenessProbe`? (Try it with `kubectl apply -f deployment.yaml`)
+### Step 1: Deploy a Memory Leaking Pod
 
-**Expected Outcome**:  
-You should identify that the pod is using 100% CPU due to a memory leak in the application (common in Python apps). The fix involves adding `memory` limits and increasing `livenessProbe` thresholds.
+```bash
+cat << 'EOF' | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oom-demo
+  namespace: k8s-deep-dive
+spec:
+  restartPolicy: Never
+  containers:
+    - name: memory-eater
+      image: python:3.11-alpine
+      command: ["python3", "-c"]
+      args:
+        - |
+          import time
+          print("Allocating memory rapidly...")
+          chunks = []
+          for i in range(100):
+              chunks.append(b"A" * (10 * 1024 * 1024)) # 10MB chunk per iteration
+              print(f"Allocated {(i+1)*10} MB")
+              time.sleep(0.1)
+      resources:
+        limits:
+          memory: "50Mi" # Hard limit: 50MB
+EOF
+```
 
-> 💡 **Why this matters**: Real-world production failures often stem from unbounded resource usage. This exercise teaches you to diagnose at the kernel level (via `strace` and `top`).
+### Step 2: Validate the OOMKiller Eviction Event
+
+```bash
+# Wait for the pod to terminate
+sleep 5
+kubectl get pod oom-demo
+
+# Inspect container exit status
+kubectl get pod oom-demo -o jsonpath='{.status.containerStatuses[0].state.terminated}'
+```
+
+### Expected Output Analysis:
+```json
+{
+  "exitCode": 137,
+  "reason": "OOMKilled",
+  "finishedAt": "..."
+}
+```
+
+* **Exit Code 137 Meaning:** The application did not call `exit(137)`. In Linux, an exit code $> 128$ represents termination by a signal ($128 + N$). Signal 9 is `SIGKILL` ($128 + 9 = 137$).
+* The Linux kernel's cgroup memory subsystem observed the container crossing its 50Mi memory ceiling and instantly sent uncatchable `SIGKILL` to prevent host starvation.
 
 ---
 
-**Final Verification Command**:  
+## Exercise 5: Clean Up
+
 ```bash
-minikube stop  # Clean up after lab
+# Delete all resources created in this lab
+kubectl delete namespace k8s-deep-dive
 ```
+
+---
+
+## Challenge Lab: Socratic Exploration
+1. In `Exercise 2`, modify the Deployment to set `readinessProbe` to query an invalid endpoint (`/does-not-exist`). Trigger a rollout. Why does `kubectl rollout status` hang indefinitely, and why does the existing Service continue serving traffic without dropping requests?
+2. If a Pod is stuck in `Terminating` for 15 minutes, what Linux kernel process states (e.g., Uninterruptible Sleep `D` state on NFS/storage mounts) prevent the `kubelet` from unmounting volumes? How do you diagnose this via `dmesg`?
