@@ -1,0 +1,27 @@
+# Python Virtual Environment & Bytecode
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Node & Frontend Dependencies
+node_modules/
+app/frontend/node_modules/
+dist/
+app/frontend/dist/
+
+# Operating System & IDE
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+
+# Secrets & Environment Files
+.env
+.env.*
+*.local
