@@ -1,102 +1,137 @@
-# Foundation: Ebpf
+# Foundation: Extended Berkeley Packet Filter (eBPF)
 
-## 1. Conceptual Mental Model (Core intuition, analogies, and first principles)
+## 1. Conceptual Mental Model
 
-Ebpf (Extended Berkeley Packet Filter) is a **secure, runtime-verified kernel programming interface** that enables user-space programs to execute directly within the Linux kernel's memory space without requiring kernel module loading. At its core, Ebpf operates as a **hardware-accelerated event-driven sandbox** that runs on the kernel's CPU cache hierarchy (specifically L1 cache) with strict memory isolation.
+### The Kernel Programmability Revolution
+Historically, modifying or observing the behavior of the Linux kernel required one of two extremes:
+1. **Upstreaming Code into the Linux Kernel:** Submitting patches to the kernel mailing list, waiting months or years for merge, distribution packaging, and production infrastructure upgrades.
+2. **Developing Out-of-Tree Kernel Modules (LKMs):** Writing C code that executes with unrestricted kernel-mode privilege (`Ring 0`). An uncaught null pointer dereference, buffer overrun, or race condition in an LKM crashes the host instantly with a kernel panic. Furthermore, LKMs break across kernel version bumps due to non-stable internal KABIs (Kernel Application Binary Interfaces).
 
-**Core intuition**: Think of Ebpf as a *kernel-level event loop* that runs in the kernel's memory space but is programmed by user-space. Unlike traditional kernel modules that require compilation and loading at runtime, Ebpf programs are compiled to bytecode that the kernel verifies *before* execution. This creates a **hardware-enforced security boundary** between user-space and kernel-space operations.
+```
+Traditional Kernel Execution vs. eBPF Sandboxed Execution
+==========================================================
 
-**First principles**:
-- **Memory isolation**: Ebpf programs run in a dedicated kernel memory region (not user-space) with strict access controls via the kernel's page tables
-- **Hardware acceleration**: Execution occurs on the CPU's L1 cache (not main memory) to minimize latency
-- **Verification-first**: All programs undergo a strict kernel verifier that checks for:
-  - No direct memory access
-  - No system calls
-  - No kernel code execution
-  - Safe data structures
-- **Event-driven**: Programs only execute when specific kernel events occur (e.g., network packets)
++--------------------------------------------------------------+
+| User Space                                                   |
+|   Applications, Daemons, Observability Agents                |
++--------------------------------------------------------------+
+                                |
+             System Calls / bpf() syscall / perf_event
+                                v
++--------------------------------------------------------------+
+| Linux Kernel (Ring 0)                                        |
+|                                                              |
+|   Traditional Kernel Modules (LKM):                          |
+|     + Unrestricted pointer access                            |
+|     + Bugs cause fatal Kernel Panics (oops / crash)          |
+|                                                              |
+|   eBPF Subsystem:                                            |
+|     +----------------------------------------------------+   |
+|     | Bytecode Validation (Static Verifier DAG Analysis) |   |
+|     +----------------------------------------------------+   |
+|                               | (Proves safety & termination)|
+|                               v                              |
+|     +----------------------------------------------------+   |
+|     | In-Kernel JIT Compiler (Native x86_64 / ARM64)     |   |
+|     +----------------------------------------------------+   |
+|                               |                              |
+|                               v                              |
+|     +----------------------------------------------------+   |
+|     | Sandboxed Execution at Native Clock Speed          |   |
+|     | Hooked directly into XDP, TC, kprobes, tracepoints |   |
+|     +----------------------------------------------------+   |
+|                               |                              |
+|     +-------------------------+--------------------------+   |
+|     | eBPF Maps (Lockless Per-CPU Arrays, Hash, RingBuf) |   |
+|     +----------------------------------------------------+   |
++--------------------------------------------------------------+
+```
 
-**Analogy**: Imagine a *high-speed traffic controller* that:
-1. Monitors vehicle flow (kernel events)
-2. Uses pre-approved traffic rules (verified programs)
-3. Executes decisions in the physical infrastructure (kernel memory)
-4. Never interacts with external systems (user-space)
-5. Has built-in safety checks (verifier)
+**eBPF solves this dilemma by turning the kernel into an event-driven programmable runtime.** It embeds a verified, sandboxed virtual machine into the kernel core. You write high-level restricted C or Rust code, compile it using Clang/LLVM into eBPF bytecode, and load it into the kernel via the `bpf()` system call.
 
-This model eliminates the need for kernel module loading while providing security through hardware-enforced boundaries.
+Before any instruction executes, the **In-Kernel Static Verifier** exhaustively parses the bytecode to mathematically prove that the program cannot crash the kernel, cannot corrupt kernel memory, cannot leak uninitialized data, and is guaranteed to terminate. Once verified, an **In-Kernel JIT (Just-In-Time) Compiler** translates the bytecode directly into native machine instructions (x86_64, aarch64, s390x, riscv), executing at raw hardware speed upon event invocation.
+
+### The JavaScript Analogy
+Consider web browsers before 1995: web pages were static HTML. To add dynamic client-side behavior, browser vendors had to add native features to the browser engine and release a new binary. JavaScript introduced a safe, sandboxed, event-driven runtime inside the browser, allowing developers to execute dynamic logic in response to DOM events (clicks, scrolls, network fetches) without risking operating system crashes.
+
+**eBPF is the JavaScript of the Linux Kernel.** It allows developers to attach safe, sandboxed mini-programs to any kernel event—a packet ingress, a function entry, a context switch, or a disk write—without modifying the kernel source code or loading hazardous kernel modules.
+
+---
 
 ## 2. Essential Terminology & Taxonomy
 
-| Term | Definition | Critical Mechanism |
-|------|------------|---------------------|
-| **Program** | User-space C code compiled to eBPF bytecode | Runs in kernel's eBPF VM (not user-space) |
-| **Verifier** | Kernel component that validates program safety | Checks for memory access, system calls, and data structures |
-| **Attach Point** | Kernel event interface (e.g., `xdp`, `tc`, `socket`) | Where program executes when event occurs |
-| **Map** | Kernel-managed data structure (key-value store) | Shared memory between programs (no user-space copying) |
-| **eBPF VM** | Specialized kernel virtual machine | Executes bytecode on CPU L1 cache (not main memory) |
-| **Socket** | Kernel interface for network packet processing | e.g., `xdp` (e.ggress), `tc` (traffic control) |
-| **Filter** | Program that selects events before execution | First-stage program for event filtering |
-| **JIT Compiler** | Kernel component that compiles bytecode to native instructions | Runs on CPU L1 cache (not main memory) |
+| Term | Technical Definition & In-Kernel Architecture |
+| :--- | :--- |
+| **eBPF VM** | A 64-bit RISC register machine embedded in the kernel. Features eleven 64-bit registers (`R0`–`R10`), a 512-byte fixed-size call frame stack, and 64-bit atomic instruction encoding. |
+| **Static Verifier** | An in-kernel safety gate (`kernel/bpf/verifier.c`). Analyzes the program's control-flow graph (CFG) as a Directed Acyclic Graph (DAG), tracking register states, types, bounds (`smin`/`smax`, `umin`/`umax`), and memory access ranges. Rejects any code that violates invariants. |
+| **JIT Compiler** | In-kernel compiler (`arch/*/net/bpf_jit_comp*.c`) that translates validated eBPF bytecode instructions into bare-metal native CPU instructions with 1:1 hardware register mappings. |
+| **eBPF Map** | Kernel-resident, memory-efficient key/value data structures (`struct bpf_map`) used to persist state and provide bi-directional, high-throughput communication between user space and kernel space. |
+| **XDP (eXpress Data Path)** | The earliest programmable network hook in the Linux network stack. Executes eBPF bytecode directly inside the network interface card (NIC) driver layer before the kernel allocates a `struct sk_buff` (socket buffer). |
+| **TC (Traffic Control)** | Hook located in the `cls_bpf` classifier subsystem of the Linux networking stack. Operates on full `sk_buff` structures on both ingress and egress interfaces. |
+| **kprobe / kretprobe** | Dynamic tracing hooks that allow attaching eBPF programs to virtually any internal kernel function entry (`kprobe`) or return (`kretprobe`) by dynamically patching instructions with breakpoints. |
+| **tracepoint** | Static, deterministic trace hooks hardcoded into kernel source code by kernel developers (`TRACE_EVENT` macros). Guarantees stable API signatures across kernel minor versions. |
+| **uprobe / uretprobe** | User-space dynamic tracing hooks. Patches instructions in user-space binaries or shared libraries (`libc.so`, Go binaries, SSL/TLS libraries) to inspect user-space function calls without recompiling. |
+| **CO-RE (Compile Once – Run Everywhere)** | Compilation methodology relying on BPF Type Format (BTF) and Clang compiler built-ins (`__builtin_preserve_access_index`) to resolve kernel struct memory offset differences dynamically across diverse kernel versions at load time. |
 
-## 3. Architecture & Core Workflow
+---
+
+## 3. Architecture & Execution Workflow
+
+The lifecycle of an eBPF program moves through four distinct phases: Development, Verification, Compilation, and Event-Driven Execution.
 
 ```mermaid
-flowchart TD
-    A[Network Packet] --> B{Kernel Event Check}
-    B -->|Yes| C[eBPF Program Execution]
-    C --> D[Packet Handling: Drop/Modify/Forward]
-    D --> E[Map Operations]
-    E --> F[User-Space via BPF_MAP]
-    B -->|No| G[Standard Network Stack]
-    F --> H[User-Space Application]
-    style B fill:#f9f,stroke:#333
-    style C fill:#e6f7ff,stroke:#333
-    style D fill:#f9f,stroke:#333
-    style E fill:#e6f7ff,stroke:#333
-    style F fill:#f9f,stroke:#333
-    style G fill:#f9f,stroke:#333
-    note style H fill:#e6f7ff
+sequenceDiagram
+    autonumber
+    participant Dev as Clang / LLVM (User Space)
+    participant Lib as libbpf Loader
+    participant Sys as bpf() System Call
+    participant Ver as In-Kernel Verifier
+    participant JIT as In-Kernel JIT Compiler
+    participant Hook as Kernel Hook (XDP / kprobe / TC)
+    participant Map as BPF Map (Memory Storage)
+
+    Dev->>Lib: Compile C source to ELF bytecode (.o with BTF)
+    Lib->>Sys: Invokes bpf(BPF_PROG_LOAD, attr)
+    Sys->>Ver: Passes bytecode for static analysis
+    Note over Ver: 1. Graph state exploration (DAG)<br/>2. Register type & bounds tracking<br/>3. Memory access validation
+    alt Verification Fails
+        Ver-->>Sys: Error (-EACCES / -EINVAL) with verifier log
+        Sys-->>Lib: Program rejected
+    else Verification Succeeds
+        Ver->>JIT: Pass verified instructions
+        JIT->>Hook: Emit native machine code (x86_64) into executable kernel page
+        Hook-->>Sys: Return program file descriptor (FD)
+    end
+    Note over Hook,Map: Runtime Event Triggers (e.g., Packet Ingress)
+    Hook->>Hook: Execute JIT-compiled instructions
+    Hook->>Map: Read / Write atomic state
+    Map-->>Lib: User space reads metrics via bpf(BPF_MAP_LOOKUP_ELEM)
 ```
 
-**Workflow breakdown**:
-1. **Network packet arrives** → Kernel checks for eBPF attach points
-2. **If eBPF program exists** → Program executes in kernel's eBPF VM (L1 cache)
-3. **Packet handling** → Program may:
-   - Drop packet (e.g., via `return DROP`)
-   - Modify packet (e.g., add headers)
-   - Forward to next stage
-4. **Map operations** → Program accesses shared kernel maps (no user-space copying)
-5. **User-space communication** → Results sent via `BPF_MAP` (kernel-to-user-space)
-6. **Standard network stack** → Fallback path if no eBPF program exists
-
-**Critical hardware context**: Execution occurs on CPU L1 cache (not main memory) to ensure:
-- < 100ns latency (vs. 1000+ ns for main memory)
-- No cache coherence issues
-- Hardware-enforced memory isolation
+---
 
 ## 4. Common Misconceptions & Mental Traps
 
-| Misconception | Reality | Verification Command | Destructive Risk |
-|---------------|---------|------------------------|-------------------|
-| "Ebpf is a kernel module" | Ebpf runs in kernel's *verified sandbox* (not user-space) | `lsmod \| grep bpf` (shows no module) | Kernel instability if unverified programs run |
-| "Ebpf programs run in user-space" | Programs execute in kernel's eBPF VM (L1 cache) | `cat /proc/kallsyms \| grep bpf` | Memory corruption from unverified access |
-| "Ebpf is slow" | JIT-compiled to native instructions (L1 cache) | `perf stat -e cycles,bpf_jit -a` | CPU cache thrashing if too many programs |
-| "All eBPF programs are secure" | Verifier *only* checks for safety (not all threats) | `bpf_prog_test` (fails on unsafe programs) | Kernel crashes from unverified programs |
+### Misconception 1: "eBPF is just an improved packet capture tool (like tcpdump)."
+* **Reality:** Classic BPF (cBPF) was designed in 1992 specifically for socket filtering (`libpcap`). eBPF, introduced in Linux 3.18, is a general-purpose, 64-bit in-kernel computation engine. It is utilized for full Layer 3/4 network routing (Cilium), runtime security enforcement (Tetragon, Falco), block storage profiling (BCC tools), CPU scheduling diagnostics, and application performance tracing.
 
-**Critical mental trap**: Assuming eBPF programs are *always* faster than kernel modules. In reality, complex programs can cause **CPU cache thrashing** (L1 cache saturation) due to:
-- High program complexity
-- Frequent map accesses
-- Inefficient memory patterns
+### Misconception 2: "eBPF programs run in user space or inside a container."
+* **Reality:** eBPF bytecode executes strictly inside **Kernel Space (Ring 0)**. It runs with kernel execution context and can inspect raw kernel data structures. Its safety does not stem from hardware virtualization (like KVM) or OS isolation (like Docker cgroups/namespaces); its safety is proven **statically prior to execution** by the in-kernel verifier.
 
-**Verification command**: `sudo perf stat -e bpf_jit,cache-misses -a -- sleep 1` (measures JIT compilation and cache misses)
+### Misconception 3: "The verifier just checks for infinite loops."
+* **Reality:** Loop detection is only one minor check. The verifier tracks the abstract type and numerical bounds of every single register on every possible execution branch. It validates:
+  - Pointer provenance (distinguishing `PTR_TO_STACK`, `PTR_TO_MAP_VALUE`, `PTR_TO_CTX`, `SCALAR_VALUE`).
+  - Pointer alignment and bounds checks before dereferencing.
+  - Zero-initialization of stack memory before passing to helper functions.
+  - Correct arguments and return type validation for in-kernel helper functions (`bpf_ktime_get_ns()`, `bpf_map_lookup_elem()`).
+
+### Misconception 4: "eBPF programs can execute arbitrary Linux system calls."
+* **Reality:** eBPF programs **cannot** invoke system calls or call arbitrary kernel functions. They can only invoke a strict, whitelist of stable **BPF Helper Functions** (`bpf_probe_read_kernel()`, `bpf_trace_printk()`, etc.) and designated BPF kfuncs exposed specifically for that program type.
+
+---
 
 ## 5. Socratic Discussion Starters
 
-1. **How does the eBPF verifier enforce memory isolation at the hardware level without requiring user-space intervention, and what are the trade-offs in the verification process?**  
-   *(Probes hardware-enforced security boundaries and verification overhead)*
-
-2. **If an eBPF program causes CPU cache thrashing (measured via `perf stat`), what specific kernel-level mechanisms would you investigate first, and how would you validate the root cause?**  
-   *(Targets low-level hardware performance diagnostics)*
-
-3. **In what scenarios would you *choose not* to use eBPF for network packet processing despite its advantages, and what critical hardware constraints would influence this decision?**  
-   *(Forces practical trade-offs between hardware capabilities and software requirements)*
+1. **The Safety vs. Expressiveness Boundary:** How does the eBPF verifier reconcile the Halting Problem (which states that determining whether an arbitrary program will halt is undecidable) while verifying arbitrary eBPF programs? What specific constraints does it enforce on loops and graph complexity to make verification mathematically tractable?
+2. **Context Switching Costs:** In high-speed 100GbE networking, why does standard Linux packet processing through `sk_buff` and `iptables` drop packets under load, whereas XDP programs running on bare metal can drop or forward 20+ million packets per second on a single CPU core?
+3. **Observability Overhead:** Why is eBPF dynamic tracing using `kprobes` and `perf_event` ring buffers orders of magnitude faster and safer than traditional debugging techniques like `ptrace` or user-space logging daemons?
