@@ -4,7 +4,12 @@ Here are all the available subtopics in this learning module organized by catego
 
 ### Pure Math
 
-- **Abstract Algebra** (`pure_math/abstract_algebra/`)
+### Abstract Algebra
+- **Groups Cosets and Lagrange** (`pure_math/abstract_algebra/01_groups_cosets_and_lagrange/`)
+- **Normal Subgroups and Isomorphisms** (`pure_math/abstract_algebra/02_normal_subgroups_and_isomorphisms/`)
+- **Group Actions and Sylow Theorems** (`pure_math/abstract_algebra/03_group_actions_and_sylow_theorems/`)
+- **Rings Ideals and Factorization Domains** (`pure_math/abstract_algebra/04_rings_ideals_and_factorization_domains/`)
+- **Field Extensions and Galois Theory** (`pure_math/abstract_algebra/05_field_extensions_and_galois_theory/`)
 - **Linear Algebra** (`pure_math/linear_algebra/`)
 - **Elementary Algebra** (`pure_math/algebra/`)
 - **Arithmetic Foundations** (`pure_math/arithmetic/`)
@@ -22,7 +27,13 @@ Here are all the available subtopics in this learning module organized by catego
 ### Applied Math
 
 - **Mathematical Cryptography** (`applied_math/cryptography/`)
-- **Game Theory** (`applied_math/game_theory/`)
+### Game Theory
+- **Strategic Form and Nash Equilibrium** (`applied_math/game_theory/01_strategic_form_and_nash_equilibrium/`)
+- **Mixed Strategies and Indifference** (`applied_math/game_theory/02_mixed_strategies_and_indifference/`)
+- **Extensive Form and Subgame Perfection** (`applied_math/game_theory/03_extensive_form_and_subgame_perfection/`)
+- **Repeated Games and Folk Theorem** (`applied_math/game_theory/04_repeated_games_and_folk_theorem/`)
+- **Mechanism Design and VCG** (`applied_math/game_theory/05_mechanism_design_and_vcg/`)
+- **Cooperative Games and Shapley Value** (`applied_math/game_theory/06_cooperative_games_and_shapley_value/`)
 - **Graph Theory** (`applied_math/graph_theory/`)
 - **Numerical Analysis** (`applied_math/numerical_analysis/`)
 - **Optimization Theory** (`applied_math/optimization/`)

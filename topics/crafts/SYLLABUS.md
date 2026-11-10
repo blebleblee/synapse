@@ -53,7 +53,11 @@ Here are all the available subtopics in this learning module organized by catego
 
 ### Metalworking
 
-- **Welding** (`metalworking/welding/`)
+### Welding
+- **MIG Setup and Bead Control** (`metalworking/welding/01_mig_setup_and_bead_control/`)
+- **TIG High Frequency and Puddle Control** (`metalworking/welding/02_tig_high_frequency_and_puddle_control/`)
+- **Joint Types and Penetration** (`metalworking/welding/03_joint_types_and_penetration/`)
+- **Heat Management and Distortion Control** (`metalworking/welding/04_heat_management_and_distortion_control/`)
 - **Metal Fabrication** (`metalworking/metal_fabrication/`)
 - **Machining** (`metalworking/machining/`)
 - **CNC Systems** (`metalworking/cnc/`)

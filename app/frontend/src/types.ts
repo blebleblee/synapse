@@ -7,21 +7,34 @@ export interface SubtopicStatus {
   files: string[];
 }
 
-export interface SubtopicNode {
+export interface UnitNode {
   display_name: string;
+  domain: string;
+  discipline: string;
+  course: string;
+  unit: string;
   rel_path: string;
   full_path: string;
   status: SubtopicStatus;
 }
 
+export interface CourseNode {
+  units: { [unitSlug: string]: UnitNode };
+}
+
+export interface DisciplineNode {
+  courses: { [courseSlug: string]: CourseNode };
+}
+
 export interface CategoryMap {
   [category: string]: {
-    [subtopic: string]: SubtopicNode;
+    [subtopic: string]: UnitNode;
   };
 }
 
 export interface DomainNode {
   path: string;
+  disciplines: { [discSlug: string]: DisciplineNode };
   categories: CategoryMap;
 }
 

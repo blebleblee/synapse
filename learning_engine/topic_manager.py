@@ -1,5 +1,6 @@
 """
-Topic and Curriculum Management
+Topic and Curriculum Management (4-Level Architecture)
+Domain (L1) -> Discipline (L2) -> Course (L3) -> Unit (L4)
 Scans, navigates, and modifies the learning workspace filesystem hierarchy.
 """
 
@@ -9,6 +10,8 @@ from typing import Dict, Any, List, Optional, Tuple
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
+
+LEVELS = ["beginner", "intermediate", "advanced"]
 
 def get_topics_dir() -> Path:
     return TOPICS_DIR
@@ -22,12 +25,11 @@ def get_domain_persona(domain: str) -> str:
         return gemini_md.read_text(encoding="utf-8")
     return "You are an expert educator and technical mentor."
 
-def scan_subtopic_status(subtopic_dir: Path) -> Dict[str, Any]:
-    levels = ["beginner", "intermediate", "advanced"]
+def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
     level_status = {}
 
-    for lvl in levels:
-        lvl_dir = subtopic_dir / lvl
+    for lvl in LEVELS:
+        lvl_dir = unit_dir / lvl
         f = (lvl_dir / "FOUNDATION.md").exists()
         l = (lvl_dir / "LESSON.md").exists()
         b = (lvl_dir / "LABS.md").exists()
@@ -38,10 +40,10 @@ def scan_subtopic_status(subtopic_dir: Path) -> Dict[str, Any]:
             "complete": (f and l and b)
         }
 
-    # Backward compatibility with root files
-    root_f = (subtopic_dir / "FOUNDATION.md").exists()
-    root_l = (subtopic_dir / "LESSON.md").exists()
-    root_b = (subtopic_dir / "LABS.md").exists()
+    # Root file support
+    root_f = (unit_dir / "FOUNDATION.md").exists()
+    root_l = (unit_dir / "LESSON.md").exists()
+    root_b = (unit_dir / "LABS.md").exists()
 
     has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f
     has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l
@@ -50,7 +52,7 @@ def scan_subtopic_status(subtopic_dir: Path) -> Dict[str, Any]:
     is_leveled_complete = all(s["complete"] for s in level_status.values())
     is_root_complete = (root_f and root_l and root_b)
 
-    all_files = [f.name for f in subtopic_dir.iterdir() if f.is_file() and not f.name.startswith(".")]
+    all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
 
     return {
         "has_foundation": has_foundation,
@@ -69,7 +71,8 @@ def get_topic_tree() -> Dict[str, Any]:
         syllabus_file = domain_dir / "SYLLABUS.md"
         tree[domain] = {
             "path": str(domain_dir.relative_to(WORKSPACE_ROOT)),
-            "categories": {}
+            "disciplines": {},
+            "categories": {} # Backward-compatible alias
         }
 
         if not syllabus_file.exists():
@@ -81,68 +84,90 @@ def get_topic_tree() -> Dict[str, Any]:
 
         for display_name, rel_path in matches:
             parts = rel_path.split("/")
-            if len(parts) == 2:
-                cat, sub = parts[0], parts[1]
-            elif len(parts) == 1:
-                cat, sub = "general", parts[0]
+            if len(parts) >= 3:
+                disc = parts[0]
+                course = parts[1]
+                unit = "/".join(parts[2:])
+            elif len(parts) == 2:
+                disc = parts[0]
+                course = parts[1]
+                unit = "core"
             else:
-                cat, sub = parts[0], "/".join(parts[1:])
+                disc = "general"
+                course = parts[0]
+                unit = "core"
 
-            if cat not in tree[domain]["categories"]:
-                tree[domain]["categories"][cat] = {}
+            if disc not in tree[domain]["disciplines"]:
+                tree[domain]["disciplines"][disc] = {"courses": {}}
+                tree[domain]["categories"][disc] = {}
 
-            sub_path = domain_dir / rel_path
-            status = scan_subtopic_status(sub_path) if sub_path.exists() else {
+            if course not in tree[domain]["disciplines"][disc]["courses"]:
+                tree[domain]["disciplines"][disc]["courses"][course] = {"units": {}}
+
+            unit_path = domain_dir / rel_path
+            status = scan_subtopic_status(unit_path) if unit_path.exists() else {
                 "has_foundation": False,
                 "has_lesson": False,
                 "has_labs": False,
                 "complete": False,
+                "levels": {},
                 "file_count": 0,
                 "files": []
             }
 
-            tree[domain]["categories"][cat][sub] = {
+            node_data = {
                 "display_name": display_name,
+                "domain": domain,
+                "discipline": disc,
+                "course": course,
+                "unit": unit,
                 "rel_path": f"{domain}/{rel_path}",
-                "full_path": str(sub_path),
+                "full_path": str(unit_path),
                 "status": status
             }
+
+            tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
+            # Backward-compatible flat mapping under categories
+            flat_key = f"{course}_{unit}" if unit != "core" else course
+            tree[domain]["categories"][disc][flat_key] = node_data
 
     return tree
 
 def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     """
-    Resolves a search query to (domain, category, subtopic, full_path).
+    Resolves a search query to (domain, discipline, unit_slug, full_path).
     Supports:
-      - Full path: computing_and_engineering/infrastructure_and_ops/linux
-      - Category path: infrastructure_and_ops/linux
-      - Subtopic name: linux
+      - 4-level path: computing/infrastructure/kubernetes/01_control_plane
+      - 2-level path: kubernetes/01_control_plane
+      - Slug: 01_control_plane or kubernetes
     """
     query = query.strip("/").lower()
     tree = get_topic_tree()
 
-    # Exact full match
+    # 1. Exact relative match
     for domain, ddata in tree.items():
-        for cat, cdata in ddata["categories"].items():
-            for sub, sdata in cdata.items():
-                full_rel = sdata["rel_path"].lower()
-                cat_rel = f"{cat}/{sub}".lower()
-                if query == full_rel or query == cat_rel or query == sub.lower():
-                    return domain, cat, sub, Path(sdata["full_path"])
+        for disc, disc_data in ddata["disciplines"].items():
+            for course, c_data in disc_data["courses"].items():
+                for unit, u_data in c_data["units"].items():
+                    full_rel = u_data["rel_path"].lower()
+                    course_unit = f"{course}/{unit}".lower()
+                    if query == full_rel or query == course_unit or query == unit.lower():
+                        return domain, f"{disc}/{course}", unit, Path(u_data["full_path"])
 
-    # Fuzzy endswith match
+    # 2. Fuzzy match
     for domain, ddata in tree.items():
-        for cat, cdata in ddata["categories"].items():
-            for sub, sdata in cdata.items():
-                if sub.lower().startswith(query) or query in sub.lower():
-                    return domain, cat, sub, Path(sdata["full_path"])
+        for disc, disc_data in ddata["disciplines"].items():
+            for course, c_data in disc_data["courses"].items():
+                for unit, u_data in c_data["units"].items():
+                    if query in u_data["rel_path"].lower() or query in u_data["display_name"].lower():
+                        return domain, f"{disc}/{course}", unit, Path(u_data["full_path"])
 
     return None
 
 def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Optional[str] = None) -> Path:
     domain_dir = TOPICS_DIR / domain
     if not domain_dir.exists():
-        raise ValueError(f"Domain '{domain}' does not exist.")
+        domain_dir.mkdir(parents=True, exist_ok=True)
 
     category_slug = category.lower().replace(" ", "_").replace("-", "_")
     subtopic_slug = subtopic_id.lower().replace(" ", "_").replace("-", "_")
@@ -159,15 +184,12 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
     if syllabus_file.exists():
         content = syllabus_file.read_text(encoding="utf-8")
         if rel_entry not in content:
-            # Check if category section exists
             cat_header = f"### {category_slug.replace('_', ' ').title()}"
             if cat_header in content:
-                # Insert under category header
                 parts = content.split(cat_header)
                 new_content = parts[0] + cat_header + f"\n{syllabus_entry}" + parts[1]
                 syllabus_file.write_text(new_content, encoding="utf-8")
             else:
-                # Append new category section
                 content += f"\n\n{cat_header}\n\n{syllabus_entry}\n"
                 syllabus_file.write_text(content, encoding="utf-8")
     else:

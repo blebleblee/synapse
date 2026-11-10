@@ -5,6 +5,7 @@ import {
   Search,
   Plus,
   GitBranch,
+  BookOpen,
   Cpu,
   Coins,
   Binary,
@@ -12,7 +13,7 @@ import {
   Palette,
   Hammer
 } from 'lucide-react';
-import type { TopicTreeData, SubtopicNode } from '../types';
+import type { TopicTreeData, UnitNode } from '../types';
 
 interface TopicTreeProps {
   tree: TopicTreeData;
@@ -33,13 +34,16 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({
-    computing_and_engineering: true,
+    computing: true,
   });
-  const [openCategories, setOpenCategories] = useState<{ [key: string]: boolean }>({
-    'computing_and_engineering/infrastructure_and_ops': true,
+  const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({
+    'computing/infrastructure': true,
+  });
+  const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({
+    'computing/infrastructure/kubernetes': true,
   });
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addDomain, setAddDomain] = useState('computing_and_engineering');
+  const [addDomain, setAddDomain] = useState('computing');
   const [addCategory, setAddCategory] = useState('');
   const [addSubtopicId, setAddSubtopicId] = useState('');
   const [addTitle, setAddTitle] = useState('');
@@ -49,33 +53,38 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     setOpenDomains((prev) => ({ ...prev, [domain]: !prev[domain] }));
   };
 
-  const toggleCategory = (catKey: string) => {
-    setOpenCategories((prev) => ({ ...prev, [catKey]: !prev[catKey] }));
+  const toggleDiscipline = (discKey: string) => {
+    setOpenDisciplines((prev) => ({ ...prev, [discKey]: !prev[discKey] }));
+  };
+
+  const toggleCourse = (courseKey: string) => {
+    setOpenCourses((prev) => ({ ...prev, [courseKey]: !prev[courseKey] }));
   };
 
   const getDomainIcon = (domain: string) => {
     switch (domain) {
-      case 'computing_and_engineering':
+      case 'computing':
         return <Cpu size={16} className="domain-icon" />;
-      case 'business_and_economics':
-        return <Coins size={16} className="domain-icon" />;
+      case 'engineering':
+        return <Hammer size={16} className="domain-icon" />;
       case 'formal_sciences':
         return <Binary size={16} className="domain-icon" />;
       case 'natural_sciences':
         return <FlaskConical size={16} className="domain-icon" />;
-      case 'arts_and_humanities':
+      case 'business':
+      case 'economics':
+        return <Coins size={16} className="domain-icon" />;
+      case 'arts':
         return <Palette size={16} className="domain-icon" />;
-      case 'hobbies_and_crafts':
-        return <Hammer size={16} className="domain-icon" />;
       default:
         return <Folder size={16} className="domain-icon" />;
     }
   };
 
-  const renderBadge = (node: SubtopicNode) => {
+  const renderBadge = (node: UnitNode) => {
     const st = node.status;
     if (st.complete) {
-      return <span className="badge badge-complete" title="Foundation, Lesson, and Labs Ready">FLB</span>;
+      return <span className="badge badge-complete" title="All tiers complete">FLB</span>;
     }
     const f = st.has_foundation ? 'F' : '.';
     const l = st.has_lesson ? 'L' : '.';
@@ -141,19 +150,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       <div className="tree-content">
         {Object.entries(tree).map(([domain, ddata]) => {
           const isDomainOpen = openDomains[domain] || searchTerm.length > 0;
-
-          // Check if domain matches search
-          const domainCategories = Object.entries(ddata.categories);
-          const hasMatchingSubtopics = domainCategories.some(([_, subtopics]) =>
-            Object.values(subtopics).some((s) =>
-              s.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              s.rel_path.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-          );
-
-          if (searchTerm && !hasMatchingSubtopics && !domain.toLowerCase().includes(searchTerm.toLowerCase())) {
-            return null;
-          }
+          const disciplines = ddata.disciplines || {};
 
           return (
             <div key={domain} className="domain-group">
@@ -169,49 +166,84 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
               {isDomainOpen && (
                 <div className="domain-categories">
-                  {domainCategories.map(([category, subtopics]) => {
-                    const catKey = `${domain}/${category}`;
-                    const isCatOpen = openCategories[catKey] || searchTerm.length > 0;
-
-                    const filteredSubtopics = Object.entries(subtopics).filter(([_, s]) => {
-                      if (!searchTerm) return true;
-                      return (
-                        s.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        s.rel_path.toLowerCase().includes(searchTerm.toLowerCase())
-                      );
-                    });
-
-                    if (searchTerm && filteredSubtopics.length === 0) {
-                      return null;
-                    }
+                  {Object.entries(disciplines).map(([disc, discData]) => {
+                    const discKey = `${domain}/${disc}`;
+                    const isDiscOpen = openDisciplines[discKey] || searchTerm.length > 0;
+                    const courses = discData.courses || {};
 
                     return (
-                      <div key={catKey} className="category-group">
+                      <div key={discKey} className="category-group">
                         <div
                           className="category-header"
-                          onClick={() => toggleCategory(catKey)}
+                          onClick={() => toggleDiscipline(discKey)}
                         >
                           <FolderOpen size={14} className="category-icon" />
                           <span className="category-label">
-                            {category.replace(/_/g, ' ')}
+                            {disc.replace(/_/g, ' ')}
                           </span>
-                          <span className="category-count">{Object.keys(subtopics).length}</span>
+                          <span className="category-count">{Object.keys(courses).length}</span>
                         </div>
 
-                        {isCatOpen && (
+                        {isDiscOpen && (
                           <div className="subtopic-list">
-                            {filteredSubtopics.map(([_, subNode]) => {
-                              const isSelected = selectedSubtopic === subNode.rel_path;
+                            {Object.entries(courses).map(([courseSlug, cData]) => {
+                              const courseKey = `${discKey}/${courseSlug}`;
+                              const isCourseOpen = openCourses[courseKey] || searchTerm.length > 0;
+                              const units = Object.values(cData.units || {});
+
+                              if (units.length === 1 && units[0].unit === 'core') {
+                                const singleUnit = units[0];
+                                const isSelected = selectedSubtopic === singleUnit.rel_path;
+                                return (
+                                  <div
+                                    key={singleUnit.rel_path}
+                                    className={`subtopic-item ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => onSelectSubtopic(singleUnit.rel_path)}
+                                  >
+                                    <span className="subtopic-title" title={singleUnit.rel_path}>
+                                      {singleUnit.display_name}
+                                    </span>
+                                    {renderBadge(singleUnit)}
+                                  </div>
+                                );
+                              }
+
+                              const completedUnits = units.filter((u) => u.status.complete).length;
+
                               return (
-                                <div
-                                  key={subNode.rel_path}
-                                  className={`subtopic-item ${isSelected ? 'selected' : ''}`}
-                                  onClick={() => onSelectSubtopic(subNode.rel_path)}
-                                >
-                                  <span className="subtopic-title" title={subNode.rel_path}>
-                                    {subNode.display_name}
-                                  </span>
-                                  {renderBadge(subNode)}
+                                <div key={courseKey} className="course-group">
+                                  <div
+                                    className="course-header"
+                                    onClick={() => toggleCourse(courseKey)}
+                                  >
+                                    <BookOpen size={12} className="course-icon" />
+                                    <span className="course-title">
+                                      {courseSlug.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="course-progress">
+                                      {completedUnits}/{units.length}
+                                    </span>
+                                  </div>
+
+                                  {isCourseOpen && (
+                                    <div className="course-units-list">
+                                      {units.map((unitNode) => {
+                                        const isSelected = selectedSubtopic === unitNode.rel_path;
+                                        return (
+                                          <div
+                                            key={unitNode.rel_path}
+                                            className={`subtopic-item unit-item ${isSelected ? 'selected' : ''}`}
+                                            onClick={() => onSelectSubtopic(unitNode.rel_path)}
+                                          >
+                                            <span className="subtopic-title" title={unitNode.rel_path}>
+                                              {unitNode.display_name}
+                                            </span>
+                                            {renderBadge(unitNode)}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}
@@ -247,10 +279,10 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               </div>
 
               <div className="form-group">
-                <label>Category (Folder Slug)</label>
+                <label>Discipline / Course Path</label>
                 <input
                   type="text"
-                  placeholder="e.g. infrastructure_and_ops, macro_and_policy"
+                  placeholder="e.g. infrastructure/kubernetes"
                   value={addCategory}
                   onChange={(e) => setAddCategory(e.target.value)}
                   required
@@ -258,10 +290,10 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               </div>
 
               <div className="form-group">
-                <label>Subtopic Slug</label>
+                <label>Unit Slug</label>
                 <input
                   type="text"
-                  placeholder="e.g. wasm, vector_databases"
+                  placeholder="e.g. 01_control_plane"
                   value={addSubtopicId}
                   onChange={(e) => setAddSubtopicId(e.target.value)}
                   required
@@ -272,7 +304,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                 <label>Display Title (Optional)</label>
                 <input
                   type="text"
-                  placeholder="e.g. WebAssembly & Edge Compute"
+                  placeholder="e.g. Control Plane Internals & etcd"
                   value={addTitle}
                   onChange={(e) => setAddTitle(e.target.value)}
                 />
@@ -283,7 +315,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Creating...' : 'Create Subtopic'}
+                  {isSubmitting ? 'Creating...' : 'Create Unit'}
                 </button>
               </div>
             </form>

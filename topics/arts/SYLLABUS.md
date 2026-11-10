@@ -7,8 +7,16 @@ Here are all the available subtopics in this learning module organized by catego
 - **Piano Performance** (`music_performance/piano/`)
 - **Acoustic Guitar** (`music_performance/guitar/`)
 - **Electric Guitar** (`music_performance/electric_guitar/`)
-- **Bass Guitar** (`music_performance/bass_guitar/`)
-- **Drum Performance** (`music_performance/drums/`)
+### Bass Guitar
+- **Technique and Fretboard Mechanics** (`music_performance/bass_guitar/01_technique_and_fretboard_mechanics/`)
+- **Rhythm Muting and Grooves** (`music_performance/bass_guitar/02_rhythm_muting_and_grooves/`)
+- **Walking Lines and Harmonic Theory** (`music_performance/bass_guitar/03_walking_lines_and_harmonic_theory/`)
+- **Slap Pops and Percussive Phrasing** (`music_performance/bass_guitar/04_slap_pops_and_percussive_phrasing/`)
+### Drums
+- **Rudiments Grip and Rebound** (`music_performance/drums/01_rudiments_grip_and_rebound/`)
+- **Four Limb Independence** (`music_performance/drums/02_four_limb_independence/`)
+- **Grooves Timekeeping and Subdivisions** (`music_performance/drums/03_grooves_timekeeping_and_subdivisions/`)
+- **Linear Drumming and Polyrhythms** (`music_performance/drums/04_linear_drumming_and_polyrhythms/`)
 - **Percussion** (`music_performance/percussion/`)
 - **Vocals** (`music_performance/vocals/`)
 - **Brass Instruments** (`music_performance/brass/`)

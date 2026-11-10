@@ -1446,3 +1446,61 @@ body, html, #root {
 .mastery-select.not_started, .mastery-icon.not_started {
   color: var(--text-muted);
 }
+
+/* Course & Unit 4-Level Styling */
+.course-group {
+  margin-left: 6px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.course-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.course-header:hover {
+  background-color: var(--bg-tertiary);
+  color: #f0f6fc;
+}
+
+.course-icon {
+  color: var(--accent-blue);
+}
+
+.course-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-progress {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  background-color: var(--bg-tertiary);
+  padding: 1px 5px;
+  border-radius: 8px;
+}
+
+.course-units-list {
+  margin-left: 10px;
+  border-left: 1px dashed var(--border-color);
+  padding-left: 4px;
+}
+
+.subtopic-item.unit-item {
+  font-size: 11px;
+  padding: 3px 8px;
+}
