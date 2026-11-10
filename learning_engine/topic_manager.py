@@ -184,30 +184,107 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
     if not domain_dir.exists():
         domain_dir.mkdir(parents=True, exist_ok=True)
 
-    category_slug = category.lower().replace(" ", "_").replace("-", "_")
-    subtopic_slug = subtopic_id.lower().replace(" ", "_").replace("-", "_")
-    display_title = display_name or subtopic_id.replace("_", " ").title()
+    clean_cat = category.strip("/").lower().replace(" ", "_")
+    clean_sub = subtopic_id.strip("/").lower().replace(" ", "_")
+    display_title = display_name or clean_sub.replace("_", " ").title()
 
-    target_dir = domain_dir / category_slug / subtopic_slug
+    target_dir = domain_dir / clean_cat / clean_sub
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    # Update SYLLABUS.md
+    rel_entry = f"{clean_cat}/{clean_sub}"
     syllabus_file = domain_dir / "SYLLABUS.md"
-    rel_entry = f"{category_slug}/{subtopic_slug}"
     syllabus_entry = f"- **{display_title}** (`{rel_entry}/`)"
 
     if syllabus_file.exists():
         content = syllabus_file.read_text(encoding="utf-8")
         if rel_entry not in content:
-            cat_header = f"### {category_slug.replace('_', ' ').title()}"
+            parts = clean_cat.split("/")
+            header_name = parts[-1].replace("_", " ").title()
+            cat_header = f"### {header_name}"
             if cat_header in content:
-                parts = content.split(cat_header)
-                new_content = parts[0] + cat_header + f"\n{syllabus_entry}" + parts[1]
+                p = content.split(cat_header)
+                new_content = p[0] + cat_header + f"\n{syllabus_entry}" + p[1]
                 syllabus_file.write_text(new_content, encoding="utf-8")
             else:
                 content += f"\n\n{cat_header}\n\n{syllabus_entry}\n"
                 syllabus_file.write_text(content, encoding="utf-8")
     else:
-        syllabus_file.write_text(f"# Syllabus: {domain.replace('_', ' ').title()}\n\n### {category_slug.replace('_', ' ').title()}\n\n{syllabus_entry}\n", encoding="utf-8")
+        syllabus_file.write_text(f"# Syllabus: {domain.replace('_', ' ').title()}\n\n### {clean_cat.replace('_', ' ').title()}\n\n{syllabus_entry}\n", encoding="utf-8")
 
     return target_dir
+
+def delete_subtopic(rel_path: str) -> bool:
+    clean_rel = rel_path.strip("/")
+    parts = clean_rel.split("/")
+    if len(parts) < 2:
+        return False
+
+    domain = parts[0]
+    sub_rel = "/".join(parts[1:])
+    target_dir = TOPICS_DIR / domain / sub_rel
+
+    import shutil
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+
+    # Clean from SYLLABUS.md
+    syllabus_file = TOPICS_DIR / domain / "SYLLABUS.md"
+    if syllabus_file.exists():
+        lines = syllabus_file.read_text(encoding="utf-8").splitlines()
+        filtered = [l for l in lines if f"`{sub_rel}/`" not in l and f"`{sub_rel}`" not in l]
+        syllabus_file.write_text("\n".join(filtered) + "\n", encoding="utf-8")
+
+    # Clean from mastery.json
+    try:
+        from .mastery import load_mastery_data, save_mastery_data
+        mdata = load_mastery_data()
+        if clean_rel in mdata:
+            del mdata[clean_rel]
+            save_mastery_data(mdata)
+    except Exception:
+        pass
+
+    # Git commit and push
+    try:
+        import subprocess
+        subprocess.run(["git", "add", "-A"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"chore(topics): remove topic {clean_rel}"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception:
+        pass
+
+    return True
+
+def rename_subtopic(rel_path: str, new_title: str) -> bool:
+    clean_rel = rel_path.strip("/")
+    parts = clean_rel.split("/")
+    if len(parts) < 2:
+        return False
+
+    domain = parts[0]
+    sub_rel = "/".join(parts[1:])
+    syllabus_file = TOPICS_DIR / domain / "SYLLABUS.md"
+    if not syllabus_file.exists():
+        return False
+
+    lines = syllabus_file.read_text(encoding="utf-8").splitlines()
+    new_lines = []
+    pattern = f"`{sub_rel}/`"
+    for l in lines:
+        if pattern in l:
+            new_lines.append(f"- **{new_title}** (`{sub_rel}/`)")
+        else:
+            new_lines.append(l)
+
+    syllabus_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+    # Git commit and push
+    try:
+        import subprocess
+        subprocess.run(["git", "add", str(syllabus_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"chore(topics): rename topic {clean_rel} to '{new_title}'"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception:
+        pass
+
+    return True

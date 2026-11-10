@@ -33,6 +33,8 @@ from learning_engine.topic_manager import (
     get_domain_persona,
     resolve_subtopic,
     add_subtopic,
+    delete_subtopic,
+    rename_subtopic,
     TOPICS_DIR
 )
 from learning_engine.generator import generate_subtopic_content
@@ -301,6 +303,24 @@ def add_topic(req: AddTopicRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+class RenameTopicRequest(BaseModel):
+    path: str
+    new_title: str
+
+@app.delete("/api/topic")
+def api_delete_topic(path: str = Query(..., description="Relative path of topic/unit to delete")):
+    success = delete_subtopic(path)
+    if not success:
+        raise HTTPException(status_code=400, detail=f"Failed to delete topic '{path}'")
+    return {"success": True, "message": f"Deleted {path}"}
+
+@app.put("/api/topic/rename")
+def api_rename_topic(req: RenameTopicRequest):
+    success = rename_subtopic(req.path, req.new_title)
+    if not success:
+        raise HTTPException(status_code=400, detail=f"Failed to rename topic '{req.path}'")
+    return {"success": True, "message": f"Renamed to {req.new_title}"}
 
 @app.post("/api/chat")
 def chat_with_tutor(req: ChatRequest):

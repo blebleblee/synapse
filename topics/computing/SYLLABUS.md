@@ -102,6 +102,7 @@ Here are all the available subtopics in this learning module organized by catego
 - **Machine Learning Operations** (`ai/mlops/`)
 
 
-### Ai/Vibe Coding
-
-- **Test** (`ai/vibe_coding/test/`)
+### AI: Vibe Coding
+- **Prompt Engineering and Spec-Driven Dev** (`ai/vibe_coding/01_prompt_engineering_and_specs/`)
+- **Agentic Workflows and Tool Calling** (`ai/vibe_coding/02_agentic_workflows_and_tools/`)
+- **Evaluation Loops and Benchmarking** (`ai/vibe_coding/03_evaluation_loops_and_benchmarks/`)

@@ -153,6 +153,42 @@ export function App() {
     }
   };
 
+  const handleDeleteTopic = async (path: string) => {
+    if (!window.confirm(`Are you sure you want to delete '${path}'? This will remove all files and update the syllabus.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/topic?path=${encodeURIComponent(path)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        if (selectedPath === path || selectedPath?.startsWith(path)) {
+          setSelectedPath(null);
+          setTopicDetails(null);
+        }
+        await fetchTree();
+        await fetchStatus();
+      }
+    } catch (err) {
+      console.error('Failed to delete topic:', err);
+    }
+  };
+
+  const handleRenameTopic = async (path: string, newTitle: string) => {
+    try {
+      const res = await fetch('/api/topic/rename', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path, new_title: newTitle }),
+      });
+      if (res.ok) {
+        await fetchTree();
+      }
+    } catch (err) {
+      console.error('Failed to rename topic:', err);
+    }
+  };
+
   const handleSelectLevel = (level: string) => {
     setCurrentLevel(level);
     if (selectedPath) {
@@ -317,6 +353,8 @@ export function App() {
           onOpenSearch={() => setSearchOpen(true)}
           onOpenGraph={() => setGraphOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
+          onDeleteTopic={handleDeleteTopic}
+          onRenameTopic={handleRenameTopic}
         />
 
         <LessonViewer

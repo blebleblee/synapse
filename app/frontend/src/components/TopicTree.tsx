@@ -19,7 +19,10 @@ import {
   ArrowUpDown,
   Settings,
   ChevronsDownUp,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Edit2,
+  Trash2,
+  X
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -31,6 +34,8 @@ interface TopicTreeProps {
   onOpenSearch: () => void;
   onOpenGraph: () => void;
   onOpenSettings: () => void;
+  onDeleteTopic?: (path: string) => Promise<void>;
+  onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
 }
 
 const DOMAIN_ORDER = [
@@ -55,6 +60,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenSearch,
   onOpenGraph,
   onOpenSettings,
+  onDeleteTopic,
+  onRenameTopic,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
@@ -62,12 +69,19 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({});
   const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({});
   const [allExpanded, setAllExpanded] = useState(false);
+
+  // Add Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [addDomain, setAddDomain] = useState('computing');
-  const [addCategory, setAddCategory] = useState('');
-  const [addSubtopicId, setAddSubtopicId] = useState('');
+  const [addDiscipline, setAddDiscipline] = useState('infrastructure');
+  const [addCourse, setAddCourse] = useState('');
+  const [addUnitSlug, setAddUnitSlug] = useState('');
   const [addTitle, setAddTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Rename Modal State
+  const [renameTarget, setRenameTarget] = useState<{ path: string; currentTitle: string } | null>(null);
+  const [renameInput, setRenameInput] = useState('');
 
   const toggleAll = () => {
     if (allExpanded) {
@@ -155,17 +169,37 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
   const handleCreateTopic = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!addSubtopicId.trim() || !addCategory.trim()) return;
+    if (!addCourse.trim() || !addDiscipline.trim()) return;
+
     setIsSubmitting(true);
     try {
-      await onAddSubtopic(addDomain, addCategory.trim(), addSubtopicId.trim(), addTitle.trim() || undefined);
+      const disc = addDiscipline.trim();
+      const course = addCourse.trim().replace(/\s+/g, '_');
+      const unit = addUnitSlug.trim() ? addUnitSlug.trim().replace(/\s+/g, '_') : '01_fundamentals';
+      const categoryPath = `${disc}/${course}`;
+      const title = addTitle.trim() || undefined;
+
+      await onAddSubtopic(addDomain, categoryPath, unit, title);
       setShowAddModal(false);
-      setAddSubtopicId('');
+      setAddCourse('');
+      setAddUnitSlug('');
       setAddTitle('');
     } catch (err) {
       console.error(err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRenameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renameTarget || !renameInput.trim() || !onRenameTopic) return;
+    try {
+      await onRenameTopic(renameTarget.path, renameInput.trim());
+      setRenameTarget(null);
+      setRenameInput('');
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -195,7 +229,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         const rateB = getDomainCompletion(ddataB).rate;
         return rateB - rateA;
       }
-      // default established order
       const idxA = DOMAIN_ORDER.indexOf(a);
       const idxB = DOMAIN_ORDER.indexOf(b);
       return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
@@ -238,7 +271,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <button
             className="btn-primary-sm"
             onClick={() => setShowAddModal(true)}
-            title="Add New Topic/Subtopic"
+            title="Add New Topic/Course"
           >
             <Plus size={14} />
           </button>
@@ -279,7 +312,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             sortedDisciplines.sort(([a], [b]) => a.localeCompare(b));
           }
 
-          // Filter check for domain
           const domainMatches = cleanTerm === '' || domain.toLowerCase().includes(cleanTerm);
 
           const matchingDisciplines = sortedDisciplines.filter(([disc, discData]) => {
@@ -396,7 +428,32 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                     <span className="subtopic-title" title={singleUnit.rel_path}>
                                       {singleUnit.display_name}
                                     </span>
-                                    {renderBadge(singleUnit)}
+                                    <div className="item-meta">
+                                      {renderBadge(singleUnit)}
+                                      <div className="item-actions" onClick={(e) => e.stopPropagation()}>
+                                        {onRenameTopic && (
+                                          <button
+                                            className="action-mini-btn"
+                                            onClick={() => {
+                                              setRenameTarget({ path: singleUnit.rel_path, currentTitle: singleUnit.display_name });
+                                              setRenameInput(singleUnit.display_name);
+                                            }}
+                                            title="Rename unit"
+                                          >
+                                            <Edit2 size={11} />
+                                          </button>
+                                        )}
+                                        {onDeleteTopic && (
+                                          <button
+                                            className="action-mini-btn delete"
+                                            onClick={() => onDeleteTopic(singleUnit.rel_path)}
+                                            title="Delete unit"
+                                          >
+                                            <Trash2 size={11} />
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
                                 );
                               }
@@ -414,9 +471,23 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                     <span className="course-title">
                                       {courseSlug.replace(/_/g, ' ')}
                                     </span>
-                                    <span className="course-progress">
-                                      {completedUnits}/{units.length}
-                                    </span>
+                                    <div className="course-meta">
+                                      <span className="course-progress">
+                                        {completedUnits}/{units.length}
+                                      </span>
+                                      {onDeleteTopic && (
+                                        <button
+                                          className="action-mini-btn delete"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteTopic(`${discKey}/${courseSlug}`);
+                                          }}
+                                          title={`Delete course ${courseSlug}`}
+                                        >
+                                          <Trash2 size={11} />
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
 
                                   {isCourseOpen && (
@@ -432,7 +503,32 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                             <span className="subtopic-title" title={unitNode.rel_path}>
                                               {unitNode.display_name}
                                             </span>
-                                            {renderBadge(unitNode)}
+                                            <div className="item-meta">
+                                              {renderBadge(unitNode)}
+                                              <div className="item-actions" onClick={(e) => e.stopPropagation()}>
+                                                {onRenameTopic && (
+                                                  <button
+                                                    className="action-mini-btn"
+                                                    onClick={() => {
+                                                      setRenameTarget({ path: unitNode.rel_path, currentTitle: unitNode.display_name });
+                                                      setRenameInput(unitNode.display_name);
+                                                    }}
+                                                    title="Rename unit"
+                                                  >
+                                                    <Edit2 size={11} />
+                                                  </button>
+                                                )}
+                                                {onDeleteTopic && (
+                                                  <button
+                                                    className="action-mini-btn delete"
+                                                    onClick={() => onDeleteTopic(unitNode.rel_path)}
+                                                    title="Delete unit"
+                                                  >
+                                                    <Trash2 size={11} />
+                                                  </button>
+                                                )}
+                                              </div>
+                                            </div>
                                           </div>
                                         );
                                       })}
@@ -453,16 +549,17 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         })}
       </div>
 
+      {/* Clean 4-Level Add Topic Modal */}
       {showAddModal && (
         <div className="modal-backdrop" onClick={() => setShowAddModal(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Topic</h3>
+              <h3>Add New Course or Study Unit</h3>
               <button className="icon-btn" onClick={() => setShowAddModal(false)}>✕</button>
             </div>
             <form onSubmit={handleCreateTopic}>
               <div className="form-group">
-                <label>Domain</label>
+                <label>1. Target Domain</label>
                 <select value={addDomain} onChange={(e) => setAddDomain(e.target.value)}>
                   {Object.keys(tree).map((d) => (
                     <option key={d} value={d}>
@@ -473,32 +570,42 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               </div>
 
               <div className="form-group">
-                <label>Discipline / Course Path</label>
+                <label>2. Discipline / Category</label>
                 <input
                   type="text"
-                  placeholder="e.g. infrastructure/kubernetes"
-                  value={addCategory}
-                  onChange={(e) => setAddCategory(e.target.value)}
+                  placeholder="e.g. ai, infrastructure, security"
+                  value={addDiscipline}
+                  onChange={(e) => setAddDiscipline(e.target.value)}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label>Unit Slug</label>
+                <label>3. Course Slug</label>
                 <input
                   type="text"
-                  placeholder="e.g. 01_control_plane"
-                  value={addSubtopicId}
-                  onChange={(e) => setAddSubtopicId(e.target.value)}
+                  placeholder="e.g. vibe_coding, kubernetes, rust_internals"
+                  value={addCourse}
+                  onChange={(e) => setAddCourse(e.target.value)}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label>Display Title (Optional)</label>
+                <label>4. Unit Slug (Optional)</label>
                 <input
                   type="text"
-                  placeholder="e.g. Control Plane Internals & etcd"
+                  placeholder="e.g. 01_prompt_engineering (default: 01_fundamentals)"
+                  value={addUnitSlug}
+                  onChange={(e) => setAddUnitSlug(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>5. Display Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Prompt Engineering & Spec-Driven Development"
                   value={addTitle}
                   onChange={(e) => setAddTitle(e.target.value)}
                 />
@@ -510,6 +617,42 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                 </button>
                 <button type="submit" className="btn-primary" disabled={isSubmitting}>
                   {isSubmitting ? 'Creating...' : 'Create Unit'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Rename Dialog Modal */}
+      {renameTarget && (
+        <div className="modal-backdrop" onClick={() => setRenameTarget(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Rename Study Unit</h3>
+              <button className="icon-btn" onClick={() => setRenameTarget(null)}><X size={16} /></button>
+            </div>
+            <form onSubmit={handleRenameSubmit}>
+              <div className="form-group">
+                <label>Topic Path</label>
+                <input type="text" value={renameTarget.path} disabled />
+              </div>
+              <div className="form-group">
+                <label>New Display Title</label>
+                <input
+                  type="text"
+                  value={renameInput}
+                  onChange={(e) => setRenameInput(e.target.value)}
+                  autoFocus
+                  required
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => setRenameTarget(null)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Save Title
                 </button>
               </div>
             </form>
