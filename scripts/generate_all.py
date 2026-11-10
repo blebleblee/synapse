@@ -1,95 +1,146 @@
 #!/usr/bin/env python3
 """
-Automated Workspace-Wide Curriculum Generator
-Iterates through all 6 domains and all 252 subtopics, generating complete
-FOUNDATION.md, LESSON.md, and LABS.md learning modules using local Ollama (or Gemini).
+Automated Clustered Curriculum Generator
+Parallelizes multi-tier lesson generation across all available Ollama cluster nodes
+(localhost, studio.2464.cz, and any configured remote machines).
 """
 
 import sys
 import time
+import threading
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from typing import Optional, List
 
-# Add workspace root to sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
 
 from learning_engine.topic_manager import get_topic_tree, scan_subtopic_status
 from learning_engine.generator import generate_subtopic_content
-from learning_engine.models import get_provider
+from learning_engine.models import (
+    OllamaProvider,
+    OllamaCluster,
+    get_configured_hosts,
+    get_provider
+)
 
-def batch_generate(provider_type=None, model=None, force=False):
-    tree = get_topic_tree()
-    provider = get_provider(provider_type=provider_type, model=model)
-    model_name = getattr(provider, "model", "default")
-    provider_name = provider.__class__.__name__
+git_lock = threading.Lock()
 
-    print("==================================================")
-    print("     STARTING MASTER CURRICULUM BATCH GENERATION  ")
-    print(f"     Provider: {provider_name} | Model: {model_name}")
-    print("==================================================")
+def process_subtopic(item, host_info, total_count, force=False):
+    idx, domain, cat, sub, sub_path = item
+    host, model = host_info
 
-    # Collect all subtopics
-    all_subtopics = []
-    for domain, ddata in tree.items():
-        for cat, cdata in ddata["categories"].items():
-            for sub, sdata in cdata.items():
-                all_subtopics.append((domain, cat, sub, Path(sdata["full_path"])))
+    status = scan_subtopic_status(sub_path)
+    if status["complete"] and not force:
+        print(f"[{idx:3d}/{total_count}] [↷] Skipping {domain}/{cat}/{sub} (Already Complete)", flush=True)
+        return False
 
-    total = len(all_subtopics)
-    print(f"[*] Found {total} total subtopics across {len(tree)} domains.\n")
+    print(f"[{idx:3d}/{total_count}] [*] [{host} - {model}] Processing {domain} / {cat} / {sub}...", flush=True)
+    sub_path.mkdir(parents=True, exist_ok=True)
 
-    completed = 0
-    skipped = 0
-    generated_count = 0
+    provider = OllamaProvider(host=host, model=model)
 
-    for idx, (domain, cat, sub, sub_path) in enumerate(all_subtopics, 1):
-        status = scan_subtopic_status(sub_path)
-        if status["complete"] and not force:
-            print(f"[{idx:3d}/{total}] [↷] Skipping {domain}/{cat}/{sub} (Already Complete)")
-            skipped += 1
-            completed += 1
-            continue
+    try:
+        results = generate_subtopic_content(
+            domain=domain,
+            category=cat,
+            subtopic_id=sub,
+            subtopic_dir=sub_path,
+            provider=provider,
+            force=force
+        )
+        created = [k for k, v in results.items() if v]
+        if created:
+            print(f"[{idx:3d}/{total_count}] [✔] Generated on {host}: {', '.join(created)}", flush=True)
 
-        print(f"[{idx:3d}/{total}] [*] Processing {domain} / {cat} / {sub}...")
-        sub_path.mkdir(parents=True, exist_ok=True)
-
-        try:
-            results = generate_subtopic_content(
-                domain=domain,
-                category=cat,
-                subtopic_id=sub,
-                subtopic_dir=sub_path,
-                provider=provider,
-                force=force
-            )
-            created = [k for k, v in results.items() if v]
-            if created:
-                print(f"         [✔] Generated: {', '.join(created)}", flush=True)
-                generated_count += 1
-
-                # Maintain git commits upon changes
+            # Thread-safe Git Commit & Push
+            with git_lock:
                 try:
-                    import subprocess
                     subprocess.run(["git", "add", str(sub_path)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
                     commit_msg = f"content({domain}/{cat}): generate learning units for {sub}"
                     subprocess.run(["git", "commit", "-m", commit_msg], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
                     subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-                    print(f"         [↑] Committed & pushed to Gitea: {commit_msg}", flush=True)
-                except Exception:
+                    print(f"[{idx:3d}/{total_count}] [↑] Pushed to Gitea: {commit_msg}", flush=True)
+                except Exception as git_err:
                     pass
-            else:
-                print(f"         [↷] All units up to date.", flush=True)
-            completed += 1
-        except Exception as e:
-            print(f"         [✘] Error generating {sub}: {e}")
-            time.sleep(2)
+            return True
+        else:
+            print(f"[{idx:3d}/{total_count}] [↷] Units up to date for {sub}.", flush=True)
+            return False
+    except Exception as e:
+        print(f"[{idx:3d}/{total_count}] [✘] Error on {host} for {sub}: {e}", flush=True)
+        return False
+
+def batch_generate(provider_type=None, model=None, force=False):
+    tree = get_topic_tree()
+
+    # Discover cluster nodes
+    cluster = OllamaCluster()
+    cluster_status = cluster.get_cluster_status()
+
+    # Build active worker configurations
+    workers = []
+    for host, hdata in cluster_status.items():
+        if hdata["online"] and hdata["models"]:
+            # Pick best model for this host
+            h_models = hdata["models"]
+            chosen = model
+            if not chosen:
+                if "qwen2.5-coder:32b" in h_models:
+                    chosen = "qwen2.5-coder:32b"
+                elif "qwen2.5-coder:7b" in h_models:
+                    chosen = "qwen2.5-coder:7b"
+                elif "llama3.1:8b" in h_models:
+                    chosen = "llama3.1:8b"
+                elif "qwen3:4b" in h_models:
+                    chosen = "qwen3:4b"
+                else:
+                    chosen = h_models[0]
+            workers.append((host, chosen))
+
+    if not workers:
+        print("[!] No Ollama cluster nodes online. Falling back to default provider.")
+        workers = [("http://localhost:11434", "qwen3:4b")]
+
+    print("==================================================")
+    print("   OLLAMA MULTI-NODE CLUSTER BATCH GENERATION     ")
+    print("==================================================")
+    print(f"[*] Active Nodes in Cluster ({len(workers)}):")
+    for host, m in workers:
+        print(f"    - Node: {host} (Model: {m})")
+    print("==================================================")
+
+    # Collect all subtopics
+    all_subtopics = []
+    idx = 1
+    for domain, ddata in tree.items():
+        for cat, cdata in ddata["categories"].items():
+            for sub, sdata in cdata.items():
+                all_subtopics.append((idx, domain, cat, sub, Path(sdata["full_path"])))
+                idx += 1
+
+    total = len(all_subtopics)
+    print(f"[*] Total subtopics in curriculum: {total}\n")
+
+    # Round-robin dispatch across cluster workers
+    worker_cycle = itertools.cycle(workers) if "itertools" in globals() else None
+    import itertools
+    worker_cycle = itertools.cycle(workers)
+
+    with ThreadPoolExecutor(max_workers=len(workers)) as executor:
+        futures = []
+        for item in all_subtopics:
+            target_worker = next(worker_cycle)
+            f = executor.submit(process_subtopic, item, target_worker, total, force)
+            futures.append(f)
+
+        for f in futures:
+            f.result()
 
     print("\n==================================================")
-    print(f"[✔] BATCH GENERATION FINISHED!")
-    print(f"    Total Processed: {completed} / {total}")
-    print(f"    Newly Generated: {generated_count}")
-    print(f"    Already Complete: {skipped}")
+    print("[✔] CLUSTER BATCH GENERATION COMPLETED!")
     print("==================================================")
 
 if __name__ == "__main__":
