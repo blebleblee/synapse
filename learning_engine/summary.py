@@ -1,0 +1,114 @@
+"""
+Topic Summary Engine
+Generates, maintains, and dynamically regenerates SUMMARY.md for every subtopic,
+incorporating curriculum units and ongoing AI discussion sessions.
+"""
+
+from pathlib import Path
+from typing import Optional
+from .models import get_provider, LLMProvider
+from .topic_manager import resolve_subtopic, get_domain_persona
+
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+def generate_initial_summary(domain: str, category: str, subtopic_id: str, subtopic_dir: Path, provider: Optional[LLMProvider] = None) -> str:
+    if not provider:
+        provider = get_provider(domain=domain)
+
+    persona = get_domain_persona(domain)
+    subtopic_title = subtopic_id.replace("_", " ").title()
+
+    # Collect available context
+    context = []
+    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
+        fpath = subtopic_dir / fname
+        if fpath.exists():
+            context.append(fpath.read_text(encoding="utf-8")[:2500])
+
+    if not context:
+        for lvl in ["beginner", "intermediate", "advanced"]:
+            fpath = subtopic_dir / lvl / "FOUNDATION.md"
+            if fpath.exists():
+                context.append(fpath.read_text(encoding="utf-8")[:1500])
+
+    prompt = f"""You are synthesizing an Executive Summary for '{subtopic_title}'.
+Domain: '{domain.replace('_', ' ').title()}' | Category: '{category.replace('_', ' ').title()}'.
+
+Write an authoritative, high-density SUMMARY.md covering:
+# Executive Summary: {subtopic_title}
+## 1. Core Invariants & Mental Model (The fundamental 'why' and essential intuition)
+## 2. Key Architecture & Mechanisms (High-level data structures, protocols, or formulas)
+## 3. Practical Use Cases & Production Relevance
+## 4. Synthesis of Discussions & Key Takeaways (Initial study overview)
+## 5. Next Steps & Recommended Exploration
+
+Curriculum Excerpts:
+{"".join(context)[:5000] if context else "Foundational curriculum module."}
+
+Output clean, comprehensive Markdown only."""
+
+    summary_text = provider.generate(prompt, system_instruction=persona).strip()
+    out_file = subtopic_dir / "SUMMARY.md"
+    out_file.write_text(summary_text + "\n", encoding="utf-8")
+    return summary_text
+
+def regenerate_summary(query: str, provider_type: Optional[str] = None, model: Optional[str] = None) -> str:
+    target = resolve_subtopic(query)
+    if not target:
+        raise ValueError(f"Topic '{query}' not found.")
+
+    domain, cat, sub, sub_path = target
+    persona = get_domain_persona(domain)
+    subtopic_title = sub.replace("_", " ").title()
+
+    # Ingest all curriculum files
+    curriculum_parts = []
+    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
+        fpath = sub_path / fname
+        if fpath.exists():
+            curriculum_parts.append(f"--- {fname} ---\n" + fpath.read_text(encoding="utf-8")[:2500])
+
+    # Ingest all session logs from user-AI discussions
+    session_parts = []
+    sessions_dir = sub_path / "sessions"
+    if sessions_dir.exists():
+        for sfile in sorted(sessions_dir.glob("*.md")):
+            session_parts.append(f"--- Session: {sfile.name} ---\n" + sfile.read_text(encoding="utf-8")[:2000])
+
+    prompt = f"""You are updating and regenerating the Executive SUMMARY.md for '{subtopic_title}'.
+Domain: '{domain.replace('_', ' ').title()}' | Category: '{cat.replace('_', ' ').title()}'.
+
+Synthesize both the formal curriculum knowledge AND all insights, breakthroughs, student questions, and corrections from the discussion session logs below into an authoritative, living summary.
+
+Structure:
+# Executive Summary: {subtopic_title}
+## 1. Core Invariants & Mental Model (Foundational intuition and theoretical grounding)
+## 2. Key Architecture, Mechanisms & Derivations (Essential technical design and protocols)
+## 3. Practical Applications & Production Best Practices
+## 4. Discussion Insights & Breakthrough Takeaways (Synthesizing questions explored with the AI tutor)
+## 5. Mastery Review & Next Milestones
+
+Curriculum Knowledge:
+{"".join(curriculum_parts)[:4000]}
+
+Discussion Session Transcripts:
+{"".join(session_parts)[:4000] if session_parts else "No active discussion sessions logged yet."}
+
+Output clean, comprehensive Markdown only."""
+
+    provider = get_provider(provider_type=provider_type, model=model, domain=domain)
+    summary_text = provider.generate(prompt, system_instruction=persona).strip()
+
+    out_file = sub_path / "SUMMARY.md"
+    out_file.write_text(summary_text + "\n", encoding="utf-8")
+
+    # Git commit and push
+    try:
+        import subprocess
+        subprocess.run(["git", "add", str(out_file)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"summary({sub}): regenerate executive topic summary"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception:
+        pass
+
+    return summary_text

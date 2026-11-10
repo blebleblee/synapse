@@ -41,6 +41,7 @@ from learning_engine.graph import get_prerequisite_graph
 from learning_engine.mastery import set_subtopic_mastery, load_mastery_data, get_mastery_summary, get_subtopic_mastery
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
+from learning_engine.summary import regenerate_summary, generate_initial_summary
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
 
@@ -218,6 +219,26 @@ def get_topic_details(
         if artifacts:
             lesson = artifacts[0].read_text(encoding="utf-8")
 
+    # Load or generate initial summary
+    summary = ""
+    summary_file = sub_path / "SUMMARY.md"
+    if summary_file.exists():
+        summary = summary_file.read_text(encoding="utf-8")
+    elif bool(foundation or lesson or labs):
+        try:
+            summary = generate_initial_summary(domain, cat, sub, sub_path)
+        except Exception:
+            summary = ""
+
+    # Load persistent chat history for this topic
+    saved_chat_history = []
+    history_file = sub_path / "sessions" / "chat_history.json"
+    if history_file.exists():
+        try:
+            saved_chat_history = json.loads(history_file.read_text(encoding="utf-8"))
+        except Exception:
+            saved_chat_history = []
+
     return {
         "domain": domain,
         "category": cat,
@@ -227,6 +248,8 @@ def get_topic_details(
         "level": selected_level,
         "available_levels": available_levels or ["beginner", "intermediate", "advanced"],
         "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
+        "summary": summary,
+        "chat_history": saved_chat_history,
         "foundation": foundation,
         "lesson": lesson,
         "labs": labs,
@@ -304,10 +327,53 @@ def chat_with_tutor(req: ChatRequest):
 
     prompt = "\n\n".join(conversation_text)
     response_text = provider.generate(prompt, system_instruction=system_instruction)
+    reply = response_text.strip()
+
+    # -------------------------------------------------------------
+    # Auto-Save Conversation & History
+    # -------------------------------------------------------------
+    try:
+        sessions_dir = sub_path / "sessions"
+        sessions_dir.mkdir(parents=True, exist_ok=True)
+
+        # 1. Append to active_session.md
+        active_session_file = sessions_dir / "active_session.md"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry = f"\n\n**[{timestamp}] Student:**\n{req.message}\n\n**[{timestamp}] AI Tutor:**\n{reply}\n\n---\n"
+        with open(active_session_file, "a", encoding="utf-8") as f:
+            f.write(entry)
+
+        # 2. Persist chat_history.json
+        history_file = sessions_dir / "chat_history.json"
+        updated_history = [m.dict() for m in req.history] + [
+            {"role": "student", "content": req.message},
+            {"role": "tutor", "content": reply}
+        ]
+        history_file.write_text(json.dumps(updated_history, indent=2), encoding="utf-8")
+
+        # 3. Auto-commit to Git in background
+        subprocess.Popen(
+            ["git", "add", str(sessions_dir)],
+            cwd=str(WORKSPACE_ROOT),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+    except Exception as e:
+        print(f"[!] Auto-save error: {e}")
 
     return {
-        "reply": response_text.strip()
+        "reply": reply
     }
+
+class SummaryRequest(BaseModel):
+    query: str
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+@app.post("/api/summary/regenerate")
+def api_regenerate_summary(req: SummaryRequest):
+    new_summary = regenerate_summary(req.query, provider_type=req.provider, model=req.model)
+    return {"summary": new_summary}
 
 class QuizRequest(BaseModel):
     query: str

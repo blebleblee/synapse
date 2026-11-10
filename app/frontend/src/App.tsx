@@ -15,12 +15,12 @@ export function App() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
   const [currentLevel, setCurrentLevel] = useState<string>('beginner');
-  const [activeTab, setActiveTab] = useState<'foundation' | 'lesson' | 'labs' | 'quiz'>('foundation');
+  const [activeTab, setActiveTab] = useState<'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz'>('summary');
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
-  const [isSavingSession, setIsSavingSession] = useState(false);
   const [isCompilingGuide, setIsCompilingGuide] = useState(false);
+  const [isRegeneratingSummary, setIsRegeneratingSummary] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ [key: string]: ChatMessage[] }>({});
   const [quizQuestions, setQuizQuestions] = useState<{ [key: string]: QuizQuestion[] }>({});
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
@@ -64,8 +64,19 @@ export function App() {
         setSelectedPath(query);
         setCurrentLevel(level);
 
+        // Restore persistent chat history if available
+        if (data.chat_history && data.chat_history.length > 0) {
+          const chatKey = `${query}/${level}`;
+          setChatHistory((prev) => ({
+            ...prev,
+            [chatKey]: data.chat_history,
+          }));
+        }
+
         // Pick initial active tab based on what exists
-        if (data.foundation) {
+        if (data.summary) {
+          setActiveTab('summary');
+        } else if (data.foundation) {
           setActiveTab('foundation');
         } else if (data.lesson) {
           setActiveTab('lesson');
@@ -169,30 +180,6 @@ export function App() {
     }
   };
 
-  const handleSaveSession = async () => {
-    if (!selectedPath) return;
-    const chatKey = `${selectedPath}/${currentLevel}`;
-    const history = chatHistory[chatKey] || [];
-    if (history.length === 0) return;
-
-    setIsSavingSession(true);
-    try {
-      const res = await fetch('/api/session/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: selectedPath, history }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        alert(`Session debrief saved to ${data.path} and committed to Gitea!`);
-      }
-    } catch (err) {
-      console.error('Failed to save session:', err);
-    } finally {
-      setIsSavingSession(false);
-    }
-  };
-
   const handleCompileGuide = async () => {
     if (!selectedPath) return;
 
@@ -274,6 +261,28 @@ export function App() {
     window.open(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}&level=${currentLevel}`, '_blank');
   };
 
+  const handleRegenerateSummary = async () => {
+    if (!selectedPath) return;
+    setIsRegeneratingSummary(true);
+    try {
+      const res = await fetch('/api/summary/regenerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: selectedPath }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (topicDetails) {
+          setTopicDetails({ ...topicDetails, summary: data.summary });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to regenerate summary:', err);
+    } finally {
+      setIsRegeneratingSummary(false);
+    }
+  };
+
   const activeChatKey = selectedPath ? `${selectedPath}/${currentLevel}` : '';
   const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
 
@@ -307,6 +316,8 @@ export function App() {
           onUpdateMastery={handleUpdateMastery}
           onDownloadFlashcards={handleDownloadFlashcards}
           onDownloadHandbook={handleDownloadHandbook}
+          onRegenerateSummary={handleRegenerateSummary}
+          isRegeneratingSummary={isRegeneratingSummary}
         />
 
         <TutorChat
@@ -314,8 +325,6 @@ export function App() {
           history={activeChatKey ? chatHistory[activeChatKey] || [] : []}
           isChatting={isChatting}
           onSendMessage={handleSendMessage}
-          onSaveSession={handleSaveSession}
-          isSavingSession={isSavingSession}
         />
       </div>
 

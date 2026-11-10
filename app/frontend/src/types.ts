@@ -38,6 +38,8 @@ export interface TopicDetails {
   level: string;
   available_levels: string[];
   mastery?: string;
+  summary?: string;
+  chat_history?: ChatMessage[];
   foundation: string;
   lesson: string;
   labs: string;

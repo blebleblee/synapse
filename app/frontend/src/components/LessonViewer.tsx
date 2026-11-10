@@ -10,7 +10,8 @@ import {
   Gauge,
   Award,
   Layers,
-  Download
+  Download,
+  FileText
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -22,8 +23,8 @@ interface LessonViewerProps {
   isGenerating: boolean;
   onGenerate: (query: string, force?: boolean, level?: string) => void;
   onRunInTerminal: (command: string) => void;
-  activeTab: 'foundation' | 'lesson' | 'labs' | 'quiz';
-  setActiveTab: (tab: 'foundation' | 'lesson' | 'labs' | 'quiz') => void;
+  activeTab: 'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz';
+  setActiveTab: (tab: 'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz') => void;
   currentLevel: string;
   onSelectLevel: (level: string) => void;
   quizQuestions: QuizQuestion[];
@@ -34,6 +35,8 @@ interface LessonViewerProps {
   onUpdateMastery: (state: string) => void;
   onDownloadFlashcards: () => void;
   onDownloadHandbook: () => void;
+  onRegenerateSummary: () => Promise<void>;
+  isRegeneratingSummary: boolean;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -54,11 +57,14 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onUpdateMastery,
   onDownloadFlashcards,
   onDownloadHandbook,
+  onRegenerateSummary,
+  isRegeneratingSummary,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
+    if (activeTab === 'summary') return topic.summary || '';
     if (activeTab === 'foundation') return topic.foundation;
     if (activeTab === 'lesson') return topic.lesson;
     if (activeTab === 'labs') return topic.labs;
@@ -103,7 +109,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     );
   }
 
-  const hasAnyContent = Boolean(topic.foundation || topic.lesson || topic.labs);
+  const hasAnyContent = Boolean(topic.summary || topic.foundation || topic.lesson || topic.labs);
   const masteryState = topic.mastery || 'not_started';
 
   return (
@@ -161,37 +167,60 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <span>{isCompiling ? 'Compiling...' : 'Guide'}</span>
           </button>
 
-          <button
-            className="btn-secondary-sm"
-            onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
-            disabled={isGenerating}
-            title="Regenerate this level"
-          >
-            <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
-            <span>{isGenerating ? 'Generating...' : 'Regen'}</span>
-          </button>
+          {activeTab === 'summary' ? (
+            <button
+              className="btn-secondary-sm"
+              onClick={onRegenerateSummary}
+              disabled={isRegeneratingSummary}
+              title="Regenerate summary with latest discussion session insights"
+            >
+              <RefreshCw size={13} className={isRegeneratingSummary ? 'spin' : ''} />
+              <span>{isRegeneratingSummary ? 'Updating Summary...' : 'Update Summary'}</span>
+            </button>
+          ) : (
+            <button
+              className="btn-secondary-sm"
+              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
+              disabled={isGenerating}
+              title="Regenerate this level"
+            >
+              <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
+              <span>{isGenerating ? 'Generating...' : 'Regen'}</span>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Progressive Difficulty Level Selector Bar */}
-      <div className="levels-bar">
-        <span className="levels-label">
-          <Gauge size={13} /> Mastery Level:
-        </span>
-        <div className="level-pills">
-          {['beginner', 'intermediate', 'advanced'].map((lvl) => (
-            <button
-              key={lvl}
-              className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
-              onClick={() => onSelectLevel(lvl)}
-            >
-              {lvl.toUpperCase()}
-            </button>
-          ))}
+      {/* Progressive Difficulty Level Selector Bar (only shown for non-summary content) */}
+      {activeTab !== 'summary' && (
+        <div className="levels-bar">
+          <span className="levels-label">
+            <Gauge size={13} /> Mastery Level:
+          </span>
+          <div className="level-pills">
+            {['beginner', 'intermediate', 'advanced'].map((lvl) => (
+              <button
+                key={lvl}
+                className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
+                onClick={() => onSelectLevel(lvl)}
+              >
+                {lvl.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="tabs-bar">
+        <button
+          className={`tab-btn ${activeTab === 'summary' ? 'active' : ''}`}
+          onClick={() => setActiveTab('summary')}
+        >
+          <FileText size={14} />
+          <span>Executive Summary</span>
+          {topic.summary && <span className="tab-dot" />}
+        </button>
+
         <button
           className={`tab-btn ${activeTab === 'foundation' ? 'active' : ''}`}
           onClick={() => setActiveTab('foundation')}
@@ -239,9 +268,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         ) : !hasAnyContent ? (
           <div className="viewer-missing-card">
             <Sparkles size={36} className="missing-icon" />
-            <h3>No Content Generated for {currentLevel.toUpperCase()} Level</h3>
+            <h3>No Content Generated Yet</h3>
             <p>
-              Generate the {currentLevel} tier (Foundation, Lesson, and Labs) designed to build upon earlier concepts.
+              Generate the curriculum units (Foundation, Lesson, and Labs) for this topic.
             </p>
             <button
               className="btn-primary"
@@ -249,13 +278,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               disabled={isGenerating}
             >
               <Sparkles size={16} />
-              <span>{isGenerating ? `Synthesizing ${currentLevel} Units...` : `Generate ${currentLevel.toUpperCase()} Units Now`}</span>
+              <span>{isGenerating ? `Synthesizing Units...` : `Generate Learning Units Now`}</span>
             </button>
           </div>
         ) : !rawMarkdown ? (
           <div className="viewer-missing-card">
-            <h3>This unit is missing in {currentLevel} tier</h3>
-            <p>You can generate this unit using the Regenerate button above.</p>
+            <h3>{activeTab === 'summary' ? 'Summary not yet generated' : `This unit is missing in ${currentLevel} tier`}</h3>
+            <p>You can generate this unit using the action button in the top right.</p>
           </div>
         ) : (
           <article

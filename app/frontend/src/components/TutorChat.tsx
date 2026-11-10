@@ -8,8 +8,6 @@ interface TutorChatProps {
   history: ChatMessage[];
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
-  onSaveSession: () => Promise<void>;
-  isSavingSession: boolean;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -17,8 +15,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   history,
   isChatting,
   onSendMessage,
-  onSaveSession,
-  isSavingSession,
 }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -62,17 +58,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           </div>
         </div>
 
-        {history.length > 0 && (
-          <button
-            className="btn-secondary-sm"
-            onClick={onSaveSession}
-            disabled={isSavingSession}
-            title="Save dialogue transcript to sessions/"
-          >
-            <BookmarkCheck size={13} />
-            <span>{isSavingSession ? 'Saving...' : 'Save Session'}</span>
-          </button>
-        )}
+        <div className="chat-header-actions">
+          <div className="autosave-badge" title="All discussions are automatically saved to disk and versioned in Git">
+            <BookmarkCheck size={12} className="autosave-icon" />
+            <span>Auto-Saved</span>
+          </div>
+        </div>
       </div>
 
       <div className="chat-messages">
