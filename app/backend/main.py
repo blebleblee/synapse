@@ -220,16 +220,19 @@ def get_topic_details(
         if artifacts:
             lesson = artifacts[0].read_text(encoding="utf-8")
 
-    # Load or generate initial summary
+    # Load summary non-blocking
     summary = ""
     summary_file = sub_path / "SUMMARY.md"
     if summary_file.exists():
         summary = summary_file.read_text(encoding="utf-8")
     elif bool(foundation or lesson or labs):
-        try:
-            summary = generate_initial_summary(domain, cat, sub, sub_path)
-        except Exception:
-            summary = ""
+        # Generate summary in background thread without blocking HTTP response
+        import threading
+        threading.Thread(
+            target=generate_initial_summary,
+            args=(domain, cat, sub, sub_path),
+            daemon=True
+        ).start()
 
     # Load persistent chat history for this topic
     saved_chat_history = []

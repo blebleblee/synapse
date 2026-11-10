@@ -22,6 +22,7 @@ from .exporter import export_handbook
 from .daemon import start_daemon, stop_daemon, generate_service_files
 from .mastery import get_mastery_summary, set_subtopic_mastery, load_mastery_data
 from .flashcards import generate_flashcards
+from .reviewer import review_and_fix_unit, audit_content
 
 def format_status_badge(status: dict) -> str:
     f = "F" if status["has_foundation"] else "."
@@ -238,6 +239,52 @@ def cmd_mastery(args):
 def cmd_stop(args):
     stop_daemon()
 
+def cmd_review(args):
+    if args.query:
+        target = resolve_subtopic(args.query)
+        if not target:
+            print(f"[!] Topic '{args.query}' not found.")
+            return
+        _, _, _, sub_path = target
+        print("==================================================")
+        print(f"[*] INDEPENDENT CROSS-MODEL PEER REVIEW: {args.query}")
+        print(f"[*] Reviewer Model: {args.model or 'deepseek-r1:32b'}")
+        print("==================================================")
+        res = review_and_fix_unit(sub_path, reviewer_provider=args.provider, reviewer_model=args.model, auto_fix=args.fix)
+        for r in res["reports"]:
+            badge = "[✔] VERIFIED" if r.get("verdict") == "VERIFIED" else "[!] " + str(r.get("verdict"))
+            print(f"\n{badge} :: {r.get('file')} (Score: {r.get('score', 0)}/100)")
+            if r.get("hallucinations"):
+                print(f"    - Hallucinations: {r.get('hallucinations')}")
+            if r.get("factual_errors"):
+                print(f"    - Errors: {r.get('factual_errors')}")
+            print(f"    - Critique: {r.get('critique')}")
+            if r.get("fixed"):
+                print(f"    - [FIXED]: Document rewritten and verified.")
+    else:
+        print("==================================================")
+        print(f"[*] RUNNING CROSS-MODEL PEER AUDIT ACROSS UNITS   ")
+        print(f"[*] Reviewer Model: {args.model or 'deepseek-r1:32b'}")
+        print("==================================================")
+        tree = get_topic_tree()
+        verified_count = 0
+        total_audited = 0
+        for domain, ddata in tree.items():
+            for disc, disc_data in ddata["disciplines"].items():
+                for course, c_data in disc_data["courses"].items():
+                    for unit, u_data in c_data["units"].items():
+                        if u_data["status"]["complete"]:
+                            total_audited += 1
+                            u_path = Path(u_data["full_path"])
+                            res = review_and_fix_unit(u_path, reviewer_provider=args.provider, reviewer_model=args.model, auto_fix=args.fix)
+                            status_str = "[✔] PASS" if not res["has_issues"] else "[!] ISSUES"
+                            print(f"{status_str} :: {u_data['rel_path']}")
+                            if not res["has_issues"]:
+                                verified_count += 1
+        print("==================================================")
+        print(f"[*] Peer Review Summary: {verified_count} / {total_audited} Units Verified")
+        print("==================================================")
+
 def cmd_serve(args):
     if args.daemon:
         start_daemon(host=args.host or "127.0.0.1", port=args.port or 8000)
@@ -318,6 +365,14 @@ def main():
     p_mst.add_argument("query", nargs="?", default=None, help="Subtopic path")
     p_mst.add_argument("--set", "-s", choices=["not_started", "studying", "lab_verified", "mastered"], help="Set new mastery state")
     p_mst.set_defaults(func=cmd_mastery)
+
+    # review
+    p_rev = subparsers.add_parser("review", help="Independent cross-model quality & hallucination audit")
+    p_rev.add_argument("query", nargs="?", default=None, help="Target unit name or path")
+    p_rev.add_argument("--model", "-m", default="deepseek-r1:32b", help="Reviewer model (default: deepseek-r1:32b)")
+    p_rev.add_argument("--provider", "-p", choices=["ollama", "gemini"], help="Reviewer LLM provider")
+    p_rev.add_argument("--fix", "-f", action="store_true", help="Auto-fix detected hallucinations and rewrite units")
+    p_rev.set_defaults(func=cmd_review)
 
     # add
     p_add = subparsers.add_parser("add", help="Add a new subtopic to a domain")
