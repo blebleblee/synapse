@@ -13,35 +13,35 @@ Welcome to your AI-native learning repository. This workspace uses the filesyste
   - `/topics/hobbies_and_crafts`: LEGO engineering, fine woodworking, and 3D printing (Persona: Master Builder, Woodworker, and Fabrication Craftsman).
 - `/scripts`: Utility scripts for managing the workspace and automated curriculum generation.
 
-## Learning Engine CLI (`./learning`)
+## Learning Engine CLI (`bin/learning`)
 
 The workspace includes a command-line interface for managing topics, generating lessons, and starting tutor sessions:
 
 ```bash
 # Launch the Interactive Web Workbench (UI + AI Chat + PTY Terminal on http://127.0.0.1:8000)
-./learning serve
+bin/learning serve
 
 # Check completion stats across all domains and active LLM engines
-./learning status
+bin/learning status
 
 # View the hierarchical curriculum tree with status badges ([FLB])
-./learning tree
-./learning tree --domain computing_and_engineering
+bin/learning tree
+bin/learning tree --domain computing_and_engineering
 
 # Add a new topic or subtopic (automatically updates SYLLABUS.md)
-./learning add computing_and_engineering infrastructure_and_ops ebpf --title "Extended Berkeley Packet Filter (eBPF)"
+bin/learning add computing_and_engineering infrastructure_and_ops ebpf --title "Extended Berkeley Packet Filter (eBPF)"
 
 # Generate Foundation, Lesson, and Labs for any subtopic (uses local Ollama or Gemini)
-./learning generate ebpf
-./learning generate game_theory --model qwen3:4b
+bin/learning generate ebpf
+bin/learning generate game_theory --model qwen3:4b
 
 # Start an interactive terminal Socratic session with domain persona and context loaded
-./learning chat ebpf
+bin/learning chat ebpf
 ```
 
-### Interactive Web Workbench (`./learning serve`)
+### Interactive Web Workbench (`bin/learning serve`)
 
-Running `./learning serve` boots the unified engineering dashboard at `http://127.0.0.1:8000`:
+Running `bin/learning serve` boots the unified engineering dashboard at `http://127.0.0.1:8000`:
 - **Topic Explorer (Left Pane):** Real-time search, category breakdown, status indicators (`[FLB]`), and a "+ New Topic" modal.
 - **Lesson & Knowledge Viewer (Center Pane):** Tabbed reader switching between `Foundation`, `Technical Lesson`, and `Operational Labs` with live one-click "Generate" capability.
 - **Socratic AI Tutor Chat (Right Pane):** Dynamically mounts the active directory's `GEMINI.md` persona and subtopic lesson context into Ollama or Gemini for deep interactive dialogue.
