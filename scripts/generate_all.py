@@ -65,10 +65,21 @@ def batch_generate(provider_type=None, model=None, force=False):
             )
             created = [k for k, v in results.items() if v]
             if created:
-                print(f"         [✔] Generated: {', '.join(created)}")
+                print(f"         [✔] Generated: {', '.join(created)}", flush=True)
                 generated_count += 1
+
+                # Maintain git commits upon changes
+                try:
+                    import subprocess
+                    subprocess.run(["git", "add", str(sub_path)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                    commit_msg = f"content({domain}/{cat}): generate learning units for {sub}"
+                    subprocess.run(["git", "commit", "-m", commit_msg], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                    subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                    print(f"         [↑] Committed & pushed to Gitea: {commit_msg}", flush=True)
+                except Exception:
+                    pass
             else:
-                print(f"         [↷] All units up to date.")
+                print(f"         [↷] All units up to date.", flush=True)
             completed += 1
         except Exception as e:
             print(f"         [✘] Error generating {sub}: {e}")
