@@ -1409,3 +1409,40 @@ body, html, #root {
 .dag-status-icon.pending {
   color: var(--text-muted);
 }
+
+/* User Mastery Selector */
+.mastery-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+.mastery-select {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.mastery-select.mastered, .mastery-icon.mastered {
+  color: var(--accent-green);
+}
+
+.mastery-select.lab_verified, .mastery-icon.lab_verified {
+  color: var(--accent-blue);
+}
+
+.mastery-select.studying, .mastery-icon.studying {
+  color: var(--accent-orange);
+}
+
+.mastery-select.not_started, .mastery-icon.not_started {
+  color: var(--text-muted);
+}

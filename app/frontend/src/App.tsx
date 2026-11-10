@@ -246,6 +246,34 @@ export function App() {
     }
   };
 
+  const handleUpdateMastery = async (state: string) => {
+    if (!selectedPath) return;
+    try {
+      const res = await fetch('/api/mastery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: selectedPath, state }),
+      });
+      if (res.ok) {
+        if (topicDetails) {
+          setTopicDetails({ ...topicDetails, mastery: state });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update mastery:', err);
+    }
+  };
+
+  const handleDownloadFlashcards = () => {
+    if (!selectedPath) return;
+    window.open(`/api/flashcards?query=${encodeURIComponent(selectedPath)}`, '_blank');
+  };
+
+  const handleDownloadHandbook = () => {
+    if (!topicDetails) return;
+    window.open(`/api/export?domain=${encodeURIComponent(topicDetails.domain)}&level=${currentLevel}`, '_blank');
+  };
+
   const activeChatKey = selectedPath ? `${selectedPath}/${currentLevel}` : '';
   const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
 
@@ -276,6 +304,9 @@ export function App() {
           onRefreshQuiz={handleRefreshQuiz}
           onCompileGuide={handleCompileGuide}
           isCompiling={isCompilingGuide}
+          onUpdateMastery={handleUpdateMastery}
+          onDownloadFlashcards={handleDownloadFlashcards}
+          onDownloadHandbook={handleDownloadHandbook}
         />
 
         <TutorChat

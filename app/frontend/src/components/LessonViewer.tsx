@@ -7,7 +7,10 @@ import {
   Sparkles,
   RefreshCw,
   FileCheck2,
-  Gauge
+  Gauge,
+  Award,
+  Layers,
+  Download
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -28,6 +31,9 @@ interface LessonViewerProps {
   onRefreshQuiz: () => void;
   onCompileGuide: () => void;
   isCompiling: boolean;
+  onUpdateMastery: (state: string) => void;
+  onDownloadFlashcards: () => void;
+  onDownloadHandbook: () => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -45,6 +51,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onRefreshQuiz,
   onCompileGuide,
   isCompiling,
+  onUpdateMastery,
+  onDownloadFlashcards,
+  onDownloadHandbook,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -89,12 +98,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
         <h2>Select a Topic from the Tree</h2>
-        <p>Explore over 280 structured subtopics across Computing, Math, Sciences, and Arts.</p>
+        <p>Explore over 290 structured subtopics across Computing, Math, Sciences, and Arts.</p>
       </div>
     );
   }
 
   const hasAnyContent = Boolean(topic.foundation || topic.lesson || topic.labs);
+  const masteryState = topic.mastery || 'not_started';
 
   return (
     <main className="lesson-viewer">
@@ -108,6 +118,39 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         </div>
 
         <div className="header-actions">
+          {/* User Competence Mastery Selector */}
+          <div className="mastery-selector">
+            <Award size={13} className={`mastery-icon ${masteryState}`} />
+            <select
+              value={masteryState}
+              onChange={(e) => onUpdateMastery(e.target.value)}
+              className={`mastery-select ${masteryState}`}
+            >
+              <option value="not_started">Not Started</option>
+              <option value="studying">Studying</option>
+              <option value="lab_verified">Lab Verified</option>
+              <option value="mastered">Mastered</option>
+            </select>
+          </div>
+
+          <button
+            className="btn-secondary-sm"
+            onClick={onDownloadFlashcards}
+            title="Download Anki spaced-repetition flashcards (.csv)"
+          >
+            <Layers size={13} />
+            <span>Anki</span>
+          </button>
+
+          <button
+            className="btn-secondary-sm"
+            onClick={onDownloadHandbook}
+            title={`Export complete ${topic.domain} handbook (.md)`}
+          >
+            <Download size={13} />
+            <span>Handbook</span>
+          </button>
+
           <button
             className="btn-secondary-sm"
             onClick={onCompileGuide}
@@ -115,7 +158,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Compile mastered summary guide to artifacts/"
           >
             <FileCheck2 size={13} />
-            <span>{isCompiling ? 'Compiling...' : 'Compile Guide'}</span>
+            <span>{isCompiling ? 'Compiling...' : 'Guide'}</span>
           </button>
 
           <button
@@ -125,7 +168,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Regenerate this level"
           >
             <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
-            <span>{isGenerating ? 'Generating...' : 'Regenerate'}</span>
+            <span>{isGenerating ? 'Generating...' : 'Regen'}</span>
           </button>
         </div>
       </header>

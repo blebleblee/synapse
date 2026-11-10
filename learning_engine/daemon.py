@@ -23,8 +23,12 @@ def start_daemon(host: str = "0.0.0.0", port: int = 8000) -> int:
         except OSError:
             PID_FILE.unlink(missing_ok=True)
 
+    python_bin = WORKSPACE_ROOT / ".venv" / "bin" / "python3"
+    if not python_bin.exists():
+        python_bin = sys.executable
+
     cmd = [
-        sys.executable,
+        str(python_bin),
         "-m", "uvicorn",
         "app.backend.main:app",
         "--host", host,
@@ -32,14 +36,15 @@ def start_daemon(host: str = "0.0.0.0", port: int = 8000) -> int:
     ]
 
     log_path = WORKSPACE_ROOT / "workbench.log"
-    with open(log_path, "a") as log_file:
-        proc = subprocess.Popen(
-            cmd,
-            cwd=str(WORKSPACE_ROOT),
-            stdout=log_file,
-            stderr=log_file,
-            start_new_session=True
-        )
+    log_file = open(log_path, "a", encoding="utf-8")
+    proc = subprocess.Popen(
+        cmd,
+        cwd=str(WORKSPACE_ROOT),
+        stdin=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
+        start_new_session=True
+    )
 
     PID_FILE.write_text(str(proc.pid))
     print(f"[✔] Workbench daemon started (PID: {proc.pid}) on http://{host}:{port}")

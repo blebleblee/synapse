@@ -37,6 +37,7 @@ export interface TopicDetails {
   persona: string;
   level: string;
   available_levels: string[];
+  mastery?: string;
   foundation: string;
   lesson: string;
   labs: string;

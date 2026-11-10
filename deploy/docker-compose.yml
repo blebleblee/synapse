@@ -1,0 +1,14 @@
+services:
+  workbench:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: learning-workbench
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOSTS=http://studio.2464.cz:11434,http://host.docker.internal:11434
+    volumes:
+      - ../topics:/workspace/topics
+      - ../exports:/workspace/exports

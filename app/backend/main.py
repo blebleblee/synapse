@@ -19,6 +19,7 @@ from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 # Ensure workspace root is in sys.path
@@ -37,6 +38,9 @@ from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import get_provider, OllamaProvider
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph
+from learning_engine.mastery import set_subtopic_mastery, load_mastery_data, get_mastery_summary, get_subtopic_mastery
+from learning_engine.exporter import export_handbook
+from learning_engine.flashcards import generate_flashcards
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
 
@@ -129,6 +133,45 @@ def api_search(q: str = Query(..., min_length=2)):
 def api_graph():
     return get_prerequisite_graph()
 
+class MasteryUpdateRequest(BaseModel):
+    path: str
+    state: str
+
+@app.get("/api/mastery")
+def get_mastery():
+    return {
+        "summary": get_mastery_summary(),
+        "topics": load_mastery_data()
+    }
+
+@app.post("/api/mastery")
+def update_mastery(req: MasteryUpdateRequest):
+    return set_subtopic_mastery(req.path, req.state)
+
+@app.get("/api/export")
+def download_export(domain: str, level: Optional[str] = None):
+    try:
+        out_file = export_handbook(domain, level)
+        return FileResponse(
+            str(out_file),
+            media_type="text/markdown",
+            filename=out_file.name
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/flashcards")
+def download_flashcards(query: str):
+    try:
+        csv_file = generate_flashcards(query)
+        return FileResponse(
+            str(csv_file),
+            media_type="text/csv",
+            filename=f"{query.replace('/', '_')}_flashcards.csv"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
@@ -183,6 +226,7 @@ def get_topic_details(
         "persona": persona,
         "level": selected_level,
         "available_levels": available_levels or ["beginner", "intermediate", "advanced"],
+        "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
         "foundation": foundation,
         "lesson": lesson,
         "labs": labs,

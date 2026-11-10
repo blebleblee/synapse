@@ -20,6 +20,8 @@ from .graph import get_prerequisite_graph
 from .linter import lint_curriculum
 from .exporter import export_handbook
 from .daemon import start_daemon, stop_daemon, generate_service_files
+from .mastery import get_mastery_summary, set_subtopic_mastery, load_mastery_data
+from .flashcards import generate_flashcards
 
 def format_status_badge(status: dict) -> str:
     f = "F" if status["has_foundation"] else "."
@@ -213,6 +215,26 @@ def cmd_export(args):
     out_file = export_handbook(domain=args.domain, level=args.level)
     print(f"[✔] Successfully exported {args.domain} handbook to: {out_file}")
 
+def cmd_flashcards(args):
+    out = generate_flashcards(args.query, provider_type=args.provider, model=args.model)
+    print(f"[✔] Generated Anki flashcard deck at: {out}")
+
+def cmd_mastery(args):
+    if args.set:
+        res = set_subtopic_mastery(args.query, args.set)
+        print(f"[✔] Updated mastery for '{args.query}' to: {args.set.upper()}")
+    else:
+        summary = get_mastery_summary()
+        print("==================================================")
+        print("          USER CURRICULUM MASTERY SUMMARY         ")
+        print("==================================================")
+        print(f"  Total Tracked:    {summary['total_tracked']}")
+        print(f"  Mastered Topics:  {summary['mastered_count']} ({summary['percentage']}%)")
+        print("--------------------------------------------------")
+        for state, count in summary["counts"].items():
+            print(f"  - {state.replace('_', ' ').title():16s}: {count}")
+        print("==================================================")
+
 def cmd_stop(args):
     stop_daemon()
 
@@ -283,6 +305,19 @@ def main():
     p_export.add_argument("domain", help="Domain to export (e.g. computing, formal_sciences)")
     p_export.add_argument("--level", "-l", choices=["beginner", "intermediate", "advanced"], help="Filter by difficulty level")
     p_export.set_defaults(func=cmd_export)
+
+    # flashcards
+    p_fc = subparsers.add_parser("flashcards", help="Generate Anki active-recall flashcard deck (CSV format)")
+    p_fc.add_argument("query", help="Subtopic name or path")
+    p_fc.add_argument("--provider", "-p", choices=["ollama", "gemini"], help="LLM Provider")
+    p_fc.add_argument("--model", "-m", help="Specific model name")
+    p_fc.set_defaults(func=cmd_flashcards)
+
+    # mastery
+    p_mst = subparsers.add_parser("mastery", help="Track or update user topic mastery state")
+    p_mst.add_argument("query", nargs="?", default=None, help="Subtopic path")
+    p_mst.add_argument("--set", "-s", choices=["not_started", "studying", "lab_verified", "mastered"], help="Set new mastery state")
+    p_mst.set_defaults(func=cmd_mastery)
 
     # add
     p_add = subparsers.add_parser("add", help="Add a new subtopic to a domain")
