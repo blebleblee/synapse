@@ -52,7 +52,7 @@ class OllamaProvider(LLMProvider):
         req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
 
         try:
-            with urllib.request.urlopen(req, timeout=300) as resp:
+            with urllib.request.urlopen(req, timeout=600) as resp:
                 res_json = json.loads(resp.read().decode("utf-8"))
                 return res_json.get("response", "")
         except urllib.error.URLError as e:
@@ -105,8 +105,16 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
         models = OllamaProvider.list_models()
         chosen_model = model
         if not chosen_model:
-            # Pick preferred model if available
-            preferred = ["qwen2.5-coder:32b", "qwen3:4b", "llama3.1:8b", "qwen2.5:3b"]
+            # Prioritize deep 32B coding and reasoning models
+            preferred = [
+                "qwen2.5-coder:32b",
+                "deepseek-r1:32b",
+                "qwen2.5:32b",
+                "gemma4:31b",
+                "llama3.1:8b",
+                "qwen3:4b",
+                "qwen2.5:3b"
+            ]
             for pref in preferred:
                 if pref in models:
                     chosen_model = pref

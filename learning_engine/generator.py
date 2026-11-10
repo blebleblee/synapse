@@ -32,18 +32,26 @@ def generate_subtopic_content(
     # 1. FOUNDATION.md
     foundation_path = subtopic_dir / "FOUNDATION.md"
     if not foundation_path.exists() or force:
-        prompt = f"""Write an essential FOUNDATION guide for the topic of '{subtopic_title}'.
-This belongs to the '{domain_title}' domain under '{category.replace('_', ' ').title()}'.
+        prompt = f"""You are authoring a rigorous, comprehensive FOUNDATION textbook chapter on '{subtopic_title}'.
+Domain: '{domain_title}' | Category: '{category.replace('_', ' ').title()}'.
 
-Structure the document with:
+REQUIREMENTS:
+- Do NOT provide brief or superficial bullet points. Deliver an exhaustive, deep-dive conceptual breakdown.
+- Ground everything in first principles, historical motivations, and underlying physical or architectural mechanisms.
+- Provide a clean, detailed ASCII diagram and a Mermaid sequence or flowchart diagram illustrating internal workflows.
+- Detail 5-8 foundational terms with full mathematical or system-level definitions.
+- Analyze subtle misconceptions and mental traps that trip up practitioners.
+- Provide 3 deep, provocative Socratic discussion questions.
+
+Structure:
 # Foundation: {subtopic_title}
-## 1. Conceptual Mental Model (Core intuition, analogies, and first principles)
-## 2. Essential Terminology & Taxonomy (Definitions of 5-8 foundational terms)
-## 3. Architecture & Core Workflow (Visual ASCII or Mermaid diagram illustrating the system flow)
-## 4. Common Misconceptions & Mental Traps
-## 5. Socratic Discussion Starters (3 deep questions for exploring this topic with your AI tutor)
+## 1. Conceptual Mental Model (First principles, historical context, and fundamental paradigm shifts)
+## 2. Essential Terminology & Taxonomy (Comprehensive architectural definitions)
+## 3. Architecture & Core Workflow (Detailed ASCII and Mermaid diagrams with step-by-step dataflow)
+## 4. Common Misconceptions & Mental Traps (Subtle edge cases and flawed mental models)
+## 5. Socratic Discussion Starters (Advanced questions for deep Socratic exploration)
 
-Output clean, well-formatted Markdown only."""
+Output clean, exhaustive, publication-grade Markdown only."""
         content = provider.generate(prompt, system_instruction=system_instruction)
         foundation_path.write_text(content.strip() + "\n", encoding="utf-8")
         results["foundation"] = True
@@ -53,18 +61,25 @@ Output clean, well-formatted Markdown only."""
     # 2. LESSON.md
     lesson_path = subtopic_dir / "LESSON.md"
     if not lesson_path.exists() or force:
-        prompt = f"""Write an exhaustive, complete technical LESSON on the topic of '{subtopic_title}'.
-This belongs to the '{domain_title}' domain under '{category.replace('_', ' ').title()}'.
+        prompt = f"""You are authoring an exhaustive, production-grade technical LESSON on '{subtopic_title}'.
+Domain: '{domain_title}' | Category: '{category.replace('_', ' ').title()}'.
 
-Structure the document with:
+REQUIREMENTS:
+- Deliver deep technical exposition at the level of a Principal Systems Architect, Staff Security Researcher, or Mathematics Professor.
+- Cover low-level mechanics: memory layouts, kernel subsystems, hardware registers, protocols, mathematical derivations, or data structures.
+- Provide fully realized, complete production code, configurations, or mathematical proofs. NEVER use placeholders like '// TODO' or '...'.
+- Exhaustively explore failure domains, edge cases, race conditions, memory bottlenecks, or counterexamples.
+- Ensure 100% technical accuracy. Do not hallucinate or use hand-waving explanations.
+
+Structure:
 # In-Depth Technical Lesson: {subtopic_title}
 ## 1. Underlying Mechanics & Deep Theory
-## 2. Architecture, Data Structures, or Physical Laws
-## 3. Production Implementations / Real-World Code or Manifests (No placeholders, fully realized examples)
+## 2. Architecture, Data Structures, Protocols & Invariants
+## 3. Production Implementations & Concrete Real-World Code / Proofs
 ## 4. Failure Domains, Edge Cases & Performance Tradeoffs
 ## 5. Executive Summary & Key Takeaways
 
-Output clean, well-formatted Markdown only."""
+Output exhaustive, verified, publication-grade Markdown only."""
         content = provider.generate(prompt, system_instruction=system_instruction)
         lesson_path.write_text(content.strip() + "\n", encoding="utf-8")
         results["lesson"] = True
@@ -74,18 +89,24 @@ Output clean, well-formatted Markdown only."""
     # 3. LABS.md
     labs_path = subtopic_dir / "LABS.md"
     if not labs_path.exists() or force:
-        prompt = f"""Write a hands-on, operational LAB guide for practicing '{subtopic_title}'.
-This belongs to the '{domain_title}' domain under '{category.replace('_', ' ').title()}'.
+        prompt = f"""You are authoring an exhaustive, hands-on operational LAB guide on '{subtopic_title}'.
+Domain: '{domain_title}' | Category: '{category.replace('_', ' ').title()}'.
 
-Structure the document with:
+REQUIREMENTS:
+- Provide concrete, fully runnable terminal commands, code scripts, or diagnostic workflows.
+- Include explicit, realistic expected command outputs and state inspection steps.
+- Include a dedicated fault injection and debugging exercise demonstrating how to diagnose failures.
+- Provide challenging self-guided lab scenarios for testing with an AI mentor.
+
+Structure:
 # Hands-On Operational Lab: {subtopic_title}
-## Objective & Prerequisites
-## Exercise 1: Exploration & System State Inspection (Explicit verification commands and expected outputs)
-## Exercise 2: Building & Deploying / Modeling Scenario (Step-by-step interactive workflow)
+## Objective & Lab Prerequisites
+## Exercise 1: Exploration, Diagnostics & System State Inspection
+## Exercise 2: Building, Configuring & Deploying a Production Scenario
 ## Exercise 3: Fault Injection, Failure Analysis & Debugging
-## Challenge Lab: Independent Problem for Socratic Discussion with the AI Tutor
+## Challenge Lab: Independent Advanced Scenarios
 
-Output clean, well-formatted Markdown with exact shell commands or actionable steps."""
+Output clean, executable, publication-grade Markdown only."""
         content = provider.generate(prompt, system_instruction=system_instruction)
         labs_path.write_text(content.strip() + "\n", encoding="utf-8")
         results["labs"] = True
