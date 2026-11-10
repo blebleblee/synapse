@@ -28,18 +28,6 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
   const [isCompleted, setIsCompleted] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
 
-  useEffect(() => {
-    if (isOpen && topicPath) {
-      loadDeck();
-    } else {
-      setCards([]);
-      setCurrentIndex(0);
-      setIsFlipped(false);
-      setIsCompleted(false);
-      setReviewedCount(0);
-    }
-  }, [isOpen, topicPath]);
-
   const loadDeck = async () => {
     setIsLoading(true);
     try {
@@ -57,6 +45,18 @@ export const FlashcardStudyModal: React.FC<FlashcardStudyModalProps> = ({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen && topicPath) {
+      loadDeck();
+    } else {
+      setCards([]);
+      setCurrentIndex(0);
+      setIsFlipped(false);
+      setIsCompleted(false);
+      setReviewedCount(0);
+    }
+  }, [isOpen, topicPath]);
 
   const handleFlip = () => {
     setIsFlipped((prev) => !prev);

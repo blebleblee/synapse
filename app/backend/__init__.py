@@ -1,0 +1,1 @@
+"""Synapse FastAPI Backend Package"""

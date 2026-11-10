@@ -23,7 +23,7 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
   });
 
   // 2. Process inline math: $...$
-  processed = processed.replace(/(?<!\\)\$([^\$\n]+?)\$/g, (_, math) => {
+  processed = processed.replace(/(?<!\\)\$([^$\n]+?)\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
     } catch {

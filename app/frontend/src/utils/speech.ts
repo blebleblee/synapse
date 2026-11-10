@@ -23,10 +23,10 @@ export const speakText = (
     .replace(/```[\s\S]*?```/g, ' Code snippet omitted. ')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/\$\$[\s\S]*?\$\$/g, ' Mathematical equation. ')
-    .replace(/\$([^\$]+)\$/g, '$1')
+    .replace(/\$([^$]+)\$/g, '$1')
     .replace(/#+\s/g, '')
     .replace(/\*+/g, '')
-    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .trim();
 
   if (!clean) return;

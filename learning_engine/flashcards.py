@@ -63,8 +63,15 @@ Output valid JSON only with no markdown formatting."""
 
     cards = []
     try:
-        cards = json.loads(raw)
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict):
+            cards = parsed.get("flashcards", parsed.get("cards", []))
+        elif isinstance(parsed, list):
+            cards = parsed
     except Exception:
+        pass
+
+    if not cards or not isinstance(cards, list):
         cards = [
             {"front": f"What is the foundational invariant of {sub.replace('_', ' ').title()}?", "back": "Refer to Foundation documentation for core structural axioms."}
         ]
@@ -74,6 +81,7 @@ Output valid JSON only with no markdown formatting."""
         writer = csv.writer(f)
         writer.writerow(["#separator:Comma", "#html:true", f"#tags:{domain} {cat} {sub}"])
         for c in cards:
-            writer.writerow([c.get("front", ""), c.get("back", ""), f"{domain}::{sub}"])
+            if isinstance(c, dict):
+                writer.writerow([c.get("front", ""), c.get("back", ""), f"{domain}::{sub}"])
 
     return out_csv
