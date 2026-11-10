@@ -117,8 +117,19 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     <aside className="tree-sidebar">
       <div className="sidebar-header">
         <div className="brand">
-          <div className="brand-dot" />
-          <span className="brand-title">Learning Workbench</span>
+          <svg className="brand-logo-svg" viewBox="0 0 48 48" width="22" height="22" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#58a6ff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#39c5cf" strokeWidth="2.5" fill="#161b22" />
+            <line x1="24" y1="8" x2="24" y2="24" stroke="#58a6ff" strokeWidth="2" />
+            <line x1="38" y1="16" x2="24" y2="24" stroke="#39c5cf" strokeWidth="2" />
+            <line x1="38" y1="32" x2="24" y2="24" stroke="#3fb950" strokeWidth="2" />
+            <line x1="24" y1="40" x2="24" y2="24" stroke="#3fb950" strokeWidth="2" />
+            <line x1="10" y1="32" x2="24" y2="24" stroke="#58a6ff" strokeWidth="2" />
+            <line x1="10" y1="16" x2="24" y2="24" stroke="#39c5cf" strokeWidth="2" />
+            <circle cx="24" cy="24" r="4.5" fill="#3fb950" />
+            <circle cx="24" cy="24" r="2.5" fill="#f0f6fc"/>
+          </svg>
+          <span className="brand-title">Synapse</span>
         </div>
         <div className="sidebar-header-actions">
           <button className="icon-btn" onClick={onOpenSearch} title="Full-Text Search (Cmd+K)">

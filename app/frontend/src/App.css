@@ -709,15 +709,31 @@ body, html, #root {
   border-top: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: height 0.2s ease-in-out;
+  position: relative;
+  transition: height 0.15s ease-out;
 }
 
-.terminal-drawer.open {
-  height: 240px;
+.terminal-drawer.maximized {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.terminal-resize-handle {
+  height: 5px;
+  background-color: var(--border-color);
+  cursor: ns-resize;
+  transition: background-color 0.15s;
+}
+
+.terminal-resize-handle:hover {
+  background-color: var(--accent-blue);
 }
 
 .terminal-drawer.closed {
-  height: 36px;
+  height: 36px !important;
 }
 
 .terminal-header {
@@ -741,6 +757,34 @@ body, html, #root {
   text-transform: uppercase;
   color: var(--text-secondary);
   letter-spacing: 0.5px;
+}
+
+.terminal-env-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.env-icon {
+  color: var(--accent-blue);
+}
+
+.env-select {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+
+.brand-logo-svg {
+  flex-shrink: 0;
 }
 
 .status-dot {

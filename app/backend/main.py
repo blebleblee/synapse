@@ -14,6 +14,7 @@ import asyncio
 import json
 import datetime
 import subprocess
+import shutil
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -550,12 +551,36 @@ Output clean, production-ready Markdown."""
 async def terminal_websocket(websocket: WebSocket):
     await websocket.accept()
 
+    env_type = websocket.query_params.get("env", "host")
+
     master, slave = pty.openpty()
     # Default terminal size (80 cols, 24 rows)
     winsize = struct.pack("HHHH", 24, 80, 0, 0)
     fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
 
     shell = os.environ.get("SHELL", "/bin/bash")
+    exec_cmd = [shell]
+
+    if env_type == "docker":
+        docker_bin = shutil.which("docker")
+        if docker_bin:
+            exec_cmd = [
+                docker_bin, "run", "-it", "--rm",
+                "--privileged",
+                "-v", f"{WORKSPACE_ROOT}:/workspace",
+                "-w", "/workspace",
+                "ubuntu:24.04", "/bin/bash"
+            ]
+    elif env_type == "k8s":
+        kubectl_bin = shutil.which("kubectl")
+        if kubectl_bin:
+            exec_cmd = [
+                kubectl_bin, "run", f"synapse-lab-{os.getpid()}",
+                "-it", "--rm", "--restart=Never",
+                "--image=nicolaka/netshoot",
+                "--namespace=default", "--", "bash"
+            ]
+
     pid = os.fork()
 
     if pid == 0:
@@ -572,7 +597,7 @@ async def terminal_websocket(websocket: WebSocket):
         env = os.environ.copy()
         env["TERM"] = "xterm-256color"
         env["PROMPT_COMMAND"] = ""
-        os.execve(shell, [shell], env)
+        os.execvpe(exec_cmd[0], exec_cmd, env)
 
     # Parent process
     os.close(slave)

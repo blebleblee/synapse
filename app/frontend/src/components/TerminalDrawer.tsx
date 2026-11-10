@@ -2,7 +2,16 @@ import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 're
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
-import { Terminal as TerminalIcon, ChevronDown, ChevronUp, Trash2, RefreshCw } from 'lucide-react';
+import {
+  Terminal as TerminalIcon,
+  ChevronDown,
+  ChevronUp,
+  Trash2,
+  RefreshCw,
+  Maximize2,
+  Minimize2,
+  Layers
+} from 'lucide-react';
 
 export interface TerminalDrawerHandle {
   runCommand: (command: string) => void;
@@ -19,15 +28,19 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const fitAddonRef = useRef<FitAddon | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [terminalHeight, setTerminalHeight] = useState(260);
+  const [terminalEnv, setTerminalEnv] = useState<'host' | 'docker' | 'k8s'>('host');
+  const isDraggingRef = useRef(false);
 
-  const connectWs = () => {
+  const connectWs = (env = terminalEnv) => {
     if (wsRef.current) {
       wsRef.current.close();
     }
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/terminal`;
+    const wsUrl = `${protocol}//${host}/ws/terminal?env=${env}`;
 
     const ws = new WebSocket(wsUrl);
     ws.binaryType = 'arraybuffer';
@@ -52,13 +65,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       }
     };
 
-    ws.onclose = () => {
-      setConnected(false);
-    };
-
-    ws.onerror = () => {
-      setConnected(false);
-    };
+    ws.onclose = () => setConnected(false);
+    ws.onerror = () => setConnected(false);
 
     wsRef.current = ws;
   };
@@ -100,7 +108,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       }
     });
 
-    connectWs();
+    connectWs('host');
 
     const resizeObserver = new ResizeObserver(() => {
       if (isOpen && fitAddonRef.current && termRef.current) {
@@ -119,8 +127,30 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       resizeObserver.observe(containerRef.current);
     }
 
+    // Drag handle resizing listeners
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const newHeight = window.innerHeight - e.clientY;
+      if (newHeight >= 120 && newHeight <= window.innerHeight * 0.85) {
+        setTerminalHeight(newHeight);
+      }
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      document.body.style.cursor = '';
+      if (fitAddonRef.current && termRef.current) {
+        fitAddonRef.current.fit();
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
       if (wsRef.current) wsRef.current.close();
       term.dispose();
     };
@@ -134,7 +164,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
         }
       }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, isMaximized, terminalHeight]);
 
   useImperativeHandle(ref, () => ({
     runCommand(command: string) {
@@ -153,26 +183,79 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     }
   };
 
+  const handleEnvChange = (newEnv: 'host' | 'docker' | 'k8s') => {
+    setTerminalEnv(newEnv);
+    if (termRef.current) {
+      termRef.current.write(`\r\n\x1b[33m[*] Switching execution environment to: ${newEnv.toUpperCase()}...\x1b[0m\r\n`);
+    }
+    connectWs(newEnv);
+  };
+
+  const currentHeight = !isOpen ? 36 : isMaximized ? 'calc(100vh - 38px)' : `${terminalHeight}px`;
+
   return (
-    <div className={`terminal-drawer ${isOpen ? 'open' : 'closed'}`}>
+    <div
+      className={`terminal-drawer ${isOpen ? 'open' : 'closed'} ${isMaximized ? 'maximized' : ''}`}
+      style={{ height: currentHeight }}
+    >
+      {/* Resizing Drag Handle */}
+      {isOpen && !isMaximized && (
+        <div
+          className="terminal-resize-handle"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            isDraggingRef.current = true;
+            document.body.style.cursor = 'ns-resize';
+          }}
+          title="Drag to resize terminal height"
+        />
+      )}
+
       <div className="terminal-header" onClick={onToggle}>
         <div className="terminal-title">
-          <TerminalIcon size={16} className="terminal-icon" />
-          <span>Integrated Workspace Terminal</span>
+          <TerminalIcon size={15} className="terminal-icon" />
+          <span>Terminal Sandbox</span>
           <span className={`status-dot ${connected ? 'online' : 'offline'}`} title={connected ? 'Connected' : 'Disconnected'} />
         </div>
+
+        {/* Environment Profile Selector */}
+        <div className="terminal-env-selector" onClick={(e) => e.stopPropagation()}>
+          <Layers size={13} className="env-icon" />
+          <select
+            value={terminalEnv}
+            onChange={(e) => handleEnvChange(e.target.value as any)}
+            className="env-select"
+            title="Switch execution environment"
+          >
+            <option value="host">Host Shell (Local)</option>
+            <option value="docker">Linux Sandbox (Docker / Rancher)</option>
+            <option value="k8s">Kubernetes Pod (k3s Cluster)</option>
+          </select>
+        </div>
+
         <div className="terminal-actions" onClick={(e) => e.stopPropagation()}>
-          <button className="icon-btn" onClick={connectWs} title="Reconnect Terminal">
-            <RefreshCw size={14} />
+          <button className="icon-btn" onClick={() => connectWs(terminalEnv)} title="Restart Terminal Session">
+            <RefreshCw size={13} />
           </button>
-          <button className="icon-btn" onClick={handleClear} title="Clear Terminal">
-            <Trash2 size={14} />
+          <button className="icon-btn" onClick={handleClear} title="Clear Terminal Screen">
+            <Trash2 size={13} />
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => {
+              if (!isOpen) onToggle();
+              setIsMaximized(!isMaximized);
+            }}
+            title={isMaximized ? 'Restore View' : 'Maximize / Fullscreen Terminal'}
+          >
+            {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
           </button>
           <button className="icon-btn" onClick={onToggle} title={isOpen ? 'Collapse' : 'Expand'}>
-            {isOpen ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            {isOpen ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
           </button>
         </div>
       </div>
+
       <div className="terminal-body" ref={containerRef} style={{ display: isOpen ? 'block' : 'none' }} />
     </div>
   );

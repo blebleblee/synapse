@@ -1,0 +1,39 @@
+# Synapse Engineering Sandbox Container
+# Provides an authentic Linux kernel environment for eBPF, compiling, networking, and security labs.
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    clang \
+    llvm \
+    libbpf-dev \
+    gcc \
+    g++ \
+    gdb \
+    make \
+    cmake \
+    iproute2 \
+    iptables \
+    net-tools \
+    iputils-ping \
+    curl \
+    wget \
+    git \
+    vim \
+    nano \
+    python3 \
+    python3-pip \
+    python3-venv \
+    sudo \
+    libelf-dev \
+    zlib1g-dev \
+    binutils \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]
