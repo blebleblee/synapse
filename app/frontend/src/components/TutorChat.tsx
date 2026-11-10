@@ -17,6 +17,11 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   onSendMessage,
 }) => {
   const [input, setInput] = useState('');
+  const [chatWidth, setChatWidth] = useState<number>(() => {
+    const saved = localStorage.getItem('synapse_chat_width');
+    return saved ? parseInt(saved, 10) : 480;
+  });
+  const isDraggingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -26,6 +31,31 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [history, isChatting]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth >= 320 && newWidth <= window.innerWidth * 0.6) {
+        setChatWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        document.body.style.cursor = '';
+        localStorage.setItem('synapse_chat_width', chatWidth.toString());
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [chatWidth]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,12 +76,23 @@ export const TutorChat: React.FC<TutorChatProps> = ({
     : 'Domain Expert & Socratic Mentor';
 
   return (
-    <aside className="chat-sidebar">
+    <aside className="chat-sidebar" style={{ width: `${chatWidth}px` }}>
+      {/* Draggable Vertical Resize Handle */}
+      <div
+        className="chat-resize-handle"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          isDraggingRef.current = true;
+          document.body.style.cursor = 'ew-resize';
+        }}
+        title="Drag to resize AI chat panel"
+      />
+
       <div className="chat-header">
         <div className="persona-info">
-          <Bot size={18} className="persona-icon" />
+          <Bot size={22} className="persona-icon" />
           <div className="persona-text">
-            <span className="persona-label">Socratic AI Tutor</span>
+            <span className="persona-label">Socratic Mentor</span>
             <span className="persona-role" title={personaRole}>
               {personaRole}
             </span>
@@ -69,45 +110,54 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       <div className="chat-messages">
         {history.length === 0 ? (
           <div className="chat-empty">
-            <MessageSquare size={32} className="chat-empty-icon" />
+            <MessageSquare size={36} className="chat-empty-icon" />
+            <h3>Socratic Inquiry</h3>
             <p>
-              Ask your AI tutor questions, explore code, test your mental models, or ask for a quiz.
+              Ask deep questions, test operational edge-cases, or request counter-examples.
             </p>
-            {topic && (
-              <div className="suggestions-box">
-                <span className="suggestions-title">
-                  <Lightbulb size={12} /> Socratic Starters:
-                </span>
-                <button
-                  className="suggestion-chip"
-                  onClick={() => handleSuggestionClick(`Break down the core intuition of ${topic.subtopic} with a simple real-world analogy.`)}
-                >
-                  "Explain core intuition with an analogy"
-                </button>
-                <button
-                  className="suggestion-chip"
-                  onClick={() => handleSuggestionClick(`Give me a production-grade architecture walkthrough of ${topic.subtopic}.`)}
-                >
-                  "Walk me through the architecture"
-                </button>
-                <button
-                  className="suggestion-chip"
-                  onClick={() => handleSuggestionClick(`Quiz me on the key concepts of ${topic.subtopic}. Give me 1 scenario-based question.`)}
-                >
-                  "Quiz me on key concepts"
-                </button>
-              </div>
-            )}
+
+            <div className="chat-suggestions">
+              <span className="suggestions-title">
+                <Lightbulb size={12} /> Suggested Prompts:
+              </span>
+              <button
+                className="suggestion-chip"
+                onClick={() => handleSuggestionClick("Explain the core architectural invariants and where this commonly breaks in production.")}
+              >
+                Explain the core architectural invariants and failure modes
+              </button>
+              <button
+                className="suggestion-chip"
+                onClick={() => handleSuggestionClick("Give me a challenging real-world debugging scenario to test my mental model.")}
+              >
+                Give me a challenging real-world debugging scenario
+              </button>
+              <button
+                className="suggestion-chip"
+                onClick={() => handleSuggestionClick("What are the subtle misconceptions most engineers have about this topic?")}
+              >
+                What are the subtle misconceptions most engineers have?
+              </button>
+            </div>
           </div>
         ) : (
           history.map((msg, idx) => (
             <div key={idx} className={`chat-bubble ${msg.role}`}>
-              <div className="bubble-author">
-                {msg.role === 'student' ? <User size={13} /> : <Bot size={13} />}
-                <span>{msg.role === 'student' ? 'You' : personaRole}</span>
+              <div className="bubble-header">
+                {msg.role === 'student' ? (
+                  <>
+                    <User size={13} />
+                    <span>You</span>
+                  </>
+                ) : (
+                  <>
+                    <Bot size={13} />
+                    <span>Tutor</span>
+                  </>
+                )}
               </div>
               <div
-                className="bubble-content markdown-body"
+                className="bubble-content"
                 dangerouslySetInnerHTML={{ __html: marked.parse(msg.content) as string }}
               />
             </div>
@@ -115,10 +165,10 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         )}
 
         {isChatting && (
-          <div className="chat-bubble tutor loading">
-            <div className="bubble-author">
+          <div className="chat-bubble tutor thinking">
+            <div className="bubble-header">
               <Bot size={13} />
-              <span>{personaRole}</span>
+              <span>Tutor</span>
             </div>
             <div className="typing-indicator">
               <span />
@@ -127,14 +177,13 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      <form className="chat-input-form" onSubmit={handleSubmit}>
+      <form className="chat-input-bar" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder={topic ? `Discuss ${topic.subtopic.replace(/_/g, ' ')}...` : 'Select a topic first...'}
+          placeholder={topic ? "Ask a question, test an edge-case, or discuss..." : "Select a topic first..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={!topic || isChatting}
@@ -142,7 +191,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         <button
           type="submit"
           className="send-btn"
-          disabled={!input.trim() || !topic || isChatting}
+          disabled={!input.trim() || isChatting || !topic}
+          title="Send inquiry (Enter)"
         >
           <Send size={15} />
         </button>

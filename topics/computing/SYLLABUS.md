@@ -100,3 +100,8 @@ Here are all the available subtopics in this learning module organized by catego
 - **Artificial Intelligence** (`ai/ai_foundations/`)
 - **Large Language Models** (`ai/llms/`)
 - **Machine Learning Operations** (`ai/mlops/`)
+
+
+### Ai/Vibe Coding
+
+- **Test** (`ai/vibe_coding/test/`)

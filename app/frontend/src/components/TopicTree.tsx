@@ -165,17 +165,17 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     <aside className="tree-sidebar">
       <div className="sidebar-header">
         <div className="brand">
-          <svg className="brand-logo-svg" viewBox="0 0 48 48" width="22" height="22" fill="none">
-            <circle cx="24" cy="24" r="20" stroke="#58a6ff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#cfa858" strokeWidth="2.5" fill="#141519" />
-            <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8ac9" strokeWidth="2" />
-            <line x1="38" y1="16" x2="24" y2="24" stroke="#cfa858" strokeWidth="2" />
-            <line x1="38" y1="32" x2="24" y2="24" stroke="#2fa872" strokeWidth="2" />
-            <line x1="24" y1="40" x2="24" y2="24" stroke="#2fa872" strokeWidth="2" />
-            <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8ac9" strokeWidth="2" />
-            <line x1="10" y1="16" x2="24" y2="24" stroke="#cfa858" strokeWidth="2" />
-            <circle cx="24" cy="24" r="4.5" fill="#2fa872" />
-            <circle cx="24" cy="24" r="2.5" fill="#f0f6fc"/>
+          <svg className="brand-logo-svg" viewBox="0 0 48 48" width="32" height="32" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#4f8fff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#fbbf24" strokeWidth="2.5" fill="#15181f" />
+            <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+            <line x1="38" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="38" y1="32" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+            <line x1="24" y1="40" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+            <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+            <line x1="10" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+            <circle cx="24" cy="24" r="5" fill="#10b981" />
+            <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
           </svg>
           <span className="brand-title">Synapse</span>
         </div>
