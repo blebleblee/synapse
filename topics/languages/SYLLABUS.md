@@ -12,6 +12,17 @@
 - **Sentence Structure and Verb Placement** (`germanic/german/03_sentence_structure_and_verb_placement/`)
 - **Compound Words and Idioms** (`germanic/german/04_compound_words_and_idioms/`)
 
+### Linguistics: General Linguistics
+- **Phonetics and IPA** (`linguistics/general_linguistics/01_phonetics_and_ipa/`)
+- **Morphology and Syntax** (`linguistics/general_linguistics/02_morphology_and_syntax/`)
+- **Etymology and Language Evolution** (`linguistics/general_linguistics/03_etymology_and_language_evolution/`)
+
+### Romance: Spanish
+- **Phonetics and Accentuation** (`romance/spanish/01_phonetics_and_accentuation/`)
+- **Ser Estar and Verb Conjugations** (`romance/spanish/02_ser_estar_and_verb_conjugations/`)
+- **Subjunctive Mood and Nuance** (`romance/spanish/03_subjunctive_mood_and_nuance/`)
+- **Syntax and Regional Idioms** (`romance/spanish/04_syntax_and_regional_idioms/`)
+
 ### Slavic: Czech
 - **Phonology and Vowel Length** (`slavic/czech/01_phonology_and_vowel_length/`)
 - **Seven Case System and Declensions** (`slavic/czech/02_seven_case_system_and_declensions/`)
@@ -23,14 +34,3 @@
 - **Six Case Declensions** (`slavic/russian/02_six_case_declensions/`)
 - **Verbs of Motion and Aspect** (`slavic/russian/03_verbs_of_motion_and_aspect/`)
 - **Syntax and Idiomatic Constructions** (`slavic/russian/04_syntax_and_idiomatic_constructions/`)
-
-### Romance: Spanish
-- **Phonetics and Accentuation** (`romance/spanish/01_phonetics_and_accentuation/`)
-- **Ser Estar and Verb Conjugations** (`romance/spanish/02_ser_estar_and_verb_conjugations/`)
-- **Subjunctive Mood and Nuance** (`romance/spanish/03_subjunctive_mood_and_nuance/`)
-- **Syntax and Regional Idioms** (`romance/spanish/04_syntax_and_regional_idioms/`)
-
-### Linguistics: General Linguistics
-- **Phonetics and IPA** (`linguistics/general_linguistics/01_phonetics_and_ipa/`)
-- **Morphology and Syntax** (`linguistics/general_linguistics/02_morphology_and_syntax/`)
-- **Etymology and Language Evolution** (`linguistics/general_linguistics/03_etymology_and_language_evolution/`)

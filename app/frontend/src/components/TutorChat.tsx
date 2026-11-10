@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
-import { Send, Bot, User, MessageSquare, Lightbulb, RotateCcw, Volume2 } from 'lucide-react';
+import { Send, Bot, User, MessageSquare, Lightbulb, RotateCcw, Volume2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 import { speakText } from '../utils/speech';
 
@@ -20,6 +20,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   onClearChat,
 }) => {
   const [input, setInput] = useState('');
+  const [personaExpanded, setPersonaExpanded] = useState(false);
   const [chatWidth, setChatWidth] = useState<number>(() => {
     const saved = localStorage.getItem('synapse_chat_width');
     return saved ? parseInt(saved, 10) : 480;
@@ -92,10 +93,17 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       />
 
       <div className="chat-header">
-        <div className="persona-info">
+        <div
+          className="persona-info clickable"
+          onClick={() => setPersonaExpanded((prev) => !prev)}
+          title={personaExpanded ? "Collapse Socratic mentor directives" : "Expand full Socratic mentor directives"}
+        >
           <Bot size={22} className="persona-icon" />
           <div className="persona-text">
-            <span className="persona-label">Socratic Mentor</span>
+            <div className="persona-label-row">
+              <span className="persona-label">Socratic Mentor</span>
+              {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
+            </div>
             <span className="persona-role" title={personaRole}>
               {personaRole}
             </span>
@@ -115,6 +123,18 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           )}
         </div>
       </div>
+
+      {personaExpanded && topic?.persona && (
+        <div className="persona-expanded-card">
+          <div className="persona-expanded-header">
+            <Sparkles size={13} className="sparkle-gold" />
+            <span>Mentor Directives & Epistemic Tone</span>
+          </div>
+          <div className="persona-expanded-body">
+            {topic.persona}
+          </div>
+        </div>
+      )}
 
       <div className="chat-messages">
         {history.length === 0 ? (

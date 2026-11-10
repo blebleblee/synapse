@@ -1,9 +1,28 @@
 # Syllabus: Natural Sciences
 
-Here are all the available subtopics in this learning module organized by category:
+### Biology
+- **Cellular Biology** (`biology/cellular_biology/`)
+- **Molecular Biology** (`biology/molecular_biology/`)
+- **Genetics** (`biology/genetics/`)
+- **Evolutionary Biology** (`biology/evolutionary_biology/`)
+- **Ecology** (`biology/ecology/`)
+- **Microbiology** (`biology/microbiology/`)
+- **Neuroscience** (`biology/neuroscience/`)
+
+### Biology: Extreme Biology and Genetics
+- **CRISPR Cas9 and Precision Gene Editing** (`biology/extreme_biology_and_genetics/01_crispr_cas9_and_precision_gene_editing/`)
+- **Tardigrades and Cryptobiosis Mechanisms** (`biology/extreme_biology_and_genetics/02_tardigrades_and_cryptobiosis_mechanisms/`)
+- **Bioluminescence Luciferin and Photophores** (`biology/extreme_biology_and_genetics/03_bioluminescence_luciferin_and_photophores/`)
+- **Mycelium Networks and Mycorrhizal Communication** (`biology/extreme_biology_and_genetics/04_mycelium_networks_and_mycorrhizal_communication/`)
+
+### Chemistry
+- **Organic Chemistry** (`chemistry/organic_chemistry/`)
+- **Inorganic Chemistry** (`chemistry/inorganic_chemistry/`)
+- **Physical Chemistry** (`chemistry/physical_chemistry/`)
+- **Analytical Chemistry** (`chemistry/analytical_chemistry/`)
+- **Biochemistry** (`chemistry/biochemistry/`)
 
 ### Physics
-
 - **Classical Mechanics** (`physics/classical_mechanics/`)
 - **Electromagnetism** (`physics/electromagnetism/`)
 - **Thermodynamics** (`physics/thermodynamics/`)
@@ -15,36 +34,6 @@ Here are all the available subtopics in this learning module organized by catego
 - **Cosmology** (`physics/cosmology/`)
 - **Aerodynamics** (`physics/aerodynamics/`)
 - **Flight Dynamics** (`physics/flight_dynamics/`)
-
-### Chemistry
-
-- **Organic Chemistry** (`chemistry/organic_chemistry/`)
-- **Inorganic Chemistry** (`chemistry/inorganic_chemistry/`)
-- **Physical Chemistry** (`chemistry/physical_chemistry/`)
-- **Analytical Chemistry** (`chemistry/analytical_chemistry/`)
-- **Biochemistry** (`chemistry/biochemistry/`)
-
-### Biology
-
-- **Cellular Biology** (`biology/cellular_biology/`)
-- **Molecular Biology** (`biology/molecular_biology/`)
-- **Genetics** (`biology/genetics/`)
-- **Evolutionary Biology** (`biology/evolutionary_biology/`)
-- **Ecology** (`biology/ecology/`)
-- **Microbiology** (`biology/microbiology/`)
-- **Neuroscience** (`biology/neuroscience/`)
-
-### Space and Flight: Observational Astronomy
-- **Celestial Mechanics and Keplerian Orbits** (`space_and_flight/astronomy/01_celestial_mechanics_and_keplerian_orbits/`)
-- **Optical and Radio Telescopes Spectroscopy** (`space_and_flight/astronomy/02_optical_and_radio_telescopes_spectroscopy/`)
-- **Stellar Evolution Nucleosynthesis and Supernovae** (`space_and_flight/astronomy/03_stellar_evolution_nucleosynthesis_and_supernovae/`)
-- **Cosmology Dark Matter and General Relativity** (`space_and_flight/astronomy/04_cosmology_dark_matter_and_general_relativity/`)
-
-### Space and Flight: Piloting and Aviation
-- **Flight Aerodynamics Lift Thrust Drag and Weight** (`space_and_flight/flying_and_aviation/01_flight_aerodynamics_lift_thrust_drag_and_weight/`)
-- **Aircraft Flight Instruments and Pitot Static Systems** (`space_and_flight/flying_and_aviation/02_aircraft_flight_instruments_and_pitot_static_systems/`)
-- **VFR Airspace Classes and Sectional Charts** (`space_and_flight/flying_and_aviation/03_vfr_airspace_classes_and_sectional_charts/`)
-- **Aviation Meteorology and Flight Planning** (`space_and_flight/flying_and_aviation/04_aviation_meteorology_and_flight_planning/`)
 
 ### Physics: Quantum Foundations and Paradoxes
 - **Quantum Entanglement and Bell Inequalities** (`physics/quantum_foundations_and_paradoxes/01_quantum_entanglement_and_bell_inequalities/`)
@@ -62,11 +51,17 @@ Here are all the available subtopics in this learning module organized by catego
 - **Nuclear Fusion Tokamaks and Stellarators** (`physics/energy_and_frontiers/01_nuclear_fusion_tokamaks_and_stellarators/`)
 - **Chaos Theory and Strange Attractors** (`physics/energy_and_frontiers/02_chaos_theory_and_strange_attractors/`)
 
-### Biology: Extreme Biology and Genetics
-- **CRISPR Cas9 and Precision Gene Editing** (`biology/extreme_biology_and_genetics/01_crispr_cas9_and_precision_gene_editing/`)
-- **Tardigrades and Cryptobiosis Mechanisms** (`biology/extreme_biology_and_genetics/02_tardigrades_and_cryptobiosis_mechanisms/`)
-- **Bioluminescence Luciferin and Photophores** (`biology/extreme_biology_and_genetics/03_bioluminescence_luciferin_and_photophores/`)
-- **Mycelium Networks and Mycorrhizal Communication** (`biology/extreme_biology_and_genetics/04_mycelium_networks_and_mycorrhizal_communication/`)
+### Space and Flight: Observational Astronomy
+- **Celestial Mechanics and Keplerian Orbits** (`space_and_flight/astronomy/01_celestial_mechanics_and_keplerian_orbits/`)
+- **Optical and Radio Telescopes Spectroscopy** (`space_and_flight/astronomy/02_optical_and_radio_telescopes_spectroscopy/`)
+- **Stellar Evolution Nucleosynthesis and Supernovae** (`space_and_flight/astronomy/03_stellar_evolution_nucleosynthesis_and_supernovae/`)
+- **Cosmology Dark Matter and General Relativity** (`space_and_flight/astronomy/04_cosmology_dark_matter_and_general_relativity/`)
+
+### Space and Flight: Piloting and Aviation
+- **Flight Aerodynamics Lift Thrust Drag and Weight** (`space_and_flight/flying_and_aviation/01_flight_aerodynamics_lift_thrust_drag_and_weight/`)
+- **Aircraft Flight Instruments and Pitot Static Systems** (`space_and_flight/flying_and_aviation/02_aircraft_flight_instruments_and_pitot_static_systems/`)
+- **VFR Airspace Classes and Sectional Charts** (`space_and_flight/flying_and_aviation/03_vfr_airspace_classes_and_sectional_charts/`)
+- **Aviation Meteorology and Flight Planning** (`space_and_flight/flying_and_aviation/04_aviation_meteorology_and_flight_planning/`)
 
 ### Space and Flight: Cosmic Frontiers and Astrobiology
 - **Fermi Paradox and Great Filter Solutions** (`space_and_flight/cosmic_frontiers_and_astrobiology/01_fermi_paradox_and_great_filter_solutions/`)

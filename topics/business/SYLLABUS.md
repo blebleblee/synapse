@@ -1,9 +1,6 @@
 # Syllabus: Business
 
-Here are all the available subtopics in this learning module organized by category:
-
 ### Corporate Finance
-
 - **Financial Accounting** (`corporate_finance/accounting/`)
 - **Corporate Finance** (`corporate_finance/corporate_finance/`)
 - **Financial Modeling** (`corporate_finance/financial_modeling/`)
@@ -14,30 +11,6 @@ Here are all the available subtopics in this learning module organized by catego
 - **Private Equity** (`corporate_finance/private_equity/`)
 - **Venture Capital** (`corporate_finance/venture_capital/`)
 - **Risk Management** (`corporate_finance/risk_management/`)
-
-### Personal Wealth
-
-- **Personal Finance** (`personal_wealth/personal_finance/`)
-- **Asset Management** (`personal_wealth/asset_management/`)
-- **Wealth Management** (`personal_wealth/wealth_management/`)
-- **Mutual Funds** (`personal_wealth/mutual_funds/`)
-- **Real Estate** (`personal_wealth/real_estate/`)
-- **Taxation Strategy** (`personal_wealth/taxation/`)
-
-### Markets
-
-- **Equities** (`markets/equities/`)
-- **Fixed Income** (`markets/fixed_income/`)
-- **Forex Markets** (`markets/forex/`)
-- **Cryptocurrency** (`markets/crypto/`)
-- **Hedge Funds** (`markets/hedge_funds/`)
-
-### Trading
-
-- **Algorithmic Trading** (`trading/algorithmic_trading/`)
-- **Quantitative Methods** (`trading/quant/`)
-- **Derivatives Pricing** (`trading/derivatives/`)
-- **Options Trading** (`trading/options/`)
 
 ### Management: Agile and Project Management
 - **Agile Scrum Framework and Sprint Planning** (`management/project_management/01_agile_scrum_framework_and_sprint_planning/`)
@@ -69,6 +42,21 @@ Here are all the available subtopics in this learning module organized by catego
 - **Contract Renewals and Upselling Strategies** (`management/account_management/03_contract_renewals_and_upselling_strategies/`)
 - **Churn Prediction and Retention Playbooks** (`management/account_management/04_churn_prediction_and_retention_playbooks/`)
 
+### Markets
+- **Equities** (`markets/equities/`)
+- **Fixed Income** (`markets/fixed_income/`)
+- **Forex Markets** (`markets/forex/`)
+- **Cryptocurrency** (`markets/crypto/`)
+- **Hedge Funds** (`markets/hedge_funds/`)
+
+### Personal Wealth
+- **Personal Finance** (`personal_wealth/personal_finance/`)
+- **Asset Management** (`personal_wealth/asset_management/`)
+- **Wealth Management** (`personal_wealth/wealth_management/`)
+- **Mutual Funds** (`personal_wealth/mutual_funds/`)
+- **Real Estate** (`personal_wealth/real_estate/`)
+- **Taxation Strategy** (`personal_wealth/taxation/`)
+
 ### Productivity: Microsoft Excel Mastery
 - **Advanced Lookup Formulas XLOOKUP and INDEX MATCH** (`productivity/excel_mastery/01_advanced_lookup_formulas_xlookup_and_index_match/`)
 - **Pivot Tables Slicers and Calculated Fields** (`productivity/excel_mastery/02_pivot_tables_slicers_and_calculated_fields/`)
@@ -92,3 +80,9 @@ Here are all the available subtopics in this learning module organized by catego
 - **Emergency Funds and Debt Payoff Strategies** (`productivity/personal_budgeting/02_emergency_funds_and_debt_payoff_strategies/`)
 - **Index Fund Investing and Asset Allocation** (`productivity/personal_budgeting/03_index_fund_investing_and_asset_allocation/`)
 - **Tax Advantaged Accounts and Retirement Planning** (`productivity/personal_budgeting/04_tax_advantaged_accounts_and_retirement_planning/`)
+
+### Trading
+- **Algorithmic Trading** (`trading/algorithmic_trading/`)
+- **Quantitative Methods** (`trading/quant/`)
+- **Derivatives Pricing** (`trading/derivatives/`)
+- **Options Trading** (`trading/options/`)

@@ -7,13 +7,17 @@ import {
   Sparkles,
   RefreshCw,
   FileCheck2,
-  Gauge,
   Award,
   Layers,
   Download,
   FileText,
   Volume2,
-  VolumeX
+  VolumeX,
+  Columns,
+  ZoomIn,
+  ZoomOut,
+  X,
+  Maximize2
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -119,6 +123,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     };
   }, [rawMarkdown, targetLanguage]);
 
+  const [bilingualSplit, setBilingualSplit] = useState<boolean>(() => {
+    return localStorage.getItem('synapse_bilingual_split') === 'true';
+  });
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxSvg, setLightboxSvg] = useState<string | null>(null);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
+
   const activeMarkdown = (targetLanguage && targetLanguage !== 'en' && translatedMarkdown) ? translatedMarkdown : rawMarkdown;
 
   const handleToggleVoice = () => {
@@ -139,17 +150,50 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return renderMarkdownWithMathAndMermaid(activeMarkdown);
   }, [activeMarkdown]);
 
+  const originalHtmlContent = useMemo(() => {
+    if (!rawMarkdown) return '';
+    return renderMarkdownWithMathAndMermaid(rawMarkdown);
+  }, [rawMarkdown]);
+
+  const translatedHtmlContent = useMemo(() => {
+    const md = translatedMarkdown || rawMarkdown;
+    if (!md) return '';
+    return renderMarkdownWithMathAndMermaid(md);
+  }, [translatedMarkdown, rawMarkdown]);
+
   useEffect(() => {
     if (contentRef.current) {
       renderMermaidDiagramsInElement(contentRef.current);
     }
-  }, [htmlContent, activeTab]);
+  }, [htmlContent, originalHtmlContent, translatedHtmlContent, activeTab, bilingualSplit]);
 
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
+
+    // 1. Executable code block runner
     const runBtn = target.closest('.btn-run-code') as HTMLElement | null;
     if (runBtn && runBtn.dataset.code) {
       onRunInTerminal(runBtn.dataset.code);
+      return;
+    }
+
+    // 2. Zoomable Image Lightbox
+    const imgEl = target.closest('img') as HTMLImageElement | null;
+    if (imgEl && imgEl.src) {
+      setLightboxImage(imgEl.src);
+      setLightboxSvg(null);
+      setLightboxZoom(1);
+      return;
+    }
+
+    // 3. Zoomable Mermaid Vector Diagram Lightbox
+    const svgEl = target.closest('.mermaid svg') as SVGElement | null;
+    if (svgEl) {
+      const serializer = new XMLSerializer();
+      setLightboxSvg(serializer.serializeToString(svgEl));
+      setLightboxImage(null);
+      setLightboxZoom(1);
+      return;
     }
   };
 
@@ -200,19 +244,35 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           </span>
         </div>
 
-        {/* User Competence Mastery Selector on Right */}
-        <div className="mastery-selector">
-          <Award size={13} className={`mastery-icon ${masteryState}`} />
-          <select
-            value={masteryState}
-            onChange={(e) => onUpdateMastery(e.target.value)}
-            className={`mastery-select ${masteryState}`}
-          >
-            <option value="not_started">Not Started</option>
-            <option value="studying">Studying</option>
-            <option value="lab_verified">Lab Verified</option>
-            <option value="mastered">Mastered</option>
-          </select>
+        {/* Top Right: Difficulty Tier Selector + Mastery Selector */}
+        <div className="viewer-header-right">
+          <div className="header-tier-pills" title="Difficulty Tier">
+            {['beginner', 'intermediate', 'advanced'].map((lvl) => (
+              <button
+                key={lvl}
+                className={`header-tier-btn ${currentLevel === lvl ? 'active' : ''}`}
+                onClick={() => onSelectLevel(lvl)}
+                disabled={activeTab === 'summary'}
+                title={activeTab === 'summary' ? 'Summary covers all tiers' : `Switch difficulty tier to ${lvl}`}
+              >
+                {lvl.slice(0, 3).toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="mastery-selector">
+            <Award size={13} className={`mastery-icon ${masteryState}`} />
+            <select
+              value={masteryState}
+              onChange={(e) => onUpdateMastery(e.target.value)}
+              className={`mastery-select ${masteryState}`}
+            >
+              <option value="not_started">Not Started</option>
+              <option value="studying">Studying</option>
+              <option value="lab_verified">Lab Verified</option>
+              <option value="mastered">Mastered</option>
+            </select>
+          </div>
         </div>
       </header>
 
@@ -340,27 +400,21 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </button>
           )}
 
-          {/* Persistent Difficulty Level Selector */}
-          <div
-            className={`nav-level-selector ${activeTab === 'summary' ? 'summary-dimmed' : ''}`}
-            title={activeTab === 'summary' ? 'Executive summary covers all tiers' : 'Select difficulty tier'}
-          >
-            <span className="levels-label">
-              <Gauge size={12} /> Tier:
-            </span>
-            <div className="level-pills">
-              {['beginner', 'intermediate', 'advanced'].map((lvl) => (
-                <button
-                  key={lvl}
-                  className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
-                  onClick={() => onSelectLevel(lvl)}
-                  disabled={activeTab === 'summary'}
-                >
-                  {lvl.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Bilingual Dual Column Split View Toggle */}
+          {targetLanguage && targetLanguage !== 'en' && (
+            <button
+              className={`nav-action-btn ${bilingualSplit ? 'active-bilingual' : ''}`}
+              onClick={() => {
+                const next = !bilingualSplit;
+                setBilingualSplit(next);
+                localStorage.setItem('synapse_bilingual_split', String(next));
+              }}
+              title={bilingualSplit ? "Switch to Single Column View" : "Switch to Bilingual Side-by-Side Dual View"}
+            >
+              <Columns size={12} />
+              <span>{bilingualSplit ? 'Dual ◫' : 'Split ◫'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -393,6 +447,28 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <h3>{activeTab === 'summary' ? 'Summary not yet generated' : `This unit is missing in ${currentLevel} tier`}</h3>
             <p>You can generate this unit using the action button in the top right.</p>
           </div>
+        ) : bilingualSplit && targetLanguage && targetLanguage !== 'en' ? (
+          <div className="bilingual-split-container">
+            <div className="bilingual-col original">
+              <div className="bilingual-col-header">
+                <span>ORIGINAL (ENGLISH)</span>
+              </div>
+              <article
+                className="markdown-body"
+                dangerouslySetInnerHTML={{ __html: originalHtmlContent }}
+              />
+            </div>
+            <div className="bilingual-col translated">
+              <div className="bilingual-col-header">
+                <span>TRANSLATED ({targetLanguage.toUpperCase()})</span>
+                {isTranslating && <span className="translating-indicator">Translating...</span>}
+              </div>
+              <article
+                className="markdown-body"
+                dangerouslySetInnerHTML={{ __html: translatedHtmlContent }}
+              />
+            </div>
+          </div>
         ) : (
           <article
             className="markdown-body"
@@ -400,6 +476,32 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           />
         )}
       </div>
+
+      {/* Lightbox Modal for Images and Vector Diagrams */}
+      {(lightboxImage || lightboxSvg) && (
+        <div className="lightbox-backdrop" onClick={() => { setLightboxImage(null); setLightboxSvg(null); }}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <div className="lightbox-toolbar">
+              <button className="icon-btn" onClick={() => setLightboxZoom((z) => Math.min(z + 0.25, 3))} title="Zoom In">
+                <ZoomIn size={16} />
+              </button>
+              <button className="icon-btn" onClick={() => setLightboxZoom((z) => Math.max(z - 0.25, 0.5))} title="Zoom Out">
+                <ZoomOut size={16} />
+              </button>
+              <button className="icon-btn" onClick={() => setLightboxZoom(1)} title="Reset Zoom">
+                <Maximize2 size={16} />
+              </button>
+              <button className="icon-btn" onClick={() => { setLightboxImage(null); setLightboxSvg(null); }} title="Close Lightbox">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="lightbox-body" style={{ transform: `scale(${lightboxZoom})`, transformOrigin: 'center center', transition: 'transform 0.15s ease-out' }}>
+              {lightboxImage && <img src={lightboxImage} alt="Diagram High-Res View" className="lightbox-img" />}
+              {lightboxSvg && <div className="lightbox-svg-container" dangerouslySetInnerHTML={{ __html: lightboxSvg }} />}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

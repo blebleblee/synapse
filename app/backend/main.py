@@ -406,6 +406,173 @@ def api_rename_topic(req: RenameTopicRequest):
         raise HTTPException(status_code=400, detail=f"Failed to rename topic '{req.path}'")
     return {"success": True, "message": f"Renamed to {req.new_title}"}
 
+class AIExpandRequest(BaseModel):
+    path: str
+    prompt: Optional[str] = ""
+    model: Optional[str] = None
+
+class AIUnitItem(BaseModel):
+    title: str
+    slug: str
+    description: Optional[str] = ""
+
+class AIExpandApplyRequest(BaseModel):
+    domain: str
+    discipline: str
+    course: str
+    course_title: str
+    units: List[AIUnitItem]
+
+@app.post("/api/topic/ai-expand")
+def api_ai_expand_topic(req: AIExpandRequest):
+    clean_path = req.path.strip("/")
+    parts = [p.lower().replace(" ", "_") for p in clean_path.split("/") if p]
+
+    domain = parts[0] if len(parts) > 0 else "computing"
+    discipline = parts[1] if len(parts) > 1 else "software"
+    course = parts[2] if len(parts) > 2 else "general"
+
+    # Contextual hint if broadening existing unit
+    is_broadening = len(parts) >= 4
+    unit_hint = parts[3] if is_broadening else ""
+
+    prompt = f"""You are a Principal Curriculum Architect for Synapse, a production-grade AI learning workspace.
+We operate under a strict 4-level taxonomy: Domain / Discipline / Course / Unit.
+Every unit is an atomic, calibrated 2-to-3 hour modular study unit with zero composite 'and' subjects.
+
+Target Path requested: "{clean_path}"
+Domain: "{domain}"
+Discipline: "{discipline}"
+Course: "{course}"
+User Directives / Focus: "{req.prompt or 'Comprehensive, state-of-the-art coverage'}"
+{'Mode: Broaden this course with additional advanced units.' if is_broadening else 'Mode: Scaffold complete new course with progressive units.'}
+
+Propose 4 to 6 calibrated study units with clear sequential progression (from fundamentals to advanced operational mastery).
+
+CRITICAL INVARIANTS:
+1. Every slug must begin with a two-digit index (e.g. '01_ground_effect_aerodynamics', '02_hybrid_power_units').
+2. Response MUST be valid raw JSON only. Do not include markdown codeblocks (```json), commentary, or preambles.
+
+JSON Schema:
+{{
+  "domain": "{domain}",
+  "discipline": "{discipline}",
+  "course": "{course}",
+  "course_title": "<Human Readable Title for this Course>",
+  "units": [
+    {{
+      "title": "<Unit Display Title>",
+      "slug": "01_<unit_slug>",
+      "description": "<One sentence scope of this 2-3 hour unit>"
+    }}
+  ]
+}}"""
+
+    try:
+        provider = get_provider(model=req.model)
+        raw_resp = provider.generate(prompt).strip()
+
+        # Clean any accidental markdown codeblock wrapper
+        if raw_resp.startswith("```"):
+            lines = raw_resp.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            raw_resp = "\n".join(lines).strip()
+
+        import json
+        plan = json.loads(raw_resp)
+        return plan
+    except Exception as e:
+        # Fallback heuristic generator if LLM response parsing fails
+        fallback_course_title = course.replace("_", " ").title()
+        return {
+            "domain": domain,
+            "discipline": discipline,
+            "course": course,
+            "course_title": fallback_course_title,
+            "units": [
+                {
+                    "title": f"{fallback_course_title} Foundations",
+                    "slug": f"01_{course}_foundations",
+                    "description": "Core mental model, primary invariants, and theoretical mechanics."
+                },
+                {
+                    "title": f"{fallback_course_title} Architecture and Mechanics",
+                    "slug": f"02_{course}_architecture_and_mechanics",
+                    "description": "Deep component interactions, specifications, and telemetry analysis."
+                },
+                {
+                    "title": f"{fallback_course_title} Applied Optimization",
+                    "slug": f"03_{course}_applied_optimization",
+                    "description": "Advanced problem solving, tuning trade-offs, and failure mode mitigation."
+                },
+                {
+                    "title": f"{fallback_course_title} Capstone Case Studies",
+                    "slug": f"04_{course}_capstone_case_studies",
+                    "description": "Real-world engineering scenarios and rigorous operational workflows."
+                }
+            ],
+            "fallback": True,
+            "error": str(e)
+        }
+
+@app.post("/api/topic/ai-expand/apply")
+def api_ai_expand_apply(req: AIExpandApplyRequest):
+    domain = req.domain.strip("/").lower().replace(" ", "_")
+    discipline = req.discipline.strip("/").lower().replace(" ", "_")
+    course = req.course.strip("/").lower().replace(" ", "_")
+
+    domain_dir = TOPICS_DIR / domain
+    if not domain_dir.exists():
+        domain_dir.mkdir(parents=True, exist_ok=True)
+
+    created_paths = []
+    syllabus_lines = [f"\n### {discipline.replace('_', ' ').title()}: {req.course_title}"]
+
+    for u in req.units:
+        unit_slug = u.slug.strip("/").lower().replace(" ", "_")
+        unit_dir = domain_dir / discipline / course / unit_slug
+        unit_dir.mkdir(parents=True, exist_ok=True)
+        rel_unit = f"{discipline}/{course}/{unit_slug}"
+        syllabus_lines.append(f"- **{u.title}** (`{rel_unit}/`)")
+        created_paths.append(f"{domain}/{rel_unit}")
+
+    # Update SYLLABUS.md
+    syllabus_file = domain_dir / "SYLLABUS.md"
+    current_content = syllabus_file.read_text(encoding="utf-8") if syllabus_file.exists() else f"# Syllabus: {domain.replace('_', ' ').title()}\n"
+
+    check_pattern = f"`{discipline}/{course}/"
+    if check_pattern not in current_content:
+        current_content += "\n" + "\n".join(syllabus_lines) + "\n"
+        syllabus_file.write_text(current_content, encoding="utf-8")
+    else:
+        # Append only new units if course header already exists
+        for u in req.units:
+            unit_slug = u.slug.strip("/").lower().replace(" ", "_")
+            unit_rel = f"(`{discipline}/{course}/{unit_slug}/`)"
+            if unit_rel not in current_content:
+                current_content += f"\n- **{u.title}** {unit_rel}"
+        syllabus_file.write_text(current_content, encoding="utf-8")
+
+    # Git auto-commit and push to Gitea
+    try:
+        import subprocess
+        course_dir = domain_dir / discipline / course
+        subprocess.run(["git", "add", str(syllabus_file), str(course_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"feat(curriculum): AI auto-populate {domain}/{discipline}/{course} ({len(req.units)} units)"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+    except Exception as git_err:
+        print("Git commit warning:", git_err)
+
+    return {
+        "success": True,
+        "created_count": len(req.units),
+        "first_unit_path": created_paths[0] if created_paths else f"{domain}/{discipline}/{course}",
+        "units": created_paths
+    }
+
 @app.post("/api/chat")
 def chat_with_tutor(req: ChatRequest):
     target = resolve_subtopic(req.query)
