@@ -104,7 +104,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
         <h2>Select a Topic from the Tree</h2>
-        <p>Explore over 290 structured subtopics across Computing, Math, Sciences, and Arts.</p>
+        <p>Explore over 340 structured study units across Computing, Engineering, and Sciences.</p>
       </div>
     );
   }
@@ -191,11 +191,61 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
         </div>
       </header>
 
-      {/* Progressive Difficulty Level Selector Bar (only shown for non-summary content) */}
-      {activeTab !== 'summary' && (
-        <div className="levels-bar">
+      {/* Unified Permanent Non-Shifting Navigation Bar */}
+      <div className="tabs-bar">
+        <div className="tabs-group">
+          <button
+            className={`tab-btn ${activeTab === 'summary' ? 'active' : ''}`}
+            onClick={() => setActiveTab('summary')}
+          >
+            <FileText size={14} />
+            <span>Summary</span>
+            {topic.summary && <span className="tab-dot" />}
+          </button>
+
+          <button
+            className={`tab-btn ${activeTab === 'foundation' ? 'active' : ''}`}
+            onClick={() => setActiveTab('foundation')}
+          >
+            <BookOpen size={14} />
+            <span>Foundation</span>
+            {topic.foundation && <span className="tab-dot" />}
+          </button>
+
+          <button
+            className={`tab-btn ${activeTab === 'lesson' ? 'active' : ''}`}
+            onClick={() => setActiveTab('lesson')}
+          >
+            <GraduationCap size={14} />
+            <span>In-Depth Lesson</span>
+            {topic.lesson && <span className="tab-dot" />}
+          </button>
+
+          <button
+            className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('labs')}
+          >
+            <FlaskConical size={14} />
+            <span>Operational Labs</span>
+            {topic.labs && <span className="tab-dot" />}
+          </button>
+
+          <button
+            className={`tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
+            onClick={() => setActiveTab('quiz')}
+          >
+            <HelpCircle size={14} />
+            <span>Socratic Quiz</span>
+          </button>
+        </div>
+
+        {/* Persistent Difficulty Level Selector on the right */}
+        <div
+          className={`nav-level-selector ${activeTab === 'summary' ? 'summary-dimmed' : ''}`}
+          title={activeTab === 'summary' ? 'Executive summary covers all tiers' : 'Select difficulty tier'}
+        >
           <span className="levels-label">
-            <Gauge size={13} /> Mastery Level:
+            <Gauge size={12} /> Tier:
           </span>
           <div className="level-pills">
             {['beginner', 'intermediate', 'advanced'].map((lvl) => (
@@ -203,58 +253,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                 key={lvl}
                 className={`level-pill-btn ${currentLevel === lvl ? 'active' : ''}`}
                 onClick={() => onSelectLevel(lvl)}
+                disabled={activeTab === 'summary'}
               >
                 {lvl.toUpperCase()}
               </button>
             ))}
           </div>
         </div>
-      )}
-
-      <div className="tabs-bar">
-        <button
-          className={`tab-btn ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => setActiveTab('summary')}
-        >
-          <FileText size={14} />
-          <span>Executive Summary</span>
-          {topic.summary && <span className="tab-dot" />}
-        </button>
-
-        <button
-          className={`tab-btn ${activeTab === 'foundation' ? 'active' : ''}`}
-          onClick={() => setActiveTab('foundation')}
-        >
-          <BookOpen size={14} />
-          <span>Foundation</span>
-          {topic.foundation && <span className="tab-dot" />}
-        </button>
-
-        <button
-          className={`tab-btn ${activeTab === 'lesson' ? 'active' : ''}`}
-          onClick={() => setActiveTab('lesson')}
-        >
-          <GraduationCap size={14} />
-          <span>In-Depth Lesson</span>
-          {topic.lesson && <span className="tab-dot" />}
-        </button>
-
-        <button
-          className={`tab-btn ${activeTab === 'labs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('labs')}
-        >
-          <FlaskConical size={14} />
-          <span>Operational Labs</span>
-          {topic.labs && <span className="tab-dot" />}
-        </button>
-
-        <button
-          className={`tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quiz')}
-        >
-          <HelpCircle size={14} />
-          <span>Socratic Quiz</span>
-        </button>
       </div>
 
       <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>

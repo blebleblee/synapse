@@ -53,9 +53,9 @@ body, html, #root {
 
 /* Left Sidebar: Topic Tree */
 .tree-sidebar {
-  width: 290px;
-  min-width: 240px;
-  max-width: 360px;
+  width: 310px;
+  min-width: 260px;
+  max-width: 400px;
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   display: flex;
@@ -87,9 +87,16 @@ body, html, #root {
 
 .brand-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.5px;
   color: #f0f6fc;
+}
+
+.search-filter-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
 }
 
 .search-box {
@@ -97,21 +104,48 @@ body, html, #root {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  flex: 1;
 }
 
 .search-icon {
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .search-box input {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 13px;
   width: 100%;
   outline: none;
+}
+
+.sort-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border-color);
+}
+
+.sort-icon {
+  color: var(--text-muted);
+}
+
+.sort-select {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding: 4px 2px;
+}
+
+.sort-select:hover {
+  color: var(--text-primary);
 }
 
 .tree-content {
@@ -128,10 +162,10 @@ body, html, #root {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 7px 14px;
   cursor: pointer;
   user-select: none;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -140,11 +174,11 @@ body, html, #root {
 }
 
 .domain-header:hover {
-  color: var(--accent-blue);
+  color: var(--accent-gold);
 }
 
 .domain-icon {
-  color: var(--accent-blue);
+  color: var(--accent-gold);
 }
 
 .category-group {
@@ -158,8 +192,8 @@ body, html, #root {
   padding: 5px 12px;
   cursor: pointer;
   user-select: none;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 12.5px;
+  font-weight: 600;
   color: var(--text-primary);
   border-radius: 4px;
   margin: 1px 6px;
@@ -168,6 +202,7 @@ body, html, #root {
 
 .category-header:hover {
   background-color: var(--bg-tertiary);
+  color: #f0f6fc;
 }
 
 .category-icon {
@@ -203,7 +238,7 @@ body, html, #root {
   margin: 1px 4px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   transition: all 0.15s;
 }
@@ -283,59 +318,6 @@ body, html, #root {
   font-size: 12px;
 }
 
-/* Mastery Level Bar */
-.levels-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 18px;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.levels-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
-}
-
-.level-pills {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.level-pill-btn {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 2px;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: all 0.15s;
-}
-
-.level-pill-btn:hover {
-  color: var(--text-primary);
-  border-color: #3b3f4c;
-}
-
-.level-pill-btn.active {
-  background-color: var(--accent-gold);
-  border-color: var(--accent-gold);
-  color: #0c0d0f;
-  font-weight: 700;
-}
-
 .crumb-domain {
   color: var(--text-muted);
   text-transform: capitalize;
@@ -356,13 +338,78 @@ body, html, #root {
   text-transform: capitalize;
 }
 
+/* Unified Permanent Non-Shifting Navigation Bar */
 .tabs-bar {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 18px;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 42px;
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-level-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  transition: opacity 0.2s ease;
+}
+
+.nav-level-selector.summary-dimmed {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.levels-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.level-pills {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.level-pill-btn {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+
+.level-pill-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: #3b3f4c;
+}
+
+.level-pill-btn.active {
+  background-color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: #0c0d0f;
+  font-weight: 700;
 }
 
 .tab-btn {
@@ -434,11 +481,11 @@ body, html, #root {
 
 /* Markdown Styling */
 .markdown-body {
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--text-primary);
-  font-size: 14.5px;
+  font-size: 15px;
   text-align: left;
-  max-width: 900px;
+  max-width: 100%;
 }
 
 .markdown-body h1 {
@@ -535,10 +582,11 @@ body, html, #root {
 
 /* Right Sidebar: AI Tutor Chat */
 .chat-sidebar {
-  width: 340px;
-  min-width: 280px;
-  max-width: 420px;
+  width: 440px;
+  min-width: 360px;
+  max-width: 540px;
   background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Folder,
   FolderOpen,
@@ -11,7 +11,8 @@ import {
   Binary,
   FlaskConical,
   Palette,
-  Hammer
+  Hammer,
+  ArrowUpDown
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -46,6 +47,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenGraph,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({
     computing: true,
   });
@@ -126,20 +128,53 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     }
   };
 
+  // Helper to count completed units in a domain
+  const getDomainCompletion = (ddata: any) => {
+    let completed = 0;
+    let total = 0;
+    const discs = ddata.disciplines || {};
+    for (const discData of Object.values(discs) as any[]) {
+      for (const cData of Object.values(discData.courses || {}) as any[]) {
+        for (const uData of Object.values(cData.units || {}) as any[]) {
+          total += 1;
+          if (uData.status?.complete) completed += 1;
+        }
+      }
+    }
+    return { completed, total, rate: total > 0 ? completed / total : 0 };
+  };
+
+  const sortedDomainEntries = useMemo(() => {
+    return Object.entries(tree).sort(([a, ddataA], [b, ddataB]) => {
+      if (sortMode === 'az') {
+        return a.localeCompare(b);
+      }
+      if (sortMode === 'progress') {
+        const rateA = getDomainCompletion(ddataA).rate;
+        const rateB = getDomainCompletion(ddataB).rate;
+        return rateB - rateA;
+      }
+      // default curated order
+      const idxA = DOMAIN_ORDER.indexOf(a);
+      const idxB = DOMAIN_ORDER.indexOf(b);
+      return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
+    });
+  }, [tree, sortMode]);
+
   return (
     <aside className="tree-sidebar">
       <div className="sidebar-header">
         <div className="brand">
           <svg className="brand-logo-svg" viewBox="0 0 48 48" width="22" height="22" fill="none">
             <circle cx="24" cy="24" r="20" stroke="#58a6ff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#39c5cf" strokeWidth="2.5" fill="#161b22" />
-            <line x1="24" y1="8" x2="24" y2="24" stroke="#58a6ff" strokeWidth="2" />
-            <line x1="38" y1="16" x2="24" y2="24" stroke="#39c5cf" strokeWidth="2" />
-            <line x1="38" y1="32" x2="24" y2="24" stroke="#3fb950" strokeWidth="2" />
-            <line x1="24" y1="40" x2="24" y2="24" stroke="#3fb950" strokeWidth="2" />
-            <line x1="10" y1="32" x2="24" y2="24" stroke="#58a6ff" strokeWidth="2" />
-            <line x1="10" y1="16" x2="24" y2="24" stroke="#39c5cf" strokeWidth="2" />
-            <circle cx="24" cy="24" r="4.5" fill="#3fb950" />
+            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#cfa858" strokeWidth="2.5" fill="#141519" />
+            <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8ac9" strokeWidth="2" />
+            <line x1="38" y1="16" x2="24" y2="24" stroke="#cfa858" strokeWidth="2" />
+            <line x1="38" y1="32" x2="24" y2="24" stroke="#2fa872" strokeWidth="2" />
+            <line x1="24" y1="40" x2="24" y2="24" stroke="#2fa872" strokeWidth="2" />
+            <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8ac9" strokeWidth="2" />
+            <line x1="10" y1="16" x2="24" y2="24" stroke="#cfa858" strokeWidth="2" />
+            <circle cx="24" cy="24" r="4.5" fill="#2fa872" />
             <circle cx="24" cy="24" r="2.5" fill="#f0f6fc"/>
           </svg>
           <span className="brand-title">Synapse</span>
@@ -161,26 +196,40 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
       </div>
 
-      <div className="search-box">
-        <Search size={14} className="search-icon" />
-        <input
-          type="text"
-          placeholder="Filter topics or paths..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      {/* Search & Interactive Sort Controls */}
+      <div className="search-filter-row">
+        <div className="search-box">
+          <Search size={14} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Filter topics..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="sort-box" title="Sort topics">
+          <ArrowUpDown size={12} className="sort-icon" />
+          <select
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as any)}
+            className="sort-select"
+          >
+            <option value="default">Curated</option>
+            <option value="az">A → Z</option>
+            <option value="progress">Progress</option>
+          </select>
+        </div>
       </div>
 
       <div className="tree-content">
-        {Object.entries(tree)
-          .sort(([a], [b]) => {
-            const idxA = DOMAIN_ORDER.indexOf(a);
-            const idxB = DOMAIN_ORDER.indexOf(b);
-            return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
-          })
-          .map(([domain, ddata]) => {
+        {sortedDomainEntries.map(([domain, ddata]) => {
           const isDomainOpen = openDomains[domain] || searchTerm.length > 0;
           const disciplines = ddata.disciplines || {};
+
+          let sortedDisciplines = Object.entries(disciplines);
+          if (sortMode === 'az') {
+            sortedDisciplines.sort(([a], [b]) => a.localeCompare(b));
+          }
 
           return (
             <div key={domain} className="domain-group">
@@ -196,10 +245,23 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
               {isDomainOpen && (
                 <div className="domain-categories">
-                  {Object.entries(disciplines).map(([disc, discData]) => {
+                  {sortedDisciplines.map(([disc, discData]) => {
                     const discKey = `${domain}/${disc}`;
                     const isDiscOpen = openDisciplines[discKey] || searchTerm.length > 0;
                     const courses = discData.courses || {};
+
+                    let sortedCourses = Object.entries(courses);
+                    if (sortMode === 'az') {
+                      sortedCourses.sort(([a], [b]) => a.localeCompare(b));
+                    } else if (sortMode === 'progress') {
+                      sortedCourses.sort(([, cDataA], [, cDataB]) => {
+                        const unitsA = Object.values(cDataA.units || {});
+                        const unitsB = Object.values(cDataB.units || {});
+                        const compA = unitsA.filter((u: any) => u.status?.complete).length;
+                        const compB = unitsB.filter((u: any) => u.status?.complete).length;
+                        return compB - compA;
+                      });
+                    }
 
                     return (
                       <div key={discKey} className="category-group">
@@ -216,10 +278,14 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
                         {isDiscOpen && (
                           <div className="subtopic-list">
-                            {Object.entries(courses).map(([courseSlug, cData]) => {
+                            {sortedCourses.map(([courseSlug, cData]) => {
                               const courseKey = `${discKey}/${courseSlug}`;
                               const isCourseOpen = openCourses[courseKey] || searchTerm.length > 0;
-                              const units = Object.values(cData.units || {});
+                              let units = Object.values(cData.units || {}) as UnitNode[];
+
+                              if (sortMode === 'az') {
+                                units = [...units].sort((a, b) => a.display_name.localeCompare(b.display_name));
+                              }
 
                               if (units.length === 1 && units[0].unit === 'core') {
                                 const singleUnit = units[0];
@@ -246,7 +312,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                     className="course-header"
                                     onClick={() => toggleCourse(courseKey)}
                                   >
-                                    <BookOpen size={12} className="course-icon" />
+                                    <BookOpen size={13} className="course-icon" />
                                     <span className="course-title">
                                       {courseSlug.replace(/_/g, ' ')}
                                     </span>
