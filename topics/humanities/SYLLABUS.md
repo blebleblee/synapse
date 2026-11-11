@@ -123,3 +123,22 @@
 - **Metaphysics** (`philosophy/metaphysics/`)
 - **Political Philosophy** (`philosophy/political_philosophy/`)
 - **Aesthetics** (`philosophy/aesthetics/`)
+- **Life Purpose and Existential Meaning** (`philosophy/life_purpose/`)
+- **Spirituality and Mystical Traditions** (`philosophy/spirituality/`)
+
+### Interpersonal and Communication
+- **Communication Skills and Rhetorical Clarity** (`interpersonal/communication_skills/`)
+- **Essential Soft Skills and Emotional Intelligence** (`interpersonal/soft_skills/`)
+- **Body Language and Nonverbal Signals** (`interpersonal/body_language/`)
+
+### Developmental Psychology and Family
+- **Parenting and Early Child Development** (`psychology/parenting/`)
+- **Adolescent Psychology and Navigating Teenagers** (`psychology/teenagers/`)
+
+### Creative Writing and Performance
+- **Narrative Storytelling and Dramatic Structure** (`writing/storytelling/`)
+- **Fiction Writing Craft and Worldbuilding** (`writing/fiction_writing/`)
+- **Comedy Writing and Stand Up Performance** (`arts/comedy/`)
+
+### Digital Media and Broadcasting
+- **YouTube Content Strategy and Video Production** (`digital_media/youtube/`)

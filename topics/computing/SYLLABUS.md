@@ -206,3 +206,79 @@
 - **Vulnerability Research** (`security/vulnerability_research/`)
 - **Software Exploitation** (`security/software_exploitation/`)
 - **Exploit Defense** (`security/exploit_defense/`)
+
+### Systems: Linux Administration and Shell Engineering
+- **Bash Shell Scripting and POSIX Automation** (`systems/bash/`)
+- **Systemd Internals and Service Architecture** (`systems/systemd/`)
+- **Unix Signals and Inter-Process Communication** (`systems/unix_signals/`)
+- **Linux Filesystems and VFS Storage Internals** (`systems/filesystems/`)
+
+### Infrastructure: Cloud, DevOps and Automation
+- **DevOps Principles and Continuous Delivery** (`infrastructure/devops/`)
+- **Ansible Infrastructure Automation** (`infrastructure/ansible/`)
+- **Docker Containers and Containerd Runtimes** (`infrastructure/docker/`)
+- **AWS Cloud Architecture and Distributed Services** (`infrastructure/aws/`)
+- **Azure Cloud Architecture and Enterprise Solutions** (`infrastructure/azure/`)
+
+### Infrastructure: Enterprise Networking and Storage
+- **Computer Networking and TCP IP Protocol Suite** (`infrastructure/computer_networking/`)
+- **Mail Servers SMTP IMAP and Postfix Architecture** (`infrastructure/mail_servers/`)
+- **Network Attached Storage NAS Architecture** (`infrastructure/nas/`)
+- **NFS Protocol and Network File Sharing** (`infrastructure/nfs/`)
+- **NetApp ONTAP Storage Systems and Fabrics** (`infrastructure/netapp/`)
+- **iSCSI SAN Protocols and Target Configuration** (`infrastructure/iscsi/`)
+- **Ubiquiti Enterprise Networking and UniFi Fabrics** (`infrastructure/ubiquiti/`)
+- **Routers and Dynamic Routing Protocols BGP OSPF** (`infrastructure/routers/`)
+- **Network Switches and High-Speed Switching Fabrics** (`infrastructure/switches/`)
+
+### Software: Web Platforms, Languages and Frameworks
+- **Regular Expressions and Finite Automata** (`software/regex/`)
+- **AWK Stream Processing and Data Extraction** (`software/awk/`)
+- **SED Stream Editor and Pattern Substitution** (`software/sed/`)
+- **JavaScript Engine Internals V8 and Event Loop** (`software/javascript/`)
+- **TypeScript Type System and Advanced Type Programming** (`software/typescript/`)
+- **HTML5 Web Standards and Browser APIs** (`software/html5/`)
+- **Modern CSS Layout Engines Grid and Flexbox** (`software/css/`)
+- **React Architecture and Fiber Reconciliation** (`software/react/`)
+- **Next.js Server Components and App Routing** (`software/nextjs/`)
+- **Vue.js Reactivity Engine and Composition API** (`software/vuejs/`)
+- **Angular Dependency Injection and Zones** (`software/angular/`)
+- **Full Stack Web Development Architecture** (`software/full_stack_development/`)
+- **REST API Design and OpenAPI Standards** (`software/rest_api/`)
+- **Microservices and Event Driven Systems** (`software/microservices/`)
+- **Software Architecture and System Design** (`software/software_architecture/`)
+- **Software Design Patterns and Idiomatic Abstractions** (`software/design_patterns/`)
+- **Go Concurrency Goroutines and Runtime Mechanics** (`software/golang/`)
+- **Java Virtual Machine JVM and Garbage Collection** (`software/java/`)
+- **PHP Zend Engine Internals and Modern Architecture** (`software/php/`)
+- **Swift Language Mechanics and iOS Systems** (`software/swift/`)
+- **Git Internals and Content-Addressable Storage** (`software/git/`)
+- **GitHub Workflows Actions and CI CD Automation** (`software/github/`)
+- **WordPress Core Architecture and Plugin Engineering** (`software/wordpress/`)
+
+### Data: Relational Engines and Streaming
+- **SQL Relational Algebra and Query Optimization** (`data/sql_and_relational_query_optimization/`)
+- **Apache Kafka Distributed Event Streaming** (`data/apache_kafka/`)
+
+### Software: Quality Assurance and API Testing
+- **Playwright End to End Automation Framework** (`software/playwright/`)
+- **Selenium WebDriver and Grid Infrastructure** (`software/selenium/`)
+- **Postman Automated Testing and Collection Runners** (`software/postman/`)
+
+### Security: Defensive and Offensive Operations
+- **SELinux Mandatory Access Control and Policies** (`security/selinux/`)
+- **Dark Web Tor Architecture and Onion Routing** (`security/dark_web/`)
+- **Malware Analysis and Reverse Engineering** (`security/malware_analysis/`)
+- **Computer Viruses Worms and Evasion Mechanics** (`security/computer_viruses/`)
+- **Ethical Hacking and Penetration Testing Methodology** (`security/ethical_hacking/`)
+- **Offensive Security and Binary Exploit Development** (`security/offensive_security/`)
+
+### AI: Foundation Model APIs and Tool Use
+- **ChatGPT and OpenAI Developer Platform APIs** (`ai/chatgpt_and_openai_apis/`)
+- **Claude and Anthropic Model Context Protocol APIs** (`ai/claude_and_anthropic_apis/`)
+- **Gemini and Google Multimodal Developer APIs** (`ai/gemini_and_multimodal_apis/`)
+
+### Graphics: Game Engines and Neural Rendering
+- **Unity Engine Architecture and ECS Systems** (`software/unity/`)
+- **Unreal Engine Architecture Nanite and Lumen** (`software/unreal_engine/`)
+- **DLSS and Neural Super Sampling Pipelines** (`graphics/dlss/`)

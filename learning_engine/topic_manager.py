@@ -283,14 +283,18 @@ def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     query = query.strip("/").lower()
     tree = get_topic_tree()
 
-    # 1. Exact relative match
+    # 1. Exact relative match or exact course/unit slug match
     for domain, ddata in tree.items():
         for disc, disc_data in ddata["disciplines"].items():
             for course, c_data in disc_data["courses"].items():
                 for unit, u_data in c_data["units"].items():
                     full_rel = u_data["rel_path"].lower()
                     course_unit = f"{course}/{unit}".lower()
-                    if query == full_rel or query == course_unit or query == unit.lower():
+                    if (query == full_rel or
+                        query == course_unit or
+                        query == unit.lower() or
+                        query == course.lower() or
+                        query == f"{disc}/{course}".lower()):
                         return domain, f"{disc}/{course}", unit, Path(u_data["full_path"])
 
     # 2. Fuzzy match

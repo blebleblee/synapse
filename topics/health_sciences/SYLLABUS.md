@@ -62,3 +62,19 @@
 - **Hypnosis Trance States and Suggestibility** (`physiology/neurobiology_and_altered_states/06_hypnosis_trance_states_and_suggestibility/`)
 - **Near Death Experiences and Cerebral Hypoxia** (`physiology/neurobiology_and_altered_states/07_near_death_experiences_and_cerebral_hypoxia/`)
 - **Past Life Regressions Cryptomnesia and Suggestion** (`physiology/neurobiology_and_altered_states/08_past_life_regressions_cryptomnesia_and_suggestion/`)
+
+### Medicine: Pathology and Chronic Disease
+- **Oncology and Cancer Biology Mechanics** (`medicine/cancer_biology_and_oncology/`)
+- **Hypertension and Cardiovascular Blood Pressure** (`medicine/hypertension_and_blood_pressure/`)
+- **Diabetes Insulin Resistance and Metabolic Syndrome** (`medicine/diabetes_and_metabolic_syndrome/`)
+- **Human Sexuality and Reproductive Endocrinology** (`medicine/human_sexuality/`)
+
+### Pharmacology and Therapeutics
+- **Pharmacology Pharmacokinetics and Drug Action** (`pharmacology/drugs_and_pharmacology/`)
+- **Sound Therapy and Psychoacoustics** (`therapy/sound_therapy/`)
+
+### Psychology: Mental Wellbeing and Cognitive Enhancement
+- **Mindfulness and Attentional Regulation** (`psychology/mindfulness/`)
+- **Stress Management and Cortisol Neurobiology** (`psychology/stress_management/`)
+- **Memory Training and Mnemonic Architectures** (`psychology/memory_training/`)
+- **Positive Psychology and the Science of Happiness** (`psychology/happiness/`)

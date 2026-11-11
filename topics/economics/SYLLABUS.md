@@ -30,3 +30,14 @@
 - **Welfare Economics** (`policy/welfare_economics/`)
 - **Econometrics** (`policy/econometrics/`)
 - **Economic History** (`policy/economic_history/`)
+
+### Finance and Investment
+- **Investment Strategies and Portfolio Allocation** (`finance/investment_strategies/`)
+- **Stock Trading Mechanics and Market Microstructure** (`finance/stock_trading_mechanics/`)
+- **Financial Statement Analysis and Corporate Valuation** (`finance/financial_statement_analysis/`)
+- **Personal Finance and Money Management** (`finance/money_management/`)
+- **Taxation Systems and Public Finance** (`finance/taxation_systems/`)
+- **Fraud Detection and Forensic Accounting** (`finance/fraud_detection/`)
+- **Bitcoin and Proof of Work Economics** (`finance/bitcoin/`)
+- **Cryptocurrency and Decentralized Finance DeFi** (`finance/cryptocurrency_and_defi/`)
+- **Lottery Mathematics and Expected Value** (`finance/lottery_mathematics/`)

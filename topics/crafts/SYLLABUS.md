@@ -115,3 +115,9 @@
 - **Lumber Milling** (`woodworking/lumber_milling/`)
 - **Wood Turning** (`woodworking/turning/`)
 - **Finishing Staining** (`woodworking/finishing/`)
+
+### Firearms and Precision Ballistics
+- **Firearms Mechanisms Actions and Ballistics** (`firearms/guns/`)
+
+### Performance and Illusions
+- **Sleight of Hand and Stage Magic Illusions** (`performance/magic_tricks/`)

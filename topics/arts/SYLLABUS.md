@@ -139,3 +139,27 @@
 - **Podcasting Audio Mastering and Interviews** (`visual_media/content_creation/02_podcasting_audio_mastering_and_interviews/`)
 - **Livestreaming OBS and Multitrack Broadcast** (`visual_media/content_creation/03_livestreaming_obs_and_multitrack_broadcast/`)
 - **Distribution and Audience Engagement** (`visual_media/content_creation/04_distribution_and_audience_engagement/`)
+
+### 3D Graphics and Digital Sculpting
+- **Blender Modeling Shading and Cycles Rendering** (`3d_graphics/blender/`)
+- **Autodesk Maya Production Pipelines and Rigging** (`3d_graphics/maya/`)
+- **3ds Max Architectural Visualization** (`3d_graphics/3ds_max/`)
+- **ZBrush Digital Sculpting and Organic Anatomy** (`3d_graphics/zbrush/`)
+- **3D Animation Principles and Rig Mechanics** (`3d_graphics/3d_animation/`)
+- **3D Rendering Global Illumination and Lighting** (`3d_graphics/3d_rendering/`)
+
+### Visual Arts and Illustration
+- **Drawing Fundamentals and Line Weights** (`visual_arts/drawing/`)
+- **Sketching and Gesture Drawing** (`visual_arts/sketching/`)
+- **Perspective Drawing and Spatial Grids** (`visual_arts/perspective_drawing/`)
+- **Visual Composition and Harmonic Framing** (`visual_arts/composition/`)
+- **Digital Painting and Color Application** (`visual_arts/digital_painting/`)
+- **2D Animation and Motion Graphic Timing** (`visual_arts/2d_animation/`)
+
+### Design and Spatial Architecture
+- **User Experience UX Design and Wireframing** (`design/ux_design/`)
+- **UI Web Design and Responsive Systems** (`design/web_design/`)
+- **Interior Design Principles and Spatial Layouts** (`design/interior_design/`)
+
+### Video Post-Production
+- **DaVinci Resolve Color Grading and Fusion** (`visual_media/davinci_resolve/`)

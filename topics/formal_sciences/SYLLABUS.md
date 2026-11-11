@@ -53,3 +53,14 @@
 - **Mathematical Logic** (`logic/mathematical_logic/`)
 - **Model Theory** (`logic/model_theory/`)
 - **Proof Theory** (`logic/proof_theory/`)
+- **Logical and Epistemic Paradoxes** (`logic/logical_paradoxes/`)
+
+### Computer Science Theory
+- **Advanced Data Structures** (`computer_science/advanced_data_structures/`)
+- **Algorithm Design and Computational Complexity** (`computer_science/algorithm_design_and_complexity/`)
+
+### Probability and Statistics
+- **Applied Statistics and Inferential Modeling** (`applied_math/applied_statistics/`)
+
+### Theoretical Physics and Foundations
+- **Time and Temporal Mechanics** (`foundations/time_and_temporal_mechanics/`)

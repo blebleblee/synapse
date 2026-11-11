@@ -86,3 +86,16 @@
 - **Quantitative Methods** (`trading/quant/`)
 - **Derivatives Pricing** (`trading/derivatives/`)
 - **Options Trading** (`trading/options/`)
+
+### Strategy and Management
+- **Business Plan Development and Execution** (`strategy/business_plan/`)
+- **Principled Negotiation and Deal Structuring** (`management/negotiation/`)
+- **Agile Scrum and Lean Product Delivery** (`management/agile/`)
+
+### E-Commerce and Marketing
+- **Dropshipping and Global Supply Chains** (`ecommerce/dropshipping/`)
+- **Shopify E-Commerce Architecture and Integration** (`ecommerce/shopify/`)
+- **Digital Marketing and Performance Growth** (`marketing/digital_marketing/`)
+
+### Enterprise Systems
+- **SAP ERP Architecture and Business Modules** (`enterprise/sap/`)

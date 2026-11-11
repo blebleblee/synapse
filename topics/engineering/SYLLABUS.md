@@ -46,3 +46,16 @@
 - **Augmented Reality** (`robotics/augmented_reality/`)
 - **Virtual Reality** (`robotics/virtual_reality/`)
 - **Quantum Computing** (`robotics/quantum_computing/`)
+
+### Industrial Automation
+- **PLC Programming Ladder Logic and SCADA** (`automation/plc_and_scada/`)
+
+### Electrical and Fabrication
+- **High-Speed PCB Design and Layout** (`hardware/pcb_design_and_layout/`)
+
+### Mechanical and Civil Systems
+- **Plumbing Systems Hydraulics and Pipe Sizing** (`civil/plumbing_systems/`)
+- **Automotive Repair Diagnostics and Engine Mechanics** (`automotive/car_repair_and_diagnostics/`)
+
+### Chemical Engineering
+- **Energetic Materials Propellants and Explosives** (`chemical/energetic_materials_and_explosives/`)
