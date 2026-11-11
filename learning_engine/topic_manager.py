@@ -126,26 +126,31 @@ def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
     root_f = (unit_dir / "FOUNDATION.md").exists() or (unit_dir / "foundation.md").exists()
     root_l = (unit_dir / "LESSON.md").exists() or (unit_dir / "lesson.md").exists()
     root_b = (unit_dir / "LABS.md").exists() or (unit_dir / "labs.md").exists()
-    sequential_lessons = get_unit_lessons(unit_dir)
-    has_multi_lessons = len(sequential_lessons) > 0
+
+    all_unit_lessons = get_unit_lessons(unit_dir)
+    sequential_lessons = [l for l in all_unit_lessons if l["id"].startswith("lesson_")]
+    has_multi_lessons = len(sequential_lessons) >= 1
+    has_labs = (unit_dir / "labs.md").exists() or (unit_dir / "LABS.md").exists()
 
     has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f or has_multi_lessons
     has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l or has_multi_lessons
-    has_labs = any(s["has_labs"] for s in level_status.values()) or root_b
 
-    is_leveled_complete = all(s["complete"] for s in level_status.values())
+    is_leveled_complete = all(s["complete"] for s in level_status.values()) if level_status else False
     is_root_complete = (root_f and (root_l or has_multi_lessons) and root_b)
-    is_multi_lesson_complete = (has_multi_lessons and root_b)
+    is_masterclass_complete = has_multi_lessons and has_labs
+    has_legacy_content = (is_leveled_complete or is_root_complete) and not is_masterclass_complete
 
     all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
 
     return {
         "has_foundation": has_foundation,
-        "has_lesson": has_lesson,
+        "has_lesson": has_multi_lessons or has_lesson,
         "has_labs": has_labs,
-        "complete": is_leveled_complete or is_root_complete or is_multi_lesson_complete,
+        "complete": is_masterclass_complete,
+        "is_legacy": has_legacy_content,
+        "is_masterclass": is_masterclass_complete,
         "levels": level_status,
-        "lesson_count": len(sequential_lessons) if has_multi_lessons else (1 if has_lesson else 0),
+        "lesson_count": len(sequential_lessons),
         "lessons": [l["id"] for l in sequential_lessons],
         "file_count": len(all_files),
         "files": all_files

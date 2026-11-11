@@ -35,10 +35,10 @@ def cmd_status(args):
     total_domains = len(tree)
     total_disciplines = 0
     total_topics = 0
-    multi_lesson_topics = 0
-    total_lessons = 0
-    total_labs = 0
-    complete_topics = 0
+    masterclass_topics = 0
+    masterclass_lessons = 0
+    masterclass_labs = 0
+    legacy_stubs = 0
 
     for domain, ddata in tree.items():
         disciplines = ddata.get("disciplines", {})
@@ -51,17 +51,15 @@ def cmd_status(args):
                     total_topics += 1
                     status = u_data.get("status", {})
                     lessons = u_data.get("lessons", [])
-                    if lessons:
-                        total_lessons += len(lessons)
-                        if len(lessons) >= 3:
-                            multi_lesson_topics += 1
-                    elif status.get("has_lesson"):
-                        total_lessons += 1
+                    seq_lessons = [l for l in lessons if l.get("id", "").startswith("lesson_")]
+                    has_labs = status.get("has_labs", False)
 
-                    if status.get("has_labs"):
-                        total_labs += 1
-                    if status.get("complete"):
-                        complete_topics += 1
+                    if len(seq_lessons) > 0 and has_labs:
+                        masterclass_topics += 1
+                        masterclass_lessons += len(seq_lessons)
+                        masterclass_labs += 1
+                    elif status.get("is_legacy", False) or status.get("has_lesson", False):
+                        legacy_stubs += 1
 
     # Mastery statistics
     mastery_data = load_mastery_data()
@@ -77,6 +75,8 @@ def cmd_status(args):
     online_count = sum(1 for d in cluster_status.values() if d.get("online"))
     total_nodes = len(cluster_status)
 
+    unwritten_topics = total_topics - masterclass_topics - legacy_stubs
+
     print("==================================================")
     print("       AI LEARNING WORKSPACE CURRICULUM STATUS    ")
     print("==================================================")
@@ -84,10 +84,11 @@ def cmd_status(args):
     print(f"  Disciplines (L2):         {total_disciplines}")
     print(f"  Topics & Courses (L3):    {total_topics}")
     print("--------------------------------------------------")
-    print(f"  Multi-Lesson Topics:      {multi_lesson_topics} / {total_topics} ({multi_lesson_topics*100//(total_topics or 1)}%)")
-    print(f"  Authored Lessons:         {total_lessons}")
-    print(f"  Operational Labs:         {total_labs} / {total_topics} ({total_labs*100//(total_topics or 1)}%)")
-    print(f"  Fully Authored Topics:    {complete_topics} / {total_topics} ({complete_topics*100//(total_topics or 1)}%)")
+    print(f"  Masterclass Topics:       {masterclass_topics} / {total_topics} (PostgreSQL Standard)")
+    print(f"  Authored Lessons:         {masterclass_lessons} (lesson_01_*.md ...)")
+    print(f"  Operational Labs:         {masterclass_labs} (labs.md)")
+    print(f"  Legacy Stubs to Purge:    {legacy_stubs} (Pending cluster regeneration)")
+    print(f"  Unwritten Topics:         {unwritten_topics}")
     print("--------------------------------------------------")
     print(f"  Mastery Competence:       {mastery_summary['mastered_count']} Mastered | {mastery_summary['counts']['studying']} Studying")
     print(f"  Completed Lessons:        {completed_lessons_count} Verified")
