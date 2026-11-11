@@ -2,7 +2,6 @@ import React, { useMemo, useRef, useEffect, useState } from 'react';
 import {
   BookOpen,
   FlaskConical,
-  GraduationCap,
   HelpCircle,
   Sparkles,
   RefreshCw,
@@ -10,12 +9,17 @@ import {
   Award,
   Layers,
   Download,
-  FileText,
   Volume2,
   VolumeX,
   Columns,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MoreHorizontal,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  X,
+  Check
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
@@ -23,14 +27,25 @@ import { SocraticQuizView } from './SocraticQuizView';
 import { speakText, stopSpeaking } from '../utils/speech';
 import { getUIStrings } from '../utils/i18n';
 
+function toTitleCase(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map((w) => (w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
+    .join(' ');
+}
+
 interface LessonViewerProps {
   topic: TopicDetails | null;
   isLoading: boolean;
   isGenerating: boolean;
   onGenerate: (query: string, force?: boolean, level?: string) => void;
   onRunInTerminal: (command: string) => void;
-  activeTab: 'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz';
-  setActiveTab: (tab: 'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz') => void;
+  activeTab: 'study' | 'labs' | 'quiz';
+  setActiveTab: (tab: 'study' | 'labs' | 'quiz') => void;
+  activeLessonId?: string | null;
+  onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
   currentLevel: string;
   onSelectLevel: (level: string) => void;
   quizQuestions: QuizQuestion[];
@@ -57,6 +72,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onRunInTerminal,
   activeTab,
   setActiveTab,
+  activeLessonId,
   currentLevel,
   onSelectLevel,
   quizQuestions,
@@ -73,36 +89,86 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   targetLanguage,
   onNavigateBreadcrumb,
   onSelectLesson,
+  onToggleLessonCompletion,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
+
+  // Interactive Diagram & Image Zoom State
+  const [zoomedMedia, setZoomedMedia] = useState<{
+    type: 'svg' | 'image';
+    content: string;
+    title?: string;
+  } | null>(null);
+  const [zoomScale, setZoomScale] = useState<number>(1);
+  const [translate, setTranslate] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Escape key closes zoom modal, +/- zooms
+  useEffect(() => {
+    if (!zoomedMedia) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setZoomedMedia(null);
+      } else if (e.key === '+' || e.key === '=') {
+        setZoomScale((prev) => Math.min(prev + 0.25, 4));
+      } else if (e.key === '-' || e.key === '_') {
+        setZoomScale((prev) => Math.max(prev - 0.25, 0.4));
+      } else if (e.key === '0') {
+        setZoomScale(1);
+        setTranslate({ x: 0, y: 0 });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [zoomedMedia]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.dropdown-container')) {
+        setExportMenuOpen(false);
+        setOptionsMenuOpen(false);
+      }
+    };
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const ui = getUIStrings(targetLanguage);
 
   const currentLessonIndex = useMemo(() => {
-    if (!topic?.lessons || !topic.active_lesson_id) return 0;
-    const idx = topic.lessons.findIndex((l) => l.id === topic.active_lesson_id);
+    if (!topic?.lessons) return 0;
+    const targetId = activeLessonId || topic.active_lesson_id;
+    if (!targetId || targetId === 'all') return 0;
+    const idx = topic.lessons.findIndex((l) => l.id === targetId);
     return idx >= 0 ? idx : 0;
-  }, [topic?.lessons, topic?.active_lesson_id]);
+  }, [topic?.lessons, topic?.active_lesson_id, activeLessonId]);
 
   const prevLesson = topic?.lessons && currentLessonIndex > 0 ? topic.lessons[currentLessonIndex - 1] : null;
   const nextLesson = topic?.lessons && currentLessonIndex < topic.lessons.length - 1 ? topic.lessons[currentLessonIndex + 1] : null;
+  const currentLesson = topic?.lessons && topic.lessons.length > 0 ? topic.lessons[currentLessonIndex] : null;
 
   useEffect(() => {
     stopSpeaking();
     setIsSpeakingVoice(false);
-  }, [topic?.path, activeTab, currentLevel]);
+  }, [topic?.path, activeTab, currentLevel, activeLessonId]);
 
   const rawMarkdown = useMemo(() => {
     if (!topic) return '';
-    if (activeTab === 'summary') return topic.summary || '';
-    if (activeTab === 'foundation') return topic.foundation;
-    if (activeTab === 'lesson') return topic.lesson;
+    if (activeTab === 'study') {
+      if (activeLessonId === 'all') {
+        return topic.full_content || topic.lesson || topic.foundation || '';
+      }
+      return topic.lesson || topic.full_content || topic.foundation || '';
+    }
     if (activeTab === 'labs') return topic.labs;
     return '';
-  }, [topic, activeTab]);
+  }, [topic, activeTab, activeLessonId]);
 
   useEffect(() => {
     if (!targetLanguage || targetLanguage === 'en' || !rawMarkdown) {
@@ -207,6 +273,70 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     const runBtn = target.closest('.btn-run-code') as HTMLElement | null;
     if (runBtn && runBtn.dataset.code) {
       onRunInTerminal(runBtn.dataset.code);
+      return;
+    }
+
+    // Intercept clicks on Mermaid diagrams or images for interactive Zoom Lightbox
+    const mermaidEl = target.closest('.mermaid-container, .mermaid') as HTMLElement | null;
+    if (mermaidEl) {
+      const svg = mermaidEl.querySelector('svg');
+      if (svg) {
+        const clone = svg.cloneNode(true) as SVGSVGElement;
+        clone.removeAttribute('style');
+        clone.setAttribute('width', '100%');
+        clone.setAttribute('height', '100%');
+        setZoomedMedia({
+          type: 'svg',
+          content: clone.outerHTML,
+          title: 'Diagram Inspection'
+        });
+        setZoomScale(1);
+        setTranslate({ x: 0, y: 0 });
+        return;
+      }
+    }
+
+    const img = target.closest('img') as HTMLImageElement | null;
+    if (img && !img.closest('.zoom-lightbox-modal')) {
+      setZoomedMedia({
+        type: 'image',
+        content: img.src,
+        title: img.alt || 'Image Inspection'
+      });
+      setZoomScale(1);
+      setTranslate({ x: 0, y: 0 });
+      return;
+    }
+
+    // Handle relative markdown links and in-page anchor jumps
+    const anchor = target.closest('a') as HTMLAnchorElement | null;
+    if (anchor) {
+      const href = anchor.getAttribute('href') || '';
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        const targetId = href.slice(1);
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+        return;
+      }
+
+      if (href.endsWith('.md') || href.includes('lesson_')) {
+        e.preventDefault();
+        const cleanFile = href.replace(/^\.\//, '').split('#')[0];
+        if (cleanFile.startsWith('lesson_')) {
+          const lessonId = cleanFile.replace(/\.md$/, '');
+          setActiveTab('study');
+          onSelectLesson?.(lessonId);
+        } else if (cleanFile === 'LABS.md') {
+          setActiveTab('labs');
+        } else if (cleanFile === 'FOUNDATION.md' || cleanFile === 'SUMMARY.md') {
+          setActiveTab('study');
+          onSelectLesson?.('all');
+        }
+        return;
+      }
     }
   };
 
@@ -236,28 +366,41 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     <main className="lesson-viewer">
       <header className="viewer-header">
         <div className="breadcrumbs">
-          <span className="crumb-domain">{topic.domain.replace(/_/g, ' ')}</span>
+          <span className="crumb-domain">{toTitleCase(topic.domain_title || topic.domain)}</span>
           <span className="crumb-sep">/</span>
-          <span className="crumb-category">{topic.category.replace(/_/g, ' ')}</span>
+          <span className="crumb-discipline">{toTitleCase(topic.discipline_title || (topic.category.includes('/') ? topic.category.split('/')[0] : topic.category))}</span>
+          {topic.course_title && topic.course_title !== (topic.display_title || topic.subtopic.replace(/_/g, ' ')) && (
+            <>
+              <span className="crumb-sep">/</span>
+              <span className="crumb-category">{toTitleCase(topic.course_title)}</span>
+            </>
+          )}
           <span className="crumb-sep">/</span>
-          <span className="crumb-subtopic">{topic.subtopic.replace(/_/g, ' ')}</span>
+          <span className="crumb-subtopic">{toTitleCase(topic.display_title || topic.subtopic)}</span>
         </div>
 
         {/* Top Right: Difficulty Tier Selector + Mastery Selector */}
         <div className="viewer-header-right">
-          <div className="header-tier-pills" title="Difficulty Tier">
-            {['beginner', 'intermediate', 'advanced'].map((lvl) => (
-              <button
-                key={lvl}
-                className={`header-tier-btn ${currentLevel === lvl ? 'active' : ''}`}
-                onClick={() => onSelectLevel(lvl)}
-                disabled={activeTab === 'summary'}
-                title={activeTab === 'summary' ? 'Summary covers all tiers' : `Switch difficulty tier to ${lvl}`}
-              >
-                {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
-              </button>
-            ))}
-          </div>
+          {topic.available_levels && topic.available_levels.length > 0 ? (
+            <div className="header-tier-pills" title="Difficulty Tier">
+              {['beginner', 'intermediate', 'advanced']
+                .filter((lvl) => topic.available_levels.includes(lvl))
+                .map((lvl) => (
+                  <button
+                    key={lvl}
+                    className={`header-tier-btn ${currentLevel === lvl ? 'active' : ''}`}
+                    onClick={() => onSelectLevel(lvl)}
+                    title={`Switch difficulty tier to ${lvl}`}
+                  >
+                    {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                  </button>
+                ))}
+            </div>
+          ) : (
+            <div className="header-curriculum-badge" title="Comprehensive Unified Curriculum">
+              <span className="badge-pill-unified">Unified Masterclass</span>
+            </div>
+          )}
 
           <div className="mastery-selector">
             <Award size={13} className={`mastery-icon ${masteryState}`} />
@@ -279,33 +422,13 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="tabs-bar">
         <div className="tabs-group">
           <button
-            className={`tab-btn ${activeTab === 'summary' ? 'active' : ''}`}
-            onClick={() => setActiveTab('summary')}
-            title="Executive cross-tier curriculum summary and discussion insights"
-          >
-            <FileText size={14} />
-            <span>{ui.summary}</span>
-            {topic.summary && <span className="tab-dot" />}
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'foundation' ? 'active' : ''}`}
-            onClick={() => setActiveTab('foundation')}
-            title="Theoretical foundation, mental models, and formal invariants"
+            className={`tab-btn ${activeTab === 'study' ? 'active' : ''}`}
+            onClick={() => setActiveTab('study')}
+            title="Read curriculum lessons and course guide"
           >
             <BookOpen size={14} />
-            <span>{ui.foundation}</span>
-            {topic.foundation && <span className="tab-dot" />}
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'lesson' ? 'active' : ''}`}
-            onClick={() => setActiveTab('lesson')}
-            title="In-depth technical lesson with code and step-by-step mechanics"
-          >
-            <GraduationCap size={14} />
-            <span>{ui.lesson}</span>
-            {Boolean(topic.lesson || (topic.lessons && topic.lessons.length > 0)) && <span className="tab-dot" />}
+            <span>{ui.study || 'Study'}</span>
+            {Boolean(topic.has_content || topic.lesson || topic.foundation) && <span className="tab-dot" />}
           </button>
 
           <button
@@ -335,6 +458,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             </span>
           )}
 
+          {/* 1. Audio Reader */}
           <button
             className={`nav-action-btn ${isSpeakingVoice ? 'active-voice' : ''}`}
             onClick={handleToggleVoice}
@@ -345,102 +469,174 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             <span>{isSpeakingVoice ? 'Stop' : 'Listen'}</span>
           </button>
 
+          {/* 2. Interactive Study Flashcards */}
           <button
             className="nav-action-btn"
             onClick={onOpenFlashcards}
             title="Interactive in-app spaced repetition flashcards"
           >
             <Layers size={12} />
-            <span>Study Cards</span>
+            <span>Flashcards</span>
           </button>
 
-          <button
-            className="nav-action-btn"
-            onClick={onDownloadHandbook}
-            title={`Export complete ${topic.domain} handbook (.md)`}
-          >
-            <Download size={12} />
-            <span>Book</span>
-          </button>
-
-          <button
-            className="nav-action-btn"
-            onClick={onDownloadFlashcards}
-            title="Download Anki spaced-repetition flashcards (.csv)"
-          >
-            <Layers size={12} />
-            <span>Anki</span>
-          </button>
-
-          <button
-            className="nav-action-btn"
-            onClick={onCompileGuide}
-            disabled={isCompiling}
-            title="Compile mastered summary guide to artifacts/"
-          >
-            <FileCheck2 size={12} />
-            <span>{isCompiling ? ui.compiling : ui.guide}</span>
-          </button>
-
-          {activeTab === 'summary' ? (
+          {/* 3. Consolidated Export Menu */}
+          <div className="dropdown-container">
             <button
-              className="nav-action-btn"
-              onClick={onRegenerateSummary}
-              disabled={isRegeneratingSummary}
-              title="Regenerate summary with latest discussion session insights"
-            >
-              <RefreshCw size={12} className={isRegeneratingSummary ? 'spin' : ''} />
-              <span>Update</span>
-            </button>
-          ) : (
-            <button
-              className="nav-action-btn"
-              onClick={() => onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel)}
-              disabled={isGenerating}
-              title="Regenerate this level"
-            >
-              <RefreshCw size={12} className={isGenerating ? 'spin' : ''} />
-              <span>{ui.regen}</span>
-            </button>
-          )}
-
-          {/* Bilingual Dual Column Split View Toggle */}
-          {targetLanguage && targetLanguage !== 'en' && (
-            <button
-              className={`nav-action-btn ${bilingualSplit ? 'active-bilingual' : ''}`}
-              onClick={() => {
-                const next = !bilingualSplit;
-                setBilingualSplit(next);
-                localStorage.setItem('synapse_bilingual_split', String(next));
+              className={`nav-action-btn ${exportMenuOpen ? 'active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setExportMenuOpen((prev) => !prev);
+                setOptionsMenuOpen(false);
               }}
-              title={bilingualSplit ? "Switch to Single Column View" : "Switch to Bilingual Side-by-Side Dual View"}
+              title="Export curriculum documents and flashcards"
             >
-              <Columns size={12} />
-              <span>{bilingualSplit ? 'Dual ◫' : 'Split ◫'}</span>
+              <Download size={12} />
+              <span>Export ▾</span>
             </button>
-          )}
+            {exportMenuOpen && (
+              <div className="nav-dropdown-menu">
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    onDownloadHandbook();
+                  }}
+                  title={`Export complete ${topic.domain} handbook (.md)`}
+                >
+                  <BookOpen size={13} />
+                  <span>Curriculum Handbook (.md)</span>
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    onCompileGuide();
+                  }}
+                  disabled={isCompiling}
+                  title="Compile mastered summary guide to artifacts/"
+                >
+                  <FileCheck2 size={13} />
+                  <span>{isCompiling ? 'Compiling Guide...' : 'Mastered Field Guide (.md)'}</span>
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    onDownloadFlashcards();
+                  }}
+                  title="Download Anki flashcards (.csv)"
+                >
+                  <Layers size={13} />
+                  <span>Anki Flashcard Deck (.csv)</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 4. More Options Menu */}
+          <div className="dropdown-container">
+            <button
+              className={`nav-action-btn icon-only ${optionsMenuOpen ? 'active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOptionsMenuOpen((prev) => !prev);
+                setExportMenuOpen(false);
+              }}
+              title="More options and maintenance"
+            >
+              <MoreHorizontal size={13} />
+            </button>
+            {optionsMenuOpen && (
+              <div className="nav-dropdown-menu right-aligned">
+                {targetLanguage && targetLanguage !== 'en' && (
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      setOptionsMenuOpen(false);
+                      const next = !bilingualSplit;
+                      setBilingualSplit(next);
+                      localStorage.setItem('synapse_bilingual_split', String(next));
+                    }}
+                  >
+                    <Columns size={13} />
+                    <span>{bilingualSplit ? 'Single Column View' : 'Side-by-Side Dual View'}</span>
+                  </button>
+                )}
+                {topic.summary && (
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      setOptionsMenuOpen(false);
+                      onRegenerateSummary();
+                    }}
+                    disabled={isRegeneratingSummary}
+                    title="Regenerate curriculum summary with latest session insights"
+                  >
+                    <RefreshCw size={13} className={isRegeneratingSummary ? 'spin' : ''} />
+                    <span>Update Curriculum Summary</span>
+                  </button>
+                )}
+                <button
+                  className="dropdown-item danger"
+                  onClick={() => {
+                    setOptionsMenuOpen(false);
+                    if (window.confirm(`Are you sure you want to regenerate '${topic.subtopic}' with AI? This will re-synthesize content.`)) {
+                      onGenerate(`${topic.domain}/${topic.category}/${topic.subtopic}`, true, currentLevel);
+                    }
+                  }}
+                  disabled={isGenerating}
+                  title="Re-synthesize curriculum unit using LLM"
+                >
+                  <RefreshCw size={13} className={isGenerating ? 'spin' : ''} />
+                  <span>Regenerate with AI...</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Dynamic Multi-Lesson Stepper Sub-Bar */}
-      {activeTab === 'lesson' && topic.lessons && topic.lessons.length > 1 && (
-        <div className="lesson-stepper-bar">
-          <div className="lesson-stepper-label">
-            <GraduationCap size={13} />
-            <span>{ui.lessons}:</span>
+      {/* Permanent, Non-Shifting Lesson Switcher Bar on Study Tab */}
+      {activeTab === 'study' && topic.lessons && topic.lessons.length > 1 && (
+        <div className="study-lesson-selector-bar">
+          <div className="selector-dropdown-box">
+            <span className="selector-label">Lesson:</span>
+            <select
+              value={activeLessonId || topic.active_lesson_id || 'all'}
+              onChange={(e) => onSelectLesson?.(e.target.value)}
+              className="study-lesson-dropdown"
+              title="Select lesson to view"
+            >
+              <option value="all">📖 Complete Guide (All Lessons in full)</option>
+              {topic.lessons.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.title}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="lesson-pills-list">
-            {topic.lessons.map((l, idx) => (
-              <button
-                key={l.id}
-                className={`lesson-pill-btn ${topic.active_lesson_id === l.id ? 'active' : ''}`}
-                onClick={() => onSelectLesson?.(l.id)}
-                title={l.title}
-              >
-                <span className="lesson-pill-num">{idx + 1}</span>
-                <span className="lesson-pill-title">{l.title.replace(/^Lesson \d+:\s*/i, '')}</span>
-              </button>
-            ))}
+
+          <div className="selector-pills-box">
+            <button
+              className={`selector-pill-btn ${activeLessonId === 'all' ? 'active' : ''}`}
+              onClick={() => onSelectLesson?.('all')}
+              title="Complete Guide (All Lessons in full)"
+            >
+              All
+            </button>
+            {topic.lessons.map((l, idx) => {
+              const isActive = (activeLessonId === l.id) || (!activeLessonId && idx === currentLessonIndex && activeLessonId !== 'all');
+              return (
+                <button
+                  key={l.id}
+                  className={`selector-pill-btn number-pill ${isActive ? 'active' : ''}`}
+                  onClick={() => onSelectLesson?.(l.id)}
+                  title={l.title}
+                >
+                  {idx + 1}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -508,7 +704,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           </div>
         ) : !rawMarkdown ? (
           <div className="viewer-missing-card">
-            <h3>{activeTab === 'summary' ? 'Summary not yet generated' : `This unit is missing in ${currentLevel} tier`}</h3>
+            <h3>{activeTab === 'labs' ? 'Labs not yet generated' : `Content not yet generated`}</h3>
             <p>You can generate this unit using the action button in the top right.</p>
           </div>
         ) : bilingualSplit && targetLanguage && targetLanguage !== 'en' ? (
@@ -540,33 +736,197 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           />
         )}
 
-        {/* Previous / Next Lesson Navigation Footer */}
-        {activeTab === 'lesson' && topic.lessons && topic.lessons.length > 1 && (
+        {/* Sequential Study Progression Navigation Footer */}
+        {activeTab === 'study' && (
+          <div className="lesson-bottom-nav">
+            {topic.lessons && topic.lessons.length > 1 && activeLessonId !== 'all' ? (
+              <>
+                <button
+                  className="btn-secondary-sm"
+                  disabled={!prevLesson}
+                  onClick={() => prevLesson && onSelectLesson?.(prevLesson.id)}
+                  title={prevLesson ? prevLesson.title : ''}
+                >
+                  <ChevronLeft size={14} />
+                  <span>{ui.previousLesson}</span>
+                </button>
+                <div className="bottom-nav-center">
+                  <span className="lesson-progress-count">
+                    Lesson {currentLessonIndex + 1} of {topic.lessons.length}
+                  </span>
+                  {onToggleLessonCompletion && currentLesson && (
+                    <button
+                      className={`btn-toggle-complete ${topic.completed_lessons?.includes(currentLesson.id) ? 'completed' : ''}`}
+                      onClick={() => onToggleLessonCompletion(topic.path, currentLesson.id, !topic.completed_lessons?.includes(currentLesson.id))}
+                      title={topic.completed_lessons?.includes(currentLesson.id) ? "Mark lesson incomplete" : "Mark lesson complete"}
+                    >
+                      <Check size={13} />
+                      <span>{topic.completed_lessons?.includes(currentLesson.id) ? 'Completed ✓' : 'Mark Complete'}</span>
+                    </button>
+                  )}
+                </div>
+                {nextLesson ? (
+                  <button
+                    className="btn-secondary-sm"
+                    onClick={() => onSelectLesson?.(nextLesson.id)}
+                    title={nextLesson.title}
+                  >
+                    <span>{ui.nextLesson}</span>
+                    <ChevronRight size={14} />
+                  </button>
+                ) : topic.labs ? (
+                  <button
+                    className="btn-secondary-sm primary-accent"
+                    onClick={() => setActiveTab('labs')}
+                    title="Continue to Hands-on Labs"
+                  >
+                    <span>Continue to Labs 🧪</span>
+                    <ChevronRight size={14} />
+                  </button>
+                ) : (
+                  <button
+                    className="btn-secondary-sm primary-accent"
+                    onClick={() => setActiveTab('quiz')}
+                    title="Take Quiz"
+                  >
+                    <span>Take Quiz ❓</span>
+                    <ChevronRight size={14} />
+                  </button>
+                )}
+              </>
+            ) : topic.labs ? (
+              <button
+                className="btn-secondary-sm primary-accent"
+                onClick={() => setActiveTab('labs')}
+                title="Continue to Hands-on Labs"
+              >
+                <span>Continue to Operational Labs 🧪</span>
+                <ChevronRight size={14} />
+              </button>
+            ) : (
+              <button
+                className="btn-secondary-sm primary-accent"
+                onClick={() => setActiveTab('quiz')}
+                title="Test Comprehension"
+              >
+                <span>Test Comprehension with Quiz ❓</span>
+                <ChevronRight size={14} />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Labs Bottom Navigation */}
+        {activeTab === 'labs' && (
           <div className="lesson-bottom-nav">
             <button
               className="btn-secondary-sm"
-              disabled={!prevLesson}
-              onClick={() => prevLesson && onSelectLesson?.(prevLesson.id)}
-              title={prevLesson ? prevLesson.title : ''}
+              onClick={() => setActiveTab('study')}
             >
               <ChevronLeft size={14} />
-              <span>{ui.previousLesson}</span>
+              <span>Back to Study</span>
             </button>
-            <span className="lesson-progress-count">
-              {currentLessonIndex + 1} / {topic.lessons.length}
-            </span>
             <button
-              className="btn-secondary-sm"
-              disabled={!nextLesson}
-              onClick={() => nextLesson && onSelectLesson?.(nextLesson.id)}
-              title={nextLesson ? nextLesson.title : ''}
+              className="btn-secondary-sm primary-accent"
+              onClick={() => setActiveTab('quiz')}
             >
-              <span>{ui.nextLesson}</span>
+              <span>Test Knowledge: Take Quiz ❓</span>
               <ChevronRight size={14} />
             </button>
           </div>
         )}
       </div>
+
+      {/* Interactive Diagram & Image Zoom Lightbox Modal */}
+      {zoomedMedia && (
+        <div className="zoom-lightbox-backdrop" onClick={() => setZoomedMedia(null)}>
+          <div className="zoom-lightbox-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="zoom-lightbox-header">
+              <span className="zoom-lightbox-title">{zoomedMedia.title || 'Inspection View'}</span>
+              <div className="zoom-controls">
+                <button
+                  className="zoom-btn"
+                  onClick={() => setZoomScale((prev) => Math.max(prev - 0.25, 0.4))}
+                  title="Zoom Out (-)"
+                >
+                  <ZoomOut size={14} />
+                </button>
+                <span className="zoom-scale-badge">{Math.round(zoomScale * 100)}%</span>
+                <button
+                  className="zoom-btn"
+                  onClick={() => setZoomScale((prev) => Math.min(prev + 0.25, 4))}
+                  title="Zoom In (+)"
+                >
+                  <ZoomIn size={14} />
+                </button>
+                <button
+                  className="zoom-btn"
+                  onClick={() => {
+                    setZoomScale(1);
+                    setTranslate({ x: 0, y: 0 });
+                  }}
+                  title="Reset Zoom (0)"
+                >
+                  <Maximize2 size={14} />
+                </button>
+                <button
+                  className="zoom-btn close-btn"
+                  onClick={() => setZoomedMedia(null)}
+                  title="Close (Esc)"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            <div
+              className={`zoom-lightbox-viewport ${isDragging ? 'grabbing' : 'grab'}`}
+              onMouseDown={(e) => {
+                setIsDragging(true);
+                setDragStart({ x: e.clientX - translate.x, y: e.clientY - translate.y });
+              }}
+              onMouseMove={(e) => {
+                if (!isDragging) return;
+                setTranslate({
+                  x: e.clientX - dragStart.x,
+                  y: e.clientY - dragStart.y
+                });
+              }}
+              onMouseUp={() => setIsDragging(false)}
+              onMouseLeave={() => setIsDragging(false)}
+              onWheel={(e) => {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.15 : -0.15;
+                setZoomScale((prev) => Math.min(Math.max(prev + delta, 0.4), 4));
+              }}
+            >
+              {zoomedMedia.type === 'svg' ? (
+                <div
+                  className="zoomed-svg-wrapper"
+                  style={{
+                    transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoomScale})`
+                  }}
+                  dangerouslySetInnerHTML={{ __html: zoomedMedia.content }}
+                />
+              ) : (
+                <img
+                  src={zoomedMedia.content}
+                  alt={zoomedMedia.title}
+                  className="zoomed-image-wrapper"
+                  style={{
+                    transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoomScale})`
+                  }}
+                  draggable={false}
+                />
+              )}
+            </div>
+
+            <div className="zoom-lightbox-footer">
+              <span>Drag to pan • Mouse wheel or +/- to zoom • Esc to close</span>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

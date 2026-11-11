@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
+from learning_engine.mastery import get_completed_lessons
+
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
 
@@ -121,19 +123,19 @@ def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
         }
 
     # Root file and multi-lesson support
-    root_f = (unit_dir / "FOUNDATION.md").exists()
-    root_l = (unit_dir / "LESSON.md").exists()
-    root_b = (unit_dir / "LABS.md").exists()
+    root_f = (unit_dir / "FOUNDATION.md").exists() or (unit_dir / "foundation.md").exists()
+    root_l = (unit_dir / "LESSON.md").exists() or (unit_dir / "lesson.md").exists()
+    root_b = (unit_dir / "LABS.md").exists() or (unit_dir / "labs.md").exists()
     sequential_lessons = get_unit_lessons(unit_dir)
     has_multi_lessons = len(sequential_lessons) > 0
 
-    has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f
+    has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f or has_multi_lessons
     has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l or has_multi_lessons
     has_labs = any(s["has_labs"] for s in level_status.values()) or root_b
 
     is_leveled_complete = all(s["complete"] for s in level_status.values())
     is_root_complete = (root_f and (root_l or has_multi_lessons) and root_b)
-    is_multi_lesson_complete = (root_f and has_multi_lessons)
+    is_multi_lesson_complete = (has_multi_lessons and root_b)
 
     all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
 
@@ -167,6 +169,38 @@ def get_topic_tree() -> Dict[str, Any]:
         pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
         matches = re.findall(pattern, content)
 
+        # Extract human-readable course titles from syllabus section headers (### ...)
+        course_display_names = {}
+        current_section = ""
+        for line in content.splitlines():
+            line_str = line.strip()
+            if line_str.startswith("### "):
+                current_section = line_str.lstrip("#").strip()
+            elif line_str.startswith("- **"):
+                m = re.match(r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)", line_str)
+                if m:
+                    _, u_rel = m.groups()
+                    u_parts = u_rel.split("/")
+                    if len(u_parts) >= 3:
+                        u_disc = u_parts[0]
+                        u_course = u_parts[1]
+                    elif len(u_parts) == 2:
+                        u_disc = u_parts[0]
+                        u_course = u_parts[1]
+                    else:
+                        u_disc = "general"
+                        u_course = u_parts[0]
+
+                    if current_section and (u_disc, u_course) not in course_display_names:
+                        if ":" in current_section:
+                            c_title = current_section.split(":", 1)[1].strip()
+                        else:
+                            c_title = current_section
+                        if c_title and c_title.lower() != u_disc.lower():
+                            course_display_names[(u_disc, u_course)] = c_title
+                        else:
+                            course_display_names[(u_disc, u_course)] = u_course.replace("_", " ").title()
+
         for display_name, rel_path in matches:
             parts = rel_path.split("/")
             if len(parts) >= 3:
@@ -186,8 +220,16 @@ def get_topic_tree() -> Dict[str, Any]:
                 tree[domain]["disciplines"][disc] = {"courses": {}}
                 tree[domain]["categories"][disc] = {}
 
+            if unit == "core":
+                c_display_title = display_name
+            else:
+                c_display_title = course_display_names.get((disc, course), course.replace("_", " ").title())
+
             if course not in tree[domain]["disciplines"][disc]["courses"]:
-                tree[domain]["disciplines"][disc]["courses"][course] = {"units": {}}
+                tree[domain]["disciplines"][disc]["courses"][course] = {
+                    "display_name": c_display_title,
+                    "units": {}
+                }
 
             unit_path = domain_dir / rel_path
             status = scan_subtopic_status(unit_path) if unit_path.exists() else {
@@ -200,15 +242,22 @@ def get_topic_tree() -> Dict[str, Any]:
                 "files": []
             }
 
+            unit_lessons = get_unit_lessons(unit_path) if unit_path.exists() else []
+            has_summary = (unit_path / "SUMMARY.md").exists() if unit_path.exists() else False
+
             node_data = {
                 "display_name": display_name,
                 "domain": domain,
                 "discipline": disc,
                 "course": course,
+                "course_title": c_display_title,
                 "unit": unit,
                 "rel_path": f"{domain}/{rel_path}",
                 "full_path": str(unit_path),
-                "status": status
+                "status": status,
+                "lessons": unit_lessons,
+                "completed_lessons": get_completed_lessons(f"{domain}/{rel_path}"),
+                "has_summary": has_summary
             }
 
             tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data

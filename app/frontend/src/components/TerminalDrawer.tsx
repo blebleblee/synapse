@@ -36,6 +36,26 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const [showSetupGuide, setShowSetupGuide] = useState(false);
   const isDraggingRef = useRef(false);
 
+  const fitTerminal = () => {
+    if (!termRef.current || !containerRef.current || !isOpen || !fitAddonRef.current) return;
+
+    try {
+      fitAddonRef.current.fit();
+      const cols = termRef.current.cols;
+      const rows = termRef.current.rows;
+
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && cols > 0 && rows > 0) {
+        wsRef.current.send(JSON.stringify({
+          type: 'resize',
+          cols,
+          rows,
+        }));
+      }
+    } catch {
+      // Ignored if container layout is pending
+    }
+  };
+
   const connectWs = (env = terminalEnv) => {
     if (wsRef.current) {
       wsRef.current.close();
@@ -50,12 +70,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     ws.onopen = () => {
       setConnected(true);
-      if (termRef.current && fitAddonRef.current) {
-        fitAddonRef.current.fit();
-        const cols = termRef.current.cols;
-        const rows = termRef.current.rows;
-        ws.send(JSON.stringify({ type: 'resize', cols, rows }));
-      }
+      fitTerminal();
     };
 
     ws.onmessage = (event) => {
@@ -114,15 +129,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     connectWs('host');
 
     const resizeObserver = new ResizeObserver(() => {
-      if (isOpen && fitAddonRef.current && termRef.current) {
-        fitAddonRef.current.fit();
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({
-            type: 'resize',
-            cols: termRef.current.cols,
-            rows: termRef.current.rows,
-          }));
-        }
+      if (isOpen) {
+        fitTerminal();
       }
     });
 
@@ -142,9 +150,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     const handleMouseUp = () => {
       isDraggingRef.current = false;
       document.body.style.cursor = '';
-      if (fitAddonRef.current && termRef.current) {
-        fitAddonRef.current.fit();
-      }
+      fitTerminal();
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -161,11 +167,10 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        if (fitAddonRef.current && termRef.current) {
-          fitAddonRef.current.fit();
-        }
-      }, 100);
+      const timer = setTimeout(() => {
+        fitTerminal();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, isMaximized, terminalHeight]);
 

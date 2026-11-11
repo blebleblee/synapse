@@ -1,4 +1,4 @@
-# Executive Curriculum Summary: PostgreSQL Relational Engine & Storage
+# Lesson 6: Curriculum Summary & Operational Invariants
 
 ## 1. High-Level Invariants & System Guarantees
 

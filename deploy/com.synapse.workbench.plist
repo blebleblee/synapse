@@ -16,14 +16,14 @@
         <string>8000</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/Users/radovan.varga/repos/learning</string>
+    <string>/Users/radovan.varga/repos/synapse</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/radovan.varga/repos/learning/workbench.log</string>
+    <string>/Users/radovan.varga/repos/synapse/workbench.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/radovan.varga/repos/learning/workbench.log</string>
+    <string>/Users/radovan.varga/repos/synapse/workbench.log</string>
 </dict>
 </plist>

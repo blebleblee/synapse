@@ -10,6 +10,7 @@ import select
 import struct
 import fcntl
 import termios
+import signal
 import asyncio
 import json
 import datetime
@@ -43,7 +44,14 @@ from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import get_provider, OllamaProvider, OllamaCluster, get_configured_hosts, save_configured_hosts
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
-from learning_engine.mastery import set_subtopic_mastery, load_mastery_data, get_mastery_summary, get_subtopic_mastery
+from learning_engine.mastery import (
+    set_subtopic_mastery,
+    load_mastery_data,
+    get_mastery_summary,
+    get_subtopic_mastery,
+    get_completed_lessons,
+    toggle_lesson_completion
+)
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
@@ -200,6 +208,11 @@ class MasteryUpdateRequest(BaseModel):
     path: str
     state: str
 
+class LessonMasteryRequest(BaseModel):
+    path: str
+    lesson_id: str
+    completed: Optional[bool] = None
+
 @app.get("/api/mastery")
 def get_mastery():
     return {
@@ -210,6 +223,10 @@ def get_mastery():
 @app.post("/api/mastery")
 def update_mastery(req: MasteryUpdateRequest):
     return set_subtopic_mastery(req.path, req.state)
+
+@app.post("/api/mastery/lesson")
+def update_lesson_mastery(req: LessonMasteryRequest):
+    return toggle_lesson_completion(req.path, req.lesson_id, req.completed)
 
 @app.get("/api/export")
 def download_export(domain: str, level: Optional[str] = None):
@@ -346,15 +363,21 @@ def get_topic_details(
     foundation = ""
     labs = ""
 
-    if (target_dir / "FOUNDATION.md").exists():
-        foundation = (target_dir / "FOUNDATION.md").read_text(encoding="utf-8")
-    elif (sub_path / "FOUNDATION.md").exists():
-        foundation = (sub_path / "FOUNDATION.md").read_text(encoding="utf-8")
+    for fname in ["FOUNDATION.md", "foundation.md"]:
+        if (target_dir / fname).exists():
+            foundation = (target_dir / fname).read_text(encoding="utf-8")
+            break
+        elif (sub_path / fname).exists():
+            foundation = (sub_path / fname).read_text(encoding="utf-8")
+            break
 
-    if (target_dir / "LABS.md").exists():
-        labs = (target_dir / "LABS.md").read_text(encoding="utf-8")
-    elif (sub_path / "LABS.md").exists():
-        labs = (sub_path / "LABS.md").read_text(encoding="utf-8")
+    for fname in ["LABS.md", "labs.md"]:
+        if (target_dir / fname).exists():
+            labs = (target_dir / fname).read_text(encoding="utf-8")
+            break
+        elif (sub_path / fname).exists():
+            labs = (sub_path / fname).read_text(encoding="utf-8")
+            break
 
     # Multi-lesson discovery (e.g. lesson_01_*.md, lessons/*.md, or LESSON.md)
     discovered_lessons = get_unit_lessons(target_dir)
@@ -388,28 +411,30 @@ def get_topic_details(
 
     # Fallback to single LESSON.md if not populated via discovered_lessons
     if not lesson:
-        if (target_dir / "LESSON.md").exists():
-            lesson = (target_dir / "LESSON.md").read_text(encoding="utf-8")
-        elif (sub_path / "LESSON.md").exists():
-            lesson = (sub_path / "LESSON.md").read_text(encoding="utf-8")
-        elif (sub_path / "artifacts").exists():
+        for fname in ["LESSON.md", "lesson.md"]:
+            if (target_dir / fname).exists():
+                lesson = (target_dir / fname).read_text(encoding="utf-8")
+                break
+            elif (sub_path / fname).exists():
+                lesson = (sub_path / fname).read_text(encoding="utf-8")
+                break
+        if not lesson and (sub_path / "artifacts").exists():
             artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
             if artifacts:
                 lesson = artifacts[0].read_text(encoding="utf-8")
 
     # Load summary non-blocking
     summary = ""
-    summary_file = sub_path / "SUMMARY.md"
-    if summary_file.exists():
-        summary = summary_file.read_text(encoding="utf-8")
-    elif bool(foundation or lesson or labs or lessons_list):
-        # Generate summary in background thread without blocking HTTP response
-        import threading
-        threading.Thread(
-            target=generate_initial_summary,
-            args=(domain, cat, sub, sub_path),
-            daemon=True
-        ).start()
+    for fname in ["SUMMARY.md", "summary.md"]:
+        summary_file = sub_path / fname
+        if summary_file.exists():
+            summary = summary_file.read_text(encoding="utf-8")
+            break
+    if not summary:
+        for l_item in lessons_list:
+            if "summary" in l_item["id"]:
+                summary = l_item["content"]
+                break
 
     # Load persistent chat history for this topic
     saved_chat_history = []
@@ -423,16 +448,79 @@ def get_topic_details(
     # Preserve sequential numbered prefixes for course progression (e.g. 01 HCI Architecture)
     display_title = sub.replace('_', ' ').title()
 
+    # Look up human-friendly titles from topic tree
+    tree = get_topic_tree()
+    unit_display_title = None
+    course_display_title = None
+    discipline_display_title = None
+    domain_display_title = domain.replace("_", " ").title()
+
+    domain_data = tree.get(domain, {})
+    for disc_slug, disc_data in domain_data.get("disciplines", {}).items():
+        for c_slug, c_info in disc_data.get("courses", {}).items():
+            for u_slug, u_info in c_info.get("units", {}).items():
+                if Path(u_info["full_path"]).resolve() == sub_path.resolve():
+                    unit_display_title = u_info.get("display_name")
+                    discipline_display_title = disc_slug.replace("_", " ").title()
+                    if u_slug != "core":
+                        course_display_title = c_info.get("display_name")
+                    break
+
+    course_final_title = None
+    if course_display_title and course_display_title != unit_display_title:
+        course_final_title = course_display_title
+    elif "/" in cat and sub != "core":
+        course_final_title = cat.split("/")[1].replace("_", " ").title()
+
+    # Build complete continuous curriculum document
+    full_sections = []
+
+    # Quick navigation table of contents at the top of Complete Guide
+    if lessons_list and len(lessons_list) > 1:
+        toc_lines = ["## Course Table of Contents\n"]
+        for idx, item in enumerate(lessons_list):
+            toc_lines.append(f"{idx + 1}. [{item['title']}](#section-{item['id']})")
+        if labs:
+            toc_lines.append(f"{len(lessons_list) + 1}. [Operational Labs & Hands-on Verification](#section-labs)")
+        full_sections.append("\n".join(toc_lines))
+
+    if lessons_list:
+        for idx, item in enumerate(lessons_list):
+            l_content = item.get("content", "").strip()
+            # If the lesson content already begins with an H1 (# ), do NOT duplicate header
+            if l_content.startswith("# "):
+                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n{l_content}\n\n</div>')
+            else:
+                l_title = item.get("title", f"Lesson {idx + 1}")
+                full_sections.append(f'<div id="section-{item["id"]}">\n\n---\n\n# {l_title}\n\n{l_content}\n\n</div>')
+    elif lesson:
+        if lesson.strip().startswith("# "):
+            full_sections.append(f'<div id="section-lesson">\n\n---\n\n{lesson.strip()}\n\n</div>')
+        else:
+            full_sections.append(f'<div id="section-lesson">\n\n---\n\n# Technical Lesson\n\n{lesson.strip()}\n\n</div>')
+
+    if labs:
+        if labs.strip().startswith("# "):
+            full_sections.append(f'<div id="section-labs">\n\n---\n\n{labs.strip()}\n\n</div>')
+        else:
+            full_sections.append(f'<div id="section-labs">\n\n---\n\n# Operational Labs\n\n{labs.strip()}\n\n</div>')
+
+    full_content = "\n\n".join(full_sections)
+
     return {
         "domain": domain,
+        "domain_title": domain_display_title,
         "category": cat,
+        "discipline_title": discipline_display_title or cat.split("/")[0].replace("_", " ").title(),
+        "course_title": course_final_title,
         "subtopic": sub,
-        "display_title": display_title,
+        "display_title": unit_display_title or display_title,
         "path": str(sub_path.relative_to(WORKSPACE_ROOT)),
         "persona": persona,
         "level": selected_level,
-        "available_levels": available_levels or ["beginner", "intermediate", "advanced"],
+        "available_levels": available_levels,
         "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
+        "completed_lessons": get_completed_lessons(f"{domain}/{cat}/{sub}"),
         "summary": summary,
         "chat_history": saved_chat_history,
         "foundation": foundation,
@@ -440,6 +528,7 @@ def get_topic_details(
         "lessons": lessons_list,
         "active_lesson_id": target_lesson_id,
         "labs": labs,
+        "full_content": full_content,
         "has_content": bool(foundation or lesson or labs or lessons_list)
     }
 
@@ -599,10 +688,16 @@ def generate_quiz(req: QuizRequest):
     persona = get_domain_persona(domain)
 
     context_parts = []
-    for fname in ["FOUNDATION.md", "LESSON.md"]:
-        fpath = sub_path / fname
-        if fpath.exists():
-            context_parts.append(fpath.read_text(encoding="utf-8")[:3000])
+    if (sub_path / "FOUNDATION.md").exists():
+        context_parts.append((sub_path / "FOUNDATION.md").read_text(encoding="utf-8")[:3000])
+
+    for l in get_unit_lessons(sub_path)[:4]:
+        p = Path(l["path"])
+        if p.exists():
+            context_parts.append(p.read_text(encoding="utf-8")[:2000])
+
+    if (sub_path / "LABS.md").exists():
+        context_parts.append((sub_path / "LABS.md").read_text(encoding="utf-8")[:2000])
 
     system_instruction = persona + "\nYou are an expert examiner. Generate challenging scenario-based multiple-choice quiz questions to test deep intuition and operational mechanics."
     prompt = f"""Based on the curriculum for '{sub.replace('_', ' ').title()}', generate 3 scenario-based multiple choice questions.
@@ -762,8 +857,31 @@ async def terminal_websocket(websocket: WebSocket):
     winsize = struct.pack("HHHH", 24, 80, 0, 0)
     fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
 
-    shell = os.environ.get("SHELL", "/bin/bash")
-    exec_cmd = [shell]
+    cache_dir = WORKSPACE_ROOT / ".cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    zdot_dir = cache_dir / "zsh"
+    zdot_dir.mkdir(exist_ok=True)
+    zshrc_path = zdot_dir / ".zshrc"
+    zshrc_path.write_text(
+        'if [ -f "$HOME/.zshrc" ]; then source "$HOME/.zshrc"; fi\n'
+        'alias ps="ps -ww"\n',
+        encoding="utf-8"
+    )
+
+    bashrc_path = cache_dir / "bashrc"
+    bashrc_path.write_text(
+        'if [ -f "$HOME/.bashrc" ]; then source "$HOME/.bashrc"; fi\n'
+        'alias ps="ps -ww"\n'
+        'shopt -s checkwinsize 2>/dev/null\n',
+        encoding="utf-8"
+    )
+
+    shell = os.environ.get("SHELL", "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/bash")
+    if "bash" in shell:
+        exec_cmd = [shell, "--rcfile", str(bashrc_path), "-i"]
+    else:
+        exec_cmd = [shell, "-i"]
 
     if env_type == "docker":
         docker_bin = shutil.which("docker")
@@ -843,7 +961,9 @@ async def terminal_websocket(websocket: WebSocket):
         os.chdir(str(WORKSPACE_ROOT))
         env = os.environ.copy()
         env["TERM"] = "xterm-256color"
+        env["ZDOTDIR"] = str(zdot_dir)
         env["PROMPT_COMMAND"] = ""
+        env["PAGER"] = "cat"
         os.execvpe(exec_cmd[0], exec_cmd, env)
 
     # Parent process
@@ -890,6 +1010,10 @@ async def terminal_websocket(websocket: WebSocket):
                             rows = evt.get("rows", 24)
                             new_size = struct.pack("HHHH", rows, cols, 0, 0)
                             fcntl.ioctl(master, termios.TIOCSWINSZ, new_size)
+                            try:
+                                os.killpg(os.getpgid(pid), signal.SIGWINCH)
+                            except Exception:
+                                pass
                             continue
                     except Exception:
                         pass

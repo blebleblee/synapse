@@ -1,4 +1,12 @@
 {
   "computing/infrastructure/ebpf": "mastered",
-  "computing/infrastructure/kubernetes/01_control_plane_and_etcd": "studying"
+  "computing/infrastructure/kubernetes/01_control_plane_and_etcd": {
+    "state": "studying",
+    "completed_lessons": []
+  },
+  "computing/data/postgresql/01_relational_engine_and_storage": "not_started",
+  "computing/data/postgresql": {
+    "state": "not_started",
+    "completed_lessons": []
+  }
 }

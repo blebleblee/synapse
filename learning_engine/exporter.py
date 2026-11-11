@@ -5,7 +5,7 @@ Stitches topic hierarchies and progressive units into unified printable handbook
 
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from .topic_manager import get_topic_tree
+from .topic_manager import get_topic_tree, get_unit_lessons
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
@@ -62,12 +62,27 @@ def export_handbook(domain: str, level: Optional[str] = None) -> Path:
                 lvl_label = tdir.name.upper() if tdir.name in ["beginner", "intermediate", "advanced"] else "CORE"
                 chapter_content.append(f"### Tier: {lvl_label}\n")
 
-                for doc_type in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
-                    doc_path = tdir / doc_type
-                    if doc_path.exists():
-                        chapter_content.append(f"#### {doc_type.replace('.md', '')}\n")
-                        chapter_content.append(doc_path.read_text(encoding="utf-8"))
-                        chapter_content.append("\n")
+                if (tdir / "FOUNDATION.md").exists():
+                    chapter_content.append("#### Foundation\n")
+                    chapter_content.append((tdir / "FOUNDATION.md").read_text(encoding="utf-8"))
+                    chapter_content.append("\n\n")
+
+                for l in get_unit_lessons(tdir):
+                    p = Path(l["path"])
+                    if p.exists():
+                        chapter_content.append(f"#### {l['title']}\n")
+                        chapter_content.append(p.read_text(encoding="utf-8"))
+                        chapter_content.append("\n\n")
+
+                if (tdir / "LABS.md").exists():
+                    chapter_content.append("#### Labs\n")
+                    chapter_content.append((tdir / "LABS.md").read_text(encoding="utf-8"))
+                    chapter_content.append("\n\n")
+
+                if (tdir / "SUMMARY.md").exists():
+                    chapter_content.append("#### Summary\n")
+                    chapter_content.append((tdir / "SUMMARY.md").read_text(encoding="utf-8"))
+                    chapter_content.append("\n\n")
 
     full_text = "\n".join(lines) + "\n" + "\n".join(toc_entries) + "\n\n" + "\n".join(chapter_content)
     out_file.write_text(full_text, encoding="utf-8")

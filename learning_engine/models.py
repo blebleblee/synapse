@@ -12,11 +12,34 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 
 DEFAULT_OLLAMA_HOSTS = [
-    "http://localhost:11434",
+    "http://127.0.0.1:11434",
     "http://studio.2464.cz:11434",
-    "http://maxi.2464.cz:11434",
-    "http://192.168.200.60:8080"
+    "http://192.168.200.60:8080",
+    "http://maxi.2464.cz:11434"
 ]
+
+CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
+    "http://127.0.0.1:11434": {
+        "name": "localhost",
+        "memory_tier": "large",
+        "preferred_models": ["qwen2.5-coder:32b", "qwen2.5:32b", "deepseek-r1:32b", "llama3.1:latest"]
+    },
+    "http://studio.2464.cz:11434": {
+        "name": "studio",
+        "memory_tier": "large",
+        "preferred_models": ["qwen2.5-coder:32b", "qwen3.6:35b-a3b-coding-mxfp8", "qwen3.5:35b-mlx", "gemma4:26b"]
+    },
+    "http://192.168.200.60:8080": {
+        "name": "ai",
+        "memory_tier": "24gb",
+        "preferred_models": ["meta-llama-3.1-8b-instruct:latest", "gemma-4-12b-it-qat-q4_0:latest", "qwen3-8b:latest", "qwopus3.6-27b-v2-mtp-nvfp4:latest"]
+    },
+    "http://maxi.2464.cz:11434": {
+        "name": "maxi",
+        "memory_tier": "12gb",
+        "preferred_models": ["llama3.1:8b", "gemma4:e4b", "qwen3:4b", "qwen2.5:3b"]
+    }
+}
 
 def validate_generation_output(content: str) -> str:
     """
@@ -232,6 +255,45 @@ class OllamaCluster(LLMProvider):
                 return h, status[h]["models"][0]
 
         return online_hosts[0], "qwen3:4b"
+
+    def get_parallel_workers(self) -> List[Tuple[str, str, OllamaProvider]]:
+        """
+        Returns active worker nodes with memory-tiered model allocations for parallel processing.
+        Allocates large models to localhost and studio, 8B/12B models to ai (24GB),
+        and compact 4B/8B models to maxi (12GB).
+        """
+        status = self.get_cluster_status()
+        active_workers = []
+
+        for host in self.hosts:
+            host_clean = host.rstrip("/")
+            norm_key = "http://127.0.0.1:11434" if "localhost" in host_clean else host_clean
+
+            h_status = status.get(host_clean) or status.get(norm_key) or {}
+            if not h_status.get("online"):
+                continue
+
+            available_models = h_status.get("models", [])
+            spec = CLUSTER_HOST_SPECS.get(norm_key, {
+                "name": host_clean,
+                "memory_tier": "auto",
+                "preferred_models": ["llama3.1:8b", "qwen3:4b"]
+            })
+
+            selected_model = None
+            for pref in spec["preferred_models"]:
+                if pref in available_models:
+                    selected_model = pref
+                    break
+
+            if not selected_model and available_models:
+                selected_model = available_models[0]
+
+            if selected_model:
+                provider = OllamaProvider(host=norm_key, model=selected_model)
+                active_workers.append((norm_key, selected_model, provider))
+
+        return active_workers
 
     def generate(self, prompt: str, system_instruction: str = "") -> str:
         host, model = self.select_node_for_model(self.preferred_model)

@@ -12,13 +12,18 @@ export interface UnitNode {
   domain: string;
   discipline: string;
   course: string;
+  course_title?: string;
   unit: string;
   rel_path: string;
   full_path: string;
   status: SubtopicStatus;
+  lessons?: LessonItem[];
+  completed_lessons?: string[];
+  has_summary?: boolean;
 }
 
 export interface CourseNode {
+  display_name?: string;
   units: { [unitSlug: string]: UnitNode };
 }
 
@@ -51,7 +56,10 @@ export interface LessonItem {
 
 export interface TopicDetails {
   domain: string;
+  domain_title?: string;
   category: string;
+  discipline_title?: string;
+  course_title?: string;
   subtopic: string;
   display_title?: string;
   path: string;
@@ -59,6 +67,7 @@ export interface TopicDetails {
   level: string;
   available_levels: string[];
   mastery?: string;
+  completed_lessons?: string[];
   summary?: string;
   chat_history?: ChatMessage[];
   foundation: string;
@@ -66,6 +75,7 @@ export interface TopicDetails {
   lessons?: LessonItem[];
   active_lesson_id?: string;
   labs: string;
+  full_content?: string;
   has_content: boolean;
 }
 
@@ -83,14 +93,26 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface ClusterHostStatus {
+  online: boolean;
+  models: string[];
+  preferred_model?: string;
+  error?: string;
+}
+
 export interface WorkspaceStatus {
   domains: number;
+  disciplines?: number;
+  courses?: number;
   categories: number;
   subtopics: number;
-  foundation_count: number;
-  lesson_count: number;
-  labs_count: number;
-  complete_count: number;
+  with_foundation?: number;
+  with_lesson?: number;
+  with_labs?: number;
+  complete?: number;
+  complete_count?: number;
   ollama_available: boolean;
-  ollama_models: string[];
+  available_models?: string[];
+  ollama_models?: string[];
+  cluster?: { [host: string]: ClusterHostStatus };
 }

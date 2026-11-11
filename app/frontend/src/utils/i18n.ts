@@ -6,6 +6,9 @@
 export type SupportedLanguage = 'en' | 'cs' | 'de' | 'es' | 'ru';
 
 export interface UIStrings {
+  study: string;
+  completeGuide: string;
+  fullCourse: string;
   summary: string;
   foundation: string;
   lesson: string;
@@ -43,6 +46,9 @@ export interface UIStrings {
 
 export const TRANSLATIONS: Record<SupportedLanguage, UIStrings> = {
   en: {
+    study: 'Study',
+    completeGuide: 'Complete Guide',
+    fullCourse: 'Full Course',
     summary: 'Summary',
     foundation: 'Foundation',
     lesson: 'Lesson',
@@ -78,6 +84,9 @@ export const TRANSLATIONS: Record<SupportedLanguage, UIStrings> = {
     mastered: 'Mastered',
   },
   cs: {
+    study: 'Studium',
+    completeGuide: 'Kompletní průvodce',
+    fullCourse: 'Kompletní kurz',
     summary: 'Přehled',
     foundation: 'Základy',
     lesson: 'Lekce',
@@ -113,6 +122,9 @@ export const TRANSLATIONS: Record<SupportedLanguage, UIStrings> = {
     mastered: 'Zvládnuto',
   },
   de: {
+    study: 'Lernen',
+    completeGuide: 'Gesamtübersicht',
+    fullCourse: 'Gesamtkurs',
     summary: 'Übersicht',
     foundation: 'Grundlagen',
     lesson: 'Lektion',
@@ -148,6 +160,9 @@ export const TRANSLATIONS: Record<SupportedLanguage, UIStrings> = {
     mastered: 'Gemeistert',
   },
   es: {
+    study: 'Estudio',
+    completeGuide: 'Guía Completa',
+    fullCourse: 'Curso Completo',
     summary: 'Resumen',
     foundation: 'Fundamentos',
     lesson: 'Lección',
@@ -183,6 +198,9 @@ export const TRANSLATIONS: Record<SupportedLanguage, UIStrings> = {
     mastered: 'Dominado',
   },
   ru: {
+    study: 'Обучение',
+    completeGuide: 'Полное руководство',
+    fullCourse: 'Полный курс',
     summary: 'Обзор',
     foundation: 'Основы',
     lesson: 'Урок',

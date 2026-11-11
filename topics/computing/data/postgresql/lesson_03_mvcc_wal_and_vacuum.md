@@ -1,4 +1,4 @@
-# Lesson 2: Multiversion Concurrency Control (MVCC), WAL & Vacuum Engine
+# Lesson 3: Multiversion Concurrency Control (MVCC), WAL & Vacuum Engine
 
 ## 1. Physical Heap Page Layout & The Anatomy of a Tuple
 

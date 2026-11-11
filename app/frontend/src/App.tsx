@@ -13,11 +13,12 @@ import './App.css';
 
 export function App() {
   const [tree, setTree] = useState<TopicTreeData>({});
-  const [, setStatus] = useState<WorkspaceStatus | null>(null);
+  const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
   const [currentLevel, setCurrentLevel] = useState<string>('beginner');
-  const [activeTab, setActiveTab] = useState<'summary' | 'foundation' | 'lesson' | 'labs' | 'quiz'>('summary');
+  const [activeTab, setActiveTab] = useState<'study' | 'labs' | 'quiz'>('study');
+  const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
@@ -70,7 +71,7 @@ export function App() {
       const res = await fetch('/api/status');
       if (res.ok) {
         const data = await res.json();
-        setStatus(data);
+        setWorkspaceStatus(data);
       }
     } catch (err) {
       console.error('Failed to load status:', err);
@@ -81,7 +82,7 @@ export function App() {
     setIsLoadingTopic(true);
     try {
       let url = `/api/topic?query=${encodeURIComponent(query)}&level=${level}`;
-      if (lessonId) {
+      if (lessonId && lessonId !== 'all' && lessonId !== 'labs') {
         url += `&lesson_id=${encodeURIComponent(lessonId)}`;
       }
       const res = await fetch(url);
@@ -91,16 +92,19 @@ export function App() {
         setSelectedPath(query);
         setCurrentLevel(level);
 
-        // Only override tab when opening a new topic, NOT when switching levels or lessons
-        if (!preserveTab) {
-          if (data.summary) {
-            setActiveTab('summary');
-          } else if (data.foundation) {
-            setActiveTab('foundation');
-          } else if (data.lesson) {
-            setActiveTab('lesson');
-          } else if (data.labs) {
-            setActiveTab('labs');
+        if (lessonId === 'labs') {
+          setActiveTab('labs');
+          setActiveLessonId('labs');
+        } else if (lessonId === 'all') {
+          setActiveLessonId('all');
+          if (!preserveTab) setActiveTab('study');
+        } else if (lessonId) {
+          setActiveLessonId(lessonId);
+          if (!preserveTab) setActiveTab('study');
+        } else {
+          setActiveLessonId(data.active_lesson_id || null);
+          if (!preserveTab) {
+            setActiveTab('study');
           }
         }
       }
@@ -193,9 +197,40 @@ export function App() {
     }
   };
 
+  const handleSelectSubtopic = (query: string, lessonId?: string) => {
+    loadTopic(query, currentLevel, false, lessonId);
+  };
+
   const handleSelectLesson = (lessonId: string) => {
     if (selectedPath) {
-      loadTopic(selectedPath, currentLevel, true, lessonId);
+      setActiveLessonId(lessonId);
+      if (lessonId === 'labs') {
+        setActiveTab('labs');
+      } else {
+        setActiveTab('study');
+        loadTopic(selectedPath, currentLevel, true, lessonId);
+      }
+    }
+  };
+
+  const handleToggleLessonCompletion = async (path: string, lessonId: string, completed?: boolean) => {
+    try {
+      const res = await fetch('/api/mastery/lesson', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path, lesson_id: lessonId, completed }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTopicDetails((prev) => prev ? {
+          ...prev,
+          completed_lessons: data.completed_lessons,
+          mastery: data.state
+        } : null);
+        await fetchTree();
+      }
+    } catch (err) {
+      console.error('Failed to toggle lesson completion:', err);
     }
   };
 
@@ -374,13 +409,18 @@ export function App() {
       <TopicTree
         tree={tree}
         selectedSubtopic={selectedPath}
-        onSelectSubtopic={(q) => loadTopic(q, currentLevel)}
+        activeLessonId={activeLessonId}
+        activeTab={activeTab}
+        status={workspaceStatus}
+        completedLessons={topicDetails?.completed_lessons}
+        onSelectSubtopic={handleSelectSubtopic}
         onAddSubtopic={handleAddSubtopic}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenGraph={() => setGraphOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
         onDeleteTopic={handleDeleteTopic}
         onRenameTopic={handleRenameTopic}
+        onToggleLessonCompletion={handleToggleLessonCompletion}
         targetLanguage={settings.language}
       />
 
@@ -393,6 +433,7 @@ export function App() {
           onRunInTerminal={handleRunInTerminal}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          activeLessonId={activeLessonId}
           currentLevel={currentLevel}
           onSelectLevel={handleSelectLevel}
           quizQuestions={currentQuiz}
@@ -409,6 +450,7 @@ export function App() {
           targetLanguage={settings.language}
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
           onSelectLesson={handleSelectLesson}
+          onToggleLessonCompletion={handleToggleLessonCompletion}
         />
 
         <TerminalDrawer

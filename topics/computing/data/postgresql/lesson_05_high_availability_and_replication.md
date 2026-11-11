@@ -1,4 +1,4 @@
-# Lesson 4: High Availability, Streaming Replication & Connection Pooling
+# Lesson 5: High Availability, Streaming Replication & Connection Pooling
 
 ## 1. Physical Streaming Replication Architecture
 

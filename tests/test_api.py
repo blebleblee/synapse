@@ -91,26 +91,34 @@ def test_api_multi_lesson_discovery_and_selection():
     assert res.status_code == 200
     data = res.json()
     assert "lessons" in data
-    assert len(data["lessons"]) == 4
-    assert data["active_lesson_id"] == "lesson_01_architecture_and_process_model"
-    assert "Lesson 1: Architecture" in data["lessons"][0]["title"]
+    assert len(data["lessons"]) == 6
+    assert data["active_lesson_id"] == "lesson_01_foundations_and_invariants"
+    assert "Lesson 1: Foundations" in data["lessons"][0]["title"]
+    assert data["course_title"] is None
+    assert data["discipline_title"] == "Data"
+    assert data["domain_title"] == "Computing"
+    assert data["display_title"] == "PostgreSQL Internals"
+    assert data["available_levels"] == []
+    assert "full_content" in data
+    assert len(data["full_content"]) > 1000
 
     # Test selecting specific lesson
-    res_l2 = client.get("/api/topic?query=postgresql&lesson_id=lesson_02_mvcc_wal_and_vacuum")
-    assert res_l2.status_code == 200
-    data_l2 = res_l2.json()
-    assert data_l2["active_lesson_id"] == "lesson_02_mvcc_wal_and_vacuum"
-    assert "Multiversion Concurrency Control" in data_l2["lesson"]
+    res_l3 = client.get("/api/topic?query=postgresql&lesson_id=lesson_03_mvcc_wal_and_vacuum")
+    assert res_l3.status_code == 200
+    data_l3 = res_l3.json()
+    assert data_l3["active_lesson_id"] == "lesson_03_mvcc_wal_and_vacuum"
+    assert "Multiversion Concurrency Control" in data_l3["lesson"]
 
 def test_api_cluster_status():
     res = client.get("/api/settings/cluster-status")
     assert res.status_code == 200
     data = res.json()
-    assert "http://localhost:11434" in data
+    local_key = "http://127.0.0.1:11434" if "http://127.0.0.1:11434" in data else "http://localhost:11434"
+    assert local_key in data
     assert "http://studio.2464.cz:11434" in data
     assert "http://maxi.2464.cz:11434" in data
     assert "http://192.168.200.60:8080" in data
-    assert isinstance(data["http://localhost:11434"]["online"], bool)
+    assert isinstance(data[local_key]["online"], bool)
 
 def test_api_get_and_set_cluster_hosts():
     # 1. Get initial hosts

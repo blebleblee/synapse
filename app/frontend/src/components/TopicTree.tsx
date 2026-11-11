@@ -24,20 +24,26 @@ import {
   Trash2,
   X,
   Activity,
-  RotateCcw
+  Check,
+  Zap
 } from 'lucide-react';
-import type { TopicTreeData, UnitNode } from '../types';
+import type { TopicTreeData, UnitNode, WorkspaceStatus } from '../types';
 
 interface TopicTreeProps {
   tree: TopicTreeData;
   selectedSubtopic: string | null;
-  onSelectSubtopic: (query: string) => void;
+  activeLessonId?: string | null;
+  activeTab?: string;
+  status?: WorkspaceStatus | null;
+  completedLessons?: string[];
+  onSelectSubtopic: (query: string, lessonId?: string) => void;
   onAddSubtopic: (domain: string, category: string, subtopic: string, title?: string) => Promise<void>;
   onOpenSearch: () => void;
   onOpenGraph: () => void;
   onOpenSettings: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
   onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
+  onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
   targetLanguage?: string;
 }
 
@@ -56,11 +62,32 @@ const DOMAIN_ORDER = [
   'economics',
 ];
 
+export function toTitleCase(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map((w) => (w.length > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
+    .join(' ');
+}
+
+export function cleanLessonTitle(raw: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/^Lesson\s*\d+\s*[:.-]\s*/i, '')
+    .replace(/^\d+\s*[:.-]\s*/, '')
+    .trim();
+}
+
 import { getUIStrings } from '../utils/i18n';
 
 export const TopicTree: React.FC<TopicTreeProps> = ({
   tree,
   selectedSubtopic,
+  activeLessonId,
+  activeTab,
+  status,
+  completedLessons,
   onSelectSubtopic,
   onAddSubtopic,
   onOpenSearch,
@@ -68,11 +95,17 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenSettings,
   onDeleteTopic,
   onRenameTopic,
+  onToggleLessonCompletion,
   targetLanguage,
 }) => {
   const ui = getUIStrings(targetLanguage);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
+  const [openUnits, setOpenUnits] = useState<{ [key: string]: boolean }>({});
+
+  const toggleUnit = (unitPath: string) => {
+    setOpenUnits((prev) => ({ ...prev, [unitPath]: !prev[unitPath] }));
+  };
   const [customDomainOrder, setCustomDomainOrder] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('synapse_domain_order');
@@ -97,11 +130,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     list[targetIdx] = temp;
     setCustomDomainOrder(list);
     localStorage.setItem('synapse_domain_order', JSON.stringify(list));
-  };
-
-  const resetDomainOrder = () => {
-    setCustomDomainOrder(DOMAIN_ORDER);
-    localStorage.removeItem('synapse_domain_order');
   };
 
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({});
@@ -190,22 +218,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
       default:
         return <Folder size={16} className="domain-icon" />;
     }
-  };
-
-  const renderBadge = (node: UnitNode) => {
-    const st = node.status;
-    if (st.complete) {
-      return <span className="badge badge-complete" title="All tiers complete">FLB</span>;
-    }
-    const f = st.has_foundation ? 'F' : '.';
-    const l = st.has_lesson ? 'L' : '.';
-    const b = st.has_labs ? 'B' : '.';
-    const isPartial = st.has_foundation || st.has_lesson || st.has_labs;
-    return (
-      <span className={`badge ${isPartial ? 'badge-partial' : 'badge-empty'}`}>
-        {f}{l}{b}
-      </span>
-    );
   };
 
   const handleCreateTopic = async (e: React.FormEvent) => {
@@ -341,15 +353,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             <option value="az">{ui.alphabetical}</option>
             <option value="progress">{ui.progress}</option>
           </select>
-          {sortMode === 'default' && (
-            <button
-              className="icon-btn-micro"
-              onClick={resetDomainOrder}
-              title={ui.resetOrder}
-            >
-              <RotateCcw size={11} />
-            </button>
-          )}
         </div>
       </div>
 
@@ -391,7 +394,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               >
                 {getDomainIcon(domain)}
                 <span className="domain-label">
-                  {domain.replace(/_/g, ' ')}
+                  {toTitleCase(domain)}
                 </span>
                 {sortMode === 'default' && (
                   <div className="domain-reorder-actions" onClick={(e) => e.stopPropagation()}>
@@ -457,7 +460,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                         >
                           <FolderOpen size={14} className="category-icon" />
                           <span className="category-label">
-                            {disc.replace(/_/g, ' ')}
+                            {toTitleCase(disc)}
                           </span>
                           <span className="category-count">{Object.keys(courses).length}</span>
                         </div>
@@ -487,40 +490,131 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                               if (units.length === 1 && units[0].unit === 'core') {
                                 const singleUnit = units[0];
                                 const isSelected = selectedSubtopic === singleUnit.rel_path;
+                                const hasMultiLessons = Boolean(singleUnit.lessons && singleUnit.lessons.length > 1);
+                                const isUnitOpen = openUnits[singleUnit.rel_path] ?? isSelected;
+                                const unitTitle = toTitleCase(singleUnit.display_name);
+
+                                const unitCompletedLessons = isSelected && completedLessons ? completedLessons : (singleUnit.completed_lessons || []);
+                                const completedCount = unitCompletedLessons.length;
+                                const totalLessons = singleUnit.lessons ? singleUnit.lessons.length : 0;
+                                const isAllCompleted = totalLessons > 0 && completedCount >= totalLessons;
+
                                 return (
-                                  <div
-                                    key={singleUnit.rel_path}
-                                    className={`subtopic-item ${isSelected ? 'selected' : ''}`}
-                                    onClick={() => onSelectSubtopic(singleUnit.rel_path)}
-                                  >
-                                    <span className="subtopic-title" title={singleUnit.rel_path}>
-                                      {singleUnit.display_name}
-                                    </span>
-                                    <div className="item-meta">
-                                      {renderBadge(singleUnit)}
-                                      <div className="item-actions" onClick={(e) => e.stopPropagation()}>
-                                        {onRenameTopic && (
-                                          <button
-                                            className="action-mini-btn"
-                                            onClick={() => {
-                                              setRenameTarget({ path: singleUnit.rel_path, currentTitle: singleUnit.display_name });
-                                              setRenameInput(singleUnit.display_name);
-                                            }}
-                                            title="Rename unit"
-                                          >
-                                            <Edit2 size={11} />
-                                          </button>
-                                        )}
-                                        {onDeleteTopic && (
-                                          <button
-                                            className="action-mini-btn delete"
-                                            onClick={() => onDeleteTopic(singleUnit.rel_path)}
-                                            title="Delete unit"
-                                          >
-                                            <Trash2 size={11} />
-                                          </button>
-                                        )}
+                                  <div key={courseKey} className="course-group">
+                                    <div className="unit-container">
+                                      <div
+                                        className={`${hasMultiLessons ? 'course-header has-subsections' : 'subtopic-item'} ${isSelected ? 'selected' : ''}`}
+                                        onClick={() => {
+                                          if (hasMultiLessons) {
+                                            toggleUnit(singleUnit.rel_path);
+                                          }
+                                          onSelectSubtopic(singleUnit.rel_path, hasMultiLessons ? 'all' : undefined);
+                                        }}
+                                      >
+                                        {hasMultiLessons && <BookOpen size={13} className="course-icon" />}
+                                        <span className={hasMultiLessons ? "course-title" : "subtopic-title"} title={unitTitle}>
+                                          {unitTitle}
+                                        </span>
+                                        <div className={hasMultiLessons ? "course-meta" : "item-meta"}>
+                                          {hasMultiLessons && (
+                                            <span
+                                              className={`course-progress ${isAllCompleted ? 'all-completed' : completedCount > 0 ? 'has-progress' : ''}`}
+                                              title={`${completedCount} of ${totalLessons} lessons completed`}
+                                            >
+                                              {completedCount > 0 ? `${completedCount}/${totalLessons}` : `${totalLessons}L`}
+                                              {isAllCompleted && ' ✓'}
+                                            </span>
+                                          )}
+                                          <div className="item-actions" onClick={(e) => e.stopPropagation()}>
+                                            {onRenameTopic && (
+                                              <button
+                                                className="action-mini-btn"
+                                                onClick={() => {
+                                                  setRenameTarget({ path: singleUnit.rel_path, currentTitle: unitTitle });
+                                                  setRenameInput(unitTitle);
+                                                }}
+                                                title="Rename unit"
+                                              >
+                                                <Edit2 size={11} />
+                                              </button>
+                                            )}
+                                            {onDeleteTopic && (
+                                              <button
+                                                className="action-mini-btn delete"
+                                                onClick={() => onDeleteTopic(singleUnit.rel_path)}
+                                                title="Delete unit"
+                                              >
+                                                <Trash2 size={11} />
+                                              </button>
+                                            )}
+                                          </div>
+                                        </div>
                                       </div>
+
+                                      {/* Sub-lessons list nested directly under the topic */}
+                                      {isUnitOpen && hasMultiLessons && singleUnit.lessons && (
+                                        <div className="unit-lessons-sublist">
+                                          <div
+                                            className={`unit-lesson-subitem ${isSelected && (!activeLessonId || activeLessonId === 'all') ? 'active' : ''}`}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              onSelectSubtopic(singleUnit.rel_path, 'all');
+                                            }}
+                                            title="Complete Guide (All modules in full)"
+                                          >
+                                            <BookOpen size={11} className="sublesson-icon" />
+                                            <span className="sublesson-title">Complete Guide</span>
+                                          </div>
+
+                                          {singleUnit.lessons.map((lesson, lIdx) => {
+                                            const isLessonActive = isSelected && activeLessonId === lesson.id;
+                                            const isCompleted = unitCompletedLessons.includes(lesson.id);
+                                            const displayTitle = cleanLessonTitle(lesson.title);
+                                            return (
+                                              <div
+                                                key={lesson.id}
+                                                className={`unit-lesson-subitem ${isLessonActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  onSelectSubtopic(singleUnit.rel_path, lesson.id);
+                                                }}
+                                                title={lesson.title}
+                                              >
+                                                <span className={`sublesson-num ${isCompleted ? 'completed' : ''}`}>
+                                                  {isCompleted ? '✓' : lIdx + 1}
+                                                </span>
+                                                <span className="sublesson-title">{displayTitle}</span>
+                                                {onToggleLessonCompletion && (
+                                                  <button
+                                                    className={`sublesson-check-btn ${isCompleted ? 'checked' : ''}`}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      onToggleLessonCompletion(singleUnit.rel_path, lesson.id, !isCompleted);
+                                                    }}
+                                                    title={isCompleted ? "Mark incomplete" : "Mark as completed"}
+                                                  >
+                                                    <Check size={11} />
+                                                  </button>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+
+                                          {singleUnit.status.has_labs && (
+                                            <div
+                                              className={`unit-lesson-subitem ${isSelected && (activeLessonId === 'labs' || activeTab === 'labs') ? 'active' : ''}`}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                onSelectSubtopic(singleUnit.rel_path, 'labs');
+                                              }}
+                                              title="Operational Labs"
+                                            >
+                                              <FlaskConical size={11} className="sublesson-icon" />
+                                              <span className="sublesson-title">Operational Labs</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 );
@@ -528,16 +622,23 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
                               const isCourseOpen = openCourses[courseKey] || cleanTerm.length > 0;
                               const completedUnits = units.filter((u) => u.status.complete).length;
+                              const courseTitle = toTitleCase((cData as any).display_name || courseSlug);
 
                               return (
                                 <div key={courseKey} className="course-group">
                                   <div
                                     className="course-header"
-                                    onClick={() => toggleCourse(courseKey)}
+                                    onClick={() => {
+                                      toggleCourse(courseKey);
+                                      if (!isCourseOpen && matchingUnits.length > 0 && selectedSubtopic !== matchingUnits[0].rel_path) {
+                                        onSelectSubtopic(matchingUnits[0].rel_path);
+                                      }
+                                    }}
+                                    title={courseTitle}
                                   >
                                     <BookOpen size={13} className="course-icon" />
                                     <span className="course-title">
-                                      {courseSlug.replace(/_/g, ' ')}
+                                      {courseTitle}
                                     </span>
                                     <div className="course-meta">
                                       <span className="course-progress">
@@ -550,7 +651,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                             e.stopPropagation();
                                             onDeleteTopic(`${discKey}/${courseSlug}`);
                                           }}
-                                          title={`Delete course ${courseSlug}`}
+                                          title={`Delete course ${courseTitle}`}
                                         >
                                           <Trash2 size={11} />
                                         </button>
@@ -562,41 +663,130 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                     <div className="course-units-list">
                                       {matchingUnits.map((unitNode) => {
                                         const isSelected = selectedSubtopic === unitNode.rel_path;
+                                        const hasMultiLessons = Boolean(unitNode.lessons && unitNode.lessons.length > 1);
+                                        const isUnitOpen = openUnits[unitNode.rel_path] ?? isSelected;
+                                        const unitTitle = toTitleCase(unitNode.display_name);
+
+                                        const unitCompletedLessons = isSelected && completedLessons ? completedLessons : (unitNode.completed_lessons || []);
+                                        const completedCount = unitCompletedLessons.length;
+                                        const totalLessons = unitNode.lessons ? unitNode.lessons.length : 0;
+                                        const isAllCompleted = totalLessons > 0 && completedCount >= totalLessons;
+
                                         return (
-                                          <div
-                                            key={unitNode.rel_path}
-                                            className={`subtopic-item unit-item ${isSelected ? 'selected' : ''}`}
-                                            onClick={() => onSelectSubtopic(unitNode.rel_path)}
-                                          >
-                                            <span className="subtopic-title" title={unitNode.rel_path}>
-                                              {unitNode.display_name}
-                                            </span>
-                                            <div className="item-meta">
-                                              {renderBadge(unitNode)}
-                                              <div className="item-actions" onClick={(e) => e.stopPropagation()}>
-                                                {onRenameTopic && (
-                                                  <button
-                                                    className="action-mini-btn"
-                                                    onClick={() => {
-                                                      setRenameTarget({ path: unitNode.rel_path, currentTitle: unitNode.display_name });
-                                                      setRenameInput(unitNode.display_name);
-                                                    }}
-                                                    title="Rename unit"
+                                          <div key={unitNode.rel_path} className="unit-container">
+                                            <div
+                                              className={`${hasMultiLessons ? 'course-header has-subsections' : 'subtopic-item unit-item'} ${isSelected ? 'selected' : ''}`}
+                                              onClick={() => {
+                                                if (hasMultiLessons) {
+                                                  toggleUnit(unitNode.rel_path);
+                                                }
+                                                onSelectSubtopic(unitNode.rel_path, hasMultiLessons ? 'all' : undefined);
+                                              }}
+                                            >
+                                              {hasMultiLessons && <BookOpen size={13} className="course-icon" />}
+                                              <span className={hasMultiLessons ? "course-title" : "subtopic-title"} title={unitTitle}>
+                                                {unitTitle}
+                                              </span>
+                                              <div className={hasMultiLessons ? "course-meta" : "item-meta"}>
+                                                {hasMultiLessons && (
+                                                  <span
+                                                    className={`course-progress ${isAllCompleted ? 'all-completed' : completedCount > 0 ? 'has-progress' : ''}`}
+                                                    title={`${completedCount} of ${totalLessons} lessons completed`}
                                                   >
-                                                    <Edit2 size={11} />
-                                                  </button>
+                                                    {completedCount > 0 ? `${completedCount}/${totalLessons}` : `${totalLessons}L`}
+                                                    {isAllCompleted && ' ✓'}
+                                                  </span>
                                                 )}
-                                                {onDeleteTopic && (
-                                                  <button
-                                                    className="action-mini-btn delete"
-                                                    onClick={() => onDeleteTopic(unitNode.rel_path)}
-                                                    title="Delete unit"
-                                                  >
-                                                    <Trash2 size={11} />
-                                                  </button>
-                                                )}
+                                                <div className="item-actions" onClick={(e) => e.stopPropagation()}>
+                                                  {onRenameTopic && (
+                                                    <button
+                                                      className="action-mini-btn"
+                                                      onClick={() => {
+                                                        setRenameTarget({ path: unitNode.rel_path, currentTitle: unitNode.display_name });
+                                                        setRenameInput(unitNode.display_name);
+                                                      }}
+                                                      title="Rename unit"
+                                                    >
+                                                      <Edit2 size={11} />
+                                                    </button>
+                                                  )}
+                                                  {onDeleteTopic && (
+                                                    <button
+                                                      className="action-mini-btn delete"
+                                                      onClick={() => onDeleteTopic(unitNode.rel_path)}
+                                                      title="Delete unit"
+                                                    >
+                                                      <Trash2 size={11} />
+                                                    </button>
+                                                  )}
+                                                </div>
                                               </div>
                                             </div>
+
+                                            {/* Sub-lessons list nested directly under the unit */}
+                                            {isUnitOpen && hasMultiLessons && unitNode.lessons && (
+                                              <div className="unit-lessons-sublist">
+                                                <div
+                                                  className={`unit-lesson-subitem ${isSelected && (!activeLessonId || activeLessonId === 'all') ? 'active' : ''}`}
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onSelectSubtopic(unitNode.rel_path, 'all');
+                                                  }}
+                                                  title="Complete Guide (All modules in full)"
+                                                >
+                                                  <BookOpen size={11} className="sublesson-icon" />
+                                                  <span className="sublesson-title">Complete Guide</span>
+                                                </div>
+
+                                                {unitNode.lessons.map((lesson, lIdx) => {
+                                                  const isLessonActive = isSelected && activeLessonId === lesson.id;
+                                                  const isCompleted = unitCompletedLessons.includes(lesson.id);
+                                                  const displayTitle = cleanLessonTitle(lesson.title);
+                                                  return (
+                                                    <div
+                                                      key={lesson.id}
+                                                      className={`unit-lesson-subitem ${isLessonActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onSelectSubtopic(unitNode.rel_path, lesson.id);
+                                                      }}
+                                                      title={lesson.title}
+                                                    >
+                                                      <span className={`sublesson-num ${isCompleted ? 'completed' : ''}`}>
+                                                        {isCompleted ? '✓' : lIdx + 1}
+                                                      </span>
+                                                      <span className="sublesson-title">{displayTitle}</span>
+                                                      {onToggleLessonCompletion && (
+                                                        <button
+                                                          className={`sublesson-check-btn ${isCompleted ? 'checked' : ''}`}
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onToggleLessonCompletion(unitNode.rel_path, lesson.id, !isCompleted);
+                                                          }}
+                                                          title={isCompleted ? "Mark incomplete" : "Mark as completed"}
+                                                        >
+                                                          <Check size={11} />
+                                                        </button>
+                                                      )}
+                                                    </div>
+                                                  );
+                                                })}
+
+                                                {unitNode.status.has_labs && (
+                                                  <div
+                                                    className={`unit-lesson-subitem ${isSelected && (activeLessonId === 'labs' || activeTab === 'labs') ? 'active' : ''}`}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      onSelectSubtopic(unitNode.rel_path, 'labs');
+                                                    }}
+                                                    title="Operational Labs"
+                                                  >
+                                                    <FlaskConical size={11} className="sublesson-icon" />
+                                                    <span className="sublesson-title">Operational Labs</span>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
                                           </div>
                                         );
                                       })}
@@ -724,6 +914,33 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4-Node Cluster Health Footer */}
+      {status?.cluster && (
+        <div className="sidebar-cluster-footer">
+          <div className="cluster-status-row">
+            <span className="cluster-label">
+              <Zap size={12} className="cluster-icon" />
+              <span>Ollama Cluster</span>
+            </span>
+            <span className="cluster-count">
+              {Object.values(status.cluster).filter((c) => c.online).length}/{Object.keys(status.cluster).length} Online
+            </span>
+          </div>
+          <div className="cluster-nodes-pills">
+            {Object.entries(status.cluster).map(([host, info]) => (
+              <span
+                key={host}
+                className={`node-pill ${info.online ? 'online' : 'offline'}`}
+                title={`${host}: ${info.online ? (info.preferred_model || (info.models && info.models[0]) || 'active') : 'offline'}`}
+              >
+                <span className="node-dot" />
+                {host}
+              </span>
+            ))}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-# Lesson 1: Architecture, Process Model & Shared Memory Subsystems
+# Lesson 2: Architecture, Process Model & Shared Memory Subsystems
 
 ## 1. The Postmaster Daemon and Process-per-Connection Model
 

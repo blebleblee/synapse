@@ -33,10 +33,17 @@ def test_get_topic_tree_structure():
     assert "units" in k8s
     assert len(k8s["units"]) >= 1
 
+    # Verify course display name and PostgreSQL Internals
+    assert "data" in disciplines
+    assert "postgresql" in disciplines["data"]["courses"]
+    pg_course = disciplines["data"]["courses"]["postgresql"]
+    assert pg_course["display_name"] == "PostgreSQL Internals"
+
     # Verify unit node properties
     first_unit = next(iter(k8s["units"].values()))
     assert "rel_path" in first_unit
     assert "display_name" in first_unit
+    assert "course_title" in first_unit
     assert "status" in first_unit
     assert "complete" in first_unit["status"]
 
@@ -79,8 +86,8 @@ def test_get_domain_persona():
 
 def test_get_unit_lessons_postgresql():
     from learning_engine.topic_manager import get_unit_lessons, TOPICS_DIR
-    pg_dir = TOPICS_DIR / "computing" / "data" / "postgresql" / "01_relational_engine_and_storage"
+    pg_dir = TOPICS_DIR / "computing" / "data" / "postgresql"
     lessons = get_unit_lessons(pg_dir)
-    assert len(lessons) == 4
-    assert lessons[0]["id"] == "lesson_01_architecture_and_process_model"
-    assert "Lesson 1: Architecture" in lessons[0]["title"]
+    assert len(lessons) == 6
+    assert lessons[0]["id"] == "lesson_01_foundations_and_invariants"
+    assert "Lesson 1: Foundations" in lessons[0]["title"]

@@ -7,7 +7,7 @@ incorporating curriculum units and ongoing AI discussion sessions.
 from pathlib import Path
 from typing import Optional
 from .models import get_provider, LLMProvider
-from .topic_manager import resolve_subtopic, get_domain_persona
+from .topic_manager import resolve_subtopic, get_domain_persona, get_unit_lessons
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
@@ -20,10 +20,16 @@ def generate_initial_summary(domain: str, category: str, subtopic_id: str, subto
 
     # Collect available context
     context = []
-    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
-        fpath = subtopic_dir / fname
-        if fpath.exists():
-            context.append(fpath.read_text(encoding="utf-8")[:2500])
+    if (subtopic_dir / "FOUNDATION.md").exists():
+        context.append((subtopic_dir / "FOUNDATION.md").read_text(encoding="utf-8")[:2500])
+
+    for l in get_unit_lessons(subtopic_dir)[:4]:
+        p = Path(l["path"])
+        if p.exists():
+            context.append(f"\n--- {l['title']} ---\n" + p.read_text(encoding="utf-8")[:2000])
+
+    if (subtopic_dir / "LABS.md").exists():
+        context.append((subtopic_dir / "LABS.md").read_text(encoding="utf-8")[:2000])
 
     if not context:
         for lvl in ["beginner", "intermediate", "advanced"]:
@@ -68,10 +74,16 @@ def regenerate_summary(query: str, provider_type: Optional[str] = None, model: O
 
     # Ingest all curriculum files
     curriculum_parts = []
-    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
-        fpath = sub_path / fname
-        if fpath.exists():
-            curriculum_parts.append(f"--- {fname} ---\n" + fpath.read_text(encoding="utf-8")[:2500])
+    if (sub_path / "FOUNDATION.md").exists():
+        curriculum_parts.append(f"--- FOUNDATION.md ---\n" + (sub_path / "FOUNDATION.md").read_text(encoding="utf-8")[:2500])
+
+    for l in get_unit_lessons(sub_path)[:4]:
+        p = Path(l["path"])
+        if p.exists():
+            curriculum_parts.append(f"--- {l['title']} ---\n" + p.read_text(encoding="utf-8")[:2000])
+
+    if (sub_path / "LABS.md").exists():
+        curriculum_parts.append(f"--- LABS.md ---\n" + (sub_path / "LABS.md").read_text(encoding="utf-8")[:2500])
 
     # Ingest all session logs from user-AI discussions
     session_parts = []

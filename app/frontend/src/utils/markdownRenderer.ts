@@ -1,14 +1,8 @@
 import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import mermaid from 'mermaid';
 
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-});
+let mermaidInitialized = false;
 
 export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
   if (!rawMarkdown) return '';
@@ -44,7 +38,8 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
 
     if (language === 'mermaid') {
       const cleanText = text.trim();
-      return `<div class="mermaid-container">
+      return `<div class="mermaid-container" title="Click to zoom and inspect diagram">
+        <div class="diagram-zoom-hint"><span>🔍</span> Click to zoom</div>
         <pre class="mermaid">${cleanText}</pre>
       </div>`;
     }
@@ -77,6 +72,40 @@ export async function renderMermaidDiagramsInElement(container: HTMLElement) {
   try {
     const nodes = container.querySelectorAll('.mermaid');
     if (nodes.length > 0) {
+      const mermaid = (await import('mermaid')).default;
+      if (!mermaidInitialized) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: 15,
+          sequence: {
+            actorMargin: 50,
+            messageMargin: 40,
+            boxMargin: 10,
+            useMaxWidth: false,
+            width: 160,
+            height: 65,
+          },
+          flowchart: {
+            useMaxWidth: false,
+            htmlLabels: true,
+            curve: 'basis',
+            nodeSpacing: 45,
+            rankSpacing: 45,
+          },
+          themeVariables: {
+            primaryColor: '#1e2430',
+            primaryTextColor: '#f0f3f6',
+            primaryBorderColor: '#cfa858',
+            lineColor: '#cfa858',
+            secondaryColor: '#1a1f29',
+            tertiaryColor: '#161a22',
+          }
+        });
+        mermaidInitialized = true;
+      }
       await mermaid.run({
         nodes: nodes as NodeListOf<HTMLElement>,
       });

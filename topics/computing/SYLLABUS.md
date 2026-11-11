@@ -62,9 +62,7 @@
 - **Data Engineering** (`data/data_engineering/`)
 - **Big Data Architecture** (`data/big_data/`)
 - **Database Internals** (`data/database_internals/`)
-
-### Data: PostgreSQL Internals
-- **Relational Engine and Storage Architecture** (`data/postgresql/01_relational_engine_and_storage/`)
+- **PostgreSQL Internals** (`data/postgresql/`)
 
 ### Data: Exploratory Data Analysis
 - **Exploratory Data Analysis and Pandas** (`data/data_analysis/01_exploratory_data_analysis_and_pandas/`)

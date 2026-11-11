@@ -1,4 +1,4 @@
-# Lesson 3: Cost-Based Query Planning & Advanced Indexing Mechanics
+# Lesson 4: Cost-Based Query Planning & Advanced Indexing Mechanics
 
 ## 1. The Query Processing Pipeline
 
@@ -69,9 +69,9 @@ graph TD
         MJ[Merge Join]
     end
 
-    NL -->|Best for small outer set & indexed inner| NL_Desc[O(M * log N) with Index]
-    HJ -->|Best for large unindexed sets| HJ_Desc[Build in-memory hash table on inner, probe with outer]
-    MJ -->|Best when both inputs are pre-sorted| MJ_Desc[Two-pointer linear merge O(M + N)]
+    NL -->|"Small outer set and indexed inner"| NL_Desc["O(M * log N) with Index Scan"]
+    HJ -->|"Large unindexed relations"| HJ_Desc["Build in-memory hash table on inner, probe with outer"]
+    MJ -->|"Inputs are pre-sorted on join key"| MJ_Desc["Two-pointer linear merge O(M + N)"]
 ```
 
 ### 3.1. Nested Loop Join
