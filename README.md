@@ -40,19 +40,21 @@ Every leaf study unit is calibrated to a **2–3 hour evening session** and cont
 
 ---
 
-## 3. Clustered Multi-Node Ollama Engine
+## 3. Clustered Multi-Node Local AI Engine
 
-Synapse operates across a multi-node Ollama cluster load-balancing between local and homelab machines with model parity:
-- **Node 1 (Local):** `http://localhost:11434` (`qwen2.5-coder:32b`, `deepseek-r1:32b`)
-- **Node 2 (Remote Homelab):** `http://homelab.local:11434` (`qwen2.5-coder:32b`)
+Synapse operates across a multi-node local AI cluster load-balancing between local and network nodes with automated fallback and output validation safeguards:
+- **Node 1 (Local):** `http://localhost:11434` (Ollama)
+- **Node 2 (Studio):** `http://studio.2464.cz:11434` (Ollama)
+- **Node 3 (Maxi):** `http://maxi.2464.cz:11434` (Ollama)
+- **Node 4 (LocalAI):** `http://192.168.200.60:8080` (LocalAI with 24GB GPU acceleration)
 - **Cloud Fallback:** Optional Google Gemini API integration.
-- **Adversarial Peer Review:** Cross-model auditor (`deepseek-r1:32b`) audits generated units for hallucinations, wrong flags, and placeholders.
+- **Output Validation Safeguards:** Strict validation ensures runner metadata or empty responses are rejected before persisting to disk.
 
 ---
 
 ## 4. CLI Command Reference (`synapse`)
 
-The CLI is registered as a standard command `synapse` (also accessible via `./bin/synapse`):
+The CLI is registered as `synapse` (accessible via `./bin/synapse`, with `./bin/learning` maintained as a backwards-compatible alias):
 
 ```bash
 # Launch the Web Workbench (UI + Socratic Chat + PTY Sandbox Terminal)
@@ -140,6 +142,11 @@ sudo cp deploy/learning-workbench.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now learning-workbench
 ```
+
+### Windows Support (WSL2 & Docker)
+Because Synapse's sandbox terminal requires POSIX pseudo-terminals (`pty`, `termios`, `fcntl`), running on Windows is supported via:
+- **WSL2 (Windows Subsystem for Linux - Recommended):** Install Ubuntu under WSL2 (`wsl --install -d Ubuntu`). Clone the repository inside your WSL2 environment and run `./bin/synapse serve`. This provides native pseudo-terminals, Docker daemon access, and hardware-accelerated rendering.
+- **Docker Compose:** Run `docker compose -f deploy/docker-compose.yml up -d` to execute the full workbench in an isolated Linux container on Windows.
 
 ---
 

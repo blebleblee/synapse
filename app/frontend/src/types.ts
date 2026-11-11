@@ -42,10 +42,18 @@ export interface TopicTreeData {
   [domain: string]: DomainNode;
 }
 
+export interface LessonItem {
+  id: string;
+  title: string;
+  filename: string;
+  content: string;
+}
+
 export interface TopicDetails {
   domain: string;
   category: string;
   subtopic: string;
+  display_title?: string;
   path: string;
   persona: string;
   level: string;
@@ -55,6 +63,8 @@ export interface TopicDetails {
   chat_history?: ChatMessage[];
   foundation: string;
   lesson: string;
+  lessons?: LessonItem[];
+  active_lesson_id?: string;
   labs: string;
   has_content: boolean;
 }

@@ -23,7 +23,8 @@ import {
   Edit2,
   Trash2,
   X,
-  Activity
+  Activity,
+  RotateCcw
 } from 'lucide-react';
 import type { TopicTreeData, UnitNode } from '../types';
 
@@ -37,6 +38,7 @@ interface TopicTreeProps {
   onOpenSettings: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
   onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
+  targetLanguage?: string;
 }
 
 const DOMAIN_ORDER = [
@@ -54,6 +56,8 @@ const DOMAIN_ORDER = [
   'economics',
 ];
 
+import { getUIStrings } from '../utils/i18n';
+
 export const TopicTree: React.FC<TopicTreeProps> = ({
   tree,
   selectedSubtopic,
@@ -64,9 +68,42 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenSettings,
   onDeleteTopic,
   onRenameTopic,
+  targetLanguage,
 }) => {
+  const ui = getUIStrings(targetLanguage);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('az');
+  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
+  const [customDomainOrder, setCustomDomainOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('synapse_domain_order');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      // fallback
+    }
+    return DOMAIN_ORDER;
+  });
+
+  const moveDomain = (domain: string, direction: 'up' | 'down') => {
+    const list = [...customDomainOrder];
+    const idx = list.indexOf(domain);
+    if (idx < 0) return;
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+    const temp = list[idx];
+    list[idx] = list[targetIdx];
+    list[targetIdx] = temp;
+    setCustomDomainOrder(list);
+    localStorage.setItem('synapse_domain_order', JSON.stringify(list));
+  };
+
+  const resetDomainOrder = () => {
+    setCustomDomainOrder(DOMAIN_ORDER);
+    localStorage.removeItem('synapse_domain_order');
+  };
+
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({});
   const [openDisciplines, setOpenDisciplines] = useState<{ [key: string]: boolean }>({});
   const [openCourses, setOpenCourses] = useState<{ [key: string]: boolean }>({});
@@ -233,11 +270,11 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         const rateB = getDomainCompletion(ddataB).rate;
         return rateB - rateA;
       }
-      const idxA = DOMAIN_ORDER.indexOf(a);
-      const idxB = DOMAIN_ORDER.indexOf(b);
+      const idxA = customDomainOrder.indexOf(a);
+      const idxB = customDomainOrder.indexOf(b);
       return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
     });
-  }, [tree, sortMode]);
+  }, [tree, sortMode, customDomainOrder]);
 
   const cleanTerm = searchTerm.trim().toLowerCase();
 
@@ -260,22 +297,22 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <span className="brand-title">Synapse</span>
         </div>
         <div className="sidebar-header-actions">
-          <button className="icon-btn" onClick={toggleAll} title={allExpanded ? "Collapse All Sections" : "Expand All Sections"}>
+          <button className="icon-btn" onClick={toggleAll} title={allExpanded ? ui.collapseAll : ui.expandAll}>
             {allExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
           </button>
-          <button className="icon-btn" onClick={onOpenSearch} title="Full-Text Search (Cmd+K)">
+          <button className="icon-btn" onClick={onOpenSearch} title={`${ui.search} (Cmd+K)`}>
             <Search size={14} />
           </button>
-          <button className="icon-btn" onClick={onOpenGraph} title="Prerequisite Learning DAG">
+          <button className="icon-btn" onClick={onOpenGraph} title={ui.graph}>
             <GitBranch size={14} />
           </button>
-          <button className="icon-btn" onClick={onOpenSettings} title="Workbench Settings">
+          <button className="icon-btn" onClick={onOpenSettings} title={ui.settings}>
             <Settings size={14} />
           </button>
           <button
             className="btn-primary-sm"
             onClick={() => setShowAddModal(true)}
-            title="Add New Topic/Course"
+            title={ui.addTopic}
           >
             <Plus size={14} />
           </button>
@@ -288,7 +325,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           <Search size={14} className="search-icon" />
           <input
             type="text"
-            placeholder="Filter topics..."
+            placeholder={ui.filterTopics}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -300,10 +337,19 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             onChange={(e) => setSortMode(e.target.value as any)}
             className="sort-select"
           >
-            <option value="az">A to Z (Alphabetical)</option>
-            <option value="default">Curriculum Order</option>
-            <option value="progress">Progress (Most Studied)</option>
+            <option value="default">{ui.curriculumOrder}</option>
+            <option value="az">{ui.alphabetical}</option>
+            <option value="progress">{ui.progress}</option>
           </select>
+          {sortMode === 'default' && (
+            <button
+              className="icon-btn-micro"
+              onClick={resetDomainOrder}
+              title={ui.resetOrder}
+            >
+              <RotateCcw size={11} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -347,6 +393,24 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                 <span className="domain-label">
                   {domain.replace(/_/g, ' ')}
                 </span>
+                {sortMode === 'default' && (
+                  <div className="domain-reorder-actions" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="reorder-arrow-btn"
+                      onClick={() => moveDomain(domain, 'up')}
+                      title="Move Domain Up"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      className="reorder-arrow-btn"
+                      onClick={() => moveDomain(domain, 'down')}
+                      title="Move Domain Down"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                )}
               </div>
 
               {isDomainOpen && (

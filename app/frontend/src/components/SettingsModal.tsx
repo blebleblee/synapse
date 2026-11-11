@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Palette, Cpu, X, Check } from 'lucide-react';
+import { Settings, Palette, Cpu, X, Check, Plus, Trash2, RefreshCw } from 'lucide-react';
 
 export interface AppSettings {
   theme: 'studio' | 'titanium' | 'monokai' | 'nordic';
@@ -10,6 +10,7 @@ export interface AppSettings {
   terminalFontSize?: '12px' | '13px' | '14px' | '15px';
   speechRate?: '0.85' | '1.0' | '1.15' | '1.3';
   ollamaHost: string;
+  clusterHosts?: string[];
   primaryModel: string;
   reviewerModel: string;
   geminiApiKey: string;
@@ -24,6 +25,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   terminalFontSize: '13px',
   speechRate: '1.0',
   ollamaHost: 'http://localhost:11434',
+  clusterHosts: [
+    'http://localhost:11434',
+    'http://studio.2464.cz:11434',
+    'http://maxi.2464.cz:11434',
+    'http://192.168.200.60:8080'
+  ],
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
   geminiApiKey: '',
@@ -44,42 +51,126 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; latency_ms?: number; models?: string[]; error?: string } | null>(null);
-  const [isTesting, setIsTesting] = useState(false);
+  const [clusterNodes, setClusterNodes] = useState<string[]>(
+    settings.clusterHosts || DEFAULT_SETTINGS.clusterHosts || []
+  );
+  const [newNodeUrl, setNewNodeUrl] = useState('');
+  const [nodeStatuses, setNodeStatuses] = useState<{
+    [host: string]: {
+      online?: boolean;
+      latency_ms?: number;
+      models?: string[];
+      error?: string;
+      testing?: boolean;
+    };
+  }>({});
+  const [isScanningCluster, setIsScanningCluster] = useState(false);
 
   useEffect(() => {
     setFormData(settings);
-    setTestResult(null);
+    if (isOpen) {
+      fetch('/api/settings/cluster')
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data.hosts) && data.hosts.length > 0) {
+            setClusterNodes(data.hosts);
+          }
+        })
+        .catch(() => {});
+    }
   }, [settings, isOpen]);
 
-  const handleTestOllama = async () => {
-    setIsTesting(true);
-    setTestResult(null);
+  const handleAddNode = () => {
+    const clean = newNodeUrl.trim().replace(/\/+$/, '');
+    if (!clean) return;
+    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+      alert('Node URL must start with http:// or https://');
+      return;
+    }
+    if (clusterNodes.includes(clean)) {
+      alert('Node already exists in cluster list');
+      return;
+    }
+    setClusterNodes([...clusterNodes, clean]);
+    setNewNodeUrl('');
+  };
+
+  const handleRemoveNode = (index: number) => {
+    const next = [...clusterNodes];
+    next.splice(index, 1);
+    setClusterNodes(next);
+  };
+
+  const handlePingSingleNode = async (host: string) => {
+    setNodeStatuses((prev) => ({
+      ...prev,
+      [host]: { ...prev[host], testing: true }
+    }));
     try {
       const res = await fetch('/api/settings/test-ollama', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host: formData.ollamaHost }),
+        body: JSON.stringify({ host }),
       });
       const data = await res.json();
-      setTestResult(data);
+      setNodeStatuses((prev) => ({
+        ...prev,
+        [host]: {
+          online: data.ok,
+          latency_ms: data.latency_ms,
+          models: data.models,
+          error: data.error,
+          testing: false
+        }
+      }));
     } catch (err: any) {
-      setTestResult({ ok: false, error: err.message || 'Network error' });
+      setNodeStatuses((prev) => ({
+        ...prev,
+        [host]: {
+          online: false,
+          error: err.message || 'Network error',
+          testing: false
+        }
+      }));
+    }
+  };
+
+  const handleScanCluster = async () => {
+    setIsScanningCluster(true);
+    try {
+      const res = await fetch('/api/settings/cluster-status');
+      const data = await res.json();
+      setNodeStatuses(data);
+    } catch (err) {
+      console.error('Failed to scan cluster:', err);
     } finally {
-      setIsTesting(false);
+      setIsScanningCluster(false);
     }
   };
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSaveSettings(formData);
+    try {
+      await fetch('/api/settings/cluster', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hosts: clusterNodes }),
+      });
+    } catch (err) {
+      console.error('Failed to save cluster hosts:', err);
+    }
+    onSaveSettings({
+      ...formData,
+      clusterHosts: clusterNodes,
+      ollamaHost: clusterNodes[0] || formData.ollamaHost
+    });
     setSavedMessage(true);
     setTimeout(() => {
       setSavedMessage(false);
       onClose();
-    }, 500);
+    }, 800);
   };
 
   return (
@@ -190,36 +281,91 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span>AI Engine & Cluster Connectivity</span>
             </div>
 
-            <div className="form-group">
-              <label>Ollama Server Endpoint</label>
-              <div className="input-action-row">
+            <div className="cluster-nodes-manager">
+              <div className="cluster-manager-header">
+                <label>Active Cluster Worker Nodes</label>
+                <button
+                  type="button"
+                  className="btn-secondary-sm btn-scan-cluster"
+                  onClick={handleScanCluster}
+                  disabled={isScanningCluster}
+                  title="Ping and test latency across all cluster nodes"
+                >
+                  <RefreshCw size={11} className={isScanningCluster ? 'spin' : ''} />
+                  <span>{isScanningCluster ? 'Scanning...' : 'Test All Nodes'}</span>
+                </button>
+              </div>
+
+              <div className="cluster-nodes-list">
+                {clusterNodes.map((host, idx) => {
+                  const status = nodeStatuses[host];
+                  return (
+                    <div key={host} className="cluster-node-item">
+                      <div className="node-info">
+                        <span className="node-idx">#{idx + 1}</span>
+                        <span className="node-url">{host}</span>
+                        {status && (
+                          <span
+                            className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
+                            title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                          >
+                            {status.testing
+                              ? 'Pinging...'
+                              : status.online
+                              ? `Online (${status.latency_ms}ms)`
+                              : 'Offline'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="node-actions">
+                        <button
+                          type="button"
+                          className="btn-node-action"
+                          onClick={() => handlePingSingleNode(host)}
+                          title="Ping node"
+                        >
+                          Ping
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-node-action remove"
+                          onClick={() => handleRemoveNode(idx)}
+                          title="Remove node from cluster"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="add-node-row">
                 <input
                   type="text"
-                  value={formData.ollamaHost}
-                  onChange={(e) => setFormData({ ...formData, ollamaHost: e.target.value })}
-                  placeholder="http://localhost:11434"
+                  value={newNodeUrl}
+                  onChange={(e) => setNewNodeUrl(e.target.value)}
+                  placeholder="http://192.168.1.50:11434 or :8080"
                   className="text-input"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddNode();
+                    }
+                  }}
                 />
                 <button
                   type="button"
-                  className="btn btn-secondary-sm btn-test-conn"
-                  onClick={handleTestOllama}
-                  disabled={isTesting || !formData.ollamaHost.trim()}
-                  title="Ping Ollama server and verify available models"
+                  className="btn-primary-sm"
+                  onClick={handleAddNode}
+                  disabled={!newNodeUrl.trim()}
+                  title="Add endpoint to cluster"
                 >
-                  {isTesting ? 'Testing...' : 'Test Connection'}
+                  <Plus size={13} />
+                  <span>Add Node</span>
                 </button>
               </div>
-              {testResult && (
-                <div className={`conn-status-pill ${testResult.ok ? 'success' : 'failure'}`}>
-                  {testResult.ok ? (
-                    <span>✔ Online ({testResult.latency_ms}ms) • Models: {testResult.models?.slice(0, 3).join(', ') || 'ready'}</span>
-                  ) : (
-                    <span>✖ Connection failed: {testResult.error || 'Server unreachable'}</span>
-                  )}
-                </div>
-              )}
-              <span className="field-hint">e.g. http://localhost:11434 or http://homelab.local:11434</span>
+              <span className="field-hint">Supports Ollama (port 11434) and LocalAI / OpenAI-compatible (port 8080) endpoints.</span>
             </div>
 
             <div className="settings-row-2col">

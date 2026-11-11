@@ -8,17 +8,53 @@ import json
 import urllib.request
 import urllib.error
 import itertools
+from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 
 DEFAULT_OLLAMA_HOSTS = [
-    "http://localhost:11434"
+    "http://localhost:11434",
+    "http://studio.2464.cz:11434",
+    "http://maxi.2464.cz:11434",
+    "http://192.168.200.60:8080"
 ]
 
+def validate_generation_output(content: str) -> str:
+    """
+    Validates LLM output before persisting to disk.
+    Rejects empty output and raw model runner metadata/loading payloads.
+    """
+    cleaned = (content or "").strip()
+    if not cleaned:
+        raise ValueError("LLM returned an empty response.")
+    # Prevent raw runner status JSON from corrupting markdown files
+    if cleaned.startswith("{") and ("\"done_reason\"" in cleaned or "\"created_at\"" in cleaned) and "\"done\":true" in cleaned.replace(" ", ""):
+        raise ValueError(f"LLM returned raw model metadata instead of generated content: {cleaned[:120]}")
+    return cleaned
+
+CLUSTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / ".synapse_cluster.json"
+
 def get_configured_hosts() -> List[str]:
+    # 1. Environment variable priority
     env_hosts = os.environ.get("OLLAMA_HOSTS")
     if env_hosts:
         return [h.strip().rstrip("/") for h in env_hosts.split(",") if h.strip()]
+    # 2. Persistent workspace config
+    if CLUSTER_CONFIG_PATH.exists():
+        try:
+            data = json.loads(CLUSTER_CONFIG_PATH.read_text(encoding="utf-8"))
+            if isinstance(data, list) and data:
+                return [h.strip().rstrip("/") for h in data if h and isinstance(h, str)]
+        except Exception:
+            pass
+    # 3. Default fallback cluster nodes
     return DEFAULT_OLLAMA_HOSTS
+
+def save_configured_hosts(hosts: List[str]) -> List[str]:
+    cleaned = [h.strip().rstrip("/") for h in hosts if h and isinstance(h, str) and h.strip()]
+    if not cleaned:
+        cleaned = DEFAULT_OLLAMA_HOSTS
+    CLUSTER_CONFIG_PATH.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
+    return cleaned
 
 class LLMProvider:
     def generate(self, prompt: str, system_instruction: str = "") -> str:
@@ -31,8 +67,18 @@ class OllamaProvider(LLMProvider):
 
     @classmethod
     def is_available(cls, host: str = "http://localhost:11434") -> bool:
+        # Check native Ollama /api/tags
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                if resp.status == 200:
+                    return True
+        except Exception:
+            pass
+
+        # Check LocalAI / OpenAI compatible /v1/models
+        try:
+            req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
             with urllib.request.urlopen(req, timeout=3) as resp:
                 return resp.status == 200
         except Exception:
@@ -40,11 +86,23 @@ class OllamaProvider(LLMProvider):
 
     @classmethod
     def list_models(cls, host: str = "http://localhost:11434") -> List[str]:
+        # 1. Native Ollama format
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
             with urllib.request.urlopen(req, timeout=3) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-                return [m["name"] for m in data.get("models", [])]
+                models = [m["name"] for m in data.get("models", [])]
+                if models:
+                    return models
+        except Exception:
+            pass
+
+        # 2. LocalAI / OpenAI /v1/models format
+        try:
+            req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return [m["id"] for m in data.get("data", [])]
         except Exception:
             return []
 
@@ -61,8 +119,9 @@ class OllamaProvider(LLMProvider):
             return False
 
     def generate(self, prompt: str, system_instruction: str = "") -> str:
-        url = f"{self.host}/api/generate"
-        payload = {
+        # Try native Ollama API first
+        ollama_url = f"{self.host}/api/generate"
+        ollama_payload = {
             "model": self.model,
             "prompt": prompt,
             "system": system_instruction,
@@ -71,15 +130,43 @@ class OllamaProvider(LLMProvider):
                 "temperature": 0.2
             }
         }
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        data = json.dumps(ollama_payload).encode("utf-8")
+        req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
 
         try:
             with urllib.request.urlopen(req, timeout=600) as resp:
                 res_json = json.loads(resp.read().decode("utf-8"))
-                return res_json.get("response", "")
+                res_text = res_json.get("response", "")
+                if res_text:
+                    return validate_generation_output(res_text)
+        except Exception:
+            pass
+
+        # Fallback to LocalAI / OpenAI compatible chat completions
+        v1_url = f"{self.host}/v1/chat/completions"
+        messages = []
+        if system_instruction:
+            messages.append({"role": "system", "content": system_instruction})
+        messages.append({"role": "user", "content": prompt})
+
+        v1_payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": 0.2
+        }
+        data = json.dumps(v1_payload).encode("utf-8")
+        req = urllib.request.Request(v1_url, data=data, headers={"Content-Type": "application/json"})
+
+        try:
+            with urllib.request.urlopen(req, timeout=600) as resp:
+                res_json = json.loads(resp.read().decode("utf-8"))
+                choices = res_json.get("choices", [])
+                if choices:
+                    text = choices[0].get("message", {}).get("content", "")
+                    return validate_generation_output(text)
+                raise RuntimeError(f"Unexpected response structure from {self.host}: {res_json}")
         except urllib.error.URLError as e:
-            raise RuntimeError(f"Ollama request to {self.host} failed: {e}")
+            raise RuntimeError(f"Ollama/LocalAI request to {self.host} failed: {e}")
 
 class OllamaCluster(LLMProvider):
     """

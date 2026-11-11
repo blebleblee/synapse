@@ -76,3 +76,11 @@ def test_get_domain_persona():
 
     persona_unknown = get_domain_persona("unknown_domain")
     assert "technical mentor" in persona_unknown.lower()
+
+def test_get_unit_lessons_postgresql():
+    from learning_engine.topic_manager import get_unit_lessons, TOPICS_DIR
+    pg_dir = TOPICS_DIR / "computing" / "data" / "postgresql" / "01_relational_engine_and_storage"
+    lessons = get_unit_lessons(pg_dir)
+    assert len(lessons) == 4
+    assert lessons[0]["id"] == "lesson_01_architecture_and_process_model"
+    assert "Lesson 1: Architecture" in lessons[0]["title"]

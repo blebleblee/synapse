@@ -63,6 +63,9 @@
 - **Big Data Architecture** (`data/big_data/`)
 - **Database Internals** (`data/database_internals/`)
 
+### Data: PostgreSQL Internals
+- **Relational Engine and Storage Architecture** (`data/postgresql/01_relational_engine_and_storage/`)
+
 ### Data: Exploratory Data Analysis
 - **Exploratory Data Analysis and Pandas** (`data/data_analysis/01_exploratory_data_analysis_and_pandas/`)
 - **Fast Dataframes with Polars** (`data/data_analysis/02_fast_dataframes_with_polars/`)

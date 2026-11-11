@@ -115,16 +115,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         </div>
 
         <div className="chat-header-actions">
-          {history.length > 0 && onClearChat && (
-            <button
-              className="btn-secondary-sm"
-              onClick={onClearChat}
-              title="Start a new Socratic dialogue"
-            >
-              <RotateCcw size={11} />
-              <span>New Chat</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -228,6 +218,16 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       </div>
 
       <form className="chat-input-bar" onSubmit={handleSubmit}>
+        {history.length > 0 && onClearChat && (
+          <button
+            type="button"
+            className="chat-reset-btn"
+            onClick={onClearChat}
+            title="Start a new Socratic dialogue (Clear history)"
+          >
+            <RotateCcw size={14} />
+          </button>
+        )}
         <input
           type="text"
           placeholder={topic ? `Ask about ${topic.subtopic.replace(/_/g, ' ')} or test an edge-case...` : "Ask a question or test an edge-case..."}

@@ -36,10 +36,11 @@ from learning_engine.topic_manager import (
     add_subtopic,
     delete_subtopic,
     rename_subtopic,
+    get_unit_lessons,
     TOPICS_DIR
 )
 from learning_engine.generator import generate_subtopic_content
-from learning_engine.models import get_provider, OllamaProvider
+from learning_engine.models import get_provider, OllamaProvider, OllamaCluster, get_configured_hosts, save_configured_hosts
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
 from learning_engine.mastery import set_subtopic_mastery, load_mastery_data, get_mastery_summary, get_subtopic_mastery
@@ -111,8 +112,14 @@ def get_status():
                 if st["has_labs"]: with_labs += 1
                 if st["complete"]: complete += 1
 
-    ollama_up = OllamaProvider.is_available()
-    ollama_models = OllamaProvider.list_models() if ollama_up else []
+    cluster = OllamaCluster()
+    cluster_status = cluster.get_cluster_status()
+    ollama_up = any(d["online"] for d in cluster_status.values())
+    ollama_models = []
+    for d in cluster_status.values():
+        for m in d.get("models", []):
+            if m not in ollama_models:
+                ollama_models.append(m)
 
     return {
         "domains": total_domains,
@@ -135,19 +142,47 @@ class TestOllamaRequest(BaseModel):
 
 @app.post("/api/settings/test-ollama")
 def api_test_ollama(req: TestOllamaRequest):
-    import time, urllib.request
+    import time
     host = req.host.strip().rstrip("/")
     start = time.time()
     try:
-        url = f"{host}/api/tags"
-        req_obj = urllib.request.Request(url, headers={"User-Agent": "Synapse/1.0"})
-        with urllib.request.urlopen(req_obj, timeout=2.5) as resp:
-            elapsed_ms = int((time.time() - start) * 1000)
-            data = json.loads(resp.read().decode("utf-8"))
-            models = [m.get("name") for m in data.get("models", [])]
+        up = OllamaProvider.is_available(host)
+        elapsed_ms = int((time.time() - start) * 1000)
+        if up:
+            models = OllamaProvider.list_models(host)
             return {"ok": True, "latency_ms": elapsed_ms, "models": models}
+        return {"ok": False, "error": f"Host {host} is unreachable or timed out"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
+
+@app.get("/api/settings/cluster-status")
+def api_cluster_status():
+    import time
+    hosts = get_configured_hosts()
+    results = {}
+    for h in hosts:
+        start = time.time()
+        up = OllamaProvider.is_available(h)
+        elapsed_ms = int((time.time() - start) * 1000)
+        models = OllamaProvider.list_models(h) if up else []
+        results[h] = {
+            "online": up,
+            "latency_ms": elapsed_ms if up else None,
+            "models": models
+        }
+    return results
+
+class ClusterHostsRequest(BaseModel):
+    hosts: List[str]
+
+@app.get("/api/settings/cluster")
+def api_get_cluster_hosts():
+    return {"hosts": get_configured_hosts()}
+
+@app.post("/api/settings/cluster")
+def api_set_cluster_hosts(req: ClusterHostsRequest):
+    updated = save_configured_hosts(req.hosts)
+    return {"hosts": updated, "saved": True}
 
 @app.get("/api/search")
 def api_search(q: str = Query(..., min_length=2)):
@@ -287,7 +322,8 @@ Text to translate:
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
-    level: Optional[str] = Query("beginner", description="Difficulty level: beginner, intermediate, advanced")
+    level: Optional[str] = Query("beginner", description="Difficulty level: beginner, intermediate, advanced"),
+    lesson_id: Optional[str] = Query(None, description="Optional specific lesson ID e.g. 'lesson_01_introduction'")
 ):
     target = resolve_subtopic(query)
     if not target:
@@ -302,11 +338,12 @@ def get_topic_details(
         if (sub_path / lvl).exists() and any((sub_path / lvl).glob("*.md")):
             available_levels.append(lvl)
 
-    selected_level = (level or "beginner").lower()
+    # Handle direct function invocations in tests where default is QueryInfo
+    raw_level = level.default if hasattr(level, "default") else level
+    selected_level = (raw_level or "beginner").lower()
     target_dir = sub_path / selected_level if (sub_path / selected_level).exists() else sub_path
 
     foundation = ""
-    lesson = ""
     labs = ""
 
     if (target_dir / "FOUNDATION.md").exists():
@@ -314,28 +351,58 @@ def get_topic_details(
     elif (sub_path / "FOUNDATION.md").exists():
         foundation = (sub_path / "FOUNDATION.md").read_text(encoding="utf-8")
 
-    if (target_dir / "LESSON.md").exists():
-        lesson = (target_dir / "LESSON.md").read_text(encoding="utf-8")
-    elif (sub_path / "LESSON.md").exists():
-        lesson = (sub_path / "LESSON.md").read_text(encoding="utf-8")
-
     if (target_dir / "LABS.md").exists():
         labs = (target_dir / "LABS.md").read_text(encoding="utf-8")
     elif (sub_path / "LABS.md").exists():
         labs = (sub_path / "LABS.md").read_text(encoding="utf-8")
 
-    # If lesson is not found, check artifacts folder
-    if not lesson and (sub_path / "artifacts").exists():
-        artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
-        if artifacts:
-            lesson = artifacts[0].read_text(encoding="utf-8")
+    # Multi-lesson discovery (e.g. lesson_01_*.md, lessons/*.md, or LESSON.md)
+    discovered_lessons = get_unit_lessons(target_dir)
+    if not discovered_lessons and target_dir != sub_path:
+        discovered_lessons = get_unit_lessons(sub_path)
+
+    lessons_list = []
+    lesson = ""
+    raw_lesson_id = lesson_id.default if hasattr(lesson_id, "default") else lesson_id
+    target_lesson_id = raw_lesson_id
+
+    if discovered_lessons:
+        # Default to first lesson if not specified or not found
+        valid_ids = [item["id"] for item in discovered_lessons]
+        if not target_lesson_id or target_lesson_id not in valid_ids:
+            target_lesson_id = discovered_lessons[0]["id"]
+
+        for item in discovered_lessons:
+            content = ""
+            p = Path(item["path"])
+            if p.exists():
+                content = p.read_text(encoding="utf-8")
+            if item["id"] == target_lesson_id:
+                lesson = content
+            lessons_list.append({
+                "id": item["id"],
+                "title": item["title"],
+                "filename": item["filename"],
+                "content": content
+            })
+
+    # Fallback to single LESSON.md if not populated via discovered_lessons
+    if not lesson:
+        if (target_dir / "LESSON.md").exists():
+            lesson = (target_dir / "LESSON.md").read_text(encoding="utf-8")
+        elif (sub_path / "LESSON.md").exists():
+            lesson = (sub_path / "LESSON.md").read_text(encoding="utf-8")
+        elif (sub_path / "artifacts").exists():
+            artifacts = list((sub_path / "artifacts").glob("lesson_*.md"))
+            if artifacts:
+                lesson = artifacts[0].read_text(encoding="utf-8")
 
     # Load summary non-blocking
     summary = ""
     summary_file = sub_path / "SUMMARY.md"
     if summary_file.exists():
         summary = summary_file.read_text(encoding="utf-8")
-    elif bool(foundation or lesson or labs):
+    elif bool(foundation or lesson or labs or lessons_list):
         # Generate summary in background thread without blocking HTTP response
         import threading
         threading.Thread(
@@ -353,13 +420,14 @@ def get_topic_details(
         except Exception:
             saved_chat_history = []
 
-    clean_title = re.sub(r'^\d+[-_]', '', sub).replace('_', ' ').title()
+    # Preserve sequential numbered prefixes for course progression (e.g. 01 HCI Architecture)
+    display_title = sub.replace('_', ' ').title()
 
     return {
         "domain": domain,
         "category": cat,
         "subtopic": sub,
-        "display_title": clean_title,
+        "display_title": display_title,
         "path": str(sub_path.relative_to(WORKSPACE_ROOT)),
         "persona": persona,
         "level": selected_level,
@@ -369,8 +437,10 @@ def get_topic_details(
         "chat_history": saved_chat_history,
         "foundation": foundation,
         "lesson": lesson,
+        "lessons": lessons_list,
+        "active_lesson_id": target_lesson_id,
         "labs": labs,
-        "has_content": bool(foundation or lesson or labs)
+        "has_content": bool(foundation or lesson or labs or lessons_list)
     }
 
 @app.post("/api/generate")

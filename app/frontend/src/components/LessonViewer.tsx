@@ -13,12 +13,15 @@ import {
   FileText,
   Volume2,
   VolumeX,
-  Columns
+  Columns,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
 import { SocraticQuizView } from './SocraticQuizView';
 import { speakText, stopSpeaking } from '../utils/speech';
+import { getUIStrings } from '../utils/i18n';
 
 interface LessonViewerProps {
   topic: TopicDetails | null;
@@ -43,6 +46,7 @@ interface LessonViewerProps {
   onOpenFlashcards: () => void;
   targetLanguage?: string;
   onNavigateBreadcrumb?: (type: 'domain' | 'category' | 'subtopic', path: string) => void;
+  onSelectLesson?: (lessonId: string) => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -68,11 +72,23 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onOpenFlashcards,
   targetLanguage,
   onNavigateBreadcrumb,
+  onSelectLesson,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+
+  const ui = getUIStrings(targetLanguage);
+
+  const currentLessonIndex = useMemo(() => {
+    if (!topic?.lessons || !topic.active_lesson_id) return 0;
+    const idx = topic.lessons.findIndex((l) => l.id === topic.active_lesson_id);
+    return idx >= 0 ? idx : 0;
+  }, [topic?.lessons, topic?.active_lesson_id]);
+
+  const prevLesson = topic?.lessons && currentLessonIndex > 0 ? topic.lessons[currentLessonIndex - 1] : null;
+  const nextLesson = topic?.lessons && currentLessonIndex < topic.lessons.length - 1 ? topic.lessons[currentLessonIndex + 1] : null;
 
   useEffect(() => {
     stopSpeaking();
@@ -268,7 +284,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Executive cross-tier curriculum summary and discussion insights"
           >
             <FileText size={14} />
-            <span>Summary</span>
+            <span>{ui.summary}</span>
             {topic.summary && <span className="tab-dot" />}
           </button>
 
@@ -278,7 +294,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Theoretical foundation, mental models, and formal invariants"
           >
             <BookOpen size={14} />
-            <span>Foundation</span>
+            <span>{ui.foundation}</span>
             {topic.foundation && <span className="tab-dot" />}
           </button>
 
@@ -288,8 +304,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="In-depth technical lesson with code and step-by-step mechanics"
           >
             <GraduationCap size={14} />
-            <span>Lesson</span>
-            {topic.lesson && <span className="tab-dot" />}
+            <span>{ui.lesson}</span>
+            {Boolean(topic.lesson || (topic.lessons && topic.lessons.length > 0)) && <span className="tab-dot" />}
           </button>
 
           <button
@@ -298,7 +314,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Hands-on operational lab exercises and terminal verification"
           >
             <FlaskConical size={14} />
-            <span>Labs</span>
+            <span>{ui.labs}</span>
             {topic.labs && <span className="tab-dot" />}
           </button>
 
@@ -308,7 +324,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Socratic multiple-choice comprehension check"
           >
             <HelpCircle size={14} />
-            <span>Quiz</span>
+            <span>{ui.quiz}</span>
           </button>
         </div>
 
@@ -363,7 +379,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             title="Compile mastered summary guide to artifacts/"
           >
             <FileCheck2 size={12} />
-            <span>{isCompiling ? 'Compiling...' : 'Guide'}</span>
+            <span>{isCompiling ? ui.compiling : ui.guide}</span>
           </button>
 
           {activeTab === 'summary' ? (
@@ -384,7 +400,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
               title="Regenerate this level"
             >
               <RefreshCw size={12} className={isGenerating ? 'spin' : ''} />
-              <span>Regen</span>
+              <span>{ui.regen}</span>
             </button>
           )}
 
@@ -405,6 +421,29 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           )}
         </div>
       </div>
+
+      {/* Dynamic Multi-Lesson Stepper Sub-Bar */}
+      {activeTab === 'lesson' && topic.lessons && topic.lessons.length > 1 && (
+        <div className="lesson-stepper-bar">
+          <div className="lesson-stepper-label">
+            <GraduationCap size={13} />
+            <span>{ui.lessons}:</span>
+          </div>
+          <div className="lesson-pills-list">
+            {topic.lessons.map((l, idx) => (
+              <button
+                key={l.id}
+                className={`lesson-pill-btn ${topic.active_lesson_id === l.id ? 'active' : ''}`}
+                onClick={() => onSelectLesson?.(l.id)}
+                title={l.title}
+              >
+                <span className="lesson-pill-num">{idx + 1}</span>
+                <span className="lesson-pill-title">{l.title.replace(/^Lesson \d+:\s*/i, '')}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="viewer-scroll-body" ref={contentRef} onClick={handleContentClick}>
         {/* In-Lesson Real-Time Dependency Navigation Bar */}
@@ -499,6 +538,33 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
             className="markdown-body"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
+        )}
+
+        {/* Previous / Next Lesson Navigation Footer */}
+        {activeTab === 'lesson' && topic.lessons && topic.lessons.length > 1 && (
+          <div className="lesson-bottom-nav">
+            <button
+              className="btn-secondary-sm"
+              disabled={!prevLesson}
+              onClick={() => prevLesson && onSelectLesson?.(prevLesson.id)}
+              title={prevLesson ? prevLesson.title : ''}
+            >
+              <ChevronLeft size={14} />
+              <span>{ui.previousLesson}</span>
+            </button>
+            <span className="lesson-progress-count">
+              {currentLessonIndex + 1} / {topic.lessons.length}
+            </span>
+            <button
+              className="btn-secondary-sm"
+              disabled={!nextLesson}
+              onClick={() => nextLesson && onSelectLesson?.(nextLesson.id)}
+              title={nextLesson ? nextLesson.title : ''}
+            >
+              <span>{ui.nextLesson}</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
         )}
       </div>
     </main>

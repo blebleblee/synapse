@@ -77,17 +77,21 @@ export function App() {
     }
   };
 
-  const loadTopic = async (query: string, level = currentLevel, preserveTab = false) => {
+  const loadTopic = async (query: string, level = currentLevel, preserveTab = false, lessonId?: string) => {
     setIsLoadingTopic(true);
     try {
-      const res = await fetch(`/api/topic?query=${encodeURIComponent(query)}&level=${level}`);
+      let url = `/api/topic?query=${encodeURIComponent(query)}&level=${level}`;
+      if (lessonId) {
+        url += `&lesson_id=${encodeURIComponent(lessonId)}`;
+      }
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setTopicDetails(data);
         setSelectedPath(query);
         setCurrentLevel(level);
 
-        // Only override tab when opening a new topic, NOT when switching levels
+        // Only override tab when opening a new topic, NOT when switching levels or lessons
         if (!preserveTab) {
           if (data.summary) {
             setActiveTab('summary');
@@ -186,6 +190,12 @@ export function App() {
     setCurrentLevel(level);
     if (selectedPath) {
       loadTopic(selectedPath, level, true);
+    }
+  };
+
+  const handleSelectLesson = (lessonId: string) => {
+    if (selectedPath) {
+      loadTopic(selectedPath, currentLevel, true, lessonId);
     }
   };
 
@@ -371,6 +381,7 @@ export function App() {
         onOpenSettings={() => setSettingsOpen(true)}
         onDeleteTopic={handleDeleteTopic}
         onRenameTopic={handleRenameTopic}
+        targetLanguage={settings.language}
       />
 
       <div className="center-workspace-column">
@@ -397,6 +408,7 @@ export function App() {
           onOpenFlashcards={() => setFlashcardModalOpen(true)}
           targetLanguage={settings.language}
           onNavigateBreadcrumb={handleNavigateBreadcrumb}
+          onSelectLesson={handleSelectLesson}
         />
 
         <TerminalDrawer
