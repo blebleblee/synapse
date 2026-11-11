@@ -19,11 +19,42 @@ import subprocess
 import shutil
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+from collections import deque
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
+
+ANSI_ESCAPE_RE = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+
+class TerminalRingBuffer:
+    """
+    Thread-safe server-side circular buffer capturing live PTY output with ANSI code stripping.
+    Provides reliable, zero-loss read-only terminal context for AI Socratic error diagnosis.
+    """
+    def __init__(self, max_lines: int = 150):
+        self.buffer: deque[str] = deque(maxlen=max_lines)
+
+    def append_text(self, raw_bytes: bytes):
+        try:
+            text = raw_bytes.decode("utf-8", errors="replace")
+            clean = ANSI_ESCAPE_RE.sub("", text)
+            for line in clean.splitlines():
+                stripped = line.strip()
+                if stripped:
+                    self.buffer.append(stripped)
+        except Exception:
+            pass
+
+    def get_recent_lines(self, count: int = 50) -> List[str]:
+        items = list(self.buffer)
+        return items[-count:]
+
+    def get_recent_text(self, count: int = 50) -> str:
+        return "\n".join(self.get_recent_lines(count))
+
+GLOBAL_TERMINAL_BUFFER = TerminalRingBuffer(max_lines=150)
 
 # Ensure workspace root is in sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -669,6 +700,13 @@ def save_chat_session(sub_path: Path, user_msg: str, tutor_reply: str, history: 
     except Exception as e:
         print(f"[!] Auto-save error: {e}")
 
+@app.get("/api/terminal/buffer")
+def get_terminal_buffer(lines: int = 50):
+    return {
+        "lines": GLOBAL_TERMINAL_BUFFER.get_recent_lines(lines),
+        "text": GLOBAL_TERMINAL_BUFFER.get_recent_text(lines)
+    }
+
 @app.post("/api/chat")
 async def chat_with_tutor(req: ChatRequest):
     target = resolve_subtopic(req.query)
@@ -676,12 +714,17 @@ async def chat_with_tutor(req: ChatRequest):
         raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
 
     domain, cat, sub, sub_path = target
+
+    terminal_ctx = req.terminal_context
+    if not terminal_ctx or not terminal_ctx.strip():
+        terminal_ctx = GLOBAL_TERMINAL_BUFFER.get_recent_text(50)
+
     system_instruction = build_chat_system_instruction(
         domain=domain,
         category=cat,
         subtopic=sub,
         active_lesson=req.lesson_id,
-        terminal_context=req.terminal_context
+        terminal_context=terminal_ctx
     )
 
     provider, used_model = get_chat_provider(model=req.model)
@@ -1041,6 +1084,7 @@ async def terminal_websocket(websocket: WebSocket):
                     try:
                         data = os.read(master, 4096)
                         if data:
+                            GLOBAL_TERMINAL_BUFFER.append_text(data)
                             await websocket.send_bytes(data)
                         else:
                             break

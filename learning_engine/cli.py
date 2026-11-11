@@ -13,7 +13,7 @@ from .topic_manager import (
     add_subtopic,
     get_domain_persona
 )
-from .models import get_provider, OllamaProvider
+from .models import get_provider, OllamaProvider, OllamaCluster, CLUSTER_HOST_SPECS
 from .generator import generate_subtopic_content
 from .search import search_curriculum
 from .graph import get_prerequisite_graph
@@ -33,40 +33,75 @@ def format_status_badge(status: dict) -> str:
 def cmd_status(args):
     tree = get_topic_tree()
     total_domains = len(tree)
-    total_categories = 0
-    total_subtopics = 0
-    with_foundation = 0
-    with_lesson = 0
-    with_labs = 0
-    complete = 0
+    total_disciplines = 0
+    total_topics = 0
+    multi_lesson_topics = 0
+    total_lessons = 0
+    total_labs = 0
+    complete_topics = 0
 
     for domain, ddata in tree.items():
-        total_categories += len(ddata["categories"])
-        for cat, cdata in ddata["categories"].items():
-            total_subtopics += len(cdata)
-            for sub, sdata in cdata.items():
-                st = sdata["status"]
-                if st["has_foundation"]: with_foundation += 1
-                if st["has_lesson"]: with_lesson += 1
-                if st["has_labs"]: with_labs += 1
-                if st["complete"]: complete += 1
+        disciplines = ddata.get("disciplines", {})
+        total_disciplines += len(disciplines)
+        for disc, disc_data in disciplines.items():
+            courses = disc_data.get("courses", {})
+            for course, c_data in courses.items():
+                units = c_data.get("units", {})
+                for unit, u_data in units.items():
+                    total_topics += 1
+                    status = u_data.get("status", {})
+                    lessons = u_data.get("lessons", [])
+                    if lessons:
+                        total_lessons += len(lessons)
+                        if len(lessons) >= 3:
+                            multi_lesson_topics += 1
+                    elif status.get("has_lesson"):
+                        total_lessons += 1
 
-    ollama_status = "Online" if OllamaProvider.is_available() else "Offline"
-    ollama_models = ", ".join(OllamaProvider.list_models()[:3]) if ollama_status == "Online" else "None"
+                    if status.get("has_labs"):
+                        total_labs += 1
+                    if status.get("complete"):
+                        complete_topics += 1
+
+    # Mastery statistics
+    mastery_data = load_mastery_data()
+    mastery_summary = get_mastery_summary()
+    completed_lessons_count = 0
+    for val in mastery_data.values():
+        if isinstance(val, dict):
+            completed_lessons_count += len(val.get("completed_lessons", []))
+
+    # Cluster health
+    cluster = OllamaCluster()
+    cluster_status = cluster.get_cluster_status()
+    online_count = sum(1 for d in cluster_status.values() if d.get("online"))
+    total_nodes = len(cluster_status)
 
     print("==================================================")
     print("       AI LEARNING WORKSPACE CURRICULUM STATUS    ")
     print("==================================================")
-    print(f"  Domains:             {total_domains}")
-    print(f"  Categories:          {total_categories}")
-    print(f"  Subtopics:           {total_subtopics}")
+    print(f"  Domains (L1):             {total_domains}")
+    print(f"  Disciplines (L2):         {total_disciplines}")
+    print(f"  Topics & Courses (L3):    {total_topics}")
     print("--------------------------------------------------")
-    print(f"  [F] Foundation:      {with_foundation} / {total_subtopics} ({with_foundation*100//(total_subtopics or 1)}%)")
-    print(f"  [L] Technical Lesson: {with_lesson} / {total_subtopics} ({with_lesson*100//(total_subtopics or 1)}%)")
-    print(f"  [B] Operational Labs: {with_labs} / {total_subtopics} ({with_labs*100//(total_subtopics or 1)}%)")
-    print(f"  [FLB] Complete Units: {complete} / {total_subtopics} ({complete*100//(total_subtopics or 1)}%)")
+    print(f"  Multi-Lesson Topics:      {multi_lesson_topics} / {total_topics} ({multi_lesson_topics*100//(total_topics or 1)}%)")
+    print(f"  Authored Lessons:         {total_lessons}")
+    print(f"  Operational Labs:         {total_labs} / {total_topics} ({total_labs*100//(total_topics or 1)}%)")
+    print(f"  Fully Authored Topics:    {complete_topics} / {total_topics} ({complete_topics*100//(total_topics or 1)}%)")
     print("--------------------------------------------------")
-    print(f"  Local Ollama Engine: {ollama_status} ({ollama_models})")
+    print(f"  Mastery Competence:       {mastery_summary['mastered_count']} Mastered | {mastery_summary['counts']['studying']} Studying")
+    print(f"  Completed Lessons:        {completed_lessons_count} Verified")
+    print("--------------------------------------------------")
+    print(f"  Ollama Cluster Status:    {online_count}/{total_nodes} Nodes Online")
+    for host, h_data in cluster_status.items():
+        clean_host = host.rstrip("/")
+        spec = CLUSTER_HOST_SPECS.get(clean_host, {})
+        name = spec.get("name", host).upper()
+        tier = spec.get("memory_tier", "auto")
+        is_online = h_data.get("online", False)
+        status_str = "ONLINE " if is_online else "OFFLINE"
+        pref_model = h_data.get("preferred_model") or (h_data.get("models") and h_data["models"][0]) or "none"
+        print(f"    - [{name:9s}] {status_str} | Tier: {tier:8s} | Model: {pref_model}")
     print("==================================================")
 
 def cmd_tree(args):
