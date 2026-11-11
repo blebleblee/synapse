@@ -96,7 +96,23 @@ def validate_generation_output(content: str) -> str:
 
     return cleaned
 
-CLUSTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / ".synapse_cluster.json"
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+def load_env_file():
+    env_file = WORKSPACE_ROOT / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+
+load_env_file()
+
+CLUSTER_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster.json"
 
 def get_configured_hosts() -> List[str]:
     # 1. Environment variable priority
@@ -414,11 +430,114 @@ class GeminiProvider(LLMProvider):
         )
         return response.text or ""
 
+class AnthropicProvider(LLMProvider):
+    """
+    Anthropic Claude 3.5 Sonnet / Haiku Provider.
+    Direct HTTPS calls to https://api.anthropic.com/v1/messages.
+    """
+    def __init__(self, model: str = "claude-3-5-sonnet-20241022", api_key: Optional[str] = None):
+        self.model = model
+        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 4096) -> str:
+        if not self.api_key:
+            raise RuntimeError("ANTHROPIC_API_KEY is not set. Add it to .env or export ANTHROPIC_API_KEY='sk-ant-...'")
+
+        url = "https://api.anthropic.com/v1/messages"
+        payload = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.2
+        }
+        if system_instruction and system_instruction.strip():
+            payload["system"] = system_instruction.strip()
+
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            }
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                res_json = json.loads(resp.read().decode("utf-8"))
+                blocks = res_json.get("content", [])
+                text = "".join(b.get("text", "") for b in blocks if b.get("type") == "text")
+                return validate_generation_output(text)
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Anthropic API error ({e.code}): {err_body}")
+        except Exception as e:
+            raise RuntimeError(f"Anthropic request failed: {e}")
+
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 1000):
+        if not self.api_key:
+            raise RuntimeError("ANTHROPIC_API_KEY is not set. Add it to .env or export ANTHROPIC_API_KEY='sk-ant-...'")
+
+        url = "https://api.anthropic.com/v1/messages"
+        payload = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "stream": True,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.2
+        }
+        if system_instruction and system_instruction.strip():
+            payload["system"] = system_instruction.strip()
+
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            }
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                for line in resp:
+                    if not line:
+                        continue
+                    line_str = line.decode("utf-8", errors="replace").strip()
+                    if line_str.startswith("data: "):
+                        json_str = line_str[6:].strip()
+                        if json_str == "[DONE]":
+                            break
+                        try:
+                            event = json.loads(json_str)
+                            if event.get("type") == "content_block_delta":
+                                delta = event.get("delta", {})
+                                if delta.get("type") == "text_delta":
+                                    yield delta.get("text", "")
+                        except Exception:
+                            continue
+        except Exception:
+            # Fallback to non-streaming
+            full_res = self.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
+            yield full_res
+
 def get_provider(provider_type: Optional[str] = None, model: Optional[str] = None, domain: Optional[str] = None) -> LLMProvider:
     """
     Selects provider or clustered Ollama nodes.
     Supports domain-specialized model routing (coding models for computing, reasoning models for math/physics).
     """
+    if provider_type == "anthropic" or (not provider_type and os.environ.get("ANTHROPIC_API_KEY") and model and "claude" in model):
+        chosen_model = model or "claude-3-5-sonnet-20241022"
+        return AnthropicProvider(model=chosen_model)
+
     cluster = OllamaCluster()
     cluster_status = cluster.get_cluster_status()
     any_ollama_up = any(data["online"] for data in cluster_status.values())

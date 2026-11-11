@@ -24,6 +24,7 @@ from learning_engine.generator import generate_topic_parallel, generate_subtopic
 from learning_engine.models import (
     OllamaProvider,
     OllamaCluster,
+    AnthropicProvider,
     CLUSTER_HOST_SPECS
 )
 
@@ -76,25 +77,40 @@ def run_cluster_generation(
     target_query: Optional[str] = None,
     target_domain: Optional[str] = "computing",
     force: bool = False,
-    test_run: bool = False
+    test_run: bool = False,
+    provider_type: str = "ollama",
+    model: Optional[str] = None
 ):
-    cluster = OllamaCluster()
-    workers = cluster.get_parallel_workers()
+    if provider_type == "anthropic":
+        chosen_model = model or "claude-3-5-sonnet-20241022"
+        anthropic_prov = AnthropicProvider(model=chosen_model)
+        workers = [
+            ("https://api.anthropic.com", chosen_model, anthropic_prov)
+        ]
+        print("==================================================")
+        print("     SYNAPSE CLOUD ANTHROPIC GENERATION ENGINE    ")
+        print("==================================================")
+        print(f"[*] Engine: Anthropic Cloud API")
+        print(f"[*] Model:  {chosen_model}")
+        print("==================================================")
+    else:
+        cluster = OllamaCluster()
+        workers = cluster.get_parallel_workers()
 
-    if not workers:
-        print("[!] No Ollama cluster nodes online. Please check network/Ollama status.")
-        return
+        if not workers:
+            print("[!] No Ollama cluster nodes online. Please check network/Ollama status.")
+            return
 
-    print("==================================================")
-    print("   SYNAPSE 4-NODE PARALLEL GENERATION CLUSTER     ")
-    print("==================================================")
-    print(f"[*] Active Nodes in Cluster ({len(workers)}):")
-    for host, m, _ in workers:
-        spec = CLUSTER_HOST_SPECS.get(host, {})
-        tier = spec.get("memory_tier", "auto")
-        name = spec.get("name", host)
-        print(f"    - [{name.upper():9s}] {host} (Tier: {tier:10s} | Model: {m})")
-    print("==================================================")
+        print("==================================================")
+        print("   SYNAPSE 4-NODE PARALLEL GENERATION CLUSTER     ")
+        print("==================================================")
+        print(f"[*] Active Nodes in Cluster ({len(workers)}):")
+        for host, m, _ in workers:
+            spec = CLUSTER_HOST_SPECS.get(host, {})
+            tier = spec.get("memory_tier", "auto")
+            name = spec.get("name", host)
+            print(f"    - [{name.upper():9s}] {host} (Tier: {tier:10s} | Model: {m})")
+        print("==================================================")
 
     if test_run or target_query:
         test_target = target_query or "computing/data/database_internals"
@@ -138,7 +154,16 @@ if __name__ == "__main__":
     parser.add_argument("--topic", type=str, default=None, help="Target specific topic query e.g. 'database_internals'")
     parser.add_argument("--domain", "-d", type=str, default="computing", help="Target domain filter (default: computing, pass 'all' for everything)")
     parser.add_argument("--force", "-f", action="store_true", help="Force regenerate existing content and purge old files")
+    parser.add_argument("--provider", "-p", type=str, default="ollama", choices=["ollama", "anthropic"], help="Generation engine ('ollama' cluster or 'anthropic' cloud)")
+    parser.add_argument("--model", "-m", type=str, default=None, help="Model override e.g. 'claude-3-5-sonnet-20241022'")
     args = parser.parse_args()
 
     domain_arg = None if args.domain == "all" else args.domain
-    run_cluster_generation(target_query=args.topic, target_domain=domain_arg, force=args.force, test_run=args.test_run)
+    run_cluster_generation(
+        target_query=args.topic,
+        target_domain=domain_arg,
+        force=args.force,
+        test_run=args.test_run,
+        provider_type=args.provider,
+        model=args.model
+    )
