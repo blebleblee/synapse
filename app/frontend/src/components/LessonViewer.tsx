@@ -354,7 +354,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
         <h2>Select a Topic from the Tree</h2>
-        <p>Explore over 340 structured study units across Computing, Engineering, and Sciences.</p>
+        <p>Explore over 700 calibrated technical topics across 12 engineering, scientific, and polymath domains.</p>
       </div>
     );
   }
