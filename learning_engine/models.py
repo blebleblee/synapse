@@ -191,6 +191,44 @@ class OllamaProvider(LLMProvider):
         except urllib.error.URLError as e:
             raise RuntimeError(f"Ollama/LocalAI request to {self.host} failed: {e}")
 
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 250):
+        # Native Ollama API streaming
+        ollama_url = f"{self.host}/api/generate"
+        ollama_payload = {
+            "model": self.model,
+            "prompt": prompt,
+            "system": system_instruction,
+            "stream": True,
+            "options": {
+                "temperature": 0.3,
+                "num_predict": max_tokens
+            }
+        }
+        data = json.dumps(ollama_payload).encode("utf-8")
+        req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
+
+        try:
+            with urllib.request.urlopen(req, timeout=40) as resp:
+                for line in resp:
+                    if not line:
+                        continue
+                    try:
+                        chunk = json.loads(line.decode("utf-8"))
+                        text = chunk.get("response", "")
+                        if text:
+                            yield text
+                        if chunk.get("done", False):
+                            break
+                    except Exception:
+                        continue
+                return
+        except Exception:
+            pass
+
+        # Fallback to non-streaming
+        full_res = self.generate(prompt, system_instruction=system_instruction)
+        yield full_res
+
 class OllamaCluster(LLMProvider):
     """
     Manages a cluster of Ollama worker nodes across multiple machines,
@@ -356,3 +394,41 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
 
     chosen_model = model or "gemini-2.5-flash"
     return GeminiProvider(model=chosen_model)
+
+def get_chat_provider(model: Optional[str] = None) -> Tuple[OllamaProvider, str]:
+    """
+    Returns a fast, low-latency model optimized for interactive Socratic mentoring.
+    Prioritizes fast 7B/8B/4B models on localhost for instant token generation.
+    """
+    cluster = OllamaCluster()
+    status = cluster.get_cluster_status()
+
+    fast_models = [
+        "qwen2.5-coder:7b",
+        "llama3.1:8b",
+        "meta-llama-3.1-8b-instruct:latest",
+        "qwen3:4b",
+        "qwen2.5:3b",
+        "qwen2.5-coder:32b"
+    ]
+
+    if model:
+        for host, h_data in status.items():
+            if h_data.get("online") and model in h_data.get("models", []):
+                return OllamaProvider(model=model, host=host), model
+
+    local_key = "http://127.0.0.1:11434"
+    local_data = status.get(local_key) or status.get("http://localhost:11434") or {}
+    if local_data.get("online"):
+        for fm in fast_models:
+            if fm in local_data.get("models", []):
+                return OllamaProvider(model=fm, host=local_key), fm
+
+    for host, h_data in status.items():
+        if h_data.get("online"):
+            for fm in fast_models:
+                if fm in h_data.get("models", []):
+                    return OllamaProvider(model=fm, host=host), fm
+
+    node, mod = cluster.select_best_node(model="llama3.1:8b")
+    return OllamaProvider(model=mod, host=node), mod

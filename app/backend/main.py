@@ -22,7 +22,7 @@ from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 # Ensure workspace root is in sys.path
@@ -41,7 +41,14 @@ from learning_engine.topic_manager import (
     TOPICS_DIR
 )
 from learning_engine.generator import generate_subtopic_content
-from learning_engine.models import get_provider, OllamaProvider, OllamaCluster, get_configured_hosts, save_configured_hosts
+from learning_engine.models import (
+    get_provider,
+    get_chat_provider,
+    OllamaProvider,
+    OllamaCluster,
+    get_configured_hosts,
+    save_configured_hosts
+)
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
 from learning_engine.mastery import (
@@ -91,6 +98,9 @@ class ChatRequest(BaseModel):
     query: str
     message: str
     history: List[ChatMessage] = []
+    lesson_id: Optional[str] = None
+    terminal_context: Optional[str] = None
+    stream: Optional[bool] = False
     provider: Optional[str] = None
     model: Optional[str] = None
 
@@ -592,26 +602,89 @@ def api_rename_topic(req: RenameTopicRequest):
         raise HTTPException(status_code=400, detail=f"Failed to rename topic '{req.path}'")
     return {"success": True, "message": f"Renamed to {req.new_title}"}
 
+def build_chat_system_instruction(
+    domain: str,
+    category: str,
+    subtopic: str,
+    active_lesson: Optional[str] = None,
+    terminal_context: Optional[str] = None
+) -> str:
+    domain_titles = {
+        "computing": "Systems Software, Kernel Architecture & Distributed Systems",
+        "formal_sciences": "Pure Mathematics, Formal Logic & Discrete Structures",
+        "natural_sciences": "Physics, Chemistry & Foundations of Science",
+        "engineering": "Robotics, Electronics & Embedded Hardware",
+        "crafts": "Engineering Mechanisms, CAD & Digital Prototyping",
+        "arts": "Music Theory, Composition & Audio DSP",
+        "business": "Economics, System Dynamics & Strategic Decision Making",
+        "humanities": "Cognitive Science, Epistemology & Socratic Philosophy",
+    }
+    specialty = domain_titles.get(domain, domain.replace("_", " ").title())
+    sub_title = subtopic.replace("_", " ").title()
+
+    prompt_lines = [
+        f"You are a concise, high-signal Socratic Mentor specializing in {specialty}.",
+        f"The student is actively working on: '{sub_title}' (Discipline: {category}).",
+    ]
+    if active_lesson:
+        clean_lesson = active_lesson.replace("_", " ").title()
+        prompt_lines.append(f"Current Lesson Focus: '{clean_lesson}'.")
+
+    prompt_lines.extend([
+        "\n### Core Directives for Socratic Dialogue:",
+        "1. ULTRA-CONCISE: Limit answers strictly to 2-4 sentences max. Never lecture or dump long text.",
+        "2. SOCRATIC GUIDANCE: Provide the single most direct intuition immediately, then follow with ONE targeted question to test or deepen their understanding.",
+        "3. CASUAL GREETINGS: If greeted (e.g. 'hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what specific concept or intuition from the lesson they want to discuss.",
+        "4. FIRST-PRINCIPLES: Use accurate technical terminology without conversational fluff.",
+    ])
+
+    if terminal_context and terminal_context.strip():
+        prompt_lines.extend([
+            "\n### Live Student Terminal Output (Recent Commands / Error Logs):",
+            "```text",
+            terminal_context.strip()[-2500:],
+            "```",
+            "INSTRUCTION: The student ran commands in their workspace terminal. If they ask about an error or command failure, directly diagnose the root cause from the terminal output above and state the fix concisely in 1-3 sentences."
+        ])
+
+    return "\n".join(prompt_lines)
+
+def save_chat_session(sub_path: Path, user_msg: str, tutor_reply: str, history: List[Any]):
+    try:
+        sessions_dir = sub_path / "sessions"
+        sessions_dir.mkdir(parents=True, exist_ok=True)
+
+        active_session_file = sessions_dir / "active_session.md"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry = f"\n\n**[{timestamp}] Student:**\n{user_msg}\n\n**[{timestamp}] AI Tutor:**\n{tutor_reply}\n\n---\n"
+        with open(active_session_file, "a", encoding="utf-8") as f:
+            f.write(entry)
+
+        history_file = sessions_dir / "chat_history.json"
+        updated_history = [m.dict() if hasattr(m, 'dict') else m for m in history] + [
+            {"role": "student", "content": user_msg},
+            {"role": "tutor", "content": tutor_reply}
+        ]
+        history_file.write_text(json.dumps(updated_history, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[!] Auto-save error: {e}")
+
 @app.post("/api/chat")
-def chat_with_tutor(req: ChatRequest):
+async def chat_with_tutor(req: ChatRequest):
     target = resolve_subtopic(req.query)
     if not target:
         raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
 
     domain, cat, sub, sub_path = target
-    persona = get_domain_persona(domain)
+    system_instruction = build_chat_system_instruction(
+        domain=domain,
+        category=cat,
+        subtopic=sub,
+        active_lesson=req.lesson_id,
+        terminal_context=req.terminal_context
+    )
 
-    context_parts = [
-        f"# Subject: {sub.replace('_', ' ').title()} (Domain: {domain}, Category: {cat})"
-    ]
-
-    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
-        fpath = sub_path / fname
-        if fpath.exists():
-            context_parts.append(f"\n--- {fname} (Excerpt) ---\n" + fpath.read_text(encoding="utf-8")[:2500])
-
-    system_instruction = persona + "\n\n" + "\n".join(context_parts)
-    provider = get_provider(provider_type=req.provider, model=req.model)
+    provider, used_model = get_chat_provider(model=req.model)
 
     conversation_text = []
     for m in req.history[-6:]:
@@ -620,43 +693,27 @@ def chat_with_tutor(req: ChatRequest):
     conversation_text.append("Tutor:")
 
     prompt = "\n\n".join(conversation_text)
+
+    if req.stream:
+        async def stream_generator():
+            full_reply = []
+            for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
+                full_reply.append(chunk)
+                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+
+            reply_text = "".join(full_reply).strip()
+            save_chat_session(sub_path, req.message, reply_text, req.history)
+            yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
+
+        return StreamingResponse(stream_generator(), media_type="text/event-stream")
+
     response_text = provider.generate(prompt, system_instruction=system_instruction)
     reply = response_text.strip()
-
-    # -------------------------------------------------------------
-    # Auto-Save Conversation & History
-    # -------------------------------------------------------------
-    try:
-        sessions_dir = sub_path / "sessions"
-        sessions_dir.mkdir(parents=True, exist_ok=True)
-
-        # 1. Append to active_session.md
-        active_session_file = sessions_dir / "active_session.md"
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        entry = f"\n\n**[{timestamp}] Student:**\n{req.message}\n\n**[{timestamp}] AI Tutor:**\n{reply}\n\n---\n"
-        with open(active_session_file, "a", encoding="utf-8") as f:
-            f.write(entry)
-
-        # 2. Persist chat_history.json
-        history_file = sessions_dir / "chat_history.json"
-        updated_history = [m.dict() for m in req.history] + [
-            {"role": "student", "content": req.message},
-            {"role": "tutor", "content": reply}
-        ]
-        history_file.write_text(json.dumps(updated_history, indent=2), encoding="utf-8")
-
-        # 3. Auto-commit to Git in background
-        subprocess.Popen(
-            ["git", "add", str(sessions_dir)],
-            cwd=str(WORKSPACE_ROOT),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-    except Exception as e:
-        print(f"[!] Auto-save error: {e}")
+    save_chat_session(sub_path, req.message, reply, req.history)
 
     return {
-        "reply": reply
+        "reply": reply,
+        "model": used_model
     }
 
 class SummaryRequest(BaseModel):

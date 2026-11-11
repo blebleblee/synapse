@@ -91,6 +91,7 @@ export function App() {
         setTopicDetails(data);
         setSelectedPath(query);
         setCurrentLevel(level);
+        setUnifiedChatHistory(data.chat_history || []);
 
         if (lessonId === 'labs') {
           setActiveTab('labs');
@@ -239,25 +240,80 @@ export function App() {
     const updatedHistory = [...unifiedChatHistory, newStudentMsg];
     setUnifiedChatHistory(updatedHistory);
 
+    // Initial placeholder tutor message for real-time token streaming
+    const placeholderTutorMsg: ChatMessage = { role: 'tutor', content: '' };
+    setUnifiedChatHistory([...updatedHistory, placeholderTutorMsg]);
+
     setIsChatting(true);
     try {
+      const terminalOutput = terminalRef.current?.getRecentOutput?.(40) || '';
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: selectedPath || 'computing/infrastructure/kubernetes/01_control_plane_and_etcd',
+          query: selectedPath || 'computing/data/postgresql',
+          lesson_id: activeLessonId,
           message: msg,
           history: updatedHistory,
+          terminal_context: terminalOutput,
+          stream: true,
         }),
       });
 
-      if (res.ok) {
+      if (!res.ok) {
+        throw new Error(`Chat request failed with status ${res.status}`);
+      }
+
+      if (res.body) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedReply = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const textChunk = decoder.decode(value, { stream: true });
+          const lines = textChunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const parsed = JSON.parse(line.slice(6));
+                if (parsed.chunk) {
+                  accumulatedReply += parsed.chunk;
+                  setUnifiedChatHistory([
+                    ...updatedHistory,
+                    { role: 'tutor', content: accumulatedReply }
+                  ]);
+                }
+                if (parsed.done && parsed.full_reply) {
+                  accumulatedReply = parsed.full_reply;
+                  setUnifiedChatHistory([
+                    ...updatedHistory,
+                    { role: 'tutor', content: accumulatedReply }
+                  ]);
+                }
+              } catch {
+                // Ignore partial JSON chunks
+              }
+            }
+          }
+        }
+      } else {
         const data = await res.json();
-        const newTutorMsg: ChatMessage = { role: 'tutor', content: data.reply };
-        setUnifiedChatHistory([...updatedHistory, newTutorMsg]);
+        setUnifiedChatHistory([
+          ...updatedHistory,
+          { role: 'tutor', content: data.reply }
+        ]);
       }
     } catch (err) {
       console.error('Chat error:', err);
+      setUnifiedChatHistory([
+        ...updatedHistory,
+        { role: 'tutor', content: 'Connection error while communicating with AI mentor.' }
+      ]);
     } finally {
       setIsChatting(false);
     }

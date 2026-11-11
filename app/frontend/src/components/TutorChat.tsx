@@ -1,6 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
-import { Send, Bot, User, MessageSquare, Lightbulb, RotateCcw, Volume2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import {
+  Send,
+  Bot,
+  User,
+  MessageSquare,
+  Lightbulb,
+  RotateCcw,
+  Volume2,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  Terminal
+} from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 import { speakText } from '../utils/speech';
 
@@ -83,8 +95,31 @@ export const TutorChat: React.FC<TutorChatProps> = ({
     }
   };
 
-  const personaRole = topic?.persona
-    ? topic.persona.split('**')[1] || 'Domain Expert & Socratic Mentor'
+  const getDomainMentorRole = (domain?: string) => {
+    switch (domain) {
+      case 'computing':
+        return 'Systems Software & Kernel Architect';
+      case 'formal_sciences':
+        return 'Pure Mathematics & Formal Logic Mentor';
+      case 'natural_sciences':
+        return 'Physics & Scientific Reasoning Specialist';
+      case 'engineering':
+        return 'Robotics & Hardware Systems Engineer';
+      case 'crafts':
+        return 'Mechanism Design & CAD Specialist';
+      case 'arts':
+        return 'Music Theory & Audio DSP Specialist';
+      case 'business':
+        return 'Economics & Systems Thinking Mentor';
+      case 'humanities':
+        return 'Cognitive Science & Epistemology Mentor';
+      default:
+        return 'Socratic Technical Mentor';
+    }
+  };
+
+  const personaRole = topic?.domain
+    ? getDomainMentorRole(topic.domain)
     : 'Universal Socratic Mentor';
 
   return (
@@ -118,6 +153,17 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         </div>
       </div>
 
+      {/* Dynamic Context & Terminal Link Banner */}
+      <div className="chat-context-banner">
+        <span className="context-chip topic" title={`Active Subject: ${topic?.display_title || topic?.subtopic}`}>
+          {topic?.display_title || topic?.subtopic?.replace(/_/g, ' ') || 'No topic selected'}
+        </span>
+        <span className="context-chip terminal" title="Live Terminal Output Linked (AI can diagnose your errors & logs)">
+          <Terminal size={10} />
+          Terminal Linked
+        </span>
+      </div>
+
       {personaExpanded && topic?.persona && (
         <div className="persona-expanded-card">
           <div className="persona-expanded-header">
@@ -146,6 +192,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               <span className="suggestions-title">
                 <Lightbulb size={12} /> Suggested Prompts:
               </span>
+              <button
+                className="suggestion-chip"
+                onClick={() => handleSuggestionClick("Inspect my live terminal output and diagnose what caused my last error or command failure.")}
+              >
+                Inspect my live terminal output and diagnose my last error
+              </button>
               <button
                 className="suggestion-chip"
                 onClick={() => handleSuggestionClick(topic ? `What are the core architectural invariants of ${topic.subtopic.replace(/_/g, ' ')} and where does it break in production?` : "Explain the core architectural invariants of modern distributed systems.")}

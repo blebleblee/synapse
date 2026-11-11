@@ -17,6 +17,7 @@ import {
 
 export interface TerminalDrawerHandle {
   runCommand: (command: string) => void;
+  getRecentOutput: (lineCount?: number) => string;
 }
 
 interface TerminalDrawerProps {
@@ -181,6 +182,27 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
         if (!isOpen) {
           onToggle();
         }
+      }
+    },
+    getRecentOutput(lineCount = 40): string {
+      if (!termRef.current) return '';
+      try {
+        const buffer = termRef.current.buffer.active;
+        const lines: string[] = [];
+        const startLine = Math.max(0, buffer.length - lineCount);
+        for (let i = startLine; i < buffer.length; i++) {
+          const line = buffer.getLine(i);
+          if (line) {
+            const str = line.translateToString(true);
+            if (str.trim().length > 0) {
+              lines.push(str);
+            }
+          }
+        }
+        return lines.join('\n').trim();
+      } catch (err) {
+        console.error('Failed to read terminal buffer:', err);
+        return '';
       }
     },
   }));
