@@ -28,7 +28,7 @@ CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
     "http://studio.2464.cz:11434": {
         "name": "studio",
         "memory_tier": "large",
-        "preferred_models": ["qwen2.5-coder:32b", "qwen3.6:35b-a3b-coding-mxfp8", "qwen3.5:35b-mlx", "gemma4:26b"]
+        "preferred_models": ["llama3.1:8b", "gemma4:12b", "qwen3:4b", "qwen2.5-coder:32b"]
     },
     "http://192.168.200.60:8080": {
         "name": "ai",
