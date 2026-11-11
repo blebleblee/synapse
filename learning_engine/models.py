@@ -23,22 +23,43 @@ CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
     "http://127.0.0.1:11434": {
         "name": "localhost",
         "memory_tier": "large",
-        "preferred_models": ["qwen2.5-coder:32b", "qwen2.5:32b", "deepseek-r1:32b", "llama3.1:latest"]
+        "preferred_models": [
+            "qwen2.5-coder:32b",
+            "qwen2.5:32b",
+            "deepseek-r1:32b",
+            "llama3.1:latest"
+        ]
     },
     "http://studio.2464.cz:11434": {
         "name": "studio",
         "memory_tier": "large",
-        "preferred_models": ["llama3.1:8b", "gemma4:12b", "qwen3:4b", "qwen2.5-coder:32b"]
+        "preferred_models": [
+            "qwen2.5-coder:32b",
+            "qwen3.6:27b-mlx",
+            "gemma4:26b",
+            "gemma4:12b"
+        ]
     },
     "http://192.168.200.60:8080": {
         "name": "ai",
         "memory_tier": "24gb",
-        "preferred_models": ["meta-llama-3.1-8b-instruct:latest", "gemma-4-12b-it-qat-q4_0:latest", "qwen3-8b:latest", "qwopus3.6-27b-v2-mtp-nvfp4:latest"]
+        "preferred_models": [
+            "Qwen3-Coder-30B-A3B-Instruct-RTPurbo-i1-GGUF:latest",
+            "qwopus3.6-27b-coder-mtp:latest",
+            "qwen3.6-27b:latest",
+            "qwen3-32b:latest",
+            "meta-llama-3.1-8b-instruct:latest"
+        ]
     },
     "http://maxi.2464.cz:11434": {
         "name": "maxi",
         "memory_tier": "12gb",
-        "preferred_models": ["llama3.1:8b", "gemma4:e4b", "qwen3:4b", "qwen2.5:3b"]
+        "preferred_models": [
+            "llama3.1:8b",
+            "gemma4:12b",
+            "gemma4:e4b",
+            "qwen3:4b"
+        ]
     }
 }
 

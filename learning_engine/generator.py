@@ -810,28 +810,33 @@ def generate_topic_parallel(
                 validated = validate_generation_output(content)
                 elapsed = time.time() - t0
                 print(f"          [✔] [{host_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
-                return mod_item["filename"], True, validated, mod_item, host_label, elapsed, None
+                return mod_item["filename"], True, validated, mod_item, host_label, w_host, elapsed, None
             except Exception as e:
                 print(f"          [✘] [{host_label:9s}] Failed {mod_item['filename']}: {e}", flush=True)
-                return mod_item["filename"], False, None, mod_item, host_label, time.time() - t0, str(e)
+                return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
 
         # Phase 1: Concurrently draft all modules without cross-node lock contention
         with ThreadPoolExecutor(max_workers=min(len(workers), len(tasks_to_run))) as executor:
             future_to_mod = {executor.submit(run_draft_job, job): job[0]["filename"] for job in jobs}
             for fut in as_completed(future_to_mod):
-                fname, ok, content, mod_item, host_label, elapsed, err = fut.result()
+                fname, ok, content, mod_item, host_label, w_host, elapsed, err = fut.result()
                 if ok and content:
-                    drafts[fname] = (content, mod_item, host_label, elapsed)
+                    drafts[fname] = (content, mod_item, host_label, w_host, elapsed)
                 else:
                     results[fname] = False
 
         # Phase 2: Concurrent Quality Audit & Fact-Checking Pass on completed drafts
-        reviewer_worker = next((w for w in workers if "32b" in w[1]), workers[0])
-        r_host, r_model, r_provider = reviewer_worker
-        r_name = CLUSTER_HOST_SPECS.get(r_host, {}).get("name", r_host).upper()
+        def get_reviewer_for_host(author_host: str):
+            large_reviewers = [w for w in workers if ("32b" in w[1] or "30b" in w[1]) and w[0] != author_host]
+            if large_reviewers:
+                return large_reviewers[0]
+            distinct = [w for w in workers if w[0] != author_host]
+            return distinct[0] if distinct else workers[0]
 
         def run_audit_job(item):
-            fname, (content, mod_item, host_label, elapsed) = item
+            fname, (content, mod_item, host_label, author_host, elapsed) = item
+            r_host, r_model, r_provider = get_reviewer_for_host(author_host)
+            r_name = CLUSTER_HOST_SPECS.get(r_host, {}).get("name", r_host).upper()
             final_content = content
             audit_note = "Verified"
 
