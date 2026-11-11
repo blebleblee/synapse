@@ -680,9 +680,32 @@ def build_chat_system_instruction(
 
     return "\n".join(prompt_lines)
 
-def save_chat_session(sub_path: Path, user_msg: str, tutor_reply: str, history: List[Any]):
+def build_neutral_workspace_instruction(terminal_context: Optional[str] = None) -> str:
+    lines = [
+        "You are a versatile, high-signal Socratic Mentor for the Synapse Polymath Workspace.",
+        "No specific curriculum topic is currently selected. The student is exploring across all 12 domains (Computing, Engineering, Formal Sciences, Natural Sciences, etc.).",
+        "\n### Core Directives:",
+        "1. ULTRA-CONCISE: Limit answers strictly to 2-4 sentences max. Never lecture or dump long text.",
+        "2. NEUTRAL & MULTIDISCIPLINARY: Answer questions across any engineering, mathematical, or scientific subject with first-principles rigor.",
+        "3. TOPIC SELECTION: If the student asks what to study, guide them to pick a domain or topic from the sidebar tree.",
+        "4. CASUAL GREETINGS: If greeted ('hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what engineering, computing, or science subject they would like to explore or troubleshoot."
+    ]
+    if terminal_context and terminal_context.strip():
+        lines.extend([
+            "\n### Live Student Terminal Output (Recent Commands / Error Logs):",
+            "```text",
+            terminal_context.strip()[-2500:],
+            "```",
+            "INSTRUCTION: The student ran commands in their workspace terminal. If they ask about an error or command output, directly diagnose the root cause from the terminal output above and state the fix concisely in 1-3 sentences."
+        ])
+    return "\n".join(lines)
+
+def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str, history: List[Any]):
     try:
-        sessions_dir = sub_path / "sessions"
+        if sub_path:
+            sessions_dir = sub_path / "sessions"
+        else:
+            sessions_dir = TOPICS_DIR / ".workspace_sessions"
         sessions_dir.mkdir(parents=True, exist_ok=True)
 
         active_session_file = sessions_dir / "active_session.md"
@@ -709,29 +732,37 @@ def get_terminal_buffer(lines: int = 50):
 
 @app.post("/api/chat")
 async def chat_with_tutor(req: ChatRequest):
-    target = resolve_subtopic(req.query)
-    if not target:
-        raise HTTPException(status_code=404, detail=f"Topic '{req.query}' not found")
-
-    domain, cat, sub, sub_path = target
+    target = resolve_subtopic(req.query) if req.query and req.query.strip() else None
 
     terminal_ctx = req.terminal_context
     if not terminal_ctx or not terminal_ctx.strip():
         terminal_ctx = GLOBAL_TERMINAL_BUFFER.get_recent_text(50)
 
-    system_instruction = build_chat_system_instruction(
-        domain=domain,
-        category=cat,
-        subtopic=sub,
-        active_lesson=req.lesson_id,
-        terminal_context=terminal_ctx
-    )
+    if target:
+        domain, cat, sub, sub_path = target
+        system_instruction = build_chat_system_instruction(
+            domain=domain,
+            category=cat,
+            subtopic=sub,
+            active_lesson=req.lesson_id,
+            terminal_context=terminal_ctx
+        )
+    else:
+        sub_path = None
+        system_instruction = build_neutral_workspace_instruction(terminal_context=terminal_ctx)
 
     provider, used_model = get_chat_provider(model=req.model)
 
     conversation_text = []
     for m in req.history[-6:]:
         conversation_text.append(f"{m.role.capitalize()}: {m.content}")
+
+    # Inject terminal buffer directly into prompt so LLM sees it immediately
+    if terminal_ctx and terminal_ctx.strip():
+        conversation_text.append(
+            f"[Live Terminal Buffer Context]:\n```text\n{terminal_ctx.strip()[-2000:]}\n```"
+        )
+
     conversation_text.append(f"Student: {req.message}")
     conversation_text.append("Tutor:")
 

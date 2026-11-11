@@ -155,8 +155,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({
 
       {/* Dynamic Context & Terminal Link Banner */}
       <div className="chat-context-banner">
-        <span className="context-chip topic" title={`Active Subject: ${topic?.display_title || topic?.subtopic}`}>
-          {topic?.display_title || topic?.subtopic?.replace(/_/g, ' ') || 'No topic selected'}
+        <span className="context-chip topic" title={`Active Subject: ${topic?.display_title || topic?.subtopic || 'General Workspace'}`}>
+          {topic ? (topic.display_title || topic.subtopic?.replace(/_/g, ' ')) : 'General Polymath Workspace'}
         </span>
         <span className="context-chip terminal" title="Live Terminal Output Linked (AI can diagnose your errors & logs)">
           <Terminal size={10} />
@@ -282,7 +282,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
         )}
         <input
           type="text"
-          placeholder={topic ? `Ask about ${topic.subtopic.replace(/_/g, ' ')} or test an edge-case...` : "Ask a question or test an edge-case..."}
+          placeholder={topic ? `Ask ${personaRole}...` : "Ask Socratic Mentor across 12 domains or about your terminal..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={isChatting}

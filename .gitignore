@@ -28,3 +28,7 @@ Thumbs.db
 .env
 .env.*
 *.local
+
+# Transient Chat Sessions
+topics/**/sessions/
+topics/.workspace_sessions/

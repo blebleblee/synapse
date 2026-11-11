@@ -246,13 +246,24 @@ export function App() {
 
     setIsChatting(true);
     try {
-      const terminalOutput = terminalRef.current?.getRecentOutput?.(40) || '';
+      let terminalOutput = terminalRef.current?.getRecentOutput?.(40) || '';
+      if (!terminalOutput.trim()) {
+        try {
+          const termRes = await fetch('/api/terminal/buffer?lines=40');
+          if (termRes.ok) {
+            const termData = await termRes.json();
+            terminalOutput = termData.text || '';
+          }
+        } catch {
+          // ignore
+        }
+      }
 
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: selectedPath || 'computing/data/postgresql',
+          query: selectedPath || '',
           lesson_id: activeLessonId,
           message: msg,
           history: updatedHistory,
