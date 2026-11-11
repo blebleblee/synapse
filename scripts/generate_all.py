@@ -60,8 +60,10 @@ def process_subtopic_parallel(item, workers, total_count, force=False):
                     commit_msg = f"content({domain}/{cat}): generate masterclass curriculum for {sub}"
                     subprocess.run(["git", "commit", "-m", commit_msg], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
                     print(f"[{idx:3d}/{total_count}] [↑] Committed: {commit_msg}", flush=True)
-                except Exception:
-                    pass
+                    subprocess.run(["git", "push", "origin", "main"], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                    print(f"[{idx:3d}/{total_count}] [🚀] Pushed to Gitea: {commit_msg}", flush=True)
+                except Exception as git_err:
+                    print(f"[{idx:3d}/{total_count}] [!] Git sync note: {git_err}", flush=True)
             return True
         else:
             print(f"[{idx:3d}/{total_count}] [↷] Units up to date for {sub}.", flush=True)
@@ -70,7 +72,12 @@ def process_subtopic_parallel(item, workers, total_count, force=False):
         print(f"[{idx:3d}/{total_count}] [✘] Error generating {sub}: {e}", flush=True)
         return False
 
-def run_cluster_generation(target_query: Optional[str] = None, force: bool = False, test_run: bool = False):
+def run_cluster_generation(
+    target_query: Optional[str] = None,
+    target_domain: Optional[str] = "computing",
+    force: bool = False,
+    test_run: bool = False
+):
     cluster = OllamaCluster()
     workers = cluster.get_parallel_workers()
 
@@ -89,23 +96,25 @@ def run_cluster_generation(target_query: Optional[str] = None, force: bool = Fal
         print(f"    - [{name.upper():9s}] {host} (Tier: {tier:10s} | Model: {m})")
     print("==================================================")
 
-    if test_run:
+    if test_run or target_query:
         test_target = target_query or "computing/data/database_internals"
-        print(f"\n[*] Executing Test Run for: '{test_target}'...")
+        print(f"\n[*] Executing Target Run for: '{test_target}'...")
         target = resolve_subtopic(test_target)
         if not target:
             print(f"[!] Target '{test_target}' not found in topic tree.")
             return
 
         domain, cat, sub, sub_path = target
-        process_subtopic_parallel((1, domain, cat, sub, sub_path), workers, 1, force=True)
-        print("\n[✔] Test run finished!")
+        process_subtopic_parallel((1, domain, cat, sub, sub_path), workers, 1, force=force)
+        print("\n[✔] Target run finished!")
         return
 
     tree = get_topic_tree()
     all_subtopics = []
     idx = 1
     for domain, ddata in tree.items():
+        if target_domain and domain != target_domain:
+            continue
         for disc, disc_data in ddata.get("disciplines", {}).items():
             for course, c_data in disc_data.get("courses", {}).items():
                 for unit, u_data in c_data.get("units", {}).items():
@@ -113,7 +122,8 @@ def run_cluster_generation(target_query: Optional[str] = None, force: bool = Fal
                     idx += 1
 
     total = len(all_subtopics)
-    print(f"[*] Total curriculum units: {total}\n")
+    domain_label = target_domain.upper() if target_domain else "ALL DOMAINS"
+    print(f"[*] Total curriculum units to process in [{domain_label}]: {total}\n")
 
     for item in all_subtopics:
         process_subtopic_parallel(item, workers, total, force=force)
@@ -126,7 +136,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synapse Clustered Multi-Node Curriculum Generator")
     parser.add_argument("--test-run", action="store_true", help="Execute single-topic test run across all 4 nodes")
     parser.add_argument("--topic", type=str, default=None, help="Target specific topic query e.g. 'database_internals'")
-    parser.add_argument("--force", action="store_true", help="Force regenerate existing content")
+    parser.add_argument("--domain", "-d", type=str, default="computing", help="Target domain filter (default: computing, pass 'all' for everything)")
+    parser.add_argument("--force", "-f", action="store_true", help="Force regenerate existing content and purge old files")
     args = parser.parse_args()
 
-    run_cluster_generation(target_query=args.topic, force=args.force, test_run=args.test_run)
+    domain_arg = None if args.domain == "all" else args.domain
+    run_cluster_generation(target_query=args.topic, target_domain=domain_arg, force=args.force, test_run=args.test_run)

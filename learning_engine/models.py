@@ -5,6 +5,7 @@ Supports clustered Ollama nodes (localhost, remote nodes, custom clusters) and G
 
 import os
 import json
+import re
 import urllib.request
 import urllib.error
 import itertools
@@ -45,6 +46,7 @@ def validate_generation_output(content: str) -> str:
     """
     Validates LLM output before persisting to disk.
     Rejects empty output and raw model runner metadata/loading payloads.
+    Strips conversational preambles and unwraps outer markdown code blocks.
     """
     cleaned = (content or "").strip()
     if not cleaned:
@@ -52,6 +54,25 @@ def validate_generation_output(content: str) -> str:
     # Prevent raw runner status JSON from corrupting markdown files
     if cleaned.startswith("{") and ("\"done_reason\"" in cleaned or "\"created_at\"" in cleaned) and "\"done\":true" in cleaned.replace(" ", ""):
         raise ValueError(f"LLM returned raw model metadata instead of generated content: {cleaned[:120]}")
+
+    # Strip conversational preamble if auditor wrapped markdown inside code fences:
+    if "```markdown" in cleaned:
+        match = re.search(r"```markdown\s*([\s\S]*?)```", cleaned)
+        if match and match.group(1).strip().startswith("#"):
+            cleaned = match.group(1).strip()
+    elif cleaned.startswith("```") and cleaned.endswith("```"):
+        lines = cleaned.splitlines()
+        if len(lines) > 2:
+            cleaned = "\n".join(lines[1:-1]).strip()
+
+    # Strip conversational lead-in lines
+    cleaned = re.sub(
+        r"^(?:The document contains .*?Below is the corrected version:?|Here is the corrected version:?|Below is the corrected document:?)\s*",
+        "",
+        cleaned,
+        flags=re.IGNORECASE
+    ).strip()
+
     return cleaned
 
 CLUSTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / ".synapse_cluster.json"

@@ -7,6 +7,8 @@ and strictly bans lazy slide-deck bullet point lists.
 
 import time
 import itertools
+import re
+import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
@@ -14,6 +16,37 @@ from .models import OllamaCluster, OllamaProvider, get_provider, LLMProvider, va
 from .topic_manager import get_domain_persona, LEVELS
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+def purge_legacy_topic_files(topic_dir: Path):
+    """
+    Purges legacy uppercase markdown files (FOUNDATION.md, LESSON.md, LABS.md, SUMMARY.md),
+    old leveled files (beginner.md, intermediate.md, advanced.md), old session directories,
+    and legacy numbered subdirectories (01_*, 02_*).
+    """
+    if not topic_dir.exists():
+        return
+
+    legacy_files = [
+        "FOUNDATION.md", "LESSON.md", "LABS.md", "SUMMARY.md",
+        "foundation.md", "lesson.md", "summary.md",
+        "beginner.md", "intermediate.md", "advanced.md",
+        "flashcards.csv"
+    ]
+    for fname in legacy_files:
+        p = topic_dir / fname
+        if p.exists() and p.is_file():
+            try:
+                p.unlink()
+            except Exception:
+                pass
+
+    sessions_dir = topic_dir / "sessions"
+    if sessions_dir.exists() and sessions_dir.is_dir():
+        shutil.rmtree(sessions_dir, ignore_errors=True)
+
+    for sub in list(topic_dir.iterdir()):
+        if sub.is_dir() and re.match(r"^\d{2}_", sub.name):
+            shutil.rmtree(sub, ignore_errors=True)
 
 BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - This is a masterclass textbook chapter, NOT a slide-deck presentation or outline.
@@ -166,6 +199,9 @@ Output publication-grade Markdown only."""
     tasks_to_run = []
     results = {}
 
+    if force:
+        purge_legacy_topic_files(subtopic_dir)
+
     for mod in modules:
         out_path = subtopic_dir / mod["filename"]
         if not out_path.exists() or force:
@@ -177,19 +213,63 @@ Output publication-grade Markdown only."""
         return results
 
     if workers and len(workers) > 0:
-        worker_cycle = itertools.cycle(workers)
-        job_pairs = [(mod, next(worker_cycle)) for mod in tasks_to_run]
+        # Build Author -> Reviewer pairs across distinct cluster nodes
+        job_pairs = []
+        for i, mod in enumerate(tasks_to_run):
+            author_worker = workers[i % len(workers)]
+            # Distinct node as reviewer
+            reviewer_worker = workers[(i + 1) % len(workers)]
+            # If author is an 8B/4B model, prefer a 32B model as reviewer if available
+            large_workers = [w for w in workers if "32b" in w[1] or "35b" in w[1]]
+            if large_workers and ("8b" in author_worker[1] or "4b" in author_worker[1]):
+                reviewer_worker = large_workers[i % len(large_workers)]
+
+            job_pairs.append((mod, author_worker, reviewer_worker))
 
         def run_module_job(job):
-            mod_item, (w_host, w_model, w_provider) = job
+            mod_item, (w_host, w_model, w_provider), (r_host, r_model, r_provider) = job
             try:
                 t0 = time.time()
+                # 1. Authoring draft
                 content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
                 validated = validate_generation_output(content)
+
+                # 2. Adversarial Peer Review & Hallucination Audit
+                audit_prompt = f"""You are an adversarial Technical Reviewer & Fact-Checker.
+Audit this masterclass chapter for '{mod_item['title']}' on '{subtopic_title}'.
+Check for:
+1. Fabricated APIs, fake syscalls/registers, or hallucinated invariants.
+2. Syntactically invalid C/Rust snippets, bash commands, or Mermaid diagrams (ensure edge labels with '&' or math symbols are enclosed in double quotes).
+3. Any lazy placeholders (// TODO, ..., TBD) or bullet-point outlines instead of rich narrative prose.
+
+If accurate, factual, and publication-grade, output 'VERIFIED'.
+If there are any hallucinations, syntax errors, or placeholders, rewrite and correct the full document with graduate-level precision.
+
+DRAFT TO AUDIT:
+\"\"\"
+{validated[:8000]}
+\"\"\"
+
+Output either 'VERIFIED' or the fully corrected publication-grade Markdown only."""
+
+                try:
+                    review_res = r_provider.generate(audit_prompt, system_instruction="You are a ruthless technical auditor and peer reviewer.").strip()
+                    if "<think>" in review_res and "</think>" in review_res:
+                        review_res = review_res.split("</think>")[-1].strip()
+
+                    final_content = validated
+                    review_label = "Verified"
+                    if review_res and not review_res.startswith("VERIFIED") and len(review_res) > 500:
+                        final_content = validate_generation_output(review_res)
+                        review_label = f"Audited & Corrected by {r_host}"
+                except Exception as audit_err:
+                    final_content = validated
+                    review_label = f"Audit skipped ({audit_err})"
+
                 target_file = subtopic_dir / mod_item["filename"]
-                target_file.write_text(validated.strip() + "\n", encoding="utf-8")
+                target_file.write_text(final_content.strip() + "\n", encoding="utf-8")
                 elapsed = time.time() - t0
-                return mod_item["filename"], True, f"{w_host} ({w_model}) in {elapsed:.1f}s", None
+                return mod_item["filename"], True, f"Author: {w_host} ({w_model}) | {review_label} in {elapsed:.1f}s", None
             except Exception as e:
                 return mod_item["filename"], False, f"{w_host} ({w_model})", str(e)
 
@@ -198,6 +278,10 @@ Output publication-grade Markdown only."""
             for fut in as_completed(future_to_mod):
                 fname, ok, worker_info, err = fut.result()
                 results[fname] = ok
+                if ok:
+                    print(f"      [✔] {fname} -> {worker_info}", flush=True)
+                else:
+                    print(f"      [✘] {fname} failed ({worker_info}): {err}", flush=True)
     else:
         # Fallback to single provider
         provider = get_provider(domain=domain)
