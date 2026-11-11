@@ -9,6 +9,7 @@ import time
 import itertools
 import re
 import shutil
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
@@ -742,6 +743,113 @@ Output publication-grade Markdown only."""
             }
         ]
 
+def scope_topic_curriculum(
+    domain: str,
+    category: str,
+    subtopic_id: str,
+    subtopic_title: str,
+    scoping_provider: Optional[LLMProvider] = None
+) -> List[Dict[str, str]]:
+    """
+    Option B Pre-Flight AI Scoping:
+    Dynamically analyzes the true engineering surface area of the subject to size the curriculum:
+      - Focused Primitives / Specific Tools: 2 Lessons + Labs
+      - Standard Systems / Engines: 3-4 Lessons + Labs
+      - Flagship Architectures / Large Distributed Systems: 5-6 Lessons + Labs
+    Prevents artificial filler for narrow topics and prevents truncation of complex flagship topics.
+    """
+    domain_title = domain.replace("_", " ").title()
+    category_title = category.replace("_", " ").title()
+
+    fallback_modules = build_topic_modules(domain, category, subtopic_id, subtopic_title)
+    if not scoping_provider:
+        return fallback_modules
+
+    scoping_prompt = f"""You are a Principal Technical Curriculum Architect.
+Analyze the subject: '{subtopic_title}' (Domain: '{domain_title}', Discipline/Course: '{category_title}').
+
+Determine the exact number of theoretical masterclass lessons required to provide exhaustive technical coverage WITHOUT superficial padding or unnecessary filler:
+- Tier 1 (Focused Primitives / Narrow Tools): 2 Lessons (e.g. A specific tool, single protocol, or focused technique).
+- Tier 2 (Standard Engines / Frameworks / Core Protocols): 3-4 Lessons (e.g. A self-contained engine, design pattern, or subsystem).
+- Tier 3 (Flagship Architectures / Massive Distributed Systems): 5-6 Lessons (e.g. PostgreSQL, Kubernetes, Linux VFS, eBPF Kernel).
+
+Output JSON only in this exact format:
+{{
+  "scope_tier": "focused|standard|flagship",
+  "lesson_count": <int between 2 and 6>,
+  "rationale": "<1 sentence justifying the chosen depth>",
+  "lessons": [
+    {{
+      "filename": "lesson_01_<clean_slug>.md",
+      "title": "Lesson 1: <Descriptive Title without 'and'>",
+      "focus": "<Core theoretical focus, mechanisms, and invariants>"
+    }}
+  ]
+}}"""
+
+    try:
+        raw_res = scoping_provider.generate(scoping_prompt, system_instruction="Output valid JSON only.")
+        clean_json = raw_res.strip()
+        if "```json" in clean_json:
+            clean_json = clean_json.split("```json")[-1].split("```")[0].strip()
+        elif clean_json.startswith("```") and clean_json.endswith("```"):
+            clean_json = clean_json.split("```")[1].strip()
+
+        parsed = json.loads(clean_json)
+        tier = parsed.get("scope_tier", "standard").upper()
+        rationale = parsed.get("rationale", "")
+        parsed_lessons = parsed.get("lessons", [])
+
+        if len(parsed_lessons) >= 2:
+            print(f"      [★] Pre-Flight Scoping: {tier} ({len(parsed_lessons)} Lessons + Labs) -> {rationale}", flush=True)
+            dynamic_modules = []
+            for i, l in enumerate(parsed_lessons):
+                num = i + 1
+                fname = l.get("filename") or f"lesson_{num:02d}.md"
+                clean_name = fname.replace(".md", "")
+                if not re.match(r"^lesson_\d{2}_", clean_name):
+                    clean_slug = re.sub(r"^(?:lesson_)?\d*_*", "", clean_name).strip("_")
+                    fname = f"lesson_{num:02d}_{clean_slug}.md" if clean_slug else f"lesson_{num:02d}.md"
+
+                title = l.get("title") or f"Lesson {num}"
+                focus = l.get("focus") or ""
+
+                lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: Senior software engineers, systems programmers, and domain architects.
+Lesson Focus: {focus}
+
+Structure:
+# {title}
+
+## 1. First-Principles Intuition & Invariants
+(Deep narrative exposition establishing theoretical grounding, problem space, and mathematical/system invariants)
+
+## 2. Core Architecture & Mechanics
+(Dissect internal data structures, algorithms, or execution models with ASCII or clean Mermaid diagrams)
+
+## 3. High-Performance Optimization & Failure Modes
+(Concurrency, resource scaling, boundary edge cases, and failure mitigations)
+
+Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
+Output publication-grade Markdown only."""
+
+                dynamic_modules.append({
+                    "filename": fname,
+                    "title": title,
+                    "prompt": lesson_prompt
+                })
+
+            # Append the discipline-adaptive lab module
+            lab_mod = fallback_modules[-1]
+            dynamic_modules.append(lab_mod)
+            return dynamic_modules
+    except Exception as e:
+        print(f"      [!] Pre-flight scoping note ({e}), using standard adaptive template.", flush=True)
+
+    return fallback_modules
+
 def generate_topic_parallel(
     domain: str,
     category: str,
@@ -751,12 +859,8 @@ def generate_topic_parallel(
     workers: Optional[List[Tuple[str, str, OllamaProvider]]] = None
 ) -> Dict[str, Any]:
     """
-    Generates a sequential multi-lesson masterclass curriculum unit across all active
-    Ollama cluster engines in parallel:
-      - Worker 1: Foundations & System Invariants
-      - Worker 2: Core Architecture & Memory Subsystems
-      - Worker 3: Internal Mechanics & Reliability
-      - Worker 4: Operational Verification Labs
+    Generates a dynamically-scoped multi-lesson masterclass curriculum unit across all active
+    Ollama cluster engines in parallel with cross-node adversarial fact-checking.
     """
     subtopic_dir.mkdir(parents=True, exist_ok=True)
     subtopic_title = subtopic_id.replace("_", " ").title()
@@ -769,7 +873,8 @@ def generate_topic_parallel(
         cluster = OllamaCluster()
         workers = cluster.get_parallel_workers()
 
-    modules = build_topic_modules(domain, category, subtopic_id, subtopic_title)
+    scoping_prov = workers[0][2] if workers else None
+    modules = scope_topic_curriculum(domain, category, subtopic_id, subtopic_title, scoping_provider=scoping_prov)
 
     tasks_to_run = []
     results = {}
