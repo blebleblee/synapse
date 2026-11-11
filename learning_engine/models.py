@@ -432,57 +432,57 @@ class GeminiProvider(LLMProvider):
 
 class AnthropicProvider(LLMProvider):
     """
-    Anthropic Claude 3.5 Sonnet / Haiku Provider.
-    Direct HTTPS calls to https://api.anthropic.com/v1/messages.
+    Anthropic Claude 3.5 Sonnet / Haiku / Opus Provider.
+    Supports official Anthropic API as well as custom base URLs/proxies
+    via ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN.
     """
-    def __init__(self, model: str = "claude-3-5-sonnet-20241022", api_key: Optional[str] = None):
-        self.model = model
-        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+    def __init__(self, model: str = "claude-3-5-sonnet-20241022", api_key: Optional[str] = None, base_url: Optional[str] = None):
+        self.base_url = (base_url or os.environ.get("ANTHROPIC_BASE_URL") or "https://aiapiflow.com").rstrip("/")
+        self.api_key = api_key or os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
+        self.model = self._resolve_model_name(model)
+
+    def _resolve_model_name(self, model: str) -> str:
+        if "aiapiflow" in self.base_url:
+            m_lower = model.lower()
+            if "opus" in m_lower:
+                return "claude-opus-5"
+            if "fable" in m_lower or "haiku" in m_lower:
+                return "claude-fable-5"
+            return "claude-sonnet-5"
+        return model
+
+    def _get_url(self) -> str:
+        if self.base_url.endswith("/v1"):
+            return f"{self.base_url}/messages"
+        return f"{self.base_url}/v1/messages"
+
+    def _get_headers(self) -> Dict[str, str]:
+        headers = {
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+            "User-Agent": "claude-cli/1.0.0 (darwin; arm64)"
+        }
+        if self.api_key:
+            headers["x-api-key"] = self.api_key
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        return headers
 
     def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 4096) -> str:
+        """
+        Generates full completion by consuming generate_stream under the hood.
+        This continuously streams SSE tokens across the wire, preventing Cloudflare
+        edge proxy timeouts (Error 524 / 100-second idle disconnects).
+        """
+        chunks = []
+        for chunk in self.generate_stream(prompt, system_instruction=system_instruction, max_tokens=max_tokens):
+            chunks.append(chunk)
+        return validate_generation_output("".join(chunks))
+
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 4096):
         if not self.api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY is not set. Add it to .env or export ANTHROPIC_API_KEY='sk-ant-...'")
+            raise RuntimeError("ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is not set.")
 
-        url = "https://api.anthropic.com/v1/messages"
-        payload = {
-            "model": self.model,
-            "max_tokens": max_tokens,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.2
-        }
-        if system_instruction and system_instruction.strip():
-            payload["system"] = system_instruction.strip()
-
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={
-                "x-api-key": self.api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            }
-        )
-
-        try:
-            with urllib.request.urlopen(req, timeout=120) as resp:
-                res_json = json.loads(resp.read().decode("utf-8"))
-                blocks = res_json.get("content", [])
-                text = "".join(b.get("text", "") for b in blocks if b.get("type") == "text")
-                return validate_generation_output(text)
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"Anthropic API error ({e.code}): {err_body}")
-        except Exception as e:
-            raise RuntimeError(f"Anthropic request failed: {e}")
-
-    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 1000):
-        if not self.api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY is not set. Add it to .env or export ANTHROPIC_API_KEY='sk-ant-...'")
-
-        url = "https://api.anthropic.com/v1/messages"
+        url = self._get_url()
         payload = {
             "model": self.model,
             "max_tokens": max_tokens,
@@ -499,15 +499,11 @@ class AnthropicProvider(LLMProvider):
         req = urllib.request.Request(
             url,
             data=data,
-            headers={
-                "x-api-key": self.api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            }
+            headers=self._get_headers()
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=300) as resp:
                 for line in resp:
                     if not line:
                         continue
@@ -524,10 +520,11 @@ class AnthropicProvider(LLMProvider):
                                     yield delta.get("text", "")
                         except Exception:
                             continue
-        except Exception:
-            # Fallback to non-streaming
-            full_res = self.generate(prompt, system_instruction=system_instruction, max_tokens=max_tokens)
-            yield full_res
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Anthropic API error ({e.code}): {err_body}")
+        except Exception as e:
+            raise RuntimeError(f"Anthropic stream failed: {e}")
 
 def get_provider(provider_type: Optional[str] = None, model: Optional[str] = None, domain: Optional[str] = None) -> LLMProvider:
     """

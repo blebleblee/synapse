@@ -921,7 +921,9 @@ def generate_topic_parallel(
                 return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
 
         # Phase 1: Concurrently draft all modules without cross-node lock contention
-        with ThreadPoolExecutor(max_workers=min(len(workers), len(tasks_to_run))) as executor:
+        is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() for w in workers)
+        pool_size = min(3, len(tasks_to_run)) if is_cloud else min(len(workers), len(tasks_to_run))
+        with ThreadPoolExecutor(max_workers=pool_size) as executor:
             future_to_mod = {executor.submit(run_draft_job, job): job[0]["filename"] for job in jobs}
             for fut in as_completed(future_to_mod):
                 fname, ok, content, mod_item, host_label, w_host, elapsed, err = fut.result()
@@ -981,6 +983,9 @@ Output either 'VERIFIED' or the fully corrected publication-grade Markdown only.
             target_file.write_text(final_content.strip() + "\n", encoding="utf-8")
             print(f"      [✔] {fname} published ({host_label} -> {audit_note})", flush=True)
             return fname, True
+
+        if not drafts:
+            return results
 
         with ThreadPoolExecutor(max_workers=min(4, len(drafts))) as audit_executor:
             for fname, ok in audit_executor.map(run_audit_job, drafts.items()):
