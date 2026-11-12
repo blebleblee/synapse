@@ -57,7 +57,6 @@ def get_terminal_text(count: int = 50) -> str:
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
-
 from learning_engine.topic_manager import (
     get_topic_tree,
     get_domain_persona,
@@ -65,9 +64,9 @@ from learning_engine.topic_manager import (
     add_subtopic,
     delete_subtopic,
     rename_subtopic,
-    get_unit_lessons,
-    TOPICS_DIR
+    scan_subtopic_status
 )
+from learning_engine.utils import perform_cleanup
 from learning_engine.generator import generate_subtopic_content
 from learning_engine.models import (
     get_provider,
@@ -769,6 +768,16 @@ def api_rename_topic(req: RenameTopicRequest):
     if not success:
         raise HTTPException(status_code=400, detail=f"Failed to rename topic '{req.path}'")
     return {"success": True, "message": f"Renamed to {req.new_title}"}
+
+@app.post("/api/clean")
+def api_clean(req: Dict[str, bool] = {}):
+    """
+    Cleans transient runtime artifacts.
+    """
+    sessions = req.get("sessions", True)
+    exports = req.get("exports", True)
+    count = perform_cleanup(clean_sessions=sessions, clean_exports=exports)
+    return {"success": True, "cleaned": count}
 
 def build_chat_system_instruction(
     domain: str,
