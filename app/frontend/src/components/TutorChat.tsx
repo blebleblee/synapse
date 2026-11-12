@@ -6,7 +6,6 @@ import {
   User,
   MessageSquare,
   Lightbulb,
-  RotateCcw,
   Volume2,
   ChevronDown,
   ChevronUp,
@@ -169,11 +168,12 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               <Terminal size={11} />
               <span>{isTerminalConnected ? "Terminal Live" : "Terminal Offline"}</span>
             </span>
-            {onClearChat && history.length > 0 && (
+            {onClearChat && (
               <button
                 type="button"
                 className="chat-action-btn"
                 onClick={onClearChat}
+                disabled={history.length === 0}
                 title="Clear conversation history"
               >
                 <Trash2 size={13} />
@@ -296,16 +296,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       </div>
 
       <form className="chat-input-bar" onSubmit={handleSubmit}>
-        {history.length > 0 && onClearChat && (
-          <button
-            type="button"
-            className="chat-reset-btn"
-            onClick={onClearChat}
-            title="Start a new Socratic dialogue (Clear history)"
-          >
-            <RotateCcw size={14} />
-          </button>
-        )}
         <input
           type="text"
           placeholder={topic ? `Ask ${personaRole}...` : "Ask Socratic Mentor across 12 domains or about your terminal..."}

@@ -374,12 +374,11 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
         <button
           type="button"
-          className="sort-toggle-btn"
+          className="icon-btn-sm"
           onClick={cycleSortMode}
           title={`Sort: ${sortMode === 'default' ? ui.curriculumOrder : sortMode === 'az' ? ui.alphabetical : ui.progress}`}
         >
-          <ArrowUpDown size={12} />
-          <span className="sort-label">{sortMode === 'az' ? 'A-Z' : sortMode === 'progress' ? '%' : 'STD'}</span>
+          <ArrowUpDown size={13} />
         </button>
       </div>
 

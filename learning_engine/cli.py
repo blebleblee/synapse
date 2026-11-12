@@ -378,6 +378,39 @@ def cmd_desktop(args):
 
     subprocess.run([npm_path, "start"], cwd=str(desktop_dir), env=env)
 
+def cmd_clean(args):
+    """
+    Cleans transient runtime artifacts (chat sessions, export bundles, temp logs)
+    without touching authored curriculum files.
+    """
+    topics_dir = WORKSPACE_ROOT / "topics"
+    exports_dir = WORKSPACE_ROOT / "exports"
+
+    clean_sessions = args.sessions or args.all
+    clean_exports = args.exports or args.all
+
+    if not clean_sessions and not clean_exports:
+        clean_sessions = True
+        clean_exports = True
+
+    cleaned_count = 0
+
+    if clean_sessions:
+        for s_dir in list(topics_dir.rglob("sessions")) + [topics_dir / ".workspace_sessions"]:
+            if s_dir.exists() and s_dir.is_dir():
+                shutil.rmtree(s_dir)
+                print(f"[*] Cleared session directory: {s_dir.relative_to(WORKSPACE_ROOT)}")
+                cleaned_count += 1
+
+    if clean_exports and exports_dir.exists():
+        for p in exports_dir.rglob("*"):
+            if p.is_file():
+                p.unlink()
+                print(f"[*] Removed exported artifact: {p.relative_to(WORKSPACE_ROOT)}")
+                cleaned_count += 1
+
+    print(f"[✔] Cleaned {cleaned_count} transient artifacts. Authored curriculum is 100% intact.")
+
 def main():
     load_env_file()
     parser = argparse.ArgumentParser(
@@ -385,6 +418,13 @@ def main():
         description="AI Learning Workspace Content Engine & Socratic Workbench"
     )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
+
+    # clean
+    p_clean = subparsers.add_parser("clean", help="Clean transient chat sessions and export files")
+    p_clean.add_argument("--sessions", action="store_true", help="Remove transient Socratic chat sessions")
+    p_clean.add_argument("--exports", action="store_true", help="Remove generated .synpack and handbook exports")
+    p_clean.add_argument("--all", action="store_true", help="Clean all transient runtime artifacts")
+    p_clean.set_defaults(func=cmd_clean)
 
     # desktop
     p_desktop = subparsers.add_parser("desktop", help="Launch the native Electron desktop shell wrapper")

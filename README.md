@@ -140,6 +140,17 @@ If a destructive command is detected (e.g., `rm -rf /`, `mkfs`, fork bombs), the
 
 ---
 
+## 📚 Documentation
+
+For detailed multi-platform guides and operational procedures, see the `docs/` directory:
+
+- [Installation & Multi-Platform Guide (macOS, Windows, Linux)](docs/INSTALLATION.md)
+- [Terminal Sandboxes: Rancher Desktop, Docker, k3s & Host Safety](docs/CONTAINERS_AND_SANDBOX.md)
+- [SynPack Curriculum Distributions & Addon Store](docs/PACKAGES_AND_STORE.md)
+- [Clean Packaging & Workspace Data Management](docs/CLEANUP_AND_DATA_MANAGEMENT.md)
+
+---
+
 ## 📄 License
 
 Synapse is open-source software licensed under the **MIT License**. See [LICENSE](LICENSE) for details.

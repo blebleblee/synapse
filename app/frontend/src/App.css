@@ -196,17 +196,18 @@ body, html, #root {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px;
+  padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   transition: color 0.15s, background-color 0.15s;
+  flex-shrink: 0;
 }
 
 .search-clear-btn:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-tertiary);
+  color: #ffffff;
+  background-color: var(--bg-hover);
 }
 
 .icon-btn-sm {

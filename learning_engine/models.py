@@ -566,11 +566,21 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
     chosen_model = model or "gemini-2.5-flash"
     return GeminiProvider(model=chosen_model)
 
-def get_chat_provider(model: Optional[str] = None) -> Tuple[OllamaProvider, str]:
+def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
     """
-    Returns a fast, low-latency model optimized for interactive Socratic mentoring.
-    Prioritizes fast 7B/8B/4B models on localhost for instant token generation.
+    Returns a model provider optimized for interactive Socratic mentoring.
+    Checks user-specified host/model first, then scans online cluster nodes,
+    and falls back to Anthropic Claude or Google Gemini if Ollama is unreachable.
     """
+    # 1. User-specified Ollama host
+    if host:
+        clean_host = host.strip().rstrip("/")
+        if OllamaProvider.is_available(clean_host):
+            models = OllamaProvider.list_models(clean_host)
+            selected = model if (model and model in models) else (models[0] if models else model or "qwen2.5-coder:7b")
+            return OllamaProvider(model=selected, host=clean_host), selected
+
+    # 2. Check cluster status
     cluster = OllamaCluster()
     status = cluster.get_cluster_status()
 
@@ -583,23 +593,48 @@ def get_chat_provider(model: Optional[str] = None) -> Tuple[OllamaProvider, str]
         "qwen2.5-coder:32b"
     ]
 
+    # Specific model request across cluster
     if model:
-        for host, h_data in status.items():
+        for h, h_data in status.items():
             if h_data.get("online") and model in h_data.get("models", []):
-                return OllamaProvider(model=model, host=host), model
+                return OllamaProvider(model=model, host=h), model
 
+    # Localhost priority
     local_key = "http://127.0.0.1:11434"
     local_data = status.get(local_key) or status.get("http://localhost:11434") or {}
     if local_data.get("online"):
         for fm in fast_models:
             if fm in local_data.get("models", []):
                 return OllamaProvider(model=fm, host=local_key), fm
+        models = local_data.get("models", [])
+        if models:
+            return OllamaProvider(model=models[0], host=local_key), models[0]
 
-    for host, h_data in status.items():
+    # Any online cluster node
+    for h, h_data in status.items():
         if h_data.get("online"):
             for fm in fast_models:
                 if fm in h_data.get("models", []):
-                    return OllamaProvider(model=fm, host=host), fm
+                    return OllamaProvider(model=fm, host=h), fm
+            models = h_data.get("models", [])
+            if models:
+                return OllamaProvider(model=models[0], host=h), models[0]
 
-    node, mod = cluster.select_best_node(model="llama3.1:8b")
+    # 3. Cloud fallbacks if Ollama is offline
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+    settings = get_settings()
+    if not anthropic_key and settings.get("anthropic_api_key"):
+        anthropic_key = settings["anthropic_api_key"]
+    if anthropic_key:
+        claude_model = model if (model and "claude" in model) else "claude-3-5-sonnet-20241022"
+        return AnthropicProvider(model=claude_model, api_key=anthropic_key), claude_model
+
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key and settings.get("gemini_api_key"):
+        gemini_key = settings["gemini_api_key"]
+    if gemini_key:
+        return GeminiProvider(model="gemini-2.5-flash", api_key=gemini_key), "gemini-2.5-flash"
+
+    # 4. Fallback to cluster best selection
+    node, mod = cluster.select_best_node(model=model or "qwen2.5-coder:7b")
     return OllamaProvider(model=mod, host=node), mod

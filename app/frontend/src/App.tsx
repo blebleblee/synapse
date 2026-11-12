@@ -352,11 +352,14 @@ export function App() {
           terminal_context: terminalOutput,
           lesson_content: lessonContent,
           stream: true,
+          model: settings.primaryModel || undefined,
+          host: settings.ollamaHost || undefined,
         }),
       });
 
       if (!res.ok) {
-        throw new Error(`Chat request failed with status ${res.status}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Server returned ${res.status}`);
       }
 
       if (res.body) {
@@ -402,11 +405,15 @@ export function App() {
           { role: 'tutor', content: data.reply }
         ]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Chat error:', err);
+      const detail = err.message || 'Connection failed';
       setUnifiedChatHistory([
         ...updatedHistory,
-        { role: 'tutor', content: 'Connection error while communicating with AI mentor.' }
+        {
+          role: 'tutor',
+          content: `⚠️ **Unable to connect to AI Mentor** (${detail}).\n\n**To resolve:**\n1. Ensure Ollama is running on \`${settings.ollamaHost || 'http://localhost:11434'}\` with an active model (e.g. \`ollama run qwen2.5-coder:7b\`).\n2. Or open **Settings ⚙ → AI Models & Cloud API** to point to an external cluster node, or enter an Anthropic / Gemini API key for instant cloud mentoring.`
+        }
       ]);
     } finally {
       setIsChatting(false);

@@ -161,6 +161,7 @@ class ChatRequest(BaseModel):
     stream: Optional[bool] = False
     provider: Optional[str] = None
     model: Optional[str] = None
+    host: Optional[str] = None
 
     @field_validator('query')
     @classmethod
@@ -903,7 +904,7 @@ async def chat_with_tutor(req: ChatRequest):
         sub_path = None
         system_instruction = build_neutral_workspace_instruction(terminal_context=terminal_ctx)
 
-    provider, used_model = get_chat_provider(model=req.model)
+    provider, used_model = get_chat_provider(model=req.model, host=req.host)
 
     conversation_text = []
     for m in req.history[-6:]:
