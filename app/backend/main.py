@@ -137,6 +137,9 @@ app.add_middleware(
 # Data Models
 # -----------------------------------------------------------------------------
 
+from pydantic import BaseModel, Field, field_validator
+import re
+
 class AddTopicRequest(BaseModel):
     domain: str
     category: str
@@ -144,18 +147,9 @@ class AddTopicRequest(BaseModel):
     title: Optional[str] = None
     generate: bool = True
 
-class GenerateRequest(BaseModel):
-    query: str
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    force: bool = False
-
 class ChatMessage(BaseModel):
     role: str
     content: str
-
-from pydantic import BaseModel, Field, validator
-import re
 
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=0, max_length=500)
@@ -168,8 +162,9 @@ class ChatRequest(BaseModel):
     provider: Optional[str] = None
     model: Optional[str] = None
 
-    @validator('query')
-    def validate_query(cls, v):
+    @field_validator('query')
+    @classmethod
+    def validate_query(cls, v: str) -> str:
         if v and not re.match(r'^[a-zA-Z0-9_/.-]*$', v):
             raise ValueError('Invalid characters in query')
         if ".." in v:
