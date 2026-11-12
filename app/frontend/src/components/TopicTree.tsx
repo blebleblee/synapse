@@ -295,32 +295,26 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
   return (
     <aside className="tree-sidebar">
+      {/* 1. Industry-Standard Workspace Brand Bar (52px height) */}
       <div className="sidebar-header">
-        <div className="sidebar-header-top">
-          <div className="brand">
-            <svg className="brand-logo-svg" viewBox="0 0 48 48" width="34" height="34" fill="none">
-              <circle cx="24" cy="24" r="20" stroke="#4f8fff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-              <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#fbbf24" strokeWidth="2.5" fill="#15181f" />
-              <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
-              <line x1="38" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
-              <line x1="38" y1="32" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
-              <line x1="24" y1="40" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
-              <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
-              <line x1="10" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
-              <circle cx="24" cy="24" r="5" fill="#10b981" />
-              <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
-            </svg>
-            <span className="brand-title">Synapse</span>
-          </div>
+        <div className="brand">
+          <svg className="brand-logo-svg" viewBox="0 0 48 48" width="24" height="24" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#4f8fff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#fbbf24" strokeWidth="2.5" fill="#15181f" />
+            <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+            <line x1="38" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="38" y1="32" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+            <line x1="24" y1="40" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+            <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+            <line x1="10" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+            <circle cx="24" cy="24" r="5" fill="#10b981" />
+            <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
+          </svg>
+          <span className="brand-title">Synapse</span>
+          <span className="brand-dot" title="Cluster Active (4/4 Nodes Online)" />
         </div>
 
         <div className="sidebar-header-actions">
-          <button className="icon-btn" onClick={toggleAll} title={allExpanded ? ui.collapseAll : ui.expandAll}>
-            {allExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
-          </button>
-          <button className="icon-btn" onClick={onOpenSearch} title={`${ui.search} (Cmd+K)`}>
-            <Search size={14} />
-          </button>
           <button className="icon-btn" onClick={onOpenGraph} title={ui.graph}>
             <GitBranch size={14} />
           </button>
@@ -340,17 +334,17 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
       </div>
 
-      {/* Search & Sort Controls */}
+      {/* 2. Unified Search & View Controls Bar */}
       <div className="search-filter-row">
         <div className="search-box">
-          <Search size={14} className="search-icon" />
+          <Search size={13} className="search-icon" />
           <input
             type="text"
             placeholder={ui.filterTopics}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchTerm && (
+          {searchTerm ? (
             <button
               type="button"
               className="search-clear-btn"
@@ -359,8 +353,27 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             >
               <X size={12} />
             </button>
+          ) : (
+            <button
+              type="button"
+              className="search-cmd-k-badge"
+              onClick={onOpenSearch}
+              title="Deep Full-Text Search (Cmd+K)"
+            >
+              ⌘K
+            </button>
           )}
         </div>
+
+        <button
+          type="button"
+          className="icon-btn-sm"
+          onClick={toggleAll}
+          title={allExpanded ? ui.collapseAll : ui.expandAll}
+        >
+          {allExpanded ? <ChevronsDownUp size={13} /> : <ChevronsUpDown size={13} />}
+        </button>
+
         <div className="sort-box" title="Sort topics">
           <ArrowUpDown size={12} className="sort-icon" />
           <select
