@@ -170,7 +170,20 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               <button
                 type="button"
                 className="chat-action-btn"
-                onClick={onClearChat}
+                onClick={async () => {
+                  if (confirm('Permanently clear all chat sessions?')) {
+                    try {
+                      await fetch('/api/clean', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sessions: true, exports: false })
+                      });
+                      onClearChat();
+                    } catch (err) {
+                      console.error('Failed to clear sessions:', err);
+                    }
+                  }
+                }}
                 disabled={history.length === 0}
                 title="Clear conversation history"
               >
