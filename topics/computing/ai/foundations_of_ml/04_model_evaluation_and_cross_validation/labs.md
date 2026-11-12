@@ -2,7 +2,7 @@
 
 ## Objective & Environment Setup
 
-The objective of this lab is to provide hands-on experience with model evaluation and cross-validation techniques in the context of machine learning. This lab will guide you through implementing, tuning, and verifying a machine learning model using real, executable Python scripts. The environment setup requires Python 3.11+ and the following packages:
+This lab aims to provide hands-on experience with model evaluation and cross-validation techniques in the context of machine learning. Through this lab, you will implement a complete evaluation pipeline, perform hyperparameter tuning, and conduct stress testing and edge case analysis. To set up the environment, ensure you have a Python 3.11+ installation with the following packages:
 
 - PyTorch
 - Scikit-learn
@@ -17,202 +17,151 @@ pip install torch scikit-learn numpy matplotlib
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a simple machine learning pipeline using PyTorch and Scikit-learn. We will train a logistic regression model on the Iris dataset and evaluate its performance using cross-validation.
+In this exercise, we will implement a simple machine learning pipeline using a synthetic dataset. We will train a logistic regression model, evaluate it using cross-validation, and report the accuracy.
 
-### Step-by-Step Implementation
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-1. **Import Libraries**
+# Generate synthetic dataset
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=2, n_redundant=10, random_state=42)
 
-   ```python
-   import torch
-   import torch.nn as nn
-   import torch.optim as optim
-   from sklearn.datasets import load_iris
-   from sklearn.model_selection import train_test_split, cross_val_score
-   from sklearn.preprocessing import StandardScaler
-   import numpy as np
-   import matplotlib.pyplot as plt
-   ```
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-2. **Load and Preprocess Data**
+# Initialize the logistic regression model
+model = LogisticRegression(max_iter=1000)
 
-   ```python
-   # Load the Iris dataset
-   iris = load_iris()
-   X, y = iris.data, iris.target
+# Train the model
+model.fit(X_train, y_train)
 
-   # Standardize the features
-   scaler = StandardScaler()
-   X_scaled = scaler.fit_transform(X)
+# Predict on the test set
+y_pred = model.predict(X_test)
 
-   # Convert to PyTorch tensors
-   X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
-   y_tensor = torch.tensor(y, dtype=torch.long)
-   ```
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+class_report = classification_report(y_test, y_pred)
 
-3. **Define the Logistic Regression Model**
+print(f"Accuracy: {accuracy}")
+print("Confusion Matrix:")
+print(conf_matrix)
+print("Classification Report:")
+print(class_report)
 
-   ```python
-   class LogisticRegressionModel(nn.Module):
-       def __init__(self, input_dim, output_dim):
-           super(LogisticRegressionModel, self).__init__()
-           self.linear = nn.Linear(input_dim, output_dim)
-
-       def forward(self, x):
-           return self.linear(x)
-   ```
-
-4. **Train the Model**
-
-   ```python
-   # Hyperparameters
-   input_dim = X_tensor.shape[1]
-   output_dim = len(np.unique(y))
-   learning_rate = 0.01
-   num_epochs = 100
-
-   # Initialize the model, loss function, and optimizer
-   model = LogisticRegressionModel(input_dim, output_dim)
-   criterion = nn.CrossEntropyLoss()
-   optimizer = optim.SGD(model.parameters(), lr=learning_rate)
-
-   # Training loop
-   for epoch in range(num_epochs):
-       # Forward pass
-       outputs = model(X_tensor)
-       loss = criterion(outputs, y_tensor)
-
-       # Backward pass and optimization
-       optimizer.zero_grad()
-       loss.backward()
-       optimizer.step()
-
-       if (epoch+1) % 10 == 0:
-           print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
-   ```
-
-5. **Evaluate the Model with Cross-Validation**
-
-   ```python
-   # Convert PyTorch model to a function for Scikit-learn compatibility
-   def torch_model_predict(X):
-       with torch.no_grad():
-           X_tensor = torch.tensor(X, dtype=torch.float32)
-           outputs = model(X_tensor)
-           _, predicted = torch.max(outputs.data, 1)
-           return predicted.numpy()
-
-   # Perform cross-validation
-   cv_scores = cross_val_score(torch_model_predict, X_scaled, y, cv=5)
-   print(f'Cross-Validation Scores: {cv_scores}')
-   print(f'Mean CV Score: {np.mean(cv_scores):.4f}')
-   ```
+# Perform cross-validation
+cv_scores = cross_val_score(model, X, y, cv=5)
+print(f"Cross-Validation Scores: {cv_scores}")
+print(f"Mean CV Score: {np.mean(cv_scores)}")
+```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will perform hyperparameter tuning using grid search and benchmark the model's accuracy and convergence.
+In this exercise, we will perform hyperparameter tuning using grid search and evaluate the model's performance in terms of accuracy and latency.
 
-### Step-by-Step Implementation
+```python
+from sklearn.model_selection import GridSearchCV
+import time
 
-1. **Define Hyperparameter Grid**
+# Define the parameter grid
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'solver': ['liblinear', 'saga']
+}
 
-   ```python
-   from sklearn.model_selection import GridSearchCV
+# Initialize the grid search
+grid_search = GridSearchCV(LogisticRegression(max_iter=1000), param_grid, cv=5, scoring='accuracy')
 
-   # Define a function to create and train the model
-   def create_model(learning_rate=0.01, num_epochs=100):
-       model = LogisticRegressionModel(input_dim, output_dim)
-       criterion = nn.CrossEntropyLoss()
-       optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+# Record the start time
+start_time = time.time()
 
-       for epoch in range(num_epochs):
-           outputs = model(X_tensor)
-           loss = criterion(outputs, y_tensor)
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
+# Fit the grid search
+grid_search.fit(X, y)
 
-       return torch_model_predict
+# Record the end time
+end_time = time.time()
 
-   # Define the parameter grid
-   param_grid = {
-       'learning_rate': [0.001, 0.01, 0.1],
-       'num_epochs': [50, 100, 200]
-   }
-   ```
+# Calculate the elapsed time
+elapsed_time = end_time - start_time
 
-2. **Perform Grid Search**
+# Print the best parameters and the best score
+print(f"Best Parameters: {grid_search.best_params_}")
+print(f"Best Cross-Validation Score: {grid_search.best_score_}")
+print(f"Elapsed Time: {elapsed_time} seconds")
 
-   ```python
-   # Create a GridSearchCV object
-   grid_search = GridSearchCV(estimator=create_model, param_grid=param_grid, cv=5, scoring='accuracy')
-
-   # Fit the grid search to the data
-   grid_search.fit(X_scaled, y)
-
-   # Print the best parameters and best score
-   print(f'Best Parameters: {grid_search.best_params_}')
-   print(f'Best Score: {grid_search.best_score_:.4f}')
-   ```
-
-3. **Benchmark the Model**
-
-   ```python
-   import time
-
-   # Measure training time
-   start_time = time.time()
-   best_model = grid_search.best_estimator_
-   best_model(X_scaled)
-   end_time = time.time()
-   training_time = end_time - start_time
-   print(f'Training Time: {training_time:.4f} seconds')
-   ```
+# Evaluate the best model on the test set
+best_model = grid_search.best_estimator_
+y_pred_best = best_model.predict(X_test)
+accuracy_best = accuracy_score(y_test, y_pred_best)
+print(f"Test Set Accuracy with Best Model: {accuracy_best}")
+```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the model's robustness by simulating edge cases and implementing guardrails.
+In this exercise, we will test the model under various stress conditions and edge cases, and implement guardrails to handle potential failures.
 
-### Step-by-Step Implementation
+```python
+# Test with a single sample
+single_sample = X_test[0].reshape(1, -1)
+single_pred = best_model.predict(single_sample)
+print(f"Prediction for Single Sample: {single_pred}")
 
-1. **Simulate Edge Cases**
+# Test with an empty dataset
+try:
+    empty_pred = best_model.predict(np.array([]).reshape(0, X.shape[1]))
+except ValueError as e:
+    print(f"Error with Empty Dataset: {e}")
 
-   ```python
-   # Simulate edge cases by introducing outliers
-   X_outliers = np.vstack((X_scaled, np.array([[100, 100, 100, 100]])))
-   y_outliers = np.append(y, 0)
+# Test with a dataset with missing values
+X_test_missing = X_test.copy()
+X_test_missing[0, 0] = np.nan
+try:
+    missing_pred = best_model.predict(X_test_missing)
+except ValueError as e:
+    print(f"Error with Missing Values: {e}")
 
-   # Evaluate the model on the outlier data
-   outlier_scores = cross_val_score(torch_model_predict, X_outliers, y_outliers, cv=5)
-   print(f'Outlier Cross-Validation Scores: {outlier_scores}')
-   print(f'Mean Outlier CV Score: {np.mean(outlier_scores):.4f}')
-   ```
+# Implement guardrails for edge cases
+def safe_predict(model, X):
+    if X.shape[0] == 0:
+        raise ValueError("Input dataset is empty.")
+    if np.isnan(X).any():
+        raise ValueError("Input dataset contains NaN values.")
+    return model.predict(X)
 
-2. **Implement Guardrails**
+# Test the safe_predict function
+try:
+    safe_pred = safe_predict(best_model, X_test_missing)
+except ValueError as e:
+    print(f"Guardrail Triggered: {e}")
 
-   ```python
-   # Implement a guardrail to handle outliers
-   def safe_predict(X):
-       try:
-           return torch_model_predict(X)
-       except Exception as e:
-           print(f'Error during prediction: {e}')
-           return np.array([0] * X.shape[0])
-
-   # Test the guardrail with outlier data
-   safe_predictions = safe_predict(X_outliers)
-   print(f'Safe Predictions: {safe_predictions}')
-   ```
+# Test with a dataset with incorrect shape
+X_test_wrong_shape = X_test[:, :-1]
+try:
+    wrong_shape_pred = safe_predict(best_model, X_test_wrong_shape)
+except ValueError as e:
+    print(f"Guardrail Triggered: {e}")
+```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
 | Method/Parameter | Description |
 |------------------|-------------|
-| `cross_val_score` | Perform cross-validation and return the scores for each fold. |
-| `GridSearchCV` | Perform an exhaustive search over specified parameter values for an estimator. |
-| `StandardScaler` | Standardize features by removing the mean and scaling to unit variance. |
-| `torch.no_grad()` | Disable gradient calculation to reduce memory consumption and speed up computations. |
-| `torch.max` | Return the maximum value of each row of the input tensor in the given dimension. |
-| `time.time()` | Return the current time in seconds since the Epoch. |
+| `make_classification` | Generates a synthetic dataset for classification. |
+| `train_test_split` | Splits the dataset into training and testing sets. |
+| `LogisticRegression` | Initializes a logistic regression model. |
+| `fit` | Trains the model on the training data. |
+| `predict` | Predicts the labels for the input data. |
+| `accuracy_score` | Computes the accuracy of the model. |
+| `confusion_matrix` | Computes the confusion matrix for the model. |
+| `classification_report` | Generates a detailed classification report. |
+| `cross_val_score` | Performs cross-validation and returns the scores. |
+| `GridSearchCV` | Initializes a grid search for hyperparameter tuning. |
+| `best_params_` | Retrieves the best parameters found by grid search. |
+| `best_score_` | Retrieves the best cross-validation score. |
+| `safe_predict` | A function to safely predict labels with guardrails. |
 
-This lab provides a comprehensive hands-on experience with model evaluation and cross-validation, including hyperparameter tuning, benchmarking, and robustness testing. By following the steps outlined in this guide, you will gain practical skills in evaluating and verifying machine learning models.
+This lab provides a comprehensive hands-on experience with model evaluation and cross-validation, including hyperparameter tuning and stress testing. By following the exercises, you will gain practical skills in evaluating machine learning models and handling edge cases.
