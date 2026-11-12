@@ -92,8 +92,8 @@ body, html, #root {
 .sidebar-header {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 14px 14px 12px 14px;
+  gap: 14px;
+  padding: 16px 16px 14px 16px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -119,9 +119,11 @@ body, html, #root {
 }
 
 .brand-title {
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
   color: #ffffff;
 }
 
@@ -2406,6 +2408,7 @@ body, html, #root {
 }
 
 .sidebar-header-actions .btn-primary-sm {
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
