@@ -64,7 +64,8 @@ from learning_engine.topic_manager import (
     add_subtopic,
     delete_subtopic,
     rename_subtopic,
-    scan_subtopic_status
+    scan_subtopic_status,
+    get_unit_lessons
 )
 from learning_engine.utils import perform_cleanup
 from learning_engine.generator import generate_subtopic_content
@@ -79,9 +80,9 @@ from learning_engine.models import (
 )
 from learning_engine.search import search_curriculum
 from learning_engine.graph import get_prerequisite_graph, get_topic_dependencies
+from learning_engine.database import get_connection
 from learning_engine.mastery import (
     set_subtopic_mastery,
-    load_mastery_data,
     get_mastery_summary,
     get_subtopic_mastery,
     get_completed_lessons,
@@ -177,6 +178,12 @@ def get_status():
     with_labs = 0
     complete = 0
 
+    # Get mastery counts directly from DB
+    conn = get_connection()
+    mastery_rows = conn.execute("SELECT path, state, completed_lessons FROM mastery").fetchall()
+    conn.close()
+
+    # Calculate curriculum stats
     for domain, ddata in tree.items():
         total_categories += len(ddata["categories"])
         for cat, cdata in ddata["categories"].items():
@@ -322,9 +329,14 @@ class LessonMasteryRequest(BaseModel):
 
 @app.get("/api/mastery")
 def get_mastery():
+    conn = get_connection()
+    rows = conn.execute("SELECT path, state, completed_lessons FROM mastery").fetchall()
+    conn.close()
+    topics = {row["path"]: {"state": row["state"], "completed_lessons": json.loads(row["completed_lessons"])} for row in rows}
+    
     return {
         "summary": get_mastery_summary(),
-        "topics": load_mastery_data()
+        "topics": topics
     }
 
 @app.post("/api/mastery")

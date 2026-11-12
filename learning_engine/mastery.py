@@ -10,27 +10,6 @@ from .database import get_connection
 
 VALID_STATES = ["not_started", "studying", "lab_verified", "mastered"]
 
-def load_mastery_data() -> Dict[str, Any]:
-    """Deprecated: Use database directly."""
-    conn = get_connection()
-    rows = conn.execute("SELECT path, state, completed_lessons FROM mastery").fetchall()
-    conn.close()
-    return {row["path"]: {"state": row["state"], "completed_lessons": json.loads(row["completed_lessons"])} for row in rows}
-
-def save_mastery_data(data: Dict[str, Any]):
-    """Deprecated: Use set_subtopic_mastery or toggle_lesson_completion."""
-    conn = get_connection()
-    with conn:
-        for path, val in data.items():
-            state = val["state"] if isinstance(val, dict) else val
-            lessons = json.dumps(val.get("completed_lessons", [])) if isinstance(val, dict) else json.dumps([])
-            conn.execute("""
-                INSERT INTO mastery (path, state, completed_lessons)
-                VALUES (?, ?, ?)
-                ON CONFLICT(path) DO UPDATE SET state=excluded.state, completed_lessons=excluded.completed_lessons
-            """, (path, state, lessons))
-    conn.close()
-
 def get_subtopic_mastery(subtopic_path: str) -> str:
     clean_path = subtopic_path.strip("/")
     conn = get_connection()

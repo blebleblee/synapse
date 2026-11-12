@@ -558,18 +558,6 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
     Checks user-specified host/model first, then scans online cluster nodes,
     and falls back to Anthropic Claude or Google Gemini if Ollama is unreachable.
     """
-    # 1. User-specified Ollama host
-    if host:
-        clean_host = host.strip().rstrip("/")
-        if OllamaProvider.is_available(clean_host):
-            models = OllamaProvider.list_models(clean_host)
-            selected = model if (model and model in models) else (models[0] if models else model or "qwen2.5-coder:7b")
-            return OllamaProvider(model=selected, host=clean_host), selected
-
-    # 2. Check cluster status
-    cluster = OllamaCluster()
-    status = cluster.get_cluster_status()
-
     fast_models = [
         "qwen2.5-coder:7b",
         "llama3.1:8b",
@@ -578,6 +566,23 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         "qwen2.5:3b",
         "qwen2.5-coder:32b"
     ]
+
+    # 1. User-specified Ollama host
+    if host:
+        clean_host = host.strip().rstrip("/")
+        if OllamaProvider.is_available(clean_host):
+            models = OllamaProvider.list_models(clean_host)
+            if model and model in models:
+                return OllamaProvider(model=model, host=clean_host), model
+            for fm in fast_models:
+                if fm in models:
+                    return OllamaProvider(model=fm, host=clean_host), fm
+            selected = models[0] if models else "qwen2.5-coder:7b"
+            return OllamaProvider(model=selected, host=clean_host), selected
+
+    # 2. Check cluster status
+    cluster = OllamaCluster()
+    status = cluster.get_cluster_status()
 
     # Specific model request across cluster
     if model:

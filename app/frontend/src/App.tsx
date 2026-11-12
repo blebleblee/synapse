@@ -352,7 +352,7 @@ export function App() {
           terminal_context: terminalOutput,
           lesson_content: lessonContent,
           stream: true,
-          model: settings.mentorModel || settings.primaryModel || undefined,
+          model: settings.mentorModel || undefined,
           host: settings.ollamaHost || undefined,
         }),
       });

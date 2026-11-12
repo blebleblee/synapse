@@ -592,11 +592,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       {!formData.primaryModel && <option value="">Select Primary Model...</option>}
                       {formData.primaryModel && !discoveredModels.includes(formData.primaryModel) && (
-                        <option value={formData.primaryModel}>{formData.primaryModel}</option>
+                        <option value={formData.primaryModel} title={formData.primaryModel}>
+                          {formData.primaryModel.length > 34 ? `${formData.primaryModel.slice(0, 32)}...` : formData.primaryModel}
+                        </option>
                       )}
                       {discoveredModels.map((m) => (
-                        <option key={`p-${m}`} value={m}>
-                          {m}
+                        <option key={`p-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
                         </option>
                       ))}
                     </select>
@@ -610,11 +612,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       {!formData.reviewerModel && <option value="">Select Reviewer Model...</option>}
                       {formData.reviewerModel && !discoveredModels.includes(formData.reviewerModel) && (
-                        <option value={formData.reviewerModel}>{formData.reviewerModel}</option>
+                        <option value={formData.reviewerModel} title={formData.reviewerModel}>
+                          {formData.reviewerModel.length > 34 ? `${formData.reviewerModel.slice(0, 32)}...` : formData.reviewerModel}
+                        </option>
                       )}
                       {discoveredModels.map((m) => (
-                        <option key={`r-${m}`} value={m}>
-                          {m}
+                        <option key={`r-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
                         </option>
                       ))}
                     </select>
@@ -628,11 +632,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       {!formData.mentorModel && <option value="">Select Mentor Model...</option>}
                       {formData.mentorModel && !discoveredModels.includes(formData.mentorModel) && (
-                        <option value={formData.mentorModel}>{formData.mentorModel}</option>
+                        <option value={formData.mentorModel} title={formData.mentorModel}>
+                          {formData.mentorModel.length > 34 ? `${formData.mentorModel.slice(0, 32)}...` : formData.mentorModel}
+                        </option>
                       )}
                       {discoveredModels.map((m) => (
-                        <option key={`m-${m}`} value={m}>
-                          {m}
+                        <option key={`m-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
                         </option>
                       ))}
                     </select>
@@ -707,6 +713,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
                 </button>
+              </div>
+
+              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
+                <h4 className="panel-box-heading">Runtime Maintenance</h4>
+                <div className="form-group compact">
+                  <label>Transient Artifact Cleanup</label>
+                  <span className="field-hint">Clears chat session logs and cached export bundles (safe to run)</span>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    style={{ marginTop: '6px', width: 'fit-content' }}
+                    onClick={async () => {
+                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
+                        try {
+                          const res = await fetch('/api/clean', { method: 'POST' });
+                          if (res.ok) {
+                            const data = await res.json();
+                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
+                          }
+                        } catch (err) {
+                          alert('Cleanup failed.');
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <span>Clear Runtime Data</span>
+                  </button>
+                </div>
               </div>
 
               {storeMessage && (

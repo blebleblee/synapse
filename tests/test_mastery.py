@@ -5,7 +5,6 @@ Verifies competence state transitions and atomic file persistence.
 
 import pytest
 from learning_engine.mastery import (
-    load_mastery_data,
     set_subtopic_mastery,
     get_subtopic_mastery,
     get_completed_lessons,
@@ -68,9 +67,9 @@ def test_lesson_mastery_toggle():
     finally:
         set_subtopic_mastery(test_path, orig_state)
         # Restore lessons
-        data = load_mastery_data()
-        clean_path = test_path.strip("/")
-        if clean_path in data and isinstance(data[clean_path], dict):
-            data[clean_path]["completed_lessons"] = orig_lessons
-            from learning_engine.mastery import save_mastery_data
-            save_mastery_data(data)
+        from learning_engine.database import get_connection
+        import json
+        conn = get_connection()
+        with conn:
+            conn.execute("UPDATE mastery SET completed_lessons = ? WHERE path = ?", (json.dumps(orig_lessons), test_path.strip("/")))
+        conn.close()
