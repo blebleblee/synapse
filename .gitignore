@@ -11,6 +11,7 @@ __pycache__/
 # Node & Frontend Dependencies
 node_modules/
 app/frontend/node_modules/
+app/desktop/node_modules/
 dist/
 app/frontend/dist/
 
@@ -35,6 +36,7 @@ topics/.workspace_sessions/
 
 # Runtime Database & State
 data/
+exports/
 *.db
 *.db-journal
 *.db-wal

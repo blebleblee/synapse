@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Palette, Cpu, X, Check, Plus, Trash2, RefreshCw } from 'lucide-react';
+import {
+  Settings,
+  Palette,
+  Cpu,
+  X,
+  Check,
+  Plus,
+  Trash2,
+  RefreshCw,
+  Package,
+  Download,
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Search
+} from 'lucide-react';
 
 export interface AppSettings {
   theme: 'studio' | 'titanium' | 'monokai' | 'nordic';
@@ -42,6 +58,7 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
+  initialTab?: 'appearance' | 'cluster' | 'models' | 'store';
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -49,8 +66,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   settings,
   onSaveSettings,
+  initialTab,
 }) => {
-  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models' | 'store'>('appearance');
+
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
   const [clusterNodes, setClusterNodes] = useState<string[]>(
@@ -67,6 +91,123 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     };
   }>({});
   const [isScanningCluster, setIsScanningCluster] = useState(false);
+
+  // Curriculum Store & Addons State
+  const [packagesData, setPackagesData] = useState<{
+    installed: { domain: string; format?: string; title?: string; lesson_count?: number; lab_count?: number }[];
+    available_domains: { domain: string; title: string; description: string; lesson_count: number; lab_count: number; is_installed: boolean }[];
+  }>({ installed: [], available_domains: [] });
+  const [isLoadingPackages, setIsLoadingPackages] = useState(false);
+  const [storeSearch, setStoreSearch] = useState('');
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const [storeMessage, setStoreMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const fetchPackages = async () => {
+    setIsLoadingPackages(true);
+    try {
+      const res = await fetch('/api/packages');
+      if (res.ok) {
+        const data = await res.json();
+        setPackagesData(data);
+      }
+    } catch (err) {
+      console.error('Failed to load packages:', err);
+    } finally {
+      setIsLoadingPackages(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && activeTab === 'store') {
+      fetchPackages();
+    }
+  }, [isOpen, activeTab]);
+
+  const handleExportPack = async (domain: string) => {
+    setActionInProgress(`export-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/export?domain=${encodeURIComponent(domain)}`, {
+        method: 'POST'
+      });
+      if (!res.ok) throw new Error('Package export failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${domain}.synpack`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setStoreMessage({ text: `Successfully exported ${domain}.synpack`, type: 'success' });
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Export failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleInstallDomain = async (domain: string) => {
+    setActionInProgress(`install-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/install?domain=${encodeURIComponent(domain)}`, {
+        method: 'POST'
+      });
+      if (!res.ok) throw new Error('Package installation failed');
+      setStoreMessage({ text: `Package for ${domain} installed and registered!`, type: 'success' });
+      await fetchPackages();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Install failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleUninstallPack = async (domain: string) => {
+    setActionInProgress(`uninstall-${domain}`);
+    setStoreMessage(null);
+    try {
+      const res = await fetch(`/api/packages/${encodeURIComponent(domain)}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Package uninstall failed');
+      setStoreMessage({ text: `Package ${domain} uninstalled`, type: 'success' });
+      await fetchPackages();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Uninstall failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setActionInProgress('uploading');
+    setStoreMessage(null);
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append('file', file);
+      const res = await fetch('/api/packages/install', {
+        method: 'POST',
+        body: uploadForm
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Failed to install uploaded package');
+      }
+      const result = await res.json();
+      setStoreMessage({ text: `Successfully installed ${result.domain || 'custom'} package!`, type: 'success' });
+      await fetchPackages();
+    } catch (err: any) {
+      setStoreMessage({ text: err.message || 'Upload installation failed', type: 'error' });
+    } finally {
+      setActionInProgress(null);
+      if (e.target) e.target.value = '';
+    }
+  };
 
   useEffect(() => {
     setFormData(settings);
@@ -213,10 +354,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <Settings size={14} />
             <span>AI Models & Cloud API</span>
           </button>
+          <button
+            type="button"
+            className={`settings-nav-tab ${activeTab === 'store' ? 'active' : ''}`}
+            onClick={() => setActiveTab('store')}
+          >
+            <Package size={14} />
+            <span>Curriculum Store & Addons</span>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="settings-form">
-          {activeTab === 'appearance' && (
+          <div className="settings-tab-content">
+            {activeTab === 'appearance' && (
             <div className="settings-section">
               <div className="section-title">
                 <Palette size={14} />
@@ -464,6 +614,178 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
           )}
+
+          {activeTab === 'store' && (
+            <div className="settings-section">
+              <div className="section-title-row">
+                <div className="section-title">
+                  <Package size={14} />
+                  <span>Curriculum Store & Portable Addons</span>
+                </div>
+                <button
+                  type="button"
+                  className="icon-btn-sm"
+                  onClick={fetchPackages}
+                  title="Refresh Packages"
+                  disabled={isLoadingPackages}
+                >
+                  <RefreshCw size={13} className={isLoadingPackages ? 'animate-spin' : ''} />
+                </button>
+              </div>
+
+              {storeMessage && (
+                <div className={`store-message-banner ${storeMessage.type}`}>
+                  {storeMessage.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+                  <span>{storeMessage.text}</span>
+                </div>
+              )}
+
+              {/* Compact Search & Sideload Toolbar */}
+              <div className="store-top-bar">
+                <div className="store-search-box">
+                  <Search size={13} className="store-search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Filter domains (e.g. computing, arts)..."
+                    value={storeSearch}
+                    onChange={(e) => setStoreSearch(e.target.value)}
+                  />
+                  {storeSearch && (
+                    <button type="button" className="store-search-clear" onClick={() => setStoreSearch('')} title="Clear filter">
+                      <X size={11} />
+                    </button>
+                  )}
+                </div>
+
+                <label className="btn-secondary store-upload-compact-btn" title="Sideload custom .synpack archive">
+                  {actionInProgress === 'uploading' ? (
+                    <>
+                      <Loader2 size={12} className="animate-spin" />
+                      <span>Installing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={12} />
+                      <span>Sideload .synpack</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept=".synpack,.tar.gz"
+                    onChange={handleFileUpload}
+                    disabled={actionInProgress !== null}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+              </div>
+
+              {/* Installed Packages List */}
+              {packagesData.installed.length > 0 && (
+                <div className="store-installed-section">
+                  <div className="store-subsection-header">
+                    <span>Installed Packages ({packagesData.installed.length})</span>
+                  </div>
+                  <div className="store-installed-list">
+                    {packagesData.installed.map((p) => (
+                      <div key={p.domain} className="store-installed-row">
+                        <div className="store-installed-meta">
+                          <span className="store-pack-badge">{p.domain}</span>
+                          <span className="store-installed-title">{p.title || p.domain.replace(/_/g, ' ')}</span>
+                          <span className="store-installed-counts">
+                            {p.lesson_count || 0} Lessons · {p.lab_count || 0} Labs
+                          </span>
+                        </div>
+                        <div className="store-installed-actions">
+                          <button
+                            type="button"
+                            className="btn-danger-sm"
+                            onClick={() => handleUninstallPack(p.domain)}
+                            disabled={actionInProgress === `uninstall-${p.domain}`}
+                            title="Unregister Package"
+                          >
+                            <Trash2 size={12} />
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Available Domain Packages Grid */}
+              <div className="store-subsection-header">
+                <span>
+                  Available Domains ({packagesData.available_domains.filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase())).length})
+                </span>
+              </div>
+
+              <div className="store-domains-grid">
+                {packagesData.available_domains
+                  .filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase()))
+                  .map((d) => (
+                    <div key={d.domain} className={`store-domain-card ${d.is_installed ? 'installed' : ''}`}>
+                      <div className="store-card-header">
+                        <div className="store-card-title-col">
+                          <span className="store-domain-pill">{d.domain}</span>
+                          <h4 className="store-domain-title">{d.title}</h4>
+                        </div>
+                        {d.is_installed && (
+                          <span className="store-status-badge installed" title="Active in local topics">
+                            <Check size={11} /> Installed
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="store-domain-desc">{d.description}</p>
+
+                      <div className="store-card-footer">
+                        <div className="store-stat-pill">
+                          <span>{d.lesson_count} lessons</span>
+                          <span className="dot-sep">•</span>
+                          <span>{d.lab_count} labs</span>
+                        </div>
+
+                        <div className="store-card-actions">
+                          <button
+                            type="button"
+                            className="store-action-btn export"
+                            onClick={() => handleExportPack(d.domain)}
+                            disabled={actionInProgress === `export-${d.domain}`}
+                            title={`Export ${d.domain}.synpack archive`}
+                          >
+                            {actionInProgress === `export-${d.domain}` ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <Download size={12} />
+                            )}
+                            <span>Export</span>
+                          </button>
+
+                          {!d.is_installed && (
+                            <button
+                              type="button"
+                              className="store-action-btn install"
+                              onClick={() => handleInstallDomain(d.domain)}
+                              disabled={actionInProgress === `install-${d.domain}`}
+                              title={`Register ${d.domain} package`}
+                            >
+                              {actionInProgress === `install-${d.domain}` ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <Package size={12} />
+                              )}
+                              <span>Install</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+          </div>
 
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>

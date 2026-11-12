@@ -86,7 +86,9 @@ def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
                         query == course.lower() or
                         query == f"{disc}/{course}".lower()):
                         target_p = validate_workspace_path(TOPICS_DIR, Path(u_data["full_path"]))
-                        return domain, f"{disc}/{course}", unit, target_p
+                        cat_val = disc if unit == "core" else f"{disc}/{course}"
+                        sub_val = course if unit == "core" else unit
+                        return domain, cat_val, sub_val, target_p
 
     # 2. Fuzzy match
     for domain, ddata in tree.items():
@@ -95,7 +97,9 @@ def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
                 for unit, u_data in c_data["units"].items():
                     if query in u_data["rel_path"].lower() or query in u_data["display_name"].lower():
                         target_p = validate_workspace_path(TOPICS_DIR, Path(u_data["full_path"]))
-                        return domain, f"{disc}/{course}", unit, target_p
+                        cat_val = disc if unit == "core" else f"{disc}/{course}"
+                        sub_val = course if unit == "core" else unit
+                        return domain, cat_val, sub_val, target_p
 
     return None
 

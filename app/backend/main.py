@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any
 from collections import deque
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
@@ -115,7 +115,13 @@ from learning_engine.config_manager import get_settings, save_settings
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
-from learning_engine.packages import export_topic_pack, install_topic_pack, list_installed_packs
+from learning_engine.packages import (
+    export_topic_pack,
+    install_topic_pack,
+    list_installed_packs,
+    uninstall_topic_pack,
+    get_domain_pack_info
+)
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
 
@@ -328,22 +334,32 @@ def update_app_settings(settings: Dict[str, Any]):
 
 @app.get("/api/packages")
 def api_list_packages():
+    domains = [
+        {"domain": "arts", "title": "Arts & Music Production", "description": "Composition, acoustic DSP, synthesizers, visual arts, and performance."},
+        {"domain": "business", "title": "Business & Strategy", "description": "Financial modeling, negotiation, organizational design, operations."},
+        {"domain": "computing", "title": "Computing & Systems", "description": "AI, data engineering, eBPF infrastructure, Linux systems, kernel mechanics."},
+        {"domain": "crafts", "title": "Crafts & LEGO Engineering", "description": "Precision mechanisms, pneumatics, structural integrity, gear trains."},
+        {"domain": "economics", "title": "Economics & Quantitative Finance", "description": "Econometrics, game theory, macroeconomics, market design."},
+        {"domain": "engineering", "title": "Physical Engineering", "description": "Robotics, aerospace, control systems, structural analysis."},
+        {"domain": "formal_sciences", "title": "Formal Sciences & Mathematics", "description": "Abstract algebra, category theory, logic, computational proofs."},
+        {"domain": "health_sciences", "title": "Health Sciences & Medicine", "description": "Pharmacology, neuroanatomy, genomics, emergency protocols."},
+        {"domain": "humanities", "title": "Humanities & Philosophy", "description": "Epistemology, cognitive biases, rhetoric, formal debate."},
+        {"domain": "languages", "title": "Linguistics & Polyglot Foundations", "description": "Phonology, syntactic parsing, natural language evolution."},
+        {"domain": "motorsports", "title": "Motorsports & Vehicle Dynamics", "description": "Aerodynamics, telemetry, tire physics, suspension kinematics."},
+        {"domain": "natural_sciences", "title": "Natural Sciences", "description": "Quantum mechanics, thermodynamics, molecular biology, astrophysics."}
+    ]
+    installed_list = list_installed_packs()
+    installed_domains = {p.get("domain") for p in installed_list if isinstance(p, dict)}
+
+    for d in domains:
+        stats = get_domain_pack_info(d["domain"])
+        d["lesson_count"] = stats["lesson_count"]
+        d["lab_count"] = stats["lab_count"]
+        d["is_installed"] = (d["domain"] in installed_domains) or (stats["lesson_count"] > 0)
+
     return {
-        "installed": list_installed_packs(),
-        "available_domains": [
-            {"domain": "arts", "title": "Arts & Music Production", "description": "Composition, acoustic DSP, synthesizers, visual arts, and performance."},
-            {"domain": "business", "title": "Business & Strategy", "description": "Financial modeling, negotiation, organizational design, operations."},
-            {"domain": "computing", "title": "Computing & Systems", "description": "AI, data engineering, eBPF infrastructure, Linux systems, kernel mechanics."},
-            {"domain": "crafts", "title": "Crafts & LEGO Engineering", "description": "Precision mechanisms, pneumatics, structural integrity, gear trains."},
-            {"domain": "economics", "title": "Economics & Quantitative Finance", "description": "Econometrics, game theory, macroeconomics, market design."},
-            {"domain": "engineering", "title": "Physical Engineering", "description": "Robotics, aerospace, control systems, structural analysis."},
-            {"domain": "formal_sciences", "title": "Formal Sciences & Mathematics", "description": "Abstract algebra, category theory, logic, computational proofs."},
-            {"domain": "health_sciences", "title": "Health Sciences & Medicine", "description": "Pharmacology, neuroanatomy, genomics, emergency protocols."},
-            {"domain": "humanities", "title": "Humanities & Philosophy", "description": "Epistemology, cognitive biases, rhetoric, formal debate."},
-            {"domain": "languages", "title": "Linguistics & Polyglot Foundations", "description": "Phonology, syntactic parsing, natural language evolution."},
-            {"domain": "motorsports", "title": "Motorsports & Vehicle Dynamics", "description": "Aerodynamics, telemetry, tire physics, suspension kinematics."},
-            {"domain": "natural_sciences", "title": "Natural Sciences", "description": "Quantum mechanics, thermodynamics, molecular biology, astrophysics."}
-        ]
+        "installed": installed_list,
+        "available_domains": domains
     }
 
 @app.post("/api/packages/export")
@@ -356,6 +372,45 @@ def api_export_package(domain: str = Query(...)):
             filename=f"{domain}.synpack",
             media_type="application/gzip"
         )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/packages/install")
+async def api_install_package(
+    domain: Optional[str] = Query(None),
+    file: Optional[UploadFile] = File(None)
+):
+    if file:
+        if not file.filename.endswith(".synpack") and not file.filename.endswith(".tar.gz"):
+            raise HTTPException(status_code=400, detail="Only .synpack or .tar.gz archives can be installed.")
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".synpack", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+            content = await file.read()
+            tmp_path.write_bytes(content)
+        try:
+            result = install_topic_pack(tmp_path)
+            return result
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Installation failed: {e}")
+        finally:
+            tmp_path.unlink(missing_ok=True)
+    elif domain:
+        domain = sanitize_query(domain)
+        try:
+            pack_path = export_topic_pack(domain)
+            result = install_topic_pack(pack_path)
+            return result
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Domain pack installation failed: {e}")
+    else:
+        raise HTTPException(status_code=400, detail="Either 'file' upload or 'domain' parameter is required.")
+
+@app.delete("/api/packages/{domain}")
+def api_uninstall_package(domain: str):
+    domain = sanitize_query(domain)
+    try:
+        return uninstall_topic_pack(domain)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

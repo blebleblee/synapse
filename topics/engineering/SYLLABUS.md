@@ -36,10 +36,7 @@
 - **Hardware Troubleshooting** (`hardware/troubleshooting/`)
 
 ### Hardware: Software-Defined Radio
-- **IQ Sampling and Quadrature Signals** (`hardware/software_defined_radio/01_iq_sampling_and_quadrature_signals/`)
-- **GNU Radio Flowgraphs and Blocks** (`hardware/software_defined_radio/02_gnu_radio_flowgraphs_and_blocks/`)
-- **FSK and ASK Demodulation** (`hardware/software_defined_radio/03_fsk_ask_demodulation/`)
-- **RF Replay and Signal Analysis** (`hardware/software_defined_radio/04_rf_replay_and_signal_analysis/`)
+- **Software Defined Radio** (`hardware/software_defined_radio/`)
 
 ### Robotics
 - **Robotics Kinematics** (`robotics/robotics_kinematics/`)

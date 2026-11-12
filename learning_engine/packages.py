@@ -106,3 +106,23 @@ def list_installed_packs() -> List[Dict[str, Any]]:
             except Exception:
                 pass
     return packs
+
+def uninstall_topic_pack(domain: str) -> Dict[str, Any]:
+    """
+    Unregisters an installed topic package from the database.
+    """
+    with get_db_connection() as conn:
+        conn.execute("DELETE FROM settings WHERE key = ?", (f"pack:{domain}",))
+    return {"status": "uninstalled", "domain": domain}
+
+def get_domain_pack_info(domain: str) -> Dict[str, int]:
+    """
+    Calculates lesson and lab statistics for a given domain.
+    """
+    domain_dir = TOPICS_DIR / domain
+    if not domain_dir.exists() or not domain_dir.is_dir():
+        return {"lesson_count": 0, "lab_count": 0}
+    lesson_count = len(list(domain_dir.rglob("lesson_*.md")))
+    lab_count = len(list(domain_dir.rglob("labs.md")))
+    return {"lesson_count": lesson_count, "lab_count": lab_count}
+

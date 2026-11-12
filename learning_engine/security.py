@@ -1,6 +1,9 @@
 import re
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
+
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+TOPICS_DIR = WORKSPACE_ROOT / "topics"
 
 def sanitize_topic_path(domain: str, category: str, subtopic_id: str) -> tuple[str, str, str]:
     """Strict whitelist validation for topic path components."""
@@ -36,3 +39,38 @@ def validate_workspace_path(base_dir: Path, target_path: Path) -> Path:
         return resolved_target
     except Exception as e:
         raise ValueError(f"Invalid path structure: {e}")
+
+def validate_canonical_topic_path(target_path: Path, base_topics_dir: Optional[Path] = None) -> Path:
+    """
+    Guarantees that any topic directory strictly adheres to the canonical 3-level taxonomy:
+    topics/{domain}/{discipline}/{topic}
+    Rejects any path deeper or shallower than 3 levels under topics/,
+    or containing numbered prefixes (e.g. 01_*), or containing legacy level names.
+    """
+    base = (base_topics_dir or TOPICS_DIR).resolve()
+    resolved = target_path.resolve()
+    
+    if not str(resolved).startswith(str(base)):
+        raise ValueError(f"Security Violation: Path traversal attempt: {target_path}")
+
+    rel = resolved.relative_to(base)
+    parts = rel.parts
+    if len(parts) != 3:
+        raise ValueError(
+            f"Taxonomy violation: path '{rel}' has {len(parts)} levels. "
+            f"Synapse curriculum strictly requires exactly 3 levels: topics/{{domain}}/{{discipline}}/{{topic}}"
+        )
+
+    for part in parts:
+        if re.match(r"^\d{2}_", part):
+            raise ValueError(
+                f"Taxonomy violation: segment '{part}' in '{rel}' contains numbered prefix. "
+                f"Lessons belong inside the canonical topic folder, not in numbered subdirectories."
+            )
+        if part.lower() in ("beginner", "intermediate", "advanced", "lessons"):
+            raise ValueError(
+                f"Taxonomy violation: segment '{part}' in '{rel}' is a legacy level directory."
+            )
+
+    return resolved
+

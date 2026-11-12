@@ -7,6 +7,7 @@ Parallelizes multi-lesson curriculum generation across all available Ollama clus
 
 import sys
 import time
+import re
 import argparse
 import itertools
 import threading
@@ -19,6 +20,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
 
+from learning_engine.security import validate_canonical_topic_path
 from learning_engine.topic_manager import get_topic_tree, scan_subtopic_status, resolve_subtopic
 from learning_engine.generator import generate_topic_parallel, generate_subtopic_content
 from learning_engine.models import (
@@ -32,6 +34,13 @@ git_lock = threading.Lock()
 
 def process_subtopic_parallel(item, workers, total_count, force=False):
     idx, domain, cat, sub, sub_path = item
+
+    # Strict 3-level taxonomy guard: topics/{domain}/{discipline}/{topic}
+    try:
+        sub_path = validate_canonical_topic_path(sub_path)
+    except Exception as e:
+        print(f"[{idx:3d}/{total_count}] [!] Rejected invalid taxonomy path: {sub_path}: {e}", flush=True)
+        return False
 
     status = scan_subtopic_status(sub_path)
     if status["complete"] and not force:
@@ -129,13 +138,18 @@ def run_cluster_generation(
     tree = get_topic_tree()
     all_subtopics = []
     idx = 1
+    seen_paths = set()
     for domain, ddata in tree.items():
         if target_domain and domain != target_domain:
             continue
         for disc, disc_data in ddata.get("disciplines", {}).items():
             for course, c_data in disc_data.get("courses", {}).items():
                 for unit, u_data in c_data.get("units", {}).items():
-                    all_subtopics.append((idx, domain, f"{disc}/{course}", unit, Path(u_data["full_path"])))
+                    sub_p = Path(u_data["full_path"])
+                    if str(sub_p) in seen_paths:
+                        continue
+                    seen_paths.add(str(sub_p))
+                    all_subtopics.append((idx, domain, disc, course, sub_p))
                     idx += 1
 
     total = len(all_subtopics)

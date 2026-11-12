@@ -58,27 +58,18 @@ class TaxonomyService:
 
             for display_name, rel_path in matches:
                 parts = rel_path.split("/")
-                if len(parts) >= 3:
-                    disc = parts[0]
-                    course = parts[1]
-                    unit = "/".join(parts[2:])
-                elif len(parts) == 2:
-                    disc = parts[0]
-                    course = parts[1]
-                    unit = "core"
-                else:
-                    disc = "general"
-                    course = parts[0]
-                    unit = "core"
+                # Enforce strict 2-segment canonical taxonomy (discipline/topic)
+                # Purge any residual numbered or nested sub-segments (e.g. 01_*)
+                disc = parts[0] if len(parts) >= 1 else "general"
+                course = parts[1] if len(parts) >= 2 else parts[0]
+                unit = "core"
+                clean_rel = f"{disc}/{course}"
                 
                 if disc not in tree[domain]["disciplines"]:
                     tree[domain]["disciplines"][disc] = {"courses": {}}
                     tree[domain]["categories"][disc] = {}
                 
-                if unit == "core":
-                    c_display_title = display_name
-                else:
-                    c_display_title = course_display_names.get((disc, course), course.replace("_", " ").title())
+                c_display_title = display_name if len(parts) <= 2 else course_display_names.get((disc, course), course.replace("_", " ").title())
 
                 if course not in tree[domain]["disciplines"][disc]["courses"]:
                     tree[domain]["disciplines"][disc]["courses"][course] = {
@@ -86,23 +77,23 @@ class TaxonomyService:
                         "units": {}
                     }
                     
-                full_path = self.topics_dir / domain / rel_path
+                full_path = self.topics_dir / domain / disc / course
 
                 # Ensure status is populated correctly
                 status = self.scan_subtopic_status(full_path, self.levels)
 
                 node_data = {
-                    "display_name": display_name,
+                    "display_name": c_display_title,
                     "domain": domain,
                     "discipline": disc,
                     "course": course,
                     "course_title": course_display_names.get((disc, course), course.replace("_", " ").title()),
                     "unit": unit,
-                    "rel_path": f"{domain}/{rel_path}",
+                    "rel_path": f"{domain}/{clean_rel}",
                     "full_path": str(full_path),
                     "status": status,
                     "lessons": self.get_unit_lessons(full_path),
-                    "completed_lessons": mastery_get_completed(f"{domain}/{rel_path}"),
+                    "completed_lessons": mastery_get_completed(f"{domain}/{clean_rel}"),
                     "has_summary": (full_path / "SUMMARY.md").exists()
                 }
 

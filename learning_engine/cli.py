@@ -6,7 +6,11 @@ Interactive management for curricula, multi-tier lesson generation, search, lint
 import sys
 import argparse
 import os
+import subprocess
+import shutil
 from pathlib import Path
+
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 from .topic_manager import (
     get_topic_tree,
     list_domains,
@@ -344,6 +348,36 @@ def cmd_serve(args):
     print("==================================================")
     uvicorn.run("app.backend.main:app", host=host, port=port, reload=args.reload)
 
+def cmd_desktop(args):
+    """
+    Launches the Synapse Electron native desktop shell wrapper.
+    """
+    desktop_dir = WORKSPACE_ROOT / "app/desktop"
+    if not desktop_dir.exists():
+        print(f"[!] Desktop shell directory not found at {desktop_dir}")
+        return
+
+    npm_path = shutil.which("npm")
+    if not npm_path:
+        print("[!] Node.js / npm not found on PATH. Please install Node.js to use the desktop shell.")
+        return
+
+    if not (desktop_dir / "node_modules").exists():
+        print("[*] Installing desktop shell dependencies (npm install)...")
+        subprocess.run([npm_path, "install"], cwd=str(desktop_dir), check=True)
+
+    print("==================================================")
+    print("   SYNAPSE NATIVE DESKTOP SHELL WORKBENCH         ")
+    print("==================================================")
+    print("[*] Launching Electron desktop window wrapper...")
+    print("==================================================")
+
+    env = os.environ.copy()
+    if args.dev:
+        env["ELECTRON_DEV"] = "1"
+
+    subprocess.run([npm_path, "start"], cwd=str(desktop_dir), env=env)
+
 def main():
     load_env_file()
     parser = argparse.ArgumentParser(
@@ -351,6 +385,11 @@ def main():
         description="AI Learning Workspace Content Engine & Socratic Workbench"
     )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
+
+    # desktop
+    p_desktop = subparsers.add_parser("desktop", help="Launch the native Electron desktop shell wrapper")
+    p_desktop.add_argument("--dev", action="store_true", help="Connect to local Vite development server")
+    p_desktop.set_defaults(func=cmd_desktop)
 
     # serve
     p_serve = subparsers.add_parser("serve", help="Launch the integrated Web Workbench (UI + Backend + Terminal)")

@@ -28,7 +28,7 @@ def test_generate_flashcards_csv(monkeypatch):
     mock_provider.generate.return_value = '{"flashcards": [{"front": "What is etcd?", "back": "Distributed linearizable key-value store using Raft."}]}'
     monkeypatch.setattr("learning_engine.flashcards.get_provider", lambda **kwargs: mock_provider)
 
-    csv_path = generate_flashcards("computing/infrastructure/kubernetes/01_control_plane_and_etcd")
+    csv_path = generate_flashcards("computing/infrastructure/kubernetes")
     assert csv_path.exists()
     content = csv_path.read_text(encoding="utf-8")
     assert "#separator:Comma" in content

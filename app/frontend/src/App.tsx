@@ -31,6 +31,7 @@ export function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [graphOpen, setGraphOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'appearance' | 'cluster' | 'models' | 'store'>('appearance');
   const [flashcardModalOpen, setFlashcardModalOpen] = useState(false);
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
@@ -566,7 +567,14 @@ export function App() {
         onAddSubtopic={handleAddSubtopic}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenGraph={() => setGraphOpen(true)}
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={() => {
+          setSettingsTab('appearance');
+          setSettingsOpen(true);
+        }}
+        onOpenStore={() => {
+          setSettingsTab('store');
+          setSettingsOpen(true);
+        }}
         onDeleteTopic={handleDeleteTopic}
         onRenameTopic={handleRenameTopic}
         onToggleLessonCompletion={handleToggleLessonCompletion}
@@ -637,6 +645,7 @@ export function App() {
         onClose={() => setSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
+        initialTab={settingsTab}
       />
 
       <FlashcardStudyModal

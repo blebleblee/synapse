@@ -1,0 +1,69 @@
+{
+  "name": "synapse-desktop",
+  "version": "1.0.0",
+  "description": "Synapse AI Learning Workbench - Standalone Native Desktop Shell",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "ELECTRON_DEV=1 electron .",
+    "pack": "electron-builder --dir",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "synapse",
+    "ai",
+    "workbench",
+    "desktop",
+    "learning",
+    "curriculum"
+  ],
+  "author": "Synapse Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.synapse.workbench",
+    "productName": "Synapse Workbench",
+    "copyright": "Copyright © 2026 Synapse",
+    "directories": {
+      "output": "../../dist/desktop"
+    },
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "synpack",
+        "name": "Synapse Curriculum Package",
+        "role": "Editor"
+      }
+    ]
+  }
+}

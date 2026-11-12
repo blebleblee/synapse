@@ -29,17 +29,17 @@ def test_api_graph():
     data = res.json()
     assert "nodes" in data
     assert "edges" in data
-    assert data["node_count"] >= 700
+    assert data["node_count"] >= 500
 
 def test_api_topic_dependencies():
-    res = client.get("/api/topic/dependencies?query=computing/ai/large_language_models/02_instruction_tuning_and_rlhf")
+    res = client.get("/api/topic/dependencies?query=computing/ai/large_language_models")
     assert res.status_code == 200
     data = res.json()
     assert "prerequisites" in data
     assert "unlocks" in data
 
 def test_api_topic_valid():
-    res = client.get("/api/topic?query=computing/infrastructure/kubernetes/01_control_plane_and_etcd&level=beginner")
+    res = client.get("/api/topic?query=computing/infrastructure/kubernetes&level=beginner")
     assert res.status_code == 200
     data = res.json()
     assert "domain" in data
@@ -58,7 +58,7 @@ def test_api_search():
     assert len(data["results"]) > 0
 
 def test_api_mastery_get_and_post():
-    test_path = "computing/infrastructure/kubernetes/01_control_plane_and_etcd"
+    test_path = "computing/infrastructure/kubernetes"
     get_res = client.get("/api/mastery")
     assert get_res.status_code == 200
 
@@ -68,7 +68,7 @@ def test_api_mastery_get_and_post():
     assert post_res.json()["state"] == "studying"
 
 def test_api_flashcards_deck():
-    test_path = "computing/infrastructure/kubernetes/01_control_plane_and_etcd"
+    test_path = "computing/infrastructure/kubernetes"
     res = client.get(f"/api/flashcards/deck?query={test_path}")
     assert res.status_code == 200
     data = res.json()
@@ -143,3 +143,39 @@ def test_api_get_and_set_cluster_hosts():
     from learning_engine.models import CLUSTER_CONFIG_PATH
     if CLUSTER_CONFIG_PATH.exists():
         CLUSTER_CONFIG_PATH.unlink()
+
+def test_api_packages_endpoints():
+    # 1. List packages
+    res = client.get("/api/packages")
+    assert res.status_code == 200
+    data = res.json()
+    assert "installed" in data
+    assert "available_domains" in data
+    assert len(data["available_domains"]) == 12
+
+    # Verify domain enrichment fields
+    first_domain = data["available_domains"][0]
+    assert "lesson_count" in first_domain
+    assert "lab_count" in first_domain
+    assert "is_installed" in first_domain
+
+    # 2. Export package
+    res_exp = client.post("/api/packages/export?domain=arts")
+    assert res_exp.status_code == 200
+    assert len(res_exp.content) > 0
+
+    # 3. Install by domain parameter
+    res_inst = client.post("/api/packages/install?domain=arts")
+    assert res_inst.status_code == 200
+    assert res_inst.json()["status"] == "installed"
+    assert res_inst.json()["domain"] == "arts"
+
+    # 4. Verify listed in installed
+    res_list = client.get("/api/packages")
+    assert any(p.get("domain") == "arts" for p in res_list.json()["installed"])
+
+    # 5. Uninstall domain package
+    res_del = client.delete("/api/packages/arts")
+    assert res_del.status_code == 200
+    assert res_del.json()["status"] == "uninstalled"
+

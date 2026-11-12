@@ -18,6 +18,7 @@ import {
   TrendingUp,
   ArrowUpDown,
   Settings,
+  Package,
   ChevronsDownUp,
   ChevronsUpDown,
   Edit2,
@@ -41,6 +42,7 @@ interface TopicTreeProps {
   onOpenSearch: () => void;
   onOpenGraph: () => void;
   onOpenSettings: () => void;
+  onOpenStore?: () => void;
   onDeleteTopic?: (path: string) => Promise<void>;
   onRenameTopic?: (path: string, newTitle: string) => Promise<void>;
   onToggleLessonCompletion?: (path: string, lessonId: string, completed?: boolean) => Promise<void>;
@@ -93,6 +95,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   onOpenSearch,
   onOpenGraph,
   onOpenSettings,
+  onOpenStore,
   onDeleteTopic,
   onRenameTopic,
   onToggleLessonCompletion,
@@ -293,21 +296,24 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
   return (
     <aside className="tree-sidebar">
       <div className="sidebar-header">
-        <div className="brand">
-          <svg className="brand-logo-svg" viewBox="0 0 48 48" width="32" height="32" fill="none">
-            <circle cx="24" cy="24" r="20" stroke="#4f8fff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-            <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#fbbf24" strokeWidth="2.5" fill="#15181f" />
-            <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
-            <line x1="38" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
-            <line x1="38" y1="32" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
-            <line x1="24" y1="40" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
-            <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
-            <line x1="10" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
-            <circle cx="24" cy="24" r="5" fill="#10b981" />
-            <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
-          </svg>
-          <span className="brand-title">Synapse</span>
+        <div className="sidebar-header-top">
+          <div className="brand">
+            <svg className="brand-logo-svg" viewBox="0 0 48 48" width="34" height="34" fill="none">
+              <circle cx="24" cy="24" r="20" stroke="#4f8fff" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+              <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#fbbf24" strokeWidth="2.5" fill="#15181f" />
+              <line x1="24" y1="8" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+              <line x1="38" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+              <line x1="38" y1="32" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+              <line x1="24" y1="40" x2="24" y2="24" stroke="#10b981" strokeWidth="2" />
+              <line x1="10" y1="32" x2="24" y2="24" stroke="#4f8fff" strokeWidth="2" />
+              <line x1="10" y1="16" x2="24" y2="24" stroke="#fbbf24" strokeWidth="2" />
+              <circle cx="24" cy="24" r="5" fill="#10b981" />
+              <circle cx="24" cy="24" r="2.5" fill="#ffffff"/>
+            </svg>
+            <span className="brand-title">Synapse</span>
+          </div>
         </div>
+
         <div className="sidebar-header-actions">
           <button className="icon-btn" onClick={toggleAll} title={allExpanded ? ui.collapseAll : ui.expandAll}>
             {allExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
@@ -317,6 +323,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           </button>
           <button className="icon-btn" onClick={onOpenGraph} title={ui.graph}>
             <GitBranch size={14} />
+          </button>
+          <button className="icon-btn" onClick={onOpenStore || onOpenSettings} title="Curriculum Store & Addons">
+            <Package size={14} />
           </button>
           <button className="icon-btn" onClick={onOpenSettings} title={ui.settings}>
             <Settings size={14} />

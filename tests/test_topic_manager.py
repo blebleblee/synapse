@@ -48,7 +48,7 @@ def test_get_topic_tree_structure():
     assert "complete" in first_unit["status"]
 
 def test_sanitize_rel_path_valid():
-    p = sanitize_rel_path("computing/infrastructure/kubernetes/01_control_plane_and_etcd")
+    p = sanitize_rel_path("computing/infrastructure/kubernetes")
     assert p.is_relative_to(TOPICS_DIR)
 
 def test_sanitize_rel_path_traversal_attack():
@@ -59,19 +59,21 @@ def test_sanitize_rel_path_traversal_attack():
         sanitize_rel_path("../../../../../root")
 
 def test_resolve_subtopic_exact():
-    res = resolve_subtopic("computing/infrastructure/kubernetes/01_control_plane_and_etcd")
+    res = resolve_subtopic("computing/infrastructure/kubernetes")
     assert res is not None
     domain, cat, sub, sub_path = res
     assert domain == "computing"
-    assert cat == "infrastructure/kubernetes"
-    assert sub == "01_control_plane_and_etcd"
+    assert cat == "infrastructure"
+    assert sub == "kubernetes"
     assert sub_path.exists()
 
 def test_resolve_subtopic_partial():
-    res = resolve_subtopic("control_plane_and_etcd")
+    res = resolve_subtopic("kubernetes")
     assert res is not None
     domain, cat, sub, sub_path = res
     assert domain == "computing"
+    assert cat == "infrastructure"
+    assert sub == "kubernetes"
 
 def test_resolve_subtopic_non_existent():
     res = resolve_subtopic("totally_fictional_non_existent_topic_12345")
