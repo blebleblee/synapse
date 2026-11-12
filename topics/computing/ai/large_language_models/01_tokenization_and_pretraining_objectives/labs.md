@@ -2,263 +2,147 @@
 
 ## Objective & Environment Setup
 
-The primary objective of this lab is to gain hands-on experience with tokenization and pretraining of large language models (LLMs). We will implement a tokenization pipeline, pretrain a small LLM, and evaluate its performance. The lab requires a Python 3.11+ environment with the following packages installed:
+For this lab, you will need a Python 3.11+ environment with the following packages installed:
 
-- PyTorch
-- HuggingFace Transformers
-- NumPy
-- Scikit-learn
-- Ollama (optional for model deployment)
-- Polars (optional for data manipulation)
+* PyTorch
+* HuggingFace Transformers
+* NumPy
+* Scikit-learn
+* Ollama (optional)
+* Polars (optional)
 
-To set up the environment, execute the following commands:
+Additionally, you will need to configure your API credentials for the HuggingFace model hub.
 
 ```bash
-# Create a virtual environment
-python3.11 -m venv llm-lab-env
+pip install torch transformers numpy scikit-learn
+```
 
-# Activate the virtual environment
-source llm-lab-env/bin/activate
+You can use the following Python script to set up your environment:
+```python
+import torch
+import transformers
+import numpy as np
+from sklearn.model_selection import train_test_split
+from ollama import OllamaModel
+from polars import DataFrame
 
-# Install required packages
-pip install torch transformers numpy scikit-learn ollama polars
+# Set up API credentials for HuggingFace model hub
+hf_token = "YOUR_HF_TOKEN"
+hf_username = "YOUR_HF_USERNAME"
+
+# Set up device (GPU or CPU)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ```
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a tokenization pipeline and pretrain a small LLM using the HuggingFace Transformers library. We will use a simple dataset for demonstration purposes.
-
-### Tokenization Pipeline
-
-First, we will tokenize a sample text dataset using the `BytePairEncoding` tokenizer from HuggingFace.
+In this exercise, you will implement a basic tokenization and pretraining pipeline using the HuggingFace Transformers library. You will use the `BertTokenizer` and `BertModel` classes to perform tokenization and pretraining.
 
 ```python
-from transformers import AutoTokenizer
-from datasets import load_dataset
+import torch
+from transformers import BertTokenizer, BertModel
 
-# Load a sample dataset
-dataset = load_dataset('wikitext', 'wikitext-2-raw-v1', split='train[:10%]')
+# Load pre-trained model and tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertModel.from_pretrained('bert-base-uncased')
 
-# Initialize the tokenizer
-tokenizer = AutoTokenizer.from_pretrained('gpt2')
+# Define a function to perform tokenization and pretraining
+def tokenize_and_pretrain(text):
+    inputs = tokenizer.encode_plus(
+        text,
+        add_special_tokens=True,
+        max_length=512,
+        return_attention_mask=True,
+        return_tensors='pt'
+    )
+    outputs = model(inputs['input_ids'].to(device), attention_mask=inputs['attention_mask'].to(device))
+    return outputs.last_hidden_state
 
-# Tokenize the dataset
-def tokenize_function(examples):
-    return tokenizer(examples['text'], padding='max_length', truncation=True)
-
-tokenized_datasets = dataset.map(tokenize_function, batched=True)
-
-# Save the tokenizer
-tokenizer.save_pretrained('./tokenizer')
-```
-
-### Pretraining the Model
-
-Next, we will pretrain a small GPT-2 model using the tokenized dataset.
-
-```python
-from transformers import GPT2LMHeadModel, Trainer, TrainingArguments
-
-# Load the pre-trained model
-model = GPT2LMHeadModel.from_pretrained('gpt2')
-
-# Define training arguments
-training_args = TrainingArguments(
-    output_dir='./results',
-    overwrite_output_dir=True,
-    num_train_epochs=1,
-    per_device_train_batch_size=2,
-    save_steps=10_000,
-    save_total_limit=2,
-    prediction_loss_only=True,
-)
-
-# Initialize the Trainer
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_datasets,
-)
-
-# Train the model
-trainer.train()
+# Test the function with a sample text
+text = "This is a sample text for tokenization and pretraining."
+output = tokenize_and_pretrain(text)
+print(output.shape)
 ```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will perform hyperparameter tuning and benchmark the pre-trained model's performance in terms of accuracy, latency, and token costs.
-
-### Hyperparameter Tuning
-
-We will use the `Optuna` library for hyperparameter tuning. First, install Optuna:
-
-```bash
-pip install optuna
-```
-
-Then, implement the hyperparameter tuning pipeline:
+In this exercise, you will perform hyperparameter tuning and empirical benchmarking of the tokenization and pretraining pipeline. You will use the `GridSearchCV` class from Scikit-learn to perform hyperparameter tuning.
 
 ```python
-import optuna
-from transformers import GPT2LMHeadModel, Trainer, TrainingArguments
-
-def objective(trial):
-    # Suggest hyperparameters
-    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 5e-5)
-    per_device_train_batch_size = trial.suggest_categorical('per_device_train_batch_size', [2, 4, 8])
-    
-    # Define training arguments
-    training_args = TrainingArguments(
-        output_dir='./results',
-        overwrite_output_dir=True,
-        num_train_epochs=1,
-        per_device_train_batch_size=per_device_train_batch_size,
-        learning_rate=learning_rate,
-        save_steps=10_000,
-        save_total_limit=2,
-        prediction_loss_only=True,
-    )
-    
-    # Load the pre-trained model
-    model = GPT2LMHeadModel.from_pretrained('gpt2')
-    
-    # Initialize the Trainer
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized_datasets,
-    )
-    
-    # Train the model
-    trainer.train()
-    
-    # Evaluate the model
-    eval_results = trainer.evaluate()
-    return eval_results['eval_loss']
-
-# Run the hyperparameter tuning
-study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=5)
-```
-
-### Benchmarking
-
-We will benchmark the model's performance using the `time` module to measure latency and `scikit-learn` for accuracy.
-
-```python
-import time
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
-import torch
 
-# Load the tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained('./tokenizer')
-model = GPT2LMHeadModel.from_pretrained('./results/checkpoint-10000')
+# Define a function to perform hyperparameter tuning and benchmarking
+def hyperparameter_tuning_and_benchmarking(model, tokenizer, text):
+    # Split data into training and testing sets
+    train_text, test_text = train_test_split(text, test_size=0.2, random_state=42)
 
-# Prepare the input text
-input_text = "This is a sample text for benchmarking."
-inputs = tokenizer(input_text, return_tensors='pt')
+    # Define hyperparameter tuning space
+    param_grid = {
+        'learning_rate': [1e-5, 1e-4, 1e-3],
+        'num_epochs': [5, 10, 15]
+    }
 
-# Measure latency
-start_time = time.time()
-with torch.no_grad():
-    outputs = model(**inputs)
-end_time = time.time()
-latency = end_time - start_time
+    # Perform hyperparameter tuning
+    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+    grid_search.fit(tokenizer.encode_plus(train_text, add_special_tokens=True, max_length=512, return_attention_mask=True, return_tensors='pt').input_ids)
 
-# Calculate accuracy (simplified example)
-predicted_ids = torch.argmax(outputs.logits, dim=-1)
-accuracy = accuracy_score(inputs['input_ids'].flatten(), predicted_ids.flatten())
+    # Evaluate model on test set
+    y_pred = grid_search.predict(tokenizer.encode_plus(test_text, add_special_tokens=True, max_length=512, return_attention_mask=True, return_tensors='pt').input_ids)
+    accuracy = accuracy_score(y_pred, test_text)
+    return accuracy
 
-print(f'Latency: {latency} seconds')
-print(f'Accuracy: {accuracy}')
+# Test the function with a sample text
+text = "This is a sample text for tokenization and pretraining."
+accuracy = hyperparameter_tuning_and_benchmarking(model, tokenizer, text)
+print(accuracy)
 ```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the model's robustness by simulating stress conditions and edge cases, and implementing guardrails to handle failures.
-
-### Stress Testing
-
-We will simulate stress testing by generating text with a large context length.
+In this exercise, you will perform stress testing, edge case testing, and implement failure mitigation for the tokenization and pretraining pipeline. You will use the `try-except` block to catch and handle exceptions.
 
 ```python
-# Generate text with a large context length
-long_input_text = " ".join([input_text] * 100)
-long_inputs = tokenizer(long_input_text, return_tensors='pt')
+import torch
+from transformers import BertTokenizer, BertModel
 
-# Measure latency
-start_time = time.time()
-with torch.no_grad():
-    long_outputs = model.generate(**long_inputs, max_length=500)
-end_time = time.time()
-long_latency = end_time - start_time
-
-print(f'Long text latency: {long_latency} seconds')
-```
-
-### Edge Cases
-
-We will test the model's behavior with edge cases such as empty input and special characters.
-
-```python
-# Test with empty input
-empty_inputs = tokenizer("", return_tensors='pt')
-with torch.no_grad():
-    empty_outputs = model.generate(**empty_inputs, max_length=50)
-
-print(f'Empty input output: {tokenizer.decode(empty_outputs[0])}')
-
-# Test with special characters
-special_char_inputs = tokenizer("!@#$%^&*()", return_tensors='pt')
-with torch.no_grad():
-    special_char_outputs = model.generate(**special_char_inputs, max_length=50)
-
-print(f'Special characters output: {tokenizer.decode(special_char_outputs[0])}')
-```
-
-### Failure Mitigation
-
-We will implement guardrails to handle potential failures, such as input validation and exception handling.
-
-```python
-def generate_text(model, tokenizer, input_text):
+# Define a function to perform stress testing, edge case testing, and failure mitigation
+def stress_testing_edge_cases_failure_mitigation(model, tokenizer, text):
     try:
-        # Validate input
-        if not isinstance(input_text, str) or not input_text.strip():
-            raise ValueError("Input text must be a non-empty string.")
-        
-        # Tokenize input
-        inputs = tokenizer(input_text, return_tensors='pt')
-        
-        # Generate text
-        with torch.no_grad():
-            outputs = model.generate(**inputs, max_length=50)
-        
-        return tokenizer.decode(outputs[0])
-    
-    except Exception as e:
-        print(f'Error generating text: {e}')
-        return None
+        # Perform tokenization and pretraining
+        inputs = tokenizer.encode_plus(
+            text,
+            add_special_tokens=True,
+            max_length=512,
+            return_attention_mask=True,
+            return_tensors='pt'
+        )
+        outputs = model(inputs['input_ids'].to(device), attention_mask=inputs['attention_mask'].to(device))
 
-# Test guardrails
-print(generate_text(model, tokenizer, ""))  # Should handle empty input
-print(generate_text(model, tokenizer, "Valid input"))  # Should generate text
+        # Check for NaN values
+        if torch.isnan(outputs.last_hidden_state).any():
+            raise ValueError("NaN values detected in output")
+
+        # Check for out-of-memory errors
+        if torch.cuda.memory_allocated(device) > 1024 * 1024 * 1024:
+            raise MemoryError("Out-of-memory error detected")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+# Test the function with a sample text
+text = "This is a sample text for tokenization and pretraining."
+stress_testing_edge_cases_failure_mitigation(model, tokenizer, text)
 ```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
-| Method/Parameter | Description |
-|------------------|-------------|
-| `AutoTokenizer.from_pretrained` | Loads a pre-trained tokenizer. |
-| `GPT2LMHeadModel.from_pretrained` | Loads a pre-trained GPT-2 model. |
-| `Trainer` | Manages the training loop. |
-| `TrainingArguments` | Defines training arguments. |
-| `optuna.create_study` | Creates an Optuna study for hyperparameter tuning. |
-| `study.optimize` | Optimizes hyperparameters using the objective function. |
-| `tokenizer.encode` | Encodes input text into token IDs. |
-| `model.generate` | Generates text from token IDs. |
-| `time.time` | Measures execution time. |
-| `accuracy_score` | Calculates accuracy between true and predicted labels. |
-| `torch.no_grad` | Disables gradient calculation for inference. |
+| Python Method | Parameter | Verification Flag |
+| --- | --- | --- |
+| `BertTokenizer.encode_plus` | `add_special_tokens` | `True` |
+| `BertModel` | `num_epochs` | `5` |
+| `GridSearchCV` | `cv` | `5` |
+| `accuracy_score` | `y_pred` | `y_pred` |
 
-This lab provides a comprehensive hands-on experience with tokenization and pretraining of LLMs, including hyperparameter tuning, benchmarking, stress testing, and failure mitigation.
+Note: The above table is a quick reference cheat sheet for the Python methods, parameters, and verification flags used in this lab.
