@@ -40,7 +40,7 @@ exports/
 *.db
 *.db-journal
 *.db-wal
-.synapse_cluster.json
+.synapse_cluster*.json
 
 # Temporary Audit Scripts
 audit_*.py

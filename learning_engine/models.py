@@ -13,13 +13,15 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 from .config_manager import get_settings
 
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
 DEFAULT_OLLAMA_HOSTS = [
     "http://127.0.0.1:11434",
     "http://192.168.1.50:11434",
     "http://192.168.1.51:11434"
 ]
 
-CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
+DEFAULT_CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
     "http://127.0.0.1:11434": {
         "name": "localhost",
         "memory_tier": "large",
@@ -48,6 +50,21 @@ CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
         ]
     }
 }
+
+CLUSTER_SPECS_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster_specs.json"
+
+def get_cluster_specs() -> Dict[str, Dict[str, Any]]:
+    specs = dict(DEFAULT_CLUSTER_HOST_SPECS)
+    if CLUSTER_SPECS_CONFIG_PATH.exists():
+        try:
+            custom_specs = json.loads(CLUSTER_SPECS_CONFIG_PATH.read_text(encoding="utf-8"))
+            if isinstance(custom_specs, dict):
+                specs.update(custom_specs)
+        except Exception:
+            pass
+    return specs
+
+CLUSTER_HOST_SPECS = get_cluster_specs()
 
 def validate_generation_output(content: str) -> str:
     """
