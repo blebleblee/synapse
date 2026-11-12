@@ -89,3 +89,26 @@ def test_validate_canonical_topic_path_enforcement():
     numbered_p = TOPICS_DIR / "arts" / "music_performance" / "01_bass_guitar"
     with pytest.raises(ValueError, match="Taxonomy violation"):
         validate_canonical_topic_path(numbered_p)
+
+def test_zero_duplicate_lesson_numbers():
+    """Verify no topic directory contains multiple files with the same lesson index."""
+    duplicate_violations = []
+    for topic_dir in sorted(TOPICS_DIR.rglob("*")):
+        if not topic_dir.is_dir():
+            continue
+        lessons = list(topic_dir.glob("lesson_*.md"))
+        if not lessons:
+            continue
+        by_num = {}
+        for l in lessons:
+            m = re.match(r"^lesson_(\d{2})_", l.name)
+            if m:
+                num = m.group(1)
+                by_num.setdefault(num, []).append(l.name)
+
+        dupes = {num: files for num, files in by_num.items() if len(files) > 1}
+        if dupes:
+            duplicate_violations.append((str(topic_dir.relative_to(TOPICS_DIR)), dupes))
+
+    assert len(duplicate_violations) == 0, f"Found topics with duplicate lesson numbers: {duplicate_violations}"
+
