@@ -275,65 +275,38 @@ def api_cluster_status():
 @app.get("/api/settings/discovered-models")
 def api_discovered_models():
     """
-    Scans all configured endpoints and returns all available models
-    annotated with their host, node name, hardware tier, and provider type.
+    Scans all valid configured endpoints and returns a deduplicated, sorted list
+    of unique model names ready for direct selection.
     """
     cluster = OllamaCluster()
     status = cluster.get_cluster_status()
-    models_list = []
+    unique_models = []
     seen = set()
 
     for host, h_data in status.items():
         if not h_data.get("online"):
             continue
-        spec = CLUSTER_HOST_SPECS.get(host, {})
-        node_name = spec.get("name") or host.replace("http://", "").split(":")[0]
-        tier = spec.get("memory_tier", "standard")
-
         for m in h_data.get("models", []):
-            key = f"{host}::{m}"
-            if key not in seen:
-                seen.add(key)
-                models_list.append({
-                    "id": m,
-                    "display": f"[{node_name}] {m} ({tier})",
-                    "model": m,
-                    "host": host,
-                    "node_name": node_name,
-                    "tier": tier,
-                    "provider": "ollama"
-                })
+            clean_m = m.strip()
+            if clean_m and clean_m not in seen:
+                seen.add(clean_m)
+                unique_models.append(clean_m)
 
-    # Cloud models if keys configured
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
-    settings = get_settings()
-    if anthropic_key or settings.get("anthropicApiKey"):
-        for cm in ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"]:
-            models_list.append({
-                "id": cm,
-                "display": f"[anthropic] {cm} (cloud)",
-                "model": cm,
-                "host": "https://api.anthropic.com",
-                "node_name": "anthropic",
-                "tier": "cloud",
-                "provider": "anthropic"
-            })
+    # Cloud models
+    for cm in [
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-haiku-20241022",
+        "gemini-2.5-flash",
+        "gemini-2.5-pro"
+    ]:
+        if cm not in seen:
+            seen.add(cm)
+            unique_models.append(cm)
 
-    gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-    if gemini_key or settings.get("geminiApiKey"):
-        for gm in ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]:
-            models_list.append({
-                "id": gm,
-                "display": f"[gemini] {gm} (cloud)",
-                "model": gm,
-                "host": "https://generativelanguage.googleapis.com",
-                "node_name": "gemini",
-                "tier": "cloud",
-                "provider": "gemini"
-            })
+    unique_models.sort(key=lambda s: s.lower())
 
     return {
-        "models": models_list,
+        "models": unique_models,
         "nodes_scanned": len(status),
         "nodes_online": sum(1 for d in status.values() if d.get("online"))
     }

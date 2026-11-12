@@ -3190,14 +3190,14 @@ body, html, #root {
 
 /* Settings Modal Styles - Stable Fixed Dimensions */
 .settings-card {
-  width: 820px;
-  max-width: 95vw;
-  height: 640px;
-  max-height: 88vh;
+  width: 900px;
+  max-width: 96vw;
+  height: 660px;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 20px 24px 18px 24px;
+  padding: 18px 22px 16px 22px;
   border-radius: 10px;
 }
 
@@ -3211,10 +3211,10 @@ body, html, #root {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 14px;
-  margin-bottom: 14px;
+  margin-top: 10px;
+  margin-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
 
 .settings-form {
@@ -3229,17 +3229,70 @@ body, html, #root {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 6px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .settings-card .modal-actions {
   flex-shrink: 0;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-color);
+}
+
+.settings-models-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.settings-panel-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.panel-col-heading {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  margin: 0 0 2px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-group.compact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-group.compact label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-group.compact select,
+.form-group.compact input {
+  padding: 6px 10px;
+  font-size: 12.5px;
+  height: 32px;
+}
+
+.settings-row-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .settings-nav-tab {

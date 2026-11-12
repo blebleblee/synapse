@@ -107,15 +107,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [storeMessage, setStoreMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Endpoint Discovered Models State
-  const [discoveredModels, setDiscoveredModels] = useState<{
-    id: string;
-    display: string;
-    model: string;
-    host: string;
-    node_name: string;
-    tier: string;
-    provider: string;
-  }[]>([]);
+  const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
   const fetchPackages = async () => {
@@ -432,8 +424,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="settings-row-2col">
-                <div className="form-group">
+              <div className="settings-row-3col">
+                <div className="form-group compact">
                   <label>UI Font Size</label>
                   <select
                     value={formData.fontSize}
@@ -445,7 +437,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </select>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group compact">
                   <label>Reading Width</label>
                   <select
                     value={formData.readerWidth}
@@ -455,10 +447,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <option value="constrained">Comfortable Column (860px)</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="settings-row-2col" style={{ marginTop: '12px' }}>
-                <div className="form-group">
+                <div className="form-group compact">
                   <label>Reading Language</label>
                   <select
                     value={formData.language || 'en'}
@@ -470,21 +460,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <option value="es">Spanish (Español)</option>
                     <option value="ru">Russian (Русский)</option>
                   </select>
-                  <span className="field-hint">On-the-fly translation preserving math & code</span>
-                </div>
-
-                <div className="form-group">
-                  <label>Audio Speech Speed</label>
-                  <select
-                    value={formData.speechRate || '1.0'}
-                    onChange={(e) => setFormData({ ...formData, speechRate: e.target.value as any })}
-                  >
-                    <option value="0.85">0.85x (Slower & Clear)</option>
-                    <option value="1.0">1.0x (Standard Natural)</option>
-                    <option value="1.15">1.15x (Brisk Cadence)</option>
-                    <option value="1.3">1.3x (Fast Review)</option>
-                  </select>
-                  <span className="field-hint">In-browser Socratic voice synthesis</span>
                 </div>
               </div>
             </div>
@@ -587,190 +562,128 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
 
           {activeTab === 'models' && (
-            <div className="settings-section">
+            <div className="settings-section compact">
               <div className="section-title-row">
                 <div className="section-title">
                   <Settings size={14} />
-                  <span>AI Model Selection & Cloud API Credentials</span>
+                  <span>AI Models & Cloud API Keys</span>
                 </div>
                 <button
                   type="button"
                   className="btn-secondary-sm"
                   onClick={fetchDiscoveredModels}
                   disabled={isLoadingModels}
-                  title="Rescan all active cluster nodes and endpoints for installed models"
+                  title="Rescan endpoints for available models"
                 >
                   <RefreshCw size={12} className={isLoadingModels ? 'animate-spin' : ''} />
                   <span>{isLoadingModels ? 'Scanning...' : 'Pull Models from Endpoints'}</span>
                 </button>
               </div>
 
-              <div className="settings-row-2col">
-                <div className="form-group">
-                  <label>Primary Generation Model</label>
-                  <select
-                    value={
-                      formData.primaryModel && !discoveredModels.some((m) => m.id === formData.primaryModel)
-                        ? '__custom__'
-                        : formData.primaryModel || ''
-                    }
-                    onChange={(e) => {
-                      if (e.target.value === '__custom__') {
-                        setFormData({ ...formData, primaryModel: formData.primaryModel || 'qwen2.5-coder:32b' });
-                      } else {
-                        setFormData({ ...formData, primaryModel: e.target.value });
-                      }
-                    }}
-                  >
-                    <option value="">✨ Auto (qwen2.5-coder:32b or highest tier)</option>
-                    {discoveredModels.length > 0 && (
-                      <optgroup label="Discovered Endpoint Models">
-                        {discoveredModels.map((m, idx) => (
-                          <option key={`primary-${m.host}-${m.id}-${idx}`} value={m.id}>
-                            {m.display}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                    <option value="__custom__">✏️ Custom Model Name...</option>
-                  </select>
-                  {formData.primaryModel && !discoveredModels.some((m) => m.id === formData.primaryModel) && (
-                    <input
-                      type="text"
-                      className="custom-model-input"
+              <div className="settings-models-grid">
+                {/* Column 1: Model Selection */}
+                <div className="settings-panel-col">
+                  <h4 className="panel-col-heading">Model Selection</h4>
+
+                  <div className="form-group compact">
+                    <label>Primary Generation Model</label>
+                    <select
                       value={formData.primaryModel}
                       onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                      placeholder="Enter custom model string"
-                      style={{ marginTop: '6px' }}
-                    />
-                  )}
-                  <span className="field-hint">Used for curriculum drafting and lesson synthesis</span>
-                </div>
-
-                <div className="form-group">
-                  <label>Reviewer / Audit Model</label>
-                  <select
-                    value={
-                      formData.reviewerModel && !discoveredModels.some((m) => m.id === formData.reviewerModel)
-                        ? '__custom__'
-                        : formData.reviewerModel || ''
-                    }
-                    onChange={(e) => {
-                      if (e.target.value === '__custom__') {
-                        setFormData({ ...formData, reviewerModel: formData.reviewerModel || 'deepseek-r1:32b' });
-                      } else {
-                        setFormData({ ...formData, reviewerModel: e.target.value });
-                      }
-                    }}
-                  >
-                    <option value="">✨ Auto (deepseek-r1:32b or reasoning model)</option>
-                    {discoveredModels.length > 0 && (
-                      <optgroup label="Discovered Endpoint Models">
-                        {discoveredModels.map((m, idx) => (
-                          <option key={`reviewer-${m.host}-${m.id}-${idx}`} value={m.id}>
-                            {m.display}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                    <option value="__custom__">✏️ Custom Model Name...</option>
-                  </select>
-                  {formData.reviewerModel && !discoveredModels.some((m) => m.id === formData.reviewerModel) && (
-                    <input
-                      type="text"
-                      className="custom-model-input"
-                      value={formData.reviewerModel}
-                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                      placeholder="Enter custom model string"
-                      style={{ marginTop: '6px' }}
-                    />
-                  )}
-                  <span className="field-hint">Used for pedagogical review and safety checks</span>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Socratic Mentor Model (Interactive AI Tutor)</label>
-                <select
-                  value={
-                    formData.mentorModel && !discoveredModels.some((m) => m.id === formData.mentorModel)
-                      ? '__custom__'
-                      : formData.mentorModel || ''
-                  }
-                  onChange={(e) => {
-                    if (e.target.value === '__custom__') {
-                      setFormData({ ...formData, mentorModel: formData.mentorModel || 'qwen2.5-coder:7b' });
-                    } else {
-                      setFormData({ ...formData, mentorModel: e.target.value });
-                    }
-                  }}
-                >
-                  <option value="">✨ Auto (Fastest online cluster node or cloud fallback)</option>
-                  {discoveredModels.length > 0 && (
-                    <optgroup label="Discovered Endpoint Models">
-                      {discoveredModels.map((m, idx) => (
-                        <option key={`mentor-${m.host}-${m.id}-${idx}`} value={m.id}>
-                          {m.display}
+                    >
+                      {!formData.primaryModel && <option value="">Select Primary Model...</option>}
+                      {formData.primaryModel && !discoveredModels.includes(formData.primaryModel) && (
+                        <option value={formData.primaryModel}>{formData.primaryModel}</option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`p-${m}`} value={m}>
+                          {m}
                         </option>
                       ))}
-                    </optgroup>
-                  )}
-                  <option value="__custom__">✏️ Custom Model Name...</option>
-                </select>
-                {formData.mentorModel && !discoveredModels.some((m) => m.id === formData.mentorModel) && (
-                  <input
-                    type="text"
-                    className="custom-model-input"
-                    value={formData.mentorModel}
-                    onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                    placeholder="Enter custom model string"
-                    style={{ marginTop: '6px' }}
-                  />
-                )}
-                <span className="field-hint">Target model for live Socratic mentoring in the chat panel</span>
-              </div>
+                    </select>
+                  </div>
 
-              <div className="form-group">
-                <label>Anthropic API Key (Claude 3.5 Sonnet / Opus)</label>
-                <input
-                  type="password"
-                  value={formData.anthropicApiKey}
-                  onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                  placeholder="sk-ant-..."
-                />
-                <span className="field-hint">Stored securely in local SQLite database (never committed to git)</span>
-              </div>
+                  <div className="form-group compact">
+                    <label>Reviewer / Audit Model</label>
+                    <select
+                      value={formData.reviewerModel}
+                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                    >
+                      {!formData.reviewerModel && <option value="">Select Reviewer Model...</option>}
+                      {formData.reviewerModel && !discoveredModels.includes(formData.reviewerModel) && (
+                        <option value={formData.reviewerModel}>{formData.reviewerModel}</option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`r-${m}`} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="form-group">
-                <label>Anthropic Base URL (Proxy / Custom Gateway)</label>
-                <input
-                  type="text"
-                  value={formData.anthropicBaseUrl}
-                  onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
-                  placeholder="https://api.anthropic.com"
-                />
-              </div>
+                  <div className="form-group compact">
+                    <label>Socratic Mentor Model (AI Tutor)</label>
+                    <select
+                      value={formData.mentorModel || ''}
+                      onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                    >
+                      {!formData.mentorModel && <option value="">Select Mentor Model...</option>}
+                      {formData.mentorModel && !discoveredModels.includes(formData.mentorModel) && (
+                        <option value={formData.mentorModel}>{formData.mentorModel}</option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`m-${m}`} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-              <div className="form-group">
-                <label>Google Gemini API Key (Optional Fallback)</label>
-                <input
-                  type="password"
-                  value={formData.geminiApiKey}
-                  onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
-                  placeholder="AIzaSy..."
-                />
-                <span className="field-hint">Standard Google AI Studio API key (AIzaSy...) is sufficient on its own.</span>
-              </div>
+                {/* Column 2: Cloud API Credentials */}
+                <div className="settings-panel-col">
+                  <h4 className="panel-col-heading">Cloud API Credentials</h4>
 
-              <div className="form-group">
-                <label>Google Gemini Base URL (Optional Gateway / Proxy)</label>
-                <input
-                  type="text"
-                  value={formData.geminiBaseUrl || ''}
-                  onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
-                  placeholder="https://generativelanguage.googleapis.com (Default)"
-                />
-                <span className="field-hint">Leave empty for official Google API. Only set if using an enterprise AI proxy or Cloudflare gateway.</span>
+                  <div className="form-group compact">
+                    <label>Anthropic API Key</label>
+                    <input
+                      type="password"
+                      value={formData.anthropicApiKey}
+                      onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                      placeholder="sk-ant-..."
+                    />
+                  </div>
+
+                  <div className="form-group compact">
+                    <label>Anthropic Base URL</label>
+                    <input
+                      type="text"
+                      value={formData.anthropicBaseUrl}
+                      onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
+                      placeholder="https://api.anthropic.com"
+                    />
+                  </div>
+
+                  <div className="form-group compact">
+                    <label>Google Gemini API Key</label>
+                    <input
+                      type="password"
+                      value={formData.geminiApiKey}
+                      onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
+                      placeholder="AIzaSy..."
+                    />
+                  </div>
+
+                  <div className="form-group compact">
+                    <label>Google Gemini Base URL (Optional Gateway)</label>
+                    <input
+                      type="text"
+                      value={formData.geminiBaseUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
+                      placeholder="https://generativelanguage.googleapis.com"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
