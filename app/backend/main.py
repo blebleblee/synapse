@@ -31,50 +31,27 @@ from collections import deque
 from typing import Dict, List, Optional, Any
 
 ANSI_ESCAPE_RE = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+MAX_TERMINAL_LINE_LENGTH = 10000
+TERMINAL_HISTORY: deque[str] = deque(maxlen=150)
 
-class TerminalRingBuffer:
-    MAX_LINE_LENGTH: int = 10_000
+def append_terminal_bytes(raw_bytes: bytes):
+    try:
+        text = raw_bytes.decode("utf-8", errors="replace")
+        clean = ANSI_ESCAPE_RE.sub("", text)
+        for line in clean.splitlines():
+            stripped = line.strip()
+            if stripped:
+                if len(stripped) > MAX_TERMINAL_LINE_LENGTH:
+                    stripped = stripped[:MAX_TERMINAL_LINE_LENGTH] + "... [TRUNCATED]"
+                TERMINAL_HISTORY.append(stripped)
+    except Exception:
+        pass
 
-    def __init__(self, max_lines: int = 150):
-        self.buffer: deque[str] = deque(maxlen=max_lines)
-        self._lock = threading.Lock()
+def get_terminal_lines(count: int = 50) -> List[str]:
+    return list(TERMINAL_HISTORY)[-count:]
 
-    def append_text(self, raw_bytes: bytes):
-        with self._lock:
-            try:
-                text = raw_bytes.decode("utf-8", errors="replace")
-                clean = ANSI_ESCAPE_RE.sub("", text)
-                for line in clean.splitlines():
-                    stripped = line.strip()
-                    if stripped:
-                        if len(stripped) > self.MAX_LINE_LENGTH:
-                            stripped = stripped[:self.MAX_LINE_LENGTH] + "... [TRUNCATED]"
-                        self.buffer.append(stripped)
-            except Exception as e:
-                # Log error silently to avoid breaking PTY flow
-                pass
-
-    def get_recent_lines(self, count: int = 50) -> List[str]:
-        with self._lock:
-            return list(self.buffer)[-count:]
-
-    def get_recent_text(self, count: int = 50) -> str:
-        with self._lock:
-            return "\n".join(list(self.buffer)[-count:])
-
-class SessionManager:
-    def __init__(self):
-        self.sessions: Dict[str, TerminalRingBuffer] = {}
-        self._lock = threading.Lock()
-
-    def get_buffer(self, session_id: str) -> TerminalRingBuffer:
-        with self._lock:
-            if session_id not in self.sessions:
-                self.sessions[session_id] = TerminalRingBuffer()
-            return self.sessions[session_id]
-
-# Global Session Manager
-SESSION_MANAGER = SessionManager()
+def get_terminal_text(count: int = 50) -> str:
+    return "\n".join(list(TERMINAL_HISTORY)[-count:])
 
 # Ensure workspace root is in sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -881,10 +858,9 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
 
 @app.get("/api/terminal/buffer")
 def get_terminal_buffer(session_id: str = "default", lines: int = 50):
-    buffer = SESSION_MANAGER.get_buffer(session_id)
     return {
-        "lines": buffer.get_recent_lines(lines),
-        "text": buffer.get_recent_text(lines)
+        "lines": get_terminal_lines(lines),
+        "text": get_terminal_text(lines)
     }
 
 @app.post("/api/chat")
@@ -893,7 +869,7 @@ async def chat_with_tutor(req: ChatRequest):
 
     terminal_ctx = req.terminal_context
     if not terminal_ctx or not terminal_ctx.strip():
-        terminal_ctx = SESSION_MANAGER.get_buffer("default").get_recent_text(50)
+        terminal_ctx = get_terminal_text(50)
 
     if target:
         domain, cat, sub, sub_path = target
@@ -1180,8 +1156,6 @@ async def terminal_websocket(websocket: WebSocket):
             cwd=str(WORKSPACE_ROOT),
             env=os.environ.copy()
         )
-        session_id = str(id(websocket))
-        buffer = SESSION_MANAGER.get_buffer(session_id)
         notice = "\r\n\x1b[1;32m[i] Connected to Synapse Interactive Shell (Pipe Mode - Host PTY ceiling reached)\x1b[0m\r\n"
         await websocket.send_text(notice)
 
@@ -1191,7 +1165,7 @@ async def terminal_websocket(websocket: WebSocket):
                     data = await proc.stdout.read(1024)
                     if not data:
                         break
-                    buffer.append_text(data)
+                    append_terminal_bytes(data)
                     await websocket.send_bytes(data)
             except Exception:
                 pass
@@ -1344,8 +1318,6 @@ async def terminal_websocket(websocket: WebSocket):
     loop = asyncio.get_event_loop()
 
     async def pty_read_loop():
-        session_id = str(id(websocket))
-        buffer = SESSION_MANAGER.get_buffer(session_id)
         try:
             while True:
                 await asyncio.sleep(0.01)
@@ -1354,7 +1326,7 @@ async def terminal_websocket(websocket: WebSocket):
                     try:
                         data = os.read(master, 4096)
                         if data:
-                            buffer.append_text(data)
+                            append_terminal_bytes(data)
                             await websocket.send_bytes(data)
                         else:
                             break

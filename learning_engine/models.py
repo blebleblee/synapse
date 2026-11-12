@@ -16,100 +16,37 @@ from .config_manager import get_settings
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_OLLAMA_HOSTS = [
-    "http://127.0.0.1:11434",
-    "http://192.168.1.50:11434",
-    "http://192.168.1.51:11434"
+    "http://127.0.0.1:11434"
 ]
 
-DEFAULT_CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
-    "http://127.0.0.1:11434": {
-        "name": "localhost",
-        "memory_tier": "large",
-        "preferred_models": [
-            "qwen2.5-coder:32b",
-            "qwen2.5:32b",
-            "deepseek-r1:32b",
-            "llama3.1:latest"
-        ]
-    },
-    "http://192.168.1.50:11434": {
-        "name": "node-1",
-        "memory_tier": "large",
-        "preferred_models": [
-            "qwen2.5-coder:32b",
-            "gemma4:26b",
-            "gemma4:12b"
-        ]
-    },
-    "http://192.168.1.51:11434": {
-        "name": "node-2",
-        "memory_tier": "12gb",
-        "preferred_models": [
-            "llama3.1:8b",
-            "qwen3:4b"
-        ]
-    }
-}
+def get_node_name(host: str) -> str:
+    """Returns a clean display name for a cluster host."""
+    clean = host.replace("http://", "").replace("https://", "").split(":")[0]
+    return "localhost" if clean in ("127.0.0.1", "localhost") else clean
 
-CLUSTER_SPECS_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster_specs.json"
-
-def get_cluster_specs() -> Dict[str, Dict[str, Any]]:
-    specs = dict(DEFAULT_CLUSTER_HOST_SPECS)
-    if CLUSTER_SPECS_CONFIG_PATH.exists():
-        try:
-            custom_specs = json.loads(CLUSTER_SPECS_CONFIG_PATH.read_text(encoding="utf-8"))
-            if isinstance(custom_specs, dict):
-                specs.update(custom_specs)
-        except Exception:
-            pass
-    return specs
-
-CLUSTER_HOST_SPECS = get_cluster_specs()
+# Retained as empty dict for backwards compatibility
+CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {}
 
 def validate_generation_output(content: str) -> str:
     """
     Validates LLM output before persisting to disk.
-    Rejects empty output and raw model runner metadata/loading payloads.
-    Strips conversational preambles and unwraps outer markdown code blocks.
+    Rejects empty output or raw model runner metadata/loading payloads.
+    Unwraps outer markdown code block if the entire response is fenced.
     """
     cleaned = (content or "").strip()
     if not cleaned:
         raise ValueError("LLM returned an empty response.")
-    # Prevent raw runner status JSON from corrupting markdown files
-    if cleaned.startswith("{") and ("\"done_reason\"" in cleaned or "\"created_at\"" in cleaned) and "\"done\":true" in cleaned.replace(" ", ""):
+    if cleaned.startswith("{") and '"done":true' in cleaned.replace(" ", ""):
         raise ValueError(f"LLM returned raw model metadata instead of generated content: {cleaned[:120]}")
 
-    # Strip conversational preamble if auditor wrapped markdown inside code fences:
-    if "```markdown" in cleaned:
-        match = re.search(r"```markdown\s*([\s\S]*?)```", cleaned)
-        if match and match.group(1).strip().startswith("#"):
-            cleaned = match.group(1).strip()
+    if cleaned.startswith("```markdown\n") and cleaned.endswith("\n```"):
+        cleaned = cleaned[12:-4].strip()
     elif cleaned.startswith("```") and cleaned.endswith("```"):
         lines = cleaned.splitlines()
-        if len(lines) > 2:
+        if len(lines) > 2 and lines[0].startswith("```"):
             cleaned = "\n".join(lines[1:-1]).strip()
 
-    # Strip conversational lead-in lines
-    cleaned = re.sub(
-        r"^(?:The document contains .*?Below is the corrected version:?|Here is the corrected version:?|Below is the corrected document:?)\s*",
-        "",
-        cleaned,
-        flags=re.IGNORECASE
-    ).strip()
-
-    # Strip common conversational wrapper tags that models sometimes use
-    cleaned = re.sub(r"<(?:html|markdown|div|span|xml|pre|code)(?:[^>]*)>", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"</(?:html|markdown|div|span|xml|pre|code)>", "", cleaned, flags=re.IGNORECASE)
-
-    # Validate balanced code fences
-    fence_count = cleaned.count("```")
-    if fence_count % 2 != 0:
-        # Try to fix by closing the last fence
-        cleaned += "\n```"
-
     return cleaned
-
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
 def load_env_file():
     env_file = WORKSPACE_ROOT / ".env"
@@ -128,12 +65,11 @@ load_env_file()
 CLUSTER_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster.json"
 
 def get_configured_hosts() -> List[str]:
-    # 1. Environment variable priority
+    """Get Ollama hosts from .synapse_cluster.json, falling back to localhost."""
     env_hosts = os.environ.get("OLLAMA_HOSTS")
     if env_hosts:
         return [h.strip().rstrip("/") for h in env_hosts.split(",") if h.strip()]
 
-    # 2. Persistent workspace config
     if CLUSTER_CONFIG_PATH.exists():
         try:
             data = json.loads(CLUSTER_CONFIG_PATH.read_text(encoding="utf-8"))
@@ -142,18 +78,6 @@ def get_configured_hosts() -> List[str]:
         except Exception:
             pass
 
-    # 3. Custom cluster specs file overlay
-    if CLUSTER_SPECS_CONFIG_PATH.exists():
-        try:
-            specs = json.loads(CLUSTER_SPECS_CONFIG_PATH.read_text(encoding="utf-8"))
-            if isinstance(specs, dict):
-                hosts = [h.strip().rstrip("/") for h in specs.keys() if h and isinstance(h, str) and h.strip()]
-                if hosts:
-                    return hosts
-        except Exception:
-            pass
-
-    # 4. Default fallback cluster nodes
     return DEFAULT_OLLAMA_HOSTS
 
 def save_configured_hosts(hosts: List[str]) -> List[str]:

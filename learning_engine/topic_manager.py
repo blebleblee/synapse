@@ -10,12 +10,10 @@ from typing import Dict, Any, List, Optional, Tuple
 
 from learning_engine.mastery import get_completed_lessons
 from learning_engine.security import sanitize_topic_path, validate_workspace_path
-from learning_engine.services import TaxonomyService
 from learning_engine.utils import scan_subtopic_status as utils_scan, get_unit_lessons as utils_get_lessons
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = validate_workspace_path(WORKSPACE_ROOT, WORKSPACE_ROOT / "topics")
-TAXONOMY = TaxonomyService(TOPICS_DIR, WORKSPACE_ROOT)
 
 def get_topics_dir() -> Path:
     return TOPICS_DIR
@@ -56,8 +54,85 @@ def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
     return utils_scan(unit_dir)
 
 def get_topic_tree() -> Dict[str, Any]:
-    """Wraps TaxonomyService to maintain API compatibility."""
-    return TAXONOMY.get_topic_tree()
+    """Generates the full canonical 3-level taxonomy hierarchy."""
+    tree = {}
+    for domain in list_domains():
+        domain_dir = TOPICS_DIR / domain
+        syllabus_file = domain_dir / "SYLLABUS.md"
+
+        tree[domain] = {
+            "path": str(domain_dir.relative_to(WORKSPACE_ROOT)),
+            "disciplines": {},
+            "categories": {}
+        }
+
+        if not syllabus_file.exists():
+            continue
+
+        content = syllabus_file.read_text(encoding="utf-8")
+        pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
+        matches = re.findall(pattern, content)
+
+        course_display_names = {}
+        current_section = ""
+        for line in content.splitlines():
+            line_str = line.strip()
+            if line_str.startswith("### "):
+                current_section = line_str.lstrip("#").strip()
+            elif line_str.startswith("- **"):
+                m = re.match(r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)", line_str)
+                if m:
+                    _, u_rel = m.groups()
+                    u_parts = u_rel.split("/")
+                    u_disc = u_parts[0] if len(u_parts) >= 2 else "general"
+                    u_course = u_parts[1] if len(u_parts) >= 2 else u_parts[0]
+
+                    if current_section and (u_disc, u_course) not in course_display_names:
+                        c_title = current_section.split(":", 1)[1].strip() if ":" in current_section else current_section
+                        course_display_names[(u_disc, u_course)] = c_title if c_title.lower() != u_disc.lower() else u_course.replace("_", " ").title()
+
+        for display_name, rel_path in matches:
+            parts = rel_path.split("/")
+            disc = parts[0] if len(parts) >= 1 else "general"
+            course = parts[1] if len(parts) >= 2 else parts[0]
+            unit = "core"
+            clean_rel = f"{disc}/{course}"
+
+            if disc not in tree[domain]["disciplines"]:
+                tree[domain]["disciplines"][disc] = {"courses": {}}
+                tree[domain]["categories"][disc] = {}
+
+            c_display_title = display_name if len(parts) <= 2 else course_display_names.get((disc, course), course.replace("_", " ").title())
+
+            if course not in tree[domain]["disciplines"][disc]["courses"]:
+                tree[domain]["disciplines"][disc]["courses"][course] = {
+                    "display_name": c_display_title,
+                    "units": {}
+                }
+
+            full_path = TOPICS_DIR / domain / disc / course
+            status = utils_scan(full_path)
+
+            node_data = {
+                "display_name": c_display_title,
+                "domain": domain,
+                "discipline": disc,
+                "course": course,
+                "course_title": course_display_names.get((disc, course), course.replace("_", " ").title()),
+                "unit": unit,
+                "rel_path": f"{domain}/{clean_rel}",
+                "full_path": str(full_path),
+                "status": status,
+                "lessons": utils_get_lessons(full_path),
+                "completed_lessons": get_completed_lessons(f"{domain}/{clean_rel}"),
+                "has_summary": (full_path / "SUMMARY.md").exists()
+            }
+
+            tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
+            flat_key = f"{course}_{unit}" if unit != "core" else course
+            tree[domain]["categories"][disc][flat_key] = node_data
+
+    return tree
 
 def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     """

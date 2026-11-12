@@ -18,13 +18,12 @@ from .topic_manager import (
     add_subtopic,
     get_domain_persona
 )
-from .models import get_provider, OllamaProvider, OllamaCluster, CLUSTER_HOST_SPECS, load_env_file
+from .models import get_provider, OllamaProvider, OllamaCluster, load_env_file, get_node_name
 from .generator import generate_subtopic_content
 from .search import search_curriculum
 from .graph import get_prerequisite_graph
 from .linter import lint_curriculum
 from .exporter import export_handbook
-from .daemon import start_daemon, stop_daemon, generate_service_files
 from .mastery import get_mastery_summary, set_subtopic_mastery, load_mastery_data
 from .flashcards import generate_flashcards
 from .reviewer import review_and_fix_unit, audit_content
@@ -100,13 +99,11 @@ def cmd_status(args):
     print(f"  Ollama Cluster Status:    {online_count}/{total_nodes} Nodes Online")
     for host, h_data in cluster_status.items():
         clean_host = host.rstrip("/")
-        spec = CLUSTER_HOST_SPECS.get(clean_host, {})
-        name = spec.get("name", host).upper()
-        tier = spec.get("memory_tier", "auto")
+        name = get_node_name(clean_host).upper()
         is_online = h_data.get("online", False)
         status_str = "ONLINE " if is_online else "OFFLINE"
         pref_model = h_data.get("preferred_model") or (h_data.get("models") and h_data["models"][0]) or "none"
-        print(f"    - [{name:9s}] {status_str} | Tier: {tier:8s} | Model: {pref_model}")
+        print(f"    - [{name:10s}] {status_str} | Model: {pref_model}")
     
     if os.environ.get("ANTHROPIC_API_KEY"):
         print(f"    - [ANTHROPIC] ONLINE    | Tier: cloud    | Model: claude-3-5-sonnet-20241022")
@@ -284,9 +281,6 @@ def cmd_mastery(args):
             print(f"  - {state.replace('_', ' ').title():16s}: {count}")
         print("==================================================")
 
-def cmd_stop(args):
-    stop_daemon()
-
 def cmd_review(args):
     if args.query:
         target = resolve_subtopic(args.query)
@@ -334,14 +328,6 @@ def cmd_review(args):
         print("==================================================")
 
 def cmd_serve(args):
-    if args.daemon:
-        start_daemon(host=args.host or "127.0.0.1", port=args.port or 8000)
-        return
-
-    if args.service:
-        generate_service_files()
-        return
-
     import uvicorn
     host = args.host or "127.0.0.1"
     port = args.port or 8000
@@ -438,14 +424,8 @@ def main():
     p_serve = subparsers.add_parser("serve", help="Launch the integrated Web Workbench (UI + Backend + Terminal)")
     p_serve.add_argument("--port", "-p", type=int, default=8000, help="Port to listen on (default: 8000)")
     p_serve.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)")
-    p_serve.add_argument("--daemon", "-d", action="store_true", help="Run server as a background daemon process")
-    p_serve.add_argument("--service", action="store_true", help="Generate systemd and launchd service files")
     p_serve.add_argument("--reload", "-r", action="store_true", help="Enable auto-reload for development")
     p_serve.set_defaults(func=cmd_serve)
-
-    # stop
-    p_stop = subparsers.add_parser("stop", help="Stop running background workbench daemon")
-    p_stop.set_defaults(func=cmd_stop)
 
     # status
     p_status = subparsers.add_parser("status", help="Show workspace curriculum completion stats")
