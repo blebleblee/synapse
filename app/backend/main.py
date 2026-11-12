@@ -1096,10 +1096,66 @@ async def terminal_websocket(websocket: WebSocket):
 
     env_type = websocket.query_params.get("env", "host")
 
-    master, slave = pty.openpty()
-    # Default terminal size (80 cols, 24 rows)
-    winsize = struct.pack("HHHH", 24, 80, 0, 0)
-    fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
+    pty_available = True
+    master = -1
+    slave = -1
+    try:
+        master, slave = pty.openpty()
+        # Default terminal size (80 cols, 24 rows)
+        winsize = struct.pack("HHHH", 24, 80, 0, 0)
+        fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
+    except OSError:
+        pty_available = False
+
+    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached
+    if not pty_available:
+        shell = os.environ.get("SHELL", "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/bash")
+        proc = await asyncio.create_subprocess_exec(
+            shell, "-i",
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            cwd=str(WORKSPACE_ROOT),
+            env=os.environ.copy()
+        )
+        session_id = str(id(websocket))
+        buffer = SESSION_MANAGER.get_buffer(session_id)
+        notice = "\r\n\x1b[1;32m[i] Connected to Synapse Interactive Shell (Pipe Mode - Host PTY ceiling reached)\x1b[0m\r\n"
+        await websocket.send_text(notice)
+
+        async def pipe_read_loop():
+            try:
+                while True:
+                    data = await proc.stdout.read(1024)
+                    if not data:
+                        break
+                    buffer.append_text(data)
+                    await websocket.send_bytes(data)
+            except Exception:
+                pass
+
+        pipe_task = asyncio.create_task(pipe_read_loop())
+        try:
+            while True:
+                msg = await websocket.receive()
+                if "bytes" in msg and msg["bytes"]:
+                    proc.stdin.write(msg["bytes"])
+                    await proc.stdin.drain()
+                elif "text" in msg and msg["text"]:
+                    text = msg["text"]
+                    if text.startswith("{") and "cols" in text:
+                        continue
+                    proc.stdin.write(text.encode("utf-8"))
+                    await proc.stdin.drain()
+        except WebSocketDisconnect:
+            pass
+        finally:
+            pipe_task.cancel()
+            try:
+                proc.terminate()
+            except Exception:
+                pass
+        return
 
     cache_dir = WORKSPACE_ROOT / ".cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
