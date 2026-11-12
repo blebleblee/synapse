@@ -74,3 +74,34 @@ def validate_canonical_topic_path(target_path: Path, base_topics_dir: Optional[P
 
     return resolved
 
+DANGEROUS_HOST_PATTERNS = [
+    # Recursive deletion of root, home, current dir, wildcards, system dirs
+    r"rm\s+(-[a-zA-Z]*r[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*r|--recursive)\s+.*(/|~|\*|\.\.|\.env|topics|app)",
+    # Raw block device formatting and writing
+    r"mkfs.*",
+    r"dd\s+.*of=/dev/(r?disk|sd|nvme|zero|null)",
+    r">\s*/dev/(r?disk|sd|nvme)",
+    # Fork bombs
+    r":\(\)\s*{\s*:\|:&\s*};\s*:",
+    # System shutdown / reboot
+    r"^(sudo\s+)?(shutdown|reboot|halt|init\s+0|poweroff)\b",
+    # Global permissions destruction
+    r"chmod\s+(-[a-zA-Z]*R)\s+(777|000)\s+(/|~)",
+    # Destructive git operations on host
+    r"git\s+reset\s+--hard\b",
+    r"git\s+clean\s+(-[a-zA-Z]*f)",
+]
+
+def is_dangerous_host_command(cmd: str) -> bool:
+    """
+    Detects potentially destructive host system commands before they execute in host terminal mode.
+    """
+    clean = cmd.strip()
+    if not clean:
+        return False
+    for pat in DANGEROUS_HOST_PATTERNS:
+        if re.search(pat, clean, re.IGNORECASE):
+            return True
+    return False
+
+

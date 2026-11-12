@@ -110,7 +110,7 @@ from learning_engine.mastery import (
     get_completed_lessons,
     toggle_lesson_completion
 )
-from learning_engine.security import validate_workspace_path, sanitize_query
+from learning_engine.security import validate_workspace_path, sanitize_query, is_dangerous_host_command
 from learning_engine.config_manager import get_settings, save_settings
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
@@ -1215,7 +1215,10 @@ async def terminal_websocket(websocket: WebSocket):
     zshrc_path = zdot_dir / ".zshrc"
     zshrc_path.write_text(
         'if [ -f "$HOME/.zshrc" ]; then source "$HOME/.zshrc"; fi\n'
-        'alias ps="ps -ww"\n',
+        'alias ps="ps -ww"\n'
+        'alias rm="rm -i"\n'
+        'alias cp="cp -i"\n'
+        'alias mv="mv -i"\n',
         encoding="utf-8"
     )
 
@@ -1223,6 +1226,9 @@ async def terminal_websocket(websocket: WebSocket):
     bashrc_path.write_text(
         'if [ -f "$HOME/.bashrc" ]; then source "$HOME/.bashrc"; fi\n'
         'alias ps="ps -ww"\n'
+        'alias rm="rm -i"\n'
+        'alias cp="cp -i"\n'
+        'alias mv="mv -i"\n'
         'shopt -s checkwinsize 2>/dev/null\n',
         encoding="utf-8"
     )
@@ -1347,11 +1353,16 @@ async def terminal_websocket(websocket: WebSocket):
 
     read_task = asyncio.create_task(pty_read_loop())
 
+    input_line_buffer = ""
+    pending_dangerous_cmd = None
+    confirm_buffer = ""
+
     try:
         while True:
             msg = await websocket.receive()
+            raw_bytes = None
             if "bytes" in msg and msg["bytes"]:
-                os.write(master, msg["bytes"])
+                raw_bytes = msg["bytes"]
             elif "text" in msg and msg["text"]:
                 text = msg["text"]
                 # Check for resize event
@@ -1370,7 +1381,74 @@ async def terminal_websocket(websocket: WebSocket):
                             continue
                     except Exception:
                         pass
-                os.write(master, text.encode("utf-8"))
+                raw_bytes = text.encode("utf-8")
+
+            if not raw_bytes:
+                continue
+
+            # Host safety verification guard
+            if env_type == "host":
+                # If awaiting confirmation for a blocked dangerous command
+                if pending_dangerous_cmd:
+                    handled = False
+                    for b in raw_bytes:
+                        if b in (13, 10):  # Enter
+                            handled = True
+                            if confirm_buffer.strip().upper() == "CONFIRM":
+                                await websocket.send_text("\r\n\x1b[1;32m[CONFIRMED - Executing on host]\x1b[0m\r\n")
+                                os.write(master, pending_dangerous_cmd.encode("utf-8") + b"\r")
+                            else:
+                                await websocket.send_text("\r\n\x1b[1;32m[CANCELLED - Destructive command blocked]\x1b[0m\r\n")
+                                os.write(master, b"\x03")
+                            pending_dangerous_cmd = None
+                            confirm_buffer = ""
+                            input_line_buffer = ""
+                        elif b == 3:  # Ctrl+C
+                            handled = True
+                            await websocket.send_text("\r\n\x1b[1;32m[CANCELLED]\x1b[0m\r\n")
+                            os.write(master, b"\x03")
+                            pending_dangerous_cmd = None
+                            confirm_buffer = ""
+                            input_line_buffer = ""
+                        elif b in (8, 127):  # Backspace
+                            if confirm_buffer:
+                                confirm_buffer = confirm_buffer[:-1]
+                                await websocket.send_text("\b \b")
+                        elif 32 <= b <= 126:
+                            ch = chr(b)
+                            confirm_buffer += ch
+                            await websocket.send_text(ch)
+                    if handled or pending_dangerous_cmd:
+                        continue
+
+                # Normal typing: track line buffer and inspect on Enter
+                intercept_enter = False
+                for b in raw_bytes:
+                    if b in (13, 10):  # Enter key
+                        if is_dangerous_host_command(input_line_buffer):
+                            intercept_enter = True
+                            pending_dangerous_cmd = input_line_buffer
+                            confirm_buffer = ""
+                            warning = (
+                                "\r\n\r\n"
+                                "\x1b[1;41;37m DANGER \x1b[0m \x1b[1;31m[SYNAPSE HOST SAFETY GUARD]\x1b[0m\r\n"
+                                f"\x1b[1;33mBlocked destructive command on host OS:\x1b[0m \x1b[1;37m{pending_dangerous_cmd}\x1b[0m\r\n"
+                                "\x1b[1;36mThis operation can permanently destroy host system files or your workspace.\x1b[0m\r\n"
+                                "\x1b[1;33mTo run anyway, type \x1b[1;32mCONFIRM\x1b[1;33m and press Enter. To cancel, press Enter or Ctrl+C: \x1b[0m"
+                            )
+                            await websocket.send_text(warning)
+                        input_line_buffer = ""
+                    elif b in (8, 127):  # Backspace
+                        input_line_buffer = input_line_buffer[:-1]
+                    elif b in (3, 21):  # Ctrl+C, Ctrl+U
+                        input_line_buffer = ""
+                    elif 32 <= b <= 126:
+                        input_line_buffer += chr(b)
+
+                if intercept_enter:
+                    continue
+
+            os.write(master, raw_bytes)
     except WebSocketDisconnect:
         pass
     except Exception:

@@ -179,3 +179,32 @@ def test_api_packages_endpoints():
     assert res_del.status_code == 200
     assert res_del.json()["status"] == "uninstalled"
 
+def test_dangerous_command_detection():
+    from learning_engine.security import is_dangerous_host_command
+
+    # Destructive commands that MUST be blocked
+    assert is_dangerous_host_command("rm -rf /")
+    assert is_dangerous_host_command("rm -rf ~")
+    assert is_dangerous_host_command("rm -rf *")
+    assert is_dangerous_host_command("rm -rf /Users/test/workspace")
+    assert is_dangerous_host_command("sudo rm -rf /etc")
+    assert is_dangerous_host_command("mkfs.ext4 /dev/disk1s1")
+    assert is_dangerous_host_command("dd if=/dev/zero of=/dev/rdisk2")
+    assert is_dangerous_host_command("> /dev/disk2")
+    assert is_dangerous_host_command(":(){ :|:& };:")
+    assert is_dangerous_host_command("shutdown -h now")
+    assert is_dangerous_host_command("sudo reboot")
+    assert is_dangerous_host_command("chmod -R 777 /")
+    assert is_dangerous_host_command("git reset --hard")
+    assert is_dangerous_host_command("git clean -fd")
+
+    # Safe commands that MUST be allowed
+    assert not is_dangerous_host_command("ls -la")
+    assert not is_dangerous_host_command("git status")
+    assert not is_dangerous_host_command("git diff HEAD")
+    assert not is_dangerous_host_command("pytest tests/")
+    assert not is_dangerous_host_command("python main.py")
+    assert not is_dangerous_host_command("cat file.txt")
+    assert not is_dangerous_host_command("echo 'hello world'")
+
+
