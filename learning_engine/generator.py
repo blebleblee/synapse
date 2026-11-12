@@ -4,12 +4,12 @@ Generates Beginner -> Intermediate -> Advanced content units.
 Enforces human, narrative book-like prose (O'Reilly / MIT Press textbook style)
 and strictly bans lazy slide-deck bullet point lists.
 """
-
 import time
 import itertools
 import re
 import shutil
 import json
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
@@ -19,9 +19,14 @@ from .models import (
     get_provider,
     LLMProvider,
     validate_generation_output,
-    CLUSTER_HOST_SPECS
+    CLUSTER_HOST_SPECS,
+    AnthropicProvider
 )
 from .topic_manager import get_domain_persona, LEVELS
+
+# Global semaphore to limit concurrent LLM requests and avoid rate limits
+# Max 4 concurrent calls across all threads
+_LLM_SEMAPHORE = threading.Semaphore(4)
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
@@ -912,7 +917,8 @@ def generate_topic_parallel(
             host_label = CLUSTER_HOST_SPECS.get(w_host, {}).get("name", w_host).upper()
             t0 = time.time()
             try:
-                content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
+                with _LLM_SEMAPHORE:
+                    content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
                 validated = validate_generation_output(content)
                 elapsed = time.time() - t0
                 print(f"          [✔] [{host_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
@@ -982,7 +988,9 @@ DRAFT TO AUDIT & REFINE:
 
 Output the fully corrected, publication-grade, raw Markdown only."""
 
-                refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
+                refinement_res = ""
+                with _LLM_SEMAPHORE:
+                    refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
                 final_content = validate_generation_output(refinement_res)
                 audit_note = f"Audited & Refined by [{r_name}]"
             except Exception as e:
