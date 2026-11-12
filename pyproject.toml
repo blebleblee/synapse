@@ -18,7 +18,6 @@ dependencies = [
 
 [project.scripts]
 synapse = "learning_engine.cli:main"
-learning = "learning_engine.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
