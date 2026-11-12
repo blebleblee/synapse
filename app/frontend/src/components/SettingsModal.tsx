@@ -106,6 +106,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [storeMessage, setStoreMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
+  // Endpoint Discovered Models State
+  const [discoveredModels, setDiscoveredModels] = useState<{
+    id: string;
+    display: string;
+    model: string;
+    host: string;
+    node_name: string;
+    tier: string;
+    provider: string;
+  }[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+
   const fetchPackages = async () => {
     setIsLoadingPackages(true);
     try {
@@ -121,9 +133,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  const fetchDiscoveredModels = async () => {
+    setIsLoadingModels(true);
+    try {
+      const res = await fetch('/api/settings/discovered-models');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.models)) {
+          setDiscoveredModels(data.models);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load discovered models:', err);
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchPackages();
+      fetchDiscoveredModels();
     }
   }, [isOpen]);
 
@@ -558,42 +588,146 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {activeTab === 'models' && (
             <div className="settings-section">
-              <div className="section-title">
-                <Settings size={14} />
-                <span>AI Model Selection & Cloud API Credentials</span>
+              <div className="section-title-row">
+                <div className="section-title">
+                  <Settings size={14} />
+                  <span>AI Model Selection & Cloud API Credentials</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-secondary-sm"
+                  onClick={fetchDiscoveredModels}
+                  disabled={isLoadingModels}
+                  title="Rescan all active cluster nodes and endpoints for installed models"
+                >
+                  <RefreshCw size={12} className={isLoadingModels ? 'animate-spin' : ''} />
+                  <span>{isLoadingModels ? 'Scanning...' : 'Pull Models from Endpoints'}</span>
+                </button>
               </div>
 
               <div className="settings-row-2col">
                 <div className="form-group">
                   <label>Primary Generation Model</label>
-                  <input
-                    type="text"
-                    value={formData.primaryModel}
-                    onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                    placeholder="qwen2.5-coder:32b"
-                  />
+                  <select
+                    value={
+                      formData.primaryModel && !discoveredModels.some((m) => m.id === formData.primaryModel)
+                        ? '__custom__'
+                        : formData.primaryModel || ''
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === '__custom__') {
+                        setFormData({ ...formData, primaryModel: formData.primaryModel || 'qwen2.5-coder:32b' });
+                      } else {
+                        setFormData({ ...formData, primaryModel: e.target.value });
+                      }
+                    }}
+                  >
+                    <option value="">✨ Auto (qwen2.5-coder:32b or highest tier)</option>
+                    {discoveredModels.length > 0 && (
+                      <optgroup label="Discovered Endpoint Models">
+                        {discoveredModels.map((m, idx) => (
+                          <option key={`primary-${m.host}-${m.id}-${idx}`} value={m.id}>
+                            {m.display}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    <option value="__custom__">✏️ Custom Model Name...</option>
+                  </select>
+                  {formData.primaryModel && !discoveredModels.some((m) => m.id === formData.primaryModel) && (
+                    <input
+                      type="text"
+                      className="custom-model-input"
+                      value={formData.primaryModel}
+                      onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
+                      placeholder="Enter custom model string"
+                      style={{ marginTop: '6px' }}
+                    />
+                  )}
+                  <span className="field-hint">Used for curriculum drafting and lesson synthesis</span>
                 </div>
 
                 <div className="form-group">
                   <label>Reviewer / Audit Model</label>
-                  <input
-                    type="text"
-                    value={formData.reviewerModel}
-                    onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                    placeholder="deepseek-r1:32b"
-                  />
+                  <select
+                    value={
+                      formData.reviewerModel && !discoveredModels.some((m) => m.id === formData.reviewerModel)
+                        ? '__custom__'
+                        : formData.reviewerModel || ''
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === '__custom__') {
+                        setFormData({ ...formData, reviewerModel: formData.reviewerModel || 'deepseek-r1:32b' });
+                      } else {
+                        setFormData({ ...formData, reviewerModel: e.target.value });
+                      }
+                    }}
+                  >
+                    <option value="">✨ Auto (deepseek-r1:32b or reasoning model)</option>
+                    {discoveredModels.length > 0 && (
+                      <optgroup label="Discovered Endpoint Models">
+                        {discoveredModels.map((m, idx) => (
+                          <option key={`reviewer-${m.host}-${m.id}-${idx}`} value={m.id}>
+                            {m.display}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    <option value="__custom__">✏️ Custom Model Name...</option>
+                  </select>
+                  {formData.reviewerModel && !discoveredModels.some((m) => m.id === formData.reviewerModel) && (
+                    <input
+                      type="text"
+                      className="custom-model-input"
+                      value={formData.reviewerModel}
+                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                      placeholder="Enter custom model string"
+                      style={{ marginTop: '6px' }}
+                    />
+                  )}
+                  <span className="field-hint">Used for pedagogical review and safety checks</span>
                 </div>
               </div>
 
               <div className="form-group">
                 <label>Socratic Mentor Model (Interactive AI Tutor)</label>
-                <input
-                  type="text"
-                  value={formData.mentorModel || ''}
-                  onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                  placeholder="Auto (routes to fastest online cluster node or cloud fallback)"
-                />
-                <span className="field-hint">Specify a model e.g. qwen2.5-coder:7b or leave empty for auto-routing across your active cluster</span>
+                <select
+                  value={
+                    formData.mentorModel && !discoveredModels.some((m) => m.id === formData.mentorModel)
+                      ? '__custom__'
+                      : formData.mentorModel || ''
+                  }
+                  onChange={(e) => {
+                    if (e.target.value === '__custom__') {
+                      setFormData({ ...formData, mentorModel: formData.mentorModel || 'qwen2.5-coder:7b' });
+                    } else {
+                      setFormData({ ...formData, mentorModel: e.target.value });
+                    }
+                  }}
+                >
+                  <option value="">✨ Auto (Fastest online cluster node or cloud fallback)</option>
+                  {discoveredModels.length > 0 && (
+                    <optgroup label="Discovered Endpoint Models">
+                      {discoveredModels.map((m, idx) => (
+                        <option key={`mentor-${m.host}-${m.id}-${idx}`} value={m.id}>
+                          {m.display}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <option value="__custom__">✏️ Custom Model Name...</option>
+                </select>
+                {formData.mentorModel && !discoveredModels.some((m) => m.id === formData.mentorModel) && (
+                  <input
+                    type="text"
+                    className="custom-model-input"
+                    value={formData.mentorModel}
+                    onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                    placeholder="Enter custom model string"
+                    style={{ marginTop: '6px' }}
+                  />
+                )}
+                <span className="field-hint">Target model for live Socratic mentoring in the chat panel</span>
               </div>
 
               <div className="form-group">

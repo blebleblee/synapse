@@ -132,15 +132,28 @@ def get_configured_hosts() -> List[str]:
     env_hosts = os.environ.get("OLLAMA_HOSTS")
     if env_hosts:
         return [h.strip().rstrip("/") for h in env_hosts.split(",") if h.strip()]
+
     # 2. Persistent workspace config
     if CLUSTER_CONFIG_PATH.exists():
         try:
             data = json.loads(CLUSTER_CONFIG_PATH.read_text(encoding="utf-8"))
             if isinstance(data, list) and data:
-                return [h.strip().rstrip("/") for h in data if h and isinstance(h, str)]
+                return [h.strip().rstrip("/") for h in data if h and isinstance(h, str) and h.strip()]
         except Exception:
             pass
-    # 3. Default fallback cluster nodes
+
+    # 3. Custom cluster specs file overlay
+    if CLUSTER_SPECS_CONFIG_PATH.exists():
+        try:
+            specs = json.loads(CLUSTER_SPECS_CONFIG_PATH.read_text(encoding="utf-8"))
+            if isinstance(specs, dict):
+                hosts = [h.strip().rstrip("/") for h in specs.keys() if h and isinstance(h, str) and h.strip()]
+                if hosts:
+                    return hosts
+        except Exception:
+            pass
+
+    # 4. Default fallback cluster nodes
     return DEFAULT_OLLAMA_HOSTS
 
 def save_configured_hosts(hosts: List[str]) -> List[str]:
