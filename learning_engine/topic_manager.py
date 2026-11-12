@@ -231,13 +231,13 @@ def delete_subtopic(rel_path: str) -> bool:
         filtered = [l for l in lines if f"`{sub_rel}/`" not in l and f"`{sub_rel}`" not in l]
         syllabus_file.write_text("\n".join(filtered) + "\n", encoding="utf-8")
 
-    # Clean from mastery.json
+    # Clean from mastery.db
     try:
-        from .mastery import load_mastery_data, save_mastery_data
-        mdata = load_mastery_data()
-        if clean_rel in mdata:
-            del mdata[clean_rel]
-            save_mastery_data(mdata)
+        from .database import get_connection
+        conn = get_connection()
+        with conn:
+            conn.execute("DELETE FROM mastery WHERE path = ?", (clean_rel,))
+        conn.close()
     except Exception:
         pass
 

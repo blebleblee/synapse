@@ -24,9 +24,11 @@ from .search import search_curriculum
 from .graph import get_prerequisite_graph
 from .linter import lint_curriculum
 from .exporter import export_handbook
-from .mastery import get_mastery_summary, set_subtopic_mastery, load_mastery_data
+from .mastery import get_mastery_summary, set_subtopic_mastery
 from .flashcards import generate_flashcards
 from .reviewer import review_and_fix_unit, audit_content
+from learning_engine.database import get_connection
+import json
 
 def format_status_badge(status: dict) -> str:
     l = "L" if status.get("has_lesson") else "."
@@ -65,12 +67,11 @@ def cmd_status(args):
                         legacy_stubs += 1
 
     # Mastery statistics
-    mastery_data = load_mastery_data()
+    conn = get_connection()
+    mastery_rows = conn.execute("SELECT completed_lessons FROM mastery").fetchall()
+    conn.close()
+    completed_lessons_count = sum(len(json.loads(row["completed_lessons"])) for row in mastery_rows)
     mastery_summary = get_mastery_summary()
-    completed_lessons_count = 0
-    for val in mastery_data.values():
-        if isinstance(val, dict):
-            completed_lessons_count += len(val.get("completed_lessons", []))
 
     # Cluster health
     cluster = OllamaCluster()
