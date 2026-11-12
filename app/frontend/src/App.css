@@ -3648,6 +3648,17 @@ body, html, #root {
   color: #fff;
 }
 
+.store-action-btn.uninstall {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.store-action-btn.uninstall:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.25);
+  color: #fff;
+}
+
 .store-action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;

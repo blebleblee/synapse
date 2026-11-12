@@ -291,6 +291,10 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
     });
   }, [tree, sortMode, customDomainOrder]);
 
+  const cycleSortMode = () => {
+    setSortMode((prev) => (prev === 'default' ? 'az' : prev === 'az' ? 'progress' : 'default'));
+  };
+
   const cleanTerm = searchTerm.trim().toLowerCase();
 
   return (
@@ -315,6 +319,9 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
 
         <div className="sidebar-header-actions">
+          <button className="icon-btn" onClick={onOpenSearch} title={`${ui.search} (Cmd+K)`}>
+            <Search size={14} />
+          </button>
           <button className="icon-btn" onClick={onOpenGraph} title={ui.graph}>
             <GitBranch size={14} />
           </button>
@@ -344,7 +351,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchTerm ? (
+          {searchTerm && (
             <button
               type="button"
               className="search-clear-btn"
@@ -352,15 +359,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
               title="Clear filter text"
             >
               <X size={12} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="search-cmd-k-badge"
-              onClick={onOpenSearch}
-              title="Deep Full-Text Search (Cmd+K)"
-            >
-              ⌘K
             </button>
           )}
         </div>
@@ -374,18 +372,15 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           {allExpanded ? <ChevronsDownUp size={13} /> : <ChevronsUpDown size={13} />}
         </button>
 
-        <div className="sort-box" title="Sort topics">
-          <ArrowUpDown size={12} className="sort-icon" />
-          <select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value as any)}
-            className="sort-select"
-          >
-            <option value="default">{ui.curriculumOrder}</option>
-            <option value="az">{ui.alphabetical}</option>
-            <option value="progress">{ui.progress}</option>
-          </select>
-        </div>
+        <button
+          type="button"
+          className="sort-toggle-btn"
+          onClick={cycleSortMode}
+          title={`Sort: ${sortMode === 'default' ? ui.curriculumOrder : sortMode === 'az' ? ui.alphabetical : ui.progress}`}
+        >
+          <ArrowUpDown size={12} />
+          <span className="sort-label">{sortMode === 'az' ? 'A-Z' : sortMode === 'progress' ? '%' : 'STD'}</span>
+        </button>
       </div>
 
       <div className="tree-content">

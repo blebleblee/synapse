@@ -679,44 +679,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </label>
               </div>
 
-              {/* Installed Packages List */}
-              {packagesData.installed.length > 0 && (
-                <div className="store-installed-section">
-                  <div className="store-subsection-header">
-                    <span>Installed Packages ({packagesData.installed.length})</span>
-                  </div>
-                  <div className="store-installed-list">
-                    {packagesData.installed.map((p) => (
-                      <div key={p.domain} className="store-installed-row">
-                        <div className="store-installed-meta">
-                          <span className="store-pack-badge">{p.domain}</span>
-                          <span className="store-installed-title">{p.title || p.domain.replace(/_/g, ' ')}</span>
-                          <span className="store-installed-counts">
-                            {p.lesson_count || 0} Lessons · {p.lab_count || 0} Labs
-                          </span>
-                        </div>
-                        <div className="store-installed-actions">
-                          <button
-                            type="button"
-                            className="btn-danger-sm"
-                            onClick={() => handleUninstallPack(p.domain)}
-                            disabled={actionInProgress === `uninstall-${p.domain}`}
-                            title="Unregister Package"
-                          >
-                            <Trash2 size={12} />
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Available Domain Packages Grid */}
+              {/* Unified Domain Packages Grid */}
               <div className="store-subsection-header">
                 <span>
-                  Available Domains ({packagesData.available_domains.filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase())).length})
+                  Curriculum Domains ({packagesData.available_domains.filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase())).length})
                 </span>
               </div>
 
@@ -755,14 +721,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             title={`Export ${d.domain}.synpack archive`}
                           >
                             {actionInProgress === `export-${d.domain}` ? (
-                              <Loader2 size={12} className="animate-spin" />
+                              <Loader2 size={11} className="animate-spin" />
                             ) : (
-                              <Download size={12} />
+                              <Download size={11} />
                             )}
                             <span>Export</span>
                           </button>
 
-                          {!d.is_installed && (
+                          {d.is_installed ? (
+                            <button
+                              type="button"
+                              className="store-action-btn uninstall"
+                              onClick={() => handleUninstallPack(d.domain)}
+                              disabled={actionInProgress === `uninstall-${d.domain}`}
+                              title={`Uninstall / unregister ${d.domain} package`}
+                            >
+                              {actionInProgress === `uninstall-${d.domain}` ? (
+                                <Loader2 size={11} className="animate-spin" />
+                              ) : (
+                                <Trash2 size={11} />
+                              )}
+                              <span>Uninstall</span>
+                            </button>
+                          ) : (
                             <button
                               type="button"
                               className="store-action-btn install"
@@ -771,9 +752,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               title={`Register ${d.domain} package`}
                             >
                               {actionInProgress === `install-${d.domain}` ? (
-                                <Loader2 size={12} className="animate-spin" />
+                                <Loader2 size={11} className="animate-spin" />
                               ) : (
-                                <Package size={12} />
+                                <Package size={11} />
                               )}
                               <span>Install</span>
                             </button>
