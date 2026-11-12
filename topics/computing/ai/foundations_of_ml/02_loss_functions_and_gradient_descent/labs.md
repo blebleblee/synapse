@@ -1,170 +1,242 @@
-Operational Verification Labs: 02 Loss Functions And Gradient Descent
-===========================================================
+# Operational Verification Labs: 02 Loss Functions And Gradient Descent
 
-### Objective & Environment Setup
+## Objective & Environment Setup
 
-This lab guides hands-on AI engineers and practitioners through the implementation and verification of loss functions and gradient descent. To complete this lab, you will need a Python 3.11+ environment with the following packages installed:
+The objective of this lab is to gain hands-on experience with implementing and verifying loss functions and gradient descent algorithms. This lab will guide you through the process of creating a simple neural network, defining loss functions, and applying gradient descent to minimize the loss. We will use PyTorch, a popular deep learning library, for this purpose.
 
-* PyTorch
-* HuggingFace
-* NumPy
-* Scikit-learn
-* Ollama
-* Polars
+### Environment Setup
 
-Additionally, you will need to configure the API for your chosen deep learning framework.
+Ensure you have Python 3.11+ installed on your system. You can install the required packages using pip:
 
-### Exercise 1: Hands-On Implementation & Pipeline Execution
+```bash
+pip install torch numpy scikit-learn matplotlib
+```
 
-**Implementing Loss Functions and Gradient Descent**
+## Exercise 1: Hands-On Implementation & Pipeline Execution
+
+In this exercise, we will implement a simple linear regression model using PyTorch. We will define a mean squared error (MSE) loss function and use gradient descent to minimize the loss.
+
+### Complete, Runnable Python Script
 
 ```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-# Define a simple neural network model
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(5, 10)  # input layer (5) -> hidden layer (10)
-        self.fc2 = nn.Linear(10, 5)  # hidden layer (10) -> output layer (5)
-
-    def forward(self, x):
-        x = torch.relu(self.fc1(x))  # activation function for hidden layer
-        x = self.fc2(x)
-        return x
-
-# Initialize the model, loss function, and optimizer
-model = Net()
-criterion = nn.MSELoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01)
-
-# Generate some random input data
-input_data = torch.randn(10, 5)
-
-# Forward pass
-output = model(input_data)
-loss = criterion(output, torch.randn(10, 5))
-
-# Backward pass
-optimizer.zero_grad()
-loss.backward()
-optimizer.step()
-```
-
-This code defines a simple neural network model, initializes the loss function and optimizer, and performs a forward and backward pass using the PyTorch API.
-
-### Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
-
-**Hyperparameter Tuning and Benchmarking**
-
-```python
 import numpy as np
-import time
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
 
-# Generate some random data for benchmarking
+# Generate synthetic data
 np.random.seed(0)
-X = np.random.rand(1000, 5)
-y = np.random.randint(0, 2, 1000)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Convert to PyTorch tensors
+X_tensor = torch.tensor(X, dtype=torch.float32)
+y_tensor = torch.tensor(y, dtype=torch.float32)
 
-# Define a function to train the model and evaluate its performance
-def train_and_evaluate(model, X_train, y_train, X_test, y_test):
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    return accuracy
+# Define a simple linear model
+class LinearModel(nn.Module):
+    def __init__(self):
+        super(LinearModel, self).__init__()
+        self.linear = nn.Linear(1, 1)  # One input and one output
 
-# Define a range of hyperparameters to tune
-hyperparameters = {
-    'learning_rate': [0.01, 0.1, 1.0],
-    'batch_size': [10, 50, 100]
-}
+    def forward(self, x):
+        return self.linear(x)
 
-# Perform hyperparameter tuning and benchmarking
-best_accuracy = 0
-best_hyperparameters = None
-for learning_rate in hyperparameters['learning_rate']:
-    for batch_size in hyperparameters['batch_size']:
-        model = Net()
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate)
-        model.fit(X_train, y_train, batch_size=batch_size)
-        accuracy = accuracy_score(y_test, model.predict(X_test))
-        if accuracy > best_accuracy:
-            best_accuracy = accuracy
-            best_hyperparameters = {'learning_rate': learning_rate, 'batch_size': batch_size}
+# Instantiate the model, define the loss function, and the optimizer
+model = LinearModel()
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.01)
 
-print(f'Best hyperparameters: {best_hyperparameters}')
-print(f'Best accuracy: {best_accuracy:.2f}%')
+# Training loop
+num_epochs = 100
+loss_history = []
+
+for epoch in range(num_epochs):
+    # Forward pass: Compute predicted y by passing X to the model
+    y_pred = model(X_tensor)
+
+    # Compute and store the loss
+    loss = criterion(y_pred, y_tensor)
+    loss_history.append(loss.item())
+
+    # Zero gradients, perform a backward pass, and update the weights
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+# Plot the loss over epochs
+plt.plot(loss_history)
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training Loss Over Epochs')
+plt.show()
+
+# Plot the fitted line
+predicted = model(X_tensor).detach().numpy()
+plt.scatter(X, y, label='Original data')
+plt.plot(X, predicted, color='red', label='Fitted line')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.title('Linear Regression Fit')
+plt.legend()
+plt.show()
 ```
 
-This code defines a function to train the model and evaluate its performance, and then performs hyperparameter tuning and benchmarking using a range of hyperparameters.
+## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-### Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
+In this exercise, we will perform hyperparameter tuning by adjusting the learning rate and the number of epochs. We will also benchmark the model's performance by measuring the final loss and plotting the convergence curve.
 
-**Stress Testing and Edge Cases**
+### Real Benchmarking Code
 
 ```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Define a simple neural network model
-class Net(nn.Module):
+# Generate synthetic data
+np.random.seed(0)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+# Convert to PyTorch tensors
+X_tensor = torch.tensor(X, dtype=torch.float32)
+y_tensor = torch.tensor(y, dtype=torch.float32)
+
+# Define a simple linear model
+class LinearModel(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(5, 10)  # input layer (5) -> hidden layer (10)
-        self.fc2 = nn.Linear(10, 5)  # hidden layer (10) -> output layer (5)
+        super(LinearModel, self).__init__()
+        self.linear = nn.Linear(1, 1)  # One input and one output
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))  # activation function for hidden layer
-        x = self.fc2(x)
-        return x
+        return self.linear(x)
 
-# Initialize the model, loss function, and optimizer
-model = Net()
+# Hyperparameter tuning
+learning_rates = [0.001, 0.01, 0.1]
+num_epochs = 100
+
+for lr in learning_rates:
+    model = LinearModel()
+    criterion = nn.MSELoss()
+    optimizer = optim.SGD(model.parameters(), lr=lr)
+
+    loss_history = []
+
+    for epoch in range(num_epochs):
+        y_pred = model(X_tensor)
+        loss = criterion(y_pred, y_tensor)
+        loss_history.append(loss.item())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    plt.plot(loss_history, label=f'LR={lr}')
+
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Convergence Curves for Different Learning Rates')
+plt.legend()
+plt.show()
+```
+
+## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
+
+In this exercise, we will test the model with edge cases, such as very small or very large input values, and implement guardrails to handle potential failures.
+
+### Reproducing Failure Modes, Testing Edge Cases, and Implementing Guardrails
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate synthetic data
+np.random.seed(0)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+# Convert to PyTorch tensors
+X_tensor = torch.tensor(X, dtype=torch.float32)
+y_tensor = torch.tensor(y, dtype=torch.float32)
+
+# Define a simple linear model
+class LinearModel(nn.Module):
+    def __init__(self):
+        super(LinearModel, self).__init__()
+        self.linear = nn.Linear(1, 1)  # One input and one output
+
+    def forward(self, x):
+        return self.linear(x)
+
+# Instantiate the model, define the loss function, and the optimizer
+model = LinearModel()
 criterion = nn.MSELoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01)
 
-# Generate some random input data
-input_data = torch.randn(1000, 5)
+# Training loop with guardrails
+num_epochs = 100
+loss_history = []
 
-# Perform a forward pass with a large input size
-output = model(input_data)
+for epoch in range(num_epochs):
+    y_pred = model(X_tensor)
+    loss = criterion(y_pred, y_tensor)
+    loss_history.append(loss.item())
 
-# Check for NaN values in the output
-if torch.isnan(output).any():
-    print('NaN values detected in output')
-else:
-    print('No NaN values detected in output')
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 
-# Perform a backward pass with a large input size
-optimizer.zero_grad()
-loss = criterion(output, torch.randn(1000, 5))
-loss.backward()
-if torch.isnan(loss).any():
-    print('NaN values detected in loss')
-else:
-    print('No NaN values detected in loss')
+    # Guardrail: Check for NaN or Inf loss
+    if torch.isnan(loss) or torch.isinf(loss):
+        print(f'Loss became NaN or Inf at epoch {epoch+1}. Stopping training.')
+        break
+
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+# Plot the loss over epochs
+plt.plot(loss_history)
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training Loss Over Epochs')
+plt.show()
+
+# Test with edge cases
+edge_cases = np.array([[-10], [10]])
+edge_cases_tensor = torch.tensor(edge_cases, dtype=torch.float32)
+predicted_edge_cases = model(edge_cases_tensor).detach().numpy()
+
+plt.scatter(X, y, label='Original data')
+plt.plot(X, predicted, color='red', label='Fitted line')
+plt.scatter(edge_cases, predicted_edge_cases, color='green', label='Edge cases')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.title('Linear Regression Fit with Edge Cases')
+plt.legend()
+plt.show()
 ```
 
-This code defines a simple neural network model and performs a forward and backward pass with a large input size, checking for NaN values in the output and loss.
+## Verification Checklist & Quick Reference Cheat Sheet
 
-### Verification Checklist & Quick Reference Cheat Sheet
+| Method/Parameter | Description |
+|------------------|-------------|
+| `torch.tensor`   | Creates a tensor from a NumPy array. |
+| `nn.Linear`      | Defines a linear layer in the neural network. |
+| `nn.MSELoss`     | Mean squared error loss function. |
+| `optim.SGD`      | Stochastic gradient descent optimizer. |
+| `model.forward`  | Defines the forward pass of the model. |
+| `loss.backward`  | Computes the gradient of the loss with respect to the model parameters. |
+| `optimizer.step` | Updates the model parameters based on the computed gradients. |
+| `torch.isnan`    | Checks if the tensor contains NaN values. |
+| `torch.isinf`    | Checks if the tensor contains Inf values. |
 
-| **Method** | **Parameter** | **Verification Flag** |
-| --- | --- | --- |
-| `torch.nn.Linear` | `in_features`, `out_features` | `None` |
-| `torch.nn.ReLU` | `None` | `None` |
-| `torch.optim.SGD` | `lr`, `momentum` | `None` |
-| `torch.nn.MSELoss` | `None` | `None` |
-| `model.fit` | `X_train`, `y_train`, `batch_size` | `None` |
-| `model.predict` | `X_test` | `None` |
-| `accuracy_score` | `y_test`, `y_pred` | `None` |
-
-Note: This is not an exhaustive list of methods, parameters, and verification flags, but rather a selection of key concepts and techniques used in this lab.
+This lab provides a comprehensive hands-on experience with implementing and verifying loss functions and gradient descent algorithms using PyTorch. By following the exercises, you will gain a deeper understanding of these fundamental concepts in machine learning.
