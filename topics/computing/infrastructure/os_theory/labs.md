@@ -1,178 +1,147 @@
-# Operational Verification Labs: Core
+# Operational Verification Labs: Operating System Theory & Kernel Subsystems
 
 ## Objective & Environment Setup
 
 ### Objective
-The objective of this lab is to provide hands-on experience with diagnostic verification of core infrastructure and operating system components. This includes live state inspection, benchmarking, saturation profiling, and fault injection analysis using real Linux/BSD CLI commands, inspection tools, and reproduction scripts.
+This operational lab provides hands-on diagnostic verification of foundational operating system abstractions: virtual memory management, page tables, process address space layout (VMA), system call boundaries, and VFS file descriptor mechanics. Exercises utilize standard OS inspection utilities (`pmap`, `perf`, `strace`, `valgrind`, and the Linux `/proc` pseudo-filesystem).
 
-### Environment Setup
-Ensure the following CLI tools are installed on your system:
-- `bpftool`
-- `kubectl`
-- `iproute2`
-- `tcpdump`
-- `strace`
-- `perf`
+### Required Tooling
+Ensure operating system diagnostic utilities are installed:
+- `procps` (`ps`, `pmap`, `sysctl`, `free`)
+- `perf` (Linux performance counters)
+- `strace` (System call tracer)
+- Standard C compiler toolchain (`gcc`, `make`)
 
-#### Installation Commands
-For Debian/Ubuntu:
+---
+
+## Exercise 1: Process Virtual Address Space & Page Table Inspection
+
+Inspect how the operating system kernel isolates process memory, builds Virtual Memory Areas (VMAs), and maps physical page frames.
+
+### 1.1 Process Memory Mapping & Segment Layout
+Inspect the segment boundaries (Text, Data, BSS, Heap, Memory Mapped Files, Stack) for a target process:
+
 ```bash
-sudo apt-get update
-sudo apt-get install -y bpfcc-tools kubectl iproute2 tcpdump strace linux-tools-common linux-tools-generic linux-tools-`uname -r`
+# Launch a background process or target shell
+sleep 300 &
+PID=$!
+
+# Dissect process Virtual Memory Areas (VMAs)
+pmap -X $PID
 ```
 
-For CentOS/RHEL:
+Examine detailed memory allocation in `/proc/$PID/smaps`:
 ```bash
-sudo yum install -y bpfcc-tools kubectl iproute2 tcpdump strace perf
+# Inspect Private/Shared Dirty pages and RSS allocation
+cat /proc/$PID/smaps | grep -E "(Size|Rss|Pss|Shared_Clean|Private_Dirty)" | head -n 20
 ```
 
-For Fedora:
+### 1.2 Copy-On-Write (COW) Memory Verification
+Compile and run a small C harness demonstrating fork-time Copy-On-Write behavior:
+
 ```bash
-sudo dnf install -y bpfcc-tools kubectl iproute2 tcpdump strace perf
+cat << 'EOF' > cow_test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    size_t size = 64 * 1024 * 1024; // 64 MB
+    char *buf = malloc(size);
+    memset(buf, 'A', size);
+    printf("Parent PID: %d, Allocated 64MB\n", getpid());
+    
+    if (fork() == 0) {
+        printf("Child PID: %d created (COW shared pages)\n", getpid());
+        sleep(5);
+        // Trigger page fault and copy by writing
+        memset(buf, 'B', size);
+        printf("Child PID: %d dirtied pages (Private Dirty split)\n", getpid());
+        sleep(10);
+        exit(0);
+    }
+    sleep(15);
+    return 0;
+}
+EOF
+
+gcc -O2 cow_test.c -o cow_test
+./cow_test &
 ```
 
-For Arch Linux:
+While running, compare `Shared_Clean` vs `Private_Dirty` before and after the child writes:
 ```bash
-sudo pacman -S bpfcc kubectl iproute2 tcpdump strace perf
+grep -E "(Rss|Private_Dirty|Shared_Clean)" /proc/$(pgrep -n cow_test)/smaps_rollup
 ```
 
-## Exercise 1: Live State & Internal Subsystem Inspection
+---
 
-### Kernel Maps Inspection
-To inspect eBPF maps, use `bpftool`:
+## Exercise 2: System Call Boundaries & Context Switch Profiling
+
+Measure CPU mode transitions from userspace (Ring 3) to kernel space (Ring 0) and profile involuntary context switches.
+
+### 2.1 Syscall Latency & Frequency Profiling
+Profile system call overhead and CPU time distribution using `strace`:
+
 ```bash
-sudo bpftool map list
+# Collect syscall count, time, and error summary for a target workload
+strace -c dd if=/dev/zero of=/dev/null bs=1k count=100000
 ```
 
-### Memory Inspection
-To inspect memory usage and page tables, use `pmap` and `vmstat`:
+### 2.2 Voluntary vs. Involuntary Context Switching
+Measure scheduling preemption and CPU cache thrashing during high thread contention:
+
 ```bash
-pmap $(pidof <process_name>)
-vmstat -s
+# Measure context switches and CPU migrations
+perf stat -e context-switches,cpu-migrations,page-faults,cycles,instructions sleep 2
 ```
 
-### Buffer Inspection
-To inspect network buffers, use `ss` and `netstat`:
+---
+
+## Exercise 3: VFS Inode Tables, Page Cache & Out-Of-Memory (OOM) Testing
+
+Examine kernel page cache write-back mechanics, dirty memory limits, and the OOM killer scoring system.
+
+### 3.1 Kernel Page Cache & Dirty Page Flushing
+Observe page cache dynamics during heavy unbuffered I/O:
+
 ```bash
-ss -s
-netstat -s
+# Monitor kernel dirty memory state
+cat /proc/meminfo | grep -E "(Cached|Dirty|Writeback)"
+
+# Trigger kernel page cache drop
+sync
+echo 3 | sudo tee /proc/sys/vm/drop_caches
+
+# Re-inspect dropped page cache counters
+cat /proc/meminfo | grep -E "(Cached|Dirty|Writeback)"
 ```
 
-### Process Inspection
-To inspect processes and their states, use `ps` and `top`:
+### 3.2 OOM Score & Process Priority Mechanics
+Inspect how the kernel calculates process kill priority during physical memory exhaustion:
+
 ```bash
-ps aux
-top
+# Inspect a process OOM badness score (0 = immune, 1000 = prime candidate)
+cat /proc/$PID/oom_score
+cat /proc/$PID/oom_score_adj
 ```
 
-### Metrics Inspection
-To inspect system metrics, use `vmstat` and `iostat`:
+Adjust OOM score adjustment to protect critical system processes:
 ```bash
-vmstat 1 5
-iostat -x 1 5
+echo -1000 | sudo tee /proc/$PID/oom_score_adj
 ```
 
-## Exercise 2: Benchmarking & Saturation Profiling
+---
 
-### Benchmark Commands
-To benchmark CPU performance, use `sysbench`:
-```bash
-sudo apt-get install -y sysbench
-sysbench cpu run
-```
+## Operating System Theory Diagnostic Cheat Sheet
 
-To benchmark memory performance, use `memtester`:
-```bash
-sudo apt-get install -y memtester
-memtester 1G 1
-```
-
-### Load Generation
-To generate CPU load, use `stress-ng`:
-```bash
-sudo apt-get install -y stress-ng
-stress-ng --cpu 4 --timeout 60s
-```
-
-To generate network load, use `iperf`:
-```bash
-sudo apt-get install -y iperf
-# On server
-iperf -s
-# On client
-iperf -c <server_ip>
-```
-
-### Packet Throughput & Latency Profiling
-To profile network packet throughput and latency, use `iperf` and `ping`:
-```bash
-# On server
-iperf -s
-# On client
-iperf -c <server_ip>
-ping <server_ip>
-```
-
-To capture network packets and analyze, use `tcpdump`:
-```bash
-sudo tcpdump -i <interface> -w capture.pcap
-```
-
-## Exercise 3: Fault Injection & Recovery Analysis
-
-### Simulating Sudden Failure
-To simulate a sudden failure, use `kill` to terminate a process:
-```bash
-kill -9 $(pidof <process_name>)
-```
-
-### Simulating Packet Drop
-To simulate packet drops, use `tc`:
-```bash
-sudo tc qdisc add dev <interface> root netem loss 10%
-```
-
-### Simulating Partition
-To simulate network partition, use `iptables`:
-```bash
-sudo iptables -A INPUT -s <target_ip> -j DROP
-```
-
-### Inspecting Recovery Logs
-To inspect system logs for recovery, use `journalctl`:
-```bash
-sudo journalctl -xe
-```
-
-To inspect kernel logs, use `dmesg`:
-```bash
-dmesg
-```
-
-## Diagnostic Cheat Sheet & Verification Checklist
-
-### Essential CLI Commands and Operational Flags
-
-| Command      | Description                                                                 | Example Usage                                                                 |
-|--------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| `bpftool`    | Inspect eBPF maps and programs                                              | `sudo bpftool map list`                                                       |
-| `pmap`       | Display memory map of a process                                             | `pmap $(pidof <process_name>)`                                                |
-| `vmstat`     | Report virtual memory statistics                                            | `vmstat -s`                                                                 |
-| `ss`         | Display socket statistics                                                   | `ss -s`                                                                     |
-| `netstat`    | Display network connections, routing tables, interface statistics, etc.     | `netstat -s`                                                                |
-| `ps`         | Report a snapshot of the current processes                                  | `ps aux`                                                                    |
-| `top`        | Display a dynamic real-time view of a running system                        | `top`                                                                       |
-| `iostat`     | Report CPU usage and I/O statistics for devices and partitions              | `iostat -x 1 5`                                                             |
-| `sysbench`   | System performance benchmark tool                                           | `sysbench cpu run`                                                          |
-| `memtester`  | Test memory for errors                                                      | `memtester 1G 1`                                                            |
-| `stress-ng`  | Stress test a computer system in various selectable ways                    | `stress-ng --cpu 4 --timeout 60s`                                           |
-| `iperf`      | Network bandwidth measurement tool                                          | `iperf -s` (server), `iperf -c <server_ip>` (client)                        |
-| `ping`       | Send ICMP ECHO_REQUEST packets to network hosts                             | `ping <server_ip>`                                                          |
-| `tcpdump`    | Dump traffic on a network                                                   | `sudo tcpdump -i <interface> -w capture.pcap`                               |
-| `kill`       | Send a signal to a process                                                  | `kill -9 $(pidof <process_name>)`                                             |
-| `tc`         | Configure traffic control rules                                             | `sudo tc qdisc add dev <interface> root netem loss 10%`                       |
-| `iptables`   | Configure packet filtering rules                                            | `sudo iptables -A INPUT -s <target_ip> -j DROP`                             |
-| `journalctl` | Query the systemd journal                                                   | `sudo journalctl -xe`                                                       |
-| `dmesg`      | Print or control the kernel ring buffer                                     | `dmesg`                                                                     |
-
-This lab guide provides a comprehensive set of tools and commands to perform operational verification on core infrastructure and operating system components. By following these exercises, you will gain hands-on experience with live state inspection, benchmarking, saturation profiling, and fault injection analysis.
+| Subsystem | Command / Interface | Diagnostic Purpose |
+| :--- | :--- | :--- |
+| **Address Space** | `pmap -x <PID>` | Inspect process segment boundaries and RSS |
+| **Memory Map** | `/proc/<PID>/smaps_rollup` | Fast summary of PSS, USS, and Private Dirty memory |
+| **Syscall Cost** | `strace -c <command>` | Aggregate syscall execution frequency and latency |
+| **Scheduling** | `perf stat -e context-switches` | Measure voluntary and involuntary preemption |
+| **Page Faults** | `sar -B 1 5` | Monitor minor (memory) and major (disk I/O) page faults |
+| **Page Cache** | `/proc/meminfo` | Inspect Active/Inactive, Dirty, and Writeback memory |
+| **OOM Engine** | `/proc/<PID>/oom_score` | Determine kernel termination priority under memory pressure |

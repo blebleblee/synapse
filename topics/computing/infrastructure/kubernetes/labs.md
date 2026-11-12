@@ -1,4 +1,4 @@
-# Operational Verification Labs: 01 Control Plane And Etcd
+# Operational Verification Labs: Kubernetes Architecture & Etcd Diagnostics
 
 ## Objective & Environment Setup
 
@@ -6,20 +6,13 @@ This operational lab provides hands-on diagnostic verification of the Kubernetes
 
 The etcd cluster underpins all Kubernetes state. Every resource—Pods, Services, ConfigMaps—exists as a versioned key-value pair in etcd's persistent B+tree. The Raft consensus algorithm ensures that writes propagate through a quorum (floor(N/2) + 1 nodes) before acknowledging success. The apiserver acts as the sole gateway to etcd, translating RESTful HTTP requests into etcd transactions and streaming Watch events derived from etcd's monotonically increasing revision counter. Understanding this transactional boundary is critical for diagnosing split-brain conditions, stale reads, and cascading control plane failures.
 
-### Required Tools and Kernel Configuration
+### Required Diagnostic Utilities
 
-Install the following diagnostic utilities on all control plane nodes:
+Verify that standard Kubernetes administration and diagnostic tools are available on your control plane:
 
 ```bash
-sudo apt-get update && sudo apt-get install -y \
-  etcd-client \
-  iproute2 \
-  tcpdump \
-  strace \
-  sysstat \
-  bpftrace \
-  linux-tools-common \
-  linux-tools-$(uname -r)
+kubectl version --client
+etcdctl version
 ```
 
 For environments using kubeadm, the etcd static pod manifests reside in `/etc/kubernetes/manifests/etcd.yaml`. The etcd data directory defaults to `/var/lib/etcd`. Verify etcd process binding and TLS certificate paths:

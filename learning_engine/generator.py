@@ -88,10 +88,11 @@ def build_topic_modules(domain: str, category: str, subtopic_id: str, subtopic_t
     """
     domain_title = domain.replace("_", " ").title()
     category_title = category.replace("_", " ").title()
+    domain_lower = domain.lower()
     cat_lower = category.lower()
 
-    # 1. AI, Machine Learning, LLMs, Data Science
-    if any(k in cat_lower for k in ["ai", "machine_learning", "deep_learning", "data_analysis", "data_visualisation", "mlops", "rag", "vibe_coding", "prompt"]):
+    # 1. AI, Machine Learning, LLMs, Data Science (Computing domain)
+    if domain_lower == "computing" and any(k in cat_lower for k in ["ai", "machine_learning", "deep_learning", "data_analysis", "data_visualisation", "mlops", "rag", "vibe_coding", "prompt"]):
         context = {
             "subtopic_title": subtopic_title,
             "domain_title": domain_title,
@@ -183,8 +184,8 @@ def build_topic_modules(domain: str, category: str, subtopic_id: str, subtopic_t
             }
         ]
 
-    # 2. Security & Hardware Hacking
-    elif any(k in cat_lower for k in ["security", "hardware_hacking", "reverse_engineering", "cryptography", "exploit"]):
+    # 2. Security & Hardware Hacking (Computing domain)
+    elif domain_lower == "computing" and any(k in cat_lower for k in ["security", "hardware_hacking", "reverse_engineering", "cryptography", "exploit"]):
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
@@ -293,8 +294,8 @@ Output publication-grade Markdown only."""
             }
         ]
 
-    # 2b. DevSecOps, CI/CD, Supply Chain Security & Security Automation
-    elif any(k in cat_lower for k in ["devsecops", "ci_cd", "supply_chain", "security_automation", "policy_as_code"]):
+    # 2b. DevSecOps, CI/CD, Supply Chain Security & Security Automation (Computing domain)
+    elif domain_lower == "computing" and any(k in cat_lower for k in ["devsecops", "ci_cd", "supply_chain", "security_automation", "policy_as_code"]):
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
@@ -404,8 +405,8 @@ Output publication-grade Markdown only."""
             }
         ]
 
-    # 3. Systems & Cloud Infrastructure (eBPF, Kubernetes, Linux Kernel, SRE)
-    elif any(k in cat_lower for k in ["infrastructure", "ebpf", "kubernetes", "networking", "linux_kernel", "os_theory", "sre"]):
+    # 3. Systems & Cloud Infrastructure (eBPF, Kubernetes, Linux Kernel, SRE) (Computing domain)
+    elif domain_lower == "computing" and any(k in cat_lower for k in ["infrastructure", "ebpf", "kubernetes", "networking", "linux_kernel", "os_theory", "sre"]):
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
@@ -494,20 +495,20 @@ Output publication-grade Markdown only."""
                 "prompt": f"""Write the complete Operational Verification Lab guide for '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Hands-on practitioner and systems engineer.
-Goal: Step-by-step diagnostic verification using real Linux/BSD CLI commands, inspection tools, and reproduction scripts.
+Target Audience: Hands-on systems engineer and infrastructure practitioner.
+Goal: Step-by-step diagnostic verification using real tools, inspection utilities, and reproduction scripts specific to '{subtopic_title}'.
 
 Structure:
 # Operational Verification Labs: {subtopic_title}
 
 ## Objective & Environment Setup
-(Required CLI tools: bpftool, kubectl, iproute2, tcpdump, strace, perf, and environment configuration)
+(Required diagnostic utilities authentic to '{subtopic_title}' e.g. for Kubernetes: kubectl, etcdctl, helm; for Networking: ip, ss, wireshark, dig; for eBPF: bpftool, bpftrace; for Linux: strace, perf; for SRE: prometheus, alertmanager. Do NOT output generic copy-pasted kernel tool lists)
 
 ## Exercise 1: Live State & Internal Subsystem Inspection
-(Exact runnable CLI commands to inspect kernel maps, memory, buffers, processes, or metrics)
+(Exact runnable CLI commands to inspect state, memory, buffers, processes, or metrics)
 
 ## Exercise 2: Benchmarking & Saturation Profiling
-(Real benchmark commands, load generation, packet throughput, or latency profiling)
+(Real benchmark commands, load generation, throughput, or latency profiling)
 
 ## Exercise 3: Fault Injection & Recovery Analysis
 (Simulating sudden failure, packet drop, or partition, and inspecting recovery logs)
@@ -520,8 +521,8 @@ Output publication-grade Markdown only."""
             }
         ]
 
-    # 4. Database Internals & Storage Systems
-    elif any(k in cat_lower for k in ["data", "database", "postgresql", "storage", "distributed_systems"]):
+    # 4. Database Internals & Storage Systems (Computing domain)
+    elif domain_lower == "computing" and any(k in cat_lower for k in ["data", "database", "postgresql", "storage", "distributed_systems"]):
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
@@ -630,8 +631,8 @@ Output publication-grade Markdown only."""
             }
         ]
 
-    # 5. Software Engineering, Compilers, Rust Systems & Architecture
-    elif any(k in cat_lower for k in ["software", "compilers", "rust_systems", "architecture", "programming", "systems_programming"]):
+    # 5. Software Engineering, Compilers, Rust Systems & Architecture (Computing domain)
+    elif domain_lower == "computing" and any(k in cat_lower for k in ["software", "compilers", "rust_systems", "architecture", "programming", "systems_programming"]):
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
@@ -824,8 +825,13 @@ Output publication-grade Markdown only."""
                 "prompt": f"""Write the complete Operational Verification Lab guide for '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Hands-on practitioner and specialist.
+Target Audience: Hands-on practitioner and specialist in '{category_title}'.
 Goal: Step-by-step practical laboratory exercises using tools, simulators, or code specific to '{category_title}'.
+
+STRICT NON-COMPUTING MANDATE:
+- This is a non-computing subject ({domain_title} / {category_title}).
+- Under NO circumstances should you use generic Linux operating system commands (NO bpftool, NO kubectl, NO dmesg, NO strace, NO sysctl, NO apt-get, NO netstat, NO iptables).
+- All tools, environments, exercises, and setups MUST be 100% authentic and domain-native to '{domain_title}' (e.g. for Arts/Music: DAW, MIDI controllers, synthesizers, score notation software; for Motorsports: telemetry data, chassis simulators, CAD; for Natural Sciences: laboratory glassware, spectroscopy, Python scientific computing with NumPy/SciPy; for Economics: econometrics models, R/Python, spreadsheets).
 
 Structure:
 # Operational Verification Labs: {subtopic_title}

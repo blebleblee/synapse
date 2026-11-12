@@ -1,199 +1,124 @@
-# Operational Verification Labs: Core
+# Operational Verification Labs: Networking Internals
 
 ## Objective & Environment Setup
 
 ### Objective
-The primary objective of this lab is to provide hands-on experience in diagnosing and verifying the operational state of a Linux-based infrastructure. This includes inspecting kernel subsystems, benchmarking performance, and analyzing fault recovery mechanisms. The lab will equip you with practical skills using real Linux/BSD CLI tools, inspection utilities, and reproduction scripts.
+This operational lab verifies the core mechanisms of the Linux and BSD network stack. You will inspect socket buffers, trace packet traversal through kernel routing subsystems, profile interface queue drops, and diagnose path MTU and congestion window failures using standard networking diagnostic tools (`iproute2`, `ss`, `tcpdump`, `ethtool`, and `tc`).
 
-### Environment Setup
-Ensure you have the following tools installed on your Linux/BSD system:
+### Required Tooling
+Ensure standard networking diagnostic utilities are installed:
+- `iproute2` (`ip`, `ss`, `bridge`)
+- `tcpdump` / `tshark`
+- `ethtool`
+- `iperf3` / `curl`
 
-- **bpftool**: For eBPF program inspection and debugging.
-- **kubectl**: For Kubernetes cluster management and inspection.
-- **iproute2**: For network configuration and inspection.
-- **tcpdump**: For network packet capture and analysis.
-- **strace**: For system call tracing.
-- **perf**: For performance profiling and analysis.
+---
 
-#### Installation Commands
-For Debian-based systems (e.g., Ubuntu):
-```bash
-sudo apt-get update
-sudo apt-get install -y bpftool kubectl iproute2 tcpdump strace linux-tools-common linux-tools-generic linux-tools-`uname -r`
-```
+## Exercise 1: Socket Buffer Inspection & Connection State Diagnostics
 
-For Red Hat-based systems (e.g., CentOS, Fedora):
-```bash
-sudo yum install -y bpftool kubectl iproute2 tcpdump strace perf
-```
+Inspect TCP socket buffer allocations, receive/send queues, and round-trip time estimates for active connections.
 
-For Arch Linux:
-```bash
-sudo pacman -S bpftool kubectl iproute2 tcpdump strace perf
-```
-
-## Exercise 1: Live State & Internal Subsystem Inspection
-
-### Kernel Maps Inspection
-Kernel maps are essential for understanding the state of eBPF programs. Use `bpftool` to inspect these maps.
+### 1.1 Detailed Socket Memory & Flow Inspection
+Inspect socket send/receive buffer sizes, TCP congestion window (`cwnd`), and unacknowledged bytes using `ss`:
 
 ```bash
-sudo bpftool map list
+# Query active TCP streams with internal TCP info (-i), timer state (-o), and memory metrics (-m)
+ss -tipm state established
 ```
 
-This command lists all eBPF maps currently loaded in the kernel. You can inspect a specific map by its ID:
+Expected output includes metrics such as:
+- `skmem`: Socket memory buffers (`rmem_alloc`, `rcv_buf`, `wmem_alloc`, `snd_buf`).
+- `cwnd`: Congestion window size in MSS units.
+- `rtt`: Smoothed round-trip time and variance (`rtt:24.5/1.2`).
+
+### 1.2 Network Interface Queue & Ring Buffer Profiling
+Examine hardware and software ring buffer capacities and frame drops:
 
 ```bash
-sudo bpftool map dump id <map_id>
+# Query interface statistics and dropped packets
+ip -s link show dev eth0
+
+# Query Ethernet driver ring buffer descriptors (TX/RX queues)
+ethtool -g eth0
+
+# Inspect interface hardware drop and FIFO overrun counters
+ethtool -S eth0 | grep -E "drop|error|miss"
 ```
 
-Replace `<map_id>` with the ID of the map you wish to inspect.
+---
 
-### Memory Inspection
-Inspecting memory usage and virtual memory mappings is crucial for understanding system performance and resource allocation. Use `pmap` to view memory mappings of a process:
+## Exercise 2: Path MTU Discovery & Congestion Dynamics
+
+Diagnose MTU mismatches, path fragmentation boundaries, and throughput bottlenecks under artificial congestion.
+
+### 2.1 Path MTU Fragmentation Boundary Testing
+Determine the exact Path MTU to a target endpoint without permitting packet fragmentation:
 
 ```bash
-pmap <pid>
+# Probe destination with Don't Fragment (DF) bit set across packet size boundaries
+ping -c 2 -M do -s 1472 1.1.1.1
+ping -c 2 -M do -s 1473 1.1.1.1
 ```
 
-Replace `<pid>` with the process ID of the target process.
+If packet size exceeds MTU, verify receipt of ICMP Type 3, Code 4 (`Fragmentation Needed and DF set`):
+```bash
+tcpdump -nn -i any "icmp and icmp[0] == 3"
+```
 
-### Buffer Inspection
-Inspect kernel buffers to understand system logs and messages. Use `dmesg` to view kernel ring buffer messages:
+### 2.2 TCP Buffer Saturation & Flow Control
+Simulate bandwidth saturation using `iperf3` while monitoring TCP window scale factors and send queue backpressure:
 
 ```bash
-dmesg
+# In terminal 1: Monitor socket buffer backpressure
+watch -n 0.5 'ss -t -i "( sport = :5201 or dport = :5201 )"'
+
+# In terminal 2: Execute high-throughput transfer
+iperf3 -c 127.0.0.1 -t 10 -P 4
 ```
 
-For real-time monitoring, use:
+---
+
+## Exercise 3: Queueing Discipline (tc) Fault Injection & Drop Verification
+
+Inject controlled packet loss, latency jitter, and bandwidth limits to observe TCP rate-reduction and fast-retransmit behavior.
+
+### 3.1 Network Delay & Packet Loss Injection
+Add 100ms artificial round-trip latency and 5% packet loss using Linux `netem`:
 
 ```bash
-dmesg -w
+# Attach netem queueing discipline to loopback or test veth interface
+sudo tc qdisc add dev lo root netem delay 100ms loss 5%
+
+# Verify active queueing discipline configuration
+tc qdisc show dev lo
 ```
 
-### Process Inspection
-Inspecting processes and their states is fundamental for system diagnostics. Use `ps` to list running processes:
+### 3.2 Capture Duplicate ACKs & Fast Retransmission
+Capture and analyze TCP retransmission events provoked by the injected packet loss:
 
 ```bash
-ps aux
+# Capture duplicate ACKs and fast-retransmit frames
+tcpdump -nn -i lo -c 50 "tcp[tcpflags] & (tcp-ack) != 0"
 ```
 
-For detailed inspection of a specific process, use `strace`:
+### 3.3 Recovery & Queue Cleanup
+Restore default interface queueing discipline:
 
 ```bash
-sudo strace -p <pid>
+# Remove injected netem qdisc
+sudo tc qdisc del dev lo root
 ```
 
-Replace `<pid>` with the process ID of the target process.
+---
 
-### Metrics Inspection
-Inspect system metrics using `perf` to profile performance and identify bottlenecks:
+## Networking Diagnostic Cheat Sheet
 
-```bash
-sudo perf stat -a sleep 10
-```
-
-This command collects performance metrics for 10 seconds across all CPUs.
-
-## Exercise 2: Benchmarking & Saturation Profiling
-
-### Benchmark Commands
-Benchmarking is essential for understanding system performance under load. Use `sysbench` to benchmark CPU, memory, and file I/O performance:
-
-```bash
-sudo apt-get install -y sysbench
-sysbench cpu run
-sysbench memory run
-sysbench fileio --file-total-size=1G prepare
-sysbench fileio --file-total-size=1G --file-test-mode=rndrw run
-sysbench fileio --file-total-size=1G cleanup
-```
-
-### Load Generation
-Generate network load using `iperf3` to measure packet throughput and latency:
-
-```bash
-sudo apt-get install -y iperf3
-# On server machine
-iperf3 -s
-# On client machine
-iperf3 -c <server_ip>
-```
-
-Replace `<server_ip>` with the IP address of the server machine.
-
-### Packet Throughput Profiling
-Use `tcpdump` to capture and analyze network packets for throughput and latency:
-
-```bash
-sudo tcpdump -i eth0 -w capture.pcap
-```
-
-Replace `eth0` with the appropriate network interface.
-
-### Latency Profiling
-Profile network latency using `ping`:
-
-```bash
-ping -c 10 <target_ip>
-```
-
-Replace `<target_ip>` with the IP address of the target machine.
-
-## Exercise 3: Fault Injection & Recovery Analysis
-
-### Simulating Sudden Failure
-Simulate a sudden failure by killing a critical process:
-
-```bash
-sudo kill -9 <pid>
-```
-
-Replace `<pid>` with the process ID of the target process.
-
-### Simulating Packet Drop
-Simulate packet drops using `tc` (Traffic Control):
-
-```bash
-sudo tc qdisc add dev eth0 root netem loss 10%
-```
-
-Replace `eth0` with the appropriate network interface.
-
-### Simulating Partition
-Simulate network partition by isolating a node using `iptables`:
-
-```bash
-sudo iptables -A INPUT -s <target_ip> -j DROP
-sudo iptables -A OUTPUT -d <target_ip> -j DROP
-```
-
-Replace `<target_ip>` with the IP address of the target machine.
-
-### Inspecting Recovery Logs
-Inspect recovery logs using `journalctl`:
-
-```bash
-sudo journalctl -xe
-```
-
-## Diagnostic Cheat Sheet & Verification Checklist
-
-### Essential CLI Commands and Operational Flags
-
-| Command     | Description                                                                 | Example                                                                 |
-|-------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| `bpftool`   | Inspect and debug eBPF programs and maps.                                   | `sudo bpftool map list`                                                   |
-| `kubectl`   | Manage and inspect Kubernetes clusters.                                     | `kubectl get pods`                                                      |
-| `iproute2`  | Configure and inspect network interfaces and routes.                        | `ip addr show`                                                          |
-| `tcpdump`   | Capture and analyze network packets.                                        | `sudo tcpdump -i eth0 -w capture.pcap`                                  |
-| `strace`    | Trace system calls and signals.                                             | `sudo strace -p <pid>`                                                  |
-| `perf`      | Profile performance and identify bottlenecks.                               | `sudo perf stat -a sleep 10`                                            |
-| `sysbench`  | Benchmark CPU, memory, and file I/O performance.                            | `sysbench cpu run`                                                      |
-| `iperf3`    | Measure network throughput and latency.                                     | `iperf3 -c <server_ip>`                                                 |
-| `ping`      | Measure network latency.                                                    | `ping -c 10 <target_ip>`                                                |
-| `tc`        | Simulate network conditions like packet loss.                               | `sudo tc qdisc add dev eth0 root netem loss 10%`                          |
-| `iptables`  | Simulate network partition by dropping packets.                             | `sudo iptables -A INPUT -s <target_ip> -j DROP`                         |
-| `journalctl`| Inspect system logs and recovery logs.                                      | `sudo journalctl -xe`                                                   |
-
-This lab guide provides a comprehensive set of tools and commands to diagnose and verify the operational state of a Linux-based infrastructure. By following these exercises, you will gain practical experience in system diagnostics, performance benchmarking, and fault recovery analysis.
+| Subsystem | Command | Diagnostic Purpose |
+| :--- | :--- | :--- |
+| **Socket Info** | `ss -tipm state established` | Inspect `cwnd`, `rtt`, and socket buffer memory |
+| **Interface Drops** | `ip -s link show dev <iface>` | Measure RX/TX byte counters and packet drops |
+| **Ring Buffers** | `ethtool -g <iface>` | Query NIC RX/TX hardware ring capacities |
+| **HW Counters** | `ethtool -S <iface>` | Inspect low-level driver and MAC overrun errors |
+| **Packet Trace** | `tcpdump -nn -i <iface> -vvv` | Raw protocol dissection and flag inspection |
+| **Route Cache** | `ip route show table cache` | Verify Path MTU cache entries and next-hops |
+| **Fault Injection** | `tc qdisc add dev <iface> root netem` | Simulate latency, jitter, and packet loss |

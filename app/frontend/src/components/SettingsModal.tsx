@@ -580,11 +580,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               </div>
 
-              <div className="settings-models-grid">
-                {/* Column 1: Model Selection */}
-                <div className="settings-panel-col">
-                  <h4 className="panel-col-heading">Model Selection</h4>
-
+              {/* Box 1: Active Model Routing (Full Width 3-Column Row) */}
+              <div className="settings-panel-box">
+                <h4 className="panel-box-heading">Active Model Routing</h4>
+                <div className="settings-row-3col">
                   <div className="form-group compact">
                     <label>Primary Generation Model</label>
                     <select
@@ -639,23 +638,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </select>
                   </div>
                 </div>
+              </div>
 
-                {/* Column 2: Cloud API Credentials */}
-                <div className="settings-panel-col">
-                  <h4 className="panel-col-heading">Cloud API Credentials</h4>
+              {/* Box 2: Cloud API Credentials & Gateways (Spacious Full Width) */}
+              <div className="settings-panel-box">
+                <h4 className="panel-box-heading">Cloud API Credentials & Gateways</h4>
 
+                <div className="settings-row-2col">
                   <div className="form-group compact">
-                    <label>Anthropic API Key</label>
+                    <label>Anthropic API Key (Claude 3.5 Sonnet / Opus)</label>
                     <input
                       type="password"
                       value={formData.anthropicApiKey}
                       onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                      placeholder="sk-ant-..."
+                      placeholder="sk-ant-api03-..."
                     />
                   </div>
 
                   <div className="form-group compact">
-                    <label>Anthropic Base URL</label>
+                    <label>Anthropic Base URL (Proxy / Custom Gateway)</label>
                     <input
                       type="text"
                       value={formData.anthropicBaseUrl}
@@ -663,9 +664,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       placeholder="https://api.anthropic.com"
                     />
                   </div>
+                </div>
 
+                <div className="settings-row-2col" style={{ marginTop: '8px' }}>
                   <div className="form-group compact">
-                    <label>Google Gemini API Key</label>
+                    <label>Google Gemini API Key (Gemini 2.5 Flash / Pro)</label>
                     <input
                       type="password"
                       value={formData.geminiApiKey}
@@ -675,7 +678,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   <div className="form-group compact">
-                    <label>Google Gemini Base URL (Optional Gateway)</label>
+                    <label>Google Gemini Base URL (Optional Gateway / Proxy)</label>
                     <input
                       type="text"
                       value={formData.geminiBaseUrl || ''}
