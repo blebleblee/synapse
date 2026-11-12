@@ -131,6 +131,7 @@ class ChatRequest(BaseModel):
     history: List[ChatMessage] = []
     lesson_id: Optional[str] = None
     terminal_context: Optional[str] = None
+    lesson_content: Optional[str] = None
     stream: Optional[bool] = False
     provider: Optional[str] = None
     model: Optional[str] = None
@@ -761,6 +762,12 @@ async def chat_with_tutor(req: ChatRequest):
     if terminal_ctx and terminal_ctx.strip():
         conversation_text.append(
             f"[Live Terminal Buffer Context]:\n```text\n{terminal_ctx.strip()[-2000:]}\n```"
+        )
+    
+    # Inject active lesson context if provided
+    if req.lesson_content and req.lesson_content.strip():
+        conversation_text.append(
+            f"[Active Curriculum Context]:\n```markdown\n{req.lesson_content.strip()[-5000:]}\n```"
         )
 
     conversation_text.append(f"Student: {req.message}")

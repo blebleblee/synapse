@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   BookOpen,
   FlaskConical,
@@ -38,6 +38,7 @@ function toTitleCase(str: string): string {
 
 interface LessonViewerProps {
   topic: TopicDetails | null;
+  contentRef: React.RefObject<HTMLDivElement>;
   isLoading: boolean;
   isGenerating: boolean;
   onGenerate: (query: string, force?: boolean, level?: string) => void;
@@ -66,6 +67,7 @@ interface LessonViewerProps {
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
   topic,
+  contentRef,
   isLoading,
   isGenerating,
   onGenerate,
@@ -91,7 +93,6 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   onSelectLesson,
   onToggleLessonCompletion,
 }) => {
-  const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeakingVoice, setIsSpeakingVoice] = useState(false);
   const [translatedMarkdown, setTranslatedMarkdown] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);

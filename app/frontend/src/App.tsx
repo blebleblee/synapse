@@ -235,6 +235,8 @@ export function App() {
     }
   };
 
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const handleSendMessage = async (msg: string) => {
     const newStudentMsg: ChatMessage = { role: 'student', content: msg };
     const updatedHistory = [...unifiedChatHistory, newStudentMsg];
@@ -259,6 +261,12 @@ export function App() {
         }
       }
 
+      // Extract current lesson content from LessonViewer DOM
+      let lessonContent = '';
+      if (contentRef.current) {
+        lessonContent = contentRef.current.innerText || '';
+      }
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -268,6 +276,7 @@ export function App() {
           message: msg,
           history: updatedHistory,
           terminal_context: terminalOutput,
+          lesson_content: lessonContent,
           stream: true,
         }),
       });
@@ -494,6 +503,7 @@ export function App() {
       <div className="center-workspace-column">
         <LessonViewer
           topic={topicDetails}
+          contentRef={contentRef as React.RefObject<HTMLDivElement>}
           isLoading={isLoadingTopic}
           isGenerating={isGenerating}
           onGenerate={handleGenerate}

@@ -15,18 +15,20 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
   // 1. Process display math: $$...$$
   processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     try {
-      return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false })}</div>`;
-    } catch {
-      return `<pre><code>${math}</code></pre>`;
+      return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false, trust: true })}</div>`;
+    } catch (e) {
+      console.error('KaTeX render error (display):', e);
+      return `<div class="katex-error">Math Error: ${math}</div>`;
     }
   });
 
   // 2. Process inline math: $...$
   processed = processed.replace(/(?<!\\)\$([^$\n]+?)\$/g, (_, math) => {
     try {
-      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
-    } catch {
-      return `$${math}$`;
+      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false, trust: true });
+    } catch (e) {
+      console.error('KaTeX render error (inline):', e);
+      return `<span>Math Error: ${math}</span>`;
     }
   });
 
