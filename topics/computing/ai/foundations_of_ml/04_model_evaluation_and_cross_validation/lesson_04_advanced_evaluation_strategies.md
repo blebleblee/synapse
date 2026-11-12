@@ -2,78 +2,46 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-In the realm of machine learning, model evaluation is a critical component of the development pipeline. However, as models become increasingly complex and datasets grow in size, traditional evaluation metrics can become unreliable. This is where advanced evaluation strategies come into play. In this lesson, we'll delve into the theoretical underpinnings of bootstrapping, permutation tests, and ensemble methods, providing a solid foundation for robust model assessment.
+When evaluating machine learning models, we often rely on metrics such as accuracy, precision, and recall. However, these metrics can be misleading, especially when dealing with complex datasets or models. To gain a deeper understanding of our models' performance, we need to employ more advanced evaluation strategies. At their core, these strategies are rooted in statistical theory and mathematical rigor.
 
-At its core, model evaluation is a statistical problem. We're tasked with estimating the performance of a model on unseen data, while accounting for the inherent variability in the data itself. This is where the concept of resampling comes into play. Resampling involves repeatedly sampling from the original dataset, often with replacement, to create multiple subsets of data. This process allows us to estimate the variability of our model's performance, providing a more accurate picture of its true capabilities.
+One fundamental concept is the idea of **bootstrapping**, which involves resampling the training data with replacement to estimate the model's performance. This technique is based on the **bootstrap principle**, which states that the distribution of the sample mean is approximately normal with a mean equal to the population mean and a standard deviation equal to the population standard deviation divided by the square root of the sample size. By applying this principle, we can estimate the variance of our model's performance and gain a better understanding of its reliability.
 
-One of the most powerful resampling techniques is bootstrapping. Bootstrapping involves sampling with replacement from the original dataset, creating multiple subsets of data that are identical in size to the original. By repeating this process many times, we can estimate the variability of our model's performance, providing a more accurate picture of its true capabilities. The key insight behind bootstrapping is that the resampled datasets are not independent, but rather are correlated with the original dataset. This correlation allows us to estimate the variability of our model's performance, even in the presence of complex relationships between the features.
-
-Another important evaluation strategy is permutation testing. Permutation testing involves randomly shuffling the labels of the dataset, while keeping the features intact. By repeating this process many times, we can estimate the distribution of our model's performance under the null hypothesis, providing a more accurate picture of its true capabilities. The key insight behind permutation testing is that the distribution of our model's performance under the null hypothesis is identical to the distribution of our model's performance under the alternative hypothesis. This allows us to estimate the probability of observing our model's performance under the null hypothesis, providing a more accurate picture of its true capabilities.
-
-Ensemble methods are another powerful evaluation strategy. Ensemble methods involve combining the predictions of multiple models to produce a single, more accurate prediction. By combining the predictions of multiple models, we can reduce the variance of our model's performance, providing a more accurate picture of its true capabilities. The key insight behind ensemble methods is that the predictions of multiple models are not independent, but rather are correlated with each other. This correlation allows us to estimate the variability of our model's performance, even in the presence of complex relationships between the features.
+Another advanced evaluation strategy is the **permutation test**, which involves randomly permuting the labels of the training data and retraining the model. This process is repeated multiple times, and the resulting performance metrics are used to estimate the model's performance under the null hypothesis. The permutation test is particularly useful for evaluating the performance of models that are sensitive to the specific characteristics of the training data.
 
 ## 2. Core Architecture & Mechanics
 
-Let's take a closer look at the internal data structures and algorithms used in bootstrapping, permutation testing, and ensemble methods.
-
-**Bootstrapping**
+Let's take a closer look at the internal mechanics of bootstrapping and permutation testing. In the case of bootstrapping, we can represent the process as a simple algorithm:
 
 ```mermaid
 graph LR
-    A[Original Dataset] --> B[Resample with Replacement]
-    B --> C[Resampled Dataset]
-    C --> D[Estimate Model Performance]
+    A[Initialize] --> B[Resample data with replacement]
+    B --> C[Retrain model]
+    C --> D[Estimate performance]
     D --> E[Repeat]
 ```
 
-In the above diagram, we can see the core architecture of bootstrapping. We start with the original dataset, which is then resampled with replacement to create multiple subsets of data. We then estimate the model's performance on each resampled dataset, repeating the process many times.
+In this diagram, we can see that the bootstrapping process involves resampling the data with replacement, retraining the model, and estimating its performance. This process is repeated multiple times to gain a better understanding of the model's reliability.
 
-**Permutation Testing**
+For permutation testing, we can represent the process as follows:
 
 ```mermaid
 graph LR
-    A[Original Dataset] --> B[Shuffle Labels]
-    B --> C[Resampled Dataset]
-    C --> D[Estimate Model Performance]
+    A[Initialize] --> B[Permute labels]
+    B --> C[Retrain model]
+    C --> D[Estimate performance]
     D --> E[Repeat]
 ```
 
-In the above diagram, we can see the core architecture of permutation testing. We start with the original dataset, which is then shuffled to create a resampled dataset. We then estimate the model's performance on the resampled dataset, repeating the process many times.
-
-**Ensemble Methods**
-
-```mermaid
-graph LR
-    A[Model 1] --> B[Model 2]
-    B --> C[Combine Predictions]
-    C --> D[Estimate Model Performance]
-```
-
-In the above diagram, we can see the core architecture of ensemble methods. We start with two or more models, which are then combined to produce a single, more accurate prediction. We then estimate the model's performance on the combined prediction.
+In this diagram, we can see that the permutation testing process involves permuting the labels of the training data, retraining the model, and estimating its performance. This process is repeated multiple times to estimate the model's performance under the null hypothesis.
 
 ## 3. High-Performance Optimization & Failure Modes
 
-In this section, we'll discuss high-performance optimization and failure modes for bootstrapping, permutation testing, and ensemble methods.
+When implementing advanced evaluation strategies, it's essential to consider the performance and scalability of the algorithm. In the case of bootstrapping, we can optimize the process by using a **reservoir sampling** algorithm, which allows us to sample the data without replacement while maintaining the same statistical properties as resampling with replacement.
 
-**Bootstrapping**
+For permutation testing, we can optimize the process by using a **random permutation** algorithm, which allows us to permute the labels of the training data quickly and efficiently.
 
-*   To optimize bootstrapping, we can use techniques such as parallel processing and caching to reduce the computational overhead.
-*   Failure modes for bootstrapping include:
-    *   Insufficient sampling: If the resampled datasets are too small, the model's performance may not be accurately estimated.
-    *   Over-sampling: If the resampled datasets are too large, the model's performance may be over-estimated.
+In terms of failure modes, we need to consider the possibility of **overfitting**, which occurs when the model is too complex and fits the noise in the training data rather than the underlying patterns. We can mitigate overfitting by using techniques such as **regularization** and **early stopping**.
 
-**Permutation Testing**
+We also need to consider the possibility of **underfitting**, which occurs when the model is too simple and fails to capture the underlying patterns in the data. We can mitigate underfitting by using techniques such as **feature engineering** and **model selection**.
 
-*   To optimize permutation testing, we can use techniques such as parallel processing and caching to reduce the computational overhead.
-*   Failure modes for permutation testing include:
-    *   Insufficient permutations: If the number of permutations is too small, the model's performance may not be accurately estimated.
-    *   Over-permutations: If the number of permutations is too large, the model's performance may be over-estimated.
-
-**Ensemble Methods**
-
-*   To optimize ensemble methods, we can use techniques such as parallel processing and caching to reduce the computational overhead.
-*   Failure modes for ensemble methods include:
-    *   Insufficient models: If the number of models is too small, the combined prediction may not be accurate.
-    *   Over-models: If the number of models is too large, the combined prediction may be over-estimated.
-
-By understanding the theoretical underpinnings of bootstrapping, permutation testing, and ensemble methods, we can develop more robust evaluation strategies for machine learning models. By optimizing these strategies and mitigating failure modes, we can ensure that our models are accurately evaluated and perform well in real-world scenarios.
+In conclusion, advanced evaluation strategies such as bootstrapping and permutation testing provide a more rigorous and reliable way to evaluate machine learning models. By understanding the theoretical grounding and internal mechanics of these strategies, we can gain a deeper understanding of our models' performance and make more informed decisions about their deployment.
