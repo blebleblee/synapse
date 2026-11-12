@@ -26,35 +26,51 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
+import threading
+from collections import deque
+from typing import Dict, List, Optional, Any
+
 ANSI_ESCAPE_RE = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 class TerminalRingBuffer:
-    """
-    Thread-safe server-side circular buffer capturing live PTY output with ANSI code stripping.
-    Provides reliable, zero-loss read-only terminal context for AI Socratic error diagnosis.
-    """
     def __init__(self, max_lines: int = 150):
         self.buffer: deque[str] = deque(maxlen=max_lines)
+        self._lock = threading.Lock()
 
     def append_text(self, raw_bytes: bytes):
-        try:
-            text = raw_bytes.decode("utf-8", errors="replace")
-            clean = ANSI_ESCAPE_RE.sub("", text)
-            for line in clean.splitlines():
-                stripped = line.strip()
-                if stripped:
-                    self.buffer.append(stripped)
-        except Exception:
-            pass
+        with self._lock:
+            try:
+                text = raw_bytes.decode("utf-8", errors="replace")
+                clean = ANSI_ESCAPE_RE.sub("", text)
+                for line in clean.splitlines():
+                    stripped = line.strip()
+                    if stripped:
+                        self.buffer.append(stripped)
+            except Exception as e:
+                # Log error silently to avoid breaking PTY flow
+                pass
 
     def get_recent_lines(self, count: int = 50) -> List[str]:
-        items = list(self.buffer)
-        return items[-count:]
+        with self._lock:
+            return list(self.buffer)[-count:]
 
     def get_recent_text(self, count: int = 50) -> str:
-        return "\n".join(self.get_recent_lines(count))
+        with self._lock:
+            return "\n".join(list(self.buffer)[-count:])
 
-GLOBAL_TERMINAL_BUFFER = TerminalRingBuffer(max_lines=150)
+class SessionManager:
+    def __init__(self):
+        self.sessions: Dict[str, TerminalRingBuffer] = {}
+        self._lock = threading.Lock()
+
+    def get_buffer(self, session_id: str) -> TerminalRingBuffer:
+        with self._lock:
+            if session_id not in self.sessions:
+                self.sessions[session_id] = TerminalRingBuffer()
+            return self.sessions[session_id]
+
+# Global Session Manager
+SESSION_MANAGER = SessionManager()
 
 # Ensure workspace root is in sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -725,10 +741,11 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
         print(f"[!] Auto-save error: {e}")
 
 @app.get("/api/terminal/buffer")
-def get_terminal_buffer(lines: int = 50):
+def get_terminal_buffer(session_id: str = "default", lines: int = 50):
+    buffer = SESSION_MANAGER.get_buffer(session_id)
     return {
-        "lines": GLOBAL_TERMINAL_BUFFER.get_recent_lines(lines),
-        "text": GLOBAL_TERMINAL_BUFFER.get_recent_text(lines)
+        "lines": buffer.get_recent_lines(lines),
+        "text": buffer.get_recent_text(lines)
     }
 
 @app.post("/api/chat")
@@ -737,7 +754,7 @@ async def chat_with_tutor(req: ChatRequest):
 
     terminal_ctx = req.terminal_context
     if not terminal_ctx or not terminal_ctx.strip():
-        terminal_ctx = GLOBAL_TERMINAL_BUFFER.get_recent_text(50)
+        terminal_ctx = SESSION_MANAGER.get_buffer("default").get_recent_text(50)
 
     if target:
         domain, cat, sub, sub_path = target
@@ -766,9 +783,14 @@ async def chat_with_tutor(req: ChatRequest):
     
     # Inject active lesson context if provided
     if req.lesson_content and req.lesson_content.strip():
+        with open("/Users/radovan.varga/.gemini/tmp/synapse/debug.log", "a") as f:
+            f.write(f"[DEBUG] Received lesson content length: {len(req.lesson_content)}\n")
         conversation_text.append(
             f"[Active Curriculum Context]:\n```markdown\n{req.lesson_content.strip()[-5000:]}\n```"
         )
+    else:
+        with open("/Users/radovan.varga/.gemini/tmp/synapse/debug.log", "a") as f:
+            f.write("[DEBUG] No lesson content received in ChatRequest\n")
 
     conversation_text.append(f"Student: {req.message}")
     conversation_text.append("Tutor:")
@@ -1114,6 +1136,8 @@ async def terminal_websocket(websocket: WebSocket):
     loop = asyncio.get_event_loop()
 
     async def pty_read_loop():
+        session_id = str(id(websocket))
+        buffer = SESSION_MANAGER.get_buffer(session_id)
         try:
             while True:
                 await asyncio.sleep(0.01)
@@ -1122,7 +1146,7 @@ async def terminal_websocket(websocket: WebSocket):
                     try:
                         data = os.read(master, 4096)
                         if data:
-                            GLOBAL_TERMINAL_BUFFER.append_text(data)
+                            buffer.append_text(data)
                             await websocket.send_bytes(data)
                         else:
                             break
