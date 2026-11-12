@@ -122,10 +122,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   useEffect(() => {
-    if (isOpen && activeTab === 'store') {
+    if (isOpen) {
       fetchPackages();
     }
-  }, [isOpen, activeTab]);
+  }, [isOpen]);
 
   const handleExportPack = async (domain: string) => {
     setActionInProgress(`export-${domain}`);
@@ -711,6 +711,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Curriculum Domains ({packagesData.available_domains.filter((d) => !storeSearch || d.title.toLowerCase().includes(storeSearch.toLowerCase()) || d.domain.toLowerCase().includes(storeSearch.toLowerCase()) || d.description.toLowerCase().includes(storeSearch.toLowerCase())).length})
                 </span>
               </div>
+
+              {isLoadingPackages && packagesData.available_domains.length === 0 && (
+                <div className="store-loading-state">
+                  <Loader2 className="animate-spin" size={18} />
+                  <span>Loading curriculum packages...</span>
+                </div>
+              )}
+
+              {!isLoadingPackages && packagesData.available_domains.length === 0 && (
+                <div className="store-empty-state">
+                  <Package size={24} className="store-empty-icon" />
+                  <span>No curriculum packages found.</span>
+                  <button type="button" className="btn-secondary" onClick={fetchPackages}>
+                    <RefreshCw size={12} />
+                    <span>Retry Loading</span>
+                  </button>
+                </div>
+              )}
 
               <div className="store-domains-grid">
                 {packagesData.available_domains

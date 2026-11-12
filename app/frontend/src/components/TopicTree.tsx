@@ -274,12 +274,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
         </div>
 
         <div className="sidebar-header-actions">
-          <button className="icon-btn" onClick={onOpenSearch} title={`${ui.search} (Cmd+K)`}>
-            <Search size={14} />
-          </button>
-          <button className="icon-btn" onClick={onOpenGraph} title={ui.graph}>
-            <GitBranch size={14} />
-          </button>
           <button className="icon-btn" onClick={onOpenStore || onOpenSettings} title="Curriculum Store & Addons">
             <Package size={14} />
           </button>
@@ -306,7 +300,7 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchTerm && (
+          {searchTerm.length > 0 ? (
             <button
               type="button"
               className="search-clear-btn"
@@ -315,8 +309,26 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             >
               <X size={12} />
             </button>
-          )}
+          ) : null}
         </div>
+
+        <button
+          type="button"
+          className="icon-btn-sm"
+          onClick={onOpenSearch}
+          title={`${ui.search} (Cmd+K)`}
+        >
+          <Search size={13} />
+        </button>
+
+        <button
+          type="button"
+          className="icon-btn-sm"
+          onClick={onOpenGraph}
+          title={ui.graph}
+        >
+          <GitBranch size={13} />
+        </button>
 
         <button
           type="button"
@@ -331,10 +343,10 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
           type="button"
           className={`sort-pill-btn ${sortMode === 'progress' ? 'active' : ''}`}
           onClick={toggleSortMode}
-          title={sortMode === 'az' ? 'Sorted A to Z (Click to sort by % completeness)' : 'Sorted by % Completeness (Click to sort A-Z)'}
+          title={sortMode === 'az' ? 'Sorted: A-Z (Click to sort by % Completion)' : 'Sorted: % Completion (Click to sort A-Z)'}
         >
           <ArrowUpDown size={11} />
-          <span className="sort-pill-label">{sortMode === 'az' ? 'a-z' : '%'}</span>
+          <span className="sort-pill-label">{sortMode === 'az' ? 'A-Z' : 'DONE'}</span>
         </button>
       </div>
 
