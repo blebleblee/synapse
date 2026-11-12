@@ -6,7 +6,6 @@ import {
   User,
   MessageSquare,
   Lightbulb,
-  Volume2,
   ChevronDown,
   ChevronUp,
   Sparkles,
@@ -14,7 +13,6 @@ import {
   Trash2
 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
-import { speakText } from '../utils/speech';
 
 interface TutorChatProps {
   topic: TopicDetails | null;
@@ -261,15 +259,6 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                     </>
                   )}
                 </div>
-                {msg.role === 'tutor' && (
-                  <button
-                    className="bubble-audio-btn"
-                    onClick={() => speakText(msg.content)}
-                    title="Listen to this response (TTS)"
-                  >
-                    <Volume2 size={12} />
-                  </button>
-                )}
               </div>
               <div
                 className="bubble-content"

@@ -904,7 +904,13 @@ async def chat_with_tutor(req: ChatRequest):
         sub_path = None
         system_instruction = build_neutral_workspace_instruction(terminal_context=terminal_ctx)
 
-    provider, used_model = get_chat_provider(model=req.model, host=req.host)
+    try:
+        provider, used_model = get_chat_provider(model=req.model, host=req.host)
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Unable to initialize AI provider for model '{req.model or 'auto'}': {e}"
+        )
 
     conversation_text = []
     for m in req.history[-6:]:
@@ -918,14 +924,9 @@ async def chat_with_tutor(req: ChatRequest):
     
     # Inject active lesson context if provided
     if req.lesson_content and req.lesson_content.strip():
-        with open("/Users/radovan.varga/.gemini/tmp/synapse/debug.log", "a") as f:
-            f.write(f"[DEBUG] Received lesson content length: {len(req.lesson_content)}\n")
         conversation_text.append(
             f"[Active Curriculum Context]:\n```markdown\n{req.lesson_content.strip()[-5000:]}\n```"
         )
-    else:
-        with open("/Users/radovan.varga/.gemini/tmp/synapse/debug.log", "a") as f:
-            f.write("[DEBUG] No lesson content received in ChatRequest\n")
 
     conversation_text.append(f"Student: {req.message}")
     conversation_text.append("Tutor:")
@@ -935,18 +936,26 @@ async def chat_with_tutor(req: ChatRequest):
     if req.stream:
         async def stream_generator():
             full_reply = []
-            for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
-                full_reply.append(chunk)
-                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            try:
+                for chunk in provider.generate_stream(prompt, system_instruction=system_instruction, max_tokens=250):
+                    full_reply.append(chunk)
+                    yield f"data: {json.dumps({'chunk': chunk})}\n\n"
 
-            reply_text = "".join(full_reply).strip()
-            save_chat_session(sub_path, req.message, reply_text, req.history)
-            yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
+                reply_text = "".join(full_reply).strip()
+                save_chat_session(sub_path, req.message, reply_text, req.history)
+                yield f"data: {json.dumps({'done': True, 'full_reply': reply_text, 'model': used_model})}\n\n"
+            except Exception as stream_err:
+                err_text = f"⚠️ Socratic Mentor stream error ({used_model}): {stream_err}. Please verify your active model or cluster node in Settings ⚙."
+                yield f"data: {json.dumps({'chunk': err_text, 'done': True, 'full_reply': err_text, 'model': used_model})}\n\n"
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
-    response_text = provider.generate(prompt, system_instruction=system_instruction)
-    reply = response_text.strip()
+    try:
+        response_text = provider.generate(prompt, system_instruction=system_instruction)
+        reply = response_text.strip()
+    except Exception as gen_err:
+        reply = f"⚠️ Socratic Mentor error ({used_model}): {gen_err}. Please verify your cluster node in Settings ⚙."
+
     save_chat_session(sub_path, req.message, reply, req.history)
 
     return {
