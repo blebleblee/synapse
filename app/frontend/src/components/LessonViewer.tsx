@@ -245,21 +245,23 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     }
   };
 
+  const isMathDomain = topic?.domain === 'formal_sciences' || topic?.domain === 'natural_sciences';
+
   const htmlContent = useMemo(() => {
     if (!activeMarkdown) return '';
-    return renderMarkdownWithMathAndMermaid(activeMarkdown);
-  }, [activeMarkdown]);
+    return renderMarkdownWithMathAndMermaid(activeMarkdown, isMathDomain);
+  }, [activeMarkdown, isMathDomain]);
 
   const originalHtmlContent = useMemo(() => {
     if (!rawMarkdown) return '';
-    return renderMarkdownWithMathAndMermaid(rawMarkdown);
-  }, [rawMarkdown]);
+    return renderMarkdownWithMathAndMermaid(rawMarkdown, isMathDomain);
+  }, [rawMarkdown, isMathDomain]);
 
   const translatedHtmlContent = useMemo(() => {
     const md = translatedMarkdown || rawMarkdown;
     if (!md) return '';
-    return renderMarkdownWithMathAndMermaid(md);
-  }, [translatedMarkdown, rawMarkdown]);
+    return renderMarkdownWithMathAndMermaid(md, isMathDomain);
+  }, [translatedMarkdown, rawMarkdown, isMathDomain]);
 
   useEffect(() => {
     if (contentRef.current) {

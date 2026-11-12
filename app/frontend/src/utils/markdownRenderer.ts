@@ -4,7 +4,7 @@ import 'katex/dist/katex.min.css';
 
 let mermaidInitialized = false;
 
-export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
+export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath = false): string {
   if (!rawMarkdown) return '';
 
   // Strip redundant diagram meta-headers
@@ -12,25 +12,47 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
     .replace(/^###?\s*(?:Ascii diagram|Mermaid flowchart|ASCII Architecture|System Diagram)[\s:]*$/gim, '')
     .trim();
 
-  // 1. Process display math: $$...$$
-  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-    try {
-      return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false, trust: true })}</div>`;
-    } catch (e) {
-      console.error('KaTeX render error (display):', e);
-      return `<div class="katex-error">Math Error: ${math}</div>`;
-    }
-  });
+  // If math is enabled (formal_sciences, natural_sciences), safely parse LaTeX outside code
+  if (enableMath) {
+    const codeBlocks: string[] = [];
+    // Protect fenced code blocks (```...```)
+    processed = processed.replace(/(```[\s\S]*?```)/g, (_, block) => {
+      codeBlocks.push(block);
+      return `%%SYNAPSE_CODEBLOCK_${codeBlocks.length - 1}%%`;
+    });
 
-  // 2. Process inline math: $...$
-  processed = processed.replace(/(?<!\\)\$([^$\n]+?)\$/g, (_, math) => {
-    try {
-      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false, trust: true });
-    } catch (e) {
-      console.error('KaTeX render error (inline):', e);
-      return `<span>Math Error: ${math}</span>`;
-    }
-  });
+    // Protect inline code (`...`)
+    const inlineCodes: string[] = [];
+    processed = processed.replace(/(`[^`\n]+?`)/g, (_, code) => {
+      inlineCodes.push(code);
+      return `%%SYNAPSE_INLINECODE_${inlineCodes.length - 1}%%`;
+    });
+
+    // 1. Process display math: $$...$$
+    processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+      try {
+        return `<div class="katex-display">${katex.renderToString(math.trim(), { displayMode: true, throwOnError: false, trust: true })}</div>`;
+      } catch (e) {
+        console.error('KaTeX render error (display):', e);
+        return `<div class="katex-error">Math Error: ${math}</div>`;
+      }
+    });
+
+    // 2. Process inline math: $...$
+    processed = processed.replace(/(?<!\\)\$([^$\n]+?)\$/g, (_, math) => {
+      try {
+        return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false, trust: true });
+      } catch (e) {
+        console.error('KaTeX render error (inline):', e);
+        return `<span>Math Error: ${math}</span>`;
+      }
+    });
+
+    // Restore inline code
+    processed = processed.replace(/%%SYNAPSE_INLINECODE_(\d+)%%/g, (_, idx) => inlineCodes[Number(idx)]);
+    // Restore fenced code blocks
+    processed = processed.replace(/%%SYNAPSE_CODEBLOCK_(\d+)%%/g, (_, idx) => codeBlocks[Number(idx)]);
+  }
 
   // 3. Custom marked renderer for mermaid and executable sandbox code blocks
   const renderer = new marked.Renderer();
