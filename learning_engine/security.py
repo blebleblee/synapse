@@ -12,6 +12,16 @@ def sanitize_topic_path(domain: str, category: str, subtopic_id: str) -> tuple[s
             
     return domain, category, subtopic_id
 
+def sanitize_query(query: str) -> str:
+    """Validate and sanitize API query strings."""
+    if not query:
+        raise ValueError("Empty query")
+    if ".." in query or query.startswith("/"):
+        raise ValueError("Path traversal detected")
+    if not re.match(r'^[a-zA-Z0-9_/.-]+$', query):
+        raise ValueError("Query contains forbidden characters")
+    return query.strip()
+
 def validate_workspace_path(base_dir: Path, target_path: Path) -> Path:
     """Ensure target_path resolves strictly within base_dir."""
     try:

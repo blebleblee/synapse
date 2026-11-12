@@ -106,6 +106,7 @@ from learning_engine.mastery import (
     get_completed_lessons,
     toggle_lesson_completion
 )
+from learning_engine.security import validate_workspace_path, sanitize_query
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
@@ -141,16 +142,40 @@ class ChatMessage(BaseModel):
     role: str
     content: str
 
+from pydantic import BaseModel, Field, validator
+import re
+
 class ChatRequest(BaseModel):
-    query: str
-    message: str
-    history: List[ChatMessage] = []
-    lesson_id: Optional[str] = None
-    terminal_context: Optional[str] = None
-    lesson_content: Optional[str] = None
+    query: str = Field(..., min_length=0, max_length=500)
+    message: str = Field(..., min_length=1, max_length=10000)
+    history: List[Any] = []
+    lesson_id: Optional[str] = Field(None, regex=r'^[a-z0-9_-]*$')
+    terminal_context: Optional[str] = Field(None, max_length=50000)
+    lesson_content: Optional[str] = Field(None, max_length=50000)
     stream: Optional[bool] = False
     provider: Optional[str] = None
     model: Optional[str] = None
+
+    @validator('query')
+    def validate_query(cls, v):
+        if v and not re.match(r'^[a-zA-Z0-9_/.-]*$', v):
+            raise ValueError('Invalid characters in query')
+        if ".." in v:
+            raise ValueError('Path traversal detected')
+        return v
+
+class GenerateRequest(BaseModel):
+    domain: str = Field(..., regex=r'^[a-z0-9_-]+$')
+    category: str = Field(..., regex=r'^[a-z0-9_/-]+$')
+    subtopic: str = Field(..., regex=r'^[a-z0-9_-]+$')
+    level: str = Field(default='beginner', regex=r'^(beginner|intermediate|advanced)$')
+    force: bool = False
+
+class TranslateRequest(BaseModel):
+    text: str = Field(..., max_length=50000)
+    target_lang: str = Field(..., regex=r'^[a-z]{2}$')
+
+# ... update chat_with_tutor to use GenerateRequest and ChatRequest ...
 
 # -----------------------------------------------------------------------------
 # REST Endpoints
@@ -289,11 +314,15 @@ def update_lesson_mastery(req: LessonMasteryRequest):
 @app.get("/api/export")
 def download_export(domain: str, level: Optional[str] = None):
     try:
+        domain = sanitize_query(domain)
+        if level:
+            level = sanitize_query(level)
         out_file = export_handbook(domain, level)
+        target_path = validate_workspace_path(WORKSPACE_ROOT, out_file)
         return FileResponse(
-            str(out_file),
+            str(target_path),
             media_type="text/markdown",
-            filename=out_file.name
+            filename=target_path.name
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -400,6 +429,13 @@ def get_topic_details(
     level: Optional[str] = Query("beginner", description="Difficulty level: beginner, intermediate, advanced"),
     lesson_id: Optional[str] = Query(None, description="Optional specific lesson ID e.g. 'lesson_01_introduction'")
 ):
+    try:
+        query = sanitize_query(query)
+        if level:
+            level = sanitize_query(level)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+        
     target = resolve_subtopic(query)
     if not target:
         raise HTTPException(status_code=404, detail=f"Topic '{query}' not found")
