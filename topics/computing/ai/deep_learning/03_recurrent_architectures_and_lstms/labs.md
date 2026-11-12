@@ -1,8 +1,7 @@
 # Operational Verification Labs: 03 Recurrent Architectures And LSTMs
 
 ## Objective & Environment Setup
-
-The objective of this lab is to gain hands-on experience with Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks. We will implement an LSTM model to predict time series data, perform hyperparameter tuning, and conduct stress testing to ensure robustness. This lab assumes a Python 3.11+ environment with the following packages installed:
+The objective of this lab is to gain hands-on experience with implementing, tuning, and verifying Long Short-Term Memory (LSTM) networks, a type of recurrent neural network (RNN) widely used in sequence prediction problems. We will use a Python 3.11+ environment with the following packages installed:
 
 - PyTorch
 - HuggingFace Transformers
@@ -10,19 +9,18 @@ The objective of this lab is to gain hands-on experience with Recurrent Neural N
 - Scikit-learn
 - Matplotlib
 
-You can set up the environment using the following command:
+Ensure your environment is set up with these packages. You can install them using pip:
 
 ```bash
 pip install torch transformers numpy scikit-learn matplotlib
 ```
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
-
-In this exercise, we will implement an LSTM model to predict the sine wave function. This will serve as a simple yet effective demonstration of how LSTMs can capture temporal dependencies in sequential data.
+In this exercise, we will implement an LSTM network to predict the next value in a time series. We will use the popular sine wave dataset for this purpose. The LSTM will be trained to predict the next value in the sequence given a fixed number of previous values.
 
 ### Step-by-Step Implementation
 
-1. **Import Required Libraries**
+1. **Import Libraries**
 
 ```python
 import numpy as np
@@ -57,7 +55,7 @@ scaler = MinMaxScaler(feature_range=(-1, 1))
 data = scaler.fit_transform(data)
 ```
 
-4. **Create Train and Test Sets**
+4. **Split Data into Training and Testing Sets**
 
 ```python
 train_size = int(len(data) * 0.8)
@@ -65,221 +63,262 @@ train_data = data[:train_size]
 test_data = data[train_size:]
 ```
 
-5. **Prepare Data for LSTM**
+5. **Create DataLoader**
 
 ```python
-def create_inout_sequences(input_data, tw):
-    inout_seq = []
-    L = len(input_data)
-    for i in range(L - tw):
-        train_seq = input_data[i:i + tw]
-        train_label = input_data[i + tw:i + tw + 1]
-        inout_seq.append((train_seq, train_label))
-    return inout_seq
+def create_data_loader(data, seq_length, batch_size):
+    x = []
+    y = []
+    for i in range(len(data) - seq_length):
+        x.append(data[i:i + seq_length, :-1])
+        y.append(data[i + seq_length - 1, -1])
+    x = np.array(x)
+    y = np.array(y)
+    x = torch.tensor(x, dtype=torch.float32)
+    y = torch.tensor(y, dtype=torch.float32)
+    dataset = torch.utils.data.TensorDataset(x, y)
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    return data_loader
 
-train_inout_seq = create_inout_sequences(train_data, seq_length)
-test_inout_seq = create_inout_sequences(test_data, seq_length)
+batch_size = 32
+train_loader = create_data_loader(train_data, seq_length, batch_size)
+test_loader = create_data_loader(test_data, seq_length, batch_size)
 ```
 
 6. **Define LSTM Model**
 
 ```python
-class LSTM(nn.Module):
-    def __init__(self, input_size=1, hidden_layer_size=100, output_size=1):
-        super().__init__()
-        self.hidden_layer_size = hidden_layer_size
+class LSTMModel(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, output_size):
+        super(LSTMModel, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
 
-        self.lstm = nn.LSTM(input_size, hidden_layer_size)
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        out, _ = self.lstm(x, (h0, c0))
+        out = self.fc(out[:, -1, :])
+        return out
 
-        self.linear = nn.Linear(hidden_layer_size, output_size)
+input_size = 1
+hidden_size = 50
+num_layers = 2
+output_size = 1
+model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+```
 
-        self.hidden_cell = (torch.zeros(1, 1, self.hidden_layer_size),
-                            torch.zeros(1, 1, self.hidden_layer_size))
+7. **Define Loss Function and Optimizer**
 
-    def forward(self, input_seq):
-        lstm_out, self.hidden_cell = self.lstm(input_seq.view(len(input_seq), 1, -1), self.hidden_cell)
-        predictions = self.linear(lstm_out.view(len(input_seq), -1))
-        return predictions[-1]
-
-model = LSTM()
-loss_function = nn.MSELoss()
+```python
+criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
 
-7. **Train the Model**
+8. **Train the Model**
 
 ```python
-epochs = 150
-
-for i in range(epochs):
-    for seq, labels in train_inout_seq:
+num_epochs = 100
+for epoch in range(num_epochs):
+    for inputs, labels in train_loader:
         optimizer.zero_grad()
-        model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                            torch.zeros(1, 1, model.hidden_layer_size))
-
-        y_pred = model(seq)
-
-        single_loss = loss_function(y_pred, labels)
-        single_loss.backward()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
         optimizer.step()
-
-    if i % 25 == 1:
-        print(f'Epoch {i} loss: {single_loss.item()}')
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 ```
 
-8. **Test the Model**
+9. **Evaluate the Model**
 
 ```python
-fut_pred = 15
-test_inputs = train_data[-seq_length:].tolist()
-
 model.eval()
-
-for i in range(fut_pred):
-    seq = torch.FloatTensor(test_inputs[-seq_length:])
-    with torch.no_grad():
-        model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                            torch.zeros(1, 1, model.hidden_layer_size))
-        test_inputs.append(model(seq).item())
-
-actual_predictions = scaler.inverse_transform(np.array(test_inputs[seq_length:]).reshape(-1, 1))
-x = np.arange(0, len(actual_predictions), 1)
-
-plt.title('Model Prediction')
-plt.scatter(x, actual_predictions)
-plt.grid(True)
-plt.show()
+with torch.no_grad():
+    predictions = []
+    for inputs, labels in test_loader:
+        outputs = model(inputs)
+        predictions.extend(outputs.numpy())
+    predictions = np.array(predictions)
+    predictions = scaler.inverse_transform(np.concatenate((test_data[-len(predictions):, :-1], predictions.reshape(-1, 1)), axis=1))[:, -1]
+    true_values = scaler.inverse_transform(test_data[-len(predictions):])[:, -1]
+    plt.figure(figsize=(12, 6))
+    plt.plot(true_values, label='True Values')
+    plt.plot(predictions, label='Predictions')
+    plt.legend()
+    plt.show()
 ```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
+In this exercise, we will perform hyperparameter tuning and benchmark the LSTM model based on accuracy and convergence curves.
 
-In this exercise, we will perform hyperparameter tuning to optimize the LSTM model's performance. We will measure accuracy, latency, and convergence curves.
-
-### Step-by-Step Tuning and Benchmarking
+### Hyperparameter Tuning
 
 1. **Define Hyperparameters**
 
 ```python
-hidden_layer_sizes = [50, 100, 150]
-learning_rates = [0.001, 0.01, 0.1]
-epochs = 150
+hyperparameters = {
+    'hidden_size': [50, 100, 200],
+    'num_layers': [1, 2, 3],
+    'learning_rate': [0.001, 0.0001, 0.00001]
+}
 ```
 
-2. **Benchmarking Function**
+2. **Grid Search**
 
 ```python
-def benchmark_lstm(hidden_layer_size, learning_rate):
-    model = LSTM(hidden_layer_size=hidden_layer_size)
-    loss_function = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+best_loss = float('inf')
+best_params = None
 
-    losses = []
-    for i in range(epochs):
-        for seq, labels in train_inout_seq:
-            optimizer.zero_grad()
-            model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                                torch.zeros(1, 1, model.hidden_layer_size))
+for hs in hyperparameters['hidden_size']:
+    for nl in hyperparameters['num_layers']:
+        for lr in hyperparameters['learning_rate']:
+            model = LSTMModel(input_size, hs, nl, output_size)
+            criterion = nn.MSELoss()
+            optimizer = optim.Adam(model.parameters(), lr=lr)
+            for epoch in range(num_epochs):
+                for inputs, labels in train_loader:
+                    optimizer.zero_grad()
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
+                    loss.backward()
+                    optimizer.step()
+            if loss.item() < best_loss:
+                best_loss = loss.item()
+                best_params = {'hidden_size': hs, 'num_layers': nl, 'learning_rate': lr}
+            print(f'Hidden Size: {hs}, Num Layers: {nl}, Learning Rate: {lr}, Loss: {loss.item():.4f}')
 
-            y_pred = model(seq)
-
-            single_loss = loss_function(y_pred, labels)
-            single_loss.backward()
-            optimizer.step()
-
-        losses.append(single_loss.item())
-
-    return losses
+print(f'Best Parameters: {best_params}')
 ```
 
-3. **Run Benchmarks**
+### Benchmarking
+
+1. **Convergence Curves**
 
 ```python
-results = {}
-for hidden_layer_size in hidden_layer_sizes:
-    for learning_rate in learning_rates:
-        print(f'Running benchmark for hidden_layer_size={hidden_layer_size}, learning_rate={learning_rate}')
-        losses = benchmark_lstm(hidden_layer_size, learning_rate)
-        results[(hidden_layer_size, learning_rate)] = losses
-```
+import matplotlib.pyplot as plt
 
-4. **Plot Convergence Curves**
+hidden_size = best_params['hidden_size']
+num_layers = best_params['num_layers']
+learning_rate = best_params['learning_rate']
 
-```python
-for (hidden_layer_size, learning_rate), losses in results.items():
-    plt.plot(losses, label=f'hidden_layer_size={hidden_layer_size}, learning_rate={learning_rate}')
+model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-plt.title('Convergence Curves')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
+losses = []
+for epoch in range(num_epochs):
+    for inputs, labels in train_loader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+    losses.append(loss.item())
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+plt.figure(figsize=(12, 6))
+plt.plot(losses, label='Training Loss')
 plt.legend()
-plt.grid(True)
 plt.show()
 ```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
+In this exercise, we will test the LSTM model under various stress conditions and edge cases to ensure robustness and reliability.
 
-In this exercise, we will stress test the LSTM model by introducing edge cases and implementing guardrails to handle potential failures.
+### Stress Testing
 
-### Step-by-Step Stress Testing
-
-1. **Introduce Edge Cases**
+1. **Large Input Sequences**
 
 ```python
-def create_edge_case_sequences(input_data, tw):
-    inout_seq = []
-    L = len(input_data)
-    for i in range(L - tw):
-        train_seq = input_data[i:i + tw]
-        train_label = input_data[i + tw:i + tw + 1]
-        inout_seq.append((train_seq, train_label))
-    # Introduce an edge case with a NaN value
-    inout_seq.append((np.array([np.nan] * tw), np.array([0])))
-    return inout_seq
+large_seq_length = 100
+large_data = generate_sine_wave_data(large_seq_length, num_samples)
+large_data = scaler.fit_transform(large_data)
+large_train_data = large_data[:train_size]
+large_test_data = large_data[train_size:]
+large_train_loader = create_data_loader(large_train_data, large_seq_length, batch_size)
+large_test_loader = create_data_loader(large_test_data, large_seq_length, batch_size)
 
-edge_case_inout_seq = create_edge_case_sequences(train_data, seq_length)
+model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+for epoch in range(num_epochs):
+    for inputs, labels in large_train_loader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 ```
 
-2. **Handle Edge Cases**
+### Edge Cases
+
+1. **Single Data Point**
 
 ```python
-def safe_forward(model, input_seq):
-    if np.isnan(input_seq).any():
-        print("NaN detected in input sequence. Returning default value.")
-        return torch.tensor([0.0])
-    return model(input_seq)
+single_data = generate_sine_wave_data(1, num_samples)
+single_data = scaler.fit_transform(single_data)
+single_train_data = single_data[:train_size]
+single_test_data = single_data[train_size:]
+single_train_loader = create_data_loader(single_train_data, 1, batch_size)
+single_test_loader = create_data_loader(single_test_data, 1, batch_size)
 
-model.eval()
+model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-for seq, labels in edge_case_inout_seq:
-    seq = torch.FloatTensor(seq)
-    with torch.no_grad():
-        model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                            torch.zeros(1, 1, model.hidden_layer_size))
-        prediction = safe_forward(model, seq)
-        print(f'Prediction: {prediction.item()}')
+for epoch in range(num_epochs):
+    for inputs, labels in single_train_loader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+```
+
+### Failure Mitigation
+
+1. **Guardrails and Error Handling**
+
+```python
+try:
+    model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        for inputs, labels in train_loader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+        if (epoch+1) % 10 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+except Exception as e:
+    print(f'An error occurred: {e}')
 ```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
-### Essential Python Methods and Parameters
+| Method/Parameter | Description |
+|------------------|-------------|
+| `generate_sine_wave_data` | Generates a sine wave dataset for training and testing. |
+| `MinMaxScaler` | Normalizes the dataset to a specified range. |
+| `create_data_loader` | Creates a DataLoader for batching and shuffling the dataset. |
+| `LSTMModel` | Defines the LSTM architecture with specified input, hidden, and output sizes. |
+| `nn.MSELoss` | Mean Squared Error loss function for regression tasks. |
+| `optim.Adam` | Adam optimizer for training the model. |
+| `model.eval()` | Sets the model to evaluation mode. |
+| `torch.no_grad()` | Disables gradient calculation for inference. |
+| `scaler.inverse_transform` | Inverse transforms the normalized data to its original scale. |
+| `plt.plot` | Plots the training and testing data for visualization. |
 
-| Method/Parameter          | Description                                                                 |
-|---------------------------|-----------------------------------------------------------------------------|
-| `generate_sine_wave_data` | Generates sine wave data for training and testing.                          |
-| `MinMaxScaler`            | Scales features to a given range.                                           |
-| `create_inout_sequences`  | Creates input-output sequences for LSTM training.                           |
-| `LSTM`                    | Defines the LSTM model architecture.                                        |
-| `nn.MSELoss`              | Mean squared error loss function.                                           |
-| `optim.Adam`              | Adam optimizer for training the model.                                      |
-| `benchmark_lstm`          | Benchmarks the LSTM model with different hyperparameters.                   |
-| `safe_forward`            | Safely handles edge cases by checking for NaN values in input sequences.    |
-
-### Verification Flags
-
-- **Loss Function**: `nn.MSELoss` is used to measure the mean squared error between predictions and actual values.
-- **Optimizer**: `optim.Adam` is used for efficient gradient descent.
-- **Epochs**: Number of iterations over the entire training dataset.
-- **Hidden Layer Size**: Number of neurons in the LSTM hidden layer.
-- **Learning Rate**: Step size for the optimizer during training.
-
-By completing this lab, you will have a solid understanding of implementing, tuning, and testing LSTM models for time series prediction. This hands-on experience will equip you with the skills to apply LSTM architectures to various real-world problems.
+This lab provides a comprehensive hands-on experience with implementing, tuning, and verifying LSTM networks. By following the steps and exercises, you will gain a deeper understanding of recurrent architectures and their applications in sequence prediction problems.
