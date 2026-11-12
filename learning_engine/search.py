@@ -44,18 +44,16 @@ def search_curriculum(query: str, max_results: int = 25) -> List[Dict[str, Any]]
         if not matches:
             continue
 
-        # Deduce hierarchy
+        # Deduce hierarchy (domain / discipline / topic / file.md)
         rel_parts = md_path.relative_to(TOPICS_DIR).parts
         if len(rel_parts) >= 3:
             domain = rel_parts[0]
             category = rel_parts[1]
             subtopic = rel_parts[2]
-            level = rel_parts[3] if len(rel_parts) >= 4 and rel_parts[3] in ["beginner", "intermediate", "advanced"] else "root"
         else:
             domain = rel_parts[0] if len(rel_parts) > 0 else ""
             category = rel_parts[1] if len(rel_parts) > 1 else ""
             subtopic = md_path.stem
-            level = "root"
 
         # Extract first match snippet
         first_match = matches[0]
@@ -75,7 +73,6 @@ def search_curriculum(query: str, max_results: int = 25) -> List[Dict[str, Any]]
             "domain": domain,
             "category": category,
             "subtopic": subtopic,
-            "level": level,
             "file": md_path.name,
             "path": f"{domain}/{category}/{subtopic}",
             "section": section,

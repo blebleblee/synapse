@@ -114,3 +114,16 @@ def test_zero_duplicate_lesson_numbers():
 
     assert len(duplicate_violations) == 0, f"Found topics with duplicate lesson numbers: {duplicate_violations}"
 
+def test_zero_foundation_files():
+    """Verify absolutely zero legacy FOUNDATION.md files exist in the curriculum."""
+    foundations = [str(f.relative_to(TOPICS_DIR)) for f in TOPICS_DIR.rglob("*.md") if f.name.lower() == "foundation.md"]
+    assert len(foundations) == 0, f"Found legacy FOUNDATION.md files: {foundations}"
+
+def test_zero_legacy_level_directories():
+    """Verify no legacy beginner/intermediate/advanced directories exist anywhere in topics/."""
+    level_dirs = []
+    for d in TOPICS_DIR.rglob("*"):
+        if d.is_dir() and d.name.lower() in ["beginner", "intermediate", "advanced"]:
+            level_dirs.append(str(d.relative_to(TOPICS_DIR)))
+    assert len(level_dirs) == 0, f"Found legacy level directories: {level_dirs}"
+

@@ -39,7 +39,7 @@ def test_api_topic_dependencies():
     assert "unlocks" in data
 
 def test_api_topic_valid():
-    res = client.get("/api/topic?query=computing/infrastructure/kubernetes&level=beginner")
+    res = client.get("/api/topic?query=computing/infrastructure/kubernetes")
     assert res.status_code == 200
     data = res.json()
     assert "domain" in data
@@ -47,7 +47,7 @@ def test_api_topic_valid():
     assert "lesson" in data
 
 def test_api_topic_not_found():
-    res = client.get("/api/topic?query=fake_non_existent_topic_123&level=beginner")
+    res = client.get("/api/topic?query=fake_non_existent_topic_123")
     assert res.status_code == 404
 
 def test_api_search():
@@ -82,7 +82,7 @@ def test_api_translate_en_passthrough():
     assert data["translated"] == "# Hello World"
 
 def test_path_traversal_prevention():
-    res = client.get("/api/topic?query=../../etc/passwd&level=beginner")
+    res = client.get("/api/topic?query=../../etc/passwd")
     assert res.status_code in [400, 404]
 
 def test_api_multi_lesson_discovery_and_selection():
@@ -98,7 +98,6 @@ def test_api_multi_lesson_discovery_and_selection():
     assert data["discipline_title"] == "Data"
     assert data["domain_title"] == "Computing"
     assert data["display_title"] == "PostgreSQL Internals"
-    assert data["available_levels"] == []
     assert "full_content" in data
     assert len(data["full_content"]) > 1000
 

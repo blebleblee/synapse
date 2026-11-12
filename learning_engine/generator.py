@@ -23,7 +23,7 @@ from .models import (
     CLUSTER_HOST_SPECS,
     AnthropicProvider
 )
-from .topic_manager import get_domain_persona, LEVELS
+from .topic_manager import get_domain_persona
 from .security import validate_canonical_topic_path
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits

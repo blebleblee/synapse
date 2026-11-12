@@ -387,7 +387,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
           {topic.available_levels && topic.available_levels.length > 0 ? (
             <div className="header-tier-pills" title="Difficulty Tier">
               {['beginner', 'intermediate', 'advanced']
-                .filter((lvl) => topic.available_levels.includes(lvl))
+                .filter((lvl) => topic.available_levels?.includes(lvl))
                 .map((lvl) => (
                   <button
                     key={lvl}

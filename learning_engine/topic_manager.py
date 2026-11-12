@@ -1,6 +1,6 @@
 """
-Topic and Curriculum Management (4-Level Architecture)
-Domain (L1) -> Discipline (L2) -> Course (L3) -> Unit (L4)
+Topic and Curriculum Management (3-Level Architecture)
+Domain (L1) -> Discipline (L2) -> Topic (L3)
 Scans, navigates, and modifies the learning workspace filesystem hierarchy.
 """
 
@@ -12,13 +12,10 @@ from learning_engine.mastery import get_completed_lessons
 from learning_engine.security import sanitize_topic_path, validate_workspace_path
 from learning_engine.services import TaxonomyService
 from learning_engine.utils import scan_subtopic_status as utils_scan, get_unit_lessons as utils_get_lessons
-from learning_engine.constants import LEVELS
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = validate_workspace_path(WORKSPACE_ROOT, WORKSPACE_ROOT / "topics")
 TAXONOMY = TaxonomyService(TOPICS_DIR, WORKSPACE_ROOT)
-
-LEVELS = ["beginner", "intermediate", "advanced"]
 
 def get_topics_dir() -> Path:
     return TOPICS_DIR
@@ -56,7 +53,7 @@ def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
     return utils_get_lessons(unit_dir)
 
 def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
-    return utils_scan(unit_dir, LEVELS)
+    return utils_scan(unit_dir)
 
 def get_topic_tree() -> Dict[str, Any]:
     """Wraps TaxonomyService to maintain API compatibility."""

@@ -30,10 +30,9 @@ from .flashcards import generate_flashcards
 from .reviewer import review_and_fix_unit, audit_content
 
 def format_status_badge(status: dict) -> str:
-    f = "F" if status["has_foundation"] else "."
-    l = "L" if status["has_lesson"] else "."
-    b = "B" if status["has_labs"] else "."
-    return f"[{f}{l}{b}]"
+    l = "L" if status.get("has_lesson") else "."
+    b = "B" if status.get("has_labs") else "."
+    return f"[{l}{b}]"
 
 def cmd_status(args):
     tree = get_topic_tree()
@@ -191,10 +190,14 @@ def cmd_chat(args):
 
     # Ingest context files
     context_parts = [f"# Active Subject: {sub.replace('_', ' ').title()} ({domain}/{cat})"]
-    for fname in ["FOUNDATION.md", "LESSON.md", "LABS.md"]:
-        fpath = sub_path / fname
-        if fpath.exists():
-            context_parts.append(f"\n--- {fname} ---\n" + fpath.read_text(encoding="utf-8")[:3000])
+    for l in get_unit_lessons(sub_path)[:4]:
+        p = Path(l["path"])
+        if p.exists():
+            context_parts.append(f"\n--- {p.name} ---\n" + p.read_text(encoding="utf-8")[:2500])
+
+    labs_file = sub_path / "labs.md"
+    if labs_file.exists():
+        context_parts.append(f"\n--- labs.md ---\n" + labs_file.read_text(encoding="utf-8")[:2000])
 
     system_instruction = persona + "\n\n" + "\n".join(context_parts)
     provider = get_provider(provider_type=args.provider, model=args.model, domain=domain)
@@ -471,7 +474,6 @@ def main():
     # export
     p_export = subparsers.add_parser("export", help="Compile a domain into a cohesive printable Markdown handbook")
     p_export.add_argument("domain", help="Domain to export (e.g. computing, formal_sciences)")
-    p_export.add_argument("--level", "-l", choices=["beginner", "intermediate", "advanced"], help="Filter by difficulty level")
     p_export.set_defaults(func=cmd_export)
 
     # flashcards
@@ -507,9 +509,8 @@ def main():
     p_add.set_defaults(func=cmd_add)
 
     # generate
-    p_gen = subparsers.add_parser("generate", help="Generate Foundation, Lesson, and Labs for a subtopic")
+    p_gen = subparsers.add_parser("generate", help="Generate Masterclass Lessons and Labs for a subtopic")
     p_gen.add_argument("query", nargs="?", default=None, help="Subtopic name or path (e.g. 'linux' or 'infrastructure/linux')")
-    p_gen.add_argument("--level", "-l", choices=["beginner", "intermediate", "advanced"], help="Target specific level")
     p_gen.add_argument("--all", "-a", action="store_true", help="Generate all missing units across the entire curriculum")
     p_gen.add_argument("--force", "-f", action="store_true", help="Overwrite existing files")
     p_gen.add_argument("--provider", "-p", choices=["ollama", "gemini"], help="LLM Provider")

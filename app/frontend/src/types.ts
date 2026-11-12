@@ -1,5 +1,5 @@
 export interface SubtopicStatus {
-  has_foundation: boolean;
+  has_foundation?: boolean;
   has_lesson: boolean;
   has_labs: boolean;
   complete: boolean;
@@ -64,13 +64,13 @@ export interface TopicDetails {
   display_title?: string;
   path: string;
   persona: string;
-  level: string;
-  available_levels: string[];
+  level?: string;
+  available_levels?: string[];
   mastery?: string;
   completed_lessons?: string[];
   summary?: string;
   chat_history?: ChatMessage[];
-  foundation: string;
+  foundation?: string;
   lesson: string;
   lessons?: LessonItem[];
   active_lesson_id?: string;

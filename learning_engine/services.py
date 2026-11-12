@@ -4,14 +4,12 @@ import re
 from .security import validate_workspace_path
 from .mastery import get_completed_lessons as mastery_get_completed
 from .utils import scan_subtopic_status as utils_scan_subtopic_status, get_unit_lessons as utils_get_unit_lessons
-from .constants import LEVELS
 
 class TaxonomyService:
     """Handles raw filesystem traversal and curriculum taxonomy."""
     def __init__(self, topics_dir: Path, workspace_root: Path):
         self.topics_dir = validate_workspace_path(topics_dir.parent, topics_dir)
         self.workspace_root = workspace_root
-        self.levels = LEVELS
 
 
     def list_domains(self) -> List[str]:
@@ -80,7 +78,7 @@ class TaxonomyService:
                 full_path = self.topics_dir / domain / disc / course
 
                 # Ensure status is populated correctly
-                status = self.scan_subtopic_status(full_path, self.levels)
+                status = self.scan_subtopic_status(full_path)
 
                 node_data = {
                     "display_name": c_display_title,
@@ -105,52 +103,8 @@ class TaxonomyService:
                 
         return tree
 
-    def scan_subtopic_status(self, unit_dir: Path, levels: List[str]) -> Dict[str, Any]:
-        level_status = {}
-        for lvl in levels:
-            lvl_dir = unit_dir / lvl
-            f = (lvl_dir / "FOUNDATION.md").exists()
-            l = (lvl_dir / "LESSON.md").exists()
-            b = (lvl_dir / "LABS.md").exists()
-            level_status[lvl] = {
-                "has_foundation": f,
-                "has_lesson": l,
-                "has_labs": b,
-                "complete": (f and l and b)
-            }
-
-        root_f = (unit_dir / "FOUNDATION.md").exists() or (unit_dir / "foundation.md").exists()
-        root_l = (unit_dir / "LESSON.md").exists() or (unit_dir / "lesson.md").exists()
-        root_b = (unit_dir / "LABS.md").exists() or (unit_dir / "labs.md").exists()
-
-        all_unit_lessons = self.get_unit_lessons(unit_dir)
-        sequential_lessons = [l for l in all_unit_lessons if l["id"].startswith("lesson_")]
-        has_multi_lessons = len(sequential_lessons) >= 1
-        has_labs = (unit_dir / "labs.md").exists() or (unit_dir / "LABS.md").exists()
-
-        has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f or has_multi_lessons
-        has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l or has_multi_lessons
-
-        is_leveled_complete = all(s["complete"] for s in level_status.values()) if level_status else False
-        is_root_complete = (root_f and (root_l or has_multi_lessons) and root_b)
-        is_masterclass_complete = has_multi_lessons and has_labs
-        has_legacy_content = (is_leveled_complete or is_root_complete) and not is_masterclass_complete
-
-        all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
-
-        return {
-            "has_foundation": has_foundation,
-            "has_lesson": has_multi_lessons or has_lesson,
-            "has_labs": has_labs,
-            "complete": is_masterclass_complete,
-            "is_legacy": has_legacy_content,
-            "is_masterclass": is_masterclass_complete,
-            "levels": level_status,
-            "lesson_count": len(sequential_lessons),
-            "lessons": [l["id"] for l in sequential_lessons],
-            "file_count": len(all_files),
-            "files": all_files
-        }
+    def scan_subtopic_status(self, unit_dir: Path, levels: Optional[List[str]] = None) -> Dict[str, Any]:
+        return utils_scan_subtopic_status(unit_dir)
 
     def get_unit_lessons(self, unit_dir: Path) -> List[Dict[str, str]]:
         if not unit_dir.exists():

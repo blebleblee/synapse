@@ -177,7 +177,6 @@ class GenerateRequest(BaseModel):
     domain: str = Field(..., pattern=r'^[a-z0-9_-]+$')
     category: str = Field(..., pattern=r'^[a-z0-9_/-]+$')
     subtopic: str = Field(..., pattern=r'^[a-z0-9_-]+$')
-    level: str = Field(default='beginner', pattern=r'^(beginner|intermediate|advanced)$')
     force: bool = False
 
 class TranslateRequest(BaseModel):
@@ -196,7 +195,6 @@ def get_status():
     total_domains = len(tree)
     total_categories = 0
     total_subtopics = 0
-    with_foundation = 0
     with_lesson = 0
     with_labs = 0
     complete = 0
@@ -207,7 +205,6 @@ def get_status():
             total_subtopics += len(cdata)
             for sub, sdata in cdata.items():
                 st = sdata["status"]
-                if st["has_foundation"]: with_foundation += 1
                 if st["has_lesson"]: with_lesson += 1
                 if st["has_labs"]: with_labs += 1
                 if st["complete"]: complete += 1
@@ -225,7 +222,6 @@ def get_status():
         "domains": total_domains,
         "categories": total_categories,
         "subtopics": total_subtopics,
-        "foundation_count": with_foundation,
         "lesson_count": with_lesson,
         "labs_count": with_labs,
         "complete_count": complete,
@@ -565,13 +561,10 @@ Text to translate:
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
-    level: Optional[str] = Query("beginner", description="Difficulty level: beginner, intermediate, advanced"),
     lesson_id: Optional[str] = Query(None, description="Optional specific lesson ID e.g. 'lesson_01_introduction'")
 ):
     try:
         query = sanitize_query(query)
-        if level:
-            level = sanitize_query(level)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
         
@@ -582,40 +575,14 @@ def get_topic_details(
     domain, cat, sub, sub_path = target
     persona = get_domain_persona(domain)
 
-    # Check available levels
-    available_levels = []
-    for lvl in ["beginner", "intermediate", "advanced"]:
-        if (sub_path / lvl).exists() and any((sub_path / lvl).glob("*.md")):
-            available_levels.append(lvl)
-
-    # Handle direct function invocations in tests where default is QueryInfo
-    raw_level = level.default if hasattr(level, "default") else level
-    selected_level = (raw_level or "beginner").lower()
-    target_dir = sub_path / selected_level if (sub_path / selected_level).exists() else sub_path
-
-    foundation = ""
     labs = ""
-
-    for fname in ["FOUNDATION.md", "foundation.md"]:
-        if (target_dir / fname).exists():
-            foundation = (target_dir / fname).read_text(encoding="utf-8")
-            break
-        elif (sub_path / fname).exists():
-            foundation = (sub_path / fname).read_text(encoding="utf-8")
-            break
-
     for fname in ["LABS.md", "labs.md"]:
-        if (target_dir / fname).exists():
-            labs = (target_dir / fname).read_text(encoding="utf-8")
-            break
-        elif (sub_path / fname).exists():
+        if (sub_path / fname).exists():
             labs = (sub_path / fname).read_text(encoding="utf-8")
             break
 
     # Multi-lesson discovery (e.g. lesson_01_*.md, lessons/*.md, or LESSON.md)
-    discovered_lessons = get_unit_lessons(target_dir)
-    if not discovered_lessons and target_dir != sub_path:
-        discovered_lessons = get_unit_lessons(sub_path)
+    discovered_lessons = get_unit_lessons(sub_path)
 
     lessons_list = []
     lesson = ""
@@ -750,19 +717,16 @@ def get_topic_details(
         "display_title": unit_display_title or display_title,
         "path": str(sub_path.relative_to(WORKSPACE_ROOT)),
         "persona": persona,
-        "level": selected_level,
-        "available_levels": available_levels,
         "mastery": get_subtopic_mastery(f"{domain}/{cat}/{sub}"),
         "completed_lessons": get_completed_lessons(f"{domain}/{cat}/{sub}"),
         "summary": summary,
         "chat_history": saved_chat_history,
-        "foundation": foundation,
         "lesson": lesson,
         "lessons": lessons_list,
         "active_lesson_id": target_lesson_id,
         "labs": labs,
         "full_content": full_content,
-        "has_content": bool(foundation or lesson or labs or lessons_list)
+        "has_content": bool(lesson or labs or lessons_list)
     }
 
 @app.post("/api/generate")
@@ -1032,16 +996,14 @@ def generate_quiz(req: QuizRequest):
     persona = get_domain_persona(domain)
 
     context_parts = []
-    if (sub_path / "FOUNDATION.md").exists():
-        context_parts.append((sub_path / "FOUNDATION.md").read_text(encoding="utf-8")[:3000])
-
     for l in get_unit_lessons(sub_path)[:4]:
         p = Path(l["path"])
         if p.exists():
             context_parts.append(p.read_text(encoding="utf-8")[:2000])
 
-    if (sub_path / "LABS.md").exists():
-        context_parts.append((sub_path / "LABS.md").read_text(encoding="utf-8")[:2000])
+    labs_path = sub_path / "labs.md"
+    if labs_path.exists():
+        context_parts.append(labs_path.read_text(encoding="utf-8")[:2000])
 
     system_instruction = persona + "\nYou are an expert examiner. Generate challenging scenario-based multiple-choice quiz questions to test deep intuition and operational mechanics."
     prompt = f"""Based on the curriculum for '{sub.replace('_', ' ').title()}', generate 3 scenario-based multiple choice questions.

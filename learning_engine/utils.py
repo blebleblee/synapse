@@ -61,47 +61,22 @@ def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
 
     return lessons
 
-def scan_subtopic_status(unit_dir: Path, levels: List[str]) -> Dict[str, Any]:
-    level_status = {}
-    for lvl in levels:
-        lvl_dir = unit_dir / lvl
-        f = (lvl_dir / "FOUNDATION.md").exists()
-        l = (lvl_dir / "LESSON.md").exists()
-        b = (lvl_dir / "LABS.md").exists()
-        level_status[lvl] = {
-            "has_foundation": f,
-            "has_lesson": l,
-            "has_labs": b,
-            "complete": (f and l and b)
-        }
-
-    root_f = (unit_dir / "FOUNDATION.md").exists() or (unit_dir / "foundation.md").exists()
-    root_l = (unit_dir / "LESSON.md").exists() or (unit_dir / "lesson.md").exists()
-    root_b = (unit_dir / "LABS.md").exists() or (unit_dir / "labs.md").exists()
-
+def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
     all_unit_lessons = get_unit_lessons(unit_dir)
     sequential_lessons = [l for l in all_unit_lessons if l["id"].startswith("lesson_")]
     has_multi_lessons = len(sequential_lessons) >= 1
     has_labs = (unit_dir / "labs.md").exists() or (unit_dir / "LABS.md").exists()
 
-    has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f or has_multi_lessons
-    has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l or has_multi_lessons
-
-    is_leveled_complete = all(s["complete"] for s in level_status.values()) if level_status else False
-    is_root_complete = (root_f and (root_l or has_multi_lessons) and root_b)
     is_masterclass_complete = has_multi_lessons and has_labs
-    has_legacy_content = (is_leveled_complete or is_root_complete) and not is_masterclass_complete
 
     all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
 
     return {
-        "has_foundation": has_foundation,
-        "has_lesson": has_multi_lessons or has_lesson,
+        "has_lesson": has_multi_lessons,
         "has_labs": has_labs,
         "complete": is_masterclass_complete,
-        "is_legacy": has_legacy_content,
+        "is_legacy": False,
         "is_masterclass": is_masterclass_complete,
-        "levels": level_status,
         "lesson_count": len(sequential_lessons),
         "lessons": [l["id"] for l in sequential_lessons],
         "file_count": len(all_files),

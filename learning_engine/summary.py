@@ -1,7 +1,7 @@
 """
 Topic Summary Engine
-Generates, maintains, and dynamically regenerates SUMMARY.md for every subtopic,
-incorporating curriculum units and ongoing AI discussion sessions.
+Generates, maintains, and dynamically regenerates SUMMARY.md for canonical masterclasses,
+incorporating sequential lessons, operational labs, and ongoing Socratic AI discussion sessions.
 """
 
 from pathlib import Path
@@ -18,27 +18,19 @@ def generate_initial_summary(domain: str, category: str, subtopic_id: str, subto
     persona = get_domain_persona(domain)
     subtopic_title = subtopic_id.replace("_", " ").title()
 
-    # Collect available context
+    # Collect available masterclass context
     context = []
-    if (subtopic_dir / "FOUNDATION.md").exists():
-        context.append((subtopic_dir / "FOUNDATION.md").read_text(encoding="utf-8")[:2500])
-
     for l in get_unit_lessons(subtopic_dir)[:4]:
         p = Path(l["path"])
         if p.exists():
             context.append(f"\n--- {l['title']} ---\n" + p.read_text(encoding="utf-8")[:2000])
 
-    if (subtopic_dir / "LABS.md").exists():
-        context.append((subtopic_dir / "LABS.md").read_text(encoding="utf-8")[:2000])
-
-    if not context:
-        for lvl in ["beginner", "intermediate", "advanced"]:
-            fpath = subtopic_dir / lvl / "FOUNDATION.md"
-            if fpath.exists():
-                context.append(fpath.read_text(encoding="utf-8")[:1500])
+    labs_path = subtopic_dir / "labs.md"
+    if labs_path.exists():
+        context.append(f"\n--- Operational Labs ---\n" + labs_path.read_text(encoding="utf-8")[:2000])
 
     prompt = f"""You are writing an Executive Summary textbook chapter for '{subtopic_title}'.
-Domain: '{domain.replace('_', ' ').title()}' | Category: '{category.replace('_', ' ').title()}'.
+Domain: '{domain.replace('_', ' ').title()}' | Discipline: '{category.replace('_', ' ').title()}'.
 
 CRITICAL STYLE MANDATE:
 - Write in continuous, articulate narrative book prose (O'Reilly / MIT Press textbook style).
@@ -54,7 +46,7 @@ Structure:
 ## 5. Next Steps & Recommended Milestones
 
 Curriculum Excerpts:
-{"".join(context)[:5000] if context else "Foundational curriculum module."}
+{"".join(context)[:5000] if context else "Foundational masterclass curriculum module."}
 
 Output clean, publication-grade Markdown only."""
 
@@ -72,18 +64,16 @@ def regenerate_summary(query: str, provider_type: Optional[str] = None, model: O
     persona = get_domain_persona(domain)
     subtopic_title = sub.replace("_", " ").title()
 
-    # Ingest all curriculum files
+    # Ingest sequential lessons
     curriculum_parts = []
-    if (sub_path / "FOUNDATION.md").exists():
-        curriculum_parts.append(f"--- FOUNDATION.md ---\n" + (sub_path / "FOUNDATION.md").read_text(encoding="utf-8")[:2500])
-
     for l in get_unit_lessons(sub_path)[:4]:
         p = Path(l["path"])
         if p.exists():
             curriculum_parts.append(f"--- {l['title']} ---\n" + p.read_text(encoding="utf-8")[:2000])
 
-    if (sub_path / "LABS.md").exists():
-        curriculum_parts.append(f"--- LABS.md ---\n" + (sub_path / "LABS.md").read_text(encoding="utf-8")[:2500])
+    labs_path = sub_path / "labs.md"
+    if labs_path.exists():
+        curriculum_parts.append("--- Operational Labs ---\n" + labs_path.read_text(encoding="utf-8")[:2500])
 
     # Ingest all session logs from user-AI discussions
     session_parts = []
@@ -93,7 +83,7 @@ def regenerate_summary(query: str, provider_type: Optional[str] = None, model: O
             session_parts.append(f"--- Session: {sfile.name} ---\n" + sfile.read_text(encoding="utf-8")[:2000])
 
     prompt = f"""You are updating and regenerating the Executive SUMMARY.md for '{subtopic_title}'.
-Domain: '{domain.replace('_', ' ').title()}' | Category: '{cat.replace('_', ' ').title()}'.
+Domain: '{domain.replace('_', ' ').title()}' | Discipline: '{cat.replace('_', ' ').title()}'.
 
 CRITICAL STYLE MANDATE:
 - Write in continuous, articulate narrative book prose (O'Reilly / MIT Press textbook style).
