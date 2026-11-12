@@ -2,11 +2,12 @@
 
 ## Objective & Environment Setup
 
-### Objective
-The objective of this lab is to gain hands-on experience with implementing, tuning, and verifying a multilayer perceptron (MLP) using backpropagation. This lab will cover the core concepts of neural network architecture, training, and evaluation, providing a comprehensive understanding of how MLPs operate and how they can be optimized.
+The objective of this lab is to gain hands-on experience with implementing, tuning, and verifying a multilayer perceptron (MLP) using backpropagation. This lab will guide you through the process of building a simple MLP from scratch using PyTorch, tuning its hyperparameters, benchmarking its performance, and handling edge cases.
 
 ### Environment Setup
+
 Ensure you have a Python 3.11+ environment set up with the following packages installed:
+
 - PyTorch
 - NumPy
 - Scikit-learn
@@ -20,281 +21,245 @@ pip install torch numpy scikit-learn matplotlib
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a simple multilayer perceptron using PyTorch. The MLP will consist of an input layer, one hidden layer, and an output layer. We will use the backpropagation algorithm to train the model on a synthetic dataset.
+In this exercise, we will implement a simple multilayer perceptron using PyTorch. The MLP will consist of an input layer, one hidden layer, and an output layer. We will use the ReLU activation function for the hidden layer and the softmax function for the output layer. The dataset we will use is the MNIST dataset, which consists of 28x28 pixel grayscale images of handwritten digits.
 
-### Step-by-Step Implementation
+### Complete, Runnable Python Script
 
-1. **Import Required Libraries**
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
+import matplotlib.pyplot as plt
 
-    ```python
-    import torch
-    import torch.nn as nn
-    import torch.optim as optim
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from sklearn.datasets import make_classification
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler
-    ```
+# Define the MLP model
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, num_classes)
+        self.softmax = nn.Softmax(dim=1)
 
-2. **Generate Synthetic Dataset**
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        out = self.softmax(out)
+        return out
 
-    ```python
-    # Generate a synthetic binary classification dataset
-    X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_redundant=5, random_state=42)
+# Hyperparameters
+input_size = 28 * 28
+hidden_size = 128
+num_classes = 10
+num_epochs = 5
+batch_size = 100
+learning_rate = 0.001
 
-    # Split the dataset into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# MNIST dataset
+train_dataset = torchvision.datasets.MNIST(root='./data', 
+                                           train=True, 
+                                           transform=transforms.ToTensor(),  
+                                           download=True)
 
-    # Standardize the features
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+test_dataset = torchvision.datasets.MNIST(root='./data', 
+                                          train=False, 
+                                          transform=transforms.ToTensor())
 
-    # Convert to PyTorch tensors
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
-    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-    y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
-    ```
+# Data loader
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, 
+                                           batch_size=batch_size, 
+                                           shuffle=True)
 
-3. **Define the Multilayer Perceptron Model**
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, 
+                                          batch_size=batch_size, 
+                                          shuffle=False)
 
-    ```python
-    class MLP(nn.Module):
-        def __init__(self, input_size, hidden_size, output_size):
-            super(MLP, self).__init__()
-            self.fc1 = nn.Linear(input_size, hidden_size)
-            self.relu = nn.ReLU()
-            self.fc2 = nn.Linear(hidden_size, output_size)
-            self.sigmoid = nn.Sigmoid()
+# Initialize the model
+model = MLP(input_size, hidden_size, num_classes)
 
-        def forward(self, x):
-            out = self.fc1(x)
-            out = self.relu(out)
-            out = self.fc2(out)
-            out = self.sigmoid(out)
-            return out
-    ```
+# Loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-4. **Initialize the Model, Loss Function, and Optimizer**
+# Training loop
+total_step = len(train_loader)
+loss_history = []
 
-    ```python
-    # Hyperparameters
-    input_size = X_train.shape[1]
-    hidden_size = 10
-    output_size = 1
-    learning_rate = 0.01
-    num_epochs = 100
-
-    # Initialize the model
-    model = MLP(input_size, hidden_size, output_size)
-
-    # Define the loss function and optimizer
-    criterion = nn.BCELoss()
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate)
-    ```
-
-5. **Train the Model**
-
-    ```python
-    # Training loop
-    for epoch in range(num_epochs):
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):
+        # Flatten the images
+        images = images.view(-1, input_size)
+        
         # Forward pass
-        outputs = model(X_train_tensor)
-        loss = criterion(outputs, y_train_tensor)
-
-        # Backward pass and optimization
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        
+        # Backward and optimize
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        
+        loss_history.append(loss.item())
+        
+        if (i+1) % 100 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{total_step}], Loss: {loss.item():.4f}')
 
-        if (epoch+1) % 10 == 0:
-            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
-    ```
+# Plot loss history
+plt.plot(loss_history)
+plt.xlabel('Step')
+plt.ylabel('Loss')
+plt.title('Training Loss')
+plt.show()
 
-6. **Evaluate the Model**
+# Test the model
+model.eval()
+with torch.no_grad():
+    correct = 0
+    total = 0
+    for images, labels in test_loader:
+        images = images.view(-1, input_size)
+        outputs = model(images)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
 
-    ```python
-    # Evaluate the model on the test set
-    with torch.no_grad():
-        test_outputs = model(X_test_tensor)
-        predicted = (test_outputs > 0.5).float()
-        accuracy = (predicted.eq(y_test_tensor).sum() / float(y_test_tensor.shape[0])).item()
-        print(f'Test Accuracy: {accuracy:.4f}')
-    ```
-
-7. **Visualize Training Loss**
-
-    ```python
-    # Plot the training loss
-    plt.plot(range(1, num_epochs+1, 10), [loss.item() for epoch in range(0, num_epochs, 10)])
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Training Loss')
-    plt.show()
-    ```
+    print(f'Accuracy of the model on the 10000 test images: {100 * correct / total:.2f}%')
+```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will perform hyperparameter tuning to optimize the MLP model. We will measure the accuracy and training time for different hyperparameter settings.
+In this exercise, we will perform hyperparameter tuning and benchmark the performance of the MLP. We will measure the accuracy and convergence curves of the model.
 
-### Step-by-Step Hyperparameter Tuning
+### Real Benchmarking Code
 
-1. **Define Hyperparameter Grid**
+```python
+import numpy as np
 
-    ```python
-    import time
+# Define a function to evaluate the model
+def evaluate_model(model, test_loader):
+    model.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for images, labels in test_loader:
+            images = images.view(-1, input_size)
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        return 100 * correct / total
 
-    # Define hyperparameter grid
-    hidden_sizes = [5, 10, 20]
-    learning_rates = [0.001, 0.01, 0.1]
-    num_epochs = 100
-    ```
+# Hyperparameter tuning
+learning_rates = [0.001, 0.0001, 0.00001]
+hidden_sizes = [64, 128, 256]
+num_epochs_list = [5, 10, 15]
 
-2. **Perform Hyperparameter Tuning**
+best_accuracy = 0
+best_params = {}
 
-    ```python
-    best_accuracy = 0.0
-    best_params = {}
-
-    for hidden_size in hidden_sizes:
-        for learning_rate in learning_rates:
-            # Initialize the model
-            model = MLP(input_size, hidden_size, output_size)
-
-            # Define the loss function and optimizer
-            criterion = nn.BCELoss()
-            optimizer = optim.SGD(model.parameters(), lr=learning_rate)
-
-            # Training loop
-            start_time = time.time()
-            for epoch in range(num_epochs):
-                # Forward pass
-                outputs = model(X_train_tensor)
-                loss = criterion(outputs, y_train_tensor)
-
-                # Backward pass and optimization
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-            # Evaluate the model on the test set
-            with torch.no_grad():
-                test_outputs = model(X_test_tensor)
-                predicted = (test_outputs > 0.5).float()
-                accuracy = (predicted.eq(y_test_tensor).sum() / float(y_test_tensor.shape[0])).item()
-
-            end_time = time.time()
-            training_time = end_time - start_time
-
-            # Print results
-            print(f'Hidden Size: {hidden_size}, Learning Rate: {learning_rate}, Accuracy: {accuracy:.4f}, Training Time: {training_time:.2f}s')
-
-            # Update best parameters
+for lr in learning_rates:
+    for hs in hidden_sizes:
+        for epochs in num_epochs_list:
+            model = MLP(input_size, hs, num_classes)
+            criterion = nn.CrossEntropyLoss()
+            optimizer = optim.Adam(model.parameters(), lr=lr)
+            
+            for epoch in range(epochs):
+                for images, labels in train_loader:
+                    images = images.view(-1, input_size)
+                    outputs = model(images)
+                    loss = criterion(outputs, labels)
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+            
+            accuracy = evaluate_model(model, test_loader)
+            print(f'Learning Rate: {lr}, Hidden Size: {hs}, Epochs: {epochs}, Accuracy: {accuracy:.2f}%')
+            
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
-                best_params = {'hidden_size': hidden_size, 'learning_rate': learning_rate}
-    ```
+                best_params = {'learning_rate': lr, 'hidden_size': hs, 'num_epochs': epochs}
 
-3. **Print Best Parameters**
-
-    ```python
-    print(f'Best Parameters: {best_params}, Best Accuracy: {best_accuracy:.4f}')
-    ```
+print(f'Best Parameters: {best_params}, Best Accuracy: {best_accuracy:.2f}%')
+```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the MLP model under various stress conditions and edge cases to ensure robustness and reliability.
+In this exercise, we will test the model under various edge cases and implement guardrails to handle potential failures.
 
-### Step-by-Step Stress Testing
+### Reproducing Failure Modes, Testing Edge Cases, and Implementing Guardrails
 
-1. **Test with Noisy Data**
-
-    ```python
-    # Add noise to the test data
-    noisy_X_test = X_test + np.random.normal(0, 0.1, X_test.shape)
-
-    # Standardize the noisy test data
-    noisy_X_test = scaler.transform(noisy_X_test)
-
-    # Convert to PyTorch tensors
-    noisy_X_test_tensor = torch.tensor(noisy_X_test, dtype=torch.float32)
-
-    # Evaluate the model on the noisy test set
+```python
+# Test with a single image
+def test_single_image(model, image):
+    model.eval()
     with torch.no_grad():
-        noisy_test_outputs = model(noisy_X_test_tensor)
-        noisy_predicted = (noisy_test_outputs > 0.5).float()
-        noisy_accuracy = (noisy_predicted.eq(y_test_tensor).sum() / float(y_test_tensor.shape[0])).item()
-        print(f'Noisy Test Accuracy: {noisy_accuracy:.4f}')
-    ```
+        image = image.view(-1, input_size)
+        outputs = model(image)
+        _, predicted = torch.max(outputs.data, 1)
+        return predicted.item()
 
-2. **Test with Out-of-Distribution Data**
+# Load a single test image
+single_image, single_label = test_dataset[0]
+predicted_label = test_single_image(model, single_image)
+print(f'Predicted Label: {predicted_label}, True Label: {single_label}')
 
-    ```python
-    # Generate out-of-distribution data
-    ood_X, _ = make_classification(n_samples=100, n_features=20, n_informative=15, n_redundant=5, random_state=43)
-
-    # Standardize the out-of-distribution data
-    ood_X = scaler.transform(ood_X)
-
-    # Convert to PyTorch tensors
-    ood_X_tensor = torch.tensor(ood_X, dtype=torch.float32)
-
-    # Evaluate the model on the out-of-distribution test set
-    with torch.no_grad():
-        ood_test_outputs = model(ood_X_tensor)
-        ood_predicted = (ood_test_outputs > 0.5).float()
-        ood_accuracy = (ood_predicted.eq(torch.zeros_like(ood_predicted)).sum() / float(ood_X_tensor.shape[0])).item()
-        print(f'Out-of-Distribution Test Accuracy: {ood_accuracy:.4f}')
-    ```
-
-3. **Implement Guardrails or Error Handling**
-
-    ```python
-    # Implement guardrails for input data
-    def validate_input_data(X):
-        if not isinstance(X, np.ndarray):
-            raise ValueError("Input data must be a NumPy array.")
-        if X.shape[1] != input_size:
-            raise ValueError(f"Input data must have {input_size} features.")
-        return X
-
-    # Example usage
+# Test with an invalid input
+def test_invalid_input(model, invalid_input):
     try:
-        noisy_X_test = validate_input_data(noisy_X_test)
-        noisy_X_test_tensor = torch.tensor(noisy_X_test, dtype=torch.float32)
-    except ValueError as e:
+        model.eval()
+        with torch.no_grad():
+            outputs = model(invalid_input)
+            _, predicted = torch.max(outputs.data, 1)
+            return predicted.item()
+    except Exception as e:
         print(f'Error: {e}')
-    ```
+        return None
+
+# Create an invalid input (wrong shape)
+invalid_input = torch.randn(1, 28, 28)  # Missing the flatten step
+predicted_label = test_invalid_input(model, invalid_input)
+
+# Implement guardrails
+def safe_test_single_image(model, image):
+    if image.shape != (1, 28, 28):
+        raise ValueError("Input image must have shape (1, 28, 28)")
+    return test_single_image(model, image)
+
+# Test with a valid input
+valid_input = single_image.unsqueeze(0)  # Add batch dimension
+predicted_label = safe_test_single_image(model, valid_input)
+print(f'Predicted Label: {predicted_label}, True Label: {single_label}')
+
+# Test with an invalid input
+invalid_input = torch.randn(1, 28, 28)  # Missing the flatten step
+predicted_label = safe_test_single_image(model, invalid_input)
+```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
-### Essential Python Methods and Parameters
+### Essential Python Methods, Parameters, and Verification Flags
 
 | Method/Parameter | Description |
 |------------------|-------------|
-| `make_classification` | Generates a synthetic binary classification dataset. |
-| `train_test_split` | Splits the dataset into training and testing sets. |
-| `StandardScaler` | Standardizes features by removing the mean and scaling to unit variance. |
-| `torch.tensor` | Converts a NumPy array to a PyTorch tensor. |
-| `nn.Linear` | Applies a linear transformation to the input. |
-| `nn.ReLU` | Applies the rectified linear unit function. |
-| `nn.Sigmoid` | Applies the sigmoid function. |
-| `nn.BCELoss` | Binary cross-entropy loss function. |
-| `optim.SGD` | Stochastic gradient descent optimizer. |
-| `model.forward` | Defines the forward pass of the model. |
-| `loss.backward` | Computes the gradient of the loss with respect to the model parameters. |
-| `optimizer.step` | Updates the model parameters based on the computed gradients. |
-| `torch.no_grad` | Disables gradient calculation to reduce memory consumption during inference. |
-| `plt.plot` | Plots the training loss over epochs. |
+| `MLP`            | Class defining the multilayer perceptron model. |
+| `forward`        | Method defining the forward pass of the model. |
+| `nn.Linear`      | Linear layer in the neural network. |
+| `nn.ReLU`        | ReLU activation function. |
+| `nn.Softmax`     | Softmax activation function for output layer. |
+| `nn.CrossEntropyLoss` | Loss function for classification tasks. |
+| `optim.Adam`     | Adam optimizer for training the model. |
+| `evaluate_model` | Function to evaluate the model on a test dataset. |
+| `test_single_image` | Function to test a single image. |
+| `test_invalid_input` | Function to test an invalid input. |
+| `safe_test_single_image` | Function to test a single image with guardrails. |
 
 ### Verification Flags
 
-| Flag | Description |
-|------|-------------|
-| `--hidden_size` | Specifies the size of the hidden layer. |
-| `--learning_rate` | Specifies the learning rate for the optimizer. |
-| `--num_epochs` | Specifies the number of training epochs. |
+- `loss.item()` : Retrieves the scalar value of the loss tensor.
+- `predicted.item()` : Retrieves the scalar value of the predicted label tensor.
+- `accuracy` : Calculated accuracy of the model on the test dataset.
 
-This lab provides a comprehensive hands-on experience with implementing, tuning, and verifying a multilayer perceptron using backpropagation. By following the steps outlined in this guide, you will gain a deeper understanding of the underlying mechanics of neural networks and how they can be optimized for performance and robustness.
+By completing this lab, you should have a solid understanding of implementing, tuning, and verifying a multilayer perceptron using backpropagation. This hands-on experience will help you build a strong foundation in deep learning and neural network architectures.
