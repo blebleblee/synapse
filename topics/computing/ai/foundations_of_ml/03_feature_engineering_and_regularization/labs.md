@@ -2,186 +2,149 @@
 
 ## Objective & Environment Setup
 
-The objective of this lab is to gain hands-on experience with feature engineering and regularization techniques in machine learning. We will implement a complete pipeline that includes data preprocessing, feature engineering, model training, hyperparameter tuning, and evaluation. The lab will use a real dataset and will be executed in a Python 3.11+ environment. The required packages are PyTorch, NumPy, Scikit-learn, and Pandas. Ensure that these packages are installed in your environment.
-
-To set up the environment, you can use the following commands:
+This lab aims to provide hands-on experience with feature engineering and regularization techniques in the context of machine learning. Through this lab, you will implement these techniques using Python, leveraging libraries such as NumPy, Scikit-learn, and PyTorch. To set up your environment, ensure you have Python 3.11+ installed, and install the necessary packages with the following command:
 
 ```bash
-pip install numpy pandas scikit-learn torch
+pip install numpy scikit-learn torch
 ```
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a feature engineering pipeline and train a regularized linear regression model using Scikit-learn. We will use the Boston Housing dataset for this purpose. The dataset will be preprocessed, features will be engineered, and a regularized linear regression model will be trained.
+In this exercise, you will implement a feature engineering pipeline and apply regularization techniques to a synthetic dataset. The pipeline will include feature scaling, polynomial feature generation, and the application of L2 regularization using Ridge regression.
 
-Here is the complete, runnable Python script:
+### Complete, Runnable Python Script
 
 ```python
 import numpy as np
-import pandas as pd
-from sklearn.datasets import load_boston
+from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 
-# Load the Boston Housing dataset
-boston = load_boston()
-X, y = boston.data, boston.target
+# Generate synthetic dataset
+X, y = make_regression(n_samples=1000, n_features=10, noise=0.1, random_state=42)
 
-# Split the dataset into training and testing sets
+# Split dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Standardize the features
+# Feature scaling
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Engineer polynomial features
+# Polynomial feature generation
 poly = PolynomialFeatures(degree=2, include_bias=False)
 X_train_poly = poly.fit_transform(X_train_scaled)
 X_test_poly = poly.transform(X_test_scaled)
 
-# Train a regularized linear regression model (Ridge regression)
+# Apply L2 regularization (Ridge regression)
 ridge = Ridge(alpha=1.0)
 ridge.fit(X_train_poly, y_train)
 
-# Make predictions
-y_train_pred = ridge.predict(X_train_poly)
-y_test_pred = ridge.predict(X_test_poly)
+# Predict and evaluate
+y_pred = ridge.predict(X_test_poly)
+mse = mean_squared_error(y_test, y_pred)
 
-# Evaluate the model
-train_mse = mean_squared_error(y_train, y_train_pred)
-test_mse = mean_squared_error(y_test, y_test_pred)
-
-print(f"Training MSE: {train_mse}")
-print(f"Testing MSE: {test_mse}")
+print(f"Mean Squared Error: {mse}")
 ```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will perform hyperparameter tuning for the Ridge regression model using grid search. We will also benchmark the model's performance in terms of accuracy and latency.
+In this exercise, you will perform hyperparameter tuning for the Ridge regression model and benchmark its performance in terms of mean squared error (MSE) and computational time.
 
-Here is the complete, runnable Python script:
+### Real Benchmarking Code
 
 ```python
-import numpy as np
-import pandas as pd
-from sklearn.datasets import load_boston
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
 import time
+from sklearn.model_selection import GridSearchCV
 
-# Load the Boston Housing dataset
-boston = load_boston()
-X, y = boston.data, boston.target
-
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Standardize the features
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
-# Engineer polynomial features
-poly = PolynomialFeatures(degree=2, include_bias=False)
-X_train_poly = poly.fit_transform(X_train_scaled)
-X_test_poly = poly.transform(X_test_scaled)
-
-# Define the model and hyperparameter grid
-ridge = Ridge()
+# Define hyperparameter grid
 param_grid = {'alpha': [0.1, 1.0, 10.0, 100.0]}
 
-# Perform grid search with cross-validation
-grid_search = GridSearchCV(ridge, param_grid, cv=5, scoring='neg_mean_squared_error')
-grid_search.fit(X_train_poly, y_train)
+# Initialize Ridge regression model
+ridge = Ridge()
 
-# Get the best model
-best_ridge = grid_search.best_estimator_
+# Set up grid search with cross-validation
+grid_search = GridSearchCV(ridge, param_grid, cv=5, scoring='neg_mean_squared_error', n_jobs=-1)
 
-# Measure training time
+# Measure time taken for grid search
 start_time = time.time()
-best_ridge.fit(X_train_poly, y_train)
-training_time = time.time() - start_time
+grid_search.fit(X_train_poly, y_train)
+end_time = time.time()
 
-# Make predictions
-y_train_pred = best_ridge.predict(X_train_poly)
-y_test_pred = best_ridge.predict(X_test_poly)
+# Print best parameters and corresponding MSE
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best cross-validation MSE: {-grid_search.best_score_}")
+print(f"Time taken for grid search: {end_time - start_time} seconds")
 
-# Evaluate the model
-train_mse = mean_squared_error(y_train, y_train_pred)
-test_mse = mean_squared_error(y_test, y_test_pred)
+# Evaluate on test set
+best_ridge = grid_search.best_estimator_
+y_pred = best_ridge.predict(X_test_poly)
+mse = mean_squared_error(y_test, y_pred)
 
-print(f"Best alpha: {best_ridge.alpha}")
-print(f"Training MSE: {train_mse}")
-print(f"Testing MSE: {test_mse}")
-print(f"Training time: {training_time} seconds")
+print(f"Test set MSE: {mse}")
 ```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the model's performance on edge cases and implement guardrails to handle potential failures. We will also handle cases where the dataset might be missing values or contain outliers.
+In this exercise, you will test the robustness of your feature engineering and regularization pipeline by introducing edge cases and implementing guardrails to handle potential failures.
 
-Here is the complete, runnable Python script:
+### Reproducing Failure Modes, Testing Edge Cases, and Implementing Guardrails
 
 ```python
-import numpy as np
-import pandas as pd
-from sklearn.datasets import load_boston
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
+import warnings
 
-# Load the Boston Housing dataset
-boston = load_boston()
-X, y = boston.data, boston.target
+# Introduce edge case: zero variance feature
+X_train_poly_with_zero_variance = np.hstack((X_train_poly, np.zeros((X_train_poly.shape[0], 1))))
+X_test_poly_with_zero_variance = np.hstack((X_test_poly, np.zeros((X_test_poly.shape[0], 1))))
 
-# Introduce some missing values for stress testing
-X[::10, 0] = np.nan
+# Suppress warnings for zero variance features
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    ridge.fit(X_train_poly_with_zero_variance, y_train)
 
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Predict and evaluate
+y_pred = ridge.predict(X_test_poly_with_zero_variance)
+mse = mean_squared_error(y_test, y_pred)
 
-# Create a pipeline with imputation, scaling, polynomial features, and ridge regression
-pipeline = Pipeline([
-    ('imputer', SimpleImputer(strategy='mean')),
-    ('scaler', StandardScaler()),
-    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
-    ('ridge', Ridge(alpha=1.0))
-])
+print(f"Mean Squared Error with zero variance feature: {mse}")
 
-# Train the model
-pipeline.fit(X_train, y_train)
+# Implement guardrail: check for zero variance features
+def check_zero_variance_features(X):
+    zero_variance_features = np.all(X == X[0, :], axis=0)
+    if np.any(zero_variance_features):
+        raise ValueError("Dataset contains zero variance features.")
+    return X
 
-# Make predictions
-y_train_pred = pipeline.predict(X_train)
-y_test_pred = pipeline.predict(X_test)
+# Apply guardrail
+try:
+    X_train_poly_clean = check_zero_variance_features(X_train_poly_with_zero_variance)
+    X_test_poly_clean = check_zero_variance_features(X_test_poly_with_zero_variance)
+except ValueError as e:
+    print(e)
 
-# Evaluate the model
-train_mse = mean_squared_error(y_train, y_train_pred)
-test_mse = mean_squared_error(y_test, y_test_pred)
+# Re-fit model without zero variance features
+ridge.fit(X_train_poly_clean, y_train)
+y_pred = ridge.predict(X_test_poly_clean)
+mse = mean_squared_error(y_test, y_pred)
 
-print(f"Training MSE: {train_mse}")
-print(f"Testing MSE: {test_mse}")
+print(f"Mean Squared Error after removing zero variance features: {mse}")
 ```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
-| Method/Parameter | Description |
-|------------------|-------------|
-| `StandardScaler` | Standardizes features by removing the mean and scaling to unit variance. |
-| `PolynomialFeatures` | Generates polynomial and interaction features. |
-| `Ridge` | Linear least squares with L2 regularization. |
-| `GridSearchCV` | Exhaustive search over specified parameter values for an estimator. |
-| `SimpleImputer` | Imputation transformer for completing missing values. |
-| `Pipeline` | Sequentially apply a list of transforms and a final estimator. |
-| `mean_squared_error` | Mean squared error regression loss. |
-| `train_test_split` | Splits arrays or matrices into random train and test subsets. |
+| Method/Parameter                         | Description                                                                 |
+|------------------------------------------|-----------------------------------------------------------------------------|
+| `make_regression`                        | Generates a random regression problem.                                      |
+| `train_test_split`                       | Splits arrays or matrices into random train and test subsets.             |
+| `StandardScaler`                         | Standardizes features by removing the mean and scaling to unit variance.    |
+| `PolynomialFeatures`                     | Generates polynomial and interaction features.                              |
+| `Ridge`                                  | Linear least squares with L2 regularization.                                |
+| `mean_squared_error`                     | Mean squared error regression loss.                                         |
+| `GridSearchCV`                           | Exhaustive search over specified parameter values for an estimator.         |
+| `np.hstack`                              | Stacks arrays in sequence horizontally (column wise).                     |
+| `warnings.catch_warnings`                | Context manager for filtering warnings.                                     |
+| `check_zero_variance_features`           | Custom function to check for zero variance features in the dataset.         |
 
-This lab provides a comprehensive hands-on experience with feature engineering and regularization techniques, ensuring that you can apply these concepts in real-world machine learning projects.
+This lab provides a comprehensive hands-on experience with feature engineering and regularization, equipping you with the skills to build robust and efficient machine learning pipelines.
