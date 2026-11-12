@@ -295,6 +295,8 @@ def api_get_cluster_hosts():
 
 @app.post("/api/settings/cluster")
 def api_set_cluster_hosts(req: ClusterHostsRequest):
+    if not req.hosts:
+        return {"hosts": get_configured_hosts(), "saved": False}
     updated = save_configured_hosts(req.hosts)
     return {"hosts": updated, "saved": True}
 

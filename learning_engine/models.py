@@ -6,6 +6,7 @@ Supports clustered Ollama nodes (localhost, remote nodes, custom clusters) and G
 import os
 import json
 import re
+import time
 import urllib.request
 import urllib.error
 import itertools
@@ -65,7 +66,7 @@ load_env_file()
 CLUSTER_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster.json"
 
 def get_configured_hosts() -> List[str]:
-    """Get Ollama hosts from .synapse_cluster.json, falling back to localhost."""
+    """Get Ollama hosts from .synapse_cluster.json or SQLite settings, falling back to localhost."""
     env_hosts = os.environ.get("OLLAMA_HOSTS")
     if env_hosts:
         return [h.strip().rstrip("/") for h in env_hosts.split(",") if h.strip()]
@@ -78,6 +79,15 @@ def get_configured_hosts() -> List[str]:
         except Exception:
             pass
 
+    try:
+        from .config_manager import get_settings
+        st = get_settings()
+        db_hosts = st.get("cluster_hosts")
+        if isinstance(db_hosts, list) and db_hosts:
+            return [h.strip().rstrip("/") for h in db_hosts if h and isinstance(h, str) and h.strip()]
+    except Exception:
+        pass
+
     return DEFAULT_OLLAMA_HOSTS
 
 def save_configured_hosts(hosts: List[str]) -> List[str]:
@@ -85,6 +95,13 @@ def save_configured_hosts(hosts: List[str]) -> List[str]:
     if not cleaned:
         cleaned = DEFAULT_OLLAMA_HOSTS
     CLUSTER_CONFIG_PATH.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
+    try:
+        from .config_manager import get_settings, save_settings
+        st = get_settings()
+        st["cluster_hosts"] = cleaned
+        save_settings(st)
+    except Exception:
+        pass
     return cleaned
 
 class LLMProvider:
@@ -101,7 +118,7 @@ class OllamaProvider(LLMProvider):
         # Check native Ollama /api/tags
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=3) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 if resp.status == 200:
                     return True
         except Exception:
@@ -110,7 +127,7 @@ class OllamaProvider(LLMProvider):
         # Check LocalAI / OpenAI compatible /v1/models
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=3) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 return resp.status == 200
         except Exception:
             return False
@@ -120,7 +137,7 @@ class OllamaProvider(LLMProvider):
         # 1. Native Ollama format
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=3) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 models = [m["name"] for m in data.get("models", [])]
                 if models:
@@ -131,7 +148,7 @@ class OllamaProvider(LLMProvider):
         # 2. LocalAI / OpenAI /v1/models format
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=3) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 return [m["id"] for m in data.get("data", [])]
         except Exception:
@@ -237,6 +254,8 @@ class OllamaProvider(LLMProvider):
         full_res = self.generate(prompt, system_instruction=system_instruction)
         yield full_res
 
+_CLUSTER_STATUS_CACHE: Dict[str, Any] = {"timestamp": 0.0, "status": {}}
+
 class OllamaCluster(LLMProvider):
     """
     Manages a cluster of Ollama worker nodes across multiple machines,
@@ -247,15 +266,25 @@ class OllamaCluster(LLMProvider):
         self.preferred_model = preferred_model
         self._host_cycle = itertools.cycle(self.hosts)
 
-    def get_cluster_status(self) -> Dict[str, Any]:
+    def get_cluster_status(self, force_refresh: bool = False) -> Dict[str, Any]:
+        global _CLUSTER_STATUS_CACHE
+        now = time.time()
+        if not force_refresh and (now - _CLUSTER_STATUS_CACHE["timestamp"] < 10.0) and _CLUSTER_STATUS_CACHE["status"]:
+            return _CLUSTER_STATUS_CACHE["status"]
+
         status = {}
-        for h in self.hosts:
+        from concurrent.futures import ThreadPoolExecutor
+
+        def probe_node(h: str) -> Tuple[str, Dict[str, Any]]:
             up = OllamaProvider.is_available(h)
             models = OllamaProvider.list_models(h) if up else []
-            status[h] = {
-                "online": up,
-                "models": models
-            }
+            return h, {"online": up, "models": models}
+
+        with ThreadPoolExecutor(max_workers=min(8, len(self.hosts) or 1)) as executor:
+            for h, res in executor.map(probe_node, self.hosts):
+                status[h] = res
+
+        _CLUSTER_STATUS_CACHE = {"timestamp": now, "status": status}
         return status
 
     def select_node_for_model(self, model: Optional[str] = None) -> Tuple[str, str]:
