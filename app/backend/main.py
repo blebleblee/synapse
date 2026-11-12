@@ -115,6 +115,7 @@ from learning_engine.config_manager import get_settings, save_settings
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
+from learning_engine.packages import export_topic_pack, install_topic_pack, list_installed_packs
 
 app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
 
@@ -324,6 +325,39 @@ def get_app_settings():
 def update_app_settings(settings: Dict[str, Any]):
     save_settings(settings)
     return {"status": "success"}
+
+@app.get("/api/packages")
+def api_list_packages():
+    return {
+        "installed": list_installed_packs(),
+        "available_domains": [
+            {"domain": "arts", "title": "Arts & Music Production", "description": "Composition, acoustic DSP, synthesizers, visual arts, and performance."},
+            {"domain": "business", "title": "Business & Strategy", "description": "Financial modeling, negotiation, organizational design, operations."},
+            {"domain": "computing", "title": "Computing & Systems", "description": "AI, data engineering, eBPF infrastructure, Linux systems, kernel mechanics."},
+            {"domain": "crafts", "title": "Crafts & LEGO Engineering", "description": "Precision mechanisms, pneumatics, structural integrity, gear trains."},
+            {"domain": "economics", "title": "Economics & Quantitative Finance", "description": "Econometrics, game theory, macroeconomics, market design."},
+            {"domain": "engineering", "title": "Physical Engineering", "description": "Robotics, aerospace, control systems, structural analysis."},
+            {"domain": "formal_sciences", "title": "Formal Sciences & Mathematics", "description": "Abstract algebra, category theory, logic, computational proofs."},
+            {"domain": "health_sciences", "title": "Health Sciences & Medicine", "description": "Pharmacology, neuroanatomy, genomics, emergency protocols."},
+            {"domain": "humanities", "title": "Humanities & Philosophy", "description": "Epistemology, cognitive biases, rhetoric, formal debate."},
+            {"domain": "languages", "title": "Linguistics & Polyglot Foundations", "description": "Phonology, syntactic parsing, natural language evolution."},
+            {"domain": "motorsports", "title": "Motorsports & Vehicle Dynamics", "description": "Aerodynamics, telemetry, tire physics, suspension kinematics."},
+            {"domain": "natural_sciences", "title": "Natural Sciences", "description": "Quantum mechanics, thermodynamics, molecular biology, astrophysics."}
+        ]
+    }
+
+@app.post("/api/packages/export")
+def api_export_package(domain: str = Query(...)):
+    domain = sanitize_query(domain)
+    try:
+        pack_path = export_topic_pack(domain)
+        return FileResponse(
+            path=str(pack_path),
+            filename=f"{domain}.synpack",
+            media_type="application/gzip"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/api/export")
 def download_export(domain: str, level: Optional[str] = None):
