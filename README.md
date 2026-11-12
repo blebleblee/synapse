@@ -52,45 +52,67 @@ Synapse is separated into three highly decoupled components:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start & Installation
 
-### 1. Prerequisites
-- **Python 3.11+**
-- **Node.js 20+**
-- **Ollama** or **LocalAI** (for local generation)
+Most users do not need to install Python, Node.js, or build packages from source. Choose the installation method that fits your workflow:
 
-### 2. Local Setup
-Clone the repository and install dependencies:
+### Option 1: 1-Click Desktop App (Zero Build Required)
+Download the standalone, zero-dependency desktop application directly from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
+
+| Platform | Download | Instructions |
+| :--- | :--- | :--- |
+| **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases/tag/v1.0.0-rc.1)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
+| **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases/tag/v1.0.0-rc.1)** | Unzip and launch **Synapse Workbench.app** directly. |
+
+*The desktop shell automatically manages its internal backend sidecar, connects to your local Ollama instance on `127.0.0.1:11434`, and requires zero terminal setup.*
+
+---
+
+### Option 2: 1-Click Docker Compose (Universal Container)
+Run the full Synapse Socratic Workbench in an isolated, multi-stage production container:
 
 ```bash
-git clone https://github.com/yourusername/synapse.git
-cd synapse
+# Clone and launch in one command
+git clone https://gitea.2464.cz/ai/synapse.git && cd synapse
+docker compose up -d
+```
 
-# Set up Python backend environment
+- **Open:** Visit **`http://localhost:8000`** in your browser.
+- **Persistence:** Local curriculum (`./topics`), SQLite mastery database (`./data`), and exported packages (`./exports`) are automatically volume-mounted and persisted on your host machine.
+- **Host Ollama Bridge:** Pre-configured with `host.docker.internal:host-gateway` to connect seamlessly to local Ollama running on your host machine.
+
+To shut down:
+```bash
+docker compose down
+```
+
+---
+
+### Option 3: Developer & Source Setup
+For contributors developing the Python learning engine or React UI:
+
+```bash
+# 1. Clone repository
+git clone https://gitea.2464.cz/ai/synapse.git && cd synapse
+
+# 2. Set up Python virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# Set up React frontend
+# 3. Build frontend SPA
 cd app/frontend
 npm install
 npm run build
 cd ../..
-```
 
-### 3. Running the Workbench
-
-You can run Synapse as a web application or as a native desktop shell.
-
-**Web Workbench:**
-```bash
+# 4. Launch Web Workbench
 ./bin/synapse serve --port 8000
 # Open http://localhost:8000 in your browser
 ```
 
-**Native Desktop Shell (Electron):**
+To run the native desktop shell from source:
 ```bash
-# Installs desktop dependencies on first run
 ./bin/synapse desktop
 ```
 

@@ -45,3 +45,7 @@ exports/
 # Temporary Audit Scripts
 audit_*.py
 audit_*.txt
+
+# Private Local Planning & Task Scratchpads
+BACKLOG.md
+*.backlog.md

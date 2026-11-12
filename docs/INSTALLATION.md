@@ -4,7 +4,56 @@ Comprehensive guide for installing, running, and building **Synapse** across **m
 
 ---
 
-## 1. System Prerequisites
+## 🚀 1. 1-Click Desktop App (Zero Build / Zero Terminal)
+
+The easiest way to run Synapse. No Python, Node.js, or package compilation required.
+
+Download pre-compiled Release Candidate binaries from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
+
+| Platform | Download Format | Installation Instructions |
+| :--- | :--- | :--- |
+| **macOS (Apple Silicon)** | **`.dmg` (Disk Image Installer)** | Open `Synapse-Workbench-1.0.0-arm64.dmg`, drag **Synapse Workbench** to `/Applications`, and launch from Spotlight or Launchpad. |
+| **macOS (Portable Bundle)** | **`.zip` (App Archive)** | Decompress `Synapse-Workbench-1.0.0-arm64-mac.zip` and launch **Synapse Workbench.app** directly. |
+| **Windows / Linux** | **Docker Compose** | See Docker Deployment below. |
+
+*The native desktop shell includes automatic background sidecar lifecycle management, native window framing, and connects automatically to your local Ollama cluster on `127.0.0.1:11434`.*
+
+---
+
+## 🐳 2. 1-Click Docker Compose Deployment
+
+Run the complete Socratic Workbench inside an isolated, multi-stage production container with zero local toolchain setup.
+
+### Quick Start
+```bash
+# Clone the repository
+git clone https://gitea.2464.cz/ai/synapse.git
+cd synapse
+
+# Launch with Docker Compose
+docker compose up -d
+```
+
+### Access & Persistence
+- **Web UI:** Open **`http://localhost:8000`** in any web browser.
+- **Volume Mounts:**
+  - `./topics`: Mapped to `/workspace/topics` to persist all generated lessons and labs.
+  - `./data`: Mapped to `/workspace/data` to persist your SQLite mastery state and settings.
+  - `./exports`: Mapped to `/workspace/exports` for `.synpack` course packages.
+- **Ollama Host Connectivity:** The container includes `extra_hosts: host.docker.internal:host-gateway`, enabling immediate connectivity to Ollama running on your host machine at `http://host.docker.internal:11434`.
+
+### Shutdown
+```bash
+docker compose down
+```
+
+---
+
+## 🛠 3. Developer Source Setup
+
+For engineers developing the Python curriculum engine or React frontend.
+
+### Prerequisites
 
 | Platform | Minimum OS | Python | Node.js | Recommended LLM Engine |
 | :--- | :--- | :--- | :--- | :--- |
@@ -12,17 +61,15 @@ Comprehensive guide for installing, running, and building **Synapse** across **m
 | **Windows** | Windows 10/11 (PowerShell or WSL2) | 3.11+ | 20+ (LTS) | Ollama for Windows (CUDA / DirectML) |
 | **Linux** | Ubuntu 22.04+, Fedora 38+, Arch | 3.11+ | 20+ (LTS) | Ollama (native ROCm / CUDA) or LocalAI |
 
----
+### Source Installation Steps
 
-## 2. Installation Steps
-
-### Step 1: Clone Repository
+#### Step 1: Clone Repository
 ```bash
-git clone https://github.com/yourusername/synapse.git
+git clone https://gitea.2464.cz/ai/synapse.git
 cd synapse
 ```
 
-### Step 2: Python Backend Environment
+#### Step 2: Python Backend Environment
 Set up an isolated virtual environment:
 
 **macOS & Linux:**
@@ -39,7 +86,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### Step 3: Frontend Compilation
+#### Step 3: Frontend Compilation
 Install frontend dependencies and build production assets:
 ```bash
 cd app/frontend
@@ -48,23 +95,18 @@ npm run build
 cd ../..
 ```
 
----
+#### Step 4: Launching from Source
 
-## 3. Running Synapse
-
-### Mode A: Integrated Web Workbench
-Serves the responsive single-page workstation, FastAPI REST APIs, and WebSocket PTY terminal on port 8000:
+**Web Workbench:**
 ```bash
 ./bin/synapse serve --port 8000
+# Open http://localhost:8000
 ```
-Open **`http://localhost:8000`** in Chrome, Firefox, Safari, or Edge.
 
-### Mode B: Native Desktop Window (Electron)
-Launches the standalone desktop window with native macOS titlebar integration, custom menus, and automatic backend sidecar management:
+**Desktop Shell (Electron):**
 ```bash
 ./bin/synapse desktop
 ```
-*(On first execution, dependencies in `app/desktop` will be installed automatically).*
 
 ---
 

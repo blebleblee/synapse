@@ -1,0 +1,20 @@
+services:
+  synapse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: synapse-workbench:latest
+    container_name: synapse-workbench
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOSTS=${OLLAMA_HOSTS:-http://host.docker.internal:11434}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    volumes:
+      - ./topics:/workspace/topics
+      - ./data:/workspace/data
+      - ./exports:/workspace/exports
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
