@@ -9,9 +9,14 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
 from learning_engine.mastery import get_completed_lessons
+from learning_engine.security import sanitize_topic_path, validate_workspace_path
+
+def sanitize_rel_path(rel_path: str) -> Path:
+    """Deprecated: Use validate_workspace_path instead."""
+    return validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
+TOPICS_DIR = validate_workspace_path(WORKSPACE_ROOT, WORKSPACE_ROOT / "topics")
 
 LEVELS = ["beginner", "intermediate", "advanced"]
 
@@ -308,25 +313,24 @@ def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     return None
 
 def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Optional[str] = None) -> Path:
+    # 1. Sanitize components
+    domain, category, subtopic_id = sanitize_topic_path(domain, category, subtopic_id)
+    
+    # 2. Construct and validate absolute path
     domain_dir = TOPICS_DIR / domain
-    if not domain_dir.exists():
-        domain_dir.mkdir(parents=True, exist_ok=True)
-
-    clean_cat = category.strip("/").lower().replace(" ", "_")
-    clean_sub = subtopic_id.strip("/").lower().replace(" ", "_")
-    display_title = display_name or clean_sub.replace("_", " ").title()
-
-    target_dir = domain_dir / clean_cat / clean_sub
+    target_dir = validate_workspace_path(TOPICS_DIR, domain_dir / category / subtopic_id)
+    
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    rel_entry = f"{clean_cat}/{clean_sub}"
+    rel_entry = f"{category}/{subtopic_id}"
+    display_title = display_name or subtopic_id.replace("_", " ").title()
     syllabus_file = domain_dir / "SYLLABUS.md"
     syllabus_entry = f"- **{display_title}** (`{rel_entry}/`)"
 
     if syllabus_file.exists():
         content = syllabus_file.read_text(encoding="utf-8")
         if rel_entry not in content:
-            parts = clean_cat.split("/")
+            parts = category.split("/")
             header_name = parts[-1].replace("_", " ").title()
             cat_header = f"### {header_name}"
             if cat_header in content:
@@ -337,23 +341,14 @@ def add_subtopic(domain: str, category: str, subtopic_id: str, display_name: Opt
                 content += f"\n\n{cat_header}\n\n{syllabus_entry}\n"
                 syllabus_file.write_text(content, encoding="utf-8")
     else:
-        syllabus_file.write_text(f"# Syllabus: {domain.replace('_', ' ').title()}\n\n### {clean_cat.replace('_', ' ').title()}\n\n{syllabus_entry}\n", encoding="utf-8")
+        syllabus_file.write_text(f"# Syllabus: {domain.replace('_', ' ').title()}\n\n### {category.replace('_', ' ').title()}\n\n{syllabus_entry}\n", encoding="utf-8")
 
     return target_dir
 
-def sanitize_rel_path(rel_path: str) -> Path:
-    clean = rel_path.strip().replace("\\", "/").strip("/")
-    target = (TOPICS_DIR / clean).resolve()
-    if not target.is_relative_to(TOPICS_DIR.resolve()):
-        raise ValueError(f"Path traversal detected or invalid path: '{rel_path}'")
-    return target
-
 def delete_subtopic(rel_path: str) -> bool:
-    try:
-        target_dir = sanitize_rel_path(rel_path)
-    except ValueError:
-        return False
-
+    # Strict validation
+    target_dir = validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
+    
     clean_rel = rel_path.strip("/")
     parts = clean_rel.split("/")
     if len(parts) < 2:
