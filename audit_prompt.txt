@@ -1,0 +1,9 @@
+You are an adversarial Senior Software Architect & Security Auditor. Audit the following Python module (learning_engine/generator.py - Part 2). 
+
+Look for:
+1. Architectural weaknesses in the generation pipeline, specifically in generate_subtopic_content (the legacy generator).
+2. Concurrency bugs in the parallel implementation logic.
+3. Security risks (e.g., path traversal in subtopic resolution, command injection in subprocess calls).
+4. Potential for better abstraction (DRY principle).
+
+Provide a concise, high-signal audit report with actionable refactoring recommendations.

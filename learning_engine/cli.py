@@ -5,6 +5,7 @@ Interactive management for curricula, multi-tier lesson generation, search, lint
 
 import sys
 import argparse
+import os
 from pathlib import Path
 from .topic_manager import (
     get_topic_tree,
@@ -13,7 +14,7 @@ from .topic_manager import (
     add_subtopic,
     get_domain_persona
 )
-from .models import get_provider, OllamaProvider, OllamaCluster, CLUSTER_HOST_SPECS
+from .models import get_provider, OllamaProvider, OllamaCluster, CLUSTER_HOST_SPECS, load_env_file
 from .generator import generate_subtopic_content
 from .search import search_curriculum
 from .graph import get_prerequisite_graph
@@ -344,6 +345,7 @@ def cmd_serve(args):
     uvicorn.run("app.backend.main:app", host=host, port=port, reload=args.reload)
 
 def main():
+    load_env_file()
     parser = argparse.ArgumentParser(
         prog="learning",
         description="AI Learning Workspace Content Engine & Socratic Workbench"

@@ -94,6 +94,16 @@ def validate_generation_output(content: str) -> str:
         flags=re.IGNORECASE
     ).strip()
 
+    # Strip common conversational wrapper tags that models sometimes use
+    cleaned = re.sub(r"<(?:html|markdown|div|span|xml|pre|code)(?:[^>]*)>", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"</(?:html|markdown|div|span|xml|pre|code)>", "", cleaned, flags=re.IGNORECASE)
+
+    # Validate balanced code fences
+    fence_count = cleaned.count("```")
+    if fence_count % 2 != 0:
+        # Try to fix by closing the last fence
+        cleaned += "\n```"
+
     return cleaned
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
