@@ -2,9 +2,9 @@
 
 ## Objective & Environment Setup
 
-This lab aims to provide hands-on experience with implementing, verifying, and optimizing AI workflows and tools. You will guide through setting up a robust AI pipeline, tuning hyperparameters, benchmarking performance, and handling edge cases. The lab utilizes a Python 3.11+ environment, leveraging popular libraries such as PyTorch, HuggingFace Transformers, NumPy, Scikit-learn, and Polars. Additionally, interaction with an AI model API, such as Ollama or another service, will demonstrate real-world application.
+This lab aims to provide hands-on experience with agentic workflows and tools in the domain of AI and machine learning. Through this lab, you will gain practical knowledge in implementing, tuning, and verifying a machine learning pipeline using Python 3.11+. We will utilize popular libraries such as PyTorch, HuggingFace, NumPy, Scikit-learn, and Polars. Additionally, we will demonstrate real-world application integration by interacting with an API, such as Ollama.
 
-To begin, ensure you have Python 3.11+ installed on your system. Verify your Python version by running:
+To set up your environment, ensure that Python 3.11+ is installed. Verify your Python version by running:
 
 ```bash
 python --version
@@ -16,166 +16,189 @@ Next, install the required packages using pip:
 pip install torch transformers numpy scikit-learn polars
 ```
 
-For API interaction, configure your API key and endpoint by setting environment variables. For example, if using Ollama, set:
+For API interaction, configure your API key. For Ollama, set your API key as an environment variable:
 
 ```bash
 export OLLAMA_API_KEY='your_api_key_here'
-export OLLAMA_API_URL='https://api.ollama.com/v1'
 ```
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, you will implement a simple AI pipeline that includes data preprocessing, model training, and inference. A pre-trained transformer model from HuggingFace will be used to perform text classification on a dataset. The pipeline will be implemented in a complete, runnable Python script.
+In this exercise, we will implement a machine learning pipeline that includes data preprocessing, model training, and evaluation. We will use a simple text classification task with the HuggingFace Transformers library and a dataset from Scikit-learn.
 
-First, import the necessary libraries and load a dataset. The IMDB dataset from HuggingFace's `datasets` library will be used for sentiment analysis.
+The following Python script implements the core prompt/model/algorithm for this topic:
 
 ```python
-import torch
-from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-from datasets import load_dataset
-from sklearn.metrics import accuracy_score
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, Dataset
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
 
-# Load the IMDB dataset
-dataset = load_dataset('imdb')
+# Load dataset
+newsgroups = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'))
+texts = newsgroups.data
+labels = newsgroups.target
 
-# Load a pre-trained transformer model and tokenizer
-model_name = 'distilbert-base-uncased-finetuned-sst-2-english'
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
+# Encode labels
+label_encoder = LabelEncoder()
+encoded_labels = label_encoder.fit_transform(labels)
 
-# Create a text classification pipeline
-classifier = pipeline('sentiment-analysis', model=model, tokenizer=tokenizer)
+# Split dataset
+train_texts, test_texts, train_labels, test_labels = train_test_split(texts, encoded_labels, test_size=0.2, random_state=42)
 
-# Preprocess the dataset
-def preprocess_function(examples):
-    return tokenizer(examples['text'], truncation=True, padding='max_length', max_length=128)
+# Tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-encoded_dataset = dataset.map(preprocess_function, batched=True)
+# Custom Dataset
+class TextDataset(Dataset):
+    def __init__(self, texts, labels, tokenizer, max_length=512):
+        self.texts = texts
+        self.labels = labels
+        self.tokenizer = tokenizer
+        self.max_length = max_length
 
-# Split the dataset into training and test sets
-train_dataset = encoded_dataset['train'].shuffle(seed=42).select(range(1000))
-test_dataset = encoded_dataset['test'].shuffle(seed=42).select(range(1000))
+    def __len__(self):
+        return len(self.texts)
 
-# Convert the datasets to PyTorch tensors
-train_dataset.set_format(type='torch', columns=['input_ids', 'attention_mask', 'label'])
-test_dataset.set_format(type='torch', columns=['input_ids', 'attention_mask', 'label'])
+    def __getitem__(self, idx):
+        text = self.texts[idx]
+        label = self.labels[idx]
+        encoding = self.tokenizer.encode_plus(
+            text,
+            add_special_tokens=True,
+            max_length=self.max_length,
+            return_token_type_ids=False,
+            padding='max_length',
+            return_attention_mask=True,
+            return_tensors='pt',
+        )
+        return {
+            'text': text,
+            'input_ids': encoding['input_ids'].flatten(),
+            'attention_mask': encoding['attention_mask'].flatten(),
+            'labels': torch.tensor(label, dtype=torch.long)
+        }
 
-# Define a simple training loop
-def train_model(model, train_dataset, epochs=3, batch_size=16, learning_rate=2e-5):
-    model.train()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    loss_fn = torch.nn.CrossEntropyLoss()
+# Create datasets
+train_dataset = TextDataset(train_texts, train_labels, tokenizer)
+test_dataset = TextDataset(test_texts, test_labels, tokenizer)
 
-    for epoch in range(epochs):
-        total_loss = 0
-        for i in range(0, len(train_dataset), batch_size):
-            batch = {k: v.to('cuda') for k, v in train_dataset[i:i+batch_size].items()}
-            outputs = model(**batch)
-            loss = loss_fn(outputs.logits, batch['label'])
-            total_loss += loss.item()
+# DataLoader
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=8, shuffle=False)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+# Model
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(label_encoder.classes_))
 
-        print(f'Epoch {epoch + 1}, Loss: {total_loss / len(train_dataset)}')
+# Training arguments
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=3,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    warmup_steps=500,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    logging_steps=10,
+    evaluation_strategy="epoch"
+)
 
-# Train the model
-train_model(model, train_dataset)
+# Trainer
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=test_dataset,
+    compute_metrics=lambda p: {'accuracy': accuracy_score(p.label_ids, np.argmax(p.predictions, axis=1))}
+)
 
-# Evaluate the model
-def evaluate_model(model, test_dataset):
-    model.eval()
-    predictions = []
-    true_labels = []
+# Train
+trainer.train()
 
-    with torch.no_grad():
-        for i in range(0, len(test_dataset), 16):
-            batch = {k: v.to('cuda') for k, v in test_dataset[i:i+16].items()}
-            outputs = model(**batch)
-            logits = outputs.logits
-            preds = torch.argmax(logits, dim=-1)
-            predictions.extend(preds.cpu().numpy())
-            true_labels.extend(batch['label'].cpu().numpy())
-
-    accuracy = accuracy_score(true_labels, predictions)
-    print(f'Accuracy: {accuracy}')
-
-# Evaluate the trained model
-evaluate_model(model, test_dataset)
+# Evaluate
+results = trainer.evaluate()
+print(results)
 ```
 
-This script sets up a text classification pipeline using a pre-trained DistilBERT model. It preprocesses the IMDB dataset, trains the model, and evaluates its accuracy on a test set. The script is complete and ready to run.
+This script performs the following steps:
+- Loads the 20 Newsgroups dataset and encodes the labels.
+- Splits the dataset into training and test sets.
+- Initializes a BERT tokenizer and defines a custom dataset class.
+- Creates DataLoader instances for training and testing.
+- Loads a pre-trained BERT model for sequence classification.
+- Sets up training arguments and initializes a Trainer instance.
+- Trains the model and evaluates its performance.
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, you will perform hyperparameter tuning and benchmark the performance of your model. Accuracy, latency distributions, and token costs will be measured. Scikit-learn's `GridSearchCV` will be used for hyperparameter tuning, and Polars for efficient data handling.
+In this exercise, we will perform hyperparameter tuning and empirical benchmarking to measure the accuracy, latency distributions, and convergence curves of our model. We will use the `optuna` library for hyperparameter tuning and the `time` module for latency measurement.
 
-First, modify the training loop to include hyperparameter tuning using `GridSearchCV`.
+First, install the `optuna` library:
+
+```bash
+pip install optuna
+```
+
+The following Python script performs hyperparameter tuning and benchmarking:
 
 ```python
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import make_scorer
-from transformers import Trainer, TrainingArguments
-import polars as pl
+import optuna
+import time
+from transformers import BertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.metrics import accuracy_score
 
-# Define a custom Trainer class for Scikit-learn compatibility
-class CustomTrainer(Trainer):
-    def compute_metrics(self, eval_pred):
-        logits, labels = eval_pred
-        preds = np.argmax(logits, axis=-1)
-        return {'accuracy': accuracy_score(labels, preds)}
+# Objective function for Optuna
+def objective(trial):
+    # Hyperparameters to tune
+    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 5e-5)
+    num_train_epochs = trial.suggest_int('num_train_epochs', 2, 4)
+    per_device_train_batch_size = trial.suggest_categorical('per_device_train_batch_size', [8, 16])
+    warmup_steps = trial.suggest_int('warmup_steps', 0, 500)
+    weight_decay = trial.suggest_loguniform('weight_decay', 1e-5, 1e-2)
 
-# Define a function to create a Trainer instance
-def create_trainer(model, train_dataset, eval_dataset, learning_rate, batch_size):
+    # Model
+    model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(label_encoder.classes_))
+
+    # Training arguments
     training_args = TrainingArguments(
         output_dir='./results',
-        evaluation_strategy='epoch',
-        learning_rate=learning_rate,
-        per_device_train_batch_size=batch_size,
-        per_device_eval_batch_size=batch_size,
-        num_train_epochs=3,
-        weight_decay=0.01,
+        num_train_epochs=num_train_epochs,
+        per_device_train_batch_size=per_device_train_batch_size,
+        per_device_eval_batch_size=per_device_train_batch_size,
+        warmup_steps=warmup_steps,
+        weight_decay=weight_decay,
+        logging_dir='./logs',
+        logging_steps=10,
+        evaluation_strategy="epoch"
     )
-    return CustomTrainer(
+
+    # Trainer
+    trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        eval_dataset=test_dataset,
+        compute_metrics=lambda p: {'accuracy': accuracy_score(p.label_ids, np.argmax(p.predictions, axis=1))}
     )
 
-# Define hyperparameters to tune
-param_grid = {
-    'learning_rate': [2e-5, 3e-5, 5e-5],
-    'batch_size': [16, 32, 64],
-}
+    # Train
+    start_time = time.time()
+    trainer.train()
+    end_time = time.time()
 
-# Define a scoring function
-scorer = make_scorer(accuracy_score)
+    # Evaluate
+    results = trainer.evaluate()
+    accuracy = results['eval_accuracy']
+    latency = end_time - start_time
 
-# Perform hyperparameter tuning
-grid_search = GridSearchCV(
-    estimator=CustomTrainer(model, train_dataset, test_dataset, learning_rate=2e-5, batch_size=16),
-    param_grid=param_grid,
-    scoring=scorer,
-    cv=3,
-    refit=True,
-    verbose=2,
-)
-
-grid_search.fit(train_dataset)
-
-# Print the best hyperparameters and accuracy
-print(f'Best hyperparameters: {grid_search.best_params_}')
-print(f'Best accuracy: {grid_search.best_score_}')
-
-# Benchmark the model with the best hyperparameters
-best_trainer = grid_search.best_estimator_
-best_trainer.train()
-
-# Evaluate the model
-evaluate_model(best_trainer.model, test_dataset)
-
-# Measure latency distribution
+    # Log hyperparameters and metrics
+    trial.set_user_attr('accuracy', accuracy)
+    trial.set_user_attr('latency', latency)
+    return accuracy
 ```
+
+This script defines an objective function for Optuna to tune hyperparameters such as learning rate, number of training epochs, batch size, warmup steps, and weight decay. It measures the model's accuracy and training latency, logging these metrics for each trial.
