@@ -15,9 +15,8 @@ from .config_manager import get_settings
 
 DEFAULT_OLLAMA_HOSTS = [
     "http://127.0.0.1:11434",
-    "http://studio.2464.cz:11434",
-    "http://192.168.200.60:8080",
-    "http://maxi.2464.cz:11434"
+    "http://192.168.1.50:11434",
+    "http://192.168.1.51:11434"
 ]
 
 CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
@@ -31,34 +30,20 @@ CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {
             "llama3.1:latest"
         ]
     },
-    "http://studio.2464.cz:11434": {
-        "name": "studio",
+    "http://192.168.1.50:11434": {
+        "name": "node-1",
         "memory_tier": "large",
         "preferred_models": [
             "qwen2.5-coder:32b",
-            "qwen3.6:27b-mlx",
             "gemma4:26b",
             "gemma4:12b"
         ]
     },
-    "http://192.168.200.60:8080": {
-        "name": "ai",
-        "memory_tier": "24gb",
-        "preferred_models": [
-            "Qwen3-Coder-30B-A3B-Instruct-RTPurbo-i1-GGUF:latest",
-            "qwopus3.6-27b-coder-mtp:latest",
-            "qwen3.6-27b:latest",
-            "qwen3-32b:latest",
-            "meta-llama-3.1-8b-instruct:latest"
-        ]
-    },
-    "http://maxi.2464.cz:11434": {
-        "name": "maxi",
+    "http://192.168.1.51:11434": {
+        "name": "node-2",
         "memory_tier": "12gb",
         "preferred_models": [
             "llama3.1:8b",
-            "gemma4:12b",
-            "gemma4:e4b",
             "qwen3:4b"
         ]
     }

@@ -115,9 +115,6 @@ def test_api_cluster_status():
     data = res.json()
     local_key = "http://127.0.0.1:11434" if "http://127.0.0.1:11434" in data else "http://localhost:11434"
     assert local_key in data
-    assert "http://studio.2464.cz:11434" in data
-    assert "http://maxi.2464.cz:11434" in data
-    assert "http://192.168.200.60:8080" in data
     assert isinstance(data[local_key]["online"], bool)
 
 def test_api_get_and_set_cluster_hosts():

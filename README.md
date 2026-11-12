@@ -1,164 +1,145 @@
-# Synapse — AI-Native Engineering & Polymath Workbench
+<div align="center">
+  <img src="app/frontend/public/favicon.svg" alt="Synapse Logo" width="100" />
+  <h1>Synapse</h1>
+  <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
-<p align="center">
-  <img src="app/frontend/public/favicon.svg" width="96" height="96" alt="Synapse Logo" />
-</p>
+  <a href="https://github.com/yourusername/synapse/actions">
+    <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status">
+  </a>
+  <a href="https://github.com/yourusername/synapse/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  </a>
+  <a href="#desktop-shell">
+    <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platforms">
+  </a>
+  <a href="https://fastapi.tiangolo.com/">
+    <img src="https://img.shields.io/badge/FastAPI-1.0-teal" alt="FastAPI">
+  </a>
+  <a href="https://vitejs.dev/">
+    <img src="https://img.shields.io/badge/Vite%20%2B%20React-18-blueviolet" alt="React">
+  </a>
+</div>
 
-**Synapse** is an automated, production-grade AI learning workspace, knowledge graph, and Socratic engineering workbench. It treats the filesystem as a Git-backed database across **12 atomic domains**, **54 disciplines**, and over **700 calibrated technical topics** structured for deep systems engineering, mathematical rigor, and operational mastery.
+<br />
 
----
+**Synapse** is an advanced, self-hosted Learning Workspace and automated Curriculum Engine. It autonomously generates textbook-grade masterclasses, operational labs, and flashcards across a strict taxonomy of 12 domains and 80 disciplines using multi-node local LLM clusters.
 
-## 1. Architecture & Taxonomy
-
-Synapse follows a clean **3-Level Flat Taxonomy** that eliminates arbitrary directory nesting and fragmented file sprawl:
-
-$$\text{Domain (L1)} \;\longrightarrow\; \text{Discipline (L2)} \;\longrightarrow\; \text{Topic / Course (L3)}$$
-
-### The 12 Core Domains
-1. **`computing`** — Linux Kernel, Systems Software, Infrastructure (Kubernetes, eBPF, Harvester), Security (Web, Exploitation, Hardware Hacking), AI/ML, and Data Systems.
-2. **`engineering`** — Computer Architecture, Assembly (x86/ARM), Embedded Systems, Circuits, Hardware Hacking, and Robotics.
-3. **`motorsports`** — Performance Driving Dynamics, Motorcycle Riding Dynamics, Vehicle Telemetry, Diagnostics & Powertrain.
-4. **`crafts`** — Engineering Mechanisms, Precision Machining & CNC, 3D Printing & CAD, Retro Hardware Restoration, Woodworking.
-5. **`formal_sciences`** — Pure Math (Abstract Algebra, Category Theory), Applied Math (Game Theory, Cryptography), Mathematical Logic, Discrete Mathematics.
-6. **`natural_sciences`** — Quantum Physics, Classical Mechanics, Organic/Physical Chemistry, Molecular Biology.
-7. **`arts`** — Music Performance (Bass, Drums, Piano, Electric Guitar), Audio DSP, Modular Synthesis, Orchestral Scoring, Visual Arts.
-8. **`languages`** — Germanic (English, German), Slavic (Czech, Russian), Romance (Spanish), and Comparative Linguistics.
-9. **`humanities`** — Classical Philosophy, Epistemology, Global Intellectual History, Analytical Thinking.
-10. **`business`** — Corporate Finance, M&A, Private Equity, Market Microstructure, Wealth Management.
-11. **`economics`** — Macroeconomics, Microeconomics, Game Theory, Central Banking & Monetary Policy.
-12. **`health_sciences`** — Exercise Physiology, Nutritional Biochemistry, Sports Medicine, Human Anatomy.
+Once the curriculum is generated, Synapse provides a rich native **Socratic Workbench** (available as a web app or standalone Electron desktop shell) featuring a dual-pane markdown reader, an integrated PTY terminal, and an interactive AI Mentor.
 
 ---
 
-## 2. Masterclass Multi-Lesson Curriculum
+## 🎯 Features
 
-Every topic directory is self-contained and structured as a publication-grade, O'Reilly / MIT Press-level technical textbook chapter series:
-
-```text
-topics/computing/data/postgresql/
-├── lesson_01_foundations_and_invariants.md
-├── lesson_02_architecture_and_process_model.md
-├── lesson_03_mvcc_wal_and_vacuum.md
-├── lesson_04_query_planning_and_indexing.md
-├── lesson_05_high_availability_and_replication.md
-├── lesson_06_curriculum_summary.md
-└── labs.md
-```
-
-- **Numbered Lessons (`lesson_01_*.md` to `lesson_06_*.md`):** Deep, flowing narrative prose written from first principles. Features byte-level binary layouts, ASCII memory maps, mathematical invariants, and valid Mermaid architecture diagrams.
-- **Operational Verification Labs (`labs.md`):** Hands-on diagnostic labs with exact, runnable Linux/BSD CLI commands, profiling steps, and fault-injection scripts with zero placeholders.
-- **Granular Lesson Mastery:** Completion is tracked per lesson (`✓`) and persisted atomically to `topics/mastery.json`.
+- **Automated Curriculum Generation (`generate_all.py`):** Automatically drafts, audits, and refines multi-stage technical lessons (Beginner, Intermediate, Advanced) and hands-on terminal labs.
+- **Multi-Node Cluster Orchestration:** Distributes LLM workloads across a fleet of local instances (e.g., Ollama, LocalAI) and cloud providers (Anthropic Claude 3.5), employing cross-model adversarial peer review.
+- **Native Socratic Workbench:** A beautiful, responsive Electron / React frontend featuring:
+  - **Topic Tree Navigation:** Canonical 3-level taxonomy hierarchy.
+  - **Dynamic Lesson Reader:** Supports Mermaid.js diagrams, KaTeX math blocks, and markdown rendering.
+  - **AI Mentor Chat:** Context-aware AI tutor hooked directly into your current lesson.
+  - **Integrated PTY Terminal:** Live WebSocket-bridged host terminal for executing operational labs and interactive verification.
+- **SynPack Curriculum Store:** Export and sideload full topic masterclasses as portable `.synpack` archives via the integrated Addon Store.
+- **Mastery & Knowledge Graph:** Track learning progress, unlock prerequisites, and export Anki-compatible `.csv` flashcard decks.
 
 ---
 
-## 3. Clustered 4-Node Local AI Engine (Author-Reviewer Architecture)
+## 🏗 Architecture
 
-Synapse orchestrates a local hardware-tiered Ollama cluster that parallelizes curriculum generation and enforces **cross-node adversarial fact-checking**:
+Synapse is separated into three highly decoupled components:
 
-```text
-[ Module Drafted ] ──► [ Primary Worker Node ] ──► [ Independent Auditor Node ] ──► [ Verified & Pushed ]
-Lesson 1 (32B)         localhost (32B)             node-studio (32B)                Git Commit + Remote Push
-Lesson 2 (32B)         node-studio (32B)           node-gpu (24GB)                  Git Commit + Remote Push
-Lesson 3 (30B)         node-gpu (24GB)             localhost (32B)                  Git Commit + Remote Push
-Labs (32B)             localhost (32B)             node-studio (32B)                Git Commit + Remote Push
-```
-
-- **Node 1 (Local):** `http://127.0.0.1:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`, `deepseek-r1:32b`)
-- **Node 2 (Studio Node):** `http://node-studio:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`)
-- **Node 3 (GPU Server):** `http://192.168.1.100:8080` (LocalAI / OpenAI • 24GB GPU • `Qwen3-Coder-30B`)
-- **Node 4 (Auxiliary Node):** `http://node-aux:11434` (Ollama • 12GB VRAM • `llama3.1:8b`)
-- **Cloud Provider (Anthropic):** Claude 3.5 Sonnet / Opus via official Anthropic API or custom gateway proxy.
-  > **Security Note:** Cloud API keys (`ANTHROPIC_API_KEY`, `GEMINI_API_KEY`) are stored strictly in your local, git-ignored SQLite database (`data/synapse.db`) or user environment. They are never committed to source control.
-- **Cross-Node Adversarial Review:** No model reviews its own output. Independent auditor nodes verify kernel structs, syscall signatures, and CLI syntax, auto-correcting any hallucinations or syntax errors before committing.
+1. **`learning_engine/` (Python):** The core intelligence layer. Manages the LLM orchestration, taxonomy enforcement, `.synpack` packaging, and the knowledge DAG.
+2. **`app/backend/` (FastAPI):** A lightweight asynchronous REST and WebSocket server. Bridges the frontend to the local file system and handles the live PTY terminal session.
+3. **`app/frontend/` & `app/desktop/` (React/Vite & Electron):** The UI presentation layer. Can run as a web app served by FastAPI or bundled into a native desktop `.app` / `.exe`.
 
 ---
 
-## 4. Web Workbench (Synapse Dashboard)
+## 🚀 Getting Started
 
-Open **`http://127.0.0.1:8000`** in any browser. The single integrated FastAPI service hosts the API, WebSockets, and compiled React SPA together on port 8000:
+### 1. Prerequisites
+- **Python 3.11+**
+- **Node.js 20+**
+- **Ollama** or **LocalAI** (for local generation)
 
-### Streamlined 3-Tab Reader
-- **`[ Study ]` Tab:** 
-  - Permanent, non-shifting lesson bar with full lesson title dropdown and numeric pills (`[All] [1] [2]...`).
-  - Fluid reading column with enlarged typography (`16px`, line-height `1.75`), $\LaTeX$ math equations (KaTeX), and clean code execution buttons.
-  - Bottom navigation bar with **Previous / Next** and an interactive **`[ Mark Complete ✓ ]`** toggle.
-- **`[ Labs ]` Tab:** Dedicated operational verification exercises, shell diagnostic cheat sheets, and step-by-step CLI procedures.
-- **`[ Quiz ]` Tab:** Socratic interactive quiz with immediate rationale explanations and score tracking.
-
-### Interactive Diagram & Media Lightbox
-- Flowcharts and sequence diagrams automatically expand up to **900px** with responsive typography.
-- Clicking on **any Mermaid diagram or image** opens a full-screen **Zoom & Pan Lightbox Modal** supporting:
-  - **40% to 400% Zooming:** Via modal controls or **mouse wheel scroll**.
-  - **Click-and-Drag Panning:** Move enlarged diagrams freely across the viewport.
-  - **Keyboard Hotkeys:** `Esc` to close, `+` / `-` to zoom, `0` to reset.
-
-### Socratic AI Mentor & Terminal Awareness
-- **Sub-Second Streaming:** Chat requests route to low-latency local 8B models with live Server-Sent Events (SSE) token streaming (<1–2s total response time).
-- **Strict Socratic Mandate:** Concise 2–4 sentence responses that provide direct intuition followed by one guiding question.
-- **Dynamic Context Switching:** Automatically reloads saved session history and adapts the mentor persona to the active domain (e.g., *Systems Software & Kernel Architect* for computing vs. *Pure Mathematics & Formal Logic Mentor* for formal sciences).
-- **Live Terminal Window Awareness:** A server-side circular PTY ring buffer automatically provides the AI mentor with the last 40 lines of terminal output and errors. Ask *"Why did that command fail?"* and the AI will diagnose the error directly without manual copy-pasting.
-
-### Responsive Embedded Terminal Drawer
-- POSIX PTY terminal supporting `Host Shell (Local)`, `Linux Sandbox (Docker)`, and `Kubernetes DevPod (k3s)`.
-- Responsive container auto-fitting with full multiline line-wrapping without truncation, and `ps -ww` integration.
-
----
-
-## 5. CLI Command Reference (`synapse`)
-
-Accessible via `./bin/synapse`:
+### 2. Local Setup
+Clone the repository and install dependencies:
 
 ```bash
-# Launch the Integrated Web Workbench (Port 8000)
-./bin/synapse serve
-./bin/synapse serve --daemon --port 8000   # Background daemon mode
-./bin/synapse stop                         # Stop daemon
+git clone https://github.com/yourusername/synapse.git
+cd synapse
 
-# Modernized Curriculum & Cluster Status
-./bin/synapse status                       # View L1/L2/L3 taxonomy, authored lessons, labs, mastery, and cluster health
-./bin/synapse tree                         # Print curriculum tree with lesson counts
-./bin/synapse tree --domain computing
+# Set up Python backend environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-# Clustered Batch Generation (Author-Reviewer Pipeline)
-.venv/bin/python scripts/generate_all.py --topic computing/data/postgresql --force
-.venv/bin/python scripts/generate_all.py --domain computing --force
+# Set up React frontend
+cd app/frontend
+npm install
+npm run build
+cd ../..
+```
 
-# Navigation, Search & Linting
-./bin/synapse search "eBPF verifier"       # Full-text regex search with highlighted context
-./bin/synapse graph                        # Cross-disciplinary prerequisite DAG
-./bin/synapse lint                         # Audit files for depth, headers, and placeholders
+### 3. Running the Workbench
 
-# Export, SynPack & Flashcards
-./bin/synapse export computing             # Compile domain handbook (.md)
-./bin/synapse flashcards postgresql        # Generate Anki active-recall CSV deck
+You can run Synapse as a web application or as a native desktop shell.
 
-# Granular Mastery Tracking
-./bin/synapse mastery                      # View personal mastery counts and percentages
-./bin/synapse mastery computing/data/postgresql --set mastered
+**Web Workbench:**
+```bash
+./bin/synapse serve --port 8000
+# Open http://localhost:8000 in your browser
+```
+
+**Native Desktop Shell (Electron):**
+```bash
+# Installs desktop dependencies on first run
+./bin/synapse desktop
 ```
 
 ---
 
-## 6. Deployment & Services
+## 📦 Building Standalone Binaries (Release Candidates)
 
-### Run as macOS Background Service (Launchd)
+Synapse can be packaged into zero-dependency native desktop applications using `electron-builder`.
+
 ```bash
-cp deploy/com.synapse.workbench.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.synapse.workbench.plist
-```
+cd app/desktop
+npm install
 
-### Run as Linux Service (Systemd)
-```bash
-sudo cp deploy/learning-workbench.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now learning-workbench
-```
+# Build for macOS (.app and .dmg)
+npm run build:mac
 
-### Windows Support (WSL2)
-Synapse requires POSIX pseudo-terminals (`pty`, `termios`, `fcntl`). Running on Windows is supported via **WSL2** (`wsl --install -d Ubuntu`). Clone inside WSL2 and execute `./bin/synapse serve`.
+# Build for Windows (.exe / NSIS)
+npm run build:win
+
+# Build for Linux (.AppImage / .deb)
+npm run build:linux
+```
+Compiled binaries will be output to `dist/desktop/`.
 
 ---
 
-## 7. Version Control & Git Synchronization
+## 🧠 Generating Curriculum
 
-All generated curriculum units, audits, session debriefs, and flashcards are automatically versioned and synchronized with your upstream Git repository (e.g. `origin/main`).
+You can command the `learning_engine` to autonomously research and write masterclasses for empty topics in your syllabus. 
+
+```bash
+# Generate all missing topics across all 12 domains using your local cluster
+./bin/synapse generate --domain all
+
+# Generate a specific topic using Anthropic's Claude 3.5 Sonnet
+./bin/synapse generate --topic computing/systems/bash --provider anthropic
+```
+
+---
+
+## 🛡️ Terminal Security & Host Safety
+
+Synapse features an integrated WebSocket PTY terminal that binds to your local host shell (`zsh` or `bash`). 
+To prevent accidental destruction of your host machine during operational labs, Synapse employs an **in-stream command verification interceptor**.
+
+If a destructive command is detected (e.g., `rm -rf /`, `mkfs`, fork bombs), the terminal will pause execution, intercept the keystroke, and require you to type `CONFIRM` to proceed.
+
+---
+
+## 📄 License
+
+Synapse is open-source software licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
