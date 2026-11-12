@@ -46,7 +46,7 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string): string {
       </div>`;
     }
 
-    const isExecutable = ['bash', 'sh', 'zsh', 'shell', 'python', 'c', 'rust'].includes(language);
+    const isExecutable = ['bash', 'sh', 'zsh', 'shell', 'python', 'c', 'rust', 'sql', 'psql'].includes(language);
     const escapedCode = text
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
