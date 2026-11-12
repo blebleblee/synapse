@@ -103,6 +103,10 @@ def cmd_status(args):
         status_str = "ONLINE " if is_online else "OFFLINE"
         pref_model = h_data.get("preferred_model") or (h_data.get("models") and h_data["models"][0]) or "none"
         print(f"    - [{name:9s}] {status_str} | Tier: {tier:8s} | Model: {pref_model}")
+    
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        print(f"    - [ANTHROPIC] ONLINE    | Tier: cloud    | Model: claude-3-5-sonnet-20241022")
+
     print("==================================================")
 
 def cmd_tree(args):
