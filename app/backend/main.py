@@ -107,6 +107,7 @@ from learning_engine.mastery import (
     toggle_lesson_completion
 )
 from learning_engine.security import validate_workspace_path, sanitize_query
+from learning_engine.config_manager import get_settings, save_settings
 from learning_engine.exporter import export_handbook
 from learning_engine.flashcards import generate_flashcards
 from learning_engine.summary import regenerate_summary, generate_initial_summary
@@ -149,7 +150,7 @@ class ChatRequest(BaseModel):
     query: str = Field(..., min_length=0, max_length=500)
     message: str = Field(..., min_length=1, max_length=10000)
     history: List[Any] = []
-    lesson_id: Optional[str] = Field(None, regex=r'^[a-z0-9_-]*$')
+    lesson_id: Optional[str] = Field(None, pattern=r'^[a-z0-9_-]*$')
     terminal_context: Optional[str] = Field(None, max_length=50000)
     lesson_content: Optional[str] = Field(None, max_length=50000)
     stream: Optional[bool] = False
@@ -165,15 +166,15 @@ class ChatRequest(BaseModel):
         return v
 
 class GenerateRequest(BaseModel):
-    domain: str = Field(..., regex=r'^[a-z0-9_-]+$')
-    category: str = Field(..., regex=r'^[a-z0-9_/-]+$')
-    subtopic: str = Field(..., regex=r'^[a-z0-9_-]+$')
-    level: str = Field(default='beginner', regex=r'^(beginner|intermediate|advanced)$')
+    domain: str = Field(..., pattern=r'^[a-z0-9_-]+$')
+    category: str = Field(..., pattern=r'^[a-z0-9_/-]+$')
+    subtopic: str = Field(..., pattern=r'^[a-z0-9_-]+$')
+    level: str = Field(default='beginner', pattern=r'^(beginner|intermediate|advanced)$')
     force: bool = False
 
 class TranslateRequest(BaseModel):
     text: str = Field(..., max_length=50000)
-    target_lang: str = Field(..., regex=r'^[a-z]{2}$')
+    target_lang: str = Field(..., pattern=r'^[a-z]{2}$')
 
 # ... update chat_with_tutor to use GenerateRequest and ChatRequest ...
 
@@ -310,6 +311,15 @@ def update_mastery(req: MasteryUpdateRequest):
 @app.post("/api/mastery/lesson")
 def update_lesson_mastery(req: LessonMasteryRequest):
     return toggle_lesson_completion(req.path, req.lesson_id, req.completed)
+
+@app.get("/api/settings")
+def get_app_settings():
+    return get_settings()
+
+@app.post("/api/settings")
+def update_app_settings(settings: Dict[str, Any]):
+    save_settings(settings)
+    return {"status": "success"}
 
 @app.get("/api/export")
 def download_export(domain: str, level: Optional[str] = None):

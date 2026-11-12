@@ -1,76 +1,87 @@
 """
 User Topic Mastery State Tracker
 Tracks competence states (not_started -> studying -> lab_verified -> mastered)
-and persists progress into topics/mastery.json.
+and persists progress into data/synapse.db.
 """
 
 import json
-from pathlib import Path
 from typing import Dict, Any, List, Optional
-
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-MASTERY_FILE = WORKSPACE_ROOT / "topics" / "mastery.json"
+from .database import get_connection
 
 VALID_STATES = ["not_started", "studying", "lab_verified", "mastered"]
 
 def load_mastery_data() -> Dict[str, Any]:
-    if MASTERY_FILE.exists():
-        try:
-            return json.loads(MASTERY_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            return {}
-    return {}
+    """Deprecated: Use database directly."""
+    conn = get_connection()
+    rows = conn.execute("SELECT path, state, completed_lessons FROM mastery").fetchall()
+    conn.close()
+    return {row["path"]: {"state": row["state"], "completed_lessons": json.loads(row["completed_lessons"])} for row in rows}
 
 def save_mastery_data(data: Dict[str, Any]):
-    tmp_file = MASTERY_FILE.with_suffix(".tmp")
-    tmp_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    tmp_file.replace(MASTERY_FILE)
+    """Deprecated: Use set_subtopic_mastery or toggle_lesson_completion."""
+    conn = get_connection()
+    with conn:
+        for path, val in data.items():
+            state = val["state"] if isinstance(val, dict) else val
+            lessons = json.dumps(val.get("completed_lessons", [])) if isinstance(val, dict) else json.dumps([])
+            conn.execute("""
+                INSERT INTO mastery (path, state, completed_lessons)
+                VALUES (?, ?, ?)
+                ON CONFLICT(path) DO UPDATE SET state=excluded.state, completed_lessons=excluded.completed_lessons
+            """, (path, state, lessons))
+    conn.close()
 
 def get_subtopic_mastery(subtopic_path: str) -> str:
-    data = load_mastery_data()
-    val = data.get(subtopic_path.strip("/"), "not_started")
-    if isinstance(val, dict):
-        return val.get("state", "not_started")
-    return val
+    clean_path = subtopic_path.strip("/")
+    conn = get_connection()
+    row = conn.execute("SELECT state FROM mastery WHERE path = ?", (clean_path,)).fetchone()
+    conn.close()
+    return row["state"] if row else "not_started"
 
 def get_completed_lessons(subtopic_path: str) -> List[str]:
-    data = load_mastery_data()
-    val = data.get(subtopic_path.strip("/"), None)
-    if isinstance(val, dict):
-        return val.get("completed_lessons", [])
+    clean_path = subtopic_path.strip("/")
+    conn = get_connection()
+    row = conn.execute("SELECT completed_lessons FROM mastery WHERE path = ?", (clean_path,)).fetchone()
+    conn.close()
+    if row and row["completed_lessons"]:
+        return json.loads(row["completed_lessons"])
     return []
 
 def set_subtopic_mastery(subtopic_path: str, state: str) -> Dict[str, Any]:
     if state not in VALID_STATES:
         raise ValueError(f"Invalid mastery state '{state}'. Must be one of {VALID_STATES}")
 
-    data = load_mastery_data()
     clean_path = subtopic_path.strip("/")
-    val = data.get(clean_path, {})
-    if isinstance(val, dict):
-        val["state"] = state
-        data[clean_path] = val
-    else:
-        data[clean_path] = {"state": state, "completed_lessons": []}
-    save_mastery_data(data)
+    conn = get_connection()
+    with conn:
+        conn.execute("""
+            INSERT INTO mastery (path, state, completed_lessons)
+            VALUES (?, ?, ?)
+            ON CONFLICT(path) DO UPDATE SET state=excluded.state
+        """, (clean_path, state, json.dumps([])))
+    
+    # Get updated row
+    row = conn.execute("SELECT * FROM mastery WHERE path = ?", (clean_path,)).fetchone()
+    conn.close()
 
     return {
-        "path": clean_path,
-        "state": state,
-        "completed_lessons": data[clean_path].get("completed_lessons", []),
+        "path": row["path"],
+        "state": row["state"],
+        "completed_lessons": json.loads(row["completed_lessons"]),
         "stats": get_mastery_summary()
     }
 
 def toggle_lesson_completion(subtopic_path: str, lesson_id: str, completed: Optional[bool] = None) -> Dict[str, Any]:
-    data = load_mastery_data()
     clean_path = subtopic_path.strip("/")
-    val = data.get(clean_path, "studying")
-    if isinstance(val, str):
-        state = val
-        completed_lessons: List[str] = []
+    conn = get_connection()
+    row = conn.execute("SELECT state, completed_lessons FROM mastery WHERE path = ?", (clean_path,)).fetchone()
+    
+    if row:
+        state = row["state"]
+        completed_lessons = json.loads(row["completed_lessons"])
     else:
-        state = val.get("state", "studying")
-        completed_lessons = list(val.get("completed_lessons", []))
+        state = "studying"
+        completed_lessons = []
 
     if completed is None:
         if lesson_id in completed_lessons:
@@ -84,15 +95,16 @@ def toggle_lesson_completion(subtopic_path: str, lesson_id: str, completed: Opti
         if lesson_id in completed_lessons:
             completed_lessons.remove(lesson_id)
 
-    # If any lessons are completed and state is not_started, advance to studying
     if completed_lessons and state == "not_started":
         state = "studying"
 
-    data[clean_path] = {
-        "state": state,
-        "completed_lessons": sorted(completed_lessons)
-    }
-    save_mastery_data(data)
+    with conn:
+        conn.execute("""
+            INSERT INTO mastery (path, state, completed_lessons)
+            VALUES (?, ?, ?)
+            ON CONFLICT(path) DO UPDATE SET state=excluded.state, completed_lessons=excluded.completed_lessons
+        """, (clean_path, state, json.dumps(sorted(completed_lessons))))
+    conn.close()
 
     return {
         "path": clean_path,
@@ -102,14 +114,17 @@ def toggle_lesson_completion(subtopic_path: str, lesson_id: str, completed: Opti
     }
 
 def get_mastery_summary() -> Dict[str, Any]:
-    data = load_mastery_data()
+    conn = get_connection()
+    rows = conn.execute("SELECT state FROM mastery").fetchall()
+    conn.close()
+    
     counts = {s: 0 for s in VALID_STATES}
-    for val in data.values():
-        s = val.get("state", "not_started") if isinstance(val, dict) else val
+    for row in rows:
+        s = row["state"]
         if s in counts:
             counts[s] += 1
 
-    total_tracked = len(data)
+    total_tracked = len(rows)
     mastered_count = counts["mastered"]
     percentage = (mastered_count * 100 // total_tracked) if total_tracked > 0 else 0
 

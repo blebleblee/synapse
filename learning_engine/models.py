@@ -11,6 +11,7 @@ import urllib.error
 import itertools
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
+from .config_manager import get_settings
 
 DEFAULT_OLLAMA_HOSTS = [
     "http://127.0.0.1:11434",
@@ -443,12 +444,26 @@ class GeminiProvider(LLMProvider):
 class AnthropicProvider(LLMProvider):
     """
     Anthropic Claude 3.5 Sonnet / Haiku / Opus Provider.
-    Supports official Anthropic API as well as custom base URLs/proxies
-    via ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN.
+    Supports official Anthropic API as well as custom base URLs/proxies.
+    Loads settings from config/settings.json or environment.
     """
     def __init__(self, model: str = "claude-3-5-sonnet-20241022", api_key: Optional[str] = None, base_url: Optional[str] = None):
-        self.base_url = (base_url or os.environ.get("ANTHROPIC_BASE_URL") or "https://aiapiflow.com").rstrip("/")
-        self.api_key = api_key or os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
+        settings = get_settings()
+        anthropic_cfg = settings.get("anthropic", {})
+
+        self.base_url = (
+            base_url or 
+            os.environ.get("ANTHROPIC_BASE_URL") or 
+            anthropic_cfg.get("base_url") or 
+            "https://aiapiflow.com"
+        ).rstrip("/")
+
+        self.api_key = (
+            api_key or 
+            os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
+            os.environ.get("ANTHROPIC_API_KEY") or 
+            anthropic_cfg.get("api_key")
+        )
         self.model = self._resolve_model_name(model)
 
     def _resolve_model_name(self, model: str) -> str:
