@@ -29,7 +29,9 @@ export interface AppSettings {
   clusterHosts?: string[];
   primaryModel: string;
   reviewerModel: string;
+  mentorModel?: string;
   geminiApiKey: string;
+  geminiBaseUrl?: string;
   anthropicApiKey: string;
   anthropicBaseUrl: string;
 }
@@ -48,7 +50,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ],
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
+  mentorModel: '',
   geminiApiKey: '',
+  geminiBaseUrl: '',
   anthropicApiKey: '',
   anthropicBaseUrl: 'https://api.anthropic.com',
 };
@@ -377,10 +381,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <label>Color Scheme</label>
                 <div className="theme-options-grid">
                   {[
-                    { id: 'studio', label: 'Studio Dark', desc: 'Carbon & Royal Blue / Gold' },
-                    { id: 'titanium', label: 'Titanium Obsidian', desc: 'Warm Charcoal & Champagne' },
-                    { id: 'monokai', label: 'Monokai Pro', desc: 'Espresso & Pastel Accents' },
-                    { id: 'nordic', label: 'Nordic Slate', desc: 'Arctic Slate & Teal' },
+                    { id: 'studio', label: 'Studio Obsidian', desc: 'Deep Carbon & Electric Blue / Gold' },
+                    { id: 'titanium', label: 'Titanium Daybreak', desc: 'High-Contrast Clean Light Mode' },
+                    { id: 'monokai', label: 'Monokai Pro', desc: 'Toasted Espresso & Neon Pastels' },
+                    { id: 'nordic', label: 'Nordic Frost', desc: 'Deep Polar Navy & Arctic Cyan' },
                   ].map((t) => (
                     <button
                       type="button"
@@ -582,6 +586,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               <div className="form-group">
+                <label>Socratic Mentor Model (Interactive AI Tutor)</label>
+                <input
+                  type="text"
+                  value={formData.mentorModel || ''}
+                  onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                  placeholder="Auto (routes to fastest online cluster node or cloud fallback)"
+                />
+                <span className="field-hint">Specify a model e.g. qwen2.5-coder:7b or leave empty for auto-routing across your active cluster</span>
+              </div>
+
+              <div className="form-group">
                 <label>Anthropic API Key (Claude 3.5 Sonnet / Opus)</label>
                 <input
                   type="password"
@@ -610,7 +625,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
                   placeholder="AIzaSy..."
                 />
-                <span className="field-hint">Used for cloud fallback and cross-model audits</span>
+                <span className="field-hint">Standard Google AI Studio API key (AIzaSy...) is sufficient on its own.</span>
+              </div>
+
+              <div className="form-group">
+                <label>Google Gemini Base URL (Optional Gateway / Proxy)</label>
+                <input
+                  type="text"
+                  value={formData.geminiBaseUrl || ''}
+                  onChange={(e) => setFormData({ ...formData, geminiBaseUrl: e.target.value })}
+                  placeholder="https://generativelanguage.googleapis.com (Default)"
+                />
+                <span className="field-hint">Leave empty for official Google API. Only set if using an enterprise AI proxy or Cloudflare gateway.</span>
               </div>
             </div>
           )}

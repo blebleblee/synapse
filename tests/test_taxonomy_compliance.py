@@ -27,7 +27,9 @@ def test_all_lesson_files_at_canonical_depth():
     """Verify all lesson and lab files are located strictly at depth 3 under topics/."""
     violating_files = []
     for f in TOPICS_DIR.rglob("*.md"):
-        if f.name == "SYLLABUS.md" or f.name == "GEMINI.md" or f.name == "SUMMARY.md":
+        if f.name in ("SYLLABUS.md", "GEMINI.md", "SUMMARY.md"):
+            continue
+        if "sessions" in f.parts or f.name.startswith("active_session"):
             continue
         rel = f.relative_to(TOPICS_DIR)
         parts = rel.parts

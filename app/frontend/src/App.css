@@ -4379,6 +4379,22 @@ body, html, #root {
 
 .add-node-row input {
   flex: 1;
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.add-node-row input:focus {
+  border-color: var(--accent-blue);
+}
+
+.add-node-row input::placeholder {
+  color: var(--text-muted);
 }
 
 /* Granular Lesson Mastery & Bottom Navigation Checkmark */

@@ -413,18 +413,21 @@ class OllamaCluster(LLMProvider):
         return provider.generate(prompt, system_instruction=system_instruction)
 
 class GeminiProvider(LLMProvider):
-    def __init__(self, model: str = "gemini-2.5-flash", api_key: Optional[str] = None, project: Optional[str] = None):
+    def __init__(self, model: str = "gemini-2.5-flash", api_key: Optional[str] = None, project: Optional[str] = None, base_url: Optional[str] = None):
         self.model = model
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         self.project = project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        self.base_url = base_url or os.environ.get("GEMINI_BASE_URL")
 
         try:
             from google import genai
+            from google.genai import types
+            http_opts = types.HttpOptions(base_url=self.base_url) if self.base_url else None
             if self.api_key:
-                self.client = genai.Client(api_key=self.api_key)
+                self.client = genai.Client(api_key=self.api_key, http_options=http_opts)
             elif self.project:
                 location = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
-                self.client = genai.Client(vertexai=True, project=self.project, location=location)
+                self.client = genai.Client(vertexai=True, project=self.project, location=location, http_options=http_opts)
             else:
                 self.client = None
         except ImportError:
