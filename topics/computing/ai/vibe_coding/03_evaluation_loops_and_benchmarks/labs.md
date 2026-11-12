@@ -2,262 +2,255 @@
 
 ## Objective & Environment Setup
 
-The objective of this lab is to provide hands-on experience with implementing evaluation loops and benchmarks for AI models. This will involve setting up a Python environment with necessary libraries, implementing a core evaluation pipeline, tuning hyperparameters, benchmarking performance, and handling edge cases. The lab assumes a Python 3.11+ environment with the following packages installed:
+This lab aims to provide hands-on experience in implementing evaluation loops and benchmarks for AI models. You will learn to set up a comprehensive pipeline for evaluating AI models, including hyperparameter tuning, empirical benchmarking, stress testing, and failure mitigation. The lab assumes a Python 3.11+ environment with the following packages installed:
 
 - PyTorch
 - HuggingFace Transformers
 - NumPy
 - Scikit-learn
+- Ollama
 - Polars
 
-To set up the environment, you can use the following commands:
+Install these packages using pip:
 
 ```bash
-pip install torch transformers numpy scikit-learn polars
+pip install torch transformers numpy scikit-learn ollama polars
 ```
 
-Additionally, ensure that you have access to any necessary API keys or configurations for models hosted on platforms like HuggingFace.
+Ensure that you have API access configured for any external services you plan to use, such as HuggingFace's model hub.
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a core evaluation pipeline for a text classification model using a pre-trained BERT model from HuggingFace. The pipeline will include data loading, model inference, and accuracy calculation.
+In this exercise, we implement a core evaluation loop for a text classification model using the HuggingFace Transformers library. The model will be fine-tuned on a sample dataset, and its performance will be evaluated using accuracy metrics.
 
 ### Step-by-Step Implementation
 
-1. **Import Necessary Libraries**
+First, import the required libraries:
 
 ```python
 import torch
-from transformers import BertTokenizer, BertForSequenceClassification
-from sklearn.metrics import accuracy_score
 from torch.utils.data import DataLoader, Dataset
-import numpy as np
-import polars as pl
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from sklearn.metrics import accuracy_score
+from datasets import load_dataset
 ```
 
-2. **Define a Custom Dataset Class**
+Load and preprocess the dataset:
+
+```python
+# Load a sample dataset
+dataset = load_dataset('imdb')
+
+# Initialize tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+# Tokenize the dataset
+def tokenize_function(examples):
+    return tokenizer(examples['text'], padding='max_length', truncation=True)
+
+tokenized_datasets = dataset.map(tokenize_function, batched=True)
+tokenized_datasets = tokenized_datasets.remove_columns(['text'])
+tokenized_datasets = tokenized_datasets.rename_column('label', 'labels')
+tokenized_datasets.set_format('torch')
+```
+
+Define a custom dataset class:
 
 ```python
 class TextClassificationDataset(Dataset):
-    def __init__(self, dataframe, tokenizer, max_length):
-        self.dataframe = dataframe
-        self.tokenizer = tokenizer
-        self.max_length = max_length
+    def __init__(self, dataset):
+        self.dataset = dataset
 
     def __len__(self):
-        return len(self.dataframe)
+        return len(self.dataset)
 
     def __getitem__(self, idx):
-        text = self.dataframe['text'][idx]
-        label = self.dataframe['label'][idx]
-        encoding = self.tokenizer.encode_plus(
-            text,
-            add_special_tokens=True,
-            max_length=self.max_length,
-            return_token_type_ids=False,
-            padding='max_length',
-            return_attention_mask=True,
-            return_tensors='pt',
-        )
-        return {
-            'text': text,
-            'input_ids': encoding['input_ids'].flatten(),
-            'attention_mask': encoding['attention_mask'].flatten(),
-            'labels': torch.tensor(label, dtype=torch.long)
-        }
+        return {key: torch.tensor(val[idx]) for key, val in self.dataset[idx].items()}
 ```
 
-3. **Load Data and Create DataLoader**
+Initialize the model and data loaders:
 
 ```python
-# Sample data using Polars
-data = pl.DataFrame({
-    'text': ["I love programming", "Python is great", "I dislike bugs", "Debugging is fun"],
-    'label': [1, 1, 0, 1]  # 1 for positive, 0 for negative
-})
-
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-dataset = TextClassificationDataset(dataframe=data, tokenizer=tokenizer, max_length=128)
-dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
-```
-
-4. **Load Pre-trained BERT Model**
-
-```python
+# Initialize model
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
-model.eval()
+
+# Create DataLoaders
+train_dataset = TextClassificationDataset(tokenized_datasets['train'])
+eval_dataset = TextClassificationDataset(tokenized_datasets['test'])
+
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
 ```
 
-5. **Define Evaluation Loop**
+Define evaluation metrics:
 
 ```python
-def evaluate_model(model, dataloader, device):
-    model.to(device)
-    model.eval()
-    predictions, true_labels = [], []
-
-    with torch.no_grad():
-        for batch in dataloader:
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            labels = batch['labels'].to(device)
-
-            outputs = model(input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            logits = logits.detach().cpu().numpy()
-            label_ids = labels.to('cpu').numpy()
-
-            predictions.extend(np.argmax(logits, axis=1).flatten())
-            true_labels.extend(label_ids)
-
-    return accuracy_score(true_labels, predictions)
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = torch.argmax(logits, dim=-1)
+    return {'accuracy': accuracy_score(labels, predictions)}
 ```
 
-6. **Execute Evaluation Loop**
+Set up training arguments and the Trainer:
 
 ```python
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-accuracy = evaluate_model(model, dataloader, device)
-print(f'Accuracy: {accuracy}')
+training_args = TrainingArguments(
+    output_dir='./results',
+    evaluation_strategy='epoch',
+    learning_rate=2e-5,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    num_train_epochs=3,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    logging_steps=10,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics,
+)
+```
+
+Train and evaluate the model:
+
+```python
+# Train the model
+trainer.train()
+
+# Evaluate the model
+eval_results = trainer.evaluate()
+print(eval_results)
 ```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will perform hyperparameter tuning and benchmark the model's performance in terms of accuracy and latency.
+In this exercise, we perform hyperparameter tuning and empirical benchmarking to measure the model's accuracy, latency, and convergence curves.
 
 ### Hyperparameter Tuning
 
-We will use a simple grid search to tune the `max_length` parameter of the tokenizer.
+We use the `Trainer` class's built-in hyperparameter tuning capabilities with Optuna.
 
-```python
-from sklearn.model_selection import ParameterGrid
+Install Optuna:
 
-param_grid = {
-    'max_length': [128, 256, 512]
-}
-
-best_accuracy = 0
-best_params = {}
-
-for params in ParameterGrid(param_grid):
-    dataset = TextClassificationDataset(dataframe=data, tokenizer=tokenizer, max_length=params['max_length'])
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
-    accuracy = evaluate_model(model, dataloader, device)
-    print(f'Params: {params}, Accuracy: {accuracy}')
-    
-    if accuracy > best_accuracy:
-        best_accuracy = accuracy
-        best_params = params
-
-print(f'Best Params: {best_params}, Best Accuracy: {best_accuracy}')
+```bash
+pip install optuna
 ```
 
-### Benchmarking Performance
+Define the hyperparameter search space:
 
-We will measure the latency of the model inference.
+```python
+import optuna
+from transformers import TrainingArguments
+
+def objective(trial):
+    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 5e-5)
+    per_device_train_batch_size = trial.suggest_categorical('per_device_train_batch_size', [8, 16, 32])
+    num_train_epochs = trial.suggest_int('num_train_epochs', 2, 4)
+
+    training_args = TrainingArguments(
+        output_dir='./results',
+        evaluation_strategy='epoch',
+        learning_rate=learning_rate,
+        per_device_train_batch_size=per_device_train_batch_size,
+        per_device_eval_batch_size=per_device_train_batch_size,
+        num_train_epochs=num_train_epochs,
+        weight_decay=0.01,
+        logging_dir='./logs',
+        logging_steps=10,
+    )
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        compute_metrics=compute_metrics,
+    )
+
+    trainer.train()
+    eval_results = trainer.evaluate()
+    return eval_results['eval_accuracy']
+```
+
+Run the hyperparameter search:
+
+```python
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=5)
+
+print("Best trial:")
+trial = study.best_trial
+
+print(f"  Value: {trial.value}")
+print("  Params: ")
+for key, value in trial.params.items():
+    print(f"    {key}: {value}")
+```
+
+### Empirical Benchmarking
+
+We measure the model's latency and convergence curves.
+
+Measure inference latency:
 
 ```python
 import time
 
-def benchmark_model(model, dataloader, device, num_samples=100):
-    model.to(device)
-    model.eval()
-    latencies = []
+# Measure inference latency
+model.eval()
+with torch.no_grad():
+    start_time = time.time()
+    for batch in eval_loader:
+        outputs = model(**batch)
+    end_time = time.time()
 
-    with torch.no_grad():
-        for _ in range(num_samples):
-            batch = next(iter(dataloader))
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
+latency = (end_time - start_time) / len(eval_loader)
+print(f"Inference latency: {latency} seconds per batch")
+```
 
-            start_time = time.time()
-            _ = model(input_ids, attention_mask=attention_mask)
-            end_time = time.time()
+Plot convergence curves:
 
-            latencies.append(end_time - start_time)
+```python
+import matplotlib.pyplot as plt
 
-    return np.mean(latencies), np.std(latencies)
+# Plot training and evaluation loss
+training_loss = trainer.state.log_history[::2]
+eval_loss = trainer.state.log_history[1::2]
 
-mean_latency, std_latency = benchmark_model(model, dataloader, device)
-print(f'Mean Latency: {mean_latency}, Std Latency: {std_latency}')
+plt.figure(figsize=(10, 5))
+plt.plot([entry['loss'] for entry in training_loss], label='Training Loss')
+plt.plot([entry['eval_loss'] for entry in eval_loss], label='Evaluation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Convergence Curves')
+plt.show()
 ```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the model on edge cases and implement guardrails to handle potential failures.
+In this exercise, we test the model under stress conditions, handle edge cases, and implement guardrails to mitigate failures.
 
 ### Stress Testing
 
-We will test the model with very long and very short texts.
+Simulate high load:
 
 ```python
-# Test with very long text
-long_text = " ".join(["This is a very long sentence"] * 100)
-long_data = pl.DataFrame({
-    'text': [long_text],
-    'label': [1]
-})
-long_dataset = TextClassificationDataset(dataframe=long_data, tokenizer=tokenizer, max_length=512)
-long_dataloader = DataLoader(long_dataset, batch_size=1, shuffle=False)
-long_accuracy = evaluate_model(model, long_dataloader, device)
-print(f'Long Text Accuracy: {long_accuracy}')
+import threading
 
-# Test with very short text
-short_text = "Hi"
-short_data = pl.DataFrame({
-    'text': [short_text],
-    'label': [1]
-})
-short_dataset = TextClassificationDataset(dataframe=short_data, tokenizer=tokenizer, max_length=512)
-short_dataloader = DataLoader(short_dataset, batch_size=1, shuffle=False)
-short_accuracy = evaluate_model(model, short_dataloader, device)
-print(f'Short Text Accuracy: {short_accuracy}')
-```
-
-### Implementing Guardrails
-
-We will add error handling to manage potential issues during inference.
-
-```python
-def safe_evaluate_model(model, dataloader, device):
-    model.to(device)
-    model.eval()
-    predictions, true_labels = [], []
-
+def simulate_load():
     with torch.no_grad():
-        for batch in dataloader:
-            try:
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                labels = batch['labels'].to(device)
+        for _ in range(100):
+            for batch in eval_loader:
+                outputs = model(**batch)
 
-                outputs = model(input_ids, attention_mask=attention_mask)
-                logits = outputs.logits
-                logits = logits.detach().cpu().numpy()
-                label_ids = labels.to('cpu').numpy()
+threads = [threading.Thread(target=simulate_load) for _ in range(10)]
 
-                predictions.extend(np.argmax(logits, axis=1).flatten())
-                true_labels.extend(label_ids)
-            except Exception as e:
-                print(f'Error processing batch: {e}')
-                continue
-
-    return accuracy_score(true_labels, predictions)
-
-safe_accuracy = safe_evaluate_model(model, dataloader, device)
-print(f'Safe Accuracy: {safe_accuracy}')
+start_time = time.time()
+for thread in threads:
+    thread.start()
 ```
-
-## Verification Checklist & Quick Reference Cheat Sheet
-
-| Method/Parameter | Description |
-|------------------|-------------|
-| `evaluate_model` | Evaluates the model on a given dataloader and returns accuracy. |
-| `ParameterGrid`  | Used for hyperparameter tuning with grid search. |
-| `benchmark_model`| Measures the mean and standard deviation of model inference latency. |
-| `safe_evaluate_model` | Evaluates the model with error handling to manage potential issues. |
-| `max_length`     | Hyperparameter for the maximum length of tokenized input. |
-| `batch_size`     | Number of samples per batch in the dataloader. |
-| `device`         | Specifies the device (CPU or GPU) for model execution. |
-
-This lab provides a comprehensive hands-on experience with implementing evaluation loops, hyperparameter tuning, benchmarking, and handling edge cases in AI model evaluation.
