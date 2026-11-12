@@ -33,6 +33,8 @@ from typing import Dict, List, Optional, Any
 ANSI_ESCAPE_RE = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 class TerminalRingBuffer:
+    MAX_LINE_LENGTH: int = 10_000
+
     def __init__(self, max_lines: int = 150):
         self.buffer: deque[str] = deque(maxlen=max_lines)
         self._lock = threading.Lock()
@@ -45,6 +47,8 @@ class TerminalRingBuffer:
                 for line in clean.splitlines():
                     stripped = line.strip()
                     if stripped:
+                        if len(stripped) > self.MAX_LINE_LENGTH:
+                            stripped = stripped[:self.MAX_LINE_LENGTH] + "... [TRUNCATED]"
                         self.buffer.append(stripped)
             except Exception as e:
                 # Log error silently to avoid breaking PTY flow

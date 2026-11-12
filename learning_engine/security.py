@@ -16,6 +16,8 @@ def sanitize_query(query: str) -> str:
     """Validate and sanitize API query strings."""
     if not query:
         raise ValueError("Empty query")
+    if len(query) > 256:
+        raise ValueError("Query too long (max 256 characters)")
     if ".." in query or query.startswith("/"):
         raise ValueError("Path traversal detected")
     if not re.match(r'^[a-zA-Z0-9_/.-]+$', query):

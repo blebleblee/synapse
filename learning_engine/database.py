@@ -1,19 +1,33 @@
 import sqlite3
 from pathlib import Path
 from typing import Optional
+from contextlib import contextmanager
 
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "synapse.db"
 
-def get_connection():
+def get_connection() -> sqlite3.Connection:
     CONFIG_DIR = DB_PATH.parent
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     return conn
 
-def init_db():
+@contextmanager
+def get_db_connection():
     conn = get_connection()
-    with conn:
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def init_db():
+    with get_db_connection() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS mastery (
                 path TEXT PRIMARY KEY,
@@ -28,6 +42,5 @@ def init_db():
                 value TEXT NOT NULL
             )
         """)
-    conn.close()
 
 init_db()
