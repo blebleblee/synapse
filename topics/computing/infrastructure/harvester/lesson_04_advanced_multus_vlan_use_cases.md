@@ -25,12 +25,12 @@ The `multus` daemon utilizes a data structure known as the `VLAN Map`, which is 
 Here is a simplified representation of the `VLAN Map` data structure using Mermaid diagrams:
 ```mermaid
 graph LR
-    subgraph VLAN Map
-        VLAN ID -->|Hash Table|--> Network Interface
+    subgraph "VLAN Map"
+        VLAN ID -->|\"Hash Table\"| Network Interface
     end
-    subgraph multus Daemon
-        Network Interface -->|Bridge|--> Host Network Stack
-        Network Interface -->|Bridge|--> Container Network Namespace
+    subgraph "multus Daemon"
+        Network Interface -->|\"Bridge\"| Host Network Stack
+        Network Interface -->|\"Bridge\"| Container Network Namespace
     end
 ```
 This diagram illustrates the core mechanics of the `multus` daemon, which establishes a bridge between the host's network stack and the container's network namespace.

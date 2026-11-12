@@ -37,10 +37,10 @@ The self-model in AlphaGo is represented as a **graph neural network** (GNN), wh
 Here's a simplified representation of the AlphaGo architecture using Mermaid diagrams:
 ```mermaid
 graph LR
-    A[Policy Network] -->|input|> B[Value Network]
-    B -->|output|> C[Self-Model (GNN)]
-    C -->|input|> D[Policy Network]
-    D -->|output|> E[Move Generation]
+    A[Policy Network] -->|\"input\"| B[Value Network]
+    B -->|\"output\"| C[\"Self-Model (GNN)\"]
+    C -->|\"input\"| D[Policy Network]
+    D -->|\"output\"| E[Move Generation]
 ```
 The self-model in AlphaGo serves as a foundation for introspection, enabling the system to reason about its own behavior and adapt to changing circumstances.
 

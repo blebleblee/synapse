@@ -17,7 +17,7 @@ Let's take a closer look at the internal data structures and algorithms used in 
 ```mermaid
 graph LR
     A[Input Signal] --> B[Encoder]
-    B --> C[Recurrent Neural Network (RNN)]
+    B --> C[\"Recurrent Neural Network (RNN)\"]
     C --> D[Decoder]
     D --> E[Output Signal]
 ```

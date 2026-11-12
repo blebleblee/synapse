@@ -27,12 +27,12 @@ The mechanics of finger independence can be understood through the lens of biome
 To illustrate the architecture and mechanics of finger independence, we can use a simple diagram to represent the motor control system. The diagram below shows the key components of the motor control system, including the motor cortex, spinal cord, muscles, tendons, ligaments, and bones.
 
 ```mermaid
-graph TD;
-    MotorCortex -->| "Signals" | SpinalCord;
-    SpinalCord -->| "Signals" | Muscles;
-    Muscles -->| "Control" | Tendons;
-    Tendons -->| "Attach" | Ligaments;
-    Ligaments -->| "Support" | Bones;
+graph TD
+    MotorCortex -->| "Signals" | SpinalCord
+    SpinalCord -->| "Signals" | Muscles
+    Muscles -->| "Control" | Tendons
+    Tendons -->| "Attach" | Ligaments
+    Ligaments -->| "Support" | Bones
 ```
 
 This diagram highlights the hierarchical structure of the motor control system, from the high-level commands of the motor cortex to the precise movements of the fingers. Understanding this system is crucial for developing finger independence and achieving the nuanced control required for advanced piano performance.

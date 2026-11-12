@@ -27,11 +27,11 @@ The adaptation strategy in this example could be implemented using a rule that m
 To visualize the core architecture of a reflection mechanism, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Performance Monitor] --> B[Learning Algorithm];
-    B --> C[Adaptation Strategy];
-    C --> D[Agent];
-    D --> A;
+graph TD
+    A[Performance Monitor] --> B[Learning Algorithm]
+    B --> C[Adaptation Strategy]
+    C --> D[Agent]
+    D --> A
 ```
 
 In this diagram, the performance monitor evaluates the agent's performance based on a predefined performance metric. The learning algorithm updates the agent's behavior based on the feedback received from the performance monitor. The adaptation strategy modifies the agent's behavior in response to new information or changes in the environment. The agent then uses its updated behavior to perform tasks, and the cycle repeats.

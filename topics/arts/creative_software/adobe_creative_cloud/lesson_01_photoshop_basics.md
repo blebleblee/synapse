@@ -17,11 +17,11 @@ The architecture of Photoshop is built around the concept of layers, which are o
 At a more detailed level, the mechanics of layer blending in Photoshop can be described using the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Layer 1 (Top Layer)" | B;
-    B -->| "Layer 2" | C;
-    C -->| "Layer 3" | D;
-    D -->| "Background" | E;
+graph TD
+    A -->| "Layer 1 (Top Layer)" | B
+    B -->| "Layer 2" | C
+    C -->| "Layer 3" | D
+    D -->| "Background" | E
 ```
 
 In this diagram, each layer is represented as a node in a stack, with the top layer being the most visible. The blending process starts from the top layer and proceeds downwards, with each layer being blended with the result of the previous blending operation. The blending mode of each layer determines how its pixels are combined with the pixels of the underlying layers. Common blending modes include Normal, Multiply, Screen, Overlay, and Soft Light, each of which applies a specific mathematical function to the pixel values.
@@ -31,23 +31,23 @@ Masks in Photoshop are implemented as additional channels that are associated wi
 The following diagram illustrates the internal data structures and algorithms involved in layer blending and masking:
 
 ```mermaid
-graph TD;
-    A1 -->| "Layer 1 Pixels" | B1;
-    A2 -->| "Layer 1 Mask" | B2;
-    B1 -->| "Blended Result" | C1;
-    B2 -->| "Blended Result" | C1;
-    A3 -->| "Layer 2 Pixels" | B3;
-    A4 -->| "Layer 2 Mask" | B4;
-    B3 -->| "Blended Result" | C2;
-    B4 -->| "Blended Result" | C2;
-    A5 -->| "Layer 3 Pixels" | B5;
-    A6 -->| "Layer 3 Mask" | B6;
-    B5 -->| "Blended Result" | C3;
-    B6 -->| "Blended Result" | C3;
-    A7 -->| "Background" | B7;
-    A8 -->| "Background Mask" | B8;
-    B7 -->| "Blended Result" | C4;
-    B8 -->| "Blended Result" | C4;
+graph TD
+    A1 -->| "Layer 1 Pixels" | B1
+    A2 -->| "Layer 1 Mask" | B2
+    B1 -->| "Blended Result" | C1
+    B2 -->| "Blended Result" | C1
+    A3 -->| "Layer 2 Pixels" | B3
+    A4 -->| "Layer 2 Mask" | B4
+    B3 -->| "Blended Result" | C2
+    B4 -->| "Blended Result" | C2
+    A5 -->| "Layer 3 Pixels" | B5
+    A6 -->| "Layer 3 Mask" | B6
+    B5 -->| "Blended Result" | C3
+    B6 -->| "Blended Result" | C3
+    A7 -->| "Background" | B7
+    A8 -->| "Background Mask" | B8
+    B7 -->| "Blended Result" | C4
+    B8 -->| "Blended Result" | C4
 ```
 
 In this diagram, each layer is represented by its pixel data and mask, and the blending process is shown as a series of operations that combine the layer pixels with the mask values to produce the final blended result. The blending modes and mask operations are applied in sequence, starting from the top layer and proceeding downwards.

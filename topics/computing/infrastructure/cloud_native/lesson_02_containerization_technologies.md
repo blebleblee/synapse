@@ -31,14 +31,14 @@ The container process is executed by the runc container executor, which is respo
 The following Mermaid diagram illustrates the core architecture of the Docker runtime:
 
 ```mermaid
-graph TD;
-    A[Docker Daemon] --> B[Containerd Runtime];
-    B --> C[runc Container Executor];
-    B --> D[Container Image];
-    D --> E[Container Registry];
-    C --> F[Container Process];
-    F --> G[Container Namespace];
-    F --> H[Container Cgroup];
+graph TD
+    A[Docker Daemon] --> B[Containerd Runtime]
+    B --> C[runc Container Executor]
+    B --> D[Container Image]
+    D --> E[Container Registry]
+    C --> F[Container Process]
+    F --> G[Container Namespace]
+    F --> H[Container Cgroup]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

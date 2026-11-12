@@ -29,22 +29,22 @@ Writing a file to a file system involves a similar process, but in reverse. The 
 To illustrate the internal data structures and algorithms of a file system, consider the following simplified diagram of an ext4 file system:
 
 ```mermaid
-graph TD;
-    A[Superblock] --> B[Inode Table];
-    A --> C[Free Block Bitmap];
-    B --> D[Inode 1];
-    B --> E[Inode 2];
-    B --> F[Inode 3];
-    D --> G[Data Block 1];
-    D --> H[Data Block 2];
-    E --> I[Data Block 3];
-    F --> J[Data Block 4];
-    F --> K[Data Block 5];
-    G --> L[File Data];
-    H --> M[File Data];
-    I --> N[File Data];
-    J --> O[File Data];
-    K --> P[File Data];
+graph TD
+    A[Superblock] --> B[Inode Table]
+    A --> C[Free Block Bitmap]
+    B --> D[Inode 1]
+    B --> E[Inode 2]
+    B --> F[Inode 3]
+    D --> G[Data Block 1]
+    D --> H[Data Block 2]
+    E --> I[Data Block 3]
+    F --> J[Data Block 4]
+    F --> K[Data Block 5]
+    G --> L[File Data]
+    H --> M[File Data]
+    I --> N[File Data]
+    J --> O[File Data]
+    K --> P[File Data]
 ```
 
 In this diagram, the superblock contains metadata about the file system, including pointers to the inode table and the free block bitmap. The inode table contains inodes for individual files and directories, with each inode containing pointers to the data blocks that store the file's contents. The free block bitmap keeps track of which data blocks are available for use, allowing the file system to allocate and deallocate blocks dynamically.

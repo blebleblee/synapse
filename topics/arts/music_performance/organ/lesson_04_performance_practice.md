@@ -14,11 +14,11 @@ The organ's mechanical action, a marvel of engineering, is based on a system of 
 
 Here is a simplified diagram of the organ's mechanical action:
 ```mermaid
-graph LR;
-    A["Keyboard"] -->| "Levers" | B;
-    B -->| "Pedals" | C;
-    C -->| "Drawknobs" | D;
-    D -->| "Pipes" | E;
+graph LR
+    A["Keyboard"] -->| "Levers" | B
+    B -->| "Pedals" | C
+    C -->| "Drawknobs" | D
+    D -->| "Pipes" | E
 ```
 This diagram illustrates the flow of mechanical energy from the keyboard to the pipes, highlighting the key components of the organ's mechanical action.
 

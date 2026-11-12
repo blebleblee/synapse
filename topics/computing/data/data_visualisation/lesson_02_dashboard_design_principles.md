@@ -23,13 +23,13 @@ The visualization components of a dashboard are the building blocks that bring t
 To illustrate the architecture of a dashboard, consider the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Data Sources] --> B[Data Transformation];
-    B --> C[Visualization Components];
-    C --> D[Dashboard];
-    D --> E[User Interaction];
-    E --> F[Feedback Loop];
-    F --> A;
+graph TD
+    A[Data Sources] --> B[Data Transformation]
+    B --> C[Visualization Components]
+    C --> D[Dashboard]
+    D --> E[User Interaction]
+    E --> F[Feedback Loop]
+    F --> A
 ```
 
 In this diagram, the data sources are the starting point, providing the raw data that will be visualized. The data transformation step involves cleaning, aggregating, and filtering the data to prepare it for visualization. The visualization components are then used to create the individual visualizations that make up the dashboard. The dashboard itself is the composite of these visualizations, and it is through the dashboard that the user interacts with the data. Finally, the feedback loop allows the user's interactions to influence the data transformation and visualization processes, enabling a dynamic and interactive experience.

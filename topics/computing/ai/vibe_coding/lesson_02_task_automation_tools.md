@@ -21,17 +21,17 @@ The reconciliation loop in Kubernetes is implemented using a combination of data
 To illustrate the architecture of the reconciliation loop, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A["Desired State<br>(etcd store)"] -->| "API Server" | B["Kubernetes API Server"];
-    B -->| "Controllers" | C["Deployment Controller"];
-    B -->| "Controllers" | D["Replica Set Controller"];
-    B -->| "Controllers" | E["Pod Controller"];
-    C -->| "Kubelet" | F["Kubelet on Node 1"];
-    D -->| "Kubelet" | G["Kubelet on Node 2"];
-    E -->| "Kubelet" | H["Kubelet on Node 3"];
-    F -->| "Node" | I["Node 1"];
-    G -->| "Node" | J["Node 2"];
-    H -->| "Node" | K["Node 3"];
+graph TD
+    A["Desired State<br>(etcd store)"] -->| "API Server" | B["Kubernetes API Server"]
+    B -->| "Controllers" | C["Deployment Controller"]
+    B -->| "Controllers" | D["Replica Set Controller"]
+    B -->| "Controllers" | E["Pod Controller"]
+    C -->| "Kubelet" | F["Kubelet on Node 1"]
+    D -->| "Kubelet" | G["Kubelet on Node 2"]
+    E -->| "Kubelet" | H["Kubelet on Node 3"]
+    F -->| "Node" | I["Node 1"]
+    G -->| "Node" | J["Node 2"]
+    H -->| "Node" | K["Node 3"]
 ```
 
 In this diagram, the desired state is stored in the etcd store, and the Kubernetes API server provides a RESTful interface for interacting with the etcd store. The controllers use the Kubernetes API server to read the desired state from etcd and compare it with the current state of the system. The current state is obtained through the Kubernetes API server, which interacts with the kubelet on each node to obtain the state of the pods running on the node.

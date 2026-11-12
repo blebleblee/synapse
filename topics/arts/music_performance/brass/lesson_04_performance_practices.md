@@ -15,11 +15,11 @@ In brass performance, dynamics play a crucial role in shaping the musical narrat
 The internal workings of the brass instrument can be thought of as a complex system, comprising several key components: the mouthpiece, the leadpipe, the valves (in the case of brass instruments with valves), and the bell. The mouthpiece serves as the interface between the player's embouchure and the instrument, while the leadpipe and valves transmit the airflow and pressure to the instrument's tubing.
 
 ```mermaid
-graph LR;
-    A["Mouthpiece"] --> B["Leadpipe"];
-    B --> C["Valves"];
-    C --> D["Bell"];
-    D --> E["Tubing"];
+graph LR
+    A["Mouthpiece"] --> B["Leadpipe"]
+    B --> C["Valves"]
+    C --> D["Bell"]
+    D --> E["Tubing"]
 ```
 
 In this diagram, we see the basic architecture of a brass instrument, with the mouthpiece serving as the input and the bell serving as the output. The leadpipe and valves act as a kind of "pipeline" for the airflow and pressure, transmitting the player's embouchure to the instrument's tubing.

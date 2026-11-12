@@ -23,14 +23,14 @@ The integration of these services is facilitated by a set of internal APIs that 
 To illustrate the mechanics of integration within Adobe Creative Cloud, we can use a simple Mermaid diagram to visualize the flow of data between applications and services:
 
 ```mermaid
-graph TD;
-    A["Photoshop"] -->| "Save" | B["Creative Cloud Files"];
-    B -->| "Sync" | C["Creative Cloud Libraries"];
-    C -->| "Reuse" | D["Adobe Illustrator"];
-    D -->| "Save" | B;
-    B -->| "Sync" | E["Adobe XD"];
-    E -->| "Reuse" | F["Adobe After Effects"];
-    F -->| "Save" | B;
+graph TD
+    A["Photoshop"] -->| "Save" | B["Creative Cloud Files"]
+    B -->| "Sync" | C["Creative Cloud Libraries"]
+    C -->| "Reuse" | D["Adobe Illustrator"]
+    D -->| "Save" | B
+    B -->| "Sync" | E["Adobe XD"]
+    E -->| "Reuse" | F["Adobe After Effects"]
+    F -->| "Save" | B
 ```
 
 In this diagram, we can see how data flows between Photoshop, Creative Cloud Files, Creative Cloud Libraries, Adobe Illustrator, Adobe XD, and Adobe After Effects. Each application is connected to the Creative Cloud Files service, which provides a centralized repository for all project files. The Creative Cloud Files service is also connected to the Creative Cloud Libraries service, which provides a centralized repository for reusable assets. This architecture enables seamless data exchange and synchronization between applications, allowing users to work on their projects with minimal friction.

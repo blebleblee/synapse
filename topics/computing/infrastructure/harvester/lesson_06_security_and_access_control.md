@@ -49,14 +49,14 @@ Hashes are used to ensure the integrity of metadata, preventing unauthorized mod
 To illustrate the core architecture and mechanics of Longhorn's security architecture, we can use the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[User/Group] -->|RBAC Role Binding| B[Role];
-    B -->|Permissions| C[Longhorn API];
-    C -->|Data Encryption| D[Encrypted Data];
-    D -->|Checksum Calculation| E[Data Block];
-    E -->|Hash Calculation| F[Metadata];
-    F -->|TLS Encryption| G[Network];
-    G -->|Encrypted Data| H[Storage Node];
+graph TD
+    A[\"User/Group\"] -->|"RBAC Role Binding"| B[Role]
+    B -->|Permissions| C[Longhorn API]
+    C -->|"Data Encryption"| D[Encrypted Data]
+    D -->|"Checksum Calculation"| E[Data Block]
+    E -->|"Hash Calculation"| F[Metadata]
+    F -->|"TLS Encryption"| G[Network]
+    G -->|"Encrypted Data"| H[Storage Node]
 ```
 
 In this diagram, we can see how the security architecture of Longhorn is implemented. Users and groups are assigned roles and permissions using RBAC role bindings, which determine the permissions granted to users and groups. The Longhorn API is used to manage storage resources, and data is encrypted using AES-256 encryption before it is written to storage. Checksums are calculated for each data block to verify its integrity, and hashes are calculated for metadata to ensure its integrity. Data is transmitted over the network using TLS encryption, ensuring that it is protected from eavesdropping and man-in-the-middle attacks. Finally, encrypted data is written to storage nodes, where it is stored securely.

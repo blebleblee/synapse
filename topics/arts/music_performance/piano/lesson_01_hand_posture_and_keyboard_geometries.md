@@ -21,16 +21,16 @@ The geometry of the keyboard is also closely tied to the acoustic properties of 
 To illustrate the core architecture of the piano keyboard, consider the following simplified diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Key Press" | B;
-    B -->| "Hammer Strikes String" | C;
-    C -->| "Damper Lifts" | D;
-    D -->| "String Vibrates" | E;
-    E -->| "Sound Produced" | F;
-    F -->| "Key Release" | G;
-    G -->| "Damper Returns" | H;
-    H -->| "Vibration Damped" | I;
-    I -->| "Sound Stops" | J;
+graph TD
+    A -->| "Key Press" | B
+    B -->| "Hammer Strikes String" | C
+    C -->| "Damper Lifts" | D
+    D -->| "String Vibrates" | E
+    E -->| "Sound Produced" | F
+    F -->| "Key Release" | G
+    G -->| "Damper Returns" | H
+    H -->| "Vibration Damped" | I
+    I -->| "Sound Stops" | J
 ```
 
 In this diagram, each key press initiates a sequence of events involving the hammer, string, and damper, culminating in sound production and cessation.

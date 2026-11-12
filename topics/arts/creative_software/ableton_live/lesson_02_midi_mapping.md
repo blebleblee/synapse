@@ -17,10 +17,10 @@ The architecture of MIDI mapping in Ableton Live is deeply intertwined with the 
 To illustrate this process, we can use a simplified diagram to represent the core architecture of MIDI mapping in Ableton Live:
 
 ```mermaid
-graph TD;
-    A -->| "MIDI Message" | B;
-    B -->| "Interpretation" | C;
-    C -->| "Action Execution" | D;
+graph TD
+    A -->| "MIDI Message" | B
+    B -->| "Interpretation" | C
+    C -->| "Action Execution" | D
     A["MIDI Controller (e.g., Knob, Pad)"] 
     B["MIDI Input (MIDI In Port)"] 
     C["MIDI Mapping (MIDI Map)"] 

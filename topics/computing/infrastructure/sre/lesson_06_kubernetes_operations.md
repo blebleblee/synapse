@@ -27,29 +27,29 @@ The node components are responsible for running the workloads assigned to them b
 The following diagram illustrates the core architecture of Kubernetes, highlighting the key components and their interactions:
 
 ```mermaid
-graph TD;
-    A[API Server] --> B[etcd];
-    A --> C[Controller Manager];
-    A --> D[Scheduler];
-    C --> E[Node Controller];
-    C --> F[Replication Controller];
-    C --> G[Endpoint Controller];
-    C --> H[Service Controller];
-    D --> I[Node 1];
-    D --> J[Node 2];
-    D --> K[Node 3];
-    I --> L[kubelet];
-    I --> M[kube-proxy];
-    I --> N[Container Runtime];
-    I --> O[Network Plugin];
-    J --> P[kubelet];
-    J --> Q[kube-proxy];
-    J --> R[Container Runtime];
-    J --> S[Network Plugin];
-    K --> T[kubelet];
-    K --> U[kube-proxy];
-    K --> V[Container Runtime];
-    K --> W[Network Plugin];
+graph TD
+    A[API Server] --> B[etcd]
+    A --> C[Controller Manager]
+    A --> D[Scheduler]
+    C --> E[Node Controller]
+    C --> F[Replication Controller]
+    C --> G[Endpoint Controller]
+    C --> H[Service Controller]
+    D --> I[Node 1]
+    D --> J[Node 2]
+    D --> K[Node 3]
+    I --> L[kubelet]
+    I --> M[kube-proxy]
+    I --> N[Container Runtime]
+    I --> O[Network Plugin]
+    J --> P[kubelet]
+    J --> Q[kube-proxy]
+    J --> R[Container Runtime]
+    J --> S[Network Plugin]
+    K --> T[kubelet]
+    K --> U[kube-proxy]
+    K --> V[Container Runtime]
+    K --> W[Network Plugin]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

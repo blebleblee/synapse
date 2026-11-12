@@ -18,16 +18,16 @@ HDFS is a distributed storage system designed for large-scale data processing. A
 
 ```mermaid
 graph LR
-    subgraph Namenode
-        title="Global Namespace"
+    subgraph "Namenode
+        title="Global Namespace""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
-    subgraph Datanode
-        title="Data Blocks"
+    subgraph "Datanode
+        title="Data Blocks""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
     Namenode -->|Metadata| Datanode
-    Datanode -->|Data Blocks| Namenode
+    Datanode -->|"Data Blocks"| Namenode
 ```
 
 HDFS uses a simple replication strategy, where each data block is replicated across multiple DataNodes. This ensures data availability and fault tolerance.
@@ -38,12 +38,12 @@ Cassandra is a NoSQL database designed for high availability and scalability. It
 
 ```mermaid
 graph LR
-    subgraph Node
-        title="Distributed Hash Table"
+    subgraph "Node
+        title="Distributed Hash Table""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
-    subgraph Token
-        title="Token Range"
+    subgraph "Token
+        title="Token Range""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
     Node -->|Token| Token
@@ -58,16 +58,16 @@ Amazon S3 is a cloud-based object storage solution designed for high scalability
 
 ```mermaid
 graph LR
-    subgraph Bucket
-        title="Object Storage"
+    subgraph "Bucket
+        title="Object Storage""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
-    subgraph Object
-        title="Object Key"
+    subgraph "Object
+        title="Object Key""
         style title fill:#f9f,stroke:#333,stroke-width:2px
     end
-    Bucket -->|Object Key| Object
-    Object -->|Object Data| Bucket
+    Bucket -->|"Object Key"| Object
+    Object -->|"Object Data"| Bucket
 ```
 
 S3 uses a simple replication strategy, where each object is replicated across multiple Availability Zones (AZs). This ensures data availability and fault tolerance.

@@ -25,10 +25,10 @@ Another important architecture is the recurrent neural network (RNN), which is d
 To illustrate the architecture of a simple neural network, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input Layer] --> B[Hidden Layer 1];
-    B --> C[Hidden Layer 2];
-    C --> D[Output Layer];
+graph TD
+    A[Input Layer] --> B[Hidden Layer 1]
+    B --> C[Hidden Layer 2]
+    C --> D[Output Layer]
 ```
 
 In this diagram, the input layer receives the raw data, which is then processed by two hidden layers before producing the final output. Each layer consists of a set of neurons that perform computations on the input data and pass the results to the next layer.
@@ -38,12 +38,12 @@ The training process of a neural network involves optimizing the model parameter
 The training process can be visualized as follows:
 
 ```mermaid
-graph TD;
-    A[Training Data] --> B[Forward Pass];
-    B --> C[Loss Calculation];
-    C --> D[Backward Pass];
-    D --> E[Parameter Update];
-    E --> F[Repeat until Convergence];
+graph TD
+    A[Training Data] --> B[Forward Pass]
+    B --> C[Loss Calculation]
+    C --> D[Backward Pass]
+    D --> E[Parameter Update]
+    E --> F[Repeat until Convergence]
 ```
 
 In this diagram, the training data is fed into the model, and the forward pass computes the predicted output. The loss calculation measures the error between the predicted output and the true output, and the backward pass computes the gradients of the loss with respect to the model parameters. The parameter update step adjusts the parameters in the direction that reduces the error, and the process is repeated until the model converges to a minimum error.

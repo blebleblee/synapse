@@ -37,17 +37,17 @@ The Logging and Monitoring Service is responsible for collecting and analyzing l
 To illustrate the architecture of the Anthropic API, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Client Application] --> B[API Gateway];
-    B --> C[Request Router];
-    C --> D[Model Service];
-    C --> E[Authentication and Authorization Service];
-    C --> F[Data Management Service];
-    C --> G[Logging and Monitoring Service];
-    D --> H[Model Instances];
-    E --> I[User Database];
-    F --> J[Data Storage];
-    G --> K[Log Storage];
+graph TD
+    A[Client Application] --> B[API Gateway]
+    B --> C[Request Router]
+    C --> D[Model Service]
+    C --> E[Authentication and Authorization Service]
+    C --> F[Data Management Service]
+    C --> G[Logging and Monitoring Service]
+    D --> H[Model Instances]
+    E --> I[User Database]
+    F --> J[Data Storage]
+    G --> K[Log Storage]
 ```
 
 In this diagram, the Client Application sends requests to the API Gateway, which routes them to the Request Router. The Request Router then forwards the requests to the appropriate services, including the Model Service, Authentication and Authorization Service, Data Management Service, and Logging and Monitoring Service. The Model Service processes the requests using the underlying NLP models, while the other services handle authentication, data management, and logging.

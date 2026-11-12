@@ -79,11 +79,11 @@ graph LR
         SC[Stats Collector]
     end
 
-    CP -->|Periodic Sync| Disk[(Disk Storage)]
-    BW -->|Proactive Clean| Disk
-    WW -->|fsync WAL| WAL[(WAL Logs)]
-    AL -->|Spawns Workers| AVW[Autovacuum Workers]
-    AVW -->|Freezes & Vacuums| Disk
+    CP -->|"Periodic Sync"| Disk[\"(Disk Storage)\"]
+    BW -->|"Proactive Clean"| Disk
+    WW -->|"fsync WAL"| WAL[\"(WAL Logs)\"]
+    AL -->|"Spawns Workers"| AVW[Autovacuum Workers]
+    AVW -->|"Freezes & Vacuums"| Disk
 ```
 
 ### 3.1. The Checkpointer Process

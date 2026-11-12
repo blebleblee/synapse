@@ -15,16 +15,16 @@ Let's dive into the core architecture of service meshes, focusing on Istio and L
 [Istio Architecture Diagram]
 ```mermaid
 graph LR
-    subgraph Control Plane
+    subgraph "Control Plane"
         Pilot[Service Registry]
         Citadel[Security]
         Galley[Policy]
     end
-    subgraph Data Plane
+    subgraph "Data Plane"
         Envoy[Sidecar Proxy]
     end
-    subgraph Application
-        Service A
+    subgraph "Application
+        Service A"
         Service B
     end
     Pilot --> Envoy
@@ -39,16 +39,16 @@ In Istio, the control plane consists of the Pilot, Citadel, and Galley component
 [Linkerd Architecture Diagram]
 ```mermaid
 graph LR
-    subgraph Control Plane
+    subgraph "Control Plane"
         Linkerd[Service Registry]
         Linkerd[Security]
         Linkerd[Policy]
     end
-    subgraph Data Plane
+    subgraph "Data Plane"
         Linkerd[Sidecar Proxy]
     end
-    subgraph Application
-        Service A
+    subgraph "Application
+        Service A"
         Service B
     end
     Linkerd --> Linkerd

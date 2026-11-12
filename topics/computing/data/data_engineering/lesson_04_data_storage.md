@@ -18,16 +18,16 @@ To gain a deeper understanding of the internal workings of data storage solution
 
 ```mermaid
 graph LR
-    subgraph Storage Layer
+    subgraph "Storage Layer"
         Storage Engine[Storage Engine]
         Buffer Cache[Buffer Cache]
     end
-    subgraph Query Layer
+    subgraph "Query Layer"
         Query Optimizer[Query Optimizer]
         Query Executor[Query Executor]
     end
-    Storage Engine -->| Disk I/O |> Buffer Cache
-    Query Optimizer -->| Query Plan |> Query Executor
+    Storage Engine -->|\"Disk I/O\"| Buffer Cache
+    Query Optimizer -->|\"Query Plan\"| Query Executor
 ```
 
 In a relational database, the storage layer is responsible for managing the physical storage of data on disk. The storage engine is responsible for reading and writing data to disk, and the buffer cache is a cache of recently accessed data. The query layer is responsible for executing SQL queries, and the query optimizer is responsible for generating an optimal query plan.
@@ -36,16 +36,16 @@ In a relational database, the storage layer is responsible for managing the phys
 
 ```mermaid
 graph LR
-    subgraph Storage Layer
+    subgraph "Storage Layer"
         Storage Engine[Storage Engine]
         In-Memory Data[In-Memory Data]
     end
-    subgraph Query Layer
+    subgraph "Query Layer"
         Query Engine[Query Engine]
         Indexing Engine[Indexing Engine]
     end
-    Storage Engine -->| Disk I/O |> In-Memory Data
-    Query Engine -->| Query Execution |> Indexing Engine
+    Storage Engine -->|\"Disk I/O\"| In-Memory Data
+    Query Engine -->|\"Query Execution\"| Indexing Engine
 ```
 
 In a NoSQL database, the storage layer is responsible for managing the physical storage of data on disk, and the in-memory data is a cache of recently accessed data. The query layer is responsible for executing queries, and the query engine is responsible for executing queries against the in-memory data. The indexing engine is responsible for maintaining indexes on the data.

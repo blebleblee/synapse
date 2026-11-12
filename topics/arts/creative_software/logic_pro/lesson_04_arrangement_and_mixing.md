@@ -25,23 +25,23 @@ Logic Pro also includes a powerful MIDI sequencing system, which allows for the 
 The following diagram illustrates the core architecture of Logic Pro, highlighting the key components and their interactions:
 
 ```mermaid
-graph TD;
-    A -->| "Multitrack System" | B;
-    B -->| "Audio Tracks" | C;
-    B -->| "MIDI Tracks" | D;
-    B -->| "Track Effects" | E;
-    B -->| "Automation System" | F;
-    F -->| "Track Levels" | G;
-    F -->| "Panning" | H;
-    F -->| "Effect Settings" | I;
-    B -->| "MIDI Sequencing" | J;
-    J -->| "MIDI Tracks" | K;
-    J -->| "MIDI Events" | L;
-    J -->| "MIDI Processing" | M;
-    B -->| "DSP Engine" | N;
-    N -->| "Equalization" | O;
-    N -->| "Compression" | P;
-    N -->| "Reverb" | Q;
+graph TD
+    A -->| "Multitrack System" | B
+    B -->| "Audio Tracks" | C
+    B -->| "MIDI Tracks" | D
+    B -->| "Track Effects" | E
+    B -->| "Automation System" | F
+    F -->| "Track Levels" | G
+    F -->| "Panning" | H
+    F -->| "Effect Settings" | I
+    B -->| "MIDI Sequencing" | J
+    J -->| "MIDI Tracks" | K
+    J -->| "MIDI Events" | L
+    J -->| "MIDI Processing" | M
+    B -->| "DSP Engine" | N
+    N -->| "Equalization" | O
+    N -->| "Compression" | P
+    N -->| "Reverb" | Q
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

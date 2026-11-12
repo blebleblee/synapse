@@ -19,17 +19,17 @@ Hadoop is a foundational framework in the big data ecosystem, designed to provid
 HDFS is a distributed file system designed to store large files across a cluster of machines. It is built on the principle of data locality, which aims to minimize data transfer across the network by processing data on the nodes where it is stored. HDFS is organized into blocks, which are typically 128 MB or 256 MB in size, and are replicated across multiple nodes to ensure fault tolerance. The NameNode manages the metadata of the filesystem, including the mapping of blocks to nodes, while the DataNodes store the actual data blocks and handle read and write requests.
 
 ```mermaid
-graph TD;
-    A[NameNode] --> B[Block Metadata];
-    A --> C[DataNode 1];
-    A --> D[DataNode 2];
-    A --> E[DataNode 3];
-    C --> F[Block 1];
-    C --> G[Block 2];
-    D --> H[Block 1];
-    D --> I[Block 2];
-    E --> J[Block 1];
-    E --> K[Block 2];
+graph TD
+    A[NameNode] --> B[Block Metadata]
+    A --> C[DataNode 1]
+    A --> D[DataNode 2]
+    A --> E[DataNode 3]
+    C --> F[Block 1]
+    C --> G[Block 2]
+    D --> H[Block 1]
+    D --> I[Block 2]
+    E --> J[Block 1]
+    E --> K[Block 2]
 ```
 
 #### MapReduce
@@ -37,17 +37,17 @@ graph TD;
 MapReduce is a programming model and execution framework for processing large datasets in parallel. It consists of two main phases: the Map phase and the Reduce phase. In the Map phase, data is processed in parallel across multiple nodes, and the results are partitioned into intermediate key-value pairs. In the Reduce phase, these intermediate results are combined to produce the final output. MapReduce is designed to be fault-tolerant, automatically handling node failures and re-executing tasks as necessary.
 
 ```mermaid
-graph TD;
-    A[Input Data] --> B[Map Task 1];
-    A --> C[Map Task 2];
-    A --> D[Map Task 3];
-    B --> E[Intermediate Key-Value Pairs];
-    C --> E;
-    D --> E;
-    E --> F[Reduce Task 1];
-    E --> G[Reduce Task 2];
-    F --> H[Output Data];
-    G --> H;
+graph TD
+    A[Input Data] --> B[Map Task 1]
+    A --> C[Map Task 2]
+    A --> D[Map Task 3]
+    B --> E[Intermediate Key-Value Pairs]
+    C --> E
+    D --> E
+    E --> F[Reduce Task 1]
+    E --> G[Reduce Task 2]
+    F --> H[Output Data]
+    G --> H
 ```
 
 ### Apache Spark
@@ -63,12 +63,12 @@ Spark consists of several core components, including the Spark Core, Spark SQL, 
 Spark's execution model is based on the concept of resilient distributed datasets (RDDs), which are immutable, distributed collections of data. RDDs can be created from various data sources, including HDFS, local files, and external databases. RDDs support a variety of transformations and actions, which can be used to process and analyze data. Spark's in-memory processing capabilities allow for efficient execution of iterative algorithms, which are common in machine learning and graph processing.
 
 ```mermaid
-graph TD;
-    A[Input Data] --> B[RDD Creation];
-    B --> C[Transformation 1];
-    C --> D[Transformation 2];
-    D --> E[Action];
-    E --> F[Output Data];
+graph TD
+    A[Input Data] --> B[RDD Creation]
+    B --> C[Transformation 1]
+    C --> D[Transformation 2]
+    D --> E[Action]
+    E --> F[Output Data]
 ```
 
 ### NoSQL Databases

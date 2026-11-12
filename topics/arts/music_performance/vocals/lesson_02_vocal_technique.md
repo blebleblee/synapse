@@ -21,11 +21,11 @@ The process of vocal production can be visualized through a series of interconne
 To illustrate the core architecture of vocal production, we can use a simplified diagram:
 
 ```mermaid
-graph TD;
-    Lungs -->| "Air Expulsion" | Glottis;
-    Glottis -->| "Vibration" | VocalFolds;
-    VocalFolds -->| "Sound Waves" | VocalTract;
-    VocalTract -->| "Resonance" | SoundProduction;
+graph TD
+    Lungs -->| "Air Expulsion" | Glottis
+    Glottis -->| "Vibration" | VocalFolds
+    VocalFolds -->| "Sound Waves" | VocalTract
+    VocalTract -->| "Resonance" | SoundProduction
 ```
 
 In this diagram, the lungs provide the air necessary for vocal production, which is then directed through the glottis to the vocal folds. The vocal folds vibrate to produce sound waves, which then resonate through the vocal tract to create the final sound. This process is governed by the principles of acoustics and biomechanics, and understanding the interactions between these systems is essential for maintaining vocal health and achieving high-quality performance.

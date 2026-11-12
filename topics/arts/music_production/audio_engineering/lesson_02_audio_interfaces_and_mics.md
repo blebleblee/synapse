@@ -27,11 +27,11 @@ The architecture of audio interfaces also includes several other components, suc
 The following diagram illustrates the core architecture of an audio interface:
 
 ```mermaid
-graph TD;
-    A -->| "Microphone Input" | B;
-    B -->| "Preamplifier" | C;
-    C -->| "Analog-to-Digital Converter (ADC)" | D;
-    D -->| "Digital Signal Processor (DSP)" | E;
-    E -->| "Digital Audio Interface (DAI)" | F;
-    F -->| "Digital Audio Workstation (DAW)" | G;
+graph TD
+    A -->| "Microphone Input" | B
+    B -->| "Preamplifier" | C
+    C -->| "Analog-to-Digital Converter (ADC)" | D
+    D -->| "Digital Signal Processor (DSP)" | E
+    E -->| "Digital Audio Interface (DAI)" | F
+    F -->| "Digital Audio Workstation (DAW)" | G
 ```

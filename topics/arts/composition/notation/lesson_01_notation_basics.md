@@ -27,11 +27,11 @@ In addition to pitch and rhythm, notation includes symbols for articulation, dyn
 To illustrate the architecture of musical notation, consider the following measure of music in $\frac{4}{4}$ time:
 
 ```mermaid
-graph TD;
-    A -->| "G4" | B;
-    B -->| "B4" | C;
-    C -->| "D5" | D;
-    D -->| "G5" | E;
+graph TD
+    A -->| "G4" | B
+    B -->| "B4" | C
+    C -->| "D5" | D
+    D -->| "G5" | E
 ```
 
 In this measure, the time signature of $\frac{4}{4}$ indicates that there are four beats in each measure, with each beat corresponding to a quarter note. The notes G4, B4, D5, and G5 are represented by their respective positions on the staff, with G4 on the second line of the treble clef, B4 on the third space, D5 on the fourth line, and G5 on the fifth space. The duration of each note is indicated by its shape, with each note represented by a quarter note symbol. The interplay between these notes creates a simple melodic line, and the absence of rests indicates that the notes are played consecutively without any periods of silence.

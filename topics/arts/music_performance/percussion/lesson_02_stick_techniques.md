@@ -23,12 +23,12 @@ The wrist serves as the pivot point for the stick, allowing for rapid and accura
 To illustrate the mechanics of stick techniques, we can use a simple diagram to represent the interaction between the stick, the arm, and the drumhead. The diagram below shows the matched grip, the downstroke, and the upstroke, along with the corresponding wrist and arm movements.
 
 ```mermaid
-graph TD;
-    A -->| "Dominant Hand" | B;
-    B -->| "Stick Grip" | C;
-    C -->| "Wrist Pivot" | D;
-    D -->| "Forearm Power" | E;
-    E -->| "Drumhead" | F;
+graph TD
+    A -->| "Dominant Hand" | B
+    B -->| "Stick Grip" | C
+    C -->| "Wrist Pivot" | D
+    D -->| "Forearm Power" | E
+    E -->| "Drumhead" | F
 ```
 
 In this diagram, the dominant hand holds the stick with the index finger resting on the shaft, while the thumb and middle finger form a cradle around the stick. The non-dominant hand holds the stick with the index finger resting on the tip, while the thumb and middle finger form a cradle around the stick. The wrist serves as the pivot point for the stick, allowing for rapid and accurate strikes. The forearm and upper arm provide the power and stability needed for more forceful strokes, while the fingers and thumb offer fine control and articulation.

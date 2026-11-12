@@ -27,14 +27,14 @@ The core data structures for these effects are typically implemented using circu
 To illustrate the flow of a modulation effect, consider the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Modulator Oscillator" | C;
-    C -->| "Modulated Parameter" | D;
-    D -->| "Delay Line/Filter" | E;
-    E -->| "Processed Signal" | F;
-    F -->| "Mix with Original" | G;
-    G -->| "Output Signal" | H;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Modulator Oscillator" | C
+    C -->| "Modulated Parameter" | D
+    D -->| "Delay Line/Filter" | E
+    E -->| "Processed Signal" | F
+    F -->| "Mix with Original" | G
+    G -->| "Output Signal" | H
 ```
 
 This diagram captures the essential components and flow of a modulation effect, from the input signal through the modulator oscillator, to the delay line or filter, and finally to the output signal after mixing with the original.

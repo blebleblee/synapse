@@ -21,16 +21,16 @@ Visualization is a critical component of any monitoring system, as it enables en
 To illustrate the architecture of a monitoring system for AI/MLops pipelines, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Data Collection] --> B[Agents];
-    A --> C[Probes];
-    B --> D[Aggregation Layer];
-    C --> D;
-    D --> E[Time-Series Database];
-    E --> F[Visualization];
-    F --> G[Grafana];
-    F --> H[Kibana];
-    F --> I[Datadog];
+graph TD
+    A[Data Collection] --> B[Agents]
+    A --> C[Probes]
+    B --> D[Aggregation Layer]
+    C --> D
+    D --> E[Time-Series Database]
+    E --> F[Visualization]
+    F --> G[Grafana]
+    F --> H[Kibana]
+    F --> I[Datadog]
 ```
 
 In this diagram, data collection is performed by agents and probes, which send metrics to the aggregation layer. The aggregation layer processes and stores the metrics in a time-series database, which is then visualized using tools such as Grafana, Kibana, and Datadog.

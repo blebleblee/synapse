@@ -24,18 +24,18 @@ The replication process involves the following steps:
 Here is a simplified Mermaid diagram illustrating the replication process:
 ```mermaid
 graph LR
-    subgraph Leader Node
-        A[Leader Node] -->|Replication Request|> B[Follower Node 1]
-        A -->|Replication Request|> C[Follower Node 2]
+    subgraph "Leader Node"
+        A[Leader Node] -->|\"Replication Request\"| B[Follower Node 1]
+        A -->|\"Replication Request\"| C[Follower Node 2]
     end
 
-    subgraph Follower Nodes
-        B -->|Replication Response|> A
-        C -->|Replication Response|> A
+    subgraph "Follower Nodes"
+        B -->|\"Replication Response\"| A
+        C -->|\"Replication Response\"| A
     end
 
-    A -->|Replication Factor|> D[ISR Update]
-    D -->|ISR Update|> E[Replicated Data]
+    A -->|\"Replication Factor\"| D[ISR Update]
+    D -->|\"ISR Update\"| E[Replicated Data]
 ```
 ## 3. High-Performance Optimization & Failure Modes
 

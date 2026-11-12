@@ -29,19 +29,19 @@ The data structures used in the mixer are optimized for performance and real-tim
 To illustrate the signal flow within a DAW mixer, consider the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Audio Input" | B;
-    B -->| "Anti-Aliasing Filter" | C;
-    C -->| "Gain Stage" | D;
-    D -->| "Equalization" | E;
-    E -->| "Dynamics Processing" | F;
-    F -->| "Effect Sends" | G;
-    G -->| "Routing Matrix" | H;
-    H -->| "Bus Output" | I;
-    H -->| "Track Output" | J;
-    I -->| "Master Bus" | K;
-    J -->| "Master Bus" | K;
-    K -->| "Audio Output" | L;
+graph TD
+    A -->| "Audio Input" | B
+    B -->| "Anti-Aliasing Filter" | C
+    C -->| "Gain Stage" | D
+    D -->| "Equalization" | E
+    E -->| "Dynamics Processing" | F
+    F -->| "Effect Sends" | G
+    G -->| "Routing Matrix" | H
+    H -->| "Bus Output" | I
+    H -->| "Track Output" | J
+    I -->| "Master Bus" | K
+    J -->| "Master Bus" | K
+    K -->| "Audio Output" | L
 ```
 
 This diagram represents a simplified view of the signal path within a DAW mixer, showing how audio data flows from input through various processing stages and ultimately to the output. Each stage in the pipeline is critical to maintaining the integrity and quality of the audio signal.

@@ -27,11 +27,11 @@ The link layer is responsible for the physical transmission of data over a netwo
 To illustrate the architecture of the TCP/IP protocol suite, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Application Layer] --> B[Transport Layer];
-    B --> C[Network Layer];
-    C --> D[Link Layer];
-    D --> E[Physical Medium];
+graph TD
+    A[Application Layer] --> B[Transport Layer]
+    B --> C[Network Layer]
+    C --> D[Link Layer]
+    D --> E[Physical Medium]
 ```
 
 In this diagram, the application layer is at the top, providing services for applications to communicate over the network. The transport layer is responsible for end-to-end communication between applications, while the network layer is responsible for routing packets of data across networks. The link layer is responsible for the physical transmission of data over a network, and the physical medium represents the actual transmission medium, such as Ethernet or Wi-Fi.

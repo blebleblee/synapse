@@ -19,10 +19,10 @@ The simplest and most fundamental architecture of neural networks is the feedfor
 The architecture of an FNN can be visualized as a series of interconnected layers, where each layer consists of a set of neurons. Each neuron in a layer is connected to every neuron in the previous layer, and these connections are weighted. During the forward pass, the input data is multiplied by the weights and passed through an activation function to produce the output of the neuron. This process is repeated for each layer, with the output of one layer serving as the input to the next.
 
 ```mermaid
-graph TD;
-    A[Input Layer] --> B[Hidden Layer 1];
-    B --> C[Hidden Layer 2];
-    C --> D[Output Layer];
+graph TD
+    A[Input Layer] --> B[Hidden Layer 1]
+    B --> C[Hidden Layer 2]
+    C --> D[Output Layer]
 ```
 
 The choice of activation function is critical to the performance of an FNN. Common activation functions include the sigmoid, hyperbolic tangent (tanh), and rectified linear unit (ReLU). Each of these functions introduces non-linearity into the network, allowing it to learn complex patterns in the data. The ReLU function, in particular, has become popular due to its simplicity and effectiveness in mitigating the vanishing gradient problem, which can hinder the training of deep networks.
@@ -34,13 +34,13 @@ Convolutional neural networks (CNNs) are a specialized type of neural network de
 The architecture of a CNN consists of multiple convolutional layers, followed by pooling layers, and finally fully connected layers. The convolutional layers apply the filters to the input data, while the pooling layers downsample the feature maps to reduce their spatial dimensions and computational complexity. The fully connected layers then take the flattened feature maps as input and produce the final output predictions.
 
 ```mermaid
-graph TD;
-    A[Input Layer] --> B[Convolutional Layer 1];
-    B --> C[Pooling Layer 1];
-    C --> D[Convolutional Layer 2];
-    D --> E[Pooling Layer 2];
-    E --> F[Fully Connected Layer];
-    F --> G[Output Layer];
+graph TD
+    A[Input Layer] --> B[Convolutional Layer 1]
+    B --> C[Pooling Layer 1]
+    C --> D[Convolutional Layer 2]
+    D --> E[Pooling Layer 2]
+    E --> F[Fully Connected Layer]
+    F --> G[Output Layer]
 ```
 
 The use of convolutional layers in CNNs allows them to capture spatial hierarchies in the data, making them highly effective for tasks such as image classification and object detection. The filters in the convolutional layers are learned during training, and they can capture a wide range of features, from low-level edges and textures to high-level shapes and objects.
@@ -52,11 +52,11 @@ Recurrent neural networks (RNNs) are designed for processing sequential data, su
 The architecture of an RNN consists of a single recurrent layer, which processes the input data one time step at a time. At each time step, the input data is combined with the hidden state from the previous time step, and the result is passed through a non-linear activation function to produce the new hidden state. The hidden state is then used to produce the output prediction for the current time step.
 
 ```mermaid
-graph TD;
-    A[Input Layer] --> B[Recurrent Layer];
-    B --> C[Hidden State];
-    C --> D[Output Layer];
-    C --> B;
+graph TD
+    A[Input Layer] --> B[Recurrent Layer]
+    B --> C[Hidden State]
+    C --> D[Output Layer]
+    C --> B
 ```
 
 The use of recurrent connections in RNNs allows them to capture temporal dependencies in the data, making them highly effective for tasks such as language modeling and speech recognition. However, the training of RNNs can be challenging due to issues such as vanishing and exploding gradients, which can hinder the learning of long-range dependencies. To address these challenges, variants of RNNs such as long short-term memory (LSTM) and gated recurrent units (GRU) have been developed. These variants use gating mechanisms to control the flow of information through the network, allowing them to learn long-range dependencies more effectively.

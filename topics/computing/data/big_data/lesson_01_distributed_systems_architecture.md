@@ -19,13 +19,13 @@ Another critical component of distributed systems is the use of Multi-Version Co
 To illustrate the architecture of a distributed system, consider the example of a distributed key-value store. In this system, data is partitioned across multiple nodes, each responsible for a subset of the key-value pairs. The system uses a consensus mechanism, such as Raft, to ensure that all nodes agree on the state of the key-value store. When a client writes a key-value pair to the system, the leader node replicates the write to a quorum of follower nodes. Once the write is committed, the leader node updates its local copy of the key-value store and notifies the client of the successful write. When a client reads a key-value pair, the node responsible for the key retrieves the most recent version of the value from its local copy of the key-value store and returns it to the client. This architecture ensures that the system remains highly available and scalable, while maintaining data consistency and fault tolerance.
 
 ```mermaid
-graph TD;
-    A[Client] --> B[Leader Node];
-    B --> C[Quorum of Follower Nodes];
-    B --> D[Local Key-Value Store];
-    A --> E[Node with Key];
-    E --> F[Local Key-Value Store];
-    E --> A;
+graph TD
+    A[Client] --> B[Leader Node]
+    B --> C[Quorum of Follower Nodes]
+    B --> D[Local Key-Value Store]
+    A --> E[Node with Key]
+    E --> F[Local Key-Value Store]
+    E --> A
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

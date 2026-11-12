@@ -25,8 +25,8 @@ The scheduling algorithm is another critical component of the kernel's architect
 To illustrate the architecture of the kernel, we can use a simple Mermaid diagram to depict the relationship between the key data structures and algorithms:
 
 ```mermaid
-graph TD;
-    A[Kernel] --> B[Process Control Block (PCB)]
+graph TD
+    A[Kernel] --> B[\"Process Control Block (PCB)\"]
     A --> C[Page Table]
     A --> D[Scheduling Algorithm]
     B --> E[Process State]
@@ -56,7 +56,7 @@ In addition to high-performance optimization, the kernel must also be designed t
 To illustrate the high-performance optimization and failure modes of the kernel, we can use a simple Mermaid diagram to depict the relationship between the key components:
 
 ```mermaid
-graph TD;
+graph TD
     A[Kernel] --> B[Concurrency]
     A --> C[Resource Scaling]
     A --> D[Boundary Edge Cases]

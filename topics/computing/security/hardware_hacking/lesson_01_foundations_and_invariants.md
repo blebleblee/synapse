@@ -44,13 +44,13 @@ Cryptographic invariants are the security assumptions that underpin cryptographi
 To fully understand the interactions between the master device, target chip, and analyzer in UART communication, it is essential to examine the bus topology and interface architecture. The following Mermaid diagram illustrates the high-level bus topology and interface architecture of UART communication:
 
 ```mermaid
-graph TD;
-    A[Master Device] -->|TX| B[UART Interface];
-    B -->|RX| A;
-    B -->|TX| C[Target Chip];
-    C -->|RX| B;
-    D[Analyzer] -->|RX| B;
-    B -->|TX| D;
+graph TD
+    A[Master Device] -->|TX| B[UART Interface]
+    B -->|RX| A
+    B -->|TX| C[Target Chip]
+    C -->|RX| B
+    D[Analyzer] -->|RX| B
+    B -->|TX| D
 ```
 
 In this diagram, the master device and target chip communicate with each other through the UART interface. The analyzer is also connected to the UART interface, allowing it to intercept and analyze the data being transmitted. The TX and RX lines represent the transmit and receive lines of the UART interface, respectively.

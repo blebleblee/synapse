@@ -25,15 +25,15 @@ The Engine service is responsible for providing block-level access to the storag
 The interaction between these components is illustrated in the following diagram:
 
 ```mermaid
-graph TD;
-    A[Application] --> B[Engine];
-    B --> C[Replica];
-    B --> D[Replica];
-    B --> E[Replica];
-    C --> F[Manager];
-    D --> F;
-    E --> F;
-    F --> G[etcd];
+graph TD
+    A[Application] --> B[Engine]
+    B --> C[Replica]
+    B --> D[Replica]
+    B --> E[Replica]
+    C --> F[Manager]
+    D --> F
+    E --> F
+    F --> G[etcd]
 ```
 
 In this diagram, the Application interacts with the Engine service, which in turn interacts with the Replica services to read and write data to the storage volumes. The Manager service orchestrates the storage cluster, managing the lifecycle of the storage volumes and their replicas. The Manager service also interacts with the etcd key-value store to maintain the global state of the storage cluster.

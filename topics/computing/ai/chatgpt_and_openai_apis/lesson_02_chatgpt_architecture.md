@@ -76,16 +76,16 @@ The execution model of ChatGPT involves processing the input sequence through mu
 The execution model can be visualized using the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input Sequence] --> B[Self-Attention Sub-Layer];
-    B --> C[Feed-Forward Sub-Layer];
-    C --> D[Layer Normalization];
-    D --> E[Transformer Layer];
-    E --> F[Transformer Layer];
-    F --> G[Transformer Layer];
-    G --> H[Linear Transformation];
-    H --> I[Softmax Function];
-    I --> J[Output Probabilities];
+graph TD
+    A[Input Sequence] --> B[Self-Attention Sub-Layer]
+    B --> C[Feed-Forward Sub-Layer]
+    C --> D[Layer Normalization]
+    D --> E[Transformer Layer]
+    E --> F[Transformer Layer]
+    F --> G[Transformer Layer]
+    G --> H[Linear Transformation]
+    H --> I[Softmax Function]
+    I --> J[Output Probabilities]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

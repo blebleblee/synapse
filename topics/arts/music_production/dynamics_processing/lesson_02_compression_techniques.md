@@ -31,13 +31,13 @@ The makeup gain stage is used to restore the overall level of the signal after c
 To illustrate the internal architecture of a compressor, we can use a simplified block diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Envelope Follower" | C;
-    C -->| "Threshold Comparator" | D;
-    D -->| "Gain Reduction Circuit" | E;
-    E -->| "Makeup Gain" | F;
-    F -->| "Output Signal" | G;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Envelope Follower" | C
+    C -->| "Threshold Comparator" | D
+    D -->| "Gain Reduction Circuit" | E
+    E -->| "Makeup Gain" | F
+    F -->| "Output Signal" | G
 ```
 
 In this diagram, the input signal is processed by an envelope follower to extract its amplitude envelope. The envelope is then compared to the threshold level, and if it exceeds the threshold, the gain reduction circuit is activated. The gain reduction is applied to the signal, and the resulting compressed signal is amplified by the makeup gain stage to produce the final output.

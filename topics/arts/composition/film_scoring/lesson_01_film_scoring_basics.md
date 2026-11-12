@@ -23,12 +23,12 @@ The final stage in the film scoring process is the recording and mixing of the s
 To illustrate the architecture of film scoring, we can use a simplified diagram that outlines the key stages of the process:
 
 ```mermaid
-graph TD;
-    A -->| "Conceptualization" | B;
-    B -->| "Composition" | C;
-    C -->| "Orchestration" | D;
-    D -->| "Recording" | E;
-    E -->| "Mixing & Editing" | F;
+graph TD
+    A -->| "Conceptualization" | B
+    B -->| "Composition" | C
+    C -->| "Orchestration" | D
+    D -->| "Recording" | E
+    E -->| "Mixing & Editing" | F
 ```
 
 This diagram provides a high-level overview of the film scoring process, highlighting the key stages and their interdependencies. Each stage of the process is critical to the success of the final product, and the composer must navigate these stages with skill and precision to create a score that is both artistically compelling and technically proficient.

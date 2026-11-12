@@ -27,10 +27,10 @@ The acoustics of the vocal tract can be understood through the principles of Fou
 The architecture of the human voice can be visualized through a series of diagrams, illustrating the key components and their roles in the production of sound. The larynx, located in the neck, contains the vocal folds, which vibrate to generate sound waves. The sound waves then propagate through the vocal tract, a resonant cavity that includes the pharynx, oral cavity, and nasal cavity. The resonant cavities amplify certain frequencies of the sound wave, creating formants that contribute to the unique timbre and quality of the voice.
 
 ```mermaid
-graph TD;
-    Larynx -->| "Vocal Folds" | Pharynx;
-    Pharynx -->| "Sound Waves" | Oral_Cavity;
-    Oral_Cavity -->| "Resonant Cavities" | Nasal_Cavity;
+graph TD
+    Larynx -->| "Vocal Folds" | Pharynx
+    Pharynx -->| "Sound Waves" | Oral_Cavity
+    Oral_Cavity -->| "Resonant Cavities" | Nasal_Cavity
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

@@ -17,11 +17,11 @@ To achieve flow, you must cultivate a deep understanding of your instrument, you
 Let us dissect the internal mechanics of performance, exploring the key components that contribute to a successful live show.
 
 ```mermaid
-graph LR;
-    A["Technical Foundation"] -->| "feeds into" | B["Musicality"];
-    B -->| "influences" | C["Stage Presence"];
-    C -->| "interacts with" | D["Audience Engagement"];
-    D -->| "affects" | E["Live Performance Techniques"];
+graph LR
+    A["Technical Foundation"] -->| "feeds into" | B["Musicality"]
+    B -->| "influences" | C["Stage Presence"]
+    C -->| "interacts with" | D["Audience Engagement"]
+    D -->| "affects" | E["Live Performance Techniques"]
 ```
 
 As you can see, the technical foundation is the bedrock upon which all other aspects of performance are built. Your musicality, stage presence, audience engagement, and live performance techniques are all interconnected, and each one influences the others.

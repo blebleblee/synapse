@@ -19,13 +19,13 @@ Consumers in Kafka are responsible for reading data from the Kafka brokers. Cons
 To illustrate the architecture and mechanics of Kafka's producer and consumer APIs, we can use a simple Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Producer] -->|Send Record| B[Kafka Broker];
-    B -->|Append Record| C[Partition Log];
-    C -->|Return Offset| B;
-    B -->|Return Record| D[Consumer];
-    D -->|Process Record| E[Application];
-    D -->|Specify Offset| B;
+graph TD
+    A[Producer] -->|"Send Record"| B[Kafka Broker]
+    B -->|"Append Record"| C[Partition Log]
+    C -->|"Return Offset"| B
+    B -->|"Return Record"| D[Consumer]
+    D -->|"Process Record"| E[Application]
+    D -->|"Specify Offset"| B
 ```
 
 In this diagram, a producer sends a record to a Kafka broker, which appends the record to a partition log and returns the offset of the record to the producer. A consumer then reads the record from the partition log using the offset and processes the record in an application. This cycle continues as producers send records to the broker and consumers read and process records from the broker.

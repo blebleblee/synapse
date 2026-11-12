@@ -17,13 +17,13 @@ Video generation, by contrast, involves the synthesis of visual frames, each of 
 To illustrate the architecture of a video generation system, consider the following simplified diagram:
 
 ```mermaid
-graph TD;
-    A[Scene Description] --> B[Geometry Processing];
-    B --> C[Lighting Calculation];
-    C --> D[Shading];
-    D --> E[Texture Mapping];
-    E --> F[Frame Buffer];
-    F --> G[Output];
+graph TD
+    A[Scene Description] --> B[Geometry Processing]
+    B --> C[Lighting Calculation]
+    C --> D[Shading]
+    D --> E[Texture Mapping]
+    E --> F[Frame Buffer]
+    F --> G[Output]
 ```
 
 In this diagram, the scene description is a high-level representation of the objects and lighting in the scene. This description is processed by the geometry processing stage, which calculates the position and orientation of each object in the scene. The lighting calculation stage then determines the intensity and direction of light sources, while the shading stage applies these lighting calculations to the objects in the scene. The texture mapping stage applies textures to the objects, and the final frame buffer is used to store the rendered image, which is then output to the display.

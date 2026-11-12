@@ -16,24 +16,24 @@ To better understand the performance characteristics of a system, it's essential
 
 ```mermaid
 graph LR
-    subgraph Storage Layer
+    subgraph "Storage Layer"
         Storage Engine[Storage Engine]
         Disk[Disk]
     end
-    subgraph Query Execution Layer
+    subgraph "Query Execution Layer"
         Parser[Parser]
         Optimizer[Optimizer]
         Executor[Executor]
     end
-    subgraph Memory Management Layer
+    subgraph "Memory Management Layer"
         Buffer Pool[Buffer Pool]
         Page Cache[Page Cache]
     end
-    Storage Engine -->|Disk I/O|> Disk
-    Parser -->|Query Plan|> Optimizer
-    Optimizer -->|Execution Plan|> Executor
-    Executor -->|Result Set|> Buffer Pool
-    Buffer Pool -->|Page Cache|> Page Cache
+    Storage Engine -->|\"Disk I/O\"| Disk
+    Parser -->|\"Query Plan\"| Optimizer
+    Optimizer -->|\"Execution Plan\"| Executor
+    Executor -->|\"Result Set\"| Buffer Pool
+    Buffer Pool -->|\"Page Cache\"| Page Cache
 ```
 
 In this simplified architecture, we can see the key components involved in query execution:

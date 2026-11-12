@@ -25,19 +25,19 @@ The feedback loop is the mechanism by which the conductor receives information a
 The architecture of conducting can be visualized using a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A["Conductor's Gestures"] --> B["Ensemble's Response"];
-    B --> C["Feedback Loop"];
-    C --> A;
-    A --> D["Baton"];
-    A --> E["Body"];
-    A --> F["Voice"];
-    B --> G["Individual Musicians"];
-    B --> H["Sections"];
-    B --> I["Ensemble as a Whole"];
-    C --> J["Conductor's Ears"];
-    C --> K["Conductor's Eyes"];
-    C --> L["Conductor's Intuition"];
+graph TD
+    A["Conductor's Gestures"] --> B["Ensemble's Response"]
+    B --> C["Feedback Loop"]
+    C --> A
+    A --> D["Baton"]
+    A --> E["Body"]
+    A --> F["Voice"]
+    B --> G["Individual Musicians"]
+    B --> H["Sections"]
+    B --> I["Ensemble as a Whole"]
+    C --> J["Conductor's Ears"]
+    C --> K["Conductor's Eyes"]
+    C --> L["Conductor's Intuition"]
 ```
 
 ## High-Performance Optimization & Failure Modes

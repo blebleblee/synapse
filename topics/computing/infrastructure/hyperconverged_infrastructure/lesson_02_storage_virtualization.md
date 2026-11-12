@@ -25,12 +25,12 @@ Another important component of the storage virtualization engine is the data pat
 To illustrate the architecture of a storage virtualization system, we can use a simple Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Application] --> B[Storage Virtualization Engine];
-    B --> C[Metadata Manager];
-    B --> D[Data Path Manager];
-    D --> E[Physical Storage Devices];
-    C --> F[Metadata Store];
+graph TD
+    A[Application] --> B[Storage Virtualization Engine]
+    B --> C[Metadata Manager]
+    B --> D[Data Path Manager]
+    D --> E[Physical Storage Devices]
+    C --> F[Metadata Store]
 ```
 
 In this diagram, the application interacts with the storage virtualization engine, which manages the mapping of logical storage to physical storage. The metadata manager maintains the mapping in the metadata store, while the data path manager handles the actual storage and retrieval of data on the physical storage devices.

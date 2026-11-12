@@ -19,9 +19,9 @@ To gain a deeper understanding of Linux security mechanisms, let's dissect the i
 SELinux uses a complex data structure called the security context, which consists of three components: user, role, and type. The security context is used to determine the access rights of a subject to an object. The following diagram illustrates the SELinux security context:
 ```mermaid
 graph LR
-    A[User] -->|maps to|> B[Role]
-    B -->|maps to|> C[Type]
-    C -->|maps to|> D[Object]
+    A[User] -->|\"maps to\"| B[Role]
+    B -->|\"maps to\"| C[Type]
+    C -->|\"maps to\"| D[Object]
 ```
 The SELinux policy is defined using a set of rules, which are stored in the `/etc/selinux/` directory. The policy is composed of three main components: the type enforcement (TE) policy, the role-based access control (RBAC) policy, and the MLS (Multi-Level Security) policy.
 
@@ -32,8 +32,8 @@ AppArmor uses a simple, rule-based approach to access control. The rules are sto
 The following diagram illustrates the AppArmor rule structure:
 ```mermaid
 graph LR
-    A[Profile] -->|maps to|> B[Network]
-    B -->|maps to|> C[Capability]
+    A[Profile] -->|\"maps to\"| B[Network]
+    B -->|\"maps to\"| C[Capability]
 ```
 ### Kernel Security Modules
 
@@ -42,8 +42,8 @@ KSMs provide a flexible and extensible way to implement custom security policies
 The following diagram illustrates the KSM architecture:
 ```mermaid
 graph LR
-    A[Module] -->|maps to|> B[Policy]
-    B -->|maps to|> C[Hook]
+    A[Module] -->|\"maps to\"| B[Policy]
+    B -->|\"maps to\"| C[Hook]
 ```
 ## 3. High-Performance Optimization & Failure Modes
 

@@ -67,23 +67,23 @@ The backpropagation algorithm is used to adjust the weights and biases of the ne
 To visualize the architecture of a simple feedforward neural network, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input Layer] --> B[Hidden Layer];
-    B --> C[Output Layer];
+graph TD
+    A[Input Layer] --> B[Hidden Layer]
+    B --> C[Output Layer]
     subgraph Layer1[Input Layer]
         direction LR
-        I1[Neuron 1] --> I2[Neuron 2];
-        I2 --> I3[Neuron n];
+        I1[Neuron 1] --> I2[Neuron 2]
+        I2 --> I3[Neuron n]
     end
     subgraph Layer2[Hidden Layer]
         direction LR
-        H1[Neuron 1] --> H2[Neuron 2];
-        H2 --> H3[Neuron m];
+        H1[Neuron 1] --> H2[Neuron 2]
+        H2 --> H3[Neuron m]
     end
     subgraph Layer3[Output Layer]
         direction LR
-        O1[Neuron 1] --> O2[Neuron 2];
-        O2 --> O3[Neuron k];
+        O1[Neuron 1] --> O2[Neuron 2]
+        O2 --> O3[Neuron k]
     end
 ```
 

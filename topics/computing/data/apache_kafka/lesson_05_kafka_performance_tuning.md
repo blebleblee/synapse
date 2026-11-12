@@ -27,17 +27,17 @@ Another key data structure in Kafka is the index, which is used to manage the of
 The architecture of Kafka is also based on a series of internal algorithms that are designed to manage the storage and retrieval of messages efficiently. One of the key algorithms in Kafka is the log compaction algorithm, which is used to remove old messages from the log to free up space. The log compaction algorithm is based on a series of invariants that ensure that old messages are removed from the log without affecting the consistency of the log. Another key algorithm in Kafka is the log replication algorithm, which is used to replicate partitions across multiple brokers to ensure high availability and fault tolerance. The log replication algorithm is based on a series of invariants that ensure that partitions are replicated consistently across multiple brokers.
 
 ```mermaid
-graph TD;
-    A[Producers] --> B[Brokers];
-    B --> C[Partitions];
-    C --> D[Logs];
-    D --> E[Segments];
-    E --> F[Messages];
-    B --> G[Consumers];
-    G --> C;
-    B --> H[Replicas];
-    H --> I[Brokers];
-    I --> C;
+graph TD
+    A[Producers] --> B[Brokers]
+    B --> C[Partitions]
+    C --> D[Logs]
+    D --> E[Segments]
+    E --> F[Messages]
+    B --> G[Consumers]
+    G --> C
+    B --> H[Replicas]
+    H --> I[Brokers]
+    I --> C
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

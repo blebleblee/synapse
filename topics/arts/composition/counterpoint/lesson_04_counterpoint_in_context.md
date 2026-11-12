@@ -31,9 +31,9 @@ The execution model of counterpoint involves the application of the rules and pr
 The mechanics of counterpoint can be visualized using Mermaid diagrams. For example, the following diagram illustrates the construction of a simple two-voice counterpoint in species counterpoint:
 
 ```mermaid
-graph TD;
-    A -->| "Cantus Firmus: C D E F G A B C" | B;
-    B -->| "Counterpoint: E G F E D C D C" | C;
+graph TD
+    A -->| "Cantus Firmus: C D E F G A B C" | B
+    B -->| "Counterpoint: E G F E D C D C" | C
 ```
 
 In this example, the counterpoint is constructed using the rules of species counterpoint, with the rhythm of the counterpoint matching the rhythm of the cantus firmus. The intervals between the melodic lines are analyzed to ensure they are consonant, and the harmonic series is analyzed to ensure the intervals align with the lower harmonics of the pitches involved.

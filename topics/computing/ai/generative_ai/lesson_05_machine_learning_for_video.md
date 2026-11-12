@@ -19,17 +19,17 @@ In the context of video generation, the generator is typically a recurrent neura
 To illustrate the architecture of a video GAN, we can use a simplified Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input Sequence] --> B[Generator];
-    B --> C[Generated Frame];
-    C --> D[Discriminator];
-    D --> E[Real/Fake Classification];
-    E --> F[Generator Loss];
-    F --> B;
-    A --> G[Discriminator];
-    G --> H[Real/Fake Classification];
-    H --> I[Discriminator Loss];
-    I --> G;
+graph TD
+    A[Input Sequence] --> B[Generator]
+    B --> C[Generated Frame]
+    C --> D[Discriminator]
+    D --> E[\"Real/Fake Classification\"]
+    E --> F[Generator Loss]
+    F --> B
+    A --> G[Discriminator]
+    G --> H[\"Real/Fake Classification\"]
+    H --> I[Discriminator Loss]
+    I --> G
 ```
 
 In this diagram, the generator takes an input sequence of frames and produces a generated frame. The discriminator evaluates both the generated frame and a real frame from the input sequence, providing feedback to the generator through the generator loss and to itself through the discriminator loss.

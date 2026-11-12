@@ -39,11 +39,11 @@ The access layer is the interface through which users interact with the data war
 To illustrate the architecture of a data warehouse, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Data Source Layer] --> B[Staging Area];
-    B --> C[Data Transformation Layer];
-    C --> D[Data Storage Layer];
-    D --> E[Access Layer];
+graph TD
+    A[Data Source Layer] --> B[Staging Area]
+    B --> C[Data Transformation Layer]
+    C --> D[Data Storage Layer]
+    D --> E[Access Layer]
 ```
 
 In this diagram, the data source layer is the entry point for raw data, which is loaded into the staging area for validation and cleansing. The data transformation layer then transforms the data into a format suitable for loading into the data storage layer, which is implemented using a relational database management system. Finally, the access layer provides users with tools and applications for querying and analyzing the data in the warehouse.

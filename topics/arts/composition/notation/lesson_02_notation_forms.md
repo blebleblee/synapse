@@ -23,14 +23,14 @@ The process of rendering a musical score into sound involves interpreting the sy
 The following diagram illustrates the internal data structures and algorithms involved in rendering a musical score into sound:
 
 ```mermaid
-graph TD;
-    A[Musical Score] -->| "Measures" | B[Staff Grid];
-    B -->| "Note/Chord Objects" | C[Note/Chord];
-    C -->| "Pitch/Duration Calculation" | D[Pitch/Duration];
-    D -->| "Harmonic Structure" | E[Harmonic];
-    E -->| "Rhythm Calculation" | F[Rhythm];
-    F -->| "Audio Signal Generation" | G[Audio Signal];
-    G -->| "Final Output" | H[Final Output];
+graph TD
+    A[Musical Score] -->| "Measures" | B[Staff Grid]
+    B -->| "Note/Chord Objects" | C[\"Note/Chord\"]
+    C -->| "Pitch/Duration Calculation" | D[\"Pitch/Duration\"]
+    D -->| "Harmonic Structure" | E[Harmonic]
+    E -->| "Rhythm Calculation" | F[Rhythm]
+    F -->| "Audio Signal Generation" | G[Audio Signal]
+    G -->| "Final Output" | H[Final Output]
 ```
 
 In this diagram, the musical score is represented as a sequence of measures, each containing a series of notes and chords. The staff grid represents the two-dimensional grid used to represent the score, with the vertical axis representing pitch and the horizontal axis representing time. The note/chord objects represent the individual notes and chords within the score, and the pitch/duration calculation determines the pitch and duration of each note and chord. The harmonic structure determines the sequence of chords, and the rhythm calculation determines the timing of the audio signals. Finally, the audio signal generation produces the final output, which is the rendered musical score.

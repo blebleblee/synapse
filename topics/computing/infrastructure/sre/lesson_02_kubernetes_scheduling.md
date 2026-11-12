@@ -31,16 +31,16 @@ In the second step, the scheduler scores the remaining nodes based on a set of s
 The following Mermaid diagram illustrates the internal data structures and algorithms used by the `kube-scheduler` to make scheduling decisions:
 
 ```mermaid
-graph TD;
-    A[kube-scheduler] --> B[Reconciliation Loop];
-    B --> C[Filter Nodes];
-    C --> D[PodFitsResources];
-    C --> E[MatchNodeSelector];
-    B --> F[Score Nodes];
-    F --> G[LeastRequestedPriority];
-    F --> H[SelectorSpreadPriority];
-    B --> I[Select Node];
-    I --> J[Node with Highest Score];
+graph TD
+    A[kube-scheduler] --> B[Reconciliation Loop]
+    B --> C[Filter Nodes]
+    C --> D[PodFitsResources]
+    C --> E[MatchNodeSelector]
+    B --> F[Score Nodes]
+    F --> G[LeastRequestedPriority]
+    F --> H[SelectorSpreadPriority]
+    B --> I[Select Node]
+    I --> J[Node with Highest Score]
 ```
 
 In this diagram, the `kube-scheduler` continuously monitors the state of the cluster and makes scheduling decisions for new pods. The scheduler first filters out nodes that do not meet the basic requirements of the pod using a set of predicates, such as `PodFitsResources` and `MatchNodeSelector`. The scheduler then scores the remaining nodes based on a set of scoring criteria, such as `LeastRequestedPriority` and `SelectorSpreadPriority`. The node with the highest score is selected as the target for the pod.

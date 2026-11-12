@@ -65,14 +65,14 @@ Data ingestion systems rely on a variety of execution models to optimize resourc
 To illustrate the architecture of a data ingestion system, we can use a Mermaid diagram to visualize the interactions between the key components:
 
 ```mermaid
-graph TD;
-    A[Data Sources] --> B[Data Connectors];
-    B --> C[Data Transformation Engines];
-    C --> D[Data Sinks];
-    subgraph Data Ingestion System
-        B;
-        C;
-        D;
+graph TD
+    A[Data Sources] --> B[Data Connectors]
+    B --> C[Data Transformation Engines]
+    C --> D[Data Sinks]
+    subgraph "Data Ingestion System"
+        B
+        C
+        D
     end
 ```
 

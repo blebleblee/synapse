@@ -48,27 +48,27 @@ In this example, the initial state \(s_0\) is the position of the agent (S), and
 To visualize the search process, we can use a Mermaid diagram to represent the state space and the expansion of states.
 
 ```mermaid
-graph TD;
-    S --> A1;
-    S --> A2;
-    S --> A3;
-    A1 --> B1;
-    A1 --> B2;
-    A2 --> B3;
-    A2 --> B4;
-    A3 --> B5;
-    B1 --> C1;
-    B1 --> C2;
-    B2 --> C3;
-    B3 --> C4;
-    B4 --> C5;
-    B5 --> C6;
-    C1 --> G;
-    C2 --> G;
-    C3 --> G;
-    C4 --> G;
-    C5 --> G;
-    C6 --> G;
+graph TD
+    S --> A1
+    S --> A2
+    S --> A3
+    A1 --> B1
+    A1 --> B2
+    A2 --> B3
+    A2 --> B4
+    A3 --> B5
+    B1 --> C1
+    B1 --> C2
+    B2 --> C3
+    B3 --> C4
+    B4 --> C5
+    B5 --> C6
+    C1 --> G
+    C2 --> G
+    C3 --> G
+    C4 --> G
+    C5 --> G
+    C6 --> G
 ```
 
 In this diagram, the nodes represent states, and the edges represent actions. The initial state \(S\) is connected to its successor states \(A1\), \(A2\), and \(A3\). Each successor state is further expanded, generating its own successor states, until the goal state \(G\) is reached.

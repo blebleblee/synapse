@@ -15,13 +15,13 @@ From a systems perspective, song structure can be likened to a state machine, wh
 To dissect the internal architecture of a song, we can employ a Mermaid diagram to visualize the typical flow of sections in a verse-chorus-bridge structure. This diagram will serve as a blueprint for understanding the relationships between different components and the mechanisms that govern their interactions.
 
 ```mermaid
-graph TD;
-    A["Verse 1"] --> B["Chorus"];
-    B --> C["Verse 2"];
-    C --> D["Chorus"];
-    D --> E["Bridge"];
-    E --> F["Chorus"];
-    F --> G["Outro"];
+graph TD
+    A["Verse 1"] --> B["Chorus"]
+    B --> C["Verse 2"]
+    C --> D["Chorus"]
+    D --> E["Bridge"]
+    E --> F["Chorus"]
+    F --> G["Outro"]
 ```
 
 In this diagram, we see the typical progression of a verse-chorus-bridge song. The verse introduces the thematic material, setting the scene for the chorus, which provides the emotional climax. The second verse reinforces the narrative, leading back to the chorus for another round of emotional intensity. The bridge introduces a new element, offering a moment of respite or a twist, before leading back to the chorus for the final emotional peak. The outro serves as a conclusion, bringing the song to a close.

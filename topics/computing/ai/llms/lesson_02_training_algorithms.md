@@ -52,22 +52,22 @@ where \( \odot \) denotes element-wise multiplication and \( \sigma' \) is the d
 To visualize the architecture and mechanics of the forward and backward passes, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input x] --> B[Pre-activation z1];
-    B --> C[Activation a1];
-    C --> D[Pre-activation z2];
-    D --> E[Activation y_hat];
-    E --> F[Loss L(y_hat, y)];
-    F --> G[Gradient delta2];
-    G --> H[Gradient delta1];
-    H --> I[Gradient dW1];
-    H --> J[Gradient db1];
-    G --> K[Gradient dW2];
-    G --> L[Gradient db2];
-    I --> M[Update W1];
-    J --> N[Update b1];
-    K --> O[Update W2];
-    L --> P[Update b2];
+graph TD
+    A[Input x] --> B[Pre-activation z1]
+    B --> C[Activation a1]
+    C --> D[Pre-activation z2]
+    D --> E[Activation y_hat]
+    E --> F[\"Loss L(y_hat, y)\"]
+    F --> G[Gradient delta2]
+    G --> H[Gradient delta1]
+    H --> I[Gradient dW1]
+    H --> J[Gradient db1]
+    G --> K[Gradient dW2]
+    G --> L[Gradient db2]
+    I --> M[Update W1]
+    J --> N[Update b1]
+    K --> O[Update W2]
+    L --> P[Update b2]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

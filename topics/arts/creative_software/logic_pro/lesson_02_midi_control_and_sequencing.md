@@ -21,16 +21,16 @@ MIDI sequencing in Logic Pro centers on arranging MIDI notes and controller mess
 To illustrate the architecture of MIDI control and sequencing in Logic Pro, consider the flow of MIDI messages through the DAW. The diagram below shows the relationship between MIDI controllers, channels, and automation lanes:
 
 ```mermaid
-graph TD;
-    A -->| "MIDI Controller (Knobs/Sliders)" | B;
-    B -->| "MIDI Channel (1-16)" | C;
-    C -->| "Virtual Instrument (Synthesizer)" | D;
-    B -->| "MIDI Channel (1-16)" | E;
-    E -->| "Virtual Instrument (Drum Machine)" | F;
-    B -->| "MIDI Channel (1-16)" | G;
-    G -->| "Virtual Instrument (String Section)" | H;
-    I -->| "Automation Lane (Controller Data)" | B;
-    J -->| "Automation Lane (Controller Data)" | B;
+graph TD
+    A -->| "MIDI Controller (Knobs/Sliders)" | B
+    B -->| "MIDI Channel (1-16)" | C
+    C -->| "Virtual Instrument (Synthesizer)" | D
+    B -->| "MIDI Channel (1-16)" | E
+    E -->| "Virtual Instrument (Drum Machine)" | F
+    B -->| "MIDI Channel (1-16)" | G
+    G -->| "Virtual Instrument (String Section)" | H
+    I -->| "Automation Lane (Controller Data)" | B
+    J -->| "Automation Lane (Controller Data)" | B
 ```
 
 In this diagram, MIDI controllers send control messages to MIDI channels, which are then routed to virtual instruments. Automation lanes record and playback changes to controller values over time, enabling musicians to create dynamic and expressive performances.

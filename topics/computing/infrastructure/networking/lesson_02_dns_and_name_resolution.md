@@ -28,15 +28,15 @@ DNS queries are resolved through a series of steps that involve multiple DNS ser
 The process of resolving a domain name can be visualized using a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Client] -->|Query| B[Recursive DNS Server];
-    B -->|Query Root| C[Root DNS Server];
-    C -->|Response TLD NS| B;
-    B -->|Query TLD| D[TLD DNS Server];
-    D -->|Response Domain NS| B;
-    B -->|Query Domain| E[Authoritative DNS Server];
-    E -->|Response Records| B;
-    B -->|Response Records| A;
+graph TD
+    A[Client] -->|Query| B[Recursive DNS Server]
+    B -->|"Query Root"| C[Root DNS Server]
+    C -->|"Response TLD NS"| B
+    B -->|"Query TLD"| D[TLD DNS Server]
+    D -->|"Response Domain NS"| B
+    B -->|"Query Domain"| E[Authoritative DNS Server]
+    E -->|"Response Records"| B
+    B -->|"Response Records"| A
 ```
 
 In this diagram, the client sends a query to the recursive DNS server, which then performs a series of queries to resolve the domain name. The recursive DNS server queries the root DNS server, which responds with the address of the TLD DNS server. The recursive DNS server then queries the TLD DNS server, which responds with the address of the authoritative DNS server for the domain. Finally, the recursive DNS server queries the authoritative DNS server, which responds with the requested DNS records.

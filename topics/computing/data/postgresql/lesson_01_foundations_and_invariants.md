@@ -14,10 +14,10 @@ PostgreSQL balances these trade-offs by operating essentially as an operating sy
 
 ```mermaid
 graph TD
-    Client[Client Application] -->|TCP Connection / TLS| PM[Postmaster Daemon - PID 1]
-    PM -->|fork & exec| BE[Dedicated Backend Worker Process]
-    BE <-->|Direct Read / Write via Latches| SHM[(Shared Memory Segments: Buffer Pool, WAL, Locks)]
-    SHM <-->|Block-Level Asynchronous Flush| Storage[(Persistent Storage: 8KB Slotted Heap Pages & WAL Segments)]
+    Client[Client Application] -->|"TCP Connection / TLS"| PM[Postmaster Daemon - PID 1]
+    PM -->|"fork & exec"| BE[Dedicated Backend Worker Process]
+    BE <-->|"Direct Read / Write via Latches"| SHM[\"(Shared Memory Segments: Buffer Pool, WAL, Locks)\"]
+    SHM <-->|"Block-Level Asynchronous Flush"| Storage[\"(Persistent Storage: 8KB Slotted Heap Pages & WAL Segments)\"]
     BGW[Background Auxiliary Daemons: Checkpointer, BgWriter, WalWriter, Autovacuum] <--> SHM
 ```
 

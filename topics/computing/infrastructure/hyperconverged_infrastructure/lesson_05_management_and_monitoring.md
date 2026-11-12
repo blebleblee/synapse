@@ -23,33 +23,33 @@ The analytics engine is responsible for processing the data collected by the mon
 To illustrate the architecture of a hyperconverged infrastructure management and monitoring system, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Control Plane] --> B[Declarative State Machine];
-    A --> C[Reconciliation Loop];
-    B --> D[Desired State];
-    C --> E[Actual State];
-    E --> F[Resource Allocation];
-    F --> G[Compute];
-    F --> H[Storage];
-    F --> I[Networking];
-    G --> J[CPU];
-    G --> K[Memory];
-    H --> L[Disks];
-    H --> M[Data Replication];
-    I --> N[Network Interfaces];
-    I --> O[Network Traffic];
-    A --> P[Monitoring Agents];
-    P --> Q[Node 1];
-    P --> R[Node 2];
-    P --> S[Node 3];
-    Q --> T[Metrics];
-    R --> T;
-    S --> T;
-    T --> U[Data Plane];
-    T --> V[Analytics Engine];
-    V --> W[Insights];
-    V --> X[Alerts];
-    V --> Y[Predictive Models];
+graph TD
+    A[Control Plane] --> B[Declarative State Machine]
+    A --> C[Reconciliation Loop]
+    B --> D[Desired State]
+    C --> E[Actual State]
+    E --> F[Resource Allocation]
+    F --> G[Compute]
+    F --> H[Storage]
+    F --> I[Networking]
+    G --> J[CPU]
+    G --> K[Memory]
+    H --> L[Disks]
+    H --> M[Data Replication]
+    I --> N[Network Interfaces]
+    I --> O[Network Traffic]
+    A --> P[Monitoring Agents]
+    P --> Q[Node 1]
+    P --> R[Node 2]
+    P --> S[Node 3]
+    Q --> T[Metrics]
+    R --> T
+    S --> T
+    T --> U[Data Plane]
+    T --> V[Analytics Engine]
+    V --> W[Insights]
+    V --> X[Alerts]
+    V --> Y[Predictive Models]
 ```
 
 In this diagram, the control plane is responsible for managing the desired state of the system and ensuring that the actual state matches the desired state. The monitoring agents collect data from each node within the system and report it back to the control plane. The analytics engine processes the data collected by the monitoring agents and generates insights and alerts, as well as predictive models that can be used to optimize resource allocation.

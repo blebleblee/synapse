@@ -29,10 +29,10 @@ When a probe is triggered, the eBPF code is executed, allowing the developer to 
 Here's a simplified diagram illustrating the Kprobes-eBPF integration:
 ```mermaid
 graph LR
-    A[Kprobe] -->|insert probe|> B[eBPF code]
-    B -->|execute eBPF code|> C[Kprobes data structures]
-    C -->|analyze data|> D[eBPF code]
-    D -->|process data|> E[output]
+    A[Kprobe] -->|\"insert probe\"| B[eBPF code]
+    B -->|\"execute eBPF code\"| C[Kprobes data structures]
+    C -->|\"analyze data\"| D[eBPF code]
+    D -->|\"process data\"| E[output]
 ```
 This diagram captures the essence of the integration, where the Kprobes module inserts probes into the kernel's execution flow, and the eBPF code executes within the kernel to analyze and process the collected data.
 

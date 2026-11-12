@@ -44,15 +44,15 @@ The execution model of a RAG system is a sophisticated interplay between the ret
 The execution model of a RAG system can be visualized using a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[User Query] --> B[Query Generation];
-    B --> C[Retrieval Component];
-    C --> D[Retrieve Relevant Information];
-    D --> E[Generative Component];
-    E --> F[Generate Draft Output];
-    F --> G[Integrate Retrieved Information];
-    G --> H[Generate Final Output];
-    H --> I[User Response];
+graph TD
+    A[User Query] --> B[Query Generation]
+    B --> C[Retrieval Component]
+    C --> D[Retrieve Relevant Information]
+    D --> E[Generative Component]
+    E --> F[Generate Draft Output]
+    F --> G[Integrate Retrieved Information]
+    G --> H[Generate Final Output]
+    H --> I[User Response]
 ```
 
 In this diagram, the user query is processed by the query generation component, which generates a query that is used by the retrieval component to retrieve relevant information. The retrieved information is then passed to the generative component, which generates a draft output based on the query. The draft output is then refined by integrating the retrieved information, resulting in the final output, which is returned to the user.

@@ -17,27 +17,27 @@ The organ's stops are an integral part of its architecture, as they allow the pl
 The organ's architecture can be visualized using a series of diagrams. The following diagram illustrates the basic architecture of an organ, with the bellows, action mechanism, and stops labeled:
 
 ```mermaid
-graph TD;
-    Bellows -->| "Pedal Mechanism" | ActionMechanism;
-    ActionMechanism -->| "Stops" | Pipes;
+graph TD
+    Bellows -->| "Pedal Mechanism" | ActionMechanism
+    ActionMechanism -->| "Stops" | Pipes
 ```
 
 The following diagram illustrates the relationship between the stops and the pipes:
 
 ```mermaid
-graph TD;
-    Stops -->| "Flute 8'" | Pipes;
-    Stops -->| "Principal 4'" | Pipes;
-    Stops -->| "Trumpet 2'" | Pipes;
+graph TD
+    Stops -->| "Flute 8'" | Pipes
+    Stops -->| "Principal 4'" | Pipes
+    Stops -->| "Trumpet 2'" | Pipes
 ```
 
 The following diagram illustrates the relationship between the action mechanism and the pipes:
 
 ```mermaid
-graph TD;
-    ActionMechanism -->| "Levers" | Valves;
-    ActionMechanism -->| "Sliders" | Valves;
-    Valves -->| "Pipes" | Sound;
+graph TD
+    ActionMechanism -->| "Levers" | Valves
+    ActionMechanism -->| "Sliders" | Valves
+    Valves -->| "Pipes" | Sound
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

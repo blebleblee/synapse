@@ -21,19 +21,19 @@ The mathematical invariants governing these harmonic structures are rooted in se
 To dissect the internal architecture and mechanics of advanced harmonic structures in jazz, we can use a Mermaid diagram to illustrate the relationships between different chord types and their alterations. The diagram below shows the relationships between the dominant seventh chord, its alterations, and extended chords:
 
 ```mermaid
-graph TD;
-    A["Major Scale"] --> B["Dominant Seventh (V7)"];
-    B --> C["Altered Dominant Seventh Sharp Nine (V7#9)"];
-    B --> D["Altered Dominant Seventh Flat Nine (V7b9)"];
-    B --> E["Altered Dominant Seventh Sharp Five (V7#5)"];
-    B --> F["Altered Dominant Seventh Flat Five (V7b5)"];
-    B --> G["Extended Dominant Seventh Ninth (V7/9)"];
-    B --> H["Extended Dominant Seventh Eleventh (V7/11)"];
-    B --> I["Extended Dominant Seventh Thirteenth (V7/13)"];
-    J["Diminished Seventh (vii°7)"] --> K["Substitute for V7"];
-    L["Diminished Seventh/Chromatic Approach"] --> M["Chromatic Approach Tones"];
-    N["Extended Chords"] --> O["Chromatic Alterations"];
-    N --> P["Extended Voicings"];
+graph TD
+    A["Major Scale"] --> B["Dominant Seventh (V7)"]
+    B --> C["Altered Dominant Seventh Sharp Nine (V7#9)"]
+    B --> D["Altered Dominant Seventh Flat Nine (V7b9)"]
+    B --> E["Altered Dominant Seventh Sharp Five (V7#5)"]
+    B --> F["Altered Dominant Seventh Flat Five (V7b5)"]
+    B --> G["Extended Dominant Seventh Ninth (V7/9)"]
+    B --> H["Extended Dominant Seventh Eleventh (V7/11)"]
+    B --> I["Extended Dominant Seventh Thirteenth (V7/13)"]
+    J["Diminished Seventh (vii°7)"] --> K["Substitute for V7"]
+    L["Diminished Seventh/Chromatic Approach"] --> M["Chromatic Approach Tones"]
+    N["Extended Chords"] --> O["Chromatic Alterations"]
+    N --> P["Extended Voicings"]
 ```
 
 In this diagram, the major scale serves as the foundation for the construction of the dominant seventh chord (V7). The dominant seventh chord can be altered in various ways, including the sharpening or flattening of specific scale degrees, resulting in chords such as the altered dominant seventh sharp nine (V7#9) or the altered dominant seventh flat nine (V7b9). These altered dominants introduce new harmonic tensions and resolutions, adding complexity and depth to the musical landscape.

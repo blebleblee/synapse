@@ -36,8 +36,8 @@ graph TD
     B --> C[Loss Function]
     C --> D[Parameter Updates]
     D --> E[Model Complexity]
-    E --> F[High Bias / Low Variance]
-    E --> G[Low Bias / High Variance]
+    E --> F[\"High Bias / Low Variance\"]
+    E --> G[\"Low Bias / High Variance\"]
     F --> H[Underfitting]
     G --> I[Overfitting]
 ```

@@ -18,23 +18,23 @@ Let's dissect the internal data structures and algorithms used in AI models to g
 
 ```mermaid
 graph LR
-    subgraph Input Layer
-        A[Input Data] -->|Forward Pass|> B[Activation Function]
+    subgraph "Input Layer"
+        A[Input Data] -->|\"Forward Pass\"| B[Activation Function]
     end
 
-    subgraph Hidden Layers
-        B -->|Forward Pass|> C[Activation Function]
-        C -->|Forward Pass|> D[Activation Function]
+    subgraph "Hidden Layers"
+        B -->|\"Forward Pass\"| C[Activation Function]
+        C -->|\"Forward Pass\"| D[Activation Function]
     end
 
-    subgraph Output Layer
-        D -->|Forward Pass|> E[Activation Function]
-        E -->|Backward Pass|> F[Loss Function]
+    subgraph "Output Layer"
+        D -->|\"Forward Pass\"| E[Activation Function]
+        E -->|\"Backward Pass\"| F[Loss Function]
     end
 
-    subgraph Optimization Loop
-        F -->|Optimization|> G[Weight Update]
-        G -->|Forward Pass|> E
+    subgraph "Optimization Loop"
+        F -->|\"Optimization\"| G[Weight Update]
+        G -->|\"Forward Pass\"| E
     end
 ```
 

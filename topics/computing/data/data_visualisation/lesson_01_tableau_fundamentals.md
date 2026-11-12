@@ -21,22 +21,22 @@ The data model in Tableau is a structured representation of the data that includ
 To illustrate the core architecture and mechanics of Tableau, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Data Source] --> B[Data Connection];
-    B --> C[Data Transformation];
-    C --> D[Data Model];
-    D --> E[Visualization];
-    subgraph Tableau Architecture
-        B --> F[Filtering];
-        B --> G[Aggregation];
-        B --> H[Sorting];
-        D --> I[Dimensions];
-        D --> J[Measures];
-        D --> K[Hierarchies];
-        E --> L[Bar Chart];
-        E --> M[Line Chart];
-        E --> N[Scatter Plot];
-        E --> O[Heat Map];
+graph TD
+    A[Data Source] --> B[Data Connection]
+    B --> C[Data Transformation]
+    C --> D[Data Model]
+    D --> E[Visualization]
+    subgraph "Tableau Architecture"
+        B --> F[Filtering]
+        B --> G[Aggregation]
+        B --> H[Sorting]
+        D --> I[Dimensions]
+        D --> J[Measures]
+        D --> K[Hierarchies]
+        E --> L[Bar Chart]
+        E --> M[Line Chart]
+        E --> N[Scatter Plot]
+        E --> O[Heat Map]
     end
 ```
 
@@ -55,18 +55,18 @@ Another key failure mode in Tableau is data loss, which can occur when the data 
 To illustrate the high-performance optimization and failure modes in Tableau, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Data Source] --> B[Data Connection];
-    B --> C[Data Transformation];
-    C --> D[Data Model];
-    D --> E[Visualization];
-    subgraph Tableau Optimizations
-        C --> F[In-Memory Processing];
-        C --> G[Parallel Processing];
+graph TD
+    A[Data Source] --> B[Data Connection]
+    B --> C[Data Transformation]
+    C --> D[Data Model]
+    D --> E[Visualization]
+    subgraph "Tableau Optimizations"
+        C --> F[In-Memory Processing]
+        C --> G[Parallel Processing]
     end
-    subgraph Tableau Failure Modes
-        C --> H[Data Corruption];
-        C --> I[Data Loss];
+    subgraph "Tableau Failure Modes"
+        C --> H[Data Corruption]
+        C --> I[Data Loss]
     end
 ```
 

@@ -20,9 +20,9 @@ To grasp the inner workings of AI system performance, let's dissect the internal
 
 ```mermaid
 graph LR
-    A[Model Weights] -->|Cache|> B[Cache Store]
-    B -->|Cache Hit|> C[Inference Engine]
-    C -->|Output|> D[Model Output]
+    A[Model Weights] -->|\"Cache\"| B[Cache Store]
+    B -->|\"Cache Hit\"| C[Inference Engine]
+    C -->|\"Output\"| D[Model Output]
 ```
 
 In this example, we see a basic caching mechanism where model weights are stored in a high-speed cache store. When the inference engine requests a particular weight, it checks the cache store for a cache hit. If a hit occurs, the weight is retrieved directly from the cache, reducing the latency associated with accessing the underlying model weights.
@@ -31,8 +31,8 @@ In this example, we see a basic caching mechanism where model weights are stored
 
 ```mermaid
 graph LR
-    A[Input Data] -->|Forward Pass|> B[Inference Engine]
-    B -->|Output|> C[Model Output]
+    A[Input Data] -->|\"Forward Pass\"| B[Inference Engine]
+    B -->|\"Output\"| C[Model Output]
 ```
 
 The inference engine is responsible for computing the model output given the input data. In this simplified example, we see a basic forward pass through the model, where the input data is propagated through the network to produce the final output.
@@ -47,9 +47,9 @@ To achieve optimal performance, AI systems must be designed to scale with increa
 
 ```mermaid
 graph LR
-    A[Concurrent Requests] -->|Thread Pool|> B[Worker Threads]
-    B -->|Resource Allocation|> C[Memory Pool]
-    C -->|I/O Operations|> D[Storage System]
+    A[Concurrent Requests] -->|\"Thread Pool\"| B[Worker Threads]
+    B -->|\"Resource Allocation\"| C[Memory Pool]
+    C -->|\"I/O Operations\"| D[Storage System]
 ```
 
 In this example, we see a basic thread pool architecture, where concurrent requests are distributed among worker threads. Each worker thread is responsible for allocating resources from a shared memory pool and performing I/O operations on the storage system.
@@ -60,9 +60,9 @@ As AI systems push the boundaries of performance and scalability, they inevitabl
 
 ```mermaid
 graph LR
-    A[Failure Detection] -->|Alerting|> B[Monitoring System]
-    B -->|Recovery|> C[Backup System]
-    C -->|Rollback|> D[Previous State]
+    A[Failure Detection] -->|\"Alerting\"| B[Monitoring System]
+    B -->|\"Recovery\"| C[Backup System]
+    C -->|\"Rollback\"| D[Previous State]
 ```
 
 In this example, we see a basic failure detection and recovery mechanism, where the monitoring system alerts the backup system in the event of a failure. The backup system then initiates a rollback to the previous state, ensuring minimal disruption to system operation.

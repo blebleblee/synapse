@@ -33,19 +33,19 @@ Data analysis involves querying and visualizing data to extract insights and val
 ### Mermaid Diagram of Big Data Architecture
 
 ```mermaid
-graph TD;
-    A[Data Sources] --> B[Data Ingestion];
-    B --> C[Data Storage];
-    C --> D[Data Processing];
-    D --> E[Data Analysis];
-    E --> F[Data Visualization];
-    B --> G[Secure Communication];
-    C --> H[Encryption];
-    C --> I[Access Control];
-    D --> J[Secure Execution];
-    D --> K[Data Masking];
-    E --> L[Secure Query Processing];
-    E --> M[Access Control];
+graph TD
+    A[Data Sources] --> B[Data Ingestion]
+    B --> C[Data Storage]
+    C --> D[Data Processing]
+    D --> E[Data Analysis]
+    E --> F[Data Visualization]
+    B --> G[Secure Communication]
+    C --> H[Encryption]
+    C --> I[Access Control]
+    D --> J[Secure Execution]
+    D --> K[Data Masking]
+    E --> L[Secure Query Processing]
+    E --> M[Access Control]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

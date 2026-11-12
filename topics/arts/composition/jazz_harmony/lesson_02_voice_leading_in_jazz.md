@@ -21,14 +21,14 @@ Consider the chord progression Cmaj7, D7, G7, Cmaj7. The common tones between Cm
 To visualize these concepts, we can use a Mermaid diagram to illustrate the voice leading between the chords in the progression:
 
 ```mermaid
-graph TD;
-    A["Cmaj7"] --> B["D7"];
-    B --> C["G7"];
-    C --> D["Cmaj7"];
-    A -->| "E" | B;
-    B -->| "F#" | C;
-    C -->| "B" | D;
-    B -->| "D" | C;
+graph TD
+    A["Cmaj7"] --> B["D7"]
+    B --> C["G7"]
+    C --> D["Cmaj7"]
+    A -->| "E" | B
+    B -->| "F#" | C
+    C -->| "B" | D
+    B -->| "D" | C
 ```
 
 In this diagram, nodes represent the chords, and edges represent the voice leading between them. Labels on the edges indicate notes held over or moved between chords.

@@ -21,18 +21,18 @@ A key component of After Effects is the rendering engine, responsible for genera
 To illustrate the architecture of After Effects, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "User Interface" | B;
-    B -->| "Timeline" | C;
-    B -->| "Properties Panel" | D;
-    A -->| "Core Engine" | E;
-    E -->| "Layer Management" | F;
-    E -->| "Keyframe Interpolation" | G;
-    E -->| "Effect Processing" | H;
-    E -->| "Compositing" | I;
-    A -->| "Rendering Engine" | J;
-    J -->| "Hardware Acceleration" | K;
-    J -->| "Software Rendering" | L;
+graph TD
+    A -->| "User Interface" | B
+    B -->| "Timeline" | C
+    B -->| "Properties Panel" | D
+    A -->| "Core Engine" | E
+    E -->| "Layer Management" | F
+    E -->| "Keyframe Interpolation" | G
+    E -->| "Effect Processing" | H
+    E -->| "Compositing" | I
+    A -->| "Rendering Engine" | J
+    J -->| "Hardware Acceleration" | K
+    J -->| "Software Rendering" | L
 ```
 
 In this diagram, the user interface is the primary point of interaction for the user, where the timeline and properties panel are located. The core engine manages layers, interpolates keyframes, processes effects, and composites layers. The rendering engine generates the final output of the animation, using a combination of hardware acceleration and software rendering.

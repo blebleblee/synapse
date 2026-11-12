@@ -23,12 +23,12 @@ Convolution reverb is the most accurate and flexible type of reverb algorithm. I
 The convolution reverb algorithm can be represented using the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "FFT" | C;
-    C -->| "Convolution with IR" | D;
-    D -->| "IFFT" | E;
-    E -->| "Output Signal" | F;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "FFT" | C
+    C -->| "Convolution with IR" | D
+    D -->| "IFFT" | E
+    E -->| "Output Signal" | F
 ```
 
 In this diagram, the input signal is transformed into the frequency domain using the FFT. The convolution process is then performed with the impulse response (IR) in the frequency domain. Finally, the output signal is transformed back into the time domain using the Inverse Fast Fourier Transform (IFFT).
@@ -38,12 +38,12 @@ In this diagram, the input signal is transformed into the frequency domain using
 Plate reverb is a type of reverb algorithm that simulates the sound of a metal plate excited by a transducer. The plate reverb algorithm involves the simulation of the mechanical vibrations of the plate and the subsequent sound radiation into the air. The plate reverb algorithm can be represented using the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Transducer" | C;
-    C -->| "Plate" | D;
-    D -->| "Sound Radiation" | E;
-    E -->| "Output Signal" | F;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Transducer" | C
+    C -->| "Plate" | D
+    D -->| "Sound Radiation" | E
+    E -->| "Output Signal" | F
 ```
 
 In this diagram, the input signal is applied to a transducer, which excites the plate. The mechanical vibrations of the plate are then simulated, and the resulting sound radiation is captured as the output signal. Plate reverb is known for its smooth and dense reverb characteristics, making it a popular choice for vocal and instrumental tracks.
@@ -53,12 +53,12 @@ In this diagram, the input signal is applied to a transducer, which excites the 
 Algorithmic reverb is a type of reverb algorithm that uses mathematical models to simulate the acoustic behavior of a space. The algorithmic reverb algorithm involves the use of delay lines, filters, and modulators to create the reverb effect. The algorithmic reverb algorithm can be represented using the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Delay Lines" | C;
-    C -->| "Filters" | D;
-    D -->| "Modulators" | E;
-    E -->| "Output Signal" | F;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Delay Lines" | C
+    C -->| "Filters" | D
+    D -->| "Modulators" | E
+    E -->| "Output Signal" | F
 ```
 
 In this diagram, the input signal is processed through a series of delay lines, which simulate the multiple reflections of sound within a space. The filters and modulators are then used to shape the reverb characteristics, providing a wide range of tonal and spatial effects.

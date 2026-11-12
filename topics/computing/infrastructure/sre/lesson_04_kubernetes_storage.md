@@ -23,20 +23,20 @@ The PV object is managed by the **PersistentVolumeController** (PVC), which is r
 Here is a simplified Mermaid diagram illustrating the relationship between PV, PVC, and storage class:
 ```mermaid
 graph LR
-    subgraph PV
-        PV(spec) -->|spec|> PV(status)
-        PV(phase) -->|phase|> PV(status)
+    subgraph "PV
+        PV(spec) -->|\"spec\"| PV(status)"
+        PV(phase) -->|\"phase\"| PV(status)
     end
-    subgraph PVC
-        PVC(spec) -->|spec|> PVC(status)
-        PVC(phase) -->|phase|> PVC(status)
+    subgraph "PVC
+        PVC(spec) -->|\"spec\"| PVC(status)"
+        PVC(phase) -->|\"phase\"| PVC(status)
     end
-    subgraph Storage Class
-        StorageClass -->|parameters|> PV(spec)
-        StorageClass -->|parameters|> PVC(spec)
+    subgraph "Storage Class"
+        StorageClass -->|\"parameters\"| PV(spec)
+        StorageClass -->|\"parameters\"| PVC(spec)
     end
-    PV -->|allocated|> PVC
-    PVC -->|bound|> PV
+    PV -->|\"allocated\"| PVC
+    PVC -->|\"bound\"| PV
 ```
 ## 3. High-Performance Optimization & Failure Modes
 

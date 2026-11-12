@@ -35,11 +35,11 @@ Another significant challenge is the issue of acoustic masking, where the sound 
 To illustrate the interaction between stops and the resulting acoustic output, consider the following simplified Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Principal Stop" | B;
-    B -->| "Flute Stop" | C;
-    C -->| "Reed Stop" | D;
-    D -->| "Combined Output" | E;
+graph TD
+    A -->| "Principal Stop" | B
+    B -->| "Flute Stop" | C
+    C -->| "Reed Stop" | D
+    D -->| "Combined Output" | E
 ```
 
 In this diagram, the principal, flute, and reed stops are combined to produce a rich, layered acoustic output. Each stop contributes its unique harmonic spectrum, and the resulting sound is a complex interaction of these spectra, achieving a balance of tonal clarity and depth.

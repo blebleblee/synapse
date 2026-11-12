@@ -21,19 +21,19 @@ Devices in Session Mode are the tools that allow the performer to manipulate cli
 The architecture of Session Mode can be visualized using a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Session Mode] --> B[Grid];
-    B --> C[Clips];
-    B --> D[Scenes];
-    B --> E[Devices];
-    C --> F[Audio Clips];
-    C --> G[MIDI Clips];
-    C --> H[Control Clips];
-    D --> I["Scene Launch Buttons"];
-    D --> J["Scene Automation"];
-    E --> K[Effects];
-    E --> L[Instruments];
-    E --> M["Control Devices"];
+graph TD
+    A[Session Mode] --> B[Grid]
+    B --> C[Clips]
+    B --> D[Scenes]
+    B --> E[Devices]
+    C --> F[Audio Clips]
+    C --> G[MIDI Clips]
+    C --> H[Control Clips]
+    D --> I["Scene Launch Buttons"]
+    D --> J["Scene Automation"]
+    E --> K[Effects]
+    E --> L[Instruments]
+    E --> M["Control Devices"]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

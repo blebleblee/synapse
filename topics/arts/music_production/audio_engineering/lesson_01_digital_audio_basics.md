@@ -21,10 +21,10 @@ Another critical component of digital audio systems is the Digital-to-Analog Con
 To illustrate the core architecture of a digital audio system, consider the following simplified diagram:
 
 ```mermaid
-graph TD;
-    A["Analog Signal"] -->| "ADC" | B["Digital Signal"];
-    B -->| "DSP Algorithms" | C["Digital Signal"];
-    C -->| "DAC" | D["Analog Signal"];
+graph TD
+    A["Analog Signal"] -->| "ADC" | B["Digital Signal"]
+    B -->| "DSP Algorithms" | C["Digital Signal"]
+    C -->| "DAC" | D["Analog Signal"]
 ```
 
 In this diagram, the ADC and DAC serve as the interfaces between the analog and digital domains, while the DSP algorithms perform the necessary transformations on the digital audio signal. The choice of ADC and DAC, as well as the implementation of the DSP algorithms, are critical factors in determining the overall performance and quality of the digital audio system.

@@ -31,13 +31,13 @@ Decision trees are another type of interpretable AI model that represent the dec
 The interpretability of decision trees stems from their tree-like structure, which provides a clear and intuitive representation of the decision-making process. By examining the decision rules at each internal node, stakeholders can gain insights into the key features and thresholds that drive the model's predictions. Additionally, decision trees can be visualized using ASCII or Mermaid diagrams, which provide a graphical representation of the tree structure.
 
 ```mermaid
-graph TD;
-    A[Feature A > 0.5?] --> B[Feature B < 0.3?];
-    A --> C[Feature C > 0.7?];
-    B --> D[Predict 0];
-    B --> E[Predict 1];
-    C --> F[Predict 1];
-    C --> G[Predict 0];
+graph TD
+    A[Feature A > 0.5?] --> B[Feature B < 0.3?]
+    A --> C[Feature C > 0.7?]
+    B --> D[Predict 0]
+    B --> E[Predict 1]
+    C --> F[Predict 1]
+    C --> G[Predict 0]
 ```
 
 ### Neural Networks

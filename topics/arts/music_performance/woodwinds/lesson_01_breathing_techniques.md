@@ -17,11 +17,11 @@ The efficiency of the respiratory system is also governed by the principles of f
 To dissect the mechanics of diaphragmatic breathing, we can visualize the respiratory system as a complex network of interconnected components. The diaphragm, acting as the primary pump, is supported by the abdominal muscles, which provide additional pressure during exhalation. The intercostal muscles, located between the ribs, assist in the inhalation process by elevating the rib cage. The respiratory system can be represented using a simplified diagram, as shown below:
 
 ```mermaid
-graph TD;
-    A[Thoracic Cavity] -->| "Contains" | B[Lungs];
-    A -->| "Contains" | C[Diaphragm];
-    A -->| "Contains" | D[Abdominal Muscles];
-    A -->| "Contains" | E[Intercostal Muscles];
+graph TD
+    A[Thoracic Cavity] -->| "Contains" | B[Lungs]
+    A -->| "Contains" | C[Diaphragm]
+    A -->| "Contains" | D[Abdominal Muscles]
+    A -->| "Contains" | E[Intercostal Muscles]
 ```
 
 In this diagram, the thoracic cavity represents the primary chamber where air exchange occurs. The lungs, diaphragm, abdominal muscles, and intercostal muscles work in concert to facilitate the inhalation and exhalation processes. The diaphragm, as the primary pump, is responsible for generating the initial pressure required to draw air into the lungs. The abdominal muscles provide additional support during exhalation, while the intercostal muscles assist in the inhalation process.

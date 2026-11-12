@@ -15,22 +15,22 @@ The architecture of advanced dynamics processors is built upon a series of inter
 To illustrate the architecture of a multiband compressor, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Splitter" | C;
-    C -->| "Low Band" | D;
-    C -->| "Mid Band" | E;
-    C -->| "High Band" | F;
-    D -->| "Compressor" | G;
-    E -->| "Compressor" | H;
-    F -->| "Compressor" | I;
-    G -->| "Low Band Output" | J;
-    H -->| "Mid Band Output" | K;
-    I -->| "High Band Output" | L;
-    J -->| "Joiner" | M;
-    K -->| "Joiner" | M;
-    L -->| "Joiner" | M;
-    M -->| "Output Signal" | N;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Splitter" | C
+    C -->| "Low Band" | D
+    C -->| "Mid Band" | E
+    C -->| "High Band" | F
+    D -->| "Compressor" | G
+    E -->| "Compressor" | H
+    F -->| "Compressor" | I
+    G -->| "Low Band Output" | J
+    H -->| "Mid Band Output" | K
+    I -->| "High Band Output" | L
+    J -->| "Joiner" | M
+    K -->| "Joiner" | M
+    L -->| "Joiner" | M
+    M -->| "Output Signal" | N
 ```
 
 In this diagram, the splitter divides the input signal into low, mid, and high frequency bands using bandpass filters. Each band is then processed by a compressor, which reduces the gain of the signal when it exceeds a predefined threshold. The processed bands are then recombined using a joiner to form the final output signal.
@@ -38,15 +38,15 @@ In this diagram, the splitter divides the input signal into low, mid, and high f
 Parallel compression is another advanced technique that involves processing a duplicate of the input signal with a compressor and then mixing the compressed and uncompressed signals together. This technique allows engineers to achieve a more natural-sounding compression, as the uncompressed signal retains the original dynamics while the compressed signal adds additional gain reduction. The architecture of a parallel compressor can be represented as follows:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Compressor" | C;
-    B -->| "Dry Signal" | D;
-    C -->| "Compressed Signal" | E;
-    D -->| "Dry Signal" | F;
-    E -->| "Mixer" | G;
-    F -->| "Mixer" | G;
-    G -->| "Output Signal" | H;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Compressor" | C
+    B -->| "Dry Signal" | D
+    C -->| "Compressed Signal" | E
+    D -->| "Dry Signal" | F
+    E -->| "Mixer" | G
+    F -->| "Mixer" | G
+    G -->| "Output Signal" | H
 ```
 
 In this diagram, the input signal is split into two paths: one path is processed by a compressor, while the other path remains uncompressed. The compressed and uncompressed signals are then mixed together using a mixer to form the final output signal.

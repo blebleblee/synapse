@@ -21,13 +21,13 @@ The internal data structures and algorithms used by Kprobes are designed to mini
 To further illustrate the architecture of Kprobes, consider the following Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Kernel Function] --> B[Instruction Address];
-    B --> C[Breakpoint Instruction (int3)];
-    C --> D[Kprobes Subsystem];
-    D --> E[Custom Code Execution];
-    E --> F[Original Instruction Restoration];
-    F --> G[Kernel Function Continues];
+graph TD
+    A[Kernel Function] --> B[Instruction Address]
+    B --> C[\"Breakpoint Instruction (int3)\"]
+    C --> D[Kprobes Subsystem]
+    D --> E[Custom Code Execution]
+    E --> F[Original Instruction Restoration]
+    F --> G[Kernel Function Continues]
 ```
 
 In this diagram, the kernel function is represented by node A, and the instruction address where the Kprobe is inserted is represented by node B. The breakpoint instruction is represented by node C, and the Kprobes subsystem is represented by node D. The custom code execution is represented by node E, and the original instruction restoration is represented by node F. Finally, the continuation of the kernel function is represented by node G.

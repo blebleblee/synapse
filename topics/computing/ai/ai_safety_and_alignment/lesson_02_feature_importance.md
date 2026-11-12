@@ -62,14 +62,14 @@ Sobol sensitivity analysis is particularly useful for models with complex intera
 To illustrate the mechanics of Sobol sensitivity analysis, consider a simple example using a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Model] --> B[Output Variance];
-    B --> C[First-Order Indices];
-    B --> D[Total Indices];
-    C --> E[Feature 1];
-    C --> F[Feature 2];
-    D --> G[Feature 1];
-    D --> H[Feature 2];
+graph TD
+    A[Model] --> B[Output Variance]
+    B --> C[First-Order Indices]
+    B --> D[Total Indices]
+    C --> E[Feature 1]
+    C --> F[Feature 2]
+    D --> G[Feature 1]
+    D --> H[Feature 2]
 ```
 
 In this diagram, the model's output variance is decomposed into first-order and total indices for each feature. The first-order indices represent the main effects of the features, while the total indices account for both main effects and interactions.

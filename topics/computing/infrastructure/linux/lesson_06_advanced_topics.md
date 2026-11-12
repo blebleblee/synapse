@@ -21,23 +21,23 @@ Control groups (cgroups) are another critical component of containerization, pro
 The interaction between namespaces and cgroups is illustrated in the following diagram:
 
 ```mermaid
-graph TD;
-    A[Host System] --> B[Container 1];
-    A --> C[Container 2];
-    B --> D[Mount Namespace];
-    B --> E[PID Namespace];
-    B --> F[Network Namespace];
-    B --> G[IPC Namespace];
-    B --> H[UTS Namespace];
-    B --> I[User Namespace];
-    B --> J[Cgroup];
-    C --> K[Mount Namespace];
-    C --> L[PID Namespace];
-    C --> M[Network Namespace];
-    C --> N[IPC Namespace];
-    C --> O[UTS Namespace];
-    C --> P[User Namespace];
-    C --> Q[Cgroup];
+graph TD
+    A[Host System] --> B[Container 1]
+    A --> C[Container 2]
+    B --> D[Mount Namespace]
+    B --> E[PID Namespace]
+    B --> F[Network Namespace]
+    B --> G[IPC Namespace]
+    B --> H[UTS Namespace]
+    B --> I[User Namespace]
+    B --> J[Cgroup]
+    C --> K[Mount Namespace]
+    C --> L[PID Namespace]
+    C --> M[Network Namespace]
+    C --> N[IPC Namespace]
+    C --> O[UTS Namespace]
+    C --> P[User Namespace]
+    C --> Q[Cgroup]
 ```
 
 In this diagram, each container is associated with its own set of namespaces and a cgroup, enabling isolation and resource management.
@@ -53,15 +53,15 @@ The Linux kernel supports both Type 1 and Type 2 virtualization through the KVM 
 The architecture of a KVM-based virtualization environment is illustrated in the following diagram:
 
 ```mermaid
-graph TD;
-    A[Physical Hardware] --> B[KVM Module];
-    B --> C[QEMU User-Space Emulator];
-    C --> D[VM 1];
-    C --> E[VM 2];
-    C --> F[VM 3];
-    D --> G[Guest OS 1];
-    E --> H[Guest OS 2];
-    F --> I[Guest OS 3];
+graph TD
+    A[Physical Hardware] --> B[KVM Module]
+    B --> C[QEMU User-Space Emulator]
+    C --> D[VM 1]
+    C --> E[VM 2]
+    C --> F[VM 3]
+    D --> G[Guest OS 1]
+    E --> H[Guest OS 2]
+    F --> I[Guest OS 3]
 ```
 
 In this diagram, the KVM module provides hardware-assisted virtualization, while the QEMU user-space emulator manages the allocation of system resources to each VM.
@@ -81,17 +81,17 @@ Performance monitoring tools are also essential for performance tuning, enabling
 The architecture of the Linux kernel's scheduling and resource management subsystem is illustrated in the following diagram:
 
 ```mermaid
-graph TD;
-    A[Linux Kernel] --> B[Completely Fair Scheduler (CFS)];
-    B --> C[Red-Black Tree];
-    B --> D[Preemption Models];
-    A --> E[Control Groups (cgroups)];
-    E --> F[Resource Limits];
-    E --> G[Resource Allocation];
-    A --> H[Performance Monitoring Tools];
-    H --> I[perf];
-    H --> J[trace-cmd];
-    H --> K[sysstat];
+graph TD
+    A[Linux Kernel] --> B[\"Completely Fair Scheduler (CFS)\"]
+    B --> C[Red-Black Tree]
+    B --> D[Preemption Models]
+    A --> E[\"Control Groups (cgroups)\"]
+    E --> F[Resource Limits]
+    E --> G[Resource Allocation]
+    A --> H[Performance Monitoring Tools]
+    H --> I[perf]
+    H --> J[trace-cmd]
+    H --> K[sysstat]
 ```
 
 In this diagram, the Completely Fair Scheduler (CFS) uses a red-black tree data structure to maintain a list of runnable processes and supports preemption models for quick response to changes in system load. Control groups (cgroups) allow administrators to limit and allocate resources based on specific policies and constraints, while performance monitoring tools enable administrators to collect and analyze performance data.

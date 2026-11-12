@@ -21,24 +21,24 @@ To illustrate the internal architecture of eBPF maps, consider the case of a has
 The following Mermaid diagram illustrates the internal architecture of a hash map in eBPF:
 
 ```mermaid
-graph TD;
-    A[Hash Map] --> B[Hash Table];
-    B --> C[Array of Buckets];
-    C --> D[Bucket 0];
-    C --> E[Bucket 1];
-    C --> F[Bucket 2];
-    D --> G[Entry 1];
-    D --> H[Entry 2];
-    E --> I[Entry 3];
-    F --> J[Entry 4];
-    G --> K[Key 1];
-    G --> L[Value 1];
-    H --> M[Key 2];
-    H --> N[Value 2];
-    I --> O[Key 3];
-    I --> P[Value 3];
-    J --> Q[Key 4];
-    J --> R[Value 4];
+graph TD
+    A[Hash Map] --> B[Hash Table]
+    B --> C[Array of Buckets]
+    C --> D[Bucket 0]
+    C --> E[Bucket 1]
+    C --> F[Bucket 2]
+    D --> G[Entry 1]
+    D --> H[Entry 2]
+    E --> I[Entry 3]
+    F --> J[Entry 4]
+    G --> K[Key 1]
+    G --> L[Value 1]
+    H --> M[Key 2]
+    H --> N[Value 2]
+    I --> O[Key 3]
+    I --> P[Value 3]
+    J --> Q[Key 4]
+    J --> R[Value 4]
 ```
 
 In this diagram, the hash map is implemented using a hash table, which consists of an array of buckets. Each bucket can contain a linked list of entries, which are identified by their keys and values. When an eBPF program performs a lookup operation on the hash map, it computes the hash value of the key and uses it to determine the index of the bucket in the array. It then traverses the linked list in the bucket to find the entry with the matching key.

@@ -78,28 +78,28 @@ To understand the architecture of a database system, it is essential to examine 
 The following Mermaid diagram represents the core data and control flow in a typical database system:
 
 ```mermaid
-graph TD;
-    A[Application] --> B[DBMS];
-    B --> C[Storage Engine];
-    B --> D[Query Processor];
-    B --> E[Concurrency Control Manager];
-    B --> F[Transaction Manager];
-    B --> G[Recovery Manager];
-    C --> H[Data];
-    D --> I[Query];
-    E --> J[Concurrency Control];
-    F --> K[Transaction];
-    G --> L[Recovery];
-    H --> M[Data Retrieval];
-    I --> N[Query Execution];
-    J --> O[Concurrency Control];
-    K --> P[Transaction Management];
-    L --> Q[Recovery];
-    M --> A;
-    N --> A;
-    O --> A;
-    P --> A;
-    Q --> A;
+graph TD
+    A[Application] --> B[DBMS]
+    B --> C[Storage Engine]
+    B --> D[Query Processor]
+    B --> E[Concurrency Control Manager]
+    B --> F[Transaction Manager]
+    B --> G[Recovery Manager]
+    C --> H[Data]
+    D --> I[Query]
+    E --> J[Concurrency Control]
+    F --> K[Transaction]
+    G --> L[Recovery]
+    H --> M[Data Retrieval]
+    I --> N[Query Execution]
+    J --> O[Concurrency Control]
+    K --> P[Transaction Management]
+    L --> Q[Recovery]
+    M --> A
+    N --> A
+    O --> A
+    P --> A
+    Q --> A
 ```
 
 In this diagram, the application interacts with the DBMS, which in turn interacts with the various components of the database system. The storage engine manages the physical storage of data, while the query processor parses, optimizes, and executes queries. The concurrency control manager ensures data consistency and integrity in concurrent environments, while the transaction manager manages transactions, ensuring that they are executed atomically, consistently, and durably. The recovery manager ensures that the database system can recover from failures, maintaining data consistency and integrity.

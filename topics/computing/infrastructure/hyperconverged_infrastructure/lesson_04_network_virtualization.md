@@ -37,11 +37,11 @@ The mechanics of network virtualization involve the following steps:
 The following Mermaid diagram illustrates the core architecture of a network virtualization system:
 ```mermaid
 graph LR
-    SDN Controller -->|Discovery|> Physical Infrastructure
-    SDN Controller -->|Configuration|> NFV Platform
-    NFV Platform -->|VNFs|> Virtual Network Functions
-    Virtual Network Functions -->|Traffic Flow|> Physical Infrastructure
-    SDN Controller -->|Monitoring|> Network
+    SDN Controller -->|\"Discovery\"| Physical Infrastructure
+    SDN Controller -->|\"Configuration\"| NFV Platform
+    NFV Platform -->|\"VNFs\"| Virtual Network Functions
+    Virtual Network Functions -->|\"Traffic Flow\"| Physical Infrastructure
+    SDN Controller -->|\"Monitoring\"| Network
 ```
 ## 3. High-Performance Optimization & Failure Modes
 
@@ -62,9 +62,9 @@ To handle failure modes, network virtualization systems rely on techniques such 
 The following Mermaid diagram illustrates the high-performance optimization and failure modes of a network virtualization system:
 ```mermaid
 graph LR
-    SDN Controller -->|Flow-based Routing|> Traffic Flow
-    SDN Controller -->|Traffic Engineering|> Resource Allocation
-    NFV Platform -->|Fault Tolerance|> Redundant Components
-    NFV Platform -->|Self-healing|> Automated Repair Mechanisms
-    SDN Controller -->|Scalability|> Dynamic Resource Allocation
+    SDN Controller -->|\"Flow-based Routing\"| Traffic Flow
+    SDN Controller -->|\"Traffic Engineering\"| Resource Allocation
+    NFV Platform -->|\"Fault Tolerance\"| Redundant Components
+    NFV Platform -->|\"Self-healing\"| Automated Repair Mechanisms
+    SDN Controller -->|\"Scalability\"| Dynamic Resource Allocation
 ```

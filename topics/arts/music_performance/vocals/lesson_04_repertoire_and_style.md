@@ -21,11 +21,11 @@ The human voice can be conceptualized as a complex system comprising several key
 A simplified diagram of the vocal tract is provided below:
 
 ```mermaid
-graph TD;
-    A -->| "Larynx" | B;
-    B -->| "Pharynx" | C;
-    C -->| "Oral Cavity" | D;
-    D -->| "Nasal Cavity" | E;
+graph TD
+    A -->| "Larynx" | B
+    B -->| "Pharynx" | C
+    C -->| "Oral Cavity" | D
+    D -->| "Nasal Cavity" | E
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

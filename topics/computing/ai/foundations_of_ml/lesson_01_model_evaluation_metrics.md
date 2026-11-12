@@ -49,13 +49,13 @@ To gain a deeper understanding of the mechanics of model evaluation metrics, it 
 The computation of accuracy, precision, recall, and F1-score can be visualized using a simple Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A["Confusion Matrix"] --> B["TP"];
-    A --> C["TN"];
-    A --> D["FP"];
-    A --> E["FN"];
-    B --> F["Accuracy = (TP + TN) / (TP + TN + FP + FN)"];
-    B --> G["Precision = TP / (TP + FP)"];
-    B --> H["Recall = TP / (TP + FN)"];
-    G --> I["F1-score = 2 * (Precision * Recall) / (Precision + Recall)"];
+graph TD
+    A["Confusion Matrix"] --> B["TP"]
+    A --> C["TN"]
+    A --> D["FP"]
+    A --> E["FN"]
+    B --> F["Accuracy = (TP + TN) / (TP + TN + FP + FN)"]
+    B --> G["Precision = TP / (TP + FP)"]
+    B --> H["Recall = TP / (TP + FN)"]
+    G --> I["F1-score = 2 * (Precision * Recall) / (Precision + Recall)"]
 ```

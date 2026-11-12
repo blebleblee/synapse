@@ -23,12 +23,12 @@ The makeup gain stage is used to restore the overall level of the signal after g
 To illustrate the architecture of a dynamics processor, we can use a simple block diagram:
 
 ```mermaid
-graph TD;
-    A -->| "Input Signal" | B;
-    B -->| "Detector" | C;
-    C -->| "Gain Reducer" | D;
-    D -->| "Makeup Gain Stage" | E;
-    E -->| "Output Signal" | F;
+graph TD
+    A -->| "Input Signal" | B
+    B -->| "Detector" | C
+    C -->| "Gain Reducer" | D
+    D -->| "Makeup Gain Stage" | E
+    E -->| "Output Signal" | F
 ```
 
 In this diagram, the input signal is first passed through the detector, which generates a control signal based on the amplitude of the input. This control signal is then used to adjust the gain of the gain reducer, which applies the necessary gain reduction to the input signal. Finally, the makeup gain stage amplifies the signal to restore the overall level.

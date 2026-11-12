@@ -21,16 +21,16 @@ The maintenance of a reed involves a series of steps that are carefully executed
 The preparation and maintenance of a reed can be visualized as a series of steps that are carefully executed to ensure optimal vibration and consistent quality of sound. The preparation of a reed involves the selection of high-quality cane, the shaping and cutting of the cane to achieve the desired geometry and stiffness, and the conditioning and adjustment of the reed to achieve the desired sound. The maintenance of a reed involves the cleaning and conditioning of the reed to ensure that it remains in optimal condition for performance, and the adjustment of the reed to achieve the desired sound.
 
 ```mermaid
-graph TD;
-    A -->| "Select High-Quality Cane" | B;
-    B -->| "Shape and Cut Cane" | C;
-    C -->| "Condition Reed (Soak in Water)" | D;
-    D -->| "Adjust Reed (File and Sand)" | E;
-    E -->| "Shape Profile (Achieve Sound)" | F;
-    F -->| "Clean Reed (Soak in Water)" | G;
-    G -->| "Condition Reed (Soak in Water)" | H;
-    H -->| "Adjust Reed (File and Sand)" | I;
-    I -->| "Store in Humid Environment" | J;
+graph TD
+    A -->| "Select High-Quality Cane" | B
+    B -->| "Shape and Cut Cane" | C
+    C -->| "Condition Reed (Soak in Water)" | D
+    D -->| "Adjust Reed (File and Sand)" | E
+    E -->| "Shape Profile (Achieve Sound)" | F
+    F -->| "Clean Reed (Soak in Water)" | G
+    G -->| "Condition Reed (Soak in Water)" | H
+    H -->| "Adjust Reed (File and Sand)" | I
+    I -->| "Store in Humid Environment" | J
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

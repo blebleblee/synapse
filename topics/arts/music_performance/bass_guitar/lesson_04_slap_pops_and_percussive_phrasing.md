@@ -23,13 +23,13 @@ The hand positioning is the arrangement of the fingers and thumb on the string, 
 To illustrate the slap pop technique, we can use a simple diagram to show the hand positioning and the motion of the slap and pop. The diagram below shows the hand positioning for a slap pop on the E string:
 
 ```mermaid
-graph TD;
-    A -->| "Fingers Slap" | B;
-    B -->| "Thumb Pops" | C;
-    A -->| "E String" | C;
-    subgraph Hand_Positioning
-        A -->| "Curved Fingers" | B;
-        B -->| "Thumb Behind String" | C;
+graph TD
+    A -->| "Fingers Slap" | B
+    B -->| "Thumb Pops" | C
+    A -->| "E String" | C
+    subgraph "Hand_Positioning
+        A -->| "Curved Fingers" | B"
+        B -->| "Thumb Behind String" | C
     end
 ```
 

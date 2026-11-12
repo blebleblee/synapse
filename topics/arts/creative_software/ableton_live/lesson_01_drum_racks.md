@@ -19,11 +19,11 @@ The mechanics of a drum rack are further enhanced by the use of MIDI clips, whic
 To illustrate the architecture of a drum rack, we can use a simple diagram:
 
 ```mermaid
-graph TD;
-    A -->| "MIDI Clip (Timing, Velocity)" | B;
-    B -->| "Drum Rack (Slots, Samples)" | C;
-    C -->| "Audio Buffer (Processed Samples)" | D;
-    D -->| "Output Bus (Mixed Audio)" | E;
+graph TD
+    A -->| "MIDI Clip (Timing, Velocity)" | B
+    B -->| "Drum Rack (Slots, Samples)" | C
+    C -->| "Audio Buffer (Processed Samples)" | D
+    D -->| "Output Bus (Mixed Audio)" | E
 ```
 
 In this diagram, the MIDI clip is the source of the rhythmic pattern, which is sent to the drum rack for processing. The drum rack contains a series of slots, each of which can contain a different drum sample. These samples are then processed through a series of audio buffers, which store the processed audio. Finally, the processed audio is sent to the output bus, where it is mixed with other audio signals.

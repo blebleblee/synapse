@@ -23,13 +23,13 @@ The execution model of Logic Pro centers around real-time audio processing. When
 To illustrate Logic Pro's architecture, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A -->| "User Interface" | B;
-    B -->| "Timeline Editor" | C;
-    C -->| "Audio Engine" | D;
-    D -->| "MIDI Engine" | E;
-    E -->| "Audio I/O" | F;
-    F -->| "File System" | G;
+graph TD
+    A -->| "User Interface" | B
+    B -->| "Timeline Editor" | C
+    C -->| "Audio Engine" | D
+    D -->| "MIDI Engine" | E
+    E -->| "Audio I/O" | F
+    F -->| "File System" | G
 ```
 
 In this diagram, the User Interface provides the primary means for interacting with the software, while the Timeline Editor is the primary tool for editing audio and MIDI tracks. The Audio Engine processes audio data in real-time, and the MIDI Engine handles MIDI events. The Audio I/O component manages audio signal input and output, and the File System handles storage and retrieval of audio files.

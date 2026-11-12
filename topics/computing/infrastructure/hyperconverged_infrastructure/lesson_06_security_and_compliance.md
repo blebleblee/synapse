@@ -31,17 +31,17 @@ At the hardware abstraction layer, HCI systems typically employ virtualization t
 The software stack of an HCI system is composed of several layers, each of which contributes to the system's security and compliance. The following diagram illustrates the key components of the software stack:
 
 ```mermaid
-graph TD;
-    A[Application Layer] --> B[Virtual Machine Manager];
-    B --> C[Storage Layer];
-    B --> D[Networking Layer];
-    B --> E[Compute Layer];
-    C --> F[Storage Hypervisor];
-    D --> G[Network Hypervisor];
-    E --> H[Compute Hypervisor];
-    F --> I[Physical Storage];
-    G --> J[Physical Networking];
-    H --> K[Physical Compute];
+graph TD
+    A[Application Layer] --> B[Virtual Machine Manager]
+    B --> C[Storage Layer]
+    B --> D[Networking Layer]
+    B --> E[Compute Layer]
+    C --> F[Storage Hypervisor]
+    D --> G[Network Hypervisor]
+    E --> H[Compute Hypervisor]
+    F --> I[Physical Storage]
+    G --> J[Physical Networking]
+    H --> K[Physical Compute]
 ```
 
 #### 2.2.1. Virtual Machine Manager

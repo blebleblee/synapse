@@ -49,14 +49,14 @@ In addition to representing scales and modes as arrays of notes, it is also usef
 For example, the C major scale can be represented as a graph with the following nodes and edges:
 
 ```mermaid
-graph TD;
-    60 -->| "W" | 62;
-    62 -->| "W" | 64;
-    64 -->| "H" | 65;
-    65 -->| "W" | 67;
-    67 -->| "W" | 69;
-    69 -->| "W" | 71;
-    71 -->| "H" | 72;
+graph TD
+    60 -->| "W" | 62
+    62 -->| "W" | 64
+    64 -->| "H" | 65
+    65 -->| "W" | 67
+    67 -->| "W" | 69
+    69 -->| "W" | 71
+    71 -->| "H" | 72
 ```
 
 In this graph, each node represents a MIDI value, and each edge represents a whole step (W) or half step (H) between notes. By analyzing the structure of this graph, we can gain insights into the harmonic and melodic relationships between notes in the C major scale, as well as identify potential substitutions and variations.

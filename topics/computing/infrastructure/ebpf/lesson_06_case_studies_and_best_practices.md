@@ -21,14 +21,14 @@ To understand the architecture and mechanics of eBPF maps, we must examine their
 Hash maps are the most versatile type of eBPF map, providing average O(1) time complexity for insertions, deletions, and lookups. The internal structure of a hash map consists of an array of buckets, where each bucket contains a linked list of key-value pairs. When a key is inserted into the map, it is hashed to determine the appropriate bucket. The key-value pair is then added to the linked list in that bucket. Similarly, when a key is looked up, it is hashed to determine the bucket, and the linked list is traversed to find the corresponding value.
 
 ```mermaid
-graph TD;
-    A[Hash Map] --> B[Bucket 0];
-    A --> C[Bucket 1];
-    A --> D[Bucket 2];
-    B --> E[Key-Value Pair 1];
-    B --> F[Key-Value Pair 2];
-    C --> G[Key-Value Pair 3];
-    D --> H[Key-Value Pair 4];
+graph TD
+    A[Hash Map] --> B[Bucket 0]
+    A --> C[Bucket 1]
+    A --> D[Bucket 2]
+    B --> E[Key-Value Pair 1]
+    B --> F[Key-Value Pair 2]
+    C --> G[Key-Value Pair 3]
+    D --> H[Key-Value Pair 4]
 ```
 
 ### Array Maps
@@ -36,11 +36,11 @@ graph TD;
 Array maps provide O(1) time complexity for insertions, deletions, and lookups, but with a fixed size. The internal structure of an array map is a simple array of key-value pairs, where the key is an index into the array. This fixed-size array allows for efficient memory allocation and access, making array maps ideal for use cases where the number of elements is known in advance.
 
 ```mermaid
-graph TD;
-    A[Array Map] --> B[Element 0];
-    A --> C[Element 1];
-    A --> D[Element 2];
-    A --> E[Element 3];
+graph TD
+    A[Array Map] --> B[Element 0]
+    A --> C[Element 1]
+    A --> D[Element 2]
+    A --> E[Element 3]
 ```
 
 ### Per-CPU Hash Maps
@@ -48,16 +48,16 @@ graph TD;
 Per-CPU hash maps are a variant of hash maps that are optimized for high-performance environments with multiple CPUs. Each CPU has its own instance of the hash map, allowing eBPF programs to access the map without contention. This per-CPU design eliminates the need for locking, which can be a significant performance bottleneck in multi-core systems.
 
 ```mermaid
-graph TD;
-    A[Per-CPU Hash Map] --> B[CPU 0];
-    A --> C[CPU 1];
-    A --> D[CPU 2];
-    B --> E[Bucket 0];
-    B --> F[Bucket 1];
-    C --> G[Bucket 0];
-    C --> H[Bucket 1];
-    D --> I[Bucket 0];
-    D --> J[Bucket 1];
+graph TD
+    A[Per-CPU Hash Map] --> B[CPU 0]
+    A --> C[CPU 1]
+    A --> D[CPU 2]
+    B --> E[Bucket 0]
+    B --> F[Bucket 1]
+    C --> G[Bucket 0]
+    C --> H[Bucket 1]
+    D --> I[Bucket 0]
+    D --> J[Bucket 1]
 ```
 
 The choice of map type is critical for the performance and scalability of eBPF programs. Each map type has its strengths and weaknesses, and the optimal choice depends on the specific requirements of the application. For example, hash maps are ideal for use cases where the number of elements is not known in advance, while array maps are better suited for fixed-size data sets. Per-CPU hash maps are the best choice for high-performance environments with multiple CPUs.

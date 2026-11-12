@@ -29,12 +29,12 @@ The output interface is responsible for encoding the processed audio and video d
 To illustrate the architecture of an audio and video generation system, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Data Ingestion] --> B[Preprocessing];
-    B --> C[Processing Engine];
-    C --> D[Postprocessing];
-    D --> E[Encoding];
-    E --> F[Output Delivery];
+graph TD
+    A[Data Ingestion] --> B[Preprocessing]
+    B --> C[Processing Engine]
+    C --> D[Postprocessing]
+    D --> E[Encoding]
+    E --> F[Output Delivery]
 ```
 
 In this diagram, the data ingestion component is responsible for acquiring raw audio and video data from various sources. The preprocessing component performs initial transformations, such as decoding and synchronization. The processing engine applies the core transformations and effects, leveraging parallel processing techniques to achieve high performance. The postprocessing component performs any final transformations, such as filtering and normalization. The encoding component compresses the processed data into a suitable format, and the output delivery component delivers the final output to the end user.

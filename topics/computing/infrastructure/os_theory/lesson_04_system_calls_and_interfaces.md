@@ -25,10 +25,10 @@ The system call interface is typically implemented using a combination of data s
 Here is a simplified diagram of the system call interface:
 ```mermaid
 graph LR
-    A[Application] -->|System Call|> B[Kernel]
-    B -->|System Call Handler|> C[Kernel]
-    C -->|System Call Handler Function|> D[Kernel]
-    D -->|Response|> A
+    A[Application] -->|\"System Call\"| B[Kernel]
+    B -->|\"System Call Handler\"| C[Kernel]
+    C -->|\"System Call Handler Function\"| D[Kernel]
+    D -->|\"Response\"| A
 ```
 In this diagram, the application sends a system call request to the kernel, which dispatches the system call to its corresponding handler function. The handler function executes the necessary operations to fulfill the system call request and returns the response to the application.
 

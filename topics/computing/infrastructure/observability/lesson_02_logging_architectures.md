@@ -33,11 +33,11 @@ In practice, log storage and analysis systems are often implemented as distribut
 To illustrate the architecture of a logging system, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Log Generators] --> B[Log Collectors];
-    B --> C[Log Storage and Analysis];
-    C --> D[Operators];
-    C --> E[Analysts];
+graph TD
+    A[Log Generators] --> B[Log Collectors]
+    B --> C[Log Storage and Analysis]
+    C --> D[Operators]
+    C --> E[Analysts]
 ```
 
 In this diagram, log generators (A) generate log messages, which are collected by log collectors (B). The log collectors forward the log messages to a centralized log storage and analysis system (C), which is used by operators (D) and analysts (E) to extract meaningful insights from the log data.

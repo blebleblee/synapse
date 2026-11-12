@@ -23,10 +23,10 @@ In the key of C major, the scale is C, D, E, F, G, A, B. The ii chord (Dm7) is b
 The harmonic relationships between these chords can be visualized as follows:
 
 ```mermaid
-graph TD;
-    Dm7 -->| "ii" | G7;
-    G7 -->| "V" | Cmaj7;
-    Cmaj7 -->| "I" | End;
+graph TD
+    Dm7 -->| "ii" | G7
+    G7 -->| "V" | Cmaj7
+    Cmaj7 -->| "I" | End
 ```
 
 This progression can be further analyzed in terms of its harmonic functions and transformations. The ii chord serves as a pre-dominant, setting up the dominant function of the V chord. The V chord, with its tritone and leading tones, creates a strong pull towards the tonic chord (I). The resolution of the V chord to the I chord provides a sense of harmonic closure.

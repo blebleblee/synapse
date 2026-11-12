@@ -96,9 +96,9 @@ graph TD
     end
 
     subgraph Remediation[Autovacuum Recovery]
-        Dead -->|Vacuum Scan| Pointers[Reclaim Line Pointers]
-        Pointers -->|HOT Optimization| FreeSpace[Consolidate Free Space for new inserts]
-        T2 -->|Old Age > 200M tx| Frozen[Freeze Tuple: HEAP_XMIN_FROZEN]
+        Dead -->|"Vacuum Scan"| Pointers[Reclaim Line Pointers]
+        Pointers -->|"HOT Optimization"| FreeSpace[Consolidate Free Space for new inserts]
+        T2 -->|"Old Age > 200M tx"| Frozen[Freeze Tuple: HEAP_XMIN_FROZEN]
     end
 ```
 

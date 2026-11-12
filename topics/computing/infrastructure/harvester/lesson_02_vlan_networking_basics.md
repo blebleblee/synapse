@@ -17,20 +17,20 @@ The architecture of VLANs is centered around the use of VLAN tags and the config
 The switch then forwards the frame to the appropriate ports that belong to the same VLAN. This forwarding is achieved through the use of a VLAN membership table, which maps each port to one or more VLANs. The VLAN membership table is configured by the network administrator and is used by the switch to enforce the segmentation. The following Mermaid diagram illustrates the basic architecture of VLANs:
 
 ```mermaid
-graph TD;
-    A[Device 1] --> B[Switch Port 1];
-    B --> C[VLAN Membership Table];
-    C --> D[Switch Port 2];
-    D --> E[Device 2];
-    B --> F[Switch Port 3];
-    F --> G[VLAN Membership Table];
-    G --> H[Switch Port 4];
-    H --> I[Device 3];
-    B --> J[Trunk Link];
-    J --> K[Switch Port 5];
-    K --> L[VLAN Membership Table];
-    L --> M[Switch Port 6];
-    M --> N[Device 4];
+graph TD
+    A[Device 1] --> B[Switch Port 1]
+    B --> C[VLAN Membership Table]
+    C --> D[Switch Port 2]
+    D --> E[Device 2]
+    B --> F[Switch Port 3]
+    F --> G[VLAN Membership Table]
+    G --> H[Switch Port 4]
+    H --> I[Device 3]
+    B --> J[Trunk Link]
+    J --> K[Switch Port 5]
+    K --> L[VLAN Membership Table]
+    L --> M[Switch Port 6]
+    M --> N[Device 4]
 ```
 
 In this diagram, devices 1 and 2 are connected to switch ports 1 and 2, respectively, which are configured to belong to VLAN 10. Device 3 is connected to switch port 3, which is configured to belong to VLAN 20. Switch port 4 is a trunk link that carries traffic for both VLAN 10 and VLAN 20. Device 4 is connected to switch port 6, which is configured to belong to VLAN 20.

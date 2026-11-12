@@ -27,12 +27,12 @@ The internal data structures and algorithms used to implement these stages vary 
 The following Mermaid diagram illustrates the core architecture of a dynamic processor:
 
 ```mermaid
-graph TD;
-    A["Input Signal"] --> B["Envelope Follower"];
-    B --> C["Comparator"];
-    C --> D["Gain Reduction"];
-    D --> E["Amplification"];
-    E --> F["Output Signal"];
+graph TD
+    A["Input Signal"] --> B["Envelope Follower"]
+    B --> C["Comparator"]
+    C --> D["Gain Reduction"]
+    D --> E["Amplification"]
+    E --> F["Output Signal"]
 ```
 
 In this diagram, the input signal is first passed through an envelope follower to extract the envelope. The envelope is then compared to the threshold level using a comparator, and the resulting gain reduction is applied using a gain reduction algorithm. Finally, the signal is amplified to restore the overall level of the audio.

@@ -17,9 +17,9 @@ To gain a deeper understanding of pipeline orchestration, we must dissect the in
 Let us illustrate this concept with a simple example. Consider a data pipeline that involves three stages: data ingestion, data preprocessing, and model training. In a DAG representation, the data ingestion task would be represented as a node, with an edge pointing to the data preprocessing task, indicating that the preprocessing task depends on the successful completion of the ingestion task. Similarly, the data preprocessing task would have an edge pointing to the model training task, indicating that the training task depends on the successful completion of the preprocessing task.
 
 ```mermaid
-graph TD;
-    A[Data Ingestion] --> B[Data Preprocessing];
-    B --> C[Model Training];
+graph TD
+    A[Data Ingestion] --> B[Data Preprocessing]
+    B --> C[Model Training]
 ```
 
 In this example, the DAG clearly illustrates the dependencies between tasks, providing a visual representation of the pipeline's execution order. The orchestration system would monitor the status of each task, triggering the execution of subsequent tasks once their dependencies are satisfied.

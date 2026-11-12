@@ -19,19 +19,19 @@ The timeline also supports automation of parameters over time, achieved through 
 To illustrate the architecture of the timeline in Cubase, consider the following diagram:
 
 ```mermaid
-graph TD;
-    Timeline -->| "Contains" | Track1;
-    Timeline -->| "Contains" | Track2;
-    Track1 -->| "Has" | AudioSamples1;
-    Track1 -->| "Has" | AutomationCurves1;
-    Track2 -->| "Has" | AudioSamples2;
-    Track2 -->| "Has" | AutomationCurves2;
-    AutomationCurves1 -->| "Includes" | Volume1;
-    AutomationCurves1 -->| "Includes" | Pan1;
-    AutomationCurves1 -->| "Includes" | EQ1;
-    AutomationCurves2 -->| "Includes" | Volume2;
-    AutomationCurves2 -->| "Includes" | Pan2;
-    AutomationCurves2 -->| "Includes" | EQ2;
+graph TD
+    Timeline -->| "Contains" | Track1
+    Timeline -->| "Contains" | Track2
+    Track1 -->| "Has" | AudioSamples1
+    Track1 -->| "Has" | AutomationCurves1
+    Track2 -->| "Has" | AudioSamples2
+    Track2 -->| "Has" | AutomationCurves2
+    AutomationCurves1 -->| "Includes" | Volume1
+    AutomationCurves1 -->| "Includes" | Pan1
+    AutomationCurves1 -->| "Includes" | EQ1
+    AutomationCurves2 -->| "Includes" | Volume2
+    AutomationCurves2 -->| "Includes" | Pan2
+    AutomationCurves2 -->| "Includes" | EQ2
 ```
 
 In this diagram, each track is represented as a node in the timeline, containing an array of audio samples and a set of automation curves. The automation curves are represented as arrays of control points, which are interpolated to create smooth transitions between parameter values.

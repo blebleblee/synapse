@@ -25,19 +25,19 @@ The mechanics of dynamic tracing involve several key components, including the p
 To illustrate the architecture of a dynamic tracing system, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Probe Manager] --> B[Insert Probes];
-    A --> C[Configure Probes];
-    A --> D[Manage Probes];
-    B --> E[Kernel];
-    B --> F[User-Space];
-    E --> G[Data Collector];
-    F --> G;
-    G --> H[Data Processor];
-    H --> I[Filter Data];
-    H --> J[Aggregate Data];
-    H --> K[Store Data];
-    H --> L[User Interface];
+graph TD
+    A[Probe Manager] --> B[Insert Probes]
+    A --> C[Configure Probes]
+    A --> D[Manage Probes]
+    B --> E[Kernel]
+    B --> F[User-Space]
+    E --> G[Data Collector]
+    F --> G
+    G --> H[Data Processor]
+    H --> I[Filter Data]
+    H --> J[Aggregate Data]
+    H --> K[Store Data]
+    H --> L[User Interface]
 ```
 
 In this diagram, the probe manager is responsible for inserting and managing probes in both the kernel and user-space. The data collector captures data from the probes and sends it to the data processor, which filters, aggregates, and stores the data. The user interface provides a means for analyzing the data and gaining insights into system performance.

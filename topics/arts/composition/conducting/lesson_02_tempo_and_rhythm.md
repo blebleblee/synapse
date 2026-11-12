@@ -27,19 +27,19 @@ The interaction between the conductor and the ensemble is the final component of
 To illustrate the core architecture of conducting, we can use a simple diagram to represent the relationship between the conductor's gestures, mental processes, and the ensemble's performance.
 
 ```mermaid
-graph TD;
-    A -->| "Conductor's Gestures" | B;
-    B -->| "Downbeat" | C;
-    B -->| "Steady Beat" | D;
-    B -->| "Dynamic Gestures" | E;
-    B -->| "Conductor's Mental Processes" | F;
-    F -->| "Music Structure" | G;
-    F -->| "Focus" | H;
-    F -->| "Intuition" | I;
-    F -->| "Ensemble's Performance" | J;
-    J -->| "Rhythm" | K;
-    J -->| "Tempo" | L;
-    J -->| "Expression" | M;
+graph TD
+    A -->| "Conductor's Gestures" | B
+    B -->| "Downbeat" | C
+    B -->| "Steady Beat" | D
+    B -->| "Dynamic Gestures" | E
+    B -->| "Conductor's Mental Processes" | F
+    F -->| "Music Structure" | G
+    F -->| "Focus" | H
+    F -->| "Intuition" | I
+    F -->| "Ensemble's Performance" | J
+    J -->| "Rhythm" | K
+    J -->| "Tempo" | L
+    J -->| "Expression" | M
 ```
 
 This diagram highlights the interplay between the conductor's physical gestures, mental processes, and the ensemble's performance, illustrating how these elements work together to create a cohesive and expressive musical performance.

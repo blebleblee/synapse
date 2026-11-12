@@ -21,16 +21,16 @@ The paradiddle is a more advanced instruction set, involving a combination of si
 To illustrate the mechanics of these techniques, we can use a simple diagram to represent the motion of the right hand. The diagram below shows the motion of the right hand during a single stroke, double stroke, and paradiddle.
 
 ```mermaid
-graph TD;
-    A -->| "Single Stroke" | B;
-    B -->| "Wrist: Downward" | C;
-    C -->| "Finger: Downward strike" | D;
-    A -->| "Double Stroke" | E;
-    E -->| "Wrist: Downward, Upward" | F;
-    F -->| "Finger: Downward strike, Upward strike" | G;
-    A -->| "Paradiddle" | H;
-    H -->| "Wrist: Downward, Upward, Downward" | I;
-    I -->| "Finger: Downward strike, Upward strike, Downward strike" | J;
+graph TD
+    A -->| "Single Stroke" | B
+    B -->| "Wrist: Downward" | C
+    C -->| "Finger: Downward strike" | D
+    A -->| "Double Stroke" | E
+    E -->| "Wrist: Downward, Upward" | F
+    F -->| "Finger: Downward strike, Upward strike" | G
+    A -->| "Paradiddle" | H
+    H -->| "Wrist: Downward, Upward, Downward" | I
+    I -->| "Finger: Downward strike, Upward strike, Downward strike" | J
 ```
 
 In this diagram, the wrist motion represents the primary motion of the hand, while the finger motion represents the precise strikes on the drum head. The single stroke involves a simple downward motion, with the fingers striking the drum head on the downward stroke. The double stroke involves a more complex motion, with the wrist moving both downward and upward, and the fingers striking the drum head on both strokes. The paradiddle involves a combination of single and double strokes, with the wrist moving downward, upward, and downward, and the fingers striking the drum head on each stroke.

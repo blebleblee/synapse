@@ -19,12 +19,12 @@ where $v$ is the speed of sound, $L$ is the length of the air column, and $D$ is
 The internal mechanics of woodwind instruments can be thought of as a complex system of interacting components, each contributing to the overall sound produced. The following diagram illustrates the basic components of a woodwind instrument:
 
 ```mermaid
-graph LR;
-    A["Embouchure"] --> B["Reed"];
-    B --> C["Air Column"];
-    C --> D["Bore"];
-    D --> E["Resonating Chamber"];
-    E --> F["Sound Hole"];
+graph LR
+    A["Embouchure"] --> B["Reed"]
+    B --> C["Air Column"]
+    C --> D["Bore"]
+    D --> E["Resonating Chamber"]
+    E --> F["Sound Hole"]
 ```
 
 In this diagram, the embouchure (A) provides the initial energy for the vibration of the air column (C), which is then amplified and shaped by the bore (D) and resonating chamber (E). The sound hole (F) serves as the final output, projecting the sound into the surrounding environment.

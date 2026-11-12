@@ -23,28 +23,28 @@ The relationships between these sections are critical to effective orchestration
 To illustrate these relationships, we can use a simple diagram to represent the orchestra's architecture:
 
 ```mermaid
-graph TD;
-    Orchestra -->| "Strings" | Strings;
-    Orchestra -->| "Woodwinds" | Woodwinds;
-    Orchestra -->| "Brass" | Brass;
-    Orchestra -->| "Percussion" | Percussion;
-    Strings -->| "First Violins" | FirstViolins;
-    Strings -->| "Second Violins" | SecondViolins;
-    Strings -->| "Violas" | Violas;
-    Strings -->| "Cellos" | Cellos;
-    Strings -->| "Double Basses" | DoubleBasses;
-    Woodwinds -->| "Flutes" | Flutes;
-    Woodwinds -->| "Oboes" | Oboes;
-    Woodwinds -->| "Clarinets" | Clarinets;
-    Woodwinds -->| "Bassoons" | Bassoons;
-    Brass -->| "Horns" | Horns;
-    Brass -->| "Trumpets" | Trumpets;
-    Brass -->| "Trombones" | Trombones;
-    Brass -->| "Tubas" | Tubas;
-    Percussion -->| "Drums" | Drums;
-    Percussion -->| "Cymbals" | Cymbals;
-    Percussion -->| "Timpani" | Timpani;
-    Percussion -->| "Xylophones" | Xylophones;
+graph TD
+    Orchestra -->| "Strings" | Strings
+    Orchestra -->| "Woodwinds" | Woodwinds
+    Orchestra -->| "Brass" | Brass
+    Orchestra -->| "Percussion" | Percussion
+    Strings -->| "First Violins" | FirstViolins
+    Strings -->| "Second Violins" | SecondViolins
+    Strings -->| "Violas" | Violas
+    Strings -->| "Cellos" | Cellos
+    Strings -->| "Double Basses" | DoubleBasses
+    Woodwinds -->| "Flutes" | Flutes
+    Woodwinds -->| "Oboes" | Oboes
+    Woodwinds -->| "Clarinets" | Clarinets
+    Woodwinds -->| "Bassoons" | Bassoons
+    Brass -->| "Horns" | Horns
+    Brass -->| "Trumpets" | Trumpets
+    Brass -->| "Trombones" | Trombones
+    Brass -->| "Tubas" | Tubas
+    Percussion -->| "Drums" | Drums
+    Percussion -->| "Cymbals" | Cymbals
+    Percussion -->| "Timpani" | Timpani
+    Percussion -->| "Xylophones" | Xylophones
 ```
 
 This diagram represents the basic architecture of the orchestra and the relationships between its sections. The orchestrator must understand this architecture to create effective textures and colors.

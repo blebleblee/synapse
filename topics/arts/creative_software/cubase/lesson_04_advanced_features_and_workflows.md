@@ -23,14 +23,14 @@ The project management system is another critical component of Cubase's architec
 To illustrate the internal data structures and algorithms in Cubase, we can use a combination of ASCII and Mermaid diagrams. The following diagram illustrates the hierarchical structure of a project in Cubase:
 
 ```mermaid
-graph TD;
-    A -->| "Project" | B;
-    B -->| "Folder 1" | C;
-    B -->| "Folder 2" | D;
-    C -->| "Track 1" | E;
-    C -->| "Track 2" | F;
-    D -->| "Track 3" | G;
-    D -->| "Track 4" | H;
+graph TD
+    A -->| "Project" | B
+    B -->| "Folder 1" | C
+    B -->| "Folder 2" | D
+    C -->| "Track 1" | E
+    C -->| "Track 2" | F
+    D -->| "Track 3" | G
+    D -->| "Track 4" | H
 ```
 
 This diagram represents a simplified view of a project's hierarchical structure, where "Project" is the root node, and "Folder 1" and "Folder 2" are child nodes. "Track 1" and "Track 2" are children of "Folder 1," while "Track 3" and "Track 4" are children of "Folder 2." This structure allows for efficient organization and management of audio tracks and other resources within a project.

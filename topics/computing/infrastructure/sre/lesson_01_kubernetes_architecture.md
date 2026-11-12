@@ -39,22 +39,22 @@ The node components are responsible for running the actual workloads in the clus
 To illustrate the architecture of Kubernetes, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    subgraph ControlPlane
-        A[kube-apiserver] --> B[etcd]
+graph TD
+    subgraph "ControlPlane
+        A[kube-apiserver] --> B[etcd]"
         A --> C[kube-controller-manager]
         A --> D[kube-scheduler]
     end
-    subgraph Node1
-        E[kubelet] --> F[Container Runtime]
+    subgraph "Node1
+        E[kubelet] --> F[Container Runtime]"
         E --> G[kube-proxy]
     end
-    subgraph Node2
-        H[kubelet] --> I[Container Runtime]
+    subgraph "Node2
+        H[kubelet] --> I[Container Runtime]"
         H --> J[kube-proxy]
     end
-    subgraph Node3
-        K[kubelet] --> L[Container Runtime]
+    subgraph "Node3
+        K[kubelet] --> L[Container Runtime]"
         K --> M[kube-proxy]
     end
     A --> E

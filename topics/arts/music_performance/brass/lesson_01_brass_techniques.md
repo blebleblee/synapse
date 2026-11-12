@@ -21,12 +21,12 @@ The breathing mechanism can be modeled as a system of air pressure regulation. T
 The fingerings for each note on a brass instrument can be visualized as a series of valves or slides that alter the length of the instrument's tubing. The valves on a trumpet, for example, are actuated by pressing the corresponding valve buttons, which redirects the air flow through additional tubing, effectively changing the instrument's length and thus its fundamental frequency. The trombone, on the other hand, uses a slide mechanism to change the length of the tubing. The fingerings for each note are based on the acoustical properties of the instrument and are designed to produce the desired overtone series.
 
 ```mermaid
-graph TD;
-    A -->| "Embouchure Formation" | B;
-    B -->| "Lip Vibration" | C;
-    C -->| "Standing Wave Excitation" | D;
-    D -->| "Resonating Tubing" | E;
-    E -->| "Sound Production" | F;
+graph TD
+    A -->| "Embouchure Formation" | B
+    B -->| "Lip Vibration" | C
+    C -->| "Standing Wave Excitation" | D
+    D -->| "Resonating Tubing" | E
+    E -->| "Sound Production" | F
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

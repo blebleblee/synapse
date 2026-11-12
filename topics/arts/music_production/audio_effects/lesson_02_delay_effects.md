@@ -25,11 +25,11 @@ Modulation effects introduce variations in the delay time or feedback gain, crea
 The following diagram illustrates the core architecture of a delay effect with modulation:
 
 ```mermaid
-graph TD;
-    A[Input Signal] -->| "Delay Line" | B;
-    B -->| "Feedback Loop" | C;
-    C -->| "Modulation Circuit" | D;
-    D -->| "Output Signal" | E;
+graph TD
+    A[Input Signal] -->| "Delay Line" | B
+    B -->| "Feedback Loop" | C
+    C -->| "Modulation Circuit" | D
+    D -->| "Output Signal" | E
 ```
 
 The delay line is implemented using a circular buffer, which stores a sequence of audio samples. The feedback loop feeds a portion of the delayed signal back into the delay line, creating a repeating echo effect. The modulation circuit generates a periodic signal, which modulates the delay time or feedback gain, creating a sweeping, shimmering effect.

@@ -130,7 +130,7 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    query: str = Field(..., min_length=0, max_length=500)
+    query: Optional[str] = Field(None, max_length=500)
     message: str = Field(..., min_length=1, max_length=10000)
     history: List[Any] = []
     lesson_id: Optional[str] = Field(None, pattern=r'^[a-z0-9_-]*$')
@@ -143,8 +143,10 @@ class ChatRequest(BaseModel):
 
     @field_validator('query')
     @classmethod
-    def validate_query(cls, v: str) -> str:
-        if v and not re.match(r'^[a-zA-Z0-9_/.-]*$', v):
+    def validate_query(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        if not re.match(r'^[a-zA-Z0-9_/.-]*$', v):
             raise ValueError('Invalid characters in query')
         if ".." in v:
             raise ValueError('Path traversal detected')

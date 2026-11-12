@@ -52,13 +52,13 @@ The t-test involves several steps:
 To visualize the t-test process, we can use a Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[State Hypotheses] --> B[Calculate t-statistic];
-    B --> C[Determine Degrees of Freedom];
-    C --> D[Calculate p-value];
-    D --> E[Make Decision];
-    E --> F[Reject H0];
-    E --> G[Fail to Reject H0];
+graph TD
+    A[State Hypotheses] --> B[Calculate t-statistic]
+    B --> C[Determine Degrees of Freedom]
+    C --> D[Calculate p-value]
+    D --> E[Make Decision]
+    E --> F[Reject H0]
+    E --> G[Fail to Reject H0]
 ```
 
 In this diagram, each step of the t-test process is represented as a node, and the flow of the process is represented by directed edges. The final decision to reject or fail to reject the null hypothesis is based on the calculated p-value and the significance level.

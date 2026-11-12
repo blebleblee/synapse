@@ -25,10 +25,10 @@ At the highest level of this architecture is the **expressive intent layer**, wh
 The system's execution model can be visualized as a feedback loop, where the performer's sensory input from the voice's acoustic output is continuously compared to the desired performance goal. This comparison is processed through the brain's motor control systems, which generate adjustments to the vocal tract configuration, breath pressure, and articulatory movements. The loop is closed through the performer's proprioceptive feedback, which provides real-time information about the position and movement of the vocal organs. This feedback mechanism is essential for the performer's ability to make real-time adjustments and maintain consistent performance quality.
 
 ```mermaid
-graph TD;
-    A -->| "Glottal Source" | B;
-    B -->| "Vocal Tract Filter" | C;
-    C -->| "Articulatory Control System" | D;
-    D -->| "Expressive Intent Layer" | E;
-    E -->| "Feedback" | A;
+graph TD
+    A -->| "Glottal Source" | B
+    B -->| "Vocal Tract Filter" | C
+    C -->| "Articulatory Control System" | D
+    D -->| "Expressive Intent Layer" | E
+    E -->| "Feedback" | A
 ```

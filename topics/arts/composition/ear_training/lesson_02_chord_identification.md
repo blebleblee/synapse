@@ -25,11 +25,11 @@ The process of chord identification can be formalized as a series of steps, each
 To illustrate the process of chord identification, we can use a simple algorithm represented as a flowchart:
 
 ```mermaid
-graph TD;
-    A -->| "Identify Root Note" | B;
-    B -->| "Identify Intervals" | C;
-    C -->| "Determine Chord Type and Inversion" | D;
-    D -->| "Determine Harmonic Function" | E;
+graph TD
+    A -->| "Identify Root Note" | B
+    B -->| "Identify Intervals" | C
+    C -->| "Determine Chord Type and Inversion" | D
+    D -->| "Determine Harmonic Function" | E
 ```
 
 The flowchart shows the sequence of steps involved in chord identification, starting with the identification of the root note, followed by the identification of intervals, and ending with the determination of chord type and inversion, and harmonic function.

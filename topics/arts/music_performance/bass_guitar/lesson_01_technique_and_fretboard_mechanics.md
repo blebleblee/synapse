@@ -19,20 +19,20 @@ The architecture of the bass guitar fretboard can be dissected into several key 
 To visualize the fretboard layout, consider the diagram below, which illustrates the fretboard of a standard 4-string bass guitar with a scale length of 34 inches. The fret positions are calculated using the formula provided, and the diagram indicates the position of each fret from the bridge to the nut.
 
 ```mermaid
-graph TD;
-    Nut -->| "12th fret (octave)" | F12;
-    F12 -->| "11th fret" | F11;
-    F11 -->| "10th fret" | F10;
-    F10 -->| "9th fret" | F9;
-    F9 -->| "8th fret (5th)" | F8;
-    F8 -->| "7th fret" | F7;
-    F7 -->| "6th fret (4th)" | F6;
-    F6 -->| "5th fret" | F5;
-    F5 -->| "4th fret (3rd)" | F4;
-    F4 -->| "3rd fret" | F3;
-    F3 -->| "2nd fret (2nd)" | F2;
-    F2 -->| "1st fret" | F1;
-    F1 -->| "Bridge" | Bridge;
+graph TD
+    Nut -->| "12th fret (octave)" | F12
+    F12 -->| "11th fret" | F11
+    F11 -->| "10th fret" | F10
+    F10 -->| "9th fret" | F9
+    F9 -->| "8th fret (5th)" | F8
+    F8 -->| "7th fret" | F7
+    F7 -->| "6th fret (4th)" | F6
+    F6 -->| "5th fret" | F5
+    F5 -->| "4th fret (3rd)" | F4
+    F4 -->| "3rd fret" | F3
+    F3 -->| "2nd fret (2nd)" | F2
+    F2 -->| "1st fret" | F1
+    F1 -->| "Bridge" | Bridge
 ```
 
 The diagram highlights the position of each fret from the bridge to the nut, with the 12th fret marking the octave point. The 8th fret marks the 5th, the 6th fret marks the 4th, the 4th fret marks the 3rd, and the 2nd fret marks the 2nd. These key fret positions are essential for playing scales, chords, and riffs on the bass guitar.

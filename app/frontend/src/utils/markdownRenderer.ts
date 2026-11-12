@@ -19,11 +19,25 @@ function sanitizeAndRepairMermaid(diagramText: string): string {
   // Enclose unquoted multi-word edge labels with double quotes: -->|Some Label Text| -> -->|"Some Label Text"|
   cleaned = cleaned.replace(/-->\s*\|\s*([^"|\n]+?)\s*\|\s*/g, (match, label) => {
     const trimmed = label.trim();
-    if (trimmed.includes(' ') && !trimmed.startsWith('"')) {
+    if ((trimmed.includes(' ') || trimmed.includes('(')) && !trimmed.startsWith('"')) {
       return `-->|"${trimmed}"| `;
     }
     return match;
   });
+
+  // Fix subgraphs with spaces in titles: subgraph Storage Class -> subgraph "Storage Class"
+  cleaned = cleaned.replace(/subgraph\s+([A-Za-z0-9_-]+\s+[^\n]+)/g, (match, title) => {
+    const trimmed = title.trim();
+    if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
+    return `subgraph "${trimmed}"`;
+  });
+
+  // Enclose node labels in double quotes if they contain parentheses, slashes, or arithmetic characters
+  // e.g. Node[Some text (with parens)] -> Node["Some text (with parens)"]
+  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]/g, '$1["$2"]');
+
+  // Enclose round parenthesis node labels with special chars: Node(text with spaces) -> Node["text with spaces"]
+  cleaned = cleaned.replace(/([A-Za-z0-9_-]+)\(([^"\)\n]*[\s\/\+\=\*\&][^"\)\n]*)\)/g, '$1["$2"]');
 
   return cleaned;
 }

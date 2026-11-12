@@ -23,31 +23,31 @@ User management in Linux involves the creation and management of user accounts a
 System monitoring in Linux involves the use of a variety of tools and utilities. The `top` and `htop` commands provide real-time information about system resources, including CPU usage, memory usage, and process activity. The `vmstat` command provides information about virtual memory usage, and the `iostat` command provides information about disk I/O. The `netstat` command provides information about network connections and traffic. These tools use a variety of data structures and algorithms to collect and display system metrics, including hash tables, linked lists, and binary trees.
 
 ```mermaid
-graph TD;
-    A[Process Control Block (PCB)] --> B[State];
-    A --> C[Scheduling Information];
-    A --> D[Memory Usage];
-    A --> E[Resource Limits];
-    F[Red-Black Tree] --> G[Processes];
-    H[APT Package Manager] --> I[Dependency Resolver];
-    I --> J[DAG];
-    I --> K[Backtracking Algorithm];
-    H --> L[Repositories];
-    H --> M[Caching Mechanism];
-    N[User Management] --> O[/etc/passwd];
-    N --> P[/etc/group];
-    Q[useradd] --> R[Create User];
-    S[userdel] --> T[Delete User];
-    U[groupadd] --> V[Create Group];
-    W[groupdel] --> X[Delete Group];
-    Y[passwd] --> Z[Change Password];
-    AA[chown] --> AB[Manage Ownership];
-    AC[chmod] --> AD[Manage Permissions];
-    AE[System Monitoring] --> AF[top];
-    AE --> AG[htop];
-    AE --> AH[vmstat];
-    AE --> AI[iostat];
-    AE --> AJ[netstat];
+graph TD
+    A[\"Process Control Block (PCB)\"] --> B[State]
+    A --> C[Scheduling Information]
+    A --> D[Memory Usage]
+    A --> E[Resource Limits]
+    F[Red-Black Tree] --> G[Processes]
+    H[APT Package Manager] --> I[Dependency Resolver]
+    I --> J[DAG]
+    I --> K[Backtracking Algorithm]
+    H --> L[Repositories]
+    H --> M[Caching Mechanism]
+    N[User Management] --> O[\"/etc/passwd\"]
+    N --> P[\"/etc/group\"]
+    Q[useradd] --> R[Create User]
+    S[userdel] --> T[Delete User]
+    U[groupadd] --> V[Create Group]
+    W[groupdel] --> X[Delete Group]
+    Y[passwd] --> Z[Change Password]
+    AA[chown] --> AB[Manage Ownership]
+    AC[chmod] --> AD[Manage Permissions]
+    AE[System Monitoring] --> AF[top]
+    AE --> AG[htop]
+    AE --> AH[vmstat]
+    AE --> AI[iostat]
+    AE --> AJ[netstat]
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

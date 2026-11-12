@@ -23,14 +23,14 @@ The central storage backend is responsible for storing the collected metrics in 
 To illustrate the architecture of a metrics collection system, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Application] -->|Metrics| B[Metrics Agent];
-    C[Kernel] -->|Metrics| B;
-    D[Container Runtime] -->|Metrics| B;
-    E[Network Stack] -->|Metrics| B;
-    B -->|Export Metrics| F[Time-Series Database];
-    F -->|Query Metrics| G[Visualization Tool];
-    G -->|Display Metrics| H[Dashboard];
+graph TD
+    A[Application] -->|Metrics| B[Metrics Agent]
+    C[Kernel] -->|Metrics| B
+    D[Container Runtime] -->|Metrics| B
+    E[Network Stack] -->|Metrics| B
+    B -->|"Export Metrics"| F[Time-Series Database]
+    F -->|"Query Metrics"| G[Visualization Tool]
+    G -->|"Display Metrics"| H[Dashboard]
 ```
 
 In this diagram, the application, kernel, container runtime, and network stack all export metrics to the metrics agent, which then exports these metrics to a time-series database. The visualization tool queries the time-series database and displays the metrics on a dashboard, allowing for real-time monitoring and analysis.

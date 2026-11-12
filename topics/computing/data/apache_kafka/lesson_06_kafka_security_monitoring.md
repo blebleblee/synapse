@@ -43,16 +43,16 @@ Monitoring in Kafka is achieved through the collection and analysis of various m
 To illustrate the architecture and mechanics of Kafka's security and monitoring mechanisms, consider the following diagram:
 
 ```mermaid
-graph TD;
-    A[Producers] -->|SASL/SCRAM| B[Kafka Brokers];
-    B -->|SSL/TLS| C[Consumers];
-    B -->|ACLs| D[Access Control];
-    B -->|Checksums| E[Data Integrity];
-    B -->|Metrics| F[Monitoring];
-    F -->|Throughput| G[Performance];
-    F -->|Latency| H[Timeliness];
-    F -->|Resource Utilization| I[Resource Management];
-    F -->|Error Rates| J[Reliability];
+graph TD
+    A[Producers] -->|SASL/SCRAM| B[Kafka Brokers]
+    B -->|SSL/TLS| C[Consumers]
+    B -->|ACLs| D[Access Control]
+    B -->|Checksums| E[Data Integrity]
+    B -->|Metrics| F[Monitoring]
+    F -->|Throughput| G[Performance]
+    F -->|Latency| H[Timeliness]
+    F -->|"Resource Utilization"| I[Resource Management]
+    F -->|"Error Rates"| J[Reliability]
 ```
 
 In this diagram, producers and consumers communicate with Kafka brokers using SASL/SCRAM for authentication and SSL/TLS for encryption. The brokers enforce access control using ACLs and ensure data integrity using checksums. Metrics related to performance, timeliness, resource management, and reliability are collected and analyzed to monitor the health and performance of the Kafka cluster.

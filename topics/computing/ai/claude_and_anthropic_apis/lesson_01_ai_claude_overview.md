@@ -15,14 +15,14 @@ The Claude API is built on a sophisticated architecture that integrates state-of
 To illustrate the internal data structures and algorithms of the Claude API, we can use a simplified Mermaid diagram:
 
 ```mermaid
-graph TD;
-    A[Input Text] --> B[Tokenization];
-    B --> C[Embedding Layer];
-    C --> D[Transformer Layers];
-    D --> E[Self-Attention Mechanism];
-    E --> F[Feedforward Neural Network];
-    F --> G[Output Layer];
-    G --> H[Generated Text];
+graph TD
+    A[Input Text] --> B[Tokenization]
+    B --> C[Embedding Layer]
+    C --> D[Transformer Layers]
+    D --> E[Self-Attention Mechanism]
+    E --> F[Feedforward Neural Network]
+    F --> G[Output Layer]
+    G --> H[Generated Text]
 ```
 
 In this diagram, the input text is first tokenized into a sequence of tokens, which are then embedded into a high-dimensional vector space. These embeddings are processed through multiple transformer layers, each of which consists of a self-attention mechanism and a feedforward neural network. The self-attention mechanism allows the model to focus on different parts of the input sequence when generating each token of the output, while the feedforward neural network applies non-linear transformations to the output of the self-attention mechanism. Finally, the output layer generates the final sequence of tokens, which is then decoded into human-readable text.

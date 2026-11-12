@@ -39,15 +39,15 @@ The final stage of the audio processing pipeline is output, where the processed 
 To illustrate the architecture of an audio processing system, we can use a Mermaid diagram to visualize the key components and their interactions. The diagram below shows a high-level overview of an audio processing system, including the signal acquisition, preprocessing, processing, and output stages.
 
 ```mermaid
-graph TD;
-    A[Analog Audio Signal] --> B[ADC];
-    B --> C[Digital Audio Signal];
-    C --> D[Preprocessing];
-    D --> E[Filtered Signal];
-    E --> F[Processing];
-    F --> G[Processed Signal];
-    G --> H[DAC];
-    H --> I[Analog Audio Signal];
+graph TD
+    A[Analog Audio Signal] --> B[ADC]
+    B --> C[Digital Audio Signal]
+    C --> D[Preprocessing]
+    D --> E[Filtered Signal]
+    E --> F[Processing]
+    F --> G[Processed Signal]
+    G --> H[DAC]
+    H --> I[Analog Audio Signal]
 ```
 
 In this diagram, the analog audio signal is first converted into a digital format using an ADC. The digital signal is then preprocessed to remove unwanted frequency components and noise. The preprocessed signal is then processed using a range of signal processing algorithms, such as filtering and synthesis. The processed signal is finally converted back into an analog format using a DAC and played through a speaker.

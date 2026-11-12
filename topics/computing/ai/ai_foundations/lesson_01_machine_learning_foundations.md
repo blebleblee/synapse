@@ -61,14 +61,14 @@ where \( \alpha \) is the learning rate, which controls the step size of the upd
 The following Mermaid diagram illustrates the architecture of a simple linear regression model:
 
 ```mermaid
-graph TD;
-    A[Data Collection] --> B[Data Preprocessing];
-    B --> C[Model Training];
-    C --> D[Model Evaluation];
-    D --> E[Model Deployment];
-    E --> F[Real-Time Inference];
-    F --> G[Feedback Loop];
-    G --> A;
+graph TD
+    A[Data Collection] --> B[Data Preprocessing]
+    B --> C[Model Training]
+    C --> D[Model Evaluation]
+    D --> E[Model Deployment]
+    E --> F[Real-Time Inference]
+    F --> G[Feedback Loop]
+    G --> A
 ```
 
 ## 3. High-Performance Optimization & Failure Modes

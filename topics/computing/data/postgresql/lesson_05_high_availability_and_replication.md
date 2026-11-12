@@ -65,17 +65,17 @@ graph TD
     end
 
     subgraph Node1[Primary Node]
-        P1[Patroni Agent 1] -->|Heartbeat / TTL Lease| Consensus
-        PG1[(PostgreSQL Primary)] <--> P1
+        P1[Patroni Agent 1] -->|"Heartbeat / TTL Lease"| Consensus
+        PG1[\"(PostgreSQL Primary)\"] <--> P1
     end
 
     subgraph Node2[Standby Node]
-        P2[Patroni Agent 2] -->|Watches Leader Key| Consensus
-        PG2[(PostgreSQL Standby)] <--> P2
+        P2[Patroni Agent 2] -->|"Watches Leader Key"| Consensus
+        PG2[\"(PostgreSQL Standby)\"] <--> P2
     end
 
-    Client[Client Traffic] --> VIP[HAProxy / Virtual IP]
-    VIP -->|HTTP /primary Health Check| P1
+    Client[Client Traffic] --> VIP[\"HAProxy / Virtual IP\"]
+    VIP -->|"HTTP /primary Health Check"| P1
     VIP -.->|Active Route| PG1
 ```
 
