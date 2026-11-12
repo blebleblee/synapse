@@ -13,6 +13,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
+from jinja2 import Environment, FileSystemLoader
 from .models import (
     OllamaCluster,
     OllamaProvider,
@@ -25,41 +26,46 @@ from .models import (
 from .topic_manager import get_domain_persona, LEVELS
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
-# Max 4 concurrent calls across all threads
 _LLM_SEMAPHORE = threading.Semaphore(4)
+
+# Jinja2 Setup
+TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
+
+class PromptFactory:
+    @staticmethod
+    def build_lesson_prompt(lesson_data: Dict[str, Any], context: Dict[str, Any]) -> str:
+        template = env.get_template("lesson.j2")
+        return template.render(
+            lesson_title=lesson_data["title"],
+            subtopic_title=context["subtopic_title"],
+            domain_title=context["domain_title"],
+            category_title=context["category_title"],
+            audience=lesson_data["audience"],
+            goal=lesson_data["goal"],
+            content_structure=lesson_data["structure"],
+            latex_constraint=context["latex_constraint"]
+        )
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 
 def purge_legacy_topic_files(topic_dir: Path):
     """
-    Purges legacy uppercase markdown files (FOUNDATION.md, LESSON.md, LABS.md, SUMMARY.md),
-    old leveled files (beginner.md, intermediate.md, advanced.md), old session directories,
-    and legacy numbered subdirectories (01_*, 02_*).
+    Aggressively purges everything in the topic directory to allow clean regeneration 
+    with the new 3-stage pipeline.
     """
     if not topic_dir.exists():
         return
 
-    legacy_files = [
-        "FOUNDATION.md", "LESSON.md", "LABS.md", "SUMMARY.md",
-        "foundation.md", "lesson.md", "summary.md",
-        "beginner.md", "intermediate.md", "advanced.md",
-        "flashcards.csv"
-    ]
-    for fname in legacy_files:
-        p = topic_dir / fname
-        if p.exists() and p.is_file():
+    # Delete all markdown files and subdirectories
+    for item in topic_dir.iterdir():
+        if item.is_file() and item.suffix == ".md":
             try:
-                p.unlink()
+                item.unlink()
             except Exception:
                 pass
-
-    sessions_dir = topic_dir / "sessions"
-    if sessions_dir.exists() and sessions_dir.is_dir():
-        shutil.rmtree(sessions_dir, ignore_errors=True)
-
-    for sub in list(topic_dir.iterdir()):
-        if sub.is_dir() and re.match(r"^\d{2}_", sub.name):
-            shutil.rmtree(sub, ignore_errors=True)
+        elif item.is_dir():
+            shutil.rmtree(item, ignore_errors=True)
 
 BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - This is a masterclass textbook chapter, NOT a slide-deck presentation or outline.
@@ -85,19 +91,21 @@ def build_topic_modules(domain: str, category: str, subtopic_id: str, subtopic_t
 
     # 1. AI, Machine Learning, LLMs, Data Science
     if any(k in cat_lower for k in ["ai", "machine_learning", "deep_learning", "data_analysis", "data_visualisation", "mlops", "rag", "vibe_coding", "prompt"]):
+        context = {
+            "subtopic_title": subtopic_title,
+            "domain_title": domain_title,
+            "category_title": category_title,
+            "latex_constraint": "3. FORMATTING: STRICTLY NO LaTeX ($...$ or $$...$$). Use plain text or code blocks for math."
+        }
         return [
             {
                 "filename": "lesson_01_foundations_and_invariants.md",
                 "title": f"Lesson 1: Foundations & Mathematical Formulation",
-                "prompt": f"""Write Lesson 1 (Foundations & Invariants) for the masterclass curriculum on '{subtopic_title}'.
-Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
-
-Target Audience: Senior machine learning engineers, AI researchers, and systems architects.
-Goal: Establish unshakeable theoretical grounding, problem space formulation, and mathematical invariants.
-
-Structure:
-# Lesson 1: Foundations & Mathematical Formulation
-
+                "prompt": PromptFactory.build_lesson_prompt({
+                    "title": "Lesson 1: Foundations & Mathematical Formulation",
+                    "audience": "Senior machine learning engineers, AI researchers, and systems architects.",
+                    "goal": "Establish unshakeable theoretical grounding, problem space formulation, and mathematical invariants.",
+                    "structure": """
 ## Curriculum Roadmap
 (Provide a clear outline of the curriculum modules)
 
@@ -109,22 +117,17 @@ Structure:
 
 ## 3. High-Level Pipeline & Architecture Dataflow
 (Include a clean Mermaid diagram representing the model pipeline, tensor transformations, or agentic control flow)
-
-Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
-Output publication-grade Markdown only."""
+"""
+                }, context)
             },
             {
                 "filename": "lesson_02_architecture_and_mechanics.md",
                 "title": f"Lesson 2: Core Architecture & Algorithmic Mechanics",
-                "prompt": f"""Write Lesson 2 (Core Architecture & Algorithmic Mechanics) for the masterclass curriculum on '{subtopic_title}'.
-Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
-
-Target Audience: Machine learning engineers and AI practitioners needing deep mechanical understanding.
-Goal: Dissect representations, algorithm mechanics, layer operations, and runtime data structures.
-
-Structure:
-# Lesson 2: Core Architecture & Algorithmic Mechanics
-
+                "prompt": PromptFactory.build_lesson_prompt({
+                    "title": "Lesson 2: Core Architecture & Algorithmic Mechanics",
+                    "audience": "Machine learning engineers and AI practitioners needing deep mechanical understanding.",
+                    "goal": "Dissect representations, algorithm mechanics, layer operations, and runtime data structures.",
+                    "structure": """
 ## 1. Internal Representations & Data Structures
 (Vector embeddings, token structures, attention matrices, or parameter layouts with ASCII diagrams)
 
@@ -133,22 +136,17 @@ Structure:
 
 ## 3. Memory Footprint & Computational Complexity
 (KV-cache scaling, parameter memory allocation, computational complexity O(...) bounds, and hardware accelerator mapping)
-
-Remember: Write in rich, continuous book prose. Avoid superficial summaries.
-Output publication-grade Markdown only."""
+"""
+                }, context)
             },
             {
                 "filename": "lesson_03_deep_dive_and_concurrency.md",
                 "title": f"Lesson 3: Optimization, Scaling & Failure Modes",
-                "prompt": f"""Write Lesson 3 (Optimization, Scaling & Failure Modes) for the masterclass curriculum on '{subtopic_title}'.
-Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
-
-Target Audience: Lead AI engineers and production systems architects.
-Goal: In-depth analysis of training/inference optimization, scaling laws, drift domains, and failure mitigation.
-
-Structure:
-# Lesson 3: Optimization, Scaling & Failure Modes
-
+                "prompt": PromptFactory.build_lesson_prompt({
+                    "title": "Lesson 3: Optimization, Scaling & Failure Modes",
+                    "audience": "Lead AI engineers and production systems architects.",
+                    "goal": "In-depth analysis of training/inference optimization, scaling laws, drift domains, and failure mitigation.",
+                    "structure": """
 ## 1. Training Dynamics & Convergence Invariants
 (Gradient stability, loss landscape geometry, learning rate mechanics, and regularization)
 
@@ -157,22 +155,17 @@ Structure:
 
 ## 3. Failure Modes & Edge Case Domains
 (Distribution drift, catastrophic forgetting, hallucination failure surfaces, and guardrail architectures)
-
-Remember: Write in rich, continuous book prose with technical depth.
-Output publication-grade Markdown only."""
+"""
+                }, context)
             },
             {
                 "filename": "labs.md",
                 "title": f"Operational Verification Labs",
-                "prompt": f"""Write the complete Operational Verification Lab guide for '{subtopic_title}'.
-Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
-
-Target Audience: Hands-on AI engineer and practitioner.
-Goal: Concrete hands-on lab using real, executable Python scripts, API harnesses, evaluation pipelines, and verification commands. Do NOT output generic Linux kernel or low-level sysctl/modprobe commands.
-
-Structure:
-# Operational Verification Labs: {subtopic_title}
-
+                "prompt": PromptFactory.build_lesson_prompt({
+                    "title": "Operational Verification Labs",
+                    "audience": "Hands-on AI engineer and practitioner.",
+                    "goal": "Concrete hands-on lab using real, executable Python scripts, API harnesses, evaluation pipelines, and verification commands.",
+                    "structure": """
 ## Objective & Environment Setup
 (Required Python 3.11+ environment, packages e.g. PyTorch, HuggingFace, NumPy, Scikit-learn, Ollama, or Polars, and API configuration)
 
@@ -184,12 +177,8 @@ Structure:
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 (Reproducing failure modes, testing edge cases, and implementing guardrails or error handling)
-
-## Verification Checklist & Quick Reference Cheat Sheet
-(Table of essential Python methods, parameters, and verification flags for this topic)
-
-Rules: Provide full, executable Python code and CLI commands with zero placeholders.
-Output publication-grade Markdown only."""
+"""
+                }, context)
             }
         ]
 
