@@ -1,0 +1,35 @@
+# Lesson 1: Interval Recognition
+
+## 1. First-Principles Intuition & Invariants
+
+Interval recognition is the foundational skill that underpins the construction of melodies and harmonies in music. It involves perceiving the distance between two pitches, a perception deeply rooted in the physical properties of sound waves and the psychoacoustics of human hearing. At its core, interval recognition is about understanding the mathematical relationships between frequencies and how these relationships are perceived by the ear.
+
+In acoustics, sound is produced by the vibration of objects, creating pressure waves that travel through the air. Upon reaching the ear, these waves are converted into electrical signals that the brain interprets as sound. The frequency of these vibrations determines the pitch of the sound, and the interval between two pitches is the ratio of their frequencies. For example, the interval of an octave corresponds to a frequency ratio of $2:1$, meaning the higher pitch vibrates twice as fast as the lower pitch.
+
+The concept of intervals is not arbitrary; it is grounded in the natural overtone series, which consists of frequencies that are integer multiples of a fundamental frequency. When a string is plucked or a pipe is blown, it vibrates not only at its fundamental frequency but also at higher frequencies that are integer multiples of the fundamental. These higher frequencies are called overtones, and they form the overtone series. The intervals between the fundamental and its overtones are simple ratios, such as $2:1$ for the octave, $3:2$ for the perfect fifth, and $4:3$ for the perfect fourth. These simple ratios form the basis of consonant intervals fundamental to Western music theory.
+
+From a psychoacoustical perspective, the human ear is particularly sensitive to these simple frequency ratios. The brain has evolved to recognize these ratios as consonant and pleasing to the ear, which is why they form the basis of our musical scales and harmonies. The perception of intervals is also influenced by the context in which they are heard. For example, the same interval may sound different when played in a different key or surrounded by different harmonies. This context dependence is a key aspect of interval recognition that musicians must navigate.
+
+In the context of digital signal processing (DSP), interval recognition can be approached from a mathematical and computational perspective. The Fourier Transform is a powerful tool for analyzing the frequency content of a signal, and it can be used to identify the frequencies present in a musical note. By comparing the frequencies of two notes, one can determine the interval between them. However, the Fourier Transform is just one tool in the DSP toolkit, and many other techniques can be used to analyze and recognize intervals, such as autocorrelation and cepstral analysis.
+
+## 2. Core Architecture & Mechanics
+
+To build a system for interval recognition, we need to consider the internal data structures and algorithms that will process and analyze musical signals. At a high level, the system will take in audio signals, perform spectral analysis to identify the frequencies present in the signal, and then use these frequencies to determine the interval between two notes.
+
+One of the key data structures in this system is the frequency spectrum, a representation of the frequency content of a signal. The frequency spectrum can be obtained using the Discrete Fourier Transform (DFT), a mathematical algorithm that transforms a time-domain signal into its frequency-domain representation. The DFT is computationally intensive, but efficient algorithms such as the Fast Fourier Transform (FFT) reduce the computational complexity from $O(N^2)$ to $O(N \log N)$.
+
+Once we have the frequency spectrum, we need to identify the fundamental frequency of the note. This can be done using a technique called peak detection, which involves finding the highest peak in the frequency spectrum. The fundamental frequency is the frequency with the highest amplitude, corresponding to the pitch of the note. Once we have identified the fundamental frequencies of two notes, we can determine the interval between them by computing the ratio of the two frequencies.
+
+The algorithm for interval recognition can be broken down into several steps. First, the audio signal is processed using the FFT to obtain the frequency spectrum. Second, peak detection is used to identify the fundamental frequencies of the two notes. Third, the ratio of the two frequencies is computed to determine the interval. Finally, the interval is mapped to a musical interval name, such as "major third" or "perfect fifth."
+
+To illustrate this process, consider two notes with fundamental frequencies of 261.63 Hz and 329.63 Hz. The ratio of these frequencies is $\frac{329.63}{261.63} \approx 1.26$. This ratio corresponds to a major third interval, a fundamental interval in Western music theory. The algorithm for interval recognition would take these two frequencies as input and output the interval name "major third."
+
+## 3. High-Performance Optimization & Failure Modes
+
+Building a high-performance interval recognition system requires careful consideration of the computational and resource requirements of the algorithm. The FFT is a computationally intensive algorithm, and the performance of the system can be significantly impacted by the size of the input signal and the number of frequency bins used in the FFT. To optimize the performance of the system, techniques such as zero-padding and windowing can improve frequency resolution and reduce the computational complexity of the FFT.
+
+Another important consideration is the robustness of the system to noise and other sources of interference. In real-world audio signals, background noises and other sounds can interfere with the accuracy of the interval recognition algorithm. To mitigate these issues, noise reduction and filtering techniques can preprocess the audio signal before performing the FFT. Machine learning techniques can also train a model to recognize intervals in the presence of noise and other interference.
+
+One potential failure mode of the interval recognition system is the presence of harmonics and overtones in the audio signal. Harmonics and overtones can introduce additional peaks in the frequency spectrum, making it difficult to accurately identify the fundamental frequency of the note. To mitigate this issue, techniques such as harmonic cancellation and peak picking can identify the fundamental frequency even in the presence of harmonics and overtones.
+
+Another potential failure mode is the presence of polyphonic signals, where multiple notes are played simultaneously. This can complicate the identification of individual fundamental frequencies, as the frequency spectrum will contain multiple peaks. Techniques such as source separation and polyphonic pitch detection can help isolate individual notes in polyphonic signals, improving the accuracy of interval recognition.
