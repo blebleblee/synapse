@@ -158,56 +158,70 @@ body, html, #root {
 }
 
 .search-box input {
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
   font-size: 12px;
-  width: 100%;
   outline: none;
+  padding: 0;
 }
 
 .search-box input::placeholder {
   color: var(--text-muted);
 }
 
-.search-cmd-k-badge {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 4px;
-  cursor: pointer;
-  line-height: 1.2;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.search-cmd-k-badge:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-blue);
-  background: var(--bg-hover);
-}
-
 .search-clear-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: color 0.15s, background-color 0.15s;
+  width: 18px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0;
   flex-shrink: 0;
+  transition: all 0.15s ease;
 }
 
 .search-clear-btn:hover {
+  background-color: var(--accent-blue);
   color: #ffffff;
+}
+
+.sort-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sort-pill-btn:hover {
   background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.sort-pill-btn.active {
+  color: var(--accent-gold);
+  border-color: rgba(251, 191, 36, 0.4);
+  background-color: rgba(251, 191, 36, 0.08);
 }
 
 .icon-btn-sm {

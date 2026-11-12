@@ -49,21 +49,6 @@ interface TopicTreeProps {
   targetLanguage?: string;
 }
 
-const DOMAIN_ORDER = [
-  'computing',
-  'engineering',
-  'motorsports',
-  'crafts',
-  'formal_sciences',
-  'natural_sciences',
-  'health_sciences',
-  'arts',
-  'languages',
-  'humanities',
-  'business',
-  'economics',
-];
-
 export function toTitleCase(str: string): string {
   if (!str) return '';
   return str
@@ -103,36 +88,11 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 }) => {
   const ui = getUIStrings(targetLanguage);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState<'default' | 'az' | 'progress'>('default');
+  const [sortMode, setSortMode] = useState<'az' | 'progress'>('az');
   const [openUnits, setOpenUnits] = useState<{ [key: string]: boolean }>({});
 
   const toggleUnit = (unitPath: string) => {
     setOpenUnits((prev) => ({ ...prev, [unitPath]: !prev[unitPath] }));
-  };
-  const [customDomainOrder, setCustomDomainOrder] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('synapse_domain_order');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      // fallback
-    }
-    return DOMAIN_ORDER;
-  });
-
-  const moveDomain = (domain: string, direction: 'up' | 'down') => {
-    const list = [...customDomainOrder];
-    const idx = list.indexOf(domain);
-    if (idx < 0) return;
-    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-    if (targetIdx < 0 || targetIdx >= list.length) return;
-    const temp = list[idx];
-    list[idx] = list[targetIdx];
-    list[targetIdx] = temp;
-    setCustomDomainOrder(list);
-    localStorage.setItem('synapse_domain_order', JSON.stringify(list));
   };
 
   const [openDomains, setOpenDomains] = useState<{ [key: string]: boolean }>({});
@@ -277,22 +237,17 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
   const sortedDomainEntries = useMemo(() => {
     return Object.entries(tree).sort(([a, ddataA], [b, ddataB]) => {
-      if (sortMode === 'az') {
-        return a.localeCompare(b);
-      }
       if (sortMode === 'progress') {
         const rateA = getDomainCompletion(ddataA).rate;
         const rateB = getDomainCompletion(ddataB).rate;
         return rateB - rateA;
       }
-      const idxA = customDomainOrder.indexOf(a);
-      const idxB = customDomainOrder.indexOf(b);
-      return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
+      return a.localeCompare(b);
     });
-  }, [tree, sortMode, customDomainOrder]);
+  }, [tree, sortMode]);
 
-  const cycleSortMode = () => {
-    setSortMode((prev) => (prev === 'default' ? 'az' : prev === 'az' ? 'progress' : 'default'));
+  const toggleSortMode = () => {
+    setSortMode((prev) => (prev === 'az' ? 'progress' : 'az'));
   };
 
   const cleanTerm = searchTerm.trim().toLowerCase();
@@ -374,11 +329,12 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
         <button
           type="button"
-          className="icon-btn-sm"
-          onClick={cycleSortMode}
-          title={`Sort: ${sortMode === 'default' ? ui.curriculumOrder : sortMode === 'az' ? ui.alphabetical : ui.progress}`}
+          className={`sort-pill-btn ${sortMode === 'progress' ? 'active' : ''}`}
+          onClick={toggleSortMode}
+          title={sortMode === 'az' ? 'Sorted A to Z (Click to sort by % completeness)' : 'Sorted by % Completeness (Click to sort A-Z)'}
         >
-          <ArrowUpDown size={13} />
+          <ArrowUpDown size={11} />
+          <span className="sort-pill-label">{sortMode === 'az' ? 'a-z' : '%'}</span>
         </button>
       </div>
 
@@ -422,24 +378,6 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                 <span className="domain-label">
                   {toTitleCase(domain)}
                 </span>
-                {sortMode === 'default' && (
-                  <div className="domain-reorder-actions" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      className="reorder-arrow-btn"
-                      onClick={() => moveDomain(domain, 'up')}
-                      title="Move Domain Up"
-                    >
-                      ▲
-                    </button>
-                    <button
-                      className="reorder-arrow-btn"
-                      onClick={() => moveDomain(domain, 'down')}
-                      title="Move Domain Down"
-                    >
-                      ▼
-                    </button>
-                  </div>
-                )}
               </div>
 
               {isDomainOpen && (
