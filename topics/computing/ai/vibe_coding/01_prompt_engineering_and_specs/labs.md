@@ -1,183 +1,140 @@
 # Operational Verification Labs
 
-## Objective & Environment Setup
+## 01 Prompt Engineering And Specs
 
-To complete these labs, you will need a Python 3.11+ environment with the following packages installed: PyTorch, Hugging Face Transformers, NumPy, Scikit-learn, Ollama, and Polars. Additionally, configure your API keys and credentials for the respective services.
+### Objective & Environment Setup
 
-### Required Packages
+To begin, ensure you have a Python 3.11+ environment set up with the necessary packages installed. For this lab, you will need PyTorch, HuggingFace Transformers, NumPy, Scikit-learn, Ollama for prompt engineering, and Polars for efficient data processing. Additionally, configure your API keys and credentials for the relevant services, including HuggingFace API keys for accessing pre-trained models and Ollama API keys for prompt engineering and evaluation.
 
-PyTorch can be installed using the command `pip install torch torchvision`. Hugging Face Transformers is installed via `pip install transformers`. NumPy is installed with `pip install numpy`. Scikit-learn is installed using `pip install scikit-learn`. Ollama is installed with `pip install ollama`, and Polars is installed using `pip install polars`.
+### Exercise 1: Hands-On Implementation & Pipeline Execution
 
-### API Configuration
+Implement a concrete, runnable Python script that demonstrates the core concepts of prompt engineering and specs. This script should include a well-defined prompt engineering pipeline using Ollama, a model selection and configuration process using HuggingFace Transformers, a data loading and preprocessing step using NumPy and Scikit-learn, and a pipeline execution and evaluation framework using PyTorch.
 
-Setting up your API keys and credentials involves creating accounts, generating API keys, and configuring environment variables for the respective services.
-
-## Exercise 1: Hands-On Implementation & Pipeline Execution
-
-Implement the core prompt/model/algorithm for this topic using a real, executable Python script. Ensure the script has no placeholders and is fully runnable.
-
-### Example Code
+Here is an example implementation to get you started:
 
 ```python
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from sklearn.metrics import accuracy_score
+from ollama import PromptEngine
+from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from ollama import OllamaModel
-import pandas as pd
+import numpy as np
 
-# Load pre-trained model and tokenizer
+# Load and preprocess data
+iris = load_iris()
+X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)
+
+# Define prompt engineering pipeline
+prompt_engine = PromptEngine(
+    model="ollama-base",
+    tokenizer="ollama-base",
+    max_length=512,
+    num_beams=4,
+    num_return_sequences=1,
+)
+
+# Define model selection and configuration
 model_name = "distilbert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer_name = "distilbert-base-uncased"
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
 
-# Load dataset and preprocess
-dataset = pd.read_csv("data.csv")
-le = LabelEncoder()
-dataset["label"] = le.fit_transform(dataset["label"])
-
-# Split dataset into training and testing sets
-train_text, test_text, train_labels, test_labels = train_test_split(dataset["text"], dataset["label"], test_size=0.2, random_state=42)
-
-# Create data loaders
-train_encodings = tokenizer(train_text.tolist(), truncation=True, padding=True, max_length=512, return_tensors="pt")
-test_encodings = tokenizer(test_text.tolist(), truncation=True, padding=True, max_length=512, return_tensors="pt")
-
-train_dataset = torch.utils.data.TensorDataset(train_encodings["input_ids"], train_encodings["attention_mask"], torch.tensor(train_labels))
-test_dataset = torch.utils.data.TensorDataset(test_encodings["input_ids"], test_encodings["attention_mask"], torch.tensor(test_labels))
-
-train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
-
-# Train model
+# Define pipeline execution and evaluation framework
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
+tokenizer.to(device)
 
-for epoch in range(5):
-    model.train()
-    total_loss = 0
-    for batch in train_dataloader:
-        input_ids, attention_mask, labels = [t.to(device) for t in batch]
-        optimizer.zero_grad()
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = criterion(outputs.logits, labels)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-    print(f"Epoch {epoch+1}, Loss: {total_loss / len(train_dataloader)}")
+# Execute pipeline and evaluate results
+results = []
+for prompt in prompt_engine.generate_prompts(X_train):
+    input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+    outputs = model(input_ids)
+    results.append(outputs.logits.item())
 
-model.eval()
-test_loss = 0
-correct = 0
-with torch.no_grad():
-    for batch in test_dataloader:
-        input_ids, attention_mask, labels = [t.to(device) for t in batch]
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = criterion(outputs.logits, labels)
-        test_loss += loss.item()
-        _, predicted = torch.max(outputs.logits, dim=1)
-        correct += (predicted == labels).sum().item()
-
-accuracy = correct / len(test_labels)
-print(f"Test Accuracy: {accuracy:.4f}")
+# Evaluate pipeline performance
+accuracy = np.mean(results)
+print(f"Accuracy: {accuracy:.4f}")
 ```
 
-## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
+### Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-Measure the accuracy, latency distributions, token costs, or convergence curves of the implemented model. Use real benchmarking code to evaluate the performance.
+Implement a real benchmarking code that measures accuracy, latency distributions, token costs, or convergence curves. This code should include a hyperparameter tuning framework using Scikit-learn's GridSearchCV or RandomizedSearchCV, a benchmarking pipeline that evaluates the performance of the prompt engineering pipeline, and a data loading and preprocessing step using NumPy and Scikit-learn.
 
-### Example Code
+Here is an example implementation to get you started:
 
 ```python
-import time
 import numpy as np
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score
 
-# Define hyperparameter tuning space
+# Define hyperparameter tuning framework
 param_grid = {
-    "learning_rate": [1e-5, 1e-4, 1e-3],
-    "batch_size": [16, 32, 64],
-    "epochs": [5, 10, 15]
+    "prompt_engine": {"model": ["ollama-base", "ollama-large"], "tokenizer": ["ollama-base", "ollama-large"]},
+    "model": {"name": ["distilbert-base-uncased", "bert-base-uncased"]},
+    "tokenizer": {"name": ["distilbert-base-uncased", "bert-base-uncased"]},
 }
 
-# Perform grid search
-grid_search = GridSearchCV(model, param_grid, cv=5, scoring="accuracy")
-grid_search.fit(train_text, train_labels)
+# Define benchmarking pipeline
+def benchmark_pipeline(prompt_engine, model, tokenizer):
+    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)
+    results = []
+    for prompt in prompt_engine.generate_prompts(X_train):
+        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+        outputs = model(input_ids)
+        results.append(outputs.logits.item())
+    accuracy = np.mean(results)
+    return accuracy
 
-# Get best hyperparameters and evaluate on test set
-best_params = grid_search.best_params_
-best_model = grid_search.best_estimator_
-test_accuracy = accuracy_score(test_labels, best_model.predict(test_text))
-print(f"Best Hyperparameters: {best_params}")
-print(f"Test Accuracy: {test_accuracy:.4f}")
-
-# Measure latency distributions
-latencies = []
-for batch in test_dataloader:
-    input_ids, attention_mask, labels = [t.to(device) for t in batch]
-    start_time = time.time()
-    outputs = best_model(input_ids, attention_mask=attention_mask, labels=labels)
-    end_time = time.time()
-    latencies.append(end_time - start_time)
-
-latency_distribution = np.array(latencies)
-print(f"Latency Distribution: Mean = {latency_distribution.mean():.4f}, Std Dev = {latency_distribution.std():.4f}")
+# Perform hyperparameter tuning and benchmarking
+grid_search = GridSearchCV(estimator=benchmark_pipeline, param_grid=param_grid, cv=5, scoring="accuracy")
+grid_search.fit(X_train, y_train)
+print(f"Best Parameters: {grid_search.best_params_}")
+print(f"Best Accuracy: {grid_search.best_score_:.4f}")
 ```
 
-## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
+### Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-Reproduce failure modes, test edge cases, and implement guardrails or error handling to ensure robustness.
+Implement a stress testing framework that reproduces failure modes, tests edge cases, and implements guardrails or error handling. This framework should include a stress testing pipeline that evaluates the robustness of the prompt engineering pipeline, a data loading and preprocessing step using NumPy and Scikit-learn, and a guardrail or error handling mechanism that prevents catastrophic failures.
 
-### Example Code
+Here is an example implementation to get you started:
 
 ```python
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
 
-# Load dataset and preprocess
-dataset = pd.read_csv("data.csv")
-le = LabelEncoder()
-dataset["label"] = le.fit_transform(dataset["label"])
+# Define stress testing pipeline
+def stress_test_pipeline(prompt_engine, model, tokenizer):
+    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)
+    results = []
+    for prompt in prompt_engine.generate_prompts(X_train):
+        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+        outputs = model(input_ids)
+        results.append(outputs.logits.item())
+    accuracy = np.mean(results)
+    return accuracy
 
-# Split dataset into training and testing sets
-train_text, test_text, train_labels, test_labels = train_test_split(dataset["text"], dataset["label"], test_size=0.2, random_state=42)
-
-# Create data loaders
-train_encodings = tokenizer(train_text.tolist(), truncation=True, padding=True, max_length=512, return_tensors="pt")
-test_encodings = tokenizer(test_text.tolist(), truncation=True, padding=True, max_length=512, return_tensors="pt")
-
-train_dataset = torch.utils.data.TensorDataset(train_encodings["input_ids"], train_encodings["attention_mask"], torch.tensor(train_labels))
-test_dataset = torch.utils.data.TensorDataset(test_encodings["input_ids"], test_encodings["attention_mask"], torch.tensor(test_labels))
-
-train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
-
-# Implement guardrails for edge cases
-def preprocess_text(text):
+# Define guardrail or error handling mechanism
+def guardrail(prompt_engine, model, tokenizer):
     try:
-        input_ids = tokenizer.encode_plus(text, add_special_tokens=True, max_length=512, return_attention_mask=True, return_tensors="pt")
-        return input_ids["input_ids"], input_ids["attention_mask"]
+        stress_test_pipeline(prompt_engine, model, tokenizer)
     except Exception as e:
-        print(f"Error preprocessing text: {e}")
-        return None, None
+        print(f"Error: {e}")
+        return False
+    return True
 
-# Implement error handling for failure modes
-try:
-    model.train()
-    for batch in train_dataloader:
-        input_ids, attention_mask, labels = [t.to(device) for t in batch]
-        optimizer.zero_grad()
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = criterion(outputs.logits, labels)
-        loss.backward()
-        optimizer.step()
-except Exception as e:
-    print(f"Error training model: {e}")
+# Perform stress testing and guardrail evaluation
+prompt_engine = PromptEngine(
+    model="ollama-base",
+    tokenizer="ollama-base",
+    max_length=512,
+    num_beams=4,
+    num_return_sequences=1,
+)
+model_name = "distilbert-base-uncased"
+tokenizer_name = "distilbert-base-uncased"
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+guardrail_result = guardrail(prompt_engine, model, tokenizer)
+print(f"Guardrail Result: {guardrail_result}")
 ```
-
-These labs provide hands-on experience with prompt engineering, model implementation, and pipeline execution. By completing these exercises, you will gain a deeper understanding of the underlying concepts and develop practical skills in AI coding.
