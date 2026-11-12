@@ -53,6 +53,7 @@ export function App() {
   };
 
   const terminalRef = useRef<TerminalDrawerHandle>(null);
+  const [terminalConnected, setTerminalConnected] = useState(false);
 
   const fetchTree = async () => {
     try {
@@ -605,7 +606,8 @@ export function App() {
         <TerminalDrawer
           ref={terminalRef}
           isOpen={terminalOpen}
-          onToggle={() => setTerminalOpen((prev) => !prev)}
+          onToggle={() => setTerminalOpen((prev: boolean) => !prev)}
+          onConnectionChange={setTerminalConnected}
         />
       </div>
 
@@ -615,6 +617,7 @@ export function App() {
         isChatting={isChatting}
         onSendMessage={handleSendMessage}
         onClearChat={() => setUnifiedChatHistory([])}
+        isTerminalConnected={terminalConnected}
       />
 
       <SearchModal

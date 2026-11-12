@@ -23,9 +23,10 @@ export interface TerminalDrawerHandle {
 interface TerminalDrawerProps {
   isOpen: boolean;
   onToggle: () => void;
+  onConnectionChange?: (connected: boolean) => void;
 }
 
-export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerProps>(({ isOpen, onToggle }, ref) => {
+export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerProps>(({ isOpen, onToggle, onConnectionChange }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -71,6 +72,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
     ws.onopen = () => {
       setConnected(true);
+      onConnectionChange?.(true);
       fitTerminal();
     };
 
@@ -84,8 +86,14 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       }
     };
 
-    ws.onclose = () => setConnected(false);
-    ws.onerror = () => setConnected(false);
+    ws.onclose = () => {
+      setConnected(false);
+      onConnectionChange?.(false);
+    };
+    ws.onerror = () => {
+      setConnected(false);
+      onConnectionChange?.(false);
+    };
 
     wsRef.current = ws;
   };
@@ -168,6 +176,9 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
   useEffect(() => {
     if (isOpen) {
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        connectWs(terminalEnv);
+      }
       const timer = setTimeout(() => {
         fitTerminal();
       }, 50);
@@ -243,42 +254,36 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
       <div className="terminal-header" onClick={onToggle}>
         <div className="terminal-header-left">
-          <div className="terminal-title">
-            <TerminalIcon size={15} className="terminal-icon" />
-            <span>Terminal</span>
-            <span className={`status-dot ${connected ? 'online' : 'offline'}`} title={connected ? 'Connected' : 'Disconnected'} />
-          </div>
-
-          {/* Labeled Environment Profile Selector on the Left */}
           <div className="terminal-env-selector" onClick={(e) => e.stopPropagation()}>
-            <span className="env-label">Environment:</span>
+            <TerminalIcon size={14} className="terminal-icon" />
+            <span
+              className={`status-dot ${connected ? 'online' : 'offline'}`}
+              title={connected ? 'Terminal PTY: Connected' : 'Terminal PTY: Disconnected (Click restart to reconnect)'}
+            />
             <Layers size={13} className="env-icon" />
             <select
               value={terminalEnv}
               onChange={(e) => handleEnvChange(e.target.value as any)}
               className="env-select"
-              title="Switch execution environment"
+              title="Execution Environment Profile"
             >
               <option value="host">Host Shell (Local)</option>
               <option value="docker">Linux Sandbox (Docker / Rancher)</option>
               <option value="k8s">Kubernetes Pod (k3s Cluster)</option>
             </select>
           </div>
+        </div>
 
+        <div className="terminal-actions" onClick={(e) => e.stopPropagation()}>
           <button
+            type="button"
             className={`btn-setup-guide ${showSetupGuide ? 'active' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowSetupGuide((prev) => !prev);
-            }}
-            title="Setup Guide for Rancher Desktop & k3s"
+            onClick={() => setShowSetupGuide((prev) => !prev)}
+            title="Setup Guide for Rancher Desktop & k3s Sandbox"
           >
             <HelpCircle size={12} />
             <span>Setup Guide</span>
           </button>
-        </div>
-
-        <div className="terminal-actions" onClick={(e) => e.stopPropagation()}>
           <button className="icon-btn" onClick={() => connectWs(terminalEnv)} title="Restart Terminal Session">
             <RefreshCw size={13} />
           </button>

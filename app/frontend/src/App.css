@@ -1225,10 +1225,21 @@ body, html, #root {
   font-weight: 600;
   padding: 3px 7px;
   border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.terminal-link-badge.online {
   background-color: rgba(46, 160, 67, 0.12);
   color: #3fb950;
   border: 1px solid rgba(46, 160, 67, 0.3);
-  white-space: nowrap;
+}
+
+.terminal-link-badge.offline {
+  background-color: rgba(248, 81, 73, 0.12);
+  color: #f85149;
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  opacity: 0.75;
 }
 
 .chat-action-btn {

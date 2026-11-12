@@ -23,6 +23,7 @@ interface TutorChatProps {
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
   onClearChat?: () => void;
+  isTerminalConnected?: boolean;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -31,6 +32,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   isChatting,
   onSendMessage,
   onClearChat,
+  isTerminalConnected = false,
 }) => {
   const [input, setInput] = useState('');
   const [personaExpanded, setPersonaExpanded] = useState(false);
@@ -156,9 +158,16 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           </div>
 
           <div className="chat-header-actions">
-            <span className="terminal-link-badge" title="Live Terminal Output Linked (Mentor automatically reads your terminal output & errors)">
+            <span
+              className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
+              title={
+                isTerminalConnected
+                  ? "Live Terminal Output Linked (Mentor automatically reads your terminal output & errors)"
+                  : "Terminal Disconnected (Click terminal drawer to reconnect)"
+              }
+            >
               <Terminal size={11} />
-              <span>Terminal Live</span>
+              <span>{isTerminalConnected ? "Terminal Live" : "Terminal Offline"}</span>
             </span>
             {onClearChat && history.length > 0 && (
               <button
