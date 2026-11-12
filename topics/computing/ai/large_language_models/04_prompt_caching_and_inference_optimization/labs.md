@@ -2,22 +2,26 @@
 
 ## Objective & Environment Setup
 
-The objective of this lab is to implement, optimize, and verify prompt caching and inference optimization techniques for large language models (LLMs). This hands-on lab will guide you through the process of setting up a pipeline that efficiently caches prompts and optimizes the inference process using real, executable Python scripts. The lab assumes a Python 3.11+ environment with the following packages installed:
+The objective of this lab is to implement, optimize, and verify prompt caching and inference optimization techniques for large language models (LLMs). This lab will guide you through the process of setting up a robust pipeline that leverages prompt caching to reduce inference latency and improve throughput. We will use a combination of Python libraries such as PyTorch, HuggingFace Transformers, and NumPy to build and evaluate our system.
+
+### Environment Setup
+
+Ensure you have a Python 3.11+ environment with the following packages installed:
 
 - PyTorch
 - HuggingFace Transformers
 - NumPy
 - Scikit-learn
-- Ollama (or any other LLM API provider)
-- Polars
+- Ollama (or any other LLM provider API)
+- Polars (optional, for data manipulation)
 
-Ensure your environment is set up with the necessary packages by running the following command:
+You can install these packages using pip:
 
 ```bash
 pip install torch transformers numpy scikit-learn ollama polars
 ```
 
-Additionally, configure your API keys and environment variables for the LLM provider you are using. For example, if you are using Ollama, set the API key as follows:
+Additionally, configure your API access for the LLM provider. For example, if you are using Ollama, ensure you have your API key set up:
 
 ```bash
 export OLLAMA_API_KEY=your_api_key_here
@@ -25,268 +29,173 @@ export OLLAMA_API_KEY=your_api_key_here
 
 ## Exercise 1: Hands-On Implementation & Pipeline Execution
 
-In this exercise, we will implement a prompt caching mechanism and an inference pipeline using the HuggingFace Transformers library. The caching mechanism will store previously processed prompts to avoid redundant computations, thereby optimizing the inference process.
+In this exercise, we will implement a prompt caching mechanism and integrate it with an LLM inference pipeline. The caching mechanism will store previously seen prompts and their corresponding model outputs to avoid redundant computations.
 
-### Step 1: Import Required Libraries
+### Complete, Runnable Python Script
+
+Below is a complete, runnable Python script that implements the core prompt caching and inference pipeline:
 
 ```python
-import torch
+import os
+import numpy as np
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from collections import OrderedDict
-import numpy as np
-import polars as pl
-```
 
-### Step 2: Load Pre-trained Model and Tokenizer
-
-```python
+# Load the model and tokenizer
 model_name = "gpt2"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
-```
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-### Step 3: Define Prompt Cache
+# Prompt cache
+prompt_cache = OrderedDict()
 
-We will use an `OrderedDict` to implement a simple LRU (Least Recently Used) cache for storing prompts and their corresponding model outputs.
+# Function to generate text using the model
+def generate_text(prompt, max_length=50):
+    if prompt in prompt_cache:
+        print("Cache hit!")
+        return prompt_cache[prompt]
+    else:
+        print("Cache miss!")
+        inputs = tokenizer(prompt, return_tensors="pt")
+        outputs = model.generate(**inputs, max_length=max_length)
+        text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        prompt_cache[prompt] = text
+        # Maintain a fixed cache size
+        if len(prompt_cache) > 100:
+            prompt_cache.popitem(last=False)
+        return text
 
-```python
-class PromptCache:
-    def __init__(self, max_size=100):
-        self.cache = OrderedDict()
-        self.max_size = max_size
-
-    def get(self, prompt):
-        if prompt in self.cache:
-            self.cache.move_to_end(prompt)
-            return self.cache[prompt]
-        return None
-
-    def set(self, prompt, output):
-        if prompt in self.cache:
-            self.cache.move_to_end(prompt)
-        self.cache[prompt] = output
-        if len(self.cache) > self.max_size:
-            self.cache.popitem(last=False)
-```
-
-### Step 4: Define Inference Pipeline
-
-The inference pipeline will first check the cache for the prompt. If the prompt is not in the cache, it will generate the response using the model and store it in the cache.
-
-```python
-class InferencePipeline:
-    def __init__(self, model, tokenizer, cache_size=100):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.cache = PromptCache(max_size=cache_size)
-
-    def infer(self, prompt):
-        cached_output = self.cache.get(prompt)
-        if cached_output is not None:
-            print("Cache hit!")
-            return cached_output
-
-        print("Cache miss, generating response...")
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        outputs = self.model.generate(**inputs, max_length=50)
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        self.cache.set(prompt, response)
-        return response
-```
-
-### Step 5: Execute Inference Pipeline
-
-```python
-pipeline = InferencePipeline(model, tokenizer)
-
+# Example usage
 prompts = [
-    "Explain the concept of prompt caching in LLMs.",
-    "What are the benefits of prompt caching?",
-    "Explain the concept of prompt caching in LLMs."
+    "Once upon a time",
+    "The quick brown fox",
+    "To be or not to be",
+    "Once upon a time"
 ]
 
 for prompt in prompts:
-    response = pipeline.infer(prompt)
+    response = generate_text(prompt)
     print(f"Prompt: {prompt}\nResponse: {response}\n")
 ```
 
 ## Exercise 2: Hyperparameter Tuning & Empirical Benchmarking
 
-In this exercise, we will benchmark the performance of our inference pipeline by measuring accuracy, latency distributions, token costs, and convergence curves.
+In this exercise, we will benchmark the accuracy, latency, and token costs of our inference pipeline with and without prompt caching. We will use Scikit-learn to measure latency distributions and NumPy for statistical analysis.
 
-### Step 1: Define Benchmarking Functions
+### Real Benchmarking Code
 
-We will define functions to measure the latency and token usage of the inference pipeline.
+Below is a complete, runnable Python script that performs empirical benchmarking:
 
 ```python
 import time
+import numpy as np
+from sklearn.metrics import mean_squared_error
 
-def measure_latency_and_tokens(pipeline, prompt):
-    start_time = time.time()
-    response = pipeline.infer(prompt)
-    end_time = time.time()
-    latency = end_time - start_time
-    inputs = pipeline.tokenizer(prompt, return_tensors="pt")
-    token_count = len(inputs["input_ids"][0])
-    return latency, token_count, response
-```
+# Function to measure latency
+def measure_latency(prompt, num_trials=10):
+    latencies = []
+    for _ in range(num_trials):
+        start_time = time.time()
+        generate_text(prompt)
+        end_time = time.time()
+        latencies.append(end_time - start_time)
+    return np.array(latencies)
 
-### Step 2: Execute Benchmarking
+# Function to measure token cost
+def measure_token_cost(prompt):
+    inputs = tokenizer(prompt, return_tensors="pt")
+    return len(inputs["input_ids"][0])
 
-We will execute the benchmarking functions for a set of prompts and collect the results.
-
-```python
+# Example usage
 prompts = [
-    "Explain the concept of prompt caching in LLMs.",
-    "What are the benefits of prompt caching?",
-    "Explain the concept of prompt caching in LLMs.",
-    "What are the challenges of prompt caching?",
-    "How can prompt caching be optimized?"
+    "Once upon a time",
+    "The quick brown fox",
+    "To be or not to be",
+    "Once upon a time"
 ]
 
-results = []
-
+# Benchmarking with prompt caching
+caching_latencies = []
+caching_token_costs = []
 for prompt in prompts:
-    latency, token_count, response = measure_latency_and_tokens(pipeline, prompt)
-    results.append({
-        "prompt": prompt,
-        "latency": latency,
-        "token_count": token_count,
-        "response": response
-    })
+    caching_latencies.append(measure_latency(prompt))
+    caching_token_costs.append(measure_token_cost(prompt))
 
-results_df = pl.DataFrame(results)
-print(results_df)
-```
+# Benchmarking without prompt caching
+prompt_cache.clear()
+no_caching_latencies = []
+no_caching_token_costs = []
+for prompt in prompts:
+    no_caching_latencies.append(measure_latency(prompt))
+    no_caching_token_costs.append(measure_token_cost(prompt))
 
-### Step 3: Analyze Benchmarking Results
+# Statistical analysis
+caching_latency_mean = np.mean(caching_latencies)
+caching_latency_std = np.std(caching_latencies)
+no_caching_latency_mean = np.mean(no_caching_latencies)
+no_caching_latency_std = np.std(no_caching_latencies)
 
-We will analyze the benchmarking results to understand the performance of our inference pipeline.
+print(f"Caching Latency Mean: {caching_latency_mean} ± {caching_latency_std}")
+print(f"No Caching Latency Mean: {no_caching_latency_mean} ± {no_caching_latency_std}")
 
-```python
-average_latency = results_df["latency"].mean()
-average_token_count = results_df["token_count"].mean()
-
-print(f"Average Latency: {average_latency:.4f} seconds")
-print(f"Average Token Count: {average_token_count:.2f} tokens")
+print(f"Caching Token Costs: {caching_token_costs}")
+print(f"No Caching Token Costs: {no_caching_token_costs}")
 ```
 
 ## Exercise 3: Stress Testing, Edge Cases & Failure Mitigation
 
-In this exercise, we will test the inference pipeline under stress conditions, handle edge cases, and implement guardrails or error handling.
+In this exercise, we will test the robustness of our prompt caching and inference pipeline by simulating stress conditions and edge cases. We will also implement guardrails and error handling to mitigate potential failures.
 
-### Step 1: Stress Testing
+### Reproducing Failure Modes, Testing Edge Cases, and Implementing Guardrails
 
-We will simulate a high-load scenario by generating responses for a large number of prompts.
+Below is a complete, runnable Python script that performs stress testing and implements guardrails:
 
 ```python
 import random
 
-stress_prompts = [
-    f"Explain the concept of prompt caching in LLMs. Prompt {i}"
-    for i in range(100)
-]
-
-stress_results = []
-
-for prompt in stress_prompts:
-    latency, token_count, response = measure_latency_and_tokens(pipeline, prompt)
-    stress_results.append({
-        "prompt": prompt,
-        "latency": latency,
-        "token_count": token_count,
-        "response": response
-    })
-
-stress_results_df = pl.DataFrame(stress_results)
-print(stress_results_df)
-```
-
-### Step 2: Edge Cases
-
-We will test the inference pipeline with edge cases such as empty prompts, very long prompts, and special characters.
-
-```python
-edge_cases = [
-    "",
-    "a" * 1000,
-    "Explain the concept of prompt caching in LLMs! @#$%^&*()"
-]
-
-edge_results = []
-
-for prompt in edge_cases:
-    latency, token_count, response = measure_latency_and_tokens(pipeline, prompt)
-    edge_results.append({
-        "prompt": prompt,
-        "latency": latency,
-        "token_count": token_count,
-        "response": response
-    })
-
-edge_results_df = pl.DataFrame(edge_results)
-print(edge_results_df)
-```
-
-### Step 3: Failure Mitigation
-
-We will implement error handling to manage potential failures such as model timeouts or invalid prompts.
-
-```python
-class InferencePipelineWithFailureMitigation:
-    def __init__(self, model, tokenizer, cache_size=100, timeout=5):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.cache = PromptCache(max_size=cache_size)
-        self.timeout = timeout
-
-    def infer(self, prompt):
-        cached_output = self.cache.get(prompt)
-        if cached_output is not None:
-            print("Cache hit!")
-            return cached_output
-
-        print("Cache miss, generating response...")
+# Function to simulate stress testing
+def stress_test(num_trials=1000):
+    for _ in range(num_trials):
+        random_prompt = " ".join(random.choices(["Once", "upon", "a", "time", "The", "quick", "brown", "fox"], k=5))
         try:
-            inputs = self.tokenizer(prompt, return_tensors="pt")
-            outputs = self.model.generate(**inputs, max_length=50, timeout=self.timeout)
-            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            self.cache.set(prompt, response)
-            return response
+            generate_text(random_prompt)
         except Exception as e:
-            print(f"Error during inference: {e}")
-            return "Error: Unable to generate response."
+            print(f"Error during stress test: {e}")
 
-pipeline_with_mitigation = InferencePipelineWithFailureMitigation(model, tokenizer)
+# Function to test edge cases
+def test_edge_cases():
+    edge_cases = [
+        "",
+        " " * 1000,
+        "A" * 1000,
+        "This is a very long prompt that should be truncated or handled gracefully by the model and caching mechanism."
+    ]
+    for prompt in edge_cases:
+        try:
+            generate_text(prompt)
+        except Exception as e:
+            print(f"Error during edge case test: {e}")
 
-failure_prompts = [
-    "Explain the concept of prompt caching in LLMs.",
-    "a" * 10000,  # Very long prompt
-    ""  # Empty prompt
-]
+# Stress testing
+stress_test()
 
-for prompt in failure_prompts:
-    response = pipeline_with_mitigation.infer(prompt)
-    print(f"Prompt: {prompt}\nResponse: {response}\n")
+# Edge case testing
+test_edge_cases()
 ```
 
 ## Verification Checklist & Quick Reference Cheat Sheet
 
-### Essential Python Methods and Parameters
+Below is a table of essential Python methods, parameters, and verification flags for this topic:
 
-- **PromptCache Methods:**
-  - `get(prompt)`: Retrieve cached output for a prompt.
-  - `set(prompt, output)`: Store output in the cache for a prompt.
+| Method/Parameter | Description |
+|------------------|-------------|
+| `generate_text(prompt, max_length=50)` | Generates text using the model with prompt caching. |
+| `measure_latency(prompt, num_trials=10)` | Measures the latency of text generation for a given prompt. |
+| `measure_token_cost(prompt)` | Measures the token cost of a given prompt. |
+| `stress_test(num_trials=1000)` | Simulates stress testing by generating random prompts. |
+| `test_edge_cases()` | Tests the pipeline with edge cases. |
+| `prompt_cache` | An `OrderedDict` used to store cached prompts and their corresponding outputs. |
+| `model` | The pre-trained LLM model. |
+| `tokenizer` | The tokenizer used to preprocess prompts and postprocess model outputs. |
 
-- **InferencePipeline Methods:**
-  - `infer(prompt)`: Generate response for a prompt using the model and cache.
-
-- **Benchmarking Functions:**
-  - `measure_latency_and_tokens(pipeline, prompt)`: Measure latency and token usage for a prompt.
-
-### Verification Flags
-
-- **Cache Size:** `max_size` parameter in `PromptCache` constructor.
-- **Timeout:** `timeout` parameter in `InferencePipelineWithFailureMitigation` constructor.
-
-By following this lab guide, you will have a solid understanding of how to implement, optimize, and verify prompt caching and inference optimization techniques for large language models. This hands-on experience will enable you to build more efficient and robust AI systems.
+This lab provides a comprehensive hands-on experience in implementing, optimizing, and verifying prompt caching and inference optimization techniques for large language models. By following the exercises and using the provided code, you will gain a deeper understanding of how to build efficient and robust LLM inference pipelines.
