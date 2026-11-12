@@ -61,7 +61,8 @@ BOOK_STYLE_DIRECTIVE = """CRITICAL STYLE & TONE DIRECTIVE:
 - STRICTLY AVOID endless bullet-point lists. Write in rich, articulated, flowing paragraphs of narrative prose.
 - Connect concepts through deep exposition, historical context, and cause-and-effect mechanical reasoning.
 - Write like an authoritative technical author (e.g. O'Reilly, MIT Press, No Starch Press): articulate, human, intellectually rigorous, and engaging.
-- Use lists ONLY when providing sequential step-by-step CLI commands in labs or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose."""
+- Use lists ONLY when providing sequential step-by-step CLI commands in labs or parameter reference tables. All conceptual and architectural explanations must be written in full narrative prose.
+- RAW OUTPUT ONLY: Do NOT include conversational preambles (e.g., 'Here is your lesson', 'Sure', etc.), HTML tags, or code fences (e.g. ```markdown ... ```) around the entire output. Output the raw Markdown text directly."""
 
 def build_topic_modules(domain: str, category: str, subtopic_id: str, subtopic_title: str) -> List[Dict[str, str]]:
     """
@@ -932,52 +933,48 @@ def generate_topic_parallel(
                 else:
                     results[fname] = False
 
-        # Phase 2: Concurrent Quality Audit & Fact-Checking Pass on completed drafts
-        def get_reviewer_for_host(author_host: str):
+        # Phase 2: Concurrent Quality Audit & Fact-Checking + Prose Refinement
+        def get_auditor_for_host(author_host: str):
+            # Prioritize 30B/32B local nodes, or Claude if available
             large_reviewers = [w for w in workers if ("32b" in w[1] or "30b" in w[1]) and w[0] != author_host]
             if large_reviewers:
                 return large_reviewers[0]
+            # Fallback to any other node
             distinct = [w for w in workers if w[0] != author_host]
             return distinct[0] if distinct else workers[0]
 
-        def run_audit_job(item):
+        def run_audit_and_refine_job(item):
             fname, (content, mod_item, host_label, author_host, elapsed) = item
-            r_host, r_model, r_provider = get_reviewer_for_host(author_host)
+            r_host, r_model, r_provider = get_auditor_for_host(author_host)
             r_name = CLUSTER_HOST_SPECS.get(r_host, {}).get("name", r_host).upper()
+            
             final_content = content
             audit_note = "Verified"
 
-            has_placeholders = any(p in content for p in ["// TODO", "/* TODO", "... (rest of", "TBD"])
-            if has_placeholders or "8b" in host_label.lower():
-                try:
-                    audit_prompt = f"""You are an adversarial Technical Reviewer & Fact-Checker.
-Audit this masterclass chapter for '{mod_item['title']}' on '{subtopic_title}'.
-Check for:
-1. Fabricated APIs, fake syscalls/registers, or hallucinated invariants.
-2. Syntactically invalid code snippets, bash commands, or Mermaid diagrams (ensure edge labels with '&' or math symbols are enclosed in double quotes).
-3. Any lazy placeholders (// TODO, ..., TBD) or bullet-point outlines instead of rich narrative prose.
+            # 3-Stage: Audit (Fact-Check) + Refine (Prose Polish)
+            try:
+                refine_prompt = f"""You are a master technical author and rigorous adversarial auditor.
+Audit and rewrite this masterclass chapter for '{mod_item['title']}' on '{subtopic_title}'.
 
-If accurate and publication-grade, output 'VERIFIED'.
-If there are any hallucinations, syntax errors, or placeholders, rewrite and correct the full document with graduate-level precision.
+AUDIT & REFINE REQUIREMENTS:
+1. FACT-CHECK: Fix any fabricated APIs, hallucinated invariants, or technical inaccuracies.
+2. PROSE STYLE: Rewrite all prose to be authoritative, engaging, and articulate (e.g., O'Reilly/MIT Press style). Remove all 'AI-isms' (e.g., 'In conclusion', 'It is important to note', 'I hope this helps'). Ensure continuous flow, depth, and structural coherence.
+3. SYNTAX: Ensure all code snippets and Mermaid diagrams (edge labels enclosed in double quotes) are syntactically perfect.
+4. PLACEHOLDERS: Eliminate all lazy placeholders (// TODO, ..., TBD) and bullet-point lists. Convert to rich narrative paragraphs.
 
-DRAFT TO AUDIT:
+DRAFT TO AUDIT & REFINE:
 \"\"\"
 {content[:7000]}
 \"\"\"
 
-Output either 'VERIFIED' or the fully corrected publication-grade Markdown only."""
+Output the fully corrected, publication-grade, raw Markdown only."""
 
-                    review_res = r_provider.generate(audit_prompt, system_instruction="You are a ruthless technical auditor and peer reviewer.").strip()
-                    if "<think>" in review_res and "</think>" in review_res:
-                        review_res = review_res.split("</think>")[-1].strip()
-
-                    if review_res and not review_res.startswith("VERIFIED") and len(review_res) > 500:
-                        final_content = validate_generation_output(review_res)
-                        audit_note = f"Audited & Corrected by [{r_name}]"
-                    else:
-                        audit_note = f"Audited & Verified by [{r_name}]"
-                except Exception as audit_err:
-                    audit_note = f"Audit skipped ({audit_err})"
+                refinement_res = r_provider.generate(refine_prompt, system_instruction="You are a master technical author and ruthless peer reviewer.")
+                final_content = validate_generation_output(refinement_res)
+                audit_note = f"Audited & Refined by [{r_name}]"
+            except Exception as e:
+                audit_note = f"Audit/Refine failed: {e}"
+                # Keep original draft if refinement fails
 
             target_file = subtopic_dir / fname
             target_file.write_text(final_content.strip() + "\n", encoding="utf-8")
@@ -988,7 +985,7 @@ Output either 'VERIFIED' or the fully corrected publication-grade Markdown only.
             return results
 
         with ThreadPoolExecutor(max_workers=min(4, len(drafts))) as audit_executor:
-            for fname, ok in audit_executor.map(run_audit_job, drafts.items()):
+            for fname, ok in audit_executor.map(run_audit_and_refine_job, drafts.items()):
                 results[fname] = ok
     else:
         # Fallback to single provider
