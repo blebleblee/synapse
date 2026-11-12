@@ -1,2 +1,0 @@
-#separator:Comma,#html:true,#tags:computing infrastructure/kubernetes 01_control_plane_and_etcd
-What is etcd?,Distributed linearizable key-value store using Raft.,computing::01_control_plane_and_etcd
