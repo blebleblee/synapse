@@ -10,18 +10,22 @@ from typing import Dict, Any, List, Optional, Tuple
 
 from learning_engine.mastery import get_completed_lessons
 from learning_engine.security import sanitize_topic_path, validate_workspace_path
-
-def sanitize_rel_path(rel_path: str) -> Path:
-    """Deprecated: Use validate_workspace_path instead."""
-    return validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
+from learning_engine.services import TaxonomyService
+from learning_engine.utils import scan_subtopic_status as utils_scan, get_unit_lessons as utils_get_lessons
+from learning_engine.constants import LEVELS
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOPICS_DIR = validate_workspace_path(WORKSPACE_ROOT, WORKSPACE_ROOT / "topics")
+TAXONOMY = TaxonomyService(TOPICS_DIR, WORKSPACE_ROOT)
 
 LEVELS = ["beginner", "intermediate", "advanced"]
 
 def get_topics_dir() -> Path:
     return TOPICS_DIR
+
+def sanitize_rel_path(rel_path: str) -> Path:
+    """Deprecated: Use validate_workspace_path instead."""
+    return validate_workspace_path(TOPICS_DIR, TOPICS_DIR / rel_path)
 
 DOMAIN_ORDER = [
     "computing",
@@ -49,233 +53,14 @@ def get_domain_persona(domain: str) -> str:
     return "You are an expert educator and technical mentor."
 
 def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
-    """
-    Discovers all lesson files in a unit directory (e.g. lesson_01_*.md, lessons/*.md, or LESSON.md).
-    Returns list of dicts: [{"id": slug, "title": title, "filename": name, "path": rel_or_abs}]
-    """
-    if not unit_dir.exists():
-        return []
-
-    lessons = []
-    # 1. Check for lesson_*.md in root of unit_dir
-    files = sorted(list(unit_dir.glob("lesson_*.md")))
-    # 2. Check for lessons/ directory
-    lessons_subdir = unit_dir / "lessons"
-    if lessons_subdir.exists():
-        files.extend(sorted(list(lessons_subdir.glob("*.md"))))
-
-    # 3. Fallback to artifacts/
-    artifacts_dir = unit_dir / "artifacts"
-    if not files and artifacts_dir.exists():
-        files.extend(sorted(list(artifacts_dir.glob("lesson_*.md"))))
-
-    for f in files:
-        title = ""
-        try:
-            for line in f.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line.startswith("# "):
-                    title = line.lstrip("# ").strip()
-                    break
-        except Exception:
-            pass
-        if not title:
-            # Prettify stem e.g. lesson_01_introduction -> Lesson 01: Introduction
-            cleaned = f.stem.replace("lesson_", "Lesson ").replace("_", " ").title()
-            title = cleaned
-
-        lessons.append({
-            "id": f.stem,
-            "title": title,
-            "filename": f.name,
-            "path": str(f)
-        })
-
-    # If no sequential lessons, check for single LESSON.md
-    if not lessons and (unit_dir / "LESSON.md").exists():
-        f = unit_dir / "LESSON.md"
-        title = "Technical Lesson"
-        try:
-            for line in f.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line.startswith("# "):
-                    title = line.lstrip("# ").strip()
-                    break
-        except Exception:
-            pass
-        lessons.append({
-            "id": "lesson",
-            "title": title,
-            "filename": "LESSON.md",
-            "path": str(f)
-        })
-
-    return lessons
+    return utils_get_lessons(unit_dir)
 
 def scan_subtopic_status(unit_dir: Path) -> Dict[str, Any]:
-    level_status = {}
-
-    for lvl in LEVELS:
-        lvl_dir = unit_dir / lvl
-        f = (lvl_dir / "FOUNDATION.md").exists()
-        l = (lvl_dir / "LESSON.md").exists()
-        b = (lvl_dir / "LABS.md").exists()
-        level_status[lvl] = {
-            "has_foundation": f,
-            "has_lesson": l,
-            "has_labs": b,
-            "complete": (f and l and b)
-        }
-
-    # Root file and multi-lesson support
-    root_f = (unit_dir / "FOUNDATION.md").exists() or (unit_dir / "foundation.md").exists()
-    root_l = (unit_dir / "LESSON.md").exists() or (unit_dir / "lesson.md").exists()
-    root_b = (unit_dir / "LABS.md").exists() or (unit_dir / "labs.md").exists()
-
-    all_unit_lessons = get_unit_lessons(unit_dir)
-    sequential_lessons = [l for l in all_unit_lessons if l["id"].startswith("lesson_")]
-    has_multi_lessons = len(sequential_lessons) >= 1
-    has_labs = (unit_dir / "labs.md").exists() or (unit_dir / "LABS.md").exists()
-
-    has_foundation = any(s["has_foundation"] for s in level_status.values()) or root_f or has_multi_lessons
-    has_lesson = any(s["has_lesson"] for s in level_status.values()) or root_l or has_multi_lessons
-
-    is_leveled_complete = all(s["complete"] for s in level_status.values()) if level_status else False
-    is_root_complete = (root_f and (root_l or has_multi_lessons) and root_b)
-    is_masterclass_complete = has_multi_lessons and has_labs
-    has_legacy_content = (is_leveled_complete or is_root_complete) and not is_masterclass_complete
-
-    all_files = [f.name for f in unit_dir.iterdir() if f.is_file() and not f.name.startswith(".")] if unit_dir.exists() else []
-
-    return {
-        "has_foundation": has_foundation,
-        "has_lesson": has_multi_lessons or has_lesson,
-        "has_labs": has_labs,
-        "complete": is_masterclass_complete,
-        "is_legacy": has_legacy_content,
-        "is_masterclass": is_masterclass_complete,
-        "levels": level_status,
-        "lesson_count": len(sequential_lessons),
-        "lessons": [l["id"] for l in sequential_lessons],
-        "file_count": len(all_files),
-        "files": all_files
-    }
+    return utils_scan(unit_dir, LEVELS)
 
 def get_topic_tree() -> Dict[str, Any]:
-    tree = {}
-    for domain in list_domains():
-        domain_dir = TOPICS_DIR / domain
-        syllabus_file = domain_dir / "SYLLABUS.md"
-        tree[domain] = {
-            "path": str(domain_dir.relative_to(WORKSPACE_ROOT)),
-            "disciplines": {},
-            "categories": {} # Backward-compatible alias
-        }
-
-        if not syllabus_file.exists():
-            continue
-
-        content = syllabus_file.read_text(encoding="utf-8")
-        pattern = r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)"
-        matches = re.findall(pattern, content)
-
-        # Extract human-readable course titles from syllabus section headers (### ...)
-        course_display_names = {}
-        current_section = ""
-        for line in content.splitlines():
-            line_str = line.strip()
-            if line_str.startswith("### "):
-                current_section = line_str.lstrip("#").strip()
-            elif line_str.startswith("- **"):
-                m = re.match(r"-\s+\*\*(.*?)\*\*\s+\(\`(.*?)/\`\)", line_str)
-                if m:
-                    _, u_rel = m.groups()
-                    u_parts = u_rel.split("/")
-                    if len(u_parts) >= 3:
-                        u_disc = u_parts[0]
-                        u_course = u_parts[1]
-                    elif len(u_parts) == 2:
-                        u_disc = u_parts[0]
-                        u_course = u_parts[1]
-                    else:
-                        u_disc = "general"
-                        u_course = u_parts[0]
-
-                    if current_section and (u_disc, u_course) not in course_display_names:
-                        if ":" in current_section:
-                            c_title = current_section.split(":", 1)[1].strip()
-                        else:
-                            c_title = current_section
-                        if c_title and c_title.lower() != u_disc.lower():
-                            course_display_names[(u_disc, u_course)] = c_title
-                        else:
-                            course_display_names[(u_disc, u_course)] = u_course.replace("_", " ").title()
-
-        for display_name, rel_path in matches:
-            parts = rel_path.split("/")
-            if len(parts) >= 3:
-                disc = parts[0]
-                course = parts[1]
-                unit = "/".join(parts[2:])
-            elif len(parts) == 2:
-                disc = parts[0]
-                course = parts[1]
-                unit = "core"
-            else:
-                disc = "general"
-                course = parts[0]
-                unit = "core"
-
-            if disc not in tree[domain]["disciplines"]:
-                tree[domain]["disciplines"][disc] = {"courses": {}}
-                tree[domain]["categories"][disc] = {}
-
-            if unit == "core":
-                c_display_title = display_name
-            else:
-                c_display_title = course_display_names.get((disc, course), course.replace("_", " ").title())
-
-            if course not in tree[domain]["disciplines"][disc]["courses"]:
-                tree[domain]["disciplines"][disc]["courses"][course] = {
-                    "display_name": c_display_title,
-                    "units": {}
-                }
-
-            unit_path = domain_dir / rel_path
-            status = scan_subtopic_status(unit_path) if unit_path.exists() else {
-                "has_foundation": False,
-                "has_lesson": False,
-                "has_labs": False,
-                "complete": False,
-                "levels": {},
-                "file_count": 0,
-                "files": []
-            }
-
-            unit_lessons = get_unit_lessons(unit_path) if unit_path.exists() else []
-            has_summary = (unit_path / "SUMMARY.md").exists() if unit_path.exists() else False
-
-            node_data = {
-                "display_name": display_name,
-                "domain": domain,
-                "discipline": disc,
-                "course": course,
-                "course_title": c_display_title,
-                "unit": unit,
-                "rel_path": f"{domain}/{rel_path}",
-                "full_path": str(unit_path),
-                "status": status,
-                "lessons": unit_lessons,
-                "completed_lessons": get_completed_lessons(f"{domain}/{rel_path}"),
-                "has_summary": has_summary
-            }
-
-            tree[domain]["disciplines"][disc]["courses"][course]["units"][unit] = node_data
-            # Backward-compatible flat mapping under categories
-            flat_key = f"{course}_{unit}" if unit != "core" else course
-            tree[domain]["categories"][disc][flat_key] = node_data
-
-    return tree
+    """Wraps TaxonomyService to maintain API compatibility."""
+    return TAXONOMY.get_topic_tree()
 
 def resolve_subtopic(query: str) -> Optional[Tuple[str, str, str, Path]]:
     """

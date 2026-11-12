@@ -32,3 +32,13 @@ Thumbs.db
 # Transient Chat Sessions
 topics/**/sessions/
 topics/.workspace_sessions/
+
+# Runtime Database & State
+data/
+*.db
+*.db-journal
+*.db-wal
+
+# Temporary Audit Scripts
+audit_*.py
+audit_*.txt

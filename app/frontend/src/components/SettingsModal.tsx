@@ -14,6 +14,8 @@ export interface AppSettings {
   primaryModel: string;
   reviewerModel: string;
   geminiApiKey: string;
+  anthropicApiKey: string;
+  anthropicBaseUrl: string;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -34,6 +36,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
   geminiApiKey: '',
+  anthropicApiKey: '',
+  anthropicBaseUrl: 'https://aiapiflow.com',
 };
 
 interface SettingsModalProps {
@@ -399,6 +403,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 placeholder="AIzaSy..."
               />
               <span className="field-hint">Used for cloud fallback and cross-model audits</span>
+            </div>
+
+            <div className="form-group">
+              <label>Anthropic API Key (Claude Sonnet/Haiku)</label>
+              <input
+                type="password"
+                value={formData.anthropicApiKey}
+                onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                placeholder="sk-ant-..."
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Anthropic Base URL (Proxy/Gateway)</label>
+              <input
+                type="text"
+                value={formData.anthropicBaseUrl}
+                onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
+                placeholder="https://api.anthropic.com"
+              />
             </div>
           </div>
 

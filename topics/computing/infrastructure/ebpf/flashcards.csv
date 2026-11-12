@@ -1,9 +1,0 @@
-#separator:Comma,#html:true,#tags:computing infrastructure ebpf
-What is the primary role of the eBPF in-kernel verifier?,"To statically prove memory safety, type consistency, and termination via DAG analysis before JIT compilation.",computing::ebpf
-What is the main advantage of eBPF over traditional kernel modules?,"eBPF allows for safe, sandboxed execution of bytecode in the kernel without the risk of causing kernel panics.",computing::ebpf
-How does eBPF ensure memory safety?,"The in-kernel verifier performs static analysis to prove memory safety, type consistency, and termination of eBPF programs.",computing::ebpf
-What is the maximum stack size for an eBPF program?,The maximum stack size for an eBPF program is fixed at exactly 512 bytes.,computing::ebpf
-What is the purpose of the R10 register in eBPF?,The R10 register is a read-only stack frame pointer that points to the base of the eBPF program's local stack frame.,computing::ebpf
-Which registers in eBPF are used as function argument registers?,Registers R1 to R5 are used as function argument registers.,computing::ebpf
-What happens if an eBPF program attempts to write to the R10 register?,"If an eBPF program attempts to write to the R10 register, the verifier immediately rejects the instruction with -EACCES.",computing::ebpf
-What is the architecture of eBPF?,"eBPF is implemented as an in-kernel, 64-bit RISC register machine with an instruction set closely mirroring modern hardware instruction sets like x86-64 and aarch64.",computing::ebpf
