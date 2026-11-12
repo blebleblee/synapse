@@ -953,14 +953,27 @@ def generate_topic_parallel(
 
             # 3-Stage: Audit (Fact-Check) + Refine (Prose Polish)
             try:
+                # Domain-specific constraints
+                latex_constraint = ""
+                if any(d in domain for d in ["computing", "engineering", "business", "crafts", "humanities"]):
+                    latex_constraint = "3. FORMATTING: STRICTLY NO LaTeX ($...$ or $$...$$). Use plain text or code blocks for math. "
+                else:
+                    latex_constraint = "3. FORMATTING: Use LaTeX ($...$) for mathematical formulas where appropriate."
+
                 refine_prompt = f"""You are a master technical author and rigorous adversarial auditor.
 Audit and rewrite this masterclass chapter for '{mod_item['title']}' on '{subtopic_title}'.
 
 AUDIT & REFINE REQUIREMENTS:
 1. FACT-CHECK: Fix any fabricated APIs, hallucinated invariants, or technical inaccuracies.
 2. PROSE STYLE: Rewrite all prose to be authoritative, engaging, and articulate (e.g., O'Reilly/MIT Press style). Remove all 'AI-isms' (e.g., 'In conclusion', 'It is important to note', 'I hope this helps'). Ensure continuous flow, depth, and structural coherence.
-3. SYNTAX: Ensure all code snippets and Mermaid diagrams (edge labels enclosed in double quotes) are syntactically perfect.
-4. PLACEHOLDERS: Eliminate all lazy placeholders (// TODO, ..., TBD) and bullet-point lists. Convert to rich narrative paragraphs.
+{latex_constraint}
+4. DIAGRAMS & SYNTAX: Mermaid diagrams MUST use strict syntax.
+   - All labels MUST be enclosed in double quotes (e.g., A -->| "Label Text" | B).
+   - Use simple, linear flowcharts. Do NOT use complex subgraphs or nested nodes.
+   - Examples of correct Mermaid syntax:
+     - `graph TD; A -->| "Start" | B; B -->| "End" | C;`
+     - `sequenceDiagram; participant A; participant B; A->>B: "Request"; B-->>A: "Response";`
+5. PLACEHOLDERS: Eliminate all lazy placeholders (// TODO, ..., TBD) and bullet-point lists. Convert to rich narrative paragraphs.
 
 DRAFT TO AUDIT & REFINE:
 \"\"\"
