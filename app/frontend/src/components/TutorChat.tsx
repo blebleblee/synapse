@@ -11,7 +11,8 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  Terminal
+  Terminal,
+  Trash2
 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 import { speakText } from '../utils/speech';
@@ -132,36 +133,52 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       />
 
       <div className="chat-header">
-        <div
-          className="persona-info clickable"
-          onClick={() => setPersonaExpanded((prev) => !prev)}
-          title={personaExpanded ? "Collapse Socratic mentor directives" : "Expand full Socratic mentor directives"}
-        >
-          <Bot size={22} className="persona-icon" />
-          <div className="persona-text">
-            <div className="persona-label-row">
-              <span className="persona-label">Socratic Mentor</span>
-              {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
+        <div className="chat-header-main">
+          <div
+            className="persona-info clickable"
+            onClick={() => setPersonaExpanded((prev) => !prev)}
+            title={personaExpanded ? "Collapse Socratic mentor directives" : "Expand full Socratic mentor directives"}
+          >
+            <div className="persona-avatar-wrapper">
+              <Bot size={18} className="persona-icon" />
+              <span className="persona-online-dot" />
             </div>
-            <span className="persona-role" title={personaRole}>
-              {personaRole}
+            <div className="persona-text">
+              <div className="persona-label-row">
+                <span className="persona-label">Socratic Mentor</span>
+                <span className="persona-badge">{topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}</span>
+                {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
+              </div>
+              <span className="persona-role" title={personaRole}>
+                {personaRole}
+              </span>
+            </div>
+          </div>
+
+          <div className="chat-header-actions">
+            <span className="terminal-link-badge" title="Live Terminal Output Linked (Mentor automatically reads your terminal output & errors)">
+              <Terminal size={11} />
+              <span>Terminal Live</span>
             </span>
+            {onClearChat && history.length > 0 && (
+              <button
+                type="button"
+                className="chat-action-btn"
+                onClick={onClearChat}
+                title="Clear conversation history"
+              >
+                <Trash2 size={13} />
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="chat-header-actions">
-        </div>
-      </div>
-
-      {/* Dynamic Context & Terminal Link Banner */}
-      <div className="chat-context-banner">
-        <span className="context-chip topic" title={`Active Subject: ${topic?.display_title || topic?.subtopic || 'General Workspace'}`}>
-          {topic ? (topic.display_title || topic.subtopic?.replace(/_/g, ' ')) : 'General Polymath Workspace'}
-        </span>
-        <span className="context-chip terminal" title="Live Terminal Output Linked (AI can diagnose your errors & logs)">
-          <Terminal size={10} />
-          Terminal Linked
-        </span>
+        {topic && (
+          <div className="chat-subject-row" title={`Active Topic: ${topic.display_title || topic.subtopic}`}>
+            <span className="chat-subject-label">Subject:</span>
+            <span className="chat-subject-title">{topic.display_title || topic.subtopic?.replace(/_/g, ' ')}</span>
+          </div>
+        )}
       </div>
 
       {personaExpanded && topic?.persona && (

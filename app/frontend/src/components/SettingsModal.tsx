@@ -28,16 +28,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
   speechRate: '1.0',
   ollamaHost: 'http://localhost:11434',
   clusterHosts: [
-    'http://localhost:11434',
-    'http://studio.2464.cz:11434',
-    'http://maxi.2464.cz:11434',
-    'http://192.168.200.60:8080'
+    'http://localhost:11434'
   ],
   primaryModel: 'qwen2.5-coder:32b',
   reviewerModel: 'deepseek-r1:32b',
   geminiApiKey: '',
   anthropicApiKey: '',
-  anthropicBaseUrl: 'https://aiapiflow.com',
+  anthropicBaseUrl: 'https://api.anthropic.com',
 };
 
 interface SettingsModalProps {
@@ -53,6 +50,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onSaveSettings,
 }) => {
+  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models'>('appearance');
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
   const [clusterNodes, setClusterNodes] = useState<string[]>(
@@ -190,241 +188,282 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="settings-form">
-          <div className="settings-section">
-            <div className="section-title">
-              <Palette size={14} />
-              <span>Theme & Appearance</span>
-            </div>
+        <div className="settings-tabs-nav">
+          <button
+            type="button"
+            className={`settings-nav-tab ${activeTab === 'appearance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('appearance')}
+          >
+            <Palette size={14} />
+            <span>Theme & Reader</span>
+          </button>
+          <button
+            type="button"
+            className={`settings-nav-tab ${activeTab === 'cluster' ? 'active' : ''}`}
+            onClick={() => setActiveTab('cluster')}
+          >
+            <Cpu size={14} />
+            <span>Ollama Cluster ({clusterNodes.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`settings-nav-tab ${activeTab === 'models' ? 'active' : ''}`}
+            onClick={() => setActiveTab('models')}
+          >
+            <Settings size={14} />
+            <span>AI Models & Cloud API</span>
+          </button>
+        </div>
 
-            <div className="form-group">
-              <label>Color Scheme</label>
-              <div className="theme-options-grid">
-                {[
-                  { id: 'studio', label: 'Studio Dark', desc: 'Carbon & Royal Blue / Gold' },
-                  { id: 'titanium', label: 'Titanium Obsidian', desc: 'Warm Charcoal & Champagne' },
-                  { id: 'monokai', label: 'Monokai Pro', desc: 'Espresso & Pastel Accents' },
-                  { id: 'nordic', label: 'Nordic Slate', desc: 'Arctic Slate & Teal' },
-                ].map((t) => (
+        <form onSubmit={handleSubmit} className="settings-form">
+          {activeTab === 'appearance' && (
+            <div className="settings-section">
+              <div className="section-title">
+                <Palette size={14} />
+                <span>Theme & Appearance</span>
+              </div>
+
+              <div className="form-group">
+                <label>Color Scheme</label>
+                <div className="theme-options-grid">
+                  {[
+                    { id: 'studio', label: 'Studio Dark', desc: 'Carbon & Royal Blue / Gold' },
+                    { id: 'titanium', label: 'Titanium Obsidian', desc: 'Warm Charcoal & Champagne' },
+                    { id: 'monokai', label: 'Monokai Pro', desc: 'Espresso & Pastel Accents' },
+                    { id: 'nordic', label: 'Nordic Slate', desc: 'Arctic Slate & Teal' },
+                  ].map((t) => (
+                    <button
+                      type="button"
+                      key={t.id}
+                      className={`theme-card ${formData.theme === t.id ? 'active' : ''}`}
+                      onClick={() => setFormData({ ...formData, theme: t.id as any })}
+                    >
+                      <div className="theme-card-header">
+                        <span className="theme-name">{t.label}</span>
+                        {formData.theme === t.id && <Check size={14} className="check-icon" />}
+                      </div>
+                      <span className="theme-desc">{t.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="settings-row-2col">
+                <div className="form-group">
+                  <label>UI Font Size</label>
+                  <select
+                    value={formData.fontSize}
+                    onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
+                  >
+                    <option value="compact">Compact (14px)</option>
+                    <option value="standard">Standard (15px)</option>
+                    <option value="large">Large (16px)</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Reading Width</label>
+                  <select
+                    value={formData.readerWidth}
+                    onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
+                  >
+                    <option value="full">Full Width (Fluid 100%)</option>
+                    <option value="constrained">Comfortable Column (860px)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="settings-row-2col" style={{ marginTop: '12px' }}>
+                <div className="form-group">
+                  <label>Reading Language</label>
+                  <select
+                    value={formData.language || 'en'}
+                    onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
+                  >
+                    <option value="en">English (Original Source)</option>
+                    <option value="cs">Czech (Čeština)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="ru">Russian (Русский)</option>
+                  </select>
+                  <span className="field-hint">On-the-fly translation preserving math & code</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Audio Speech Speed</label>
+                  <select
+                    value={formData.speechRate || '1.0'}
+                    onChange={(e) => setFormData({ ...formData, speechRate: e.target.value as any })}
+                  >
+                    <option value="0.85">0.85x (Slower & Clear)</option>
+                    <option value="1.0">1.0x (Standard Natural)</option>
+                    <option value="1.15">1.15x (Brisk Cadence)</option>
+                    <option value="1.3">1.3x (Fast Review)</option>
+                  </select>
+                  <span className="field-hint">In-browser Socratic voice synthesis</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'cluster' && (
+            <div className="settings-section">
+              <div className="section-title">
+                <Cpu size={14} />
+                <span>Distributed Ollama Inference Cluster</span>
+              </div>
+
+              <div className="cluster-nodes-manager">
+                <div className="cluster-manager-header">
+                  <label>Active Cluster Worker Nodes</label>
                   <button
                     type="button"
-                    key={t.id}
-                    className={`theme-card ${formData.theme === t.id ? 'active' : ''}`}
-                    onClick={() => setFormData({ ...formData, theme: t.id as any })}
+                    className="btn-secondary-sm btn-scan-cluster"
+                    onClick={handleScanCluster}
+                    disabled={isScanningCluster}
+                    title="Ping and test latency across all cluster nodes"
                   >
-                    <div className="theme-card-header">
-                      <span className="theme-name">{t.label}</span>
-                      {formData.theme === t.id && <Check size={14} className="check-icon" />}
-                    </div>
-                    <span className="theme-desc">{t.desc}</span>
+                    <RefreshCw size={11} className={isScanningCluster ? 'spin' : ''} />
+                    <span>{isScanningCluster ? 'Scanning...' : 'Test All Nodes'}</span>
                   </button>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            <div className="settings-row-2col">
-              <div className="form-group">
-                <label>UI Font Size</label>
-                <select
-                  value={formData.fontSize}
-                  onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
-                >
-                  <option value="compact">Compact (14px)</option>
-                  <option value="standard">Standard (15px)</option>
-                  <option value="large">Large (16px)</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Reading Width</label>
-                <select
-                  value={formData.readerWidth}
-                  onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
-                >
-                  <option value="full">Full Width (Fluid 100%)</option>
-                  <option value="constrained">Comfortable Column (860px)</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="settings-row-2col" style={{ marginTop: '12px' }}>
-              <div className="form-group">
-                <label>Reading Language</label>
-                <select
-                  value={formData.language || 'en'}
-                  onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
-                >
-                  <option value="en">English (Original Source)</option>
-                  <option value="cs">Czech (Čeština)</option>
-                  <option value="de">German (Deutsch)</option>
-                  <option value="es">Spanish (Español)</option>
-                  <option value="ru">Russian (Русский)</option>
-                </select>
-                <span className="field-hint">On-the-fly translation preserving math & code</span>
-              </div>
-
-              <div className="form-group">
-                <label>Audio Speech Speed</label>
-                <select
-                  value={formData.speechRate || '1.0'}
-                  onChange={(e) => setFormData({ ...formData, speechRate: e.target.value as any })}
-                >
-                  <option value="0.85">0.85x (Slower & Clear)</option>
-                  <option value="1.0">1.0x (Standard Natural)</option>
-                  <option value="1.15">1.15x (Brisk Cadence)</option>
-                  <option value="1.3">1.3x (Fast Review)</option>
-                </select>
-                <span className="field-hint">In-browser Socratic voice synthesis</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="settings-section">
-            <div className="section-title">
-              <Cpu size={14} />
-              <span>AI Engine & Cluster Connectivity</span>
-            </div>
-
-            <div className="cluster-nodes-manager">
-              <div className="cluster-manager-header">
-                <label>Active Cluster Worker Nodes</label>
-                <button
-                  type="button"
-                  className="btn-secondary-sm btn-scan-cluster"
-                  onClick={handleScanCluster}
-                  disabled={isScanningCluster}
-                  title="Ping and test latency across all cluster nodes"
-                >
-                  <RefreshCw size={11} className={isScanningCluster ? 'spin' : ''} />
-                  <span>{isScanningCluster ? 'Scanning...' : 'Test All Nodes'}</span>
-                </button>
-              </div>
-
-              <div className="cluster-nodes-list">
-                {clusterNodes.map((host, idx) => {
-                  const status = nodeStatuses[host];
-                  return (
-                    <div key={host} className="cluster-node-item">
-                      <div className="node-info">
-                        <span className="node-idx">#{idx + 1}</span>
-                        <span className="node-url">{host}</span>
-                        {status && (
-                          <span
-                            className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
-                            title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                <div className="cluster-nodes-list">
+                  {clusterNodes.map((host, idx) => {
+                    const status = nodeStatuses[host];
+                    return (
+                      <div key={host} className="cluster-node-item">
+                        <div className="node-info">
+                          <span className="node-idx">#{idx + 1}</span>
+                          <span className="node-url">{host}</span>
+                          {status && (
+                            <span
+                              className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
+                              title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                            >
+                              {status.testing
+                                ? 'Pinging...'
+                                : status.online
+                                ? `Online (${status.latency_ms}ms)`
+                                : 'Offline'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="node-actions">
+                          <button
+                            type="button"
+                            className="btn-node-action"
+                            onClick={() => handlePingSingleNode(host)}
+                            title="Ping node"
                           >
-                            {status.testing
-                              ? 'Pinging...'
-                              : status.online
-                              ? `Online (${status.latency_ms}ms)`
-                              : 'Offline'}
-                          </span>
-                        )}
+                            Ping
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-node-action remove"
+                            onClick={() => handleRemoveNode(idx)}
+                            title="Remove node from cluster"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="node-actions">
-                        <button
-                          type="button"
-                          className="btn-node-action"
-                          onClick={() => handlePingSingleNode(host)}
-                          title="Ping node"
-                        >
-                          Ping
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-node-action remove"
-                          onClick={() => handleRemoveNode(idx)}
-                          title="Remove node from cluster"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
 
-              <div className="add-node-row">
-                <input
-                  type="text"
-                  value={newNodeUrl}
-                  onChange={(e) => setNewNodeUrl(e.target.value)}
-                  placeholder="http://192.168.1.50:11434 or :8080"
-                  className="text-input"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddNode();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  className="btn-primary-sm"
-                  onClick={handleAddNode}
-                  disabled={!newNodeUrl.trim()}
-                  title="Add endpoint to cluster"
-                >
-                  <Plus size={13} />
-                  <span>Add Node</span>
-                </button>
+                <div className="add-node-row">
+                  <input
+                    type="text"
+                    value={newNodeUrl}
+                    onChange={(e) => setNewNodeUrl(e.target.value)}
+                    placeholder="http://192.168.1.50:11434 or :8080"
+                    className="text-input"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddNode();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="btn-primary-sm"
+                    onClick={handleAddNode}
+                    disabled={!newNodeUrl.trim()}
+                    title="Add endpoint to cluster"
+                  >
+                    <Plus size={13} />
+                    <span>Add Node</span>
+                  </button>
+                </div>
+                <span className="field-hint">Supports Ollama (port 11434) and LocalAI / OpenAI-compatible (port 8080) endpoints.</span>
               </div>
-              <span className="field-hint">Supports Ollama (port 11434) and LocalAI / OpenAI-compatible (port 8080) endpoints.</span>
             </div>
+          )}
 
-            <div className="settings-row-2col">
+          {activeTab === 'models' && (
+            <div className="settings-section">
+              <div className="section-title">
+                <Settings size={14} />
+                <span>AI Model Selection & Cloud API Credentials</span>
+              </div>
+
+              <div className="settings-row-2col">
+                <div className="form-group">
+                  <label>Primary Generation Model</label>
+                  <input
+                    type="text"
+                    value={formData.primaryModel}
+                    onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
+                    placeholder="qwen2.5-coder:32b"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Reviewer / Audit Model</label>
+                  <input
+                    type="text"
+                    value={formData.reviewerModel}
+                    onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                    placeholder="deepseek-r1:32b"
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
-                <label>Primary Generation Model</label>
+                <label>Anthropic API Key (Claude 3.5 Sonnet / Opus)</label>
+                <input
+                  type="password"
+                  value={formData.anthropicApiKey}
+                  onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
+                  placeholder="sk-ant-..."
+                />
+                <span className="field-hint">Stored securely in local SQLite database (never committed to git)</span>
+              </div>
+
+              <div className="form-group">
+                <label>Anthropic Base URL (Proxy / Custom Gateway)</label>
                 <input
                   type="text"
-                  value={formData.primaryModel}
-                  onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                  placeholder="qwen2.5-coder:32b"
+                  value={formData.anthropicBaseUrl}
+                  onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
+                  placeholder="https://api.anthropic.com"
                 />
               </div>
 
               <div className="form-group">
-                <label>Reviewer / Audit Model</label>
+                <label>Google Gemini API Key (Optional Fallback)</label>
                 <input
-                  type="text"
-                  value={formData.reviewerModel}
-                  onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                  placeholder="deepseek-r1:32b"
+                  type="password"
+                  value={formData.geminiApiKey}
+                  onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
+                  placeholder="AIzaSy..."
                 />
+                <span className="field-hint">Used for cloud fallback and cross-model audits</span>
               </div>
             </div>
-
-            <div className="form-group">
-              <label>Google Gemini API Key (Optional Fallback)</label>
-              <input
-                type="password"
-                value={formData.geminiApiKey}
-                onChange={(e) => setFormData({ ...formData, geminiApiKey: e.target.value })}
-                placeholder="AIzaSy..."
-              />
-              <span className="field-hint">Used for cloud fallback and cross-model audits</span>
-            </div>
-
-            <div className="form-group">
-              <label>Anthropic API Key (Claude Sonnet/Haiku)</label>
-              <input
-                type="password"
-                value={formData.anthropicApiKey}
-                onChange={(e) => setFormData({ ...formData, anthropicApiKey: e.target.value })}
-                placeholder="sk-ant-..."
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Anthropic Base URL (Proxy/Gateway)</label>
-              <input
-                type="text"
-                value={formData.anthropicBaseUrl}
-                onChange={(e) => setFormData({ ...formData, anthropicBaseUrl: e.target.value })}
-                placeholder="https://api.anthropic.com"
-              />
-            </div>
-          </div>
+          )}
 
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>

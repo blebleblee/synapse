@@ -363,11 +363,10 @@ class OllamaCluster(LLMProvider):
 
         return online_hosts[0], "qwen3:4b"
 
-    def get_parallel_workers(self) -> List[Tuple[str, str, OllamaProvider]]:
+    def get_parallel_workers(self, min_tier: str = "all") -> List[Tuple[str, str, OllamaProvider]]:
         """
         Returns active worker nodes with memory-tiered model allocations for parallel processing.
-        Allocates large models to localhost and studio, 8B/12B models to ai (24GB),
-        and compact 4B/8B models to maxi (12GB).
+        If min_tier == 'large', filters for high-VRAM flagship nodes (30B/32B) for high-caliber drafting.
         """
         status = self.get_cluster_status()
         active_workers = []
@@ -386,6 +385,10 @@ class OllamaCluster(LLMProvider):
                 "memory_tier": "auto",
                 "preferred_models": ["llama3.1:8b", "qwen3:4b"]
             })
+
+            # Filter out compact/small nodes if large flagship tier requested
+            if min_tier == "large" and spec.get("memory_tier") not in ["large", "24gb"]:
+                continue
 
             selected_model = None
             for pref in spec["preferred_models"]:

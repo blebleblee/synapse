@@ -341,6 +341,16 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              className="search-clear-btn"
+              onClick={() => setSearchTerm('')}
+              title="Clear filter text"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
         <div className="sort-box" title="Sort topics">
           <ArrowUpDown size={12} className="sort-icon" />

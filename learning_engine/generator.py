@@ -292,6 +292,117 @@ Output publication-grade Markdown only."""
             }
         ]
 
+    # 2b. DevSecOps, CI/CD, Supply Chain Security & Security Automation
+    elif any(k in cat_lower for k in ["devsecops", "ci_cd", "supply_chain", "security_automation", "policy_as_code"]):
+        return [
+            {
+                "filename": "lesson_01_foundations_and_invariants.md",
+                "title": f"Lesson 1: DevSecOps Foundations & Secure Supply Chain Invariants",
+                "prompt": f"""Write Lesson 1 (DevSecOps Foundations & Supply Chain Invariants) for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: Senior DevSecOps engineers, security architects, and platform security specialists.
+Goal: Establish threat modeling, shift-left security boundaries, and SLSA / zero-trust pipeline invariants.
+
+Structure:
+# Lesson 1: DevSecOps Foundations & Secure Supply Chain Invariants
+
+## Curriculum Roadmap
+(Provide a clear outline of the curriculum modules)
+
+## 1. Supply Chain Threat Landscape & Pipeline Attack Vectors
+(Deep exposition on dependency confusion, typosquatting, compromised CI runners, and pipeline tampering)
+
+## 2. Cryptographic Attestation & Non-Negotiable Invariants
+(Provenance verification, SLSA framework levels, SBOM integrity, and policy admission barriers)
+
+## 3. High-Level DevSecOps Pipeline Architecture
+(Include a clean Mermaid diagram representing the secure CI/CD lifecycle: lint -> SAST -> secret scan -> build -> SBOM -> image signing -> admission control)
+
+Remember: Write in rich, continuous book prose. Avoid lazy bullet point lists.
+Output publication-grade Markdown only."""
+            },
+            {
+                "filename": "lesson_02_architecture_and_mechanics.md",
+                "title": f"Lesson 2: Static Analysis, Secret Detection & Container Security",
+                "prompt": f"""Write Lesson 2 (Static Analysis, Secrets & Containers) for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: Security engineers and CI/CD platform developers.
+Goal: Dissect AST-based SAST rules, Shannon entropy secret detection, container image layer scanning, and rootless isolation.
+
+Structure:
+# Lesson 2: Static Analysis, Secret Detection & Container Security
+
+## 1. Abstract Syntax Tree (AST) Rules & SAST Engine Mechanics
+(How Semgrep parses code, pattern matching syntax, taint tracking across call graphs)
+
+## 2. High-Entropy Secret Detection & Git History Analysis
+(Shannon entropy calculations, regex token matchers, gitleaks rules, and pre-commit hook interception)
+
+## 3. OCI Container Layer Inspection & Rootless Architecture
+(Image layer hashing, base image CVE tracking, minimal distroless containers, and seccomp/apparmor profiles)
+
+Remember: Write in rich, continuous book prose with deep technical mechanics.
+Output publication-grade Markdown only."""
+            },
+            {
+                "filename": "lesson_03_deep_dive_and_concurrency.md",
+                "title": f"Lesson 3: Supply Chain Attestation, SBOMs & Policy as Code",
+                "prompt": f"""Write Lesson 3 (Attestation, SBOMs & Policy as Code) for the masterclass curriculum on '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: Principal security architects and platform engineering leads.
+Goal: In-depth analysis of in-toto attestations, Sigstore/Cosign keyless signing, SPDX/CycloneDX SBOMs, and OPA/Gatekeeper admission control.
+
+Structure:
+# Lesson 3: Supply Chain Attestation, SBOMs & Policy as Code
+
+## 1. Sigstore, Fulcio & Keyless OIDC Image Signing Mechanics
+(OIDC identity tokens, ephemeral X.509 certs, Rekor transparency log, and verification workflows)
+
+## 2. SBOM Generation & Vulnerability Correlation Engines
+(SPDX and CycloneDX standard formats, Syft package discovery, Grype vulnerability matching algorithms)
+
+## 3. Admission Control & Policy-as-Code Evaluation
+(OPA Rego and Kyverno validation webhooks, verifying signatures at Kubernetes cluster admission)
+
+Remember: Write in rich, continuous book prose. Output publication-grade Markdown only."""
+            },
+            {
+                "filename": "labs.md",
+                "title": f"Operational Verification Labs",
+                "prompt": f"""Write the complete Operational Verification Lab guide for '{subtopic_title}'.
+Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
+
+Target Audience: Hands-on DevSecOps engineer and security practitioner.
+Goal: Step-by-step diagnostic verification using real DevSecOps tools (trivy, semgrep, gitleaks, cosign, syft, grype, checkov, conftest).
+
+STRICT MANDATE: DO NOT use Linux kernel commands (NO bpftool, NO tc qdisc, NO mkfs, NO mount). Every single exercise MUST execute real application security, container scanning, secret detection, or SBOM tools.
+
+Structure:
+# Operational Verification Labs: {subtopic_title}
+
+## Objective & Lab Bench Setup
+(Required CLI tools: trivy, semgrep, gitleaks, cosign, syft, grype, checkov, conftest, and test repository setup)
+
+## Exercise 1: Static Code Analysis & Secret Scanning
+(Exact runnable CLI commands with semgrep custom rules and gitleaks git history audits, with realistic vulnerable snippets)
+
+## Exercise 2: Container Vulnerability Auditing & SBOM Generation
+(Scanning container images with Trivy/Grype, generating CycloneDX SBOMs with Syft, filtering false positives)
+
+## Exercise 3: Cryptographic Image Signing & Admission Policy Enforcement
+(Generating Cosign key pairs or keyless signing, creating OPA/conftest Rego policies to reject unsigned or high-CVE artifacts)
+
+## DevSecOps Pipeline Diagnostic Cheat Sheet & Verification Checklist
+(Table of essential CLI commands, exit codes, and operational flags)
+
+Rules: Provide full, runnable commands, configurations, and YAML/Rego policies with zero placeholders.
+Output publication-grade Markdown only."""
+            }
+        ]
+
     # 3. Systems & Cloud Infrastructure (eBPF, Kubernetes, Linux Kernel, SRE)
     elif any(k in cat_lower for k in ["infrastructure", "ebpf", "kubernetes", "networking", "linux_kernel", "os_theory", "sre"]):
         return [

@@ -57,16 +57,18 @@ Synapse orchestrates a local hardware-tiered Ollama cluster that parallelizes cu
 
 ```text
 [ Module Drafted ] ──► [ Primary Worker Node ] ──► [ Independent Auditor Node ] ──► [ Verified & Pushed ]
-Lesson 1 (32B)         localhost (32B)             studio.2464.cz (32B)             Git Commit + Gitea Push
-Lesson 2 (32B)         studio (32B)                ai (8B)                          Git Commit + Gitea Push
-Lesson 3 (8B)          ai (8B)                     localhost (32B)                  Git Commit + Gitea Push
-Labs (8B)              maxi (8B)                   studio (32B)                     Git Commit + Gitea Push
+Lesson 1 (32B)         localhost (32B)             node-studio (32B)                Git Commit + Remote Push
+Lesson 2 (32B)         node-studio (32B)           node-gpu (24GB)                  Git Commit + Remote Push
+Lesson 3 (30B)         node-gpu (24GB)             localhost (32B)                  Git Commit + Remote Push
+Labs (32B)             localhost (32B)             node-studio (32B)                Git Commit + Remote Push
 ```
 
-- **Node 1 (Local):** `http://127.0.0.1:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`, `deepseek-r1:32b`, `qwen2.5-coder:7b`)
-- **Node 2 (Studio):** `http://studio.2464.cz:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`, `qwen3.6:35b`)
-- **Node 3 (AI Node):** `http://192.168.200.60:8080` (LocalAI / OpenAI • 24GB GPU • `meta-llama-3.1-8b-instruct`, `gemma-4-12b`)
-- **Node 4 (Maxi):** `http://maxi.2464.cz:11434` (Ollama • 12GB VRAM • `llama3.1:8b`, `qwen3:4b`)
+- **Node 1 (Local):** `http://127.0.0.1:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`, `deepseek-r1:32b`)
+- **Node 2 (Studio Node):** `http://node-studio:11434` (Ollama • Large VRAM • `qwen2.5-coder:32b`)
+- **Node 3 (GPU Server):** `http://192.168.1.100:8080` (LocalAI / OpenAI • 24GB GPU • `Qwen3-Coder-30B`)
+- **Node 4 (Auxiliary Node):** `http://node-aux:11434` (Ollama • 12GB VRAM • `llama3.1:8b`)
+- **Cloud Provider (Anthropic):** Claude 3.5 Sonnet / Opus via official Anthropic API or custom gateway proxy.
+  > **Security Note:** Cloud API keys (`ANTHROPIC_API_KEY`, `GEMINI_API_KEY`) are stored strictly in your local, git-ignored SQLite database (`data/synapse.db`) or user environment. They are never committed to source control.
 - **Cross-Node Adversarial Review:** No model reviews its own output. Independent auditor nodes verify kernel structs, syscall signatures, and CLI syntax, auto-correcting any hallucinations or syntax errors before committing.
 
 ---
@@ -104,7 +106,7 @@ Open **`http://127.0.0.1:8000`** in any browser. The single integrated FastAPI s
 
 ## 5. CLI Command Reference (`synapse`)
 
-Accessible via `./bin/synapse` (or `./bin/learning`):
+Accessible via `./bin/synapse`:
 
 ```bash
 # Launch the Integrated Web Workbench (Port 8000)
@@ -113,7 +115,7 @@ Accessible via `./bin/synapse` (or `./bin/learning`):
 ./bin/synapse stop                         # Stop daemon
 
 # Modernized Curriculum & Cluster Status
-./bin/synapse status                       # View L1/L2/L3 taxonomy, authored lessons, labs, mastery, and 4-node cluster health
+./bin/synapse status                       # View L1/L2/L3 taxonomy, authored lessons, labs, mastery, and cluster health
 ./bin/synapse tree                         # Print curriculum tree with lesson counts
 ./bin/synapse tree --domain computing
 
@@ -126,7 +128,7 @@ Accessible via `./bin/synapse` (or `./bin/learning`):
 ./bin/synapse graph                        # Cross-disciplinary prerequisite DAG
 ./bin/synapse lint                         # Audit files for depth, headers, and placeholders
 
-# Export & Flashcards
+# Export, SynPack & Flashcards
 ./bin/synapse export computing             # Compile domain handbook (.md)
 ./bin/synapse flashcards postgresql        # Generate Anki active-recall CSV deck
 
@@ -157,6 +159,6 @@ Synapse requires POSIX pseudo-terminals (`pty`, `termios`, `fcntl`). Running on 
 
 ---
 
-## 7. Version Control & Gitea Synchronization
+## 7. Version Control & Git Synchronization
 
-All generated curriculum units, audits, session debriefs, and flashcards are automatically versioned and synchronized with your upstream Git remote (`https://gitea.2464.cz/ai/synapse.git`).
+All generated curriculum units, audits, session debriefs, and flashcards are automatically versioned and synchronized with your upstream Git repository (e.g. `origin/main`).

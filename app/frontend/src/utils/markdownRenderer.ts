@@ -4,6 +4,30 @@ import 'katex/dist/katex.min.css';
 
 let mermaidInitialized = false;
 
+function sanitizeAndRepairMermaid(diagramText: string): string {
+  let cleaned = diagramText.trim();
+
+  // Strip trailing semicolons after graph header or statements: graph TD; -> graph TD
+  cleaned = cleaned.replace(/^(\s*(?:graph|flowchart)\s+[A-Za-z]+)\s*;/gim, '$1');
+  cleaned = cleaned.replace(/;\s*$/gm, '');
+
+  // Fix malformed arrows like -->|label|--> or -->|label|> into -->|"label"|
+  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
+  cleaned = cleaned.replace(/-->\s*\|\s*([^|\n]+?)\s*\|\s*>/g, '-->|"$1"|');
+  cleaned = cleaned.replace(/--\s*\|\s*([^|\n]+?)\s*\|\s*-->/g, '-->|"$1"|');
+
+  // Enclose unquoted multi-word edge labels with double quotes: -->|Some Label Text| -> -->|"Some Label Text"|
+  cleaned = cleaned.replace(/-->\s*\|\s*([^"|\n]+?)\s*\|\s*/g, (match, label) => {
+    const trimmed = label.trim();
+    if (trimmed.includes(' ') && !trimmed.startsWith('"')) {
+      return `-->|"${trimmed}"| `;
+    }
+    return match;
+  });
+
+  return cleaned;
+}
+
 export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath = false): string {
   if (!rawMarkdown) return '';
 
@@ -61,7 +85,7 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
     const language = (lang || '').trim().toLowerCase();
 
     if (language === 'mermaid') {
-      const cleanText = text.trim();
+      const cleanText = sanitizeAndRepairMermaid(text);
       return `<div class="mermaid-container" title="Click to zoom and inspect diagram">
         <div class="diagram-zoom-hint"><span>🔍</span> Click to zoom</div>
         <pre class="mermaid">${cleanText}</pre>
@@ -102,16 +126,9 @@ export async function renderMermaidDiagramsInElement(container: HTMLElement) {
           startOnLoad: false,
           theme: 'dark',
           securityLevel: 'loose',
+          suppressErrorRendering: true,
           fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          fontSize: 15,
-          sequence: {
-            actorMargin: 50,
-            messageMargin: 40,
-            boxMargin: 10,
-            useMaxWidth: false,
-            width: 160,
-            height: 65,
-          },
+          fontSize: 14,
           flowchart: {
             useMaxWidth: false,
             htmlLabels: true,
@@ -130,9 +147,19 @@ export async function renderMermaidDiagramsInElement(container: HTMLElement) {
         });
         mermaidInitialized = true;
       }
-      await mermaid.run({
-        nodes: nodes as NodeListOf<HTMLElement>,
-      });
+
+      // Render each diagram node individually with graceful error handling
+      for (const node of Array.from(nodes)) {
+        try {
+          await mermaid.run({ nodes: [node as HTMLElement] });
+        } catch (diagramErr) {
+          console.warn('Mermaid diagram auto-render failed, rendering styled fallback:', diagramErr);
+          const parent = node.closest('.mermaid-container');
+          if (parent) {
+            parent.classList.add('mermaid-fallback');
+          }
+        }
+      }
     }
   } catch (err) {
     console.error('Mermaid render error:', err);

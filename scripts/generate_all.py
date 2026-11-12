@@ -95,16 +95,17 @@ def run_cluster_generation(
         print("==================================================")
     else:
         cluster = OllamaCluster()
-        workers = cluster.get_parallel_workers()
+        # Restrict drafting to flagship 24GB+/32B nodes for high-caliber prose and labs
+        workers = cluster.get_parallel_workers(min_tier="large") or cluster.get_parallel_workers()
 
         if not workers:
             print("[!] No Ollama cluster nodes online. Please check network/Ollama status.")
             return
 
         print("==================================================")
-        print("   SYNAPSE 4-NODE PARALLEL GENERATION CLUSTER     ")
+        print("   SYNAPSE PARALLEL MASTERCLASS CLUSTER           ")
         print("==================================================")
-        print(f"[*] Active Nodes in Cluster ({len(workers)}):")
+        print(f"[*] Active Flagship Nodes ({len(workers)}):")
         for host, m, _ in workers:
             spec = CLUSTER_HOST_SPECS.get(host, {})
             tier = spec.get("memory_tier", "auto")
