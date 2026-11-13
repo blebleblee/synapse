@@ -1,638 +1,757 @@
-# Lesson 3: Scales and Fingerpicking Techniques
+# Acoustic Guitar Masterclass — Lesson 3: Scales & Fingerpicking Techniques
 
-## 1. First-Principles Intuition & Invariants
+## Table of Contents
+1. [First-Principles Intuition (Condensed)](#1-first-principles-intuition-condensed)
+2. [Fretboard Architecture & The CAGED System](#2-fretboard-architecture--the-caged-system)
+3. [Right-Hand Fingerpicking Mechanics](#3-right-hand-fingerpicking-mechanics)
+4. [Fingerpicking Patterns — Drills & Notation](#4-fingerpicking-patterns--drills--notation)
+5. [Left-Hand Scale Systems & Positional Playing](#5-left-hand-scale-systems--positional-playing)
+6. [Common Failure Modes & Instant Fixes](#6-common-failure-modes--instant-fixes)
+7. [Progressive Practice Routines](#7-progressive-practice-routines)
+8. [Musical Application — From Mechanics to Expression](#8-musical-application--from-mechanics-to-expression)
 
-### Physical Foundations of String Vibration
+---
 
-The acoustic guitar transforms mechanical energy into sound through a chain of coupled oscillators. When a string is displaced and released, it vibrates according to the wave equation:
+## 1. First-Principles Intuition (Condensed)
 
-$$\frac{\partial^2 y}{\partial t^2} = \frac{T}{\mu} \frac{\partial^2 y}{\partial x^2}$$
+### Why Shorter String = Higher Pitch
 
-where $T$ is string tension, $\mu$ is linear mass density (mass per unit length), $y$ is displacement, $t$ is time, and $x$ is position along the string. The fundamental frequency of a vibrating string is determined by:
+Fretting shortens the vibrating string length. Halving the length (12th fret) doubles the frequency — one octave up. That's the entire physics you need. The key practical takeaway:
 
-$$f_0 = \frac{1}{2L}\sqrt{\frac{T}{\mu}}$$
+- **Pluck near the bridge** → bright, cutting tone (more high harmonics)
+- **Pluck over the soundhole** → warm, full tone (fundamental dominates)
+- **Pluck over the 12th fret** → hollow, flute-like tone (even harmonics suppressed)
 
-where $L$ is the vibrating length of the string. This relationship reveals the core invariants: for a given string, frequency is inversely proportional to length and proportional to the square root of tension-to-mass ratio. When a guitarist frets a string, they shorten $L$, raising the pitch. The 12th fret halves the string length, doubling the frequency and producing a note one octave higher—a direct consequence of this fundamental equation.
+Move your right-hand anchor point deliberately. This is a free tonal colour knob built into every acoustic guitar.
 
-The harmonic series emerges naturally from the boundary conditions at the string's fixed endpoints. The string can vibrate not only at its fundamental frequency but also at integer multiples: $f_n = n \cdot f_0$ where $n = 1, 2, 3, ...$. These harmonics (overtones) give each note its characteristic timbre. The relative amplitudes of these harmonics depend on where the string is plucked: plucking near the bridge emphasizes higher harmonics (brighter tone), while plucking near the 12th fret suppresses even-numbered harmonics (warmer, flute-like tone).
+### Why Fingers Resist Independence
 
-The guitar body acts as a Helmholtz resonator, amplifying certain frequencies through acoustic coupling. The soundboard (top plate) vibrates in response to string energy transmitted through the bridge, exciting the air cavity inside the body. The soundhole functions as the neck of the Helmholtz resonator, with a primary resonant frequency typically between 80-120 Hz, providing bass response. Additional resonances occur in the top and back plates, creating the complex frequency response that defines the guitar's voice. This coupling is inherently nonlinear—the soundboard's impedance varies with frequency and amplitude, introducing subtle harmonic distortion that contributes to the instrument's organic sound.
+The ring and middle fingers share a flexor tendon. This is anatomy, not weakness. Direct consequence: the ring finger is always the hardest to isolate. Every independence drill targets this coupling. You are rewiring motor cortex maps — it takes weeks of consistent, slow, tension-free practice to change, not hours of grinding.
 
-### Mathematical Structure of Scales
+### Equal Temperament in One Sentence
 
-Western music's twelve-tone equal temperament divides the octave into twelve equal semitones, where each semitone represents a frequency ratio of $2^{1/12} ≈ 1.05946$. This compromise tuning allows music to be transposed to any key while maintaining acceptable consonance, though it sacrifices the pure intervals of just intonation. A whole step (two semitones) corresponds to a frequency ratio of $2^{2/12} ≈ 1.1225$, while a half step is the fundamental $2^{1/12}$ ratio.
+Each fret raises pitch by a factor of 2^(1/12) ≈ 1.0595. The 12th fret is exactly 2× the open string frequency. Everything else follows from that ratio.
 
-The major scale's interval pattern—W-W-H-W-W-W-H (whole, whole, half, whole, whole, whole, half)—creates a specific sequence of frequency ratios relative to the root note. In the key of C major (C-D-E-F-G-A-B-C), the ratios in equal temperament are:
+---
 
-- C (1.000) → D (1.122) → E (1.260) → F (1.335) → G (1.498) → A (1.682) → B (1.888) → C (2.000)
+## 2. Fretboard Architecture & The CAGED System
 
-These intervals generate the characteristic major scale sound through their specific pattern of consonance and dissonance. The intervals from the root to the 3rd (major third) and 5th (perfect fifth) are particularly consonant, forming the basis of major chords. The major scale's structure is scale-degree invariant: the same interval pattern produces the same tonal relationships regardless of the starting pitch.
-
-The natural minor scale (W-H-W-W-H-W-W) shifts the pattern, lowering the 3rd, 6th, and 7th degrees by a semitone. This creates a different constellation of intervals with the root, fundamentally altering the scale's emotional character through its altered consonance patterns. The pentatonic scale eliminates the half steps entirely, using only five notes per octave (major pentatonic: W-W-1.5W-W-1.5W), which removes the most dissonant intervals and creates the scale's harmonically stable, universal quality across cultures.
-
-### Biomechanical Constraints and Finger Independence
-
-The human hand's motor control system imposes fundamental constraints on fingerpicking. The flexor digitorum superficialis and profundus muscles control the index, middle, ring, and little fingers, but these muscles share common tendons and neural pathways, creating mechanical and neural coupling. This coupling makes truly independent finger movement challenging—movement of one finger naturally influences the others through:
-
-1. **Mechanical coupling**: Tendons pass through the carpal tunnel and share synovial sheaths, physically linking finger movements
-2. **Neural coupling**: Motor neurons innervating adjacent fingers have overlapping receptive fields in the motor cortex
-3. **Kinematic chains**: The wrist, metacarpophalangeal (MCP), proximal interphalangeal (PIP), and distal interphalangeal (DIP) joints form interconnected kinematic chains
-
-The thumb, controlled by separate thenar muscles (flexor pollicis brevis, opponens pollicis, abductor pollicis brevis), achieves greater independence, making it ideal for bass line duties in fingerpicking. The guitar's string spacing (typically 10-11 mm at the bridge) matches the natural spacing of human fingers in a relaxed hand position, facilitating efficient string targeting.
-
-Skilled fingerpicking requires developing motor programs—learned sequences of muscle activation patterns stored in cerebellar and basal ganglia circuits. With practice, these patterns become automated, reducing cognitive load and enabling the conscious mind to focus on musical expression rather than individual finger movements. The transition from conscious control to automated motor programs explains the initial difficulty and eventual fluidity of fingerpicking mastery.
-
-### Invariant Principles of String Articulation
-
-The plucking motion transfers energy to the string through a brief impulse. The force-time profile of this impulse determines the harmonic content: a sharp, brief pluck excites more high-frequency harmonics (bright attack), while a longer, softer pluck emphasizes the fundamental (mellow attack). The angle of pluck affects this profile—plucking perpendicular to the soundboard creates maximum displacement and volume, while a glancing, parallel motion produces a softer, more controlled articulation.
-
-String damping is equally critical. After plucking, adjacent strings may sympathetically vibrate due to acoustic coupling through the bridge, creating muddy overtones. Effective fingerpicking requires selective damping—using the plucking finger to rest on the adjacent string after articulation (rest stroke) or maintaining light contact with the palm on the bass strings (palm muting) to control sustain and prevent unwanted resonances.
-
-The plucking point along the string's length follows the principle of harmonic excitation: plucking at a position $L/n$ (where $L$ is string length and $n$ is an integer) suppresses the $n$-th harmonic and all its integer multiples. Plucking at $L/2$ (12th fret position) eliminates all even harmonics, producing a hollow, fundamental-rich tone. Plucking at $L/7$ (slightly behind the bridge) excites all harmonics strongly, creating a bright, complex timbre. Classical guitarists exploit this principle by varying the plucking position (tasto near the fingerboard, ponticello near the bridge) to control tonal color.
-
-## 2. Core Architecture & Mechanics
-
-### Coordinate Systems and Fretboard Geometry
-
-The guitar fretboard implements a two-dimensional coordinate system where musical pitch is mapped to spatial position. The horizontal axis (along the neck) represents pitch, with frets positioned according to the equal temperament formula. The distance from the nut to the $n$-th fret is:
-
-$$d_n = L \left(1 - \frac{1}{2^{n/12}}\right)$$
-
-where $L$ is the scale length (distance from nut to bridge, typically 25.5" for Fender-style or 24.75" for Gibson-style guitars). This logarithmic spacing compresses as you move toward the body, with each successive fret representing the same frequency ratio but decreasing physical distance.
-
-The vertical axis (across strings) provides multiple voicing options for the same pitch. Standard tuning (E2-A2-D3-G3-B3-E4) creates overlapping pitch ranges between adjacent strings, allowing the same note to be played on multiple strings at different frets. This redundancy enables position shifting strategies: playing a phrase in different regions of the neck produces identical pitches but different timbral characteristics due to string gauge differences and harmonic content variations.
-
-```mermaid
-graph TD
-    A["Fretboard Coordinate System"] --> B["Horizontal Axis: Pitch"]
-    A --> C["Vertical Axis: String Selection"]
-    B --> D["Logarithmic Fret Spacing"]
-    B --> E["12 Semitones per Octave"]
-    C --> F["Six Strings: E-A-D-G-B-E"]
-    C --> G["Pitch Redundancy Across Strings"]
-    D --> H["Scale Length L = 25.5 inch typical"]
-    D --> I["Fret n position: L(1 - 1/2^(n/12))"]
-    F --> J["String Gauge Affects Timbre"]
-    G --> K["Multiple Voicings of Same Note"]
-    K --> L["Position Shifting Strategies"]
-```
-
-### Fingerpicking Patterns as State Machines
-
-Fingerpicking patterns can be formally modeled as finite state machines where:
-
-- **States** represent finger-string assignments at discrete time steps
-- **Transitions** represent the temporal sequencing of plucks
-- **Alphabet** consists of finger identifiers {T (thumb), I (index), M (middle), R (ring), P (pinky, rarely used)}
-- **Timing** introduces rhythm through state duration
-
-A basic Travis picking pattern in 4/4 time can be represented as a repeating state sequence:
+### Standard Tuning Reference
 
 ```
-State 1: T(6) - Thumb plucks 6th string (bass note, typically root)
-State 2: I(3) - Index plucks 3rd string (treble voice)
-State 3: T(4) - Thumb plucks 4th string (alternate bass)
-State 4: M(2) - Middle plucks 2nd string (treble voice)
-State 5: T(5) - Thumb plucks 5th string (bass)
-State 6: I(1) - Index plucks 1st string (treble voice)
-State 7: T(4) - Thumb plucks 4th string (bass)
-State 8: M(2) - Middle plucks 2nd string (treble voice)
+String:   6     5     4     3     2     1
+Name:     E2    A2    D3    G3    B3    E4
+Gauge:   .053  .042  .032  .024  .016  .012  (light acoustic set)
 ```
 
-This pattern exhibits temporal symmetry with a two-measure periodicity. The thumb creates a steady alternating bass line (beats 1, 2, 3, 4), while the treble fingers articulate a syncopated countermelody (off-beats). The pattern's efficiency derives from minimizing finger travel distance and exploiting the natural rest positions of the hand.
+> **Tuning anomaly to memorise:** The B string (string 2) is tuned a major 3rd above G (string 3), while all other adjacent pairs are perfect 4ths. This shifts every shape crossing the G→B boundary up by one fret. If a shape breaks there, add one fret — that's why.
 
-```mermaid
-stateDiagram-v2
-    [*] --> T6: Beat 1
-    T6 --> I3: & of 1
-    I3 --> T4: Beat 2
-    T4 --> M2: & of 2
-    M2 --> T5: Beat 3
-    T5 --> I1: & of 3
-    I1 --> T4b: Beat 4
-    T4b --> M2b: & of 4
-    M2b --> [*]: End cycle
-    
-    note right of T6: Thumb: 6th string (root)
-    note right of I3: Index: 3rd string
-    note right of T4: Thumb: 4th string (alt bass)
-    note right of M2: Middle: 2nd string
-```
+### CAGED System Overview
 
-More complex patterns introduce polyrhythms, where the bass and treble voices operate on different metric subdivisions. A 3-against-2 polyrhythm might have the thumb playing triplets while the treble fingers maintain steady quarter notes, creating a rich rhythmic texture.
-
-### Hand Position and Biomechanical Optimization
-
-Optimal hand position balances mechanical efficiency with tonal control. The right hand (assuming right-handed playing) should be positioned with:
-
-1. **Wrist arch**: 20-30° dorsiflexion, aligning the forearm tendons for efficient force transmission while avoiding carpal tunnel compression
-2. **Palm pivot point**: Resting lightly on the bridge, providing a stable reference point without dampening string vibration
-3. **Finger curvature**: MCP and PIP joints flexed approximately 45°, creating a "spider position" where fingertips approach strings at near-perpendicular angles
-4. **Thumb position**: Operating independently behind the fingers, prepared to strike bass strings with authority
-
-This configuration creates a biomechanical lever system where the forearm muscles (flexor digitorum superficialis, profundus) provide primary force, amplified by the multi-joint finger structure. The MCP joint acts as a fulcrum, with the finger tip as the load point. By maintaining proper joint angles, the guitarist maximizes the mechanical advantage while minimizing the muscular effort required for clear articulation.
-
-The left hand (fretting hand) requires different optimization:
-
-1. **Thumb position**: Behind the neck (not gripping over the top), providing counterpressure opposite the fretting fingers
-2. **Finger placement**: Just behind the fret wire (toward the nut), minimizing the force required to fret cleanly without buzzing
-3. **Finger curvature**: Arched to avoid muting adjacent strings while allowing the fingertip to press perpendicular to the fretboard
-4. **Wrist position**: Neutral to slightly extended, enabling finger reach across multiple frets
-
-The force required to fret a string increases with string gauge and action (string height above fretboard). For a typical .012" gauge string with 3/32" action, approximately 2-3 N of force is required to fret cleanly. This force must be applied perpendicular to the fretboard, directly behind the fret wire, to maximize string-fret contact and minimize fret buzz.
-
-### Pattern Representation and Implementation
-
-Fingerpicking patterns can be encoded in multiple representations, each suited to different purposes:
-
-**Sequential notation** (time-ordered list):
-```
-Pattern = [
-    (T, 6, 0.0),    # (finger, string, time_offset)
-    (I, 3, 0.25),
-    (T, 4, 0.5),
-    (M, 2, 0.75),
-    (T, 5, 1.0),
-    (I, 1, 1.25),
-    (T, 4, 1.5),
-    (M, 2, 1.75)
-]
-```
-
-**Parallel voice notation** (separating bass and treble):
-```
-Bass = [(T, 6, 0.0), (T, 4, 0.5), (T, 5, 1.0), (T, 4, 1.5)]
-Treble = [(I, 3, 0.25), (M, 2, 0.75), (I, 1, 1.25), (M, 2, 1.75)]
-```
-
-**Tablature notation** (graphical representation):
-```
-E|-----0-------0-------|-----0-------0-------|
-B|--3-----3--------3---|--3-----3--------3---|
-G|---------------------|---------------------|
-D|---------------------|---------------------|
-A|----------0----------|---------------------|
-E|--3------------------|--3------------------|
-  T   I   T   M   T   I   T   M
-```
-
-The tablature format provides visual feedback for learning but encodes less timing precision than the sequential notation. Professional practice typically combines multiple representations: tablature for visual learning, sequential notation for computational analysis (e.g., difficulty assessment algorithms), and parallel voice notation for understanding musical structure.
-
-### Fingering Algorithms and Position Shifting
-
-Optimal fingering selection is a constrained optimization problem. Given a sequence of notes to play, the goal is to assign left-hand fingers (1-4, representing index through pinky) and string/fret positions to minimize:
-
-- **Hand movement**: Total distance traveled by the hand along the neck
-- **Finger stretches**: Intervals requiring large finger spans (>4 frets)
-- **Position shifts**: Discontinuous hand movements requiring temporal gaps
-- **String crossings**: Right-hand jumps across multiple strings
-
-This problem is NP-complete in the general case, but heuristic approaches yield excellent solutions:
-
-1. **Greedy position selection**: Choose the position that minimizes immediate cost
-2. **One-finger-per-fret rule**: In a given position, assign adjacent frets to adjacent fingers
-3. **String preference**: Favor higher strings for melodies (brighter tone), lower strings for bass
-4. **Open string utilization**: Use open strings during position shifts to mask hand movement
-
-Dynamic programming algorithms can compute optimal fingerings for short passages by building a trellis of possible fingering states and selecting the minimum-cost path. For longer compositions, the problem is typically solved hierarchically: decompose into phrases, optimize each phrase independently, then smooth transitions between phrases.
-
-```python
-def optimal_fingering(notes, start_position=0):
-    """
-    Dynamic programming approach to fingering optimization.
-    
-    notes: List of (string, fret) tuples
-    start_position: Initial left-hand position (fret number)
-    
-    Returns: List of (finger, string, fret) assignments
-    """
-    n = len(notes)
-    # State: (position, finger_assignment)
-    # Cost: cumulative movement + stretch penalties
-    
-    # DP table: dp[i][position] = (min_cost, best_fingering_sequence)
-    dp = [{} for _ in range(n + 1)]
-    dp[0][start_position] = (0, [])
-    
-    for i in range(n):
-        string, fret = notes[i]
-        for pos, (cost, sequence) in dp[i].items():
-            # Try each valid finger assignment at this note
-            for finger in range(1, 5):  # Fingers 1-4
-                # Check if finger can reach from position pos
-                if pos - 1 <= fret <= pos + 4:
-                    # Calculate new position and costs
-                    new_pos = max(fret - 3, 0)  # Shift if needed
-                    move_cost = abs(new_pos - pos) * 10  # Position shift penalty
-                    stretch_cost = max(0, abs(fret - pos) - finger) * 5  # Stretch penalty
-                    
-                    total_cost = cost + move_cost + stretch_cost
-                    new_sequence = sequence + [(finger, string, fret)]
-                    
-                    # Update DP table if this is better
-                    if new_pos not in dp[i+1] or dp[i+1][new_pos][0] > total_cost:
-                        dp[i+1][new_pos] = (total_cost, new_sequence)
-    
-    # Return best final fingering
-    return min(dp[n].values(), key=lambda x: x[0])[1]
-```
-
-This algorithm balances position stability with stretch minimization, though real-world fingering also considers musical phrasing, vibrato opportunities, and tonal color preferences that require human judgment.
-
-## 3. High-Performance Optimization & Failure Modes
-
-### Quantifying Mechanical Efficiency
-
-Mechanical efficiency in fingerpicking can be quantified through several objective metrics:
-
-**Finger velocity minimization**: For a sequence of $n$ plucks with finger positions $\mathbf{p}_i = (x_i, y_i, z_i)$ at times $t_i$, the total finger travel is:
-
-$$D_{total} = \sum_{i=1}^{n-1} ||\mathbf{p}_{i+1} - \mathbf{p}_i||$$
-
-Efficient patterns minimize this metric by clustering plucks spatially and temporally. A well-designed pattern should exhibit $D_{total} < k \cdot n$ where $k$ is a small constant related to the average string spacing.
-
-**Finger acceleration**: Rapid changes in finger velocity require greater muscular force and increase fatigue. The peak acceleration should satisfy:
-
-$$a_{peak} = \max_i \left|\frac{v_{i+1} - v_i}{t_{i+1} - t_i}\right| < a_{threshold}$$
-
-where $a_{threshold}$ is determined by the player's biomechanical limits and comfort level. Patterns with high acceleration demands lead to tension and injury risk.
-
-**Temporal consistency**: In a repeating pattern with period $T$, individual plucks should occur at consistent time offsets $\tau_i$ relative to the pattern start. Temporal variance should satisfy:
-
-$$\sigma_\tau = \sqrt{\frac{1}{n}\sum_{i=1}^n (\tau_i - \bar{\tau}_i)^2} < 5\text{ ms}$$
-
-Professional players achieve temporal precision below 10 ms, while beginners typically exhibit variance of 30-50 ms.
-
-### Common Failure Modes and Diagnostic Techniques
-
-**Failure Mode 1: Inadequate Finger Independence**
-
-Symptom: Adjacent fingers move together, disrupting timing and causing unintended plucks. This manifests as "ghost notes" where strings are accidentally struck or difficulty executing rapid alternation between specific finger pairs (e.g., ring-middle).
-
-Root cause: Insufficient development of motor independence due to the shared flexor tendons and neural coupling discussed earlier. The ring finger is particularly problematic—it shares a tendon with both the middle and pinky fingers, making isolated movement challenging.
-
-Diagnostic test: Attempt to pluck each string in sequence (high to low) with a single finger while keeping other fingers motionless. If other fingers involuntarily curl or twitch, independence is insufficient.
-
-Remediation protocol:
-1. **Isolation exercises**: Practice plucking single strings with each finger individually, focusing on keeping non-active fingers relaxed and stationary. Use metronome at 60 BPM, one pluck per click, 5 minutes per finger daily.
-2. **Opposing motion drills**: Simultaneously flex one finger while extending another (e.g., curl middle while straightening ring), training the motor cortex to independently activate opposing muscle groups.
-3. **Gradual pattern complexity**: Start with two-finger patterns (thumb-index), then three (thumb-index-middle), finally four. Master each level before progressing.
-
-```python
-# Exercise generator for finger independence training
-def generate_independence_drill(duration_seconds, bpm, target_finger):
-    """
-    Create a practice sequence focusing on one finger.
-    
-    target_finger: 'T', 'I', 'M', or 'R'
-    Returns: List of (finger, string, timestamp) tuples
-    """
-    beat_duration = 60.0 / bpm
-    num_beats = int(duration_seconds / beat_duration)
-    
-    # Map finger to preferred strings
-    string_map = {'T': [6, 5, 4], 'I': [3], 'M': [2], 'R': [1]}
-    strings = string_map[target_finger]
-    
-    drill = []
-    for beat in range(num_beats):
-        timestamp = beat * beat_duration
-        string = strings[beat % len(strings)]
-        drill.append((target_finger, string, timestamp))
-    
-    return drill
-
-# Example: 60 seconds of middle finger isolation at 80 BPM
-middle_drill = generate_independence_drill(60, 80, 'M')
-```
-
-**Failure Mode 2: Excessive Muscular Tension**
-
-Symptom: Forearm fatigue after short practice sessions (5-10 minutes), cramping in the hand or wrist, or gradual loss of tone clarity as practice continues.
-
-Root cause: Over-activation of antagonist muscles (extensors while flexors should be active) or excessive grip force. The hand operates in a state of co-contraction, wasting metabolic energy and creating static loading on tendons and joints.
-
-Diagnostic test: Play a simple pattern for 2 minutes, then immediately check forearm rigidity by attempting to shake the hand loosely. If the hand feels stiff or the forearm feels tight/pumped, tension is excessive.
-
-Remediation protocol:
-1. **Conscious relaxation**: Before each pluck, mentally scan the hand and forearm for unnecessary tension. Use only the minimum force required to sound the string clearly.
-2. **Floating hand technique**: Practice playing with the hand completely unsupported (no palm contact with bridge). This forces awareness of grip tension since any excess immediately causes instability.
-3. **Slow practice with tension monitoring**: Play patterns at 50% speed while maintaining awareness of muscle activation. If tension creeps in, stop, shake out the hand, and resume with conscious relaxation.
-
-**Failure Mode 3: Inconsistent Plucking Angle**
-
-Symptom: Some notes sound weak or thin while others are robust; tone varies unpredictably during pattern repetition.
-
-Root cause: The finger's angle of approach to the string varies, changing the force vector's perpendicular component. A glancing blow transfers less energy to the string than a perpendicular pluck.
-
-Diagnostic test: Record audio of a repeating pattern and analyze the amplitude envelope of each pluck using audio software. Coefficient of variation should be < 15% for consistent technique.
-
-```python
-import numpy as np
-import librosa
-
-def analyze_pluck_consistency(audio_file, expected_plucks):
-    """
-    Analyze amplitude consistency of plucking pattern.
-    
-    audio_file: Path to recorded audio
-    expected_plucks: Number of plucks in the recording
-    
-    Returns: Coefficient of variation and amplitude array
-    """
-    # Load audio
-    y, sr = librosa.load(audio_file)
-    
-    # Detect onsets (plucks)
-    onset_frames = librosa.onset.onset_detect(y=y, sr=sr, units='frames')
-    onset_times = librosa.frames_to_time(onset_frames, sr=sr)
-    
-    # Extract amplitude at each onset
-    amplitudes = []
-    for onset_time in onset_times:
-        # Get RMS amplitude in 50ms window after onset
-        start_sample = int(onset_time * sr)
-        end_sample = start_sample + int(0.05 * sr)
-        window = y[start_sample:end_sample]
-        rms = np.sqrt(np.mean(window**2))
-        amplitudes.append(rms)
-    
-    amplitudes = np.array(amplitudes)
-    
-    # Calculate coefficient of variation
-    mean_amplitude = np.mean(amplitudes)
-    std_amplitude = np.std(amplitudes)
-    cv = (std_amplitude / mean_amplitude) * 100
-    
-    return cv, amplitudes
-
-# Example usage
-cv, amps = analyze_pluck_consistency("practice_recording.wav", expected_plucks=32)
-print(f"Consistency: {cv:.1f}% CoV (target: <15%)")
-```
-
-Remediation: Practice rest-stroke technique where the finger, after plucking, comes to rest against the adjacent lower string. This enforces a consistent perpendicular plucking motion and provides tactile feedback for angle control.
-
-**Failure Mode 4: Bass-Treble Imbalance**
-
-Symptom: Bass notes overpower melody, or conversely, melody is clear but bass is weak and undefined.
-
-Root cause: Differential force application between thumb and fingers, often due to natural strength differences or improper technique adjustment for string gauge differences.
-
-Diagnostic insight: Bass strings (wound, higher mass) require more energy to achieve the same perceived loudness as treble strings (plain steel, lower mass). The psychoacoustic equal-loudness contour (Fletcher-Munson curve) shows that human hearing is less sensitive to low frequencies, requiring 10-15 dB more actual sound pressure level to achieve equivalent perceived loudness.
-
-Remediation protocol:
-1. **Calibrated force training**: Practice thumb plucks and finger plucks separately, adjusting force until a tuner or spectrum analyzer shows equivalent peak amplitude. This trains the motor system to apply appropriate differential force.
-2. **Microphone feedback**: Record practice sessions and listen critically to the bass-treble balance. Adjust technique until the balance sounds musical (bass present but not overwhelming).
-3. **Thumb preparation**: Position the thumb slightly above the target string before plucking, allowing gravity to assist the downward motion and reducing the muscular effort required for bass clarity.
-
-### Advanced Performance Optimization Strategies
-
-**Strategy 1: Anticipatory Finger Positioning**
-
-Elite players position fingers on their target strings before the actual pluck time, minimizing the time-to-contact and enabling faster pattern execution. This can be modeled as a predictive control system where finger positions at time $t$ are determined by target positions at time $t + \Delta t$.
-
-Implementation: During pattern practice, consciously position the next finger on its target string as soon as the current finger completes its pluck. This creates a "prepared state" where all fingers are pre-positioned, waiting only for the temporal trigger to execute their pluck.
-
-**Strategy 2: Relaxation Cycles**
-
-Sustained fingerpicking creates cumulative fatigue. Professional players insert micro-relaxation periods between phrases, allowing muscle fibers to clear metabolic waste products (lactate, adenosine) before they accumulate to fatigue levels.
-
-Protocol: After every 8-16 measures, insert a half-beat pause where the hand completely relaxes (all fingers unweighted, wrist loose). This momentary cessation prevents fatigue accumulation while minimally disrupting the musical flow.
-
-**Strategy 3: Dynamic Practice Variation**
-
-Practicing at a single tempo and dynamic level creates a narrow motor adaptation. To develop robust, flexible technique:
-
-1. **Tempo variation**: Practice each pattern at 50%, 75%, 100%, and 125% of target tempo within a single session
-2. **Dynamic variation**: Practice at pianissimo (minimal force), mezzo-forte (moderate), and fortissimo (maximum sustainable force)
-3. **Timbral variation**: Practice with different plucking positions (bridge, soundhole, neck) to develop control over tonal color
-
-This variation builds a more flexible motor representation, enabling the player to adapt to different musical contexts without requiring separate learning for each condition.
-
-**Strategy 4: Mental Practice and Motor Imagery**
-
-Motor skill learning occurs not only through physical practice but also through mental rehearsal. Neuroimaging studies show that imagining a movement activates many of the same cortical regions as actual movement, contributing to motor learning.
-
-Protocol: Spend 10-15% of practice time in mental rehearsal. Visualize the fingerpicking pattern in detail: which finger moves to which string, the feeling of the string contact, the sound produced. Research indicates that combined physical and mental practice yields superior results to physical practice alone, particularly for complex sequences requiring precise timing and coordination.
-
-### Injury Prevention and Ergonomic Considerations
-
-Repetitive strain injuries (RSIs) are common among guitarists, particularly tendinitis (inflammation of tendons) in the flexor tendons and carpal tunnel syndrome (compression of the median nerve in the wrist). Prevention strategies include:
-
-1. **Practice duration management**: Limit continuous practice to 25-30 minute blocks, with 5-10 minute breaks to allow tissue recovery
-2. **Progressive loading**: Increase practice intensity and duration gradually (10% per week maximum) to allow adaptive remodeling of connective tissues
-3. **Wrist position monitoring**: Maintain neutral wrist alignment (within 15° of neutral in all planes) to minimize carpal tunnel pressure
-4. **Stretching protocol**: Perform wrist and finger stretches before and after practice sessions to maintain flexibility and reduce adhesion formation
-5. **Force minimization**: Use the minimum force necessary to produce clear tone; excessive force provides no musical benefit and accelerates tissue damage
-
-The "two-millimeter rule" provides a useful guideline: if string height (action) increases by 2mm, the required fretting force nearly doubles due to the increased lever arm. Maintaining low action (while avoiding fret buzz) significantly reduces left-hand strain.
-
-## 4. Scale Patterns and Positional Systems
-
-### CAGED System Architecture
-
-The CAGED system is a positional framework that organizes the fretboard into five overlapping regions, each named after an open chord shape (C, A, G, E, D). Each shape represents a specific fingering pattern that can be moved up the neck to produce the same chord type in different keys. More importantly for scale work, each CAGED position defines a specific scale fingering pattern that spans approximately four frets.
-
-The system's power lies in its invariance: the same finger pattern produces the same intervals regardless of absolute position on the neck. For example, the "E shape" major scale pattern maintains the same finger-to-interval relationships whether played in open position (E major) or at the 5th fret (A major) or the 10th fret (D major).
+The CAGED system gives you five overlapping "windows" covering the entire neck. Each window is named after the open chord shape it resembles. Same key, five different zip codes on the neck.
 
 ```mermaid
 graph LR
-    A["CAGED System"] --> B["C Shape (Position I)"]
-    A --> C["A Shape (Position II)"]
-    A --> D["G Shape (Position III)"]
-    A --> E["E Shape (Position IV)"]
-    A --> F["D Shape (Position V)"]
-    
-    B --> B1["Root on String 2 or 5"]
-    C --> C1["Root on String 5"]
-    D --> D1["Root on String 6"]
-    E --> E1["Root on String 6 or 4"]
-    F --> F1["Root on String 4"]
-    
-    B1 --> G["Cycle repeats at 12th fret"]
-    C1 --> G
-    D1 --> G
-    E1 --> G
-    F1 --> G
+    subgraph sub_caged ["CAGED — C Major, All 5 Positions"]
+        C_shape["C Shape\nFrets 0–3\nRoot: B-str fret 1\n& A-str fret 3"]
+        A_shape["A Shape\nFrets 2–5\nRoot: A-str fret 3"]
+        G_shape["G Shape\nFrets 4–8\nRoot: E6-str fret 5\n& B-str fret 5"]
+        E_shape["E Shape\nFrets 7–10\nRoot: E6-str fret 8"]
+        D_shape["D Shape\nFrets 9–12\nRoot: B-str fret 10\n& D-str fret 10"]
+        C_shape -->|"overlaps"| A_shape
+        A_shape -->|"overlaps"| G_shape
+        G_shape -->|"overlaps"| E_shape
+        E_shape -->|"overlaps"| D_shape
+        D_shape -->|"repeats at 12"| C_shape
+    end
 ```
 
-For the key of C major, the five CAGED positions are located at:
-- **C shape**: Open position (root on 3rd fret, 5th string)
-- **A shape**: 2nd-5th frets (root on 3rd fret, 5th string)
-- **G shape**: 4th-7th frets (root on 5th fret, 6th string)
-- **E shape**: 7th-10th frets (root on 8th fret, 6th string)
-- **D shape**: 9th-12th frets (root on 10th fret, 4th string)
+### C Major Scale — All 5 CAGED Positions (Fingering Diagrams)
 
-Each position overlaps with its neighbors, allowing seamless transitions between positions. A phrase begun in the G shape can naturally extend into the E shape for higher notes or back into the A shape for lower notes, enabling melodic continuity across the entire fretboard.
-
-### Three-Notes-Per-String System
-
-An alternative to CAGED, the three-notes-per-string (3NPS) system organizes scales to place exactly three scale degrees on each string. This creates a more symmetrical fingering pattern that facilitates faster playing and easier pattern recognition, at the cost of requiring larger finger stretches (spans of 5-6 frets vs. 3-4 frets in CAGED).
-
-For a major scale, the 3NPS pattern on a single string spans one of two interval configurations:
-- **Pattern A**: Whole-Whole (e.g., C-D-E, spanning 4 frets)
-- **Pattern B**: Whole-Half (e.g., E-F-G, spanning 3 frets)
-
-The complete major scale uses a sequence of these patterns across all six strings:
+**Position 1 — C Shape (Open / Frets 0–3)**
 
 ```
-String 6 (E): W-W (e.g., E-F#-G#, frets 0-2-4)
-String 5 (A): W-H (e.g., A-B-C#, frets 0-2-4)
-String 4 (D): W-W (e.g., D-E-F#, frets 0-2-4)
-String 3 (G): W-H (e.g., G-A-B, frets 0-2-4)
-String 2 (B): W-W (e.g., B-C#-D#, frets 0-2-4)
-String 1 (E): W-H (e.g., E-F#-G#, frets 0-2-4)
+e |---0---1---3---|
+B |---0---1---3---|
+G |---0---2-------|
+D |---0---2---3---|
+A |---0---2---3---|
+E |---0-----------| (open low E = not in C major; begin on A string)
+     T   1   2   4    (T = open, 1 = index, 2 = middle, 4 = pinky)
 ```
 
-This pattern shifts one fret for every key change (e.g., to play A major instead of G major, shift the entire pattern up 2 frets). The 3NPS system's regularity makes it particularly suited to rapid scalar passages and sequences, as the picking hand can maintain a strict alternate picking pattern (down-up-down-up) without string-crossing disruptions.
+Play from low A string. Root notes: A-string fret 3 (C), B-string fret 1 (C).
 
-### Intervallic Visualization and Pattern Extension
+**Position 2 — A Shape (Frets 2–5)**
 
-Beyond position-based systems, expert players develop an intervallic understanding where the fretboard is perceived as a network of interval relationships rather than memorized patterns. For any given note, the player instantly knows the locations of its 3rd, 5th, 7th, etc., enabling spontaneous construction of chords, arpeggios, and melodic lines without reference to pre-learned patterns.
-
-This intervallic approach is based on invariant interval shapes:
-
-- **Minor 3rd** (3 semitones): Same fret, 2 strings higher; or 3 frets higher, same string
-- **Major 3rd** (4 semitones): Same fret, 2 strings higher (except G-B string pair requires +1 fret); or 4 frets higher, same string
-- **Perfect 5th** (7 semitones): 2 frets higher, 1 string higher (except crossing G-B requires +1 fret); or 7 frets higher, same string
-- **Octave**: 2 frets higher, 2 strings higher (adjacent string pairs); or 12 frets higher, same string
-
-These shapes can be chained: to find the 9th (octave + whole step) of a root note, find the octave shape then add a whole step (2 frets). This compositional approach enables players to navigate the fretboard fluidly, constructing any desired interval relationship on demand.
-
-### Scale Practice Methodologies
-
-Effective scale practice goes beyond mechanical repetition of ascending and descending patterns. Advanced methodologies include:
-
-**1. Sequencing**: Practice scales in non-linear patterns that force the fingers to navigate different interval combinations. Common sequences include:
-
-- Thirds: 1-3-2-4-3-5-4-6-5-7-6-8 (in C major: C-E, D-F, E-G, F-A, ...)
-- Fourths: 1-4-2-5-3-6-4-7-5-8
-- Triadic patterns: 1-3-5, 2-4-6, 3-5-7, 4-6-8 (outlining triads within the scale)
-
-These sequences develop finger independence and train the ear to recognize interval relationships.
-
-**2. Rhythmic Variation**: Practice scales with different rhythmic groupings to develop timing precision and finger control:
-
-- Triplets (3 notes per beat)
-- Sixteenth notes (4 notes per beat)
-- Quintuplets (5 notes per beat)
-- Septuplets (7 notes per beat, creating polyrhythmic texture against 4/4 meter)
-
-**3. Dynamic Contours**: Apply crescendo, decrescendo, or alternating accents to scale passages, developing independent control of timing and dynamics.
-
-**4. Positional Shifting**: Practice scales by changing positions mid-scale, forcing smooth transitions between CAGED positions. For example, ascend the first octave in the E shape, then shift to the D shape for the second octave.
-
-```python
-def generate_scale_sequence(root, scale_type, sequence_pattern):
-    """
-    Generate a scale practice sequence.
-    
-    root: MIDI note number of scale root
-    scale_type: 'major', 'minor', 'pentatonic_major', etc.
-    sequence_pattern: List of scale degree offsets (e.g., [0, 2, 1, 3] for thirds)
-    
-    Returns: List of MIDI note numbers representing the sequence
-    """
-    # Define scale interval patterns (semitones from root)
-    scales = {
-        'major': [0, 2, 4, 5, 7, 9, 11, 12],
-        'natural_minor': [0, 2, 3, 5, 7, 8, 10, 12],
-        'harmonic_minor': [0, 2, 3, 5, 7, 8, 11, 12],
-        'pentatonic_major': [0, 2, 4, 7, 9, 12],
-        'pentatonic_minor': [0, 3, 5, 7, 10, 12],
-    }
-    
-    if scale_type not in scales:
-        raise ValueError(f"Unknown scale type: {scale_type}")
-    
-    scale_intervals = scales[scale_type]
-    sequence = []
-    
-    # Generate sequence by applying pattern
-    i = 0
-    while i < len(scale_intervals):
-        for offset in sequence_pattern:
-            idx = i + offset
-            if idx < len(scale_intervals):
-                note = root + scale_intervals[idx]
-                sequence.append(note)
-        i += 1
-    
-    return sequence
-
-# Example: C major scale in thirds
-c_major_thirds = generate_scale_sequence(60, 'major', [0, 2, 1, 3])
-# Results in: [C, E, D, F, E, G, F, A, ...]
+```
+e |---5---|
+B |---5---|
+G |---4---|
+D |---5---|
+A |---3---5---|
+E |---3---5---|
+     1   2   4
 ```
 
-### Modal Practice and Harmonic Context
+Root: A-string fret 3 (C). Stretch from fret 3 to 5 with fingers 1–4.
 
-Each major scale generates seven modes by starting on different scale degrees. These modes—Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian—share the same notes but emphasize different tonal centers, creating distinct harmonic flavors.
+**Position 3 — G Shape (Frets 4–8)**
 
-Rather than memorizing each mode as a separate pattern, expert players leverage the CAGED system's relativity: to play D Dorian (the second mode of C major), simply play the C major scale patterns while emphasizing D as the tonal center. This approach uses existing knowledge (major scale patterns) to generate new musical colors (modal tonalities).
+```
+e |---5---7---8---|
+B |---5---6---8---|
+G |---4---5---7---|
+D |---5---7-------|
+A |---5---7-------|
+E |---5---7---8---|
+     1   2   3   4
+```
 
-Effective modal practice integrates harmonic context:
+Root: low E-string fret 8 (C), high e-string fret 8 (C). Requires a stretch — keep the thumb centred behind fret 6.
 
-1. **Drone practice**: Play a scale over a sustained bass note (the mode's root) to develop the ear's ability to hear the mode's characteristic intervals
-2. **Chord progression practice**: Practice the mode over a repeating chord progression that establishes the modal tonality (e.g., Dm7-G7 for D Dorian)
-3. **Characteristic phrase construction**: Identify and emphasize each mode's characteristic intervals (e.g., the raised 4th in Lydian, the flat 2nd in Phrygian) to internalize the mode's unique sound
+**Position 4 — E Shape (Frets 7–10)**
 
-This contextual approach develops musical intuition beyond mechanical pattern execution, enabling the player to choose scales and modes based on the harmonic environment and desired emotional color.
+```
+e |---8---10---|
+B |---8---10---|
+G |---7---9----|
+D |---7---9---10--|
+A |---7---9---10--|
+E |---8---10---|
+     1   2   3   4
+```
 
-## 5. Integration: Musical Application and Expression
+Root: low E-string fret 8 (C). This is the most intuitive position for most players — same geometry as the open E chord shape.
 
-### From Mechanics to Musicality
+**Position 5 — D Shape (Frets 9–12)**
 
-Technical mastery of scales and fingerpicking patterns is merely the foundation; musical expression requires transcending mechanical execution to shape sound with intention. This transition involves developing control over multiple expressive parameters simultaneously:
+```
+e |---10---12---|
+B |---10---12---|
+G |---9----10---12---|
+D |---10---12---|
+A |---10---12---|
+E |---10---12---|
+      1    2    4
+```
 
-**Timing micro-variations**: Strict metronomic timing, while useful for practice, creates mechanical-sounding music. Expressive playing involves subtle timing deviations—rushing slightly into strong beats, laying back on weak beats, or stretching note durations for emphasis. These micro-variations, typically in the 20-50 ms range, are perceived not as timing errors but as musical intentionality, creating groove and emotional impact.
+Root: B-string fret 10 (C), D-string fret 10 (C). Connects back to Position 1 at the 12th fret octave.
 
-**Dynamic shaping**: Each note can be articulated at any dynamic level from pianissimo to fortissimo. Musical phrases have dynamic contours—crescendos building tension, decrescendos creating release, sudden accents emphasizing structural points. Developing independent dynamic control requires separating the concepts of timing (when the note occurs) and intensity (how hard it's plucked), which are neurologically coupled in untrained players.
+### Invariant Interval Shapes (Cheat Sheet)
 
-**Timbral variation**: By varying the plucking position (bridge vs. soundhole vs. fingerboard), angle of attack, and contact area (fingertip vs. flesh), the guitarist controls the harmonic content and perceived tone color. A melody played near the bridge has a bright, aggressive character; the same melody at the soundhole is warm and round. Expert players vary timbre continuously, using it as an additional expressive dimension beyond pitch, timing, and dynamics.
+Memorise these shapes and the fretboard becomes a connected map, not isolated patterns.
 
-### Phrasing and Structural Awareness
+| Interval | Same String | Adjacent Strings (normal) | Crossing G→B |
+|---|---|---|---|
+| Unison | — | 5 frets up, 1 string higher | 4 frets up crossing G→B |
+| Minor 3rd | 3 frets up | — | — |
+| Major 3rd | 4 frets up | Same fret, skip 1 string | +1 fret crossing G→B |
+| Perfect 4th | 5 frets up | Same fret, 1 string higher | +1 fret crossing G→B |
+| Perfect 5th | 7 frets up | 2 frets up, 1 string higher | +1 fret crossing G→B |
+| Octave | 12 frets up | 2 frets up, 2 strings higher | +1 fret if span crosses G→B |
 
-Musical phrases have internal structure analogous to spoken sentences: beginning (establishment), middle (development), and end (resolution). Effective musical phrasing requires shaping each phrase's arc through coordinated control of timing, dynamics, and timbre.
+---
 
-The phrase boundary is crucial—it's where the musical idea completes and a new idea begins. Guitarists mark phrase boundaries through:
+## 3. Right-Hand Fingerpicking Mechanics
 
-1. **Breath simulation**: Inserting brief silences (50-100 ms) between phrases, mimicking vocal breathing
-2. **Dynamic reset**: Reducing volume at phrase end, then beginning the new phrase at a fresh dynamic level
-3. **Timbral shift**: Changing plucking position or tone color between phrases to delineate sections
+### Hand Position Setup — Step by Step
 
-Large-scale musical form emerges from the hierarchical nesting of phrases: motifs combine into phrases, phrases into periods, periods into sections, sections into complete pieces. Awareness of this hierarchical structure informs interpretation—the climax of a piece should receive the greatest dynamic and emotional emphasis, while transitional passages serve connective functions and should not compete for attention.
+Before playing a single note, establish this posture. It takes 2 minutes to check and prevents months of bad habits.
 
-### Improvisation as Constrained Exploration
+```mermaid
+flowchart TD
+    subgraph sub_rh ["Right Hand Setup Sequence"]
+        A["1 · Sit with guitar on right leg\n(classical) or left leg (folk)\nBody angled 30° from vertical"]
+        B["2 · Forearm rests lightly on\nupper bout — no pressure\nElbow at bout edge"]
+        C["3 · Wrist arches 20–25°\nabove strings — space\nunder wrist for a pencil"]
+        D["4 · Fingers curl naturally:\nMCP + PIP joints ~45° flex\nFingertips approach strings\nfrom above, not the side"]
+        E["5 · Thumb (p) sits AHEAD\nof fingers — independent lane,\naligned with bass strings"]
+        F["6 · No palm on bridge\nfor open fingerpicking.\nOptional light contact\nfor palm-muted style only"]
+        A --> B --> C --> D --> E --> F
+    end
+```
 
-Improvisation is not random note generation but rather real-time composition within a constrained solution space. The constraints—harmonic progression, rhythmic feel, melodic motif, stylistic idiom—define the boundaries, while the improviser's creativity explores the space within those boundaries.
+### Finger Naming Convention (PIMA)
 
-Effective improvisation requires internalized knowledge structures:
+| Symbol | Finger | Preferred Strings |
+|---|---|---|
+| p (pulgar) | Thumb | Strings 6, 5, 4 (bass) |
+| i (índice) | Index | String 3 |
+| m (medio) | Middle | String 2 |
+| a (anular) | Ring | String 1 |
 
-1. **Harmonic vocabulary**: Deep familiarity with chord-scale relationships, allowing instant selection of appropriate scale material over any chord
-2. **Motivic development**: The ability to state a melodic idea, then transform it through rhythmic variation, intervallic expansion/contraction, or sequential transposition
-3. **Rhythmic flexibility**: Comfort with placing melodic ideas at different metric positions, creating syncopation and rhythmic interest
-4. **Tension-resolution arcs**: Understanding how dissonance (chromaticism, wide intervals, rhythmic displacement) creates tension that requires resolution through consonance (scalar motion, chord tones, metric alignment)
+This PIMA naming is universal in classical and fingerstyle guitar. Use it whenever reading notation.
 
-The improviser's mind operates in multiple temporal layers simultaneously: the immediate present (current note execution), near future (next few notes of the current phrase), and long-term structure (position within the overall form). This multi-scale awareness enables coherent improvisations that balance moment-to-moment interest with long-term direction.
+### Rest Stroke vs. Free Stroke
 
-### Practice Structure for Musical Development
+**Rest stroke (apoyando):** After plucking, the finger follows through and rests on the adjacent lower string. Forces a perpendicular attack angle. Produces maximum volume and tone focus. Use for melody lines.
 
-Developing musical expression requires practice approaches distinct from pure technical development:
+**Free stroke (tirando):** Finger plucks upward and clears all strings without touching. Allows simultaneous multi-voice playing. Essential for chord arpeggios and patterns where multiple strings ring together.
 
-**1. Transcription and Analysis**: Learn solos, arrangements, or compositions by ear, then analyze how the original artist shapes phrases, creates dynamics, and structures the overall piece. Transcription develops the ear's ability to perceive subtle expressive nuances and provides models for one's own musical development.
+**Drill:** On string 1, play a single note with rest stroke, then immediately the same note with free stroke. Notice the volume and tone difference. That difference is your dynamic range — use it consciously.
 
-**2. Call-and-Response Practice**: Improvise a short phrase (the "call"), then immediately respond with a complementary phrase (the "response"). This develops the ability to construct balanced musical statements and trains spontaneous creativity within structural constraints.
+### Nail vs. Flesh — Tone Control
 
-**3. Stylistic Immersion**: Study recordings intensively within a specific style (blues, jazz, classical, folk, etc.), absorbing the idiomatic vocabulary, phrasing conventions, and tonal colors that define the style. Authentic stylistic playing requires internalizing these characteristics, not just superficial imitation of surface features.
+| Contact | Tone Character | Use Case |
+|---|---|---|
+| Flesh only | Warm, round, low attack | Folk, blues, singer-songwriter |
+| Nail edge | Bright, articulate, projecting | Classical, complex arrangements |
+| Nail + flesh | Balanced, full | Most acoustic fingerstyle |
 
-**4. Recording and Critical Listening**: Record practice sessions and performances, then listen critically for opportunities to improve musical expression. What phrases felt effortless but sound unintentional? What sections have clear musical direction vs. aimless wandering? This feedback loop accelerates musical development by making unconscious habits conscious.
+For acoustic (unamplified) playing, 1–2 mm of nail beyond the fingertip provides the best projection without sounding harsh. File at a 45° bevel — the string should slide off the nail smoothly, not catch.
 
-**5. Collaboration and Performance**: Play with other musicians and perform for audiences. The social dimension of music-making requires real-time listening, adaptive response, and communication through sound. These skills cannot be developed in isolation—they require musical interaction to emerge.
+---
 
-### The Path to Mastery
+## 4. Fingerpicking Patterns — Drills & Notation
 
-Mastery of the acoustic guitar integrates technical command with musical imagination. The scales become not patterns to execute but vocabularies for expression. Fingerpicking patterns transform from mechanical sequences into vehicles for rhythmic and harmonic ideas. The instrument becomes transparent—a direct extension of musical thought, where imagined sounds flow effortlessly into physical reality.
+All patterns below use this chord: **G major open position** (320003). Set a metronome. Never play faster than you can play cleanly.
 
-This integration is asymptotic; there is no final destination, only continuous refinement. Each technical challenge overcome reveals new musical possibilities. Each musical idea pursued drives technical development. The interplay between technique and expression forms a virtuous cycle, propelling the guitarist toward ever-deeper mastery of both the instrument and the musical art it serves.
+### Pattern 1 — Basic Alternating Thumb (p-i, p-m)
+
+The foundation of everything. The thumb creates a steady bass pulse; fingers answer on the offbeats.
+
+```
+Chord: G major (320003)
+Time:  4/4
+
+e |--------3-----------3----|
+B |------0---0-------0---0--|
+G |----0-------0---0-------0|
+D |-------------------------|
+A |--2-----------2----------|
+E |3-----------3------------|
+   p  i   m  i  p  i   m  i
+
+Beat: 1  &  2  &  3  &  4  &
+```
+
+**Metronome targets:**
+- Week 1: ♩= 50 BPM — focus on thumb/finger separation, zero tension
+- Week 2: ♩= 65 BPM — add dynamic evenness
+- Week 3: ♩= 80 BPM — maintain tone quality at speed
+
+**Common error:** Thumb and index fire simultaneously on beat 1. Fix: exaggerate the gap between p and i until a clear 16th-note space exists, then gradually tighten it.
+
+### Pattern 2 — Travis Picking (Alternating Bass + Syncopated Treble)
+
+The defining pattern of country, folk, and acoustic blues. Thumb alternates between two bass strings; fingers fill the spaces independently.
+
+```
+Chord: C major (x32010)
+Time:  4/4  (each line = 1 measure)
+
+e |----------------1-------1---|
+B |----------1-----------1-----|
+G |--------0---0-------0---0---|
+D |------2-----------2---------|
+A |----3-----------3-----------|
+E |----------------------------|
+     p  p  i  p  m  p  i  p  m
+
+Beat: 1  &  2  &  3  &  4  &
+```
+
+**Thumb alternation rule for Travis picking:**
+- Beat 1 & 3 → Root string (A-string fret 3 for C = string 5)
+- Beat 2 & 4 → 5th-string bass (D-string open for C = string 4)
+
+**Four-chord Travis exercise** (the most practical vehicle for locking this in):
+
+```
+| C (x32010) | Am (x02210) | F (xx3211) | G (320003) |
+  1 meas each, loop 8 times, chord changes must not break the thumb pattern
+```
+
+**Metronome targets:**
+- ♩= 55 BPM — establish independent thumb/finger lanes
+- ♩= 70 BPM — chord changes without hesitation
+- ♩= 90 BPM — musical, relaxed feel at target tempo
+
+### Pattern 3 — Waltz Arpeggio (3/4)
+
+Essential for ballads, folk waltzes, and classical-influenced pieces.
+
+```
+Chord: Am (x02210)   then   E (022100)
+Time:  3/4
+
+e |-----0---------0---|-----0---------0---|
+B |---1-----1---1-----|---0-----0---0-----|
+G |-2-----------2---2-|-1-----------1---1-|
+D |-------------------|-------------------|
+A |-0-----------------|---2---------------|
+E |-------------------|-0-----------------|
+   p    i  m  a   i   p    i  m  a   i
+
+Beat: 1   &  2  &  3  &
+```
+
+**Technique note:** The "a" (ring finger) plucks string 1 on the "& of 2". This is the hardest moment in the pattern — ring finger firing alone while middle holds. Isolate beats 2-and-3 as a micro-drill: `m–a–m–a` on strings 2 and 1 repeatedly at ♩= 40 until it flows.
+
+### Pattern 4 — Pinch Pattern (Simultaneous Bass + Treble)
+
+A pinch fires thumb and finger(s) simultaneously, anchoring the rhythm. Fundamental to folk strumming-picking hybrids.
+
+```
+Chord: D major (xx0232)
+Time:  4/4
+
+e |--2-------2-------2-------2--|
+B |--3-------3-------3-------3--|
+G |--2-------2-------2-------2--|
+D |--0-2-0---0-2-0---0-2-0---0--|
+   p+a  i  m  p+a i  m  p+a i  m
+     ^pinch        ^pinch
+
+Beat: 1  &  2  &  3  &  4  &
+```
+
+The pinch (p+a simultaneously) on beats 1 and 3 creates a percussive anchor. The i–m fill between pinches is light and fluid.
+
+### Pattern 5 — Rolls (Banjo-Style Forward Roll on Guitar)
+
+Creates a continuous 8th-note stream — the bedrock of fingerpicking arrangements.
+
+```
+Forward Roll:  p  i  m  p  i  m  p  i
+String order:  5  3  1  4  3  1  5  3   (varies by chord)
+
+Chord: G (320003)
+
+e |--------3-------3-------|
+B |------0-------0---------|
+G |----0-------0-----------|
+D |------------------------|
+A |--2-------2-------------|
+E |3-------3---------------|
+   p i m  p i m  p i m  p i m
+```
+
+**Metronome targets:**
+- ♩= 60 (each 8th note = one click subdivision)
+- ♩= 80
+- ♩= 110 (musical performance tempo)
+
+> At ♩= 110 the roll should feel like a waterfall — continuous, even, effortless. If any note pops out louder than its neighbours, that finger is tensing. Find it and release.
+
+### Pattern Architecture — How They Connect
+
+```mermaid
+flowchart LR
+    subgraph sub_patterns ["Fingerpicking Pattern Hierarchy"]
+        P1["Basic Alt Thumb\np-i / p-m\nFoundation"]
+        P2["Travis Picking\nAlt bass + syncopated treble\nCountry / Folk"]
+        P3["Waltz Arpeggio\n3/4 p-i-m-a\nBallad / Classical"]
+        P4["Pinch Pattern\nSimultaneous p+a\nFolk / Blues"]
+        P5["Forward Roll\nContinuous 8th stream\nBluegrass / Arrangements"]
+        P6["Hybrid Patterns\nCombine elements\nArrangements & Originals"]
+        P1 --> P2
+        P1 --> P3
+        P1 --> P4
+        P2 --> P5
+        P4 --> P5
+        P2 --> P6
+        P3 --> P6
+        P5 --> P6
+    end
+```
+
+---
+
+## 5. Left-Hand Scale Systems & Positional Playing
+
+### Left-Hand Posture Rules (Non-Negotiable)
+
+1. **Thumb behind the neck** — opposite the middle finger, NOT hooked over. Exception: intentional "cheater" barre on bass strings only.
+2. **Finger placement** — just behind the fret wire (toward the nut), not on top of it, not in the middle of the fret. This is where buzz originates when wrong.
+3. **Curved fingers** — arch over strings 1–2 so they don't mute them accidentally.
+4. **Minimum pressure** — squeeze only until the note sounds clean. Any more is wasted tension. Test: fret a note, then slowly release pressure until it buzzes. The clean threshold is your target force.
+5. **Wrist position** — neutral, slightly dropped away from the neck. Never rotating the wrist sharply upward; that compresses the carpal tunnel.
+
+### Pentatonic Minor Box — The Entry Point
+
+Before tackling full 7-note scales, own the pentatonic minor. Five notes, zero half-step tension, works over blues, rock, folk, and country with minimal harmonic risk.
+
+**A Minor Pentatonic — Box 1 (Frets 5–8, most used position)**
+
+```
+e |---5---8---|
+B |---5---8---|
+G |---5---7---|
+D |---5---7---|
+A |---5---7---|
+E |---5---8---|
+     1   4     (index = 1, pinky = 4)
+```
+
+Root notes (A) are on: E6-string fret 5, D-string fret 7, G-string fret 7 (not standard root), B-string fret 5, e-string fret 5.
+
+**Scale degree map for Box 1:**
+
+```
+e |--R---4--|   R=root(A), 4=minor7th
+B |--5---b7-|   5=perfect5th, b7=minor7th
+G |--b3--4--|   b3=minor3rd, 4=perfect4th
+D |--b7--b3-|
+A |--4---b7-|
+E |--R---4--|
+```
+
+**Box 1 drill sequence:**
+```
+Ascending:  E6-str 5 → A-str 5 → 7 → D-str 5 → 7 → G-str 5 → 7 → B-str 5 → 8 → e-str 5 → 8
+Descending: reverse
+Fingering:  1–4 | 1–4 | 1–3 | 1–3 | 1–4 | 1–4
+```
+
+Metronome: ♩= 60 → 80 → 100, all as 8th notes.
+
+### Five Pentatonic Minor Boxes — Full Neck Map
+
+The five boxes connect seamlessly. Learn them in order; each one starts where the last ends.
+
+```
+   Fret:   1   2   3   4   5   6   7   8   9  10  11  12
+           |----|----|----|----|----|----|----|----|----|----|----|
+E6:        |    |    |    |    |[1] |    |    |[4] |    |[5] |    |[1]|
+A:         |    |    |    |    |[1] |    |[3] |    |[4] |    |    |[1]|
+D:         |    |    |    |    |[1] |    |[3] |    |    |[2] |    |[1]|
+G:         |    |    |    |    |[1] |    |[3] |    |    |[2] |    |   |
+B:         |    |    |    |    |[1] |    |    |[4] |    |[2] |    |   |
+E1:        |    |    |    |    |[1] |    |    |[4] |    |[5] |    |[1]|
+
+Box numbers: [1]=Box1  [2]=Box2  [3]=Box3  [4]=Box4  [5]=Box5
+```
+
+**Connection rule:** The highest note of Box 1 on the high e-string (fret 8) is the same pitch as the lowest note of Box 2 on the same string. Boxes chain upward in minor 3rd increments (3 frets).
+
+### Natural Minor Scale (Aeolian) — Adding the Missing Notes
+
+The minor pentatonic omits the 2nd (♭2→natural 2) and the 6th (♭6). Adding these two notes gives you the natural minor — 7 notes, more melodic options, and the ability to outline chord changes.
+
+**A Natural Minor — Position 1 (E-Shape CAGED, Frets 5–8)**
+
+```
+e |---5---7---8---|
+B |---5---6---8---|
+G |---5---7-------|
+D |---5---7-------|  ← add fret 6 (Bb/♭6) here compared to pentatonic
+A |---5---7-------|
+E |---5---7---8---|
+     1   2   3   4
+```
+
+Compare to Box 1 pentatonic — you're just adding fret 6 on strings 4–6 and fret 6 on string 2. Those two notes are the ♭6 and the natural 2. Slide them in gradually.
+
+**Harmonic Minor variation** — raise the 7th by one fret (G# at fret 8 on the A-string becomes fret 9). Creates that Spanish/dramatic sound. One fret change, completely different character.
+
+```
+A Harmonic Minor — difference from natural minor:
+A-string: fret 7 (G natural) → fret 8 (G#) ← the change
+```
+
+### Major Scale — E-Shape Position (The Most Versatile Starting Point)
+
+**G Major — E-Shape Position (Frets 2–5)**
+
+```
+e |---2---4---5---|
+B |---3---5-------|
+G |---2---4-------|
+D |---2---4---5---|
+A |---2---4---5---|
+E |---2---4---5---|  ← root (G) on fret 3... wait, adjust:
+     1   2   4
+```
+
+Corrected G Major E-Shape (root G on fret 3, E6 string):
+
+```
+e |---3---5-------|
+B |---3---5-------|
+G |---2---4---5---|
+D |---2---4---5---|
+A |---2---4---5---|
+E |---3---5-------|
+     1   2   3   4
+```
+
+Root notes (G): E6-string fret 3, e-string fret 3.
+
+**Ascending pattern fingering:**
+```
+E6-str:  1(3)  –  3(5)
+A-str:   1(2)  –  2(4)  –  4(5)
+D-str:   1(2)  –  2(4)  –  4(5)
+G-str:   1(2)  –  2(4)  –  4(5)
+B-str:   1(3)  –  2(5)        ← note B→G string shift: index moves one fret up
+e-str:   1(3)  –  3(5)
+```
+
+### Three-Notes-Per-String (3NPS) — Speed Scale System
+
+Where CAGED is about chord shapes and position, 3NPS is about raw scalar velocity. Exactly 3 notes per string means you pick D-U-D on every string — perfectly regular alternate picking without awkward crossings.
+
+**G Major 3NPS — Pattern 1 (starting on E6, root position)**
+
+```
+e |---3---5---7---|
+B |---3---5---7---|
+G |---2---4---5---|
+D |---2---4---5---|
+A |---2---3---5---|
+E |---3---5---7---|
+     1   2   3/4
+```
+
+**Picking hand:** D-U-D | D-U-D | D-U-D | D-U-D | D-U-D | D-U-D (strict alternate picking per string, all downstrokes at string changes — economy picking variant)
+
+**Metronome targets for 3NPS scales:**
+- ♩= 60 as triplets (3 notes per beat = 1 string per beat) — feel the string groupings
+- ♩= 80 as 16th notes — 4 notes per beat, crossing strings on the downbeat
+- ♩= 110 — musical performance tempo for most acoustic contexts
+
+### Scale Sequences — Breaking the Up-Down Rut
+
+Playing scales only ascending/descending is a practice habit, not a musical skill. These sequences train musical scale use.
+
+**Sequence 1 — Thirds** (harmonically rich, great for melodic playing)
+```
+Scale degrees:  1-3, 2-4, 3-5, 4-6, 5-7, 6-8, 7-9...
+In G major:     G-B, A-C, B-D, C-E, D-F#, E-G, F#-A...
+
+Tab (G major, E-shape position, strings 1–2):
+e |---3---5---3---5---5---7---5---7---7---8---|
+B |---3---3---5---5---3---3---5---5---7---7---|
+     G  B   A  C   B  D   C  E   D  F#
+```
+
+**Sequence 2 — Triads up the scale**
+```
+1-3-5, 2-4-6, 3-5-7, 4-6-1, 5-7-2, 6-1-3, 7-2-4
+
+In G: G-B-D, A-C-E, B-D-F#, C-E-G, D-F#-A, E-G-B, F#-A-C
+```
+
+Play each triad as a hammer-on triplet: pick the root, hammer 3rd, hammer 5th. Gives you an arpeggiated, lyrical phrasing that sounds immediately musical.
+
+**Sequence 3 — 4-note groups with accent on beat 1**
+```
+1-2-3-4, 2-3-4-5, 3-4-5-6, 4-5-6-7...
+
+Accent (play louder): note 1 of each group
+Feel: marching staircase, great for building toward phrase climax
+```
+
+---
+
+## 6. Common Failure Modes & Instant Fixes
+
+```mermaid
+flowchart TD
+    subgraph sub_fail ["Failure Mode Diagnostic Tree"]
+        S["Symptom Observed"]
+        F1["Buzz on fretted notes"]
+        F2["Weak / uneven tone\nin fingerpicking"]
+        F3["Ring finger won't\nfire independently"]
+        F4["Right-hand fatigue\nin under 10 min"]
+        F5["Bass overpowers\nmelody"]
+        F6["Pattern falls apart\nat tempo changes"]
+
+        S --> F1 & F2 & F3 & F4 & F5 & F6
+
+        F1 --> R1["Finger not behind fret wire\nOR thumb hooked over neck\nOR action too high"]
+        F2 --> R2["Inconsistent pluck angle\nUse rest-stroke drill\nRecord + review"]
+        F3 --> R3["Ring isolation drill:\nm-a trill on strings 1-2\nat ♩=40, 5 min/day"]
+        F4 --> R4["Excess tension diagnosis:\nShake hand after 2 min.\nIf stiff → reduce force\nUse floating-hand drill"]
+        F5 --> R5["Thumb force check:\nPlay bass alone, then treble.\nMatch perceived loudness.\nReduce thumb force 20%"]
+        F6 --> R6["Pattern not automated yet.\nReturn to 60% of target tempo.\nRepetition count before\nspeed = 100 clean reps"]
+    end
+```
+
+### Failure Mode Detail — Ring Finger Independence
+
+This is the most common barrier in fingerpicking development. Here is the full remediation protocol:
+
+**Stage 1 — Isolation (Week 1–2)**
+Fret a G chord. Place p on string 6, i on string 3, m on string 2, a on string 1. Without moving any other finger, pluck *only* string 1 with the ring finger (a). Other strings must not sound. ♩= 40, one pluck per click, 5 minutes.
+
+**Stage 2 — Trill Drill (Week 2–3)**
+On string 1, fret any note with the left hand. Trill between m and a — alternating middle and ring finger plucks — continuously. ♩= 50, 2 minutes. Focus: ring fires without dragging middle along.
+
+**Stage 3 — Pattern Reintegration (Week 3–4)**
+Return to Pattern 3 (Waltz Arpeggio). The m–a crossing at beat "& of 2" is now your diagnostic: if it flows, ring independence has arrived. If it stumbles, return to Stage 2 for one more week.
+
+### Failure Mode Detail — Buzz Diagnosis
+
+| Buzz Type | Sound | Cause | Fix |
+|---|---|---|---|
+| Deadened note | Thud, no pitch | Adjacent finger muting string | Arch fingers more, check fretting hand curl |
+| Fret buzz (low) | Rattly pitch | Finger too far from fret wire | Move finger closer to fret (toward bridge side) |
+| Fret buzz (high) | Rattle on release | Insufficient fret pressure | Increase pressure OR lower action |
+| Sympathetic ring | Ghost note, distant | Adjacent open string resonating | Mute with floating thumb or underside of fretting finger |
+
+### Failure Mode Detail — Tension Accumulation
+
+**The 2-Minute Tension Check:**
+1. Play your hardest pattern for exactly 2 minutes at target tempo.
+2. Stop. Without thinking, let the right hand drop to your lap.
+3. Immediately try to shake the wrist loosely.
+
+If the wrist shakes freely → tension is managed.
+If the wrist feels rigid or the forearm is "pumped" → you are over-gripping. Play the same pattern at 70% force. If the notes still sound clean (they will), you've been wasting energy.
+
+---
+
+## 7. Progressive Practice Routines
+
+### Routine A — Beginner Foundation (20 min/day)
+
+| Time | Exercise | Metronome | Focus |
+|---|---|---|---|
+| 0–3 min | Right-hand posture check + string isolation (p, i, m, a individually) | No click | Setup, zero tension |
+| 3–8 min | Pattern 1 (Alt Thumb) over G–C–D–G loop | ♩= 55 | Thumb/finger separation |
+| 8–13 min | Am Pentatonic Box 1 ascending/descending | ♩= 60 | Clean fretting, no buzz |
+| 13–18 min | Pattern 2 (Travis) on C major chord only | ♩= 55 | Alternating bass lock |
+| 18–20 min | Free play — improvise pentatonic over a drone A note | No click | Musical connection |
+
+### Routine B — Intermediate Development (30 min/day)
+
+| Time | Exercise | Metronome | Focus |
+|---|---|---|---|
+| 0–3 min | Ring finger isolation drill (Stage 2 trill) | ♩= 50 | Independence |
+| 3–8 min | Travis Pattern over I–IV–V in G: G–C–D | ♩= 65→75 | Chord-change fluidity |
+| 8–13 min | G Major E-shape scale, sequences in thirds | ♩= 65 | Intervallic thinking |
+| 13–18 min | Pattern 4 (Pinch) + Pattern 5 (Roll) combined | ♩= 70 | Pattern mixing |
+| 18–25 min | CAGED — connect Position 1 → 2 → 3 in G major | ♩= 60 | Positional shifting |
+| 25–30 min | Transcription: learn 4 bars of a fingerpicking piece by ear | No click | Ear training |
+
+### Routine C — Advanced Integration (45 min/day)
+
+| Time | Exercise | Metronome | Focus |
+|---|---|---|---|
+| 0–5 min | 3NPS G major scale, all positions, strict alt picking | ♩= 80→100 | Speed + accuracy |
+| 5–12 min | Full Travis arrangement: melody + bass simultaneous | ♩= 65→85 | Two-voice independence |
+| 12–20 min | Modal drone practice: D Dorian, E Phrygian, B Locrian over drones | No click | Modal ear development |
+| 20–28 min | Improvisation over Am–F–C–G: target chord tones on beat 1 | ♩= 75 (loop) | Harmonic targeting |
+| 28–38 min | Full piece run-through: performance mode, no stops | No click | Continuity, expression |
+| 38–45 min | Slow analysis: replay hard sections at 50% tempo, diagnose | ♩= 40 | Precision refinement |
+
+### Tempo Progression Law
+
+Never jump more than 5 BPM without earning it. The standard is **100 consecutive clean repetitions** at the current tempo before adding 5 BPM. This sounds slow. It is — and it's why most players plateau: they spend time at 80% speed instead of fully automating 70% first.
+
+```
+Target tempo: ♩= 100
+Path: 55 → 60 → 65 → 70 → 75 → 80 → 85 → 90 → 95 → 100
+      100 clean reps at each step before advancing
+```
+
+---
+
+## 8. Musical Application — From Mechanics to Expression
+
+### The Two Layers of Timing
+
+**Layer 1 — The Grid:** The metronome pulse. Your bass thumb must own this. It never wavers, never rushes, never lays back.
+
+**Layer 2 — The Feel:** Treble voices dance around the grid. Rushing the treble slightly into a chord change creates forward momentum (common in bluegrass). Laying back on treble creates a lazy, blues-soaked feel. Neither is wrong — both are intentional.
+
+The common beginner error is rushing Layer 1 (bass) while thinking they're rushing Layer 2 (expression). Record yourself. If the bass thumb is unsteady, expression work is premature — return to pure thumb drills.
+
+### Tonal Colour Map — Right-Hand Position
+
+This is a free parameter most players never consciously use.
+
+```
+Bridge                 Soundhole              Neck (12th fret area)
+  |--------------------------|------------------------|
+Bright, cutting,        Warm, balanced,        Dark, hollow,
+aggressive, louder      full fundamental,      flute-like,
+  → slide lead,          → most fingerstyle,    → jazz-influenced,
+  → emphasising attack    → singer-songwriter    → harmonic natural
+```
+
+**Exercise:** Play the exact same 4-bar phrase three times — once at each position (bridge, soundhole, neck). Same notes, same rhythm, three completely different instruments. This single exercise teaches more about tonal control than months of technique work without it.
+
+### Phrasing — The Breath Principle
+
+Every guitar phrase should imply a breath. Singers must breathe; guitarists don't have to — which is why guitar phrasing often sounds mechanical.
+
+**Rules for breath phrasing:**
+1. Every 2–4 bars, insert a brief rest (8th note minimum) — the "inhale."
+2. The phrase following the rest begins with slightly more energy — the "exhale."
+3. The last note of a phrase resolves dynamically downward (diminuendo into silence), not just harmonically.
+
+```
+Phrase structure example (4-bar unit):
+
+Bar 1: Statement (forte, start of phrase)
+Bar 2: Development (mezzo-forte, melodic motion)
+Bar 3: Extension (slight crescendo, climbing toward climax)
+Bar 4: Resolution + rest (diminuendo, last note fades, breath)
+Bar 5: New phrase begins (fresh dynamic start)
+```
+
+### Chord-Scale Connections for Improvising
+
+When improvising over chord changes, the fastest way to sound musical (not random) is to **target chord tones on beat 1 of each chord change**.
+
+| Chord | Scale Choice | Avoid Notes | Target Notes (beat 1) |
+|---|---|---|---|
+| Gmaj | G major / G major pentatonic | F (maj7 tension over triad) | G, B, D |
+| Am | A natural minor / Am pentatonic | — (all notes work) | A, C, E |
+| Cmaj | C major / G major | B over C (unless resolving) | C, E, G |
+| Dmaj | D major / D mixolydian | C# (sounds jazz-y) | D, F#, A |
+| Em | E natural minor / Em pentatonic | — | E, G, B |
+
+**One-week targeting drill:** Over a G–Em–C–D loop (♩= 70), play only single notes. The rule: whichever note you play on the downbeat of each bar change must be a chord tone (root, 3rd, or 5th of that chord). Every other note is free. This one constraint eliminates 90% of "random" improvising overnight.
+
+### Modal Colour Reference
+
+Modes are not separate scales to memorise — they are perspectives on a major scale. To play E Phrygian: play C major scale, but start and end phrases on E, and lean on the ♭2 (F) for colour.
+
+| Mode | Built on | Character | Characteristic Note | Chord Context |
+|---|---|---|---|---|
+| Ionian | 1st degree | Bright, resolved | Major 7th | Imaj7 |
+| Dorian | 2nd degree | Minor, slightly hopeful | Natural 6th | IIm7 |
+| Phrygian | 3rd degree | Spanish, dark | ♭2nd | IIIm7 |
+| Lydian | 4th degree | Dreamy, floating | ♯4th | IVmaj7♯11 |
+| Mixolydian | 5th degree | Bluesy, dominant | ♭7th | V7 |
+| Aeolian | 6th degree | Melancholic, natural minor | ♭6th | VIm7 |
+| Locrian | 7th degree | Unstable, dissonant | ♭2nd + ♭5th | VIIm7♭5 |
+
+**Practical modal entry point for acoustic players:** Start with Dorian (minor key with a raised 6th). It works over any minor chord in a major key context, sounds immediately musical, and the raised 6th distinguishes it cleanly from natural minor. D Dorian over Dm7 → G7 is the most common ii–V jazz application and also works beautifully in folk and Celtic styles.
+
+### Full Integration Flowchart
+
+```mermaid
+flowchart TD
+    subgraph sub_integration ["Path to Musical Integration"]
+        T1["Technical Foundation\n· Right-hand posture\n· Left-hand fretting\n· Clean tone, no buzz"]
+        T2["Pattern Automation\n· Travis, Waltz, Roll\n· 100 reps at target tempo\n· Chord changes without breaks"]
+        T3["Fretboard Knowledge\n· CAGED positions\n· Pentatonic + major/minor\n· Interval shapes memorised"]
+        T4["Ear Development\n· Transcribe 4-bar phrases\n· Chord tone targeting\n· Modal drone practice"]
+        T5["Expressive Control\n· Tonal colour (bridge→neck)\n· Dynamic shaping\n· Breath phrasing"]
+        T6["Musical Integration\n· Improvise over changes\n· Arrange songs fingerstyle\n· Perform without stopping"]
+
+        T1 --> T2 --> T3 --> T4 --> T5 --> T6
+        T6 -.->|"New challenges\ndrive deeper work"| T1
+    end
+```
+
+---
+
+## Quick Reference Card
+
+| Need | Go To |
+|---|---|
+| Hand setup check | §3 — Right-Hand Setup Sequence |
+| First fingerpicking pattern | §4 — Pattern 1 (Alt Thumb) |
+| Fix buzzing notes | §6 — Buzz Diagnosis Table |
+| Ring finger won't cooperate | §6 — Ring Finger Independence, 3-Stage Protocol |
+| Scale for soloing now | §5 — Am Pentatonic Box 1 |
+| Connect the whole neck | §2 — CAGED Overview + 5 Positions |
+| Sound more musical immediately | §8 — Chord-Scale Targeting Drill |
+| Practice schedule | §7 — Routines A / B / C |
