@@ -9,19 +9,35 @@ def enhance_markdown_file(provider: LLMProvider, file_path: Path, domain: str, s
     if len(content.strip()) < 50:
         return False
         
+    domain_gemini = Path(__file__).resolve().parent.parent / "topics" / domain / "GEMINI.md"
+    domain_instructions = ""
+    if domain_gemini.exists():
+        try:
+            domain_instructions = domain_gemini.read_text(encoding="utf-8")
+        except Exception:
+            pass
+
     system_instruction = (
-        "You are an elite, world-class staff engineer, distinguished researcher, and master technical author (e.g., O'Reilly/MIT Press standard). "
-        "Your goal is to perform a rigorous peer review, enhancement, and expansion of the provided curriculum lesson/lab."
+        f"You are a master practitioner, distinguished educator, and authoritative author in '{domain}'. "
+        "Your mission is to produce highly practical, actionable, and rigorously grounded masterclass lessons and labs.\n\n"
+        "PRACTICALITY FIRST MANDATE:\n"
+        "- 80% Actionable Execution: Focus on concrete, hands-on techniques, physical mechanics, step-by-step procedures, runnable code/manifests/drills, and real-world troubleshooting.\n"
+        "- 20% First-Principles Intuition: Ground the practice in core theory/physics, but NEVER let abstract math, academic derivations, or disconnected scripts overshadow hands-on mastery.\n"
+        "- Zero Placeholder Policy: Provide complete, runnable, and immediately useful examples with zero stubs.\n\n"
+        + (f"DOMAIN INSTRUCTIONS:\n{domain_instructions}\n" if domain_instructions else "")
     )
-    
+
     prompt = f"""Review and significantly enhance the following educational material for the topic '{subtopic_id}' in domain '{domain}'.
 
-OBJECTIVES:
-1. RIGOR & DEPTH: Expand the material with deep, first-principles technical depth. Explain *why* things work at an architectural level.
-2. ZERO HALLUCINATION FACT-CHECKING: Correct any inaccuracies, fabricated APIs, or hallucinated facts immediately. Ensure absolute technical correctness.
-3. MERMAID DIAGRAMS & CODE: Add missing or enhance existing Mermaid.js diagrams to visualize complex architectures or data flows. Ensure all Mermaid syntax is perfectly valid (e.g., proper quotes around labels: A -->| "Label" | B). Expand code snippets with robust, production-grade examples (Rust, C, Python, Go, SQL, etc.) where appropriate.
-4. REMOVE FLUFF: Remove AI conversational filler. Replace generic bullet points with dense, authoritative prose.
-5. COMPLETE REWRITE: Output the FULL, enhanced, publication-ready Markdown file. Do NOT truncate or use placeholders.
+CORE MANDATES:
+1. PRACTICAL & ACTIONABLE: Make this material immediately useful for someone physically practicing or executing this discipline.
+   - In music performance & instruments: Focus on hands-on playing ergonomics, hand posture, fingerings, fretboard/keyboard box shapes, chord voicings, and practice drills with metronome targets. Do NOT write instrument builder / lutherie math papers or python frequency calculators.
+   - In engineering & computing: Focus on production-grade architectures, real CLI/API commands, working code, and concrete debugging procedures.
+   - In crafts & fabrication: Focus on feeds, speeds, toolpaths, physical clamping, material behavior, and real G-code / fabrication parameters.
+2. TECHNICAL DEPTH: Explain *why* techniques work without drowning the practitioner in disconnected academic formalism.
+3. REMOVE TEMPLATE FLUFF: Discard any generic or mismatched template boilerplate from earlier drafts. Anchor 100% to '{subtopic_id}'.
+4. MERMAID DIAGRAMS & FORMATTING: Ensure all Mermaid diagrams use strict subgraph IDs (subgraph sub_id ["Title"]). Do NOT wrap output in outer ```markdown fences.
+5. COMPLETE REWRITE: Output the FULL, enhanced, publication-ready raw Markdown file starting directly with '# ...'. No preambles.
 
 ORIGINAL CONTENT:
 ```markdown

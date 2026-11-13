@@ -55,10 +55,11 @@ class DomainStrategy(ABC):
 
     def get_base_style_directive(self) -> str:
         return (
-            "CRITICAL STYLE MANDATE:\n"
+            "CRITICAL STYLE MANDATE: PRACTICALITY FIRST (80% Hands-On / 20% Theory):\n"
             "- Write in continuous, authoritative narrative textbook prose (MIT Press / O'Reilly style).\n"
-            "- AVOID superficial summaries or lazy bullet-point slide decks. Use rich, structured paragraphs.\n"
-            "- Build first-principles cause-and-effect reasoning explaining fundamental mechanisms and trade-offs.\n"
+            "- 80% Actionable Execution: Focus on real-world techniques, physical hand/tool mechanics, exact parameters, runnable code/manifests, and concrete practice routines.\n"
+            "- 20% First-Principles Intuition: Ground the practice in core theory/physics, but NEVER let abstract math, academic derivations, or disconnected scripts overshadow hands-on mastery.\n"
+            "- AVOID superficial summaries or lazy bullet-point slide decks. Use rich, structured, practitioner-first paragraphs.\n"
             "- All code, configurations, equations, and exercises must be complete with ZERO placeholders."
         )
 
