@@ -35,8 +35,8 @@ topics/**/sessions/
 topics/.workspace_sessions/
 
 # Runtime Database & State
-data/
-exports/
+/data/
+/exports/
 *.db
 *.db-journal
 *.db-wal
