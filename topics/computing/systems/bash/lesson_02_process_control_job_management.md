@@ -4,496 +4,1213 @@
 
 The Unix philosophy rests on a deceptively simple foundation: processes are isolated execution contexts, and the shell is itself a process orchestrator. To understand process control in Bash is to understand how the operating system mediates creation, lifecycle, and termination of concurrent work units. This lesson explores the mechanisms that make multitasking tractable and examines why signal handling—far from being a peripheral concern—is the central nervous system of robust shell programming.
 
-At the core lies a fundamental architectural invariant: every process occupies a unique position within a tree rooted at the kernel's init process (PID 1). When you invoke a command in your shell, the kernel does not magically spawn a new interpreter instance. Instead, the shell process (your login shell, typically PID around 1000–2000) calls the `fork()` system call, which duplicates its own memory image—copying the process descriptor, page tables, file descriptor table, and signal handlers—into a new child process. This child inherits an almost identical state to its parent, with one critical exception: the return value of `fork()` itself differs. In the parent, `fork()` returns the child's process ID (PID); in the child, it returns zero. This single datum allows the two processes to diverge: the parent can await the child's termination via `wait()`, while the child typically invokes `exec()` to replace its own memory image with a new program.
+Every process occupies a unique position within a tree rooted at the kernel's init process (PID 1). When you invoke a command in your shell, the kernel does not magically spawn a new interpreter instance. Instead, the shell process calls the `fork()` system call, which duplicates its own process image—copying the process descriptor, page tables, file descriptor table, and signal masks—into a new child process. The return value of `fork()` itself is the only point of divergence: in the parent, it returns the child's PID; in the child, it returns zero. This single datum allows the two processes to diverge: the parent can await the child's termination via `wait()`, while the child typically invokes `exec()` to replace its own memory image with a new program.
 
-This fork-exec model, standardized across all Unix systems, creates a profound separation of concerns. The shell does not need to understand or parse the internal structure of every possible command it might execute. Instead, it delegates responsibility to the program image itself, loaded by the kernel's ELF loader and initialized by libc. The shell's role is purely coordinative: create a process, set up its environment (working directory, file descriptors, signal masks), then either wait for completion or return control to the terminal.
+This fork-exec model, standardized across all POSIX-conforming systems, creates a profound separation of concerns. The shell does not need to understand the internal structure of every command it executes. Instead, it delegates responsibility to the program image itself, loaded by the kernel's ELF loader (on Linux) and initialized by the C runtime (libc). The shell's role is purely coordinative: create a process, set up its environment (working directory, file descriptors, signal masks, resource limits), then either wait for completion or return control to the terminal.
 
-Why must this be explicit? Why not have the shell simply call the command as a function? The answer is process isolation and resource management. Each process has its own virtual address space, protected by the Memory Management Unit (MMU) and enforced by page tables. When a process crashes—whether due to a segmentation fault, division by zero, or an infinite loop consuming memory—that failure cannot propagate to the shell itself. The process is quarantined. Furthermore, modern operating systems measure resource consumption per process: CPU time, memory footprint, number of open file descriptors, maximum file size. A runaway child cannot steal all the system's memory and bring down the shell. This isolation is not merely a convenience; it is a cornerstone of system stability.
+Why must this be explicit? Why not have the shell call a command as a function? The answer is process isolation and fault containment. Each process has its own virtual address space, protected by the Memory Management Unit (MMU) and enforced by per-process page tables in the kernel. When a process crashes—due to a segmentation fault, division by zero, or stack overflow—that failure cannot propagate to the shell. The process is quarantined at the hardware level. Furthermore, the kernel measures resource consumption per process: CPU time (via `RLIMIT_CPU`), memory footprint (via `RLIMIT_AS`), open file descriptors (via `RLIMIT_NOFILE`), and maximum file size (via `RLIMIT_FSIZE`). A runaway child consuming all available memory does not bring down the shell. This isolation is enforced by the hardware and OS, not merely by convention.
 
-The shell's job control system extends this isolation into a model of foreground and background execution. When you type a command and press Enter, that process ordinarily runs in the foreground: its standard input is connected to your terminal, its output appears on your screen, and the shell blocks (suspends itself) awaiting the process's exit. If you append an ampersand (`&`), the shell instead launches the process in the background: the child runs concurrently, and the shell immediately returns a prompt, ready for your next command. This shift from synchronous to asynchronous execution enables pipeline parallelism, allows long-running tasks to proceed while you continue interactive work, and forms the basis for sophisticated workflow management.
+The shell's job control system extends this isolation into a model of foreground and background execution. When you type a command and press Enter, that process runs in the foreground: its standard input is connected to the controlling terminal, its output appears on your screen, and the shell blocks awaiting the process's exit. Appending `&` causes the shell to launch the process in the background: the child runs concurrently, the shell prints a job number and PID, and immediately returns a prompt. This shift from synchronous to asynchronous execution enables pipeline parallelism and allows long-running tasks to proceed while you continue interactive work.
 
-Yet background processes introduce complexity. How does the shell track multiple children? What happens when a child exits while the shell is busy servicing a new foreground command? The kernel sends a `SIGCHLD` signal to the parent, notifying it that a child's state has changed. The shell's signal handler intercepts this notification, calls `waitpid()` to reap the child's exit status, and updates its internal job table. This asynchronous notification mechanism is essential: without it, the shell would need to poll repeatedly or block indefinitely. Instead, the kernel guarantees that the parent is notified the moment a child exits, allowing near-real-time synchronization.
+Background processes introduce a fundamental coordination problem. How does the shell track multiple children? The kernel sends a `SIGCHLD` signal to the parent whenever a child's state changes (exits, stops, or continues). The shell's `SIGCHLD` handler calls `waitpid()` with the `WNOHANG` flag to reap any terminated children without blocking, then updates its internal job table. Without this asynchronous notification mechanism, the shell would need to poll repeatedly or block indefinitely. The kernel guarantees delivery of `SIGCHLD` the moment a child transitions state, enabling near-real-time synchronization.
 
-Signals themselves deserve careful study. A signal is a software interrupt—a lightweight form of asynchronous notification delivered by the kernel to a process. When you press Ctrl+C at the terminal, the terminal driver sends a `SIGINT` signal to the foreground process group. This signal, by default, terminates the process. But the process can install a custom signal handler, allowing it to catch `SIGINT`, log diagnostics, perform cleanup, and then exit gracefully. Some signals cannot be caught (`SIGKILL`, `SIGSTOP`) because the kernel must guarantee the ability to forcibly terminate or suspend a process. Others are informational (`SIGUSR1`, `SIGUSR2`) and are typically ignored unless the program explicitly handles them. The signal model is a contract between kernel and process: the kernel promises to deliver signals reliably, and the process promises to handle them within bounded time.
+Signals are software interrupts—a lightweight form of asynchronous notification delivered by the kernel to a process. When you press Ctrl+C, the terminal driver sends `SIGINT` to the foreground process group. By default this terminates the process, but a process can install a custom signal handler to catch `SIGINT`, perform cleanup, and exit gracefully. Two signals are exceptions: `SIGKILL` (9) and `SIGSTOP` (19) cannot be caught, blocked, or ignored, because the kernel must retain the ability to forcibly terminate or suspend any process. The signal model is a contract between kernel and process: the kernel promises reliable delivery, and processes promise bounded handling time.
 
-Process substitution introduces another dimension. When you write `<(command)`, the shell creates a named pipe (FIFO) and launches the command in a subshell, redirecting its output to that pipe. From the perspective of the calling command, the FIFO appears as a file path; internally, it is a kernel buffer mediating communication between processes. This mechanism allows arbitrary commands to participate in streams that might otherwise require complex temporary files or shell control structures, exemplifying how the shell extends the Unix toolkit beyond the original fork-exec-wait trilogy.
+The process tree is a strict forest of directed trees, each rooted at PID 1 (or at a session leader). Parent-child relationships are established at `fork()` time and are immutable for the duration of a process's life. When a child exits but its parent has not yet called `wait()`, the child enters the zombie state: its process descriptor remains in the kernel's process table, holding the exit status and accumulated resource usage statistics, until the parent retrieves them. The kernel has a finite number of process table slots (controlled by `/proc/sys/kernel/pid_max` on Linux, default 32768 on older kernels, up to 4194304 on modern systems). Zombie accumulation is a real production failure mode. If a parent forks continuously without reaping, the process table fills, `fork()` returns `EAGAIN`, and the system cannot create new processes.
 
-The mathematical invariant underlying all of this is elegant: the process tree is a forest of directed acyclic graphs (DAGs), each with a single root (init or a session leader), and each non-root node has exactly one parent. Parent-child relationships are immutable during a process's lifetime. When a child exits but its parent has not yet called `wait()`, the child becomes a zombie—its process descriptor remains in the kernel's process table, holding its exit status for the parent to retrieve. The system has a finite pool of process table slots; zombie processes consume them. If a parent never calls `wait()` (or never sets up a `SIGCHLD` handler), zombies accumulate until the process table fills and the system can no longer create new processes. This is not a theoretical edge case; it is a real failure mode that has crashed production systems.
+```mermaid
+graph TD
+    PID1["PID 1: init/systemd<br/>(Session 0)"]
+    LOGIN["PID 847: login<br/>(Session 1 Leader)"]
+    SHELL["PID 1024: bash<br/>(Foreground Shell)"]
+    FG["PID 1025: ls -la<br/>(Foreground Job, PGID 1025)"]
+    BG1["PID 1026: curl -O ...<br/>(Background Job 1, PGID 1026)"]
+    BG2["PID 1027: curl -O ...<br/>(Background Job 2, PGID 1027)"]
+    PIPE1["PID 1028: cat file.txt<br/>(Pipeline, PGID 1028)"]
+    PIPE2["PID 1029: grep pattern<br/>(Pipeline, PGID 1028)"]
+    PIPE3["PID 1030: wc -l<br/>(Pipeline, PGID 1028)"]
+    ZOMBIE["PID 1031: [defunct]<br/>(Zombie: exited, not reaped)"]
+
+    PID1 --> LOGIN
+    LOGIN --> SHELL
+    SHELL --> FG
+    SHELL --> BG1
+    SHELL --> BG2
+    SHELL --> PIPE1
+    PIPE1 -->|"pipe fd"| PIPE2
+    PIPE2 -->|"pipe fd"| PIPE3
+    SHELL --> ZOMBIE
+
+    style ZOMBIE fill:#ff6b6b,color:#fff
+    style PID1 fill:#4a90d9,color:#fff
+    style SHELL fill:#5ba85a,color:#fff
+```
+
+---
 
 ## 2. Core Architecture & Mechanics
 
 ### 2.1 The Fork-Exec Model in Depth
 
-The fork-exec sequence is the heartbeat of process creation in Unix. When you type `ls -la /tmp` and press Enter, the following sequence occurs:
+When you type `ls -la /tmp` and press Enter, the following sequence occurs at the system call level:
 
-First, the shell receives the command line from the terminal driver and parses it into tokens: `ls`, `-la`, and `/tmp`. It searches for the executable `ls` by iterating through directories in the `PATH` environment variable, eventually locating `/bin/ls`. The shell then calls `fork()`, which creates an identical copy of the shell process. At this point, two processes exist: the original shell and its child. The kernel returns a unique PID to each. The parent receives the child's PID as the return value of `fork()`; the child receives zero.
+1. The shell receives the command line from the terminal driver and parses it into an argument vector: `["ls", "-la", "/tmp", NULL]`. It resolves the executable by iterating through `PATH` entries, using `access(2)` or `stat(2)` to test for execute permission, eventually finding `/usr/bin/ls`.
 
-The child process, now running a copy of the shell code, detects that `fork()` returned zero and knows it is the child. It performs any necessary setup: redirecting file descriptors, setting the working directory, clearing or installing signal handlers, and adjusting resource limits. Then it calls `exec()` (typically via `execvp()` in C, which searches `PATH`). The `exec()` call is remarkable: it does not create a new process. Instead, it replaces the calling process's memory image—its code, data, heap, and stack—with the contents of the executable file. The process ID remains unchanged; the parent-child relationship is preserved. Only the program being executed changes.
+2. The shell calls `fork(2)`. The kernel allocates a new process descriptor (`task_struct` in Linux), copies the parent's page directory, marks all writable pages in both parent and child as copy-on-write (COW), duplicates the file descriptor table, inherits the parent's signal mask, and returns the new PID to the parent and 0 to the child. On a modern x86-64 Linux system, `fork()` is implemented via the `clone(2)` syscall with specific flags.
 
-The parent shell, which also received the return value from `fork()`, now knows the child's PID. In a foreground context, the parent calls `waitpid(child_pid, &status, 0)`, blocking until the child terminates. When `ls` completes and exits, the kernel transitions the child process to a zombie state (technically, the `TASK_ZOMBIE` state in the kernel's process descriptor) and sends a `SIGCHLD` signal to the parent. The blocked `waitpid()` call returns, providing the child's exit status in the `status` variable. The parent reads this status, updates its job table, prints a new prompt, and is ready for the next command.
+3. The child process detects `fork()` returned 0, performs setup (redirections, `setpgid(2)`, `setsid(2)` if needed, closing file descriptors marked `FD_CLOEXEC`), then calls `execve(2)` with the resolved path, argument vector, and environment. `execve()` replaces the process's memory image entirely: the kernel loads the ELF binary, maps its segments into virtual address space, initializes the stack with `argc`, `argv`, and `envp`, and transfers control to the ELF interpreter (`ld-linux.so`) or directly to `_start`. The PID is preserved; the program changes.
 
-This sequence relies on several invariants:
+4. The parent receives the child's PID from `fork()`. In a foreground context, it calls `waitpid(child_pid, &status, 0)`, which blocks until the child exits. When `ls` calls `exit(3)` (or returns from `main()`), the kernel sends `SIGCHLD` to the parent and transitions the child to zombie state. The blocked `waitpid()` returns, and the shell decodes the status with `WIFEXITED(status)`, `WEXITSTATUS(status)`, or `WIFSIGNALED(status)`.
 
-The child's virtual address space is initially identical to the parent's. This is cheap to implement because modern Unix systems use copy-on-write (COW) semantics: the kernel does not physically copy all memory pages. Instead, it creates new page table entries pointing to the same physical pages, marking them read-only. Only when the child (or parent) modifies a page does the kernel trigger a page fault, allocate a new physical page, copy the contents, and update the page tables. For short-lived processes that immediately call `exec()`, the child never modifies its inherited memory, so no copying occurs.
+The COW optimization makes `fork()` cheap for the common case of an immediately-following `exec()`. The child never dirtys any inherited page, so no physical copying occurs. The overhead is only the kernel data structures (process descriptor, page tables, file descriptor table)—typically a few microseconds on modern hardware.
 
-File descriptors are inherited by the child, with the exception of those marked with the `FD_CLOEXEC` flag. This allows the parent to set up redirections (e.g., connecting `stdout` to a pipe or file) before calling `exec()`. The child's `exec()` call replaces the program image but preserves the file descriptors, so the new program inherits the redirections automatically.
+File descriptors are inherited across `fork()` unless marked `FD_CLOEXEC` (or `O_CLOEXEC` at open time), which causes them to be automatically closed in the child when `execve()` is called. This is the correct default for file descriptors the child should not inherit (sockets, log files, etc.) and the mechanism by which the shell sets up redirections: it opens the target file, duplicates it onto stdout using `dup2(2)`, then `exec()`s the command. The new program inherits the redirected stdout without knowing about it.
 
-Signal handlers are reset to their default disposition in the child, while signal masks are inherited. This prevents the child from accidentally triggering the parent's signal handlers; it forces the child to opt into custom signal handling if needed.
+Signal handlers installed by the parent are reset to `SIG_DFL` in the child after `execve()`, because the handler function pointers point into the old program's address space, which no longer exists. Signal masks, however, are inherited across both `fork()` and `exec()`. This means if a parent has blocked `SIGTERM`, the child also blocks `SIGTERM` after `exec()`. Programs that might be launched with an unexpected signal mask should call `sigprocmask(2)` early in `main()` to reset it. This is a subtle and frequently overlooked source of bugs.
 
-### 2.2 Job Control and Process Groups
+The following C program demonstrates the fork-exec sequence at the system call level, illustrating the control flow both parent and child execute:
 
-Foreground and background processes are managed through job control, a mechanism that groups processes into units that can be suspended, resumed, or terminated as a single entity. The kernel maintains a process group ID (PGID) for each process. All processes in the same process group receive the same signals (e.g., `SIGINT` from Ctrl+C) when the signal is sent to the process group rather than a single process.
+```c
+/*
+ * fork_exec_demo.c — illustrates the fork-exec-wait sequence
+ * Compile: gcc -Wall -Wextra -o fork_exec_demo fork_exec_demo.c
+ */
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
 
-When the shell creates a new job, it assigns the child process (and any processes it spawns via pipes) to a new process group. For a simple command like `ls -la /tmp`, the shell creates a single process in a new process group, waits for it to complete, and returns. For a pipeline like `cat file.txt | grep pattern | wc -l`, the shell creates three processes—one for each command—and places them all in the same process group. When any of these processes terminates naturally, the shell reaps it via `waitpid()`. If the user presses Ctrl+C, the terminal driver sends `SIGINT` to the entire process group, and all three processes receive the signal simultaneously (unless they have custom handlers). This ensures that pipelines terminate cohesively.
+static void decode_status(pid_t pid, int status) {
+    if (WIFEXITED(status)) {
+        printf("[parent] child PID %d exited normally with status %d\n",
+               pid, WEXITSTATUS(status));
+    } else if (WIFSIGNALED(status)) {
+        printf("[parent] child PID %d killed by signal %d (%s)%s\n",
+               pid, WTERMSIG(status), strsignal(WTERMSIG(status)),
+               WCOREDUMP(status) ? " (core dumped)" : "");
+    } else if (WIFSTOPPED(status)) {
+        printf("[parent] child PID %d stopped by signal %d\n",
+               pid, WSTOPSIG(status));
+    }
+}
 
-Background jobs are handled similarly, except the shell does not call `waitpid()` immediately. Instead, it registers the job in an internal table, prints a job number and PID, and returns the prompt. The shell's main loop now handles two types of events: user input from the terminal, and `SIGCHLD` signals from background children. When `SIGCHLD` arrives, the shell's signal handler calls `waitpid(-1, &status, WNOHANG)`, which reaps all terminated children without blocking. The `-1` means "any child process," and `WNOHANG` means "do not block if no children have terminated." The shell updates its job table, marking the job as done or stopped.
+int main(void) {
+    char *const argv[] = { "ls", "-la", "/tmp", NULL };
+    char *const envp[] = { NULL };  /* minimal environment */
 
-The `jobs` builtin command lists all known jobs, and the `fg` and `bg` builtins move jobs between foreground and background. When you type `fg %1`, the shell sends `SIGCONT` to the process group associated with job 1, resuming it if it was stopped, and then calls `waitpid()` to block until it completes. When you type `bg %1`, the shell sends `SIGCONT` to resume the job but does not block; the job continues in the background.
+    printf("[parent] shell PID = %d, calling fork()\n", getpid());
 
-### 2.3 Signals: The Nervous System
+    pid_t child = fork();
+    if (child < 0) {
+        perror("fork");
+        return EXIT_FAILURE;
+    }
 
-Signals are the kernel's primary mechanism for asynchronous communication with processes. A process receives a signal while executing arbitrary code; the kernel interrupts execution, delivers the signal, and—depending on the signal's disposition—either terminates the process, stops it, continues it, or invokes a custom handler. This model is elegant but requires care: signal handlers must be short, reentrant (safe to call while the main program is in any state), and use only async-signal-safe functions.
+    if (child == 0) {
+        /*
+         * Child path.
+         * PID unchanged, but we are now a distinct process.
+         * Set up the process group so the child is its own leader.
+         */
+        printf("[child]  PID = %d, PPID = %d, calling execve()\n",
+               getpid(), getppid());
 
-The standard signals most relevant to shell programming are:
+        if (setpgid(0, 0) < 0) {         /* become process group leader */
+            perror("setpgid");
+            _exit(EXIT_FAILURE);          /* _exit, not exit: avoid flushing parent's stdio buffers */
+        }
 
-`SIGTERM` (15): A request to terminate. This is the default signal sent by `kill pid`. A process should handle this gracefully by cleaning up resources and exiting.
+        execve("/usr/bin/ls", argv, envp);
+        /*
+         * execve() only returns on error. Use _exit() here, not exit(),
+         * to avoid running atexit() handlers registered by the parent.
+         */
+        perror("execve");
+        _exit(127);                       /* 127 = "command not found" convention */
+    }
 
-`SIGKILL` (9): An unconditional termination order. This signal cannot be caught, blocked, or ignored. The kernel terminates the process immediately. Use this only when `SIGTERM` is ineffective.
+    /*
+     * Parent path.
+     * child holds the new process's PID.
+     */
+    printf("[parent] forked child PID = %d, calling waitpid()\n", child);
 
-`SIGINT` (2): Interrupt from the terminal, typically triggered by Ctrl+C. The default action is to terminate the process. Custom handlers can use this to trigger cleanup routines before exit.
+    int status;
+    pid_t reaped;
+    do {
+        reaped = waitpid(child, &status, 0);
+    } while (reaped < 0 && errno == EINTR);  /* retry on signal interruption */
 
-`SIGSTOP` (19): An unconditional stop order. This signal cannot be caught or ignored. The kernel suspends the process. The process resumes when it receives `SIGCONT`.
+    if (reaped < 0) {
+        perror("waitpid");
+        return EXIT_FAILURE;
+    }
 
-`SIGCONT` (18): Continue a stopped process. If a process is not stopped, this signal is ignored.
-
-`SIGCHLD` (17): Notification that a child process has changed state (exited, stopped, or continued). The default action is to ignore this signal, but interactive shells install a custom handler to reap child processes.
-
-`SIGUSR1` (10) and `SIGUSR2` (12): User-defined signals. These are application-specific and are typically ignored unless the program installs a handler.
-
-`SIGHUP` (1): Hang-up signal, traditionally sent when a terminal connection is lost. Interactive shells interpret this as a request to exit, while daemon processes might use it to signal a configuration reload.
-
-The behavior of a signal is determined by its disposition, which can be set via the `signal()` or `sigaction()` system call. Each process maintains a signal disposition table (part of its process descriptor) and a signal mask—a set of signals currently blocked. When a signal is generated, the kernel checks if the signal is in the mask; if so, the signal is queued (pending) and not delivered until the mask is cleared. If not masked, the kernel suspends the process, saves its current state, and invokes the signal handler (if one is installed) or performs the default action (usually termination).
-
-In Bash, the builtin command `trap` installs custom signal handlers. The syntax `trap 'command' SIGNAL` registers `command` to be executed whenever `SIGNAL` is delivered to the shell. For example:
-
-```bash
-trap 'echo "Caught SIGINT"; exit 1' SIGINT
+    decode_status(reaped, status);
+    return EXIT_SUCCESS;
+}
 ```
 
-This handler catches `SIGINT` (Ctrl+C), prints a message, and exits with status 1. The handler is executed by the shell's main loop after the signal is received; it is not invoked from arbitrary code, so it can safely call any Bash builtin or command.
+The key detail above is `_exit()` vs `exit()` in the child. After `fork()`, the child inherits the parent's stdio buffers. If the child calls `exit()`, it flushes those buffers, potentially writing the parent's buffered output twice. `_exit()` terminates without flushing, which is correct in a child that will `exec()` or immediately terminate.
 
-### 2.4 Process Substitution and FIFOs
+```mermaid
+sequenceDiagram
+    participant T as Terminal Driver
+    participant SH as Shell (PID 1024)
+    participant K as Kernel
+    participant CH as Child (PID 1025)
 
-Process substitution, a Bash extension, allows you to use command output as a file. The syntax `<(command)` creates a named pipe (FIFO) and spawns `command` in a subshell, redirecting its output to the FIFO. The shell expands `<(command)` to the path of the FIFO (e.g., `/dev/fd/63`), which you can pass to any command expecting a file path.
+    T->>SH: "ls -la /tmp\n" (read(2) returns)
+    SH->>SH: parse tokens; resolve /usr/bin/ls via PATH
+    SH->>K: fork()
+    K-->>SH: returns 1025 (child PID)
+    K-->>CH: returns 0 (child path)
+    CH->>K: setpgid(0,0)
+    CH->>K: execve("/usr/bin/ls", [...], [...])
+    K-->>CH: maps ELF, transfers control to _start
+    SH->>K: waitpid(1025, &status, 0) — blocks
+    CH->>K: exit(0)
+    K->>K: child → TASK_ZOMBIE; sends SIGCHLD to PID 1024
+    K-->>SH: waitpid returns, status = 0
+    SH->>SH: WEXITSTATUS(status) = 0; print prompt
+```
 
-Consider this example:
+### 2.2 Job Control, Process Groups, and Sessions
+
+Job control is built on three kernel abstractions: **process groups**, **sessions**, and the **controlling terminal**.
+
+A **session** is a collection of process groups created by a single login. The session is identified by a session ID (SID), which equals the PID of the session leader—the first process to call `setsid(2)`. Each session has at most one controlling terminal. The shell process is the session leader for interactive logins.
+
+A **process group** is a set of processes that share a process group ID (PGID). Every process belongs to exactly one process group. Process groups are the unit of terminal signal delivery: `SIGINT` from Ctrl+C is sent to the **foreground process group** of the controlling terminal, not to a single PID.
+
+When the shell creates a pipeline `cmd1 | cmd2 | cmd3`, it forks three children and calls `setpgid(child_pid, first_child_pid)` for each, placing all three in the same new process group (whose PGID equals the PID of `cmd1`). The shell then calls `tcsetpgrp(2)` to make this new process group the foreground process group of the terminal. Now, Ctrl+C sends `SIGINT` to all three pipeline members simultaneously, ensuring the pipeline terminates atomically.
+
+```mermaid
+graph LR
+    subgraph "Session SID=1024"
+        subgraph "Shell Process Group PGID=1024"
+            SH["bash PID=1024"]
+        end
+        subgraph "Foreground Pipeline PGID=1025"
+            P1["cat PID=1025"]
+            P2["grep PID=1026"]
+            P3["wc PID=1027"]
+            P1 -->|"pipe[0]"| P2
+            P2 -->|"pipe[0]"| P3
+        end
+        subgraph "Background Job PGID=1028"
+            BG["find PID=1028"]
+        end
+    end
+    TERM["Controlling Terminal /dev/pts/0"]
+    TERM -->|"SIGINT → foreground PGID=1025"| P1
+    TERM -->|"SIGINT → foreground PGID=1025"| P2
+    TERM -->|"SIGINT → foreground PGID=1025"| P3
+    SH -.->|"tcsetpgrp sets foreground"| TERM
+```
+
+Background jobs are launched without calling `tcsetpgrp()`—the shell retains the terminal's foreground process group. The background process group receives no terminal-generated signals. If a background process attempts to `read(2)` from the terminal, the kernel sends it `SIGTTIN`, which by default stops the process. Similarly, background writes to the terminal generate `SIGTTOU` if the terminal's `TOSTOP` flag is set (it usually is not by default, so background writes typically succeed).
+
+The `jobs` builtin reports the shell's internal job table. The `fg %n` and `bg %n` builtins move jobs between foreground and background by calling `tcsetpgrp()` and `kill(-pgid, SIGCONT)`. The `-n` syntax refers to job number; `%n` is a job specification. Additional specifications include `%string` (job whose command begins with `string`), `%?string` (job containing `string`), `%%` or `%+` (current job), and `%-` (previous job).
+
+### 2.3 Signals: Architecture and POSIX Semantics
+
+A signal is a small integer notification sent by the kernel to a process (or process group). Signals are defined in `<signal.h>` and standardized by POSIX. Each signal has a default disposition: terminate, core dump, stop, continue, or ignore. A process can override the disposition for most signals using `sigaction(2)`, which is the POSIX-correct replacement for the older and less reliable `signal(2)`.
+
+The table below lists signals essential to shell programming, with their standard numbers on Linux x86-64:
+
+| Signal | Number | Default Action | Catchable | Description |
+|--------|--------|---------------|-----------|-------------|
+| `SIGHUP` | 1 | Terminate | Yes | Controlling terminal closed; daemon reload convention |
+| `SIGINT` | 2 | Terminate | Yes | Keyboard interrupt (Ctrl+C) |
+| `SIGQUIT` | 3 | Core dump | Yes | Keyboard quit (Ctrl+\\) |
+| `SIGILL` | 4 | Core dump | Yes | Illegal instruction |
+| `SIGTRAP` | 5 | Core dump | Yes | Trace/breakpoint trap |
+| `SIGABRT` | 6 | Core dump | Yes | `abort(3)` called |
+| `SIGFPE` | 8 | Core dump | Yes | Floating-point exception |
+| `SIGKILL` | 9 | Terminate | **No** | Unconditional kill |
+| `SIGSEGV` | 11 | Core dump | Yes | Segmentation violation |
+| `SIGPIPE` | 13 | Terminate | Yes | Broken pipe (write to closed reader) |
+| `SIGALRM` | 14 | Terminate | Yes | `alarm(2)` timer expired |
+| `SIGTERM` | 15 | Terminate | Yes | Polite termination request |
+| `SIGCHLD` | 17 | Ignore | Yes | Child state changed |
+| `SIGCONT` | 18 | Continue | Yes | Continue if stopped |
+| `SIGSTOP` | 19 | Stop | **No** | Unconditional stop |
+| `SIGTSTP` | 20 | Stop | Yes | Keyboard stop (Ctrl+Z) |
+| `SIGTTIN` | 21 | Stop | Yes | Background read from terminal |
+| `SIGTTOU` | 22 | Stop | Yes | Background write to terminal |
+| `SIGURG` | 23 | Ignore | Yes | Urgent data on socket |
+| `SIGUSR1` | 10 | Terminate | Yes | User-defined signal 1 |
+| `SIGUSR2` | 12 | Terminate | Yes | User-defined signal 2 |
+| `SIGWINCH` | 28 | Ignore | Yes | Terminal window size changed |
+
+**Signal numbers are architecture-dependent.** The table above is for Linux x86-64. On Linux ARM64, `SIGCHLD`=17 and `SIGCONT`=18 happen to be the same, but `SIGSTKFLT` (16) and others differ. On macOS (Darwin), `SIGUSR1`=30, `SIGUSR2`=31, and `SIGCHLD`=20. Never hardcode signal numbers; use the symbolic names.
+
+The kernel maintains per-process signal state in two 64-bit bitmasks (on Linux): a **pending set** (`sigpending`) and a **blocked set** (the signal mask, `sigmask`). When a signal is generated, the kernel sets the corresponding bit in `sigpending`. When delivering signals, the kernel checks `sigpending & ~sigmask`; any set bit represents a signal to deliver. Standard (non-real-time) signals are not queued—if the same signal arrives twice while blocked, only one delivery occurs when the mask is cleared. POSIX real-time signals (`SIGRTMIN` through `SIGRTMAX`) are queued.
+
+Signal handlers in C must only call **async-signal-safe** functions—a subset of the POSIX interface that is safe to call from a signal handler even if the main program was interrupted mid-library-call. The definitive list is in `signal-safety(7)`. Notably absent from the safe list: `printf`, `malloc`, `free`, `fopen`, `syslog`. Present: `write(2)`, `read(2)`, `kill(2)`, `_exit(2)`, `sem_post(3)`. The canonical technique for communicating from a signal handler to the main program is writing a single byte to a **self-pipe** (a pipe created by the process, with the read end monitored by `select`/`poll`/`epoll`) or setting a `volatile sig_atomic_t` flag that the main loop checks.
+
+```c
+/*
+ * self_pipe_signal.c — async-safe signal notification via self-pipe trick
+ * Compile: gcc -Wall -Wextra -o self_pipe_signal self_pipe_signal.c
+ */
+#define _POSIX_C_SOURCE 200809L
+#include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <fcntl.h>
+
+static int signal_pipe[2];  /* [0]=read end, [1]=write end */
+
+/*
+ * Signal handler: only write(2) is called — async-signal-safe per POSIX.
+ * The single byte written is the signal number for disambiguation.
+ */
+static void signal_handler(int signo) {
+    unsigned char byte = (unsigned char)signo;
+    ssize_t n;
+    do {
+        n = write(signal_pipe[1], &byte, 1);
+    } while (n < 0 && errno == EINTR);
+    /* Silently drop if pipe is full — ring buffer in main loop handles this */
+}
+
+static void set_nonblocking(int fd) {
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags < 0) { perror("fcntl F_GETFL"); exit(EXIT_FAILURE); }
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+        perror("fcntl F_SETFL"); exit(EXIT_FAILURE);
+    }
+}
+
+int main(void) {
+    if (pipe(signal_pipe) < 0) { perror("pipe"); return EXIT_FAILURE; }
+    set_nonblocking(signal_pipe[0]);
+    set_nonblocking(signal_pipe[1]);
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof sa);
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;  /* restart interrupted syscalls where possible */
+
+    sigaction(SIGINT,  &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGUSR1, &sa, NULL);
+
+    printf("PID %d: waiting for signals (send SIGUSR1, SIGINT, or SIGTERM)\n",
+           getpid());
+
+    struct pollfd pfd = { .fd = signal_pipe[0], .events = POLLIN };
+
+    for (;;) {
+        int ret = poll(&pfd, 1, 5000);  /* 5-second timeout */
+        if (ret < 0) {
+            if (errno == EINTR) continue;
+            perror("poll"); break;
+        }
+        if (ret == 0) {
+            printf("(heartbeat — no signals in 5s)\n");
+            continue;
+        }
+
+        unsigned char signo;
+        ssize_t n = read(signal_pipe[0], &signo, 1);
+        if (n < 0 && errno == EAGAIN) continue;
+        if (n <= 0) break;
+
+        printf("Received signal %d (%s)\n", signo, strsignal(signo));
+        if (signo == SIGTERM || signo == SIGINT) {
+            printf("Exiting gracefully.\n");
+            break;
+        }
+    }
+
+    close(signal_pipe[0]);
+    close(signal_pipe[1]);
+    return EXIT_SUCCESS;
+}
+```
+
+In Bash, `trap` provides a simplified signal model. The shell runs trap commands synchronously between commands (not asynchronously mid-execution), so they are inherently safe to use arbitrary shell constructs:
 
 ```bash
+trap 'echo "Caught SIGINT"; exit 1' INT
+trap 'echo "Caught SIGTERM"; exit 1' TERM
+trap 'echo "Caught SIGCHLD"' CHLD
+```
+
+Note: Bash uses signal names without the `SIG` prefix in `trap` arguments. Both forms work (`SIGINT` and `INT`), but the short form is conventional.
+
+### 2.4 Process Substitution and Named Pipes
+
+Process substitution (`<(cmd)` and `>(cmd)`) is a Bash/ksh/zsh extension; it is not in POSIX `sh`. It works through one of two mechanisms depending on the system:
+
+On Linux, Bash uses `/dev/fd/N` paths backed by anonymous pipes (not named FIFOs). It creates a pipe with `pipe(2)`, forks a subshell, connects the subshell's stdout (for `<(cmd)`) or stdin (for `>(cmd)`) to one end of the pipe, and returns the string `/dev/fd/N` where `N` is the file descriptor number of the other end. This is an anonymous pipe (exists only in the kernel's file descriptor table), not a persistent named FIFO.
+
+On macOS and older systems without `/dev/fd`, Bash falls back to actual named FIFOs created in `/tmp` or `/var/tmp`. The behavioral difference is subtle but matters for programs that call `stat(2)` on the path: on Linux, `stat("/dev/fd/63")` returns a stat for a pipe; on macOS with real FIFOs, it returns a stat for a FIFO (`S_ISFIFO`).
+
+```bash
+# On Linux: /dev/fd/63 is a symlink to a pipe
+$ ls -la /dev/fd/
+lrwx------ 1 user user 64 ... 63 -> pipe:[12345678]
+
+# The expansion:
+$ echo <(cat /dev/null)
+/dev/fd/63
+```
+
+The deadlock risk with FIFOs is real and deserves precise description. A FIFO write blocks when the buffer is full (default 65536 bytes on Linux, since kernel 2.6.11; was 4096 previously, configurable via `fcntl(F_SETPIPE_SZ)`). A deadlock occurs when two processes each block waiting for the other to drain their respective FIFOs. This cannot happen with a single process substitution because only one FIFO is in play. It can happen with nested process substitutions or with `>(cmd)` on the write side if the reader blocks before the writer finishes.
+
+```bash
+# SAFE: parallel readers, independent FIFOs
 diff <(sort file1.txt) <(sort file2.txt)
+
+# POTENTIAL ISSUE: deeply nested, single writer chain
+# Avoid; use explicit temp files for >100MB data sets
+diff <(sort <(cat file1.txt | tr a-z A-Z)) <(sort file2.txt)
 ```
 
-The shell creates two FIFOs and spawns two subshells: one sorts `file1.txt` and writes to the first FIFO, the other sorts `file2.txt` and writes to the second FIFO. The `diff` command receives the paths to these FIFOs and reads from them as if they were regular files. When `diff` closes a FIFO, the corresponding subshell's output end also closes, causing the subshell to terminate. When both subshells are done, the FIFOs are cleaned up.
+The `>(cmd)` form (process substitution for input) is less commonly used but powerful for tee-like patterns:
 
-This mechanism avoids the need for temporary files and allows natural composition of commands that do not support pipes natively. For instance, `diff` expects two file paths; without process substitution, you would need to write the output of each sort to a temporary file, invoke `diff`, and then clean up the temporary files. Process substitution handles all of this transparently.
-
-Internally, a FIFO is a kernel buffer that mediates communication between a writer and readers. Unlike regular pipes, which are created on demand and exist only during the lifetime of the processes using them, FIFOs persist in the file system (until explicitly deleted with `rm`) and can be opened by unrelated processes. However, Bash's process substitution uses the `/dev/fd` pseudo-filesystem, which provides dynamically created file descriptors as paths; these FIFOs are automatically cleaned up when the processes exit.
-
-### 2.5 Process State Transitions
-
-A process transitions through several states during its lifetime:
-
-```
-Running -> Blocked (waiting for I/O or a system call)
-Blocked -> Running (I/O completes or system call returns)
-Running -> Stopped (receives SIGSTOP or is traced)
-Stopped -> Running (receives SIGCONT)
-Running -> Zombie (process exits; parent has not yet called wait)
-Zombie -> Reaped (parent calls waitpid)
+```bash
+# Write to two sinks simultaneously
+tee >(gzip > archive.gz) >(wc -l > line_count.txt) > /dev/null < input.txt
 ```
 
-When a process exits (or is terminated by a signal), it transitions to the zombie state. The kernel keeps the process descriptor in memory, storing the exit status and resource usage, until the parent calls `waitpid()` to retrieve this information. If the parent dies before calling `waitpid()`, the process is adopted by init, which periodically reaps all orphaned children. A process in the zombie state consumes minimal resources (just the kernel memory for its descriptor), but accumulation of many zombies can prevent new process creation.
+### 2.5 Process State Machine
 
-The `ps` command displays process state using single-letter codes: `R` for running, `S` for sleeping (blocked on I/O), `T` for stopped, `Z` for zombie, and `D` for disk sleep (blocked on uninterruptible I/O, typically disk operations). Observing these states helps diagnose process management issues.
+A process transitions through a well-defined set of kernel states. On Linux, these are defined in `include/linux/sched.h` as `task_state_array`. The states visible via `ps` are:
+
+```
+R — TASK_RUNNING: on a CPU or on the run queue, ready to run
+S — TASK_INTERRUPTIBLE: sleeping, woken by signal or event
+D — TASK_UNINTERRUPTIBLE: sleeping in uninterruptible I/O (cannot be killed with SIGKILL)
+T — TASK_STOPPED: stopped by SIGSTOP or SIGTSTP, or by a debugger via ptrace
+t — TASK_TRACED (Linux): stopped by debugger (ptrace)
+Z — TASK_ZOMBIE (EXIT_ZOMBIE): exited, waiting for parent waitpid()
+X — EXIT_DEAD: being removed from process table (transient, rarely seen)
+I — TASK_IDLE: idle kernel thread (Linux 4.14+)
+```
+
+The `D` state deserves special attention: a process in `D` state cannot be killed because it is in the middle of a kernel operation that must complete (typically a synchronous disk I/O). `SIGKILL` is queued but not delivered until the process exits the `D` state. If a disk is unreachable (NFS timeout, failing hardware), a process can be stuck in `D` state indefinitely. This is a hardware-level issue; no amount of signaling resolves it.
+
+```mermaid
+stateDiagram-v2
+    [*] --> R : fork() + exec()
+    R --> S : wait for I/O or event (interruptible sleep)
+    R --> D : wait for I/O (uninterruptible sleep)
+    S --> R : I/O complete or signal received
+    D --> R : I/O complete (SIGKILL queued but not delivered in D)
+    R --> T : SIGSTOP or SIGTSTP or ptrace attach
+    T --> R : SIGCONT received
+    S --> T : SIGSTOP or SIGTSTP
+    R --> Z : exit() called or fatal signal
+    Z --> [*] : parent calls waitpid() — process table entry freed
+
+    note right of D : Cannot be killed.\nMust wait for kernel.\nTypically disk/NFS I/O.
+    note right of Z : PCB preserved.\nConsumes PID slot.\nParent must reap.
+```
+
+---
 
 ## 3. Practical Patterns and Idioms
 
 ### 3.1 Waiting for Multiple Background Jobs
 
-A common pattern is launching multiple background jobs and waiting for all to complete:
+The basic pattern for parallel execution with barrier synchronization:
 
 ```bash
-#!/bin/bash
-# Download multiple files in parallel
-for url in https://example.com/file1 https://example.com/file2 https://example.com/file3; do
-    curl -O "$url" &
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Download multiple files in parallel, capturing per-job exit status
+declare -a pids=()
+declare -A pid_to_url
+
+urls=(
+    "https://example.com/file1.tar.gz"
+    "https://example.com/file2.tar.gz"
+    "https://example.com/file3.tar.gz"
+)
+
+for url in "${urls[@]}"; do
+    curl --silent --show-error --retry 3 --retry-delay 2 -O "$url" &
+    pid=$!
+    pids+=("$pid")
+    pid_to_url[$pid]="$url"
+    echo "Launched download for $url (PID $pid)"
 done
 
-# Wait for all background jobs to complete
-wait
-```
-
-The `wait` builtin, called without arguments, blocks until all background children have exited. The shell's `SIGCHLD` handler reaps each child as it terminates, and `wait` returns once the last one is reaped. This is simpler than manually tracking PIDs or invoking `waitpid()` in a loop.
-
-If you need to capture the exit status of individual jobs, you can collect PIDs and wait for each explicitly:
-
-```bash
-#!/bin/bash
-pids=()
-for url in https://example.com/file1 https://example.com/file2 https://example.com/file3; do
-    curl -O "$url" &
-    pids+=($!)
-done
-
-# Wait for each job and check its exit status
+# Barrier: wait for each job and report per-URL status
+failed=0
 for pid in "${pids[@]}"; do
     if wait "$pid"; then
-        echo "PID $pid succeeded"
+        echo "OK:   ${pid_to_url[$pid]}"
     else
-        echo "PID $pid failed with status $?"
+        status=$?
+        echo "FAIL: ${pid_to_url[$pid]} (exit status $status)" >&2
+        ((failed++)) || true
     fi
 done
+
+if ((failed > 0)); then
+    echo "$failed download(s) failed" >&2
+    exit 1
+fi
 ```
 
-Here, `$!` expands to the PID of the last background job. Each `wait` call blocks until the specified PID terminates and returns the exit status. The `if` statement checks whether the exit status was zero (success) and prints accordingly.
+`$!` expands to the PID of the most recently backgrounded asynchronous command. `wait PID` returns the exit status of that specific child, blocking until it terminates. Calling `wait` without arguments waits for all current background children and returns the exit status of the last one to finish—useful for simple fan-out patterns but insufficient when you need per-job status.
 
-### 3.2 Graceful Shutdown with Signal Handling
+**`wait -n` (Bash 4.3+):** waits for any single background job to complete and returns its exit status. This is the primitive needed for a bounded worker pool. Note that `wait -n` returns the exit status of the job that completed, but does not tell you *which* PID completed—you must use `jobs -p` or the `$!` trick to reconcile.
 
-Production scripts often need to clean up resources—temporary files, database connections, child processes—when interrupted. A robust pattern is:
+**`wait -f PID` (Bash 5.1+):** waits until PID terminates even if the shell is not its direct parent (e.g., the job was started by a subshell and disowned). This is rarely needed in practice.
+
+### 3.2 Bounded Parallel Worker Pool
+
+`wait -n` enables a worker pool that keeps exactly `N` jobs running at all times:
 
 ```bash
-#!/bin/bash
-set -o pipefail
+#!/usr/bin/env bash
+# worker_pool.sh — process a list of items with bounded parallelism
+set -euo pipefail
 
-# Array to track background PIDs
-child_pids=()
+readonly MAX_JOBS=${1:-4}
+readonly INPUT_DIR=${2:-/data/input}
 
-cleanup() {
-    echo "Shutting down gracefully..."
-    for pid in "${child_pids[@]}"; do
-        if kill -0 "$pid" 2>/dev/null; then
-            echo "Terminating PID $pid..."
-            kill -TERM "$pid"
-        fi
-    done
-    
-    # Wait for children to exit, with a timeout
-    for i in {1..30}; do
-        remaining=0
-        for pid in "${child_pids[@]}"; do
-            if kill -0 "$pid" 2>/dev/null; then
-                remaining=$((remaining + 1))
-            fi
-        done
-        if [ $remaining -eq 0 ]; then
-            break
-        fi
-        sleep 0.1
-    done
-    
-    # Force-kill any stragglers
-    for pid in "${child_pids[@]}"; do
-        kill -9 "$pid" 2>/dev/null || true
-    done
-    
-    exit 0
+process_item() {
+    local item="$1"
+    # Simulate work; replace with real processing
+    local delay=$(( RANDOM % 5 + 1 ))
+    echo "[$$] processing $item (${delay}s)"
+    sleep "$delay"
+    # Randomly fail ~20% of the time for demonstration
+    (( RANDOM % 5 == 0 )) && { echo "[$$] ERROR on $item" >&2; exit 1; }
+    echo "[$$] done $item"
+}
+export -f process_item
+
+declare -a active_pids=()
+declare -i failed_count=0
+
+reap_one() {
+    # wait -n: wait for any one child; capture its exit status
+    local status=0
+    wait -n 2>/dev/null || status=$?
+    if (( status != 0 )); then
+        (( failed_count++ )) || true
+    fi
+    # Rebuild active_pids from currently running background jobs
+    active_pids=()
+    while IFS= read -r pid; do
+        active_pids+=("$pid")
+    done < <(jobs -p)
 }
 
-trap cleanup SIGTERM SIGINT
+for item in "$INPUT_DIR"/*; do
+    [[ -f "$item" ]] || continue
 
-# Launch background jobs
-for i in {1..5}; do
-    sleep 1000 &
-    child_pids+=($!)
+    # If at capacity, wait for one slot to open
+    while (( ${#active_pids[@]} >= MAX_JOBS )); do
+        reap_one
+    done
+
+    bash -c 'process_item "$1"' _ "$item" &
+    active_pids+=($!)
 done
 
-# Wait for all jobs (this blocks until interrupted)
-wait
+# Drain remaining jobs
+while (( ${#active_pids[@]} > 0 )); do
+    reap_one
+done
+
+echo "Pool finished. Failed jobs: $failed_count"
+(( failed_count == 0 ))  # exit 0 iff no failures
 ```
 
-This script installs a `cleanup` handler for both `SIGTERM` and `SIGINT`. When the user presses Ctrl+C or the script receives `SIGTERM`, the handler is invoked. It sends `SIGTERM` to all known children, waits up to 3 seconds for them to exit, and then force-kills any stragglers with `SIGKILL`. Finally, it exits with status 0. This ensures that the script never leaves zombie children or orphaned processes.
+This pattern requires Bash 4.3+ for `wait -n`. On older systems, replace `wait -n` with a polling loop using `kill -0` to check whether each PID is still alive, with a short `sleep` between polls.
 
-The `kill -0 $pid` test checks whether a process still exists without sending a signal; if the process is gone, `kill` returns a non-zero exit code.
+### 3.3 Robust Graceful Shutdown
 
-### 3.3 Monitoring Process State with ps and Jobs
-
-Understanding the current state of processes is essential for debugging. The `ps` command displays a snapshot of process information. Common invocations include:
+Production scripts that manage child processes must handle termination signals reliably. The key insight is that `trap` handlers in Bash are run between commands—they are not preemptive. If the script is blocked in `wait`, receiving a signal causes `wait` to return early with exit status 128+signum, and the trap fires before the next command.
 
 ```bash
-ps aux
+#!/usr/bin/env bash
+set -o pipefail
+# Do NOT use set -e in scripts with signal handlers — it interacts badly with trap
+
+readonly WORK_DIR=$(mktemp -d /tmp/worker.XXXXXX)
+declare -a child_pids=()
+declare -i shutdown_requested=0
+
+cleanup() {
+    local sig="${1:-EXIT}"
+    [[ $shutdown_requested -eq 1 ]] && return
+    shutdown_requested=1
+
+    echo "[$$] Received $sig — initiating graceful shutdown..." >&2
+
+    # Phase 1: SIGTERM — polite request to terminate
+    local pid
+    for pid in "${child_pids[@]}"; do
+        if kill -0 "$pid" 2>/dev/null; then
+            echo "[$$] Sending SIGTERM to PID $pid" >&2
+            kill -TERM "$pid" 2>/dev/null || true
+        fi
+    done
+
+    # Phase 2: Wait up to 10 seconds for voluntary exit
+    local deadline=$(( $(date +%s) + 10 ))
+    while (( $(date +%s) < deadline )); do
+        local remaining=0
+        for pid in "${child_pids[@]}"; do
+            kill -0 "$pid" 2>/dev/null && (( remaining++ )) || true
+        done
+        (( remaining == 0 )) && break
+        sleep 0.2
+    done
+
+    # Phase 3: SIGKILL any processes that did not exit
+    for pid in "${child_pids[@]}"; do
+        if kill -0 "$pid" 2>/dev/null; then
+            echo "[$$] Sending SIGKILL to PID $pid (did not exit cleanly)" >&2
+            kill -KILL "$pid" 2>/dev/null || true
+        fi
+    done
+
+    # Phase 4: Reap all children to prevent zombies
+    for pid in "${child_pids[@]}"; do
+        wait "$pid" 2>/dev/null || true
+    done
+
+    # Phase 5: Remove temporary directory
+    rm -rf "$WORK_DIR"
+    echo "[$$] Shutdown complete." >&2
+}
+
+# Install trap for all relevant termination signals
+# EXIT fires on normal exit too, ensuring cleanup always runs
+trap 'cleanup SIGTERM' TERM
+trap 'cleanup SIGINT'  INT
+trap 'cleanup SIGHUP'  HUP
+trap 'cleanup EXIT'    EXIT
+
+# Launch worker processes
+for i in {1..5}; do
+    (
+        trap - TERM INT HUP EXIT  # Reset inherited traps in child
+        echo "[worker $i] PID $$ started"
+        sleep 1000
+    ) &
+    child_pids+=($!)
+    echo "Launched worker $i (PID ${child_pids[-1]})"
+done
+
+echo "All workers running. PID=$$. Press Ctrl+C to trigger cleanup."
+wait  # Block until interrupted or all children exit
 ```
 
-This shows all processes on the system with detailed information: user, PID, CPU usage, memory usage, state, and command line. The output is typically piped to `grep` to filter for specific processes:
+Three subtleties are critical here:
 
-```bash
-ps aux | grep nginx
-```
+First, the child subshells reset their traps with `trap -`. Without this, a child that receives `SIGTERM` would run the parent's `cleanup` function—which references `child_pids`, a variable in the parent's scope—producing incorrect behavior.
 
-For a more compact view of running jobs in the current shell:
+Second, the `cleanup` function is guarded by `shutdown_requested` to prevent re-entrant invocations. If `SIGTERM` and `SIGINT` arrive within milliseconds of each other, the shell might invoke the handler twice. The guard prevents the second invocation from corrupting state.
 
-```bash
-jobs -l
-```
-
-This lists all known background jobs with their job numbers, PIDs, states (Running, Stopped, Done), and commands. The `-l` flag includes the PID. If a job has terminated, `jobs` marks it as Done but does not remove it until the next command prompt; this allows you to inspect its exit status. To clean up completed jobs:
-
-```bash
-jobs -r
-```
-
-This lists only running jobs. Completed jobs can be removed with:
-
-```bash
-jobs -c
-```
-
-(In some shells, use `disown` to remove a job from the shell's job table without terminating it.)
+Third, `kill -0 PID` sends signal 0, which performs no actual kill—it only tests whether the caller has permission to send a signal to PID and whether PID exists. It returns 0 if PID exists and the caller has permission, non-zero otherwise. This is the correct existence check.
 
 ### 3.4 Process Substitution in Data Processing
 
-Process substitution shines in data processing workflows. Consider comparing the output of two commands:
+Process substitution is most powerful when composing tools that accept only file paths—not stdin—as inputs:
 
 ```bash
-diff <(ssh host1 'ps aux') <(ssh host2 'ps aux')
+# Compare process lists on two remote hosts
+diff <(ssh host1 'ps -eo pid,ppid,cmd --sort=pid') \
+     <(ssh host2 'ps -eo pid,ppid,cmd --sort=pid')
+
+# Join two sorted streams without temp files
+# join requires both inputs to be sorted on the join field
+join <(sort -k1,1 users.csv) <(sort -k1,1 purchases.csv)
+
+# Merge multiple sorted log streams into one chronological stream
+sort -m <(ssh web1 'tail -f /var/log/app.log') \
+        <(ssh web2 'tail -f /var/log/app.log') \
+        <(ssh web3 'tail -f /var/log/app.log')
+
+# Statistical summary of two data sets side-by-side
+paste <(awk '{print $2}' dataset_a.tsv | sort -n | awk '
+    BEGIN{min=1e18;max=-1e18;sum=0;n=0}
+    {sum+=$1; if($1<min)min=$1; if($1>max)max=$1; n++}
+    END{print "A: min="min" max="max" mean="sum/n" n="n}
+') <(awk '{print $2}' dataset_b.tsv | sort -n | awk '
+    BEGIN{min=1e18;max=-1e18;sum=0;n=0}
+    {sum+=$1; if($1<min)min=$1; if($1>max)max=$1; n++}
+    END{print "B: min="min" max="max" mean="sum/n" n="n}
+')
 ```
 
-Without process substitution, you would need to log into each host, save the output to a file, transfer the files, and then compare them. With process substitution, the shell handles all of this transparently: it spawns two subshells, each executing the SSH command and writing to a FIFO, and `diff` reads from both FIFOs.
-
-Another example: feeding multiple streams into a command that expects files:
+The `>(cmd)` form allows writing to a process rather than reading from it:
 
 ```bash
-paste <(seq 1 10) <(seq 11 20) <(seq 21 30)
+# Compress output of a command while also counting lines, without temp files
+long_running_command | tee >(gzip -9 > output.gz) >(wc -l > linecount.txt) > /dev/null
 ```
 
-The `paste` command merges lines from multiple files. Without process substitution, you would need to generate three temporary files and pass them to `paste`. With process substitution, three subshells generate the sequences and write to FIFOs, and `paste` reads from them as if they were regular files.
+`tee` reads stdin and writes to each specified output. With `>(cmd)`, each output is a process substitution writing to a subshell. All three processes (tee + 2 subshells) run concurrently; the pipeline is fully streaming.
 
-### 3.5 Debugging Signal Handling
+### 3.5 Debugging Signal Handling and Process State
 
-When a script behaves unexpectedly with respect to signals, debugging can be challenging. The `set -x` option enables tracing, printing each command before execution:
+`strace` is the definitive tool for observing process behavior at the system call level:
 
 ```bash
-#!/bin/bash
+# Trace all system calls, following forks, filtering to signal-related calls
+strace -f -e trace=signal,process -p $$ 2>&1 | head -100
+
+# Trace a script from start, capturing output and system calls
+strace -f -e trace=all -o /tmp/trace.log -s 256 bash script.sh
+
+# Specifically observe how signals are delivered and handled
+strace -f -e trace=rt_sigaction,rt_sigprocmask,rt_sigreturn,kill,tgkill bash script.sh
+```
+
+On Linux, `rt_sigaction` is the syscall underlying `sigaction(2)`, `tgkill` is the precise per-thread signal delivery syscall, and `rt_sigreturn` is called when a signal handler returns, restoring the interrupted context. Seeing these in strace output confirms that your signal handlers are being installed and invoked correctly.
+
+For observing zombie accumulation:
+
+```bash
+# Watch the process table for zombies, refreshed every second
+watch -n 1 'ps aux | awk "NR==1 || /Z/"'
+
+# Count zombies for a specific parent
+ps -o pid,ppid,stat,comm --ppid $PARENT_PID | grep Z
+
+# Check for accumulated zombies system-wide
+awk '/zombies/ {print}' /proc/loadavg
+# Format: running/total processes, then last_pid. Zombies visible in "total"
+```
+
+Inside Bash, `set -x` traces command execution, and `trap '' DEBUG` can install a debug handler that fires before each command:
+
+```bash
+#!/usr/bin/env bash
+# Instrument every command with timing and PID information
+trap 'echo "[DEBUG PID=$$] $(date +%T.%N): ${BASH_COMMAND}" >&2' DEBUG
 set -x
 
-trap 'echo "Caught SIGTERM"' SIGTERM
-trap 'echo "Caught SIGINT"' SIGINT
+cleanup() { echo "Cleanup at $(date +%T.%N)" >&2; }
+trap cleanup EXIT
 
-sleep 1000
+sleep 0.1
+echo "Done"
 ```
 
-When run and interrupted, the output shows whether the trap was installed and invoked. However, `set -x` does not trace signal handlers themselves (they are invoked by the kernel, not by the shell script), so you may not see the handler's commands execute in the trace. Adding explicit logging helps:
+The `DEBUG` trap fires before each simple command. Combined with `BASH_COMMAND` (the command about to be executed), `LINENO`, and `BASH_SOURCE`, it provides comprehensive execution tracing without requiring `strace`.
 
-```bash
-trap 'echo "Handler for SIGTERM invoked at $(date)" >> /tmp/handler.log; exit 1' SIGTERM
-```
-
-This writes to a log file, which you can examine post-mortem.
-
-For deeper debugging, the `strace` utility traces system calls, including signal delivery:
-
-```bash
-strace -f -e signal bash script.sh
-```
-
-The `-f` flag traces child processes, and `-e signal` filters for signal-related system calls. The output shows when signals are delivered and how the process responds.
+---
 
 ## 4. Common Pitfalls and Solutions
 
-### 4.1 Zombie Processes
+### 4.1 Zombie Processes: Causes, Detection, and Prevention
 
-Zombie processes accumulate when a parent never calls `waitpid()` or fails to install a `SIGCHLD` handler. Once accumulated, they remain until the parent exits (at which point init adopts and reaps them) or until the parent explicitly calls `waitpid()`.
+Zombies occur in exactly one scenario: a child has exited but its parent has not yet called `waitpid()`. They are not dangerous in small numbers—each consumes roughly 1–2KB of kernel memory—but they consume a PID slot. Linux's default PID range is 32768 (`/proc/sys/kernel/pid_max`), and 32768 zombie processes will exhaust it.
 
-To identify zombies:
+The correct prevention in Bash: always pair background jobs with `wait`. The correct prevention in C: either call `waitpid()` in a `SIGCHLD` handler with `WNOHANG`, or install `SIGCHLD` with `SA_NOCLDWAIT` (which tells the kernel to automatically reap children without creating zombies, at the cost of not being able to retrieve exit statuses), or `double-fork`.
+
+The double-fork technique creates a grandchild that is immediately orphaned and adopted by init:
 
 ```bash
-ps aux | grep Z
+# Double-fork in bash: child exits immediately, grandchild is reparented to PID 1
+(
+    # Child: fork again and exit
+    (
+        # Grandchild: reparented to init; shell never needs to wait for it
+        exec long_running_daemon
+    ) &
+    # Child exits here — shell reaps it immediately
+    exit 0
+) &
+wait $!  # Only waits for child (which exited immediately)
 ```
 
-Zombies are marked with a `Z` in the STAT column. If a script creates many zombies, the root cause is typically a missing `SIGCHLD` handler or a missing `wait` call at the end of the script.
-
-Solution: Always call `wait` (without arguments) to wait for all background children to complete, or install a `SIGCHLD` handler that calls `waitpid()` with the `WNOHANG` flag.
-
-### 4.2 Signal Handlers Calling Non-Async-Safe Functions
-
-Signal handlers are invoked asynchronously, potentially interrupting the main program at any point. If the main program was in the middle of a library function (e.g., `malloc()`), and the signal handler calls another library function (e.g., `free()`), the result is undefined behavior—the library's internal data structures may be corrupted, leading to crashes or data corruption.
-
-Solution: Signal handlers should call only async-signal-safe functions. These include basic system calls like `write()`, `kill()`, and `exit()`, but not library functions like `printf()` or `malloc()`. In Bash, this is handled transparently; the shell ensures that its signal handlers call only safe functions. In C programs, refer to the `signal-safety(7)` man page for the complete list of safe functions.
-
-If you need to log from a signal handler, write to a file descriptor using `write()` rather than `printf()`:
+In C:
 
 ```c
-const char *msg = "Signal received\n";
-write(STDOUT_FILENO, msg, strlen(msg));
+pid_t child = fork();
+if (child == 0) {
+    /* Child: fork again */
+    if (fork() == 0) {
+        /* Grandchild: reparented to init when child exits */
+        setsid();
+        execvp(daemon_argv[0], daemon_argv);
+        _exit(127);
+    }
+    _exit(0);  /* Child exits immediately */
+}
+waitpid(child, NULL, 0);  /* Reap child instantly; grandchild runs under init */
 ```
 
-### 4.3 Child Processes Inheriting Unwanted State
+### 4.2 Signal Masks Inherited Across exec()
 
-When a process calls `fork()`, the child inherits file descriptors, signal handlers, and environment variables. If the parent has open file handles, the child will inherit them; if the parent has ignored `SIGPIPE`, the child will also ignore it. This can lead to subtle bugs.
-
-Solution: In Bash, use `exec` with redirection to manage file descriptors explicitly:
+This is one of the most subtle and consequential bugs in process management. When a Bash script using `trap` launches a child with certain signals blocked, those signals remain blocked in the child after `exec()`.
 
 ```bash
-exec 3< file.txt
-# PID $$ has FD 3 open
-bash -c 'echo "Child sees FD 3: $(cat <&3)"'
-# Child inherits FD 3
-```
+# Demonstration: block SIGTERM before launching child
+# (Bash doesn't directly manipulate sigmask, but here's what happens internally
+#  when certain operations are performed)
 
-If you want to isolate a child from the parent's environment, use a subshell with explicit setup:
-
-```bash
+# Problematic: child inherits blocked signals from shell internals
 (
-    # Start a fresh subshell
-    unset UNWANTED_VAR
-    # Reset signal handlers to defaults
-    trap - SIGTERM SIGINT
-    # Run the command
-    exec command
+    # In subshells, some signals may be blocked during trap execution
+    trap 'echo caught' TERM
+    
+    # Child does NOT reset signal mask unless it explicitly does so
+    bash -c 'kill -TERM $$ ; echo "Still running (SIGTERM was blocked!)"'
 )
 ```
 
-The subshell inherits the environment, but you can modify it before exec'ing the command.
+The authoritative fix in C programs is to call `sigprocmask(SIG_SETMASK, &empty_set, NULL)` early in `main()` to ensure no signals are unexpectedly blocked. In Bash, `trap - SIGNAL` in a child subshell resets the disposition to default, but does not unblock the signal if it was blocked at the mask level by the kernel.
 
-### 4.4 Race Conditions in Job Control
+### 4.3 set -e and Signal Handlers
 
-Background jobs introduce race conditions. If you launch a background job and immediately query its status, the shell's `SIGCHLD` handler may not have been invoked yet, and the job table may be out of sync.
-
-Solution: Use `wait` to explicitly synchronize with background jobs. After launching background jobs, call `wait` (with or without a PID) to ensure the jobs have completed before proceeding. This blocks the shell until the kernel has notified it of the child's state change.
-
-### 4.5 Process Substitution with Large Data
-
-Process substitution creates FIFOs, which are kernel buffers. If a command writes a large amount of data to a FIFO faster than the reader consumes it, the FIFO buffer fills up, and the writer blocks. If the reader blocks (waiting for input from another source), and the writer is blocked (waiting for the FIFO to drain), a deadlock occurs.
-
-Solution: Use explicit temporary files for large data sets, or redesign the pipeline to avoid deep nesting of process substitutions. For example, instead of:
+`set -e` (errexit) causes the shell to exit if any command returns non-zero. Combined with signal handlers, this produces surprising behavior:
 
 ```bash
-diff <(sort <(cat file1.txt | tr a-z A-Z)) <(sort file2.txt)
+#!/usr/bin/env bash
+set -e
+
+cleanup() { echo "cleanup"; }
+trap cleanup EXIT
+
+# This exit-status check works fine...
+some_command || echo "failed"
+
+# But: 'wait' returns 128+signum when interrupted by a signal.
+# With set -e, this causes the script to exit before the trap fires.
+wait  # If SIGINT arrives here, wait returns 130; set -e triggers an exit
 ```
 
-Use:
+The safe pattern for signal-aware scripts is to avoid `set -e` and handle errors explicitly, or to use `|| true` after `wait`:
 
 ```bash
-cat file1.txt | tr a-z A-Z | sort > /tmp/temp1.txt
-sort file2.txt > /tmp/temp2.txt
-diff /tmp/temp1.txt /tmp/temp2.txt
-rm /tmp/temp1.txt /tmp/temp2.txt
+wait || true  # Prevent set -e from firing on signal interruption
 ```
 
-This explicitly serializes the pipeline, avoiding potential deadlocks.
+Alternatively, use `set -E` (errtrace) which propagates ERR traps into functions and subshells, allowing centralized error handling without the brittleness of bare `set -e`.
+
+### 4.4 SIGPIPE and Broken Pipelines
+
+When a process writes to a pipe whose read end has been closed, the kernel sends `SIGPIPE` to the writer. The default disposition of `SIGPIPE` is to terminate the process. With `set -o pipefail`, a pipeline's exit status is the rightmost non-zero status—including termination by `SIGPIPE`.
+
+```bash
+# Common case: 'head' closes its input after reading N lines
+# Causes SIGPIPE to be sent to 'cat' or 'find'
+find /large/directory -name "*.log" | head -5
+# May print: "find: 'write error'" or similar on stderr
+```
+
+The correct fix is to suppress the message, not to ignore `SIGPIPE` globally:
+
+```bash
+# Option 1: redirect stderr of the producer
+find /large/directory -name "*.log" 2>/dev/null | head -5
+
+# Option 2: ignore SIGPIPE only in the subshell running the producer
+(trap '' PIPE; find /large/directory -name "*.log") | head -5
+
+# Option 3: use grep -m (max-count) instead of head, which reads all input
+# before truncating, avoiding the broken pipe
+find /large/directory -name "*.log" | grep -m 5 '.'
+```
+
+Ignoring `SIGPIPE` globally (`trap '' PIPE`) is dangerous because it allows programs to silently lose data—writes to closed pipes return `EPIPE` (errno 32) without terminating the process, but the data is gone.
+
+### 4.5 Race Condition: Checking Existence Then Acting
+
+The `kill -0 $pid` idiom tests whether a PID exists. Between the test and the subsequent `kill` or `wait`, the process may exit and the PID may be reused by an unrelated process:
+
+```bash
+# UNSAFE: TOCTOU race condition
+if kill -0 "$pid" 2>/dev/null; then
+    kill -TERM "$pid"  # Might kill a different process if PID was reused
+fi
+```
+
+The safe fix is to track PIDs in conjunction with `wait`, which is immune to PID reuse because the kernel keeps the process descriptor alive (as a zombie) until `wait()` is called. As long as the shell has not called `wait $pid`, the PID is reserved for that specific child:
+
+```bash
+# SAFE: use wait to synchronize; PID reuse cannot occur until wait returns
+kill -TERM "$pid" 2>/dev/null || true
+wait "$pid" 2>/dev/null || true
+```
+
+---
 
 ## 5. Advanced Patterns
 
-### 5.1 Managing Process Groups and Sessions
+### 5.1 Sessions, nohup, and Daemon Launching
 
-A session is a collection of process groups associated with a single terminal. The shell's process group is the session leader. When a user logs in, the login process creates a new session, and the login shell becomes the session leader.
+A session is bounded to a controlling terminal. When the terminal closes (the user logs out or the SSH connection drops), the kernel sends `SIGHUP` to the session leader (the shell), which typically propagates it to all foreground and background jobs. This is why background jobs die when you log out.
 
-Job control commands (`fg`, `bg`) operate on process groups within the current session. If you need to manage processes across session boundaries (e.g., detaching a process from the terminal), use `nohup` or `disown`:
+`nohup(1)` works by: (1) ignoring `SIGHUP` in the child, and (2) redirecting stdin from `/dev/null` and stdout/stderr to `nohup.out` if they point to a terminal. It does not remove the process from the shell's job table—`disown` does that:
 
 ```bash
-nohup long_running_task &
-disown %1
+# Start a process immune to terminal closure
+nohup ./long_running_job --config prod.yaml > /var/log/job.log 2>&1 &
+disown $!  # Remove from shell's job table (no SIGHUP on shell exit)
+echo "Job running as PID $!"
 ```
 
-`nohup` redirects the process's stdin from `/dev/null` and its stdout/stderr to a file (typically `nohup.out`), ensuring the process continues even if the terminal closes. `disown` removes the job from the shell's job table, preventing the shell from sending it a `SIGHUP` signal when the shell exits.
+`disown -h %n` marks a job so it does not receive `SIGHUP` when the shell exits, but keeps it in the job table (allowing `fg`/`bg`). `disown %n` removes it from the table entirely.
 
-### 5.2 Parallel Process Pools
-
-For tasks that benefit from parallelism but need to limit the number of concurrent processes (to avoid resource exhaustion), a process pool pattern is useful:
+For true service daemonization, use `setsid(1)` to create a new session, breaking all association with the controlling terminal:
 
 ```bash
-#!/bin/bash
-max_parallel=4
-active=()
-
-for file in /path/to/files/*; do
-    # If we've reached the max, wait for one to finish
-    if [ ${#active[@]} -ge $max_parallel ]; then
-        wait -n  # Wait for any one child to exit
-        active=()  # Reset the array
-        for pid in $(jobs -p); do
-            active+=($pid)
-        done
-    fi
-    
-    # Launch a new job
-    process_file "$file" &
-    active+=($!)
-done
-
-# Wait for all remaining jobs
-wait
+# setsid creates a new session, making the process immune to SIGHUP
+setsid ./my_daemon --foreground &
 ```
 
-The `wait -n` command blocks until any one child exits, allowing the pool to launch a new job. The `jobs -p` command lists all active job PIDs, which are stored in the `active` array for bookkeeping.
+The gold standard for production daemon management is `systemd`, `supervisord`, or `s6-supervise`, which handle PID tracking, restart policies, log capture, and resource limits far more reliably than shell-based supervisor loops.
 
-### 5.3 Structured Concurrency with exec
+### 5.2 Parallel Worker Pool with GNU parallel
 
-Complex scripts with multiple levels of subshells can become difficult to manage. A structured approach is to use `exec` to redirect file descriptors at the script level, then use process substitution for read-only operations:
+For production-grade parallelism, `GNU parallel` is preferable to hand-rolled worker pools:
 
 ```bash
-#!/bin/bash
+# Process files with up to 8 parallel jobs, with retry on failure
+find /data -name "*.csv" -print0 | \
+    parallel -0 -j 8 --retry-failed --joblog /tmp/parallel.log \
+    'python3 process.py {} > {.}.out 2> {.}.err'
+
+# Distribute work across multiple machines via SSH
+parallel -S host1,host2,host3 --transfer --return '{}.result' \
+    'expensive_computation {}' ::: input_*.dat
+
+# Rate-limit to avoid overwhelming a downstream service
+parallel -j 4 --delay 0.5 'curl -s https://api.example.com/item/{}' \
+    ::: $(seq 1 100)
+```
+
+GNU parallel handles job serialization, failure tracking, partial retries, SSH distribution, and progress reporting—features that are nontrivial to implement correctly in pure Bash.
+
+### 5.3 Process Restart Supervisor with Exponential Backoff
+
+A production-grade supervisor loop should implement exponential backoff to avoid hammering a failing service:
+
+```bash
+#!/usr/bin/env bash
+# supervisor.sh — restart a command with exponential backoff
 set -o pipefail
 
-# Redirect stdin, stdout, stderr for the entire script
-exec 3< input.txt
-exec 4> output.txt
-exec 5> error.log
+readonly CMD=("$@")
+readonly MAX_BACKOFF=300    # 5 minutes maximum delay
+readonly BACKOFF_BASE=2     # Exponential base
+readonly MAX_RETRIES=10     # 0 = unlimited
+readonly LOG_FILE="/var/log/supervisor_$(basename "$1").log"
 
-# Now process_data reads from FD 3, writes to FD 4, and logs to FD 5
-while read -u 3 line; do
-    result=$(echo "$line" | process_pipeline)
-    echo "$result" >&4
-done
+log() { echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE" >&2; }
 
-# Close the file descriptors
-exec 3<&-
-exec 4>&-
-exec 5>&-
-```
+backoff_delay() {
+    local attempt="$1"
+    # 2^attempt seconds, capped at MAX_BACKOFF, with ±10% jitter
+    local base=$(( BACKOFF_BASE ** attempt ))
+    local capped=$(( base > MAX_BACKOFF ? MAX_BACKOFF : base ))
+    local jitter=$(( RANDOM % (capped / 10 + 1) ))
+    echo $(( capped + jitter ))
+}
 
-This pattern avoids nested subshells and makes resource management explicit.
-
-### 5.4 Process Restart and Monitoring
-
-For long-running services, a supervisor pattern monitors the process and restarts it if it dies:
-
-```bash
-#!/bin/bash
-service_cmd="$1"
-max_retries=5
-retry_delay=5
 attempt=0
+child_pid=""
+running=1
 
-while [ $attempt -lt $max_retries ]; do
-    echo "Attempt $((attempt + 1)): Starting $service_cmd"
-    
-    # Run the command and capture its PID
-    $service_cmd &
-    pid=$!
-    
-    # Wait for it to exit
-    if wait $pid; then
-        echo "Service exited with status 0; assuming normal exit"
+cleanup() {
+    running=0
+    [[ -n "$child_pid" ]] && kill -TERM "$child_pid" 2>/dev/null || true
+    [[ -n "$child_pid" ]] && wait "$child_pid" 2>/dev/null || true
+    log "Supervisor exiting."
+    exit 0
+}
+trap cleanup TERM INT HUP
+
+log "Supervisor started for: ${CMD[*]}"
+
+while (( running )) && { (( MAX_RETRIES == 0 )) || (( attempt < MAX_RETRIES )); }; do
+    start_time=$(date +%s)
+
+    log "Attempt $((attempt + 1)): launching ${CMD[*]}"
+    "${CMD[@]}" &
+    child_pid=$!
+
+    wait "$child_pid"
+    exit_status=$?
+
+    child_pid=""
+    end_time=$(date +%s)
+    uptime=$(( end_time - start_time ))
+
+    if (( exit_status == 0 )); then
+        log "Process exited cleanly (status 0, uptime ${uptime}s). Not restarting."
         exit 0
-    else
-        status=$?
-        echo "Service exited with status $status; restarting in ${retry_delay}s..."
-        sleep $retry_delay
-        attempt=$((attempt + 1))
     fi
+
+    if (( uptime > 60 )); then
+        # Process ran long enough — reset backoff counter
+        attempt=0
+        log "Process ran for ${uptime}s before failing (status $exit_status). Resetting backoff."
+    else
+        log "Process failed after ${uptime}s (status $exit_status). Attempt $((attempt+1))."
+        (( attempt++ )) || true
+    fi
+
+    delay=$(backoff_delay "$attempt")
+    log "Restarting in ${delay}s..."
+    sleep "$delay" &
+    sleep_pid=$!
+    # Allow signals to interrupt the sleep
+    wait "$sleep_pid" || true
 done
 
-echo "Max retries exceeded; giving up"
+log "Max retries ($MAX_RETRIES) exceeded. Giving up."
 exit 1
 ```
 
-This runs the service in the foreground, waits for it to exit, and restarts it if the exit status is non-zero. After a configurable number of retries, it gives up and exits.
+The critical additions over a naive supervisor: (1) exponential backoff with jitter prevents thundering herd when a dependency comes back up, (2) the uptime check resets the attempt counter for processes that run successfully for over a minute before crashing (preventing a briefly-long-running process from forever depleting the retry budget), and (3) the `sleep` runs as a background job so it can be interrupted by signals, allowing clean shutdown during the wait period.
 
-## 6. Summary and Key Takeaways
+### 5.4 Structured File Descriptor Management
 
-Process control in Unix and Bash is grounded in a few elegant primitives: `fork()` creates processes, `exec()` replaces their memory image, `wait()` synchronizes on child termination, and signals provide asynchronous notification. The shell orchestrates these primitives to provide job control, background execution, and sophisticated process management.
+Bash allows opening, duplicating, and closing file descriptors explicitly, enabling sophisticated I/O routing without subshells:
 
-Understanding the fork-exec-wait model demystifies how commands are launched and how the shell maintains control over multiple children. Signals form the nervous system connecting the kernel to processes, enabling timely response to events. Process substitution extends the shell's ability to compose commands, avoiding temporary files and enabling natural data flow.
+```bash
+#!/usr/bin/env bash
+# fd_routing.sh — explicit file descriptor management
+set -euo pipefail
 
-Robust shell scripts employ careful signal handling to clean up resources, avoid zombie processes by calling `wait()`, and use process groups and job control to manage related processes cohesively. Debugging process management issues requires understanding process state transitions, recognizing symptoms like zombie accumulation, and using tools like `ps`, `jobs`, and `strace` to diagnose problems.
+# Open file descriptors at the script level (not in subshells)
+exec 3< /etc/passwd          # FD 3: read from /etc/passwd
+exec 4> /tmp/output.txt      # FD 4: write to output file
+exec 5>> /tmp/audit.log      # FD 5: append to audit log
+exec 6<> /tmp/state.fifo     # FD 6: read-write on a FIFO (synchronization)
 
-The patterns and idioms presented here—waiting for multiple jobs, graceful shutdown, monitoring process state, and supervisor loops—form the foundation of production-grade shell scripts. Mastery of these concepts transforms shell programming from a scripting convenience into a powerful tool for systems administration and automation.
+# Utility: log to audit FD without subshell
+audit() { echo "[$(date +%s)] $*" >&5; }
+
+audit "Script started"
+
+# Read from FD 3 (not stdin) while keeping stdin available for interactive use
+line_count=0
+while IFS=: read -r -u 3 username _ uid gid _ home shell; do
+    # Skip system accounts
+    (( uid < 1000 )) && continue
+    echo "User: $username (UID=$uid, shell=$shell)" >&4
+    audit "Processed user $username"
+    (( line_count++ ))
+done
+
+echo "Processed $line_count users" >&4
+audit "Script finished: $line_count users processed"
+
+# Explicitly close file descriptors
+# (the shell closes them on exit, but explicit closure is good hygiene
+#  and required if other processes need to read a "complete" file)
+exec 3<&-   # Close read FD
+exec 4>&-   # Close write FD (flushes and closes)
+exec 5>&-   # Close audit log
+exec 6>&-   # Close FIFO
+
+echo "Done. Output written to /tmp/output.txt"
+```
+
+FD 6 (`<>` mode) opens a FIFO for both reading and writing. This keeps the FIFO open even when no other process is reading from it, preventing `SIGPIPE` from being sent to the writer. It is a standard technique for maintaining a persistent FIFO endpoint.
+
+### 5.5 Coprocess Communication
+
+Bash 4.0 introduced the `coproc` builtin, which creates a bidirectional pipe to a background process:
+
+```bash
+#!/usr/bin/env bash
+# coprocess_demo.sh — stateful bidirectional communication with a child process
+set -euo pipefail
+
+# Start a Python interpreter as a coprocess
+# COPROC[0] = read end (child's stdout → parent reads)
+# COPROC[1] = write end (parent writes → child's stdin)
+coproc PYPROC { python3 -u -c '
+import sys
+import json
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        data = json.loads(line)
+        result = {k: v * 2 for k, v in data.items() if isinstance(v, (int, float))}
+        print(json.dumps(result), flush=True)
+    except json.JSONDecodeError as e:
+        print(json.dumps({"error": str(e)}), flush=True)
+'; }
+
+# Send JSON to coprocess and read response
+send_receive() {
+    local input="$1"
+    echo "$input" >&"${PYPROC[1]}"
+    local response
+    IFS= read -r -u "${PYPROC[0]}" response
+    echo "$response"
+}
+
+echo "Coprocess PID: $PYPROC_PID"
+
+result=$(send_receive '{"x": 10, "y": 5, "label": "test"}')
+echo "Response: $result"   # {"x": 20, "y": 10}
+
+result=$(send_receive '{"temperature": 23.5, "humidity": 60}')
+echo "Response: $result"   # {"temperature": 47.0, "humidity": 120}
+
+# Close the coprocess's stdin to signal EOF, then wait for it
+exec {PYPROC[1]}>&-
+wait "$PYPROC_PID"
+echo "Coprocess exited."
+```
+
+Coprocesses are valuable when you need to maintain state in a child process across multiple interactions—a pattern that would otherwise require a network socket or named FIFO. The `coproc` builtin sets `${NAME[0]}`, `${NAME[1]}`, and `${NAME}_PID` automatically. The `exec {PYPROC[1]}>&-` syntax closes the write end using a variable-based FD reference (Bash 4.1+).
+
+---
+
+## 6. The Complete Picture: Architecture Summary
+
+```mermaid
+graph TB
+    subgraph "Kernel Space"
+        SCHED["Scheduler<br/>(CFS / O(1))"]
+        PT["Process Table<br/>(task_struct array)"]
+        SIG["Signal Subsystem<br/>(sigpending, sigmask)"]
+        PIPE["Pipe Buffers<br/>(64KB default)"]
+        TTY["TTY Driver<br/>(line discipline)"]
+        MM["Memory Manager<br/>(page tables, COW)"]
+    end
+
+    subgraph "Shell Process (PID 1024)"
+        MAIN["Main Loop<br/>(read/eval/print)"]
+        PARSER["Command Parser<br/>(tokenize, expand, quote)"]
+        JT["Job Table<br/>(jobs, PIDs, PGIDs)"]
+        TRAP["Trap Table<br/>(signal → command)"]
+        FDT["File Descriptor Table<br/>(0=stdin, 1=stdout, 2=stderr, ...)"]
+    end
+
+    subgraph "Child Processes"
+        FG["Foreground Job<br/>(PGID = child PGID)<br/>tcsetpgrp() active"]
+        BG1["Background Job 1<br/>(PGID = own PGID)"]
+        BG2["Background Job 2<br/>(PGID = own PGID)"]
+        PIPE_PROC["Pipeline<br/>(shared PGID, pipe fds)"]
+    end
+
+    USER["User / Terminal"] -->|"keystrokes"| TTY
+    TTY -->|"SIGINT/SIGTSTP to fg PGID"| SIG
+    TTY -->|"cooked-mode input"| MAIN
+
+    MAIN --> PARSER
+    PARSER -->|"fork()+exec()"| MM
+    MM -->|"COW page tables"| FG
+    MM -->|"COW page tables"| BG1
+    MAIN -->|"waitpid(WNOHANG)"| PT
+
+    SIG -->|"deliver SIGCHLD"| TRAP
+    TRAP -->|"runs trap command"| JT
+    JT -->|"fg/bg/kill"| FG
+    JT -->|"fg/bg/kill"| BG1
+
+    FG -->|"write(stdout)"| FDT
+    FDT -->|"connected to"| TTY
+    BG1 -->|"write(stdout)"| FDT
+    PIPE_PROC -->|"pipe fds"| PIPE
+
+    SCHED -->|"schedules"| FG
+    SCHED -->|"schedules"| BG1
+    SCHED -->|"schedules"| BG2
+
+    style MAIN fill:#5ba85a,color:#fff
+    style SIG fill:#e67e22,color:#fff
+    style MM fill:#8e44ad,color:#fff
+    style TTY fill:#2980b9,color:#fff
+```
+
+---
+
+## 7. Summary and Key Takeaways
+
+Process control in Unix is built on three system calls—`fork()`, `exec()`, and `wait()`—and one asynchronous notification mechanism: signals. Everything else is composition.
+
+`fork()` is cheap because of COW: creating a process costs kernel data structures, not physical memory. `exec()` replaces the program image while preserving the PID and open file descriptors—this is what makes shell redirections work. `wait()` / `waitpid()` is mandatory; reaped children become zombies that consume PID slots until their parent calls it. The `SIGCHLD` signal notifies the parent asynchronously, enabling non-blocking child management via `waitpid(WNOHANG)`.
+
+Job control maps onto three kernel primitives: process groups (units of terminal signal delivery), sessions (groups of process groups sharing a controlling terminal), and `tcsetpgrp()` (which designates the foreground process group). Ctrl+C sends `SIGINT` to the foreground process group—not to the shell, not to a single PID, but to every process in the group.
+
+Signal handlers in C must only call async-signal-safe functions; the self-pipe trick is the canonical way to safely communicate from a handler to the main event loop. In Bash, `trap` commands run synchronously between commands, so this restriction does not apply—but the fundamental model of signals as asynchronous kernel notifications still governs behavior.
+
+Robust scripts: install `trap` handlers for `TERM`, `INT`, `HUP`, and `EXIT`; guard against re-entrant cleanup with a flag; send `SIGTERM` before `SIGKILL` with a timeout; always call `wait` to reap children and prevent zombies; use `kill -0` to test process existence (but be aware of the TOCTOU window); and avoid `set -e` in scripts with complex signal handling.
+
+The pitfalls that most often reach production: zombie accumulation from missing `wait()`, broken `SIGPIPE` handling in pipelines, signal masks inherited across `exec()` blocking expected signals, and `set -e` exiting the script on a signal-interrupted `wait`. Each of these has a precise, deterministic fix grounded in the kernel's process model.
+
+---
+
+## Appendix: Quick Reference
+
+```bash
+# --- Process inspection ---
+ps -eo pid,ppid,pgid,sid,stat,comm        # Full process hierarchy
+ps aux | awk '$8 ~ /Z/ {print}'           # Find zombie processes
+cat /proc/$PID/status                     # Detailed per-process info
+cat /proc/$PID/fdinfo/1                   # FD 1 (stdout) info
+ls -la /proc/$PID/fd/                     # All open file descriptors
+
+# --- Job control ---
+cmd &           # Run in background; $! = PID
+jobs -l         # List jobs with PIDs
+fg %1           # Bring job 1 to foreground
+bg %1           # Resume stopped job 1 in background
+disown %1       # Remove job 1 from table (no SIGHUP on shell exit)
+disown -h %1    # Immune to SIGHUP but keep in table
+wait            # Wait for all background jobs
+wait $pid       # Wait for specific PID (returns its exit status)
+wait -n         # Wait for any one background job (Bash 4.3+)
+
+# --- Signal sending ---
+kill -TERM $pid             # Polite termination
+kill -KILL $pid             # Unconditional kill
+kill -0 $pid                # Test process existence
+kill -STOP $pid             # Suspend process
+kill -CONT $pid             # Resume stopped process
+kill -HUP $pid              # Reload config (by convention)
+kill -s SIGUSR1 $pid        # Explicit signal name form
+killall -TERM nginx         # By name (match all processes)
+pkill -TERM -x nginx        # By exact name
+pgrep -l nginx              # Find PID(s) by name
+
+# --- Trap installation ---
+trap 'cleanup' EXIT TERM INT HUP    # Register handler
+trap '' INT                          # Ignore signal
+trap - INT                           # Reset to default
+
+# --- Process substitution ---
+cmd <(producer)             # Feed producer output as file to cmd
+cmd >(consumer)             # Feed cmd output to consumer as file
+diff <(cmd1) <(cmd2)        # Compare outputs without temp files
+
+# --- Coprocess ---
+coproc NAME { cmd; }        # Bidirectional pipe to background cmd
+echo data >&"${NAME[1]}"    # Write to coprocess stdin
+read -u "${NAME[0]}" reply  # Read from coprocess stdout
+
+# --- Debugging ---
+strace -f -e trace=process,signal bash script.sh
+set -x          # Trace commands as they execute
+set -euo pipefail  # Exit on error, undefined var, pipe failure
+bash -n script.sh  # Parse-only check (no execution)
+```
