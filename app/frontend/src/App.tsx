@@ -471,7 +471,7 @@ export function App() {
       });
       if (res.ok) {
         const data = await res.json();
-        alert(`Mastered Field Guide compiled to ${data.path} and committed to Gitea!`);
+        alert(`Mastered Field Guide compiled to ${data.path} and committed to Git!`);
       }
     } catch (err) {
       console.error('Failed to compile guide:', err);
