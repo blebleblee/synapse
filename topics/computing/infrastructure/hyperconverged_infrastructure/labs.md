@@ -1,996 +1,1631 @@
-# Operational Verification Labs: Hyperconverged Infrastructure Core
+# Operational Verification Labs: Hyperconverged Infrastructure (HCI) & Storage Virtualization
 
-## Objective & Environment Setup
+## Prerequisites
 
-This operational verification lab targets the **Core** domain of **Hyperconverged Infrastructure (HCI)**, providing comprehensive hands-on experience in diagnosing, profiling, and fault-injecting the fundamental subsystems that underpin modern HCI platforms. Hyperconverged infrastructure collapses compute, storage, and networking into software-defined layers atop commodity hardware, creating complex interdependencies between kernel subsystems, distributed storage protocols, and orchestration planes. This lab assumes a Linux kernel ≥5.10 on bare-metal or nested virtualization with root privileges, eBPF support enabled, and network interfaces capable of multi-gigabit packet capture.
-
-### Architectural Context
-
-HCI platforms abstract physical resources through multiple interconnected layers:
-
-1. **Kernel Subsystems**: Process scheduling (CFS/RT), memory management (NUMA, slab allocators), network stack (XDP, TC), and block I/O (blk-mq).
-2. **Storage Layer**: Distributed block devices (Ceph RBD, Longhorn), filesystem abstractions (ext4, XFS, Btrfs), and RAID controllers.
-3. **Virtualization**: KVM/QEMU for compute virtualization, SR-IOV for network passthrough, and vhost-net/vhost-user for I/O acceleration.
-4. **Orchestration**: Kubernetes for container workloads, libvirt for VM lifecycle management, and etcd for distributed state.
-
-Performance bottlenecks emerge at subsystem boundaries: memory contention between hypervisor and VMs, network saturation at vSwitch layers, storage I/O amplification in distributed writes, and scheduler latency under CPU overcommitment. This lab exercises each layer under normal operation, saturation, and fault conditions.
-
-```mermaid
-graph TB
-    subgraph "HCI Node Architecture"
-        A["User Workloads<br/>(VMs/Containers)"]
-        B["Orchestration Layer<br/>(Kubernetes/libvirt)"]
-        C["Virtualization Layer<br/>(KVM/QEMU)"]
-        D["Kernel Subsystems"]
-        E["Hardware Resources"]
-    end
-    
-    subgraph "Kernel Subsystems Detail"
-        D1["Process Scheduler<br/>(CFS/RT)"]
-        D2["Memory Manager<br/>(NUMA/Slab)"]
-        D3["Network Stack<br/>(XDP/TC/eBPF)"]
-        D4["Block Layer<br/>(blk-mq)"]
-    end
-    
-    subgraph "Storage Paths"
-        S1["Distributed Storage<br/>(Ceph/Longhorn)"]
-        S2["Filesystem Layer<br/>(ext4/XFS)"]
-        S3["Block Device<br/>(NVMe/SCSI)"]
-    end
-    
-    A -->|"Workload Requests"| B
-    B -->|"Resource Allocation"| C
-    C -->|"Syscalls/Hypercalls"| D
-    D --> D1
-    D --> D2
-    D --> D3
-    D --> D4
-    D4 --> S1
-    S1 --> S2
-    S2 --> S3
-    S3 --> E
-    D1 --> E
-    D2 --> E
-    D3 --> E
-```
-
-### Required CLI Tools
-
-Install the following diagnostic and profiling tools:
-
-- `bpftool` (≥5.10): eBPF program and map introspection
-- `kubectl` (≥1.25): Kubernetes cluster state inspection
-- `iproute2` (≥5.10): Network namespace and TC filter management
-- `tcpdump` (≥4.99): Packet capture with BPF filtering
-- `strace` (≥5.10): System call tracing with filtering capabilities
-- `perf` (≥5.10): CPU profiling, PMU event counting, kernel tracing
-- `bpftrace` (≥0.14): Dynamic tracing with eBPF scripting
-- `trace-cmd` (≥2.9): ftrace frontend for kernel function tracing
-- `lsof`, `ss`, `vmstat`, `iostat`, `sar`: Standard UNIX diagnostics
-- `dmesg`, `journalctl`: Kernel and systemd log inspection
-- `stress-ng` (≥0.13): Multi-modal resource stress testing
-- `iperf3` (≥3.9): Network throughput and latency benchmarking
-- `fio` (≥3.28): Flexible I/O tester for disk benchmarking
-- `sysbench` (≥1.0): CPU, memory, and thread benchmarking
-
-### Environment Configuration
-
-Verify the following prerequisites:
-
-```bash
-# 1. Kernel version and configuration
-uname -r  # Expected: ≥5.10.0
-zgrep CONFIG_BPF /proc/config.gz  # Expected: CONFIG_BPF=y
-zgrep CONFIG_DEBUG_INFO_BTF /proc/config.gz  # Expected: =y for CO-RE eBPF
-
-# 2. eBPF infrastructure
-bpftool version
-bpftool feature probe | grep -E "(program_type|map_type)"
-
-# 3. Kubernetes cluster state (if applicable)
-kubectl cluster-info
-kubectl get nodes -o wide
-
-# 4. Network interface validation
-ip link show
-ethtool -i eth0  # Verify driver and firmware versions
-
-# 5. Storage subsystem
-lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE
-cat /sys/block/*/queue/scheduler  # Verify I/O scheduler
-
-# 6. CPU topology and NUMA layout
-lscpu | grep -E "(Socket|Core|Thread|NUMA)"
-numactl --hardware
-
-# 7. Root privileges
-id  # Expected: uid=0(root)
-```
-
-**Critical**: All exercises require root privileges for kernel introspection, eBPF program loading, and network packet capture. Use `sudo -i` or direct root login.
+- 3+ node cluster (bare metal or VM) with at least 16GB RAM per node
+- Ubuntu 22.04 LTS or Rocky Linux 9
+- Root/sudo access
+- Minimum 100GB free storage per node for Ceph OSDs
+- 10GbE network recommended for storage traffic
 
 ---
 
-## Exercise 1: Live State & Internal Subsystem Inspection
-
-This exercise dissects the runtime state of kernel subsystems, eBPF infrastructure, process scheduling, and network stack internals. Understanding these mechanisms is foundational for diagnosing HCI performance anomalies.
-
-### 1.1 Kernel Memory Subsystem Inspection
-
-The Linux kernel employs a multi-tier memory allocator: buddy allocator for page frames, slab allocator (SLUB/SLAB/SLOB) for small objects, and vmalloc for non-contiguous virtual memory. Memory fragmentation, slab cache exhaustion, and NUMA imbalance directly impact VM density and storage performance.
-
-```bash
-# View system-wide memory statistics
-cat /proc/meminfo | grep -E "(MemTotal|MemFree|MemAvailable|Active|Inactive|Slab|PageTables|KernelStack)"
-
-# Inspect slab allocator state (top 20 caches by object count)
-sudo cat /proc/slabinfo | sort -k3 -nr | head -20
-
-# Detailed slab cache information with specific cache inspection
-sudo slabtop -o  # Real-time slab monitoring
-
-# For a specific process, view virtual memory layout
-cat /proc/self/maps  # Replace self with target PID
-# Format: start-end perms offset dev:inode pathname
-# Example: 7f1234567000-7f1234568000 r-xp 00000000 08:01 12345 /lib/x86_64-linux-gnu/libc.so.6
-
-# NUMA memory allocation statistics per node
-numastat -c qemu-system-x86  # Replace with target process
-
-# Page cache and buffer cache state
-cat /proc/vmstat | grep -E "(nr_file_pages|nr_dirty|nr_writeback|nr_slab_reclaimable)"
-
-# Transparent Huge Pages (THP) usage
-cat /sys/kernel/mm/transparent_hugepage/enabled
-grep AnonHugePages /proc/meminfo
-
-# Memory cgroup statistics (for containerized workloads)
-cat /sys/fs/cgroup/memory/memory.stat  # cgroup v1
-cat /sys/fs/cgroup/memory.current      # cgroup v2
-```
-
-**Key Metrics**:
-- **Slab fragmentation**: High `nr_slab_unreclaimable` indicates kernel memory leaks or fragmentation.
-- **Page cache churn**: Rapid changes in `nr_file_pages` suggest insufficient memory for filesystem caching.
-- **NUMA imbalance**: Uneven memory allocation across nodes causes cross-socket latency penalties (40-60ns overhead).
-
-### 1.2 eBPF Program and Map Introspection
-
-eBPF programs run in kernel space with JIT compilation to native code. Maps provide data structures (hash tables, arrays, ring buffers) shared between kernel and userspace. In HCI, eBPF powers network filtering (XDP), observability (tracepoints), and security (LSM hooks).
-
-```bash
-# List all loaded eBPF programs with metadata
-sudo bpftool prog show
-# Output fields: id, type (xdp/tc/tracepoint/kprobe), name, tag (hash), loaded_at
-
-# Dump specific program's JIT-compiled instructions
-sudo bpftool prog dump xlated id <prog_id>
-sudo bpftool prog dump jited id <prog_id>
-
-# View program BTF (BPF Type Format) debug information
-sudo bpftool btf dump id <btf_id>
-
-# List all BPF maps with type and key/value sizes
-sudo bpftool map show
-# Output: id, type (hash/array/ringbuf), key_size, value_size, max_entries
-
-# Dump map contents (example: hash map)
-sudo bpftool map dump id <map_id>
-
-# Inspect perf event arrays and ring buffers
-sudo bpftool map show type perf_event_array
-sudo bpftool map show type ringbuf
-
-# View program attachment points (cgroup, netdev, tracepoint)
-sudo bpftool cgroup tree /sys/fs/cgroup  # cgroup-attached programs
-sudo bpftool net show  # XDP/TC programs attached to network interfaces
-
-# Pin/unpin maps to BPF filesystem for persistence
-sudo bpftool map pin id <map_id> /sys/fs/bpf/my_map
-ls -la /sys/fs/bpf/
-
-# Realtime BPF map statistics
-sudo bpftrace -e 'tracepoint:syscalls:sys_enter_bpf { @calls[args->cmd] = count(); }'
-```
-
-**Verification**:
-- **XDP programs**: Check attachment to physical interfaces with `ip link show dev eth0 | grep xdp`.
-- **Map memory overhead**: Large maps consume locked kernel memory (check `rlimit MEMLOCK`).
-- **Verifier logs**: If program load fails, inspect `/sys/kernel/debug/tracing/trace_pipe`.
-
-### 1.3 Process Scheduling and CFS Internals
-
-The Completely Fair Scheduler (CFS) maintains per-CPU runqueues and uses red-black trees for O(log n) task selection. Understanding scheduling latency and CPU affinity is critical for latency-sensitive workloads (storage I/O, network packet processing).
-
-```bash
-# View per-CPU runqueue statistics
-cat /proc/schedstat
-# Format: cpu<N> yld_count schedule_count schedule_idle_count ttwu_count ttwu_local_count
-
-# Monitor scheduling events with perf
-sudo perf stat -e 'sched:sched_switch,sched:sched_wakeup,sched:sched_migrate_task' -a -I 1000
-
-# Inspect CFS parameters
-cat /proc/sys/kernel/sched_latency_ns        # Target preemption latency (default: 6ms)
-cat /proc/sys/kernel/sched_min_granularity_ns  # Minimum preemption granularity (default: 0.75ms)
-cat /proc/sys/kernel/sched_wakeup_granularity_ns  # Wake-up preemption granularity
-
-# Per-process scheduling statistics
-cat /proc/<PID>/sched
-# Key fields: sum_exec_runtime (total CPU time), nr_voluntary_switches, nr_involuntary_switches
-
-# CPU affinity and cgroup assignment
-taskset -cp <PID>  # View CPU affinity mask
-cat /proc/<PID>/cgroup  # View cgroup membership
-
-# Realtime scheduling priorities
-chrt -p <PID>  # View scheduling policy (SCHED_OTHER/FIFO/RR)
-
-# Trace scheduling latency with bpftrace
-sudo bpftrace -e 'tracepoint:sched:sched_wakeup { @start[args->pid] = nsecs; }
-                   tracepoint:sched:sched_switch /args->prev_state == 0/ {
-                     @latency_ns = hist(nsecs - @start[args->next_pid]); delete(@start[args->next_pid]);
-                   }'
-
-# CPU frequency scaling and governors
-cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
-
-# Monitor context switches and CPU migrations
-vmstat 1 10  # cs column = context switches per second
-perf stat -e 'migrations' -a sleep 10
-```
-
-**Performance Indicators**:
-- **High involuntary switches**: Indicates CPU contention or scheduler overload.
-- **Scheduling latency spikes**: Visible in `sched_wakeup` → `sched_switch` histogram, caused by CPU-bound processes or IRQ storms.
-- **NUMA migrations**: Excessive cross-socket migrations degrade memory locality.
-
-### 1.4 Network Stack and Interface Inspection
-
-The Linux network stack spans multiple layers: NIC driver → XDP → TC (traffic control) → netfilter → socket buffer. HCI network planes (management, storage, VM traffic) require careful separation and performance isolation.
-
-```bash
-# Detailed interface statistics with error counters
-ip -s -s link show eth0
-# Key metrics: RX/TX packets, errors, dropped, overruns, carrier errors
-
-# View all network namespaces (used by containers and VMs)
-ip netns list
-ip netns exec <namespace> ip addr show
-
-# Inspect routing table and policy routing
-ip route show table all
-ip rule show
-
-# View active TCP/UDP connections with process info
-sudo ss -tunap
-sudo ss -s  # Summary statistics
-
-# Detailed socket buffer and queue information
-cat /proc/net/sockstat
-cat /proc/net/netstat | grep -E "(TcpExt|IpExt)"
-
-# XDP and TC filter inspection
-sudo tc qdisc show dev eth0
-sudo tc filter show dev eth0 ingress
-sudo bpftool net show dev eth0
-
-# Netfilter (iptables/nftables) rule inspection
-sudo iptables -L -v -n -t filter
-sudo iptables -L -v -n -t nat
-sudo nft list ruleset
-
-# Hardware offload capabilities
-ethtool -k eth0 | grep -E "(offload|segmentation|checksum)"
-ethtool -S eth0  # NIC-specific hardware counters
-
-# Interrupt affinity and IRQ statistics
-cat /proc/interrupts | grep eth0
-cat /proc/irq/<IRQ>/smp_affinity
-
-# SNMP protocol statistics
-cat /proc/net/snmp | column -t
-# Key metrics: Tcp.RetransSegs, Udp.InErrors, Ip.FragFails
-
-# Connection tracking table (conntrack)
-sudo conntrack -L -o extended | head -20
-cat /proc/sys/net/netfilter/nf_conntrack_count
-cat /proc/sys/net/netfilter/nf_conntrack_max
-
-# Network namespace resource usage
-ip netns exec <ns> ss -s
-ip netns exec <ns> ip -s link show
-```
-
-**Diagnostic Patterns**:
-- **RX/TX drops**: Often caused by ring buffer exhaustion (increase with `ethtool -G`).
-- **TCP retransmissions**: High `RetransSegs` indicates congestion or lossy links.
-- **Conntrack table full**: Exhausted `nf_conntrack_max` drops new connections (tune via sysctl).
-
-### 1.5 Kernel Event Tracing and Logging
-
-```bash
-# Kernel ring buffer (dmesg) with timestamps and log levels
-sudo dmesg -T -l err,warn | tail -50  # Errors and warnings only
-sudo dmesg -w  # Follow mode
-
-# Systemd journal with structured logging
-sudo journalctl -k --since "1 hour ago"  # Kernel messages
-sudo journalctl -u kubelet.service --since today -o json-pretty
-sudo journalctl --disk-usage  # Journal storage consumption
-
-# Trace kernel functions with ftrace
-echo function > /sys/kernel/debug/tracing/current_tracer
-echo kvm_* > /sys/kernel/debug/tracing/set_ftrace_filter
-cat /sys/kernel/debug/tracing/trace
-
-# Use trace-cmd for function graph tracing
-sudo trace-cmd record -p function_graph -g kvm_vcpu_ioctl sleep 5
-sudo trace-cmd report
-
-# Perf-based kernel event tracing
-sudo perf record -e 'kmem:*' -a -g -- sleep 10
-sudo perf script | head -50
-
-# Audit subsystem for security events
-sudo ausearch -m AVC -ts recent  # SELinux denials
-sudo ausearch -k sched_latency  # Custom audit rules
-
-# BPF-based live tracing with bpftrace
-sudo bpftrace -e 'kprobe:tcp_sendmsg { @bytes = hist(arg2); }'
-```
-
-**Log Analysis Goals**:
-- **OOM killer events**: Search for "Out of memory" or "Killed process" in dmesg.
-- **Hardware errors**: NVMe timeouts, PCIe AER errors, EDAC memory errors.
-- **KVM exits**: High frequency in `trace_kvm_exit` indicates excessive VM exits.
-
----
-
-## Exercise 2: Benchmarking & Saturation Profiling
-
-This exercise quantifies resource capacity and identifies bottlenecks through synthetic load generation. Saturation testing reveals contention points, queueing delays, and scheduler inefficiencies before production deployment.
-
-### 2.1 CPU Saturation and PMU-Based Profiling
-
-```bash
-# Generate CPU load across all cores with stress-ng
-sudo stress-ng --cpu $(nproc) --cpu-method all --timeout 60s --metrics
-
-# Profile CPU usage with perf top (live view)
-sudo perf top -F 999  # 999 Hz sampling frequency
-# Press 'a' to annotate assembly, 's' to sort by overhead
-
-# Record CPU flamegraph data
-sudo perf record -F 999 -a -g -- sleep 30
-sudo perf script > out.perf
-# Generate flamegraph with FlameGraph toolkit (https://github.com/brendangregg/FlameGraph)
-~/FlameGraph/stackcollapse-perf.pl out.perf | ~/FlameGraph/flamegraph.pl > cpu.svg
-
-# CPU benchmark with sysbench
-sysbench cpu --cpu-max-prime=50000 --threads=$(nproc) --time=30 run
-
-# PMU (Performance Monitoring Unit) event counting
-sudo perf stat -e cycles,instructions,cache-references,cache-misses,branch-misses -a sleep 10
-# Calculate IPC (Instructions Per Cycle): instructions / cycles
-# Low IPC (<1.0) indicates CPU stalls from memory access or branch mispredictions
-
-# Detailed per-CPU statistics
-sudo perf stat -a -A -e cycles,instructions -I 1000
-
-# CPU cache hierarchy analysis
-sudo perf stat -e L1-dcache-loads,L1-dcache-load-misses,LLC-loads,LLC-load-misses -a sleep 10
-# Calculate cache miss rates to identify memory-bound workloads
-
-# Trace scheduler runqueue latency
-sudo perf sched record -a -- sleep 10
-sudo perf sched latency  # Average and max scheduling latency per task
-
-# CPU frequency and C-state transitions
-sudo turbostat --interval 1 --num_iterations 10
-```
-
-```mermaid
-graph LR
-    A["CPU Core"] -->|"L1i/L1d Cache<br/>(32KB/32KB)"| B["L2 Cache<br/>(256KB)"]
-    B -->|"L3/LLC Cache<br/>(Shared, MB)"| C["Memory<br/>Controller"]
-    C -->|"DDR4/DDR5<br/>(80-120ns)"| D["DRAM"]
-    
-    style A fill:#ff9999
-    style B fill:#ffcc99
-    style C fill:#ffff99
-    style D fill:#99ccff
-```
-
-**Bottleneck Indicators**:
-- **High cache miss rate**: LLC-load-misses / LLC-loads > 10% indicates poor spatial locality.
-- **Low IPC**: IPC < 0.5 suggests memory stalls; IPC > 2.0 indicates efficient execution.
-- **Scheduling latency**: Max latency > 10ms indicates CPU oversubscription or RT priority inversion.
-
-### 2.2 Memory Saturation and Allocation Profiling
-
-```bash
-# Memory pressure with controlled allocation patterns
-sudo stress-ng --vm 4 --vm-bytes 2G --vm-method all --timeout 60s --metrics
-
-# Monitor memory allocation rates
-sudo vmstat 1 10
-# Key columns: si/so (swap in/out), bi/bo (block in/out), us/sy/id/wa (CPU states)
-
-# Memory bandwidth measurement with stress-ng
-sudo stress-ng --vm 8 --vm-bytes 512M --vm-method read --timeout 30s --metrics-brief
-sudo stress-ng --vm 8 --vm-bytes 512M --vm-method write --timeout 30s --metrics-brief
-
-# NUMA memory bandwidth (requires numactl)
-sudo numactl --cpunodebind=0 --membind=0 stress-ng --vm 4 --vm-bytes 1G --timeout 30s
-sudo numactl --cpunodebind=0 --membind=1 stress-ng --vm 4 --vm-bytes 1G --timeout 30s
-# Compare bandwidth to detect cross-socket penalty
-
-# Perf-based memory profiling
-sudo perf record -e mem-loads,mem-stores -a -g -- stress-ng --vm 2 --vm-bytes 1G --timeout 10s
-sudo perf report --stdio
-
-# Page fault tracing
-sudo perf stat -e page-faults,minor-faults,major-faults -a sleep 10
-
-# Memory access latency (requires Intel PCM or similar)
-sudo pcm-memory 1  # Monitor DRAM bandwidth and latency
-
-# Swap usage and thrashing detection
-watch -n 1 'free -h && cat /proc/vmstat | grep -E "(pgpgin|pgpgout|pswpin|pswpout)"'
-
-# Huge page allocation and usage
-cat /proc/meminfo | grep -i huge
-cat /sys/kernel/mm/hugepages/hugepages-*/nr_hugepages
-
-# Memory cgroup pressure stall information (PSI)
-cat /sys/fs/cgroup/memory.pressure  # cgroup v2
-# some/full avg10/avg60/avg300/total metrics
-```
-
-**Memory Stall Patterns**:
-- **Major page faults**: Indicates disk-backed paging (swap thrashing) under memory pressure.
-- **NUMA remote access**: Cross-socket allocation latency 1.5-2x higher than local.
-- **THP allocation failures**: Check `/proc/vmstat | grep thp` for defrag stalls.
-
-### 2.3 Network Throughput and Latency Profiling
-
-```bash
-# Server-side network throughput test
-sudo iperf3 -s -p 5201 --one-off &
-
-# Client-side TCP throughput test with tuned parameters
-sudo iperf3 -c <server-ip> -p 5201 -t 60 -P 4 -w 512K --logfile iperf3.log
-# -P 4: 4 parallel streams to saturate multi-queue NICs
-# -w 512K: TCP window size (tune based on BDP)
-
-# UDP throughput and packet loss testing
-sudo iperf3 -c <server-ip> -u -b 10G -t 30  # 10 Gbps target bandwidth
-
-# Capture packets during throughput test
-sudo tcpdump -i eth0 -w iperf_capture.pcap -s 128 port 5201 &
-# -s 128: Snapshot length (headers only for high-rate capture)
-
-# Analyze pcap with detailed statistics
-tcpdump -r iperf_capture.pcap -nn | head -100
-tshark -r iperf_capture.pcap -q -z io,stat,1  # I/O statistics per second
-
-# Network latency measurement with ping
-ping -c 1000 -i 0.2 -s 1400 <target-ip> | tee ping.log
-# -i 0.2: 200ms interval, -s 1400: jumbo frame test
-
-# TCP RTT histogram with ss
-watch -n 1 'ss -ti dst <target-ip> | grep -E "(rtt|cwnd)"'
-
-# Packet loss and retransmission analysis
-netstat -s | grep -E "(segments retransmitted|failed connection)"
-nstat -az | grep -E "(TcpRetrans|TcpLost)"
-
-# XDP-based packet forwarding benchmark (requires custom XDP program)
-# Example: xdp_redirect_map.c from kernel samples
-
-# Network device interrupt rate
-watch -n 1 'cat /proc/interrupts | grep eth0'
-
-# NIC ring buffer utilization
-ethtool -g eth0  # View current ring buffer sizes
-ethtool -S eth0 | grep -E "(rx_queue_.*_drops|tx_queue_.*_drops)"
-
-# TC (traffic control) qdisc latency
-sudo tc qdisc add dev eth0 root netem delay 10ms
-ping -c 10 <target-ip>
-sudo tc qdisc del dev eth0 root
-
-# BPF-based packet latency tracing
-sudo bpftrace -e 'kprobe:__netif_receive_skb_core { @start[arg0] = nsecs; }
-                   kretprobe:__netif_receive_skb_core /@start[arg0]/ {
-                     @latency_us = hist((nsecs - @start[arg0]) / 1000); delete(@start[arg0]);
-                   }'
-```
+## Lab Architecture Overview
 
 ```mermaid
 graph TB
-    A["Application<br/>(send/recv)"] -->|"System Call"| B["Socket Layer"]
-    B -->|"Protocol Stack"| C["TCP/UDP Layer"]
-    C -->|"IP Routing"| D["Network Layer"]
-    D -->|"XDP (optional)"| E["TC Egress Hooks"]
-    E -->|"Qdisc Queues"| F["Device Driver"]
-    F -->|"DMA Rings"| G["NIC Hardware"]
+    subgraph cluster ["HCI Cluster Architecture"]
+        subgraph control_plane ["Control Plane"]
+            k8s_api[Kubernetes API Server]
+            ceph_mon1[Ceph Monitor 1]
+            ceph_mon2[Ceph Monitor 2]
+            ceph_mon3[Ceph Monitor 3]
+        end
+        
+        subgraph node1 ["Node 1"]
+            kubelet1[Kubelet]
+            osd1a[OSD.0]
+            osd1b[OSD.1]
+            mgr1[Ceph MGR]
+        end
+        
+        subgraph node2 ["Node 2"]
+            kubelet2[Kubelet]
+            osd2a[OSD.2]
+            osd2b[OSD.3]
+            mgr2[Ceph MGR Standby]
+        end
+        
+        subgraph node3 ["Node 3"]
+            kubelet3[Kubelet]
+            osd3a[OSD.4]
+            osd3b[OSD.5]
+        end
+        
+        subgraph storage_pool ["Ceph Storage Pool"]
+            rbd_pool["(RBD Pool<br/>Replication: 3)"]
+        end
+    end
     
-    G -->|"RX Interrupts"| H["NIC Hardware"]
-    H -->|"DMA Rings"| I["Device Driver"]
-    I -->|"NAPI Polling"| J["TC Ingress Hooks"]
-    J -->|"XDP (optional)"| K["Network Layer"]
-    K -->|"Protocol Stack"| L["TCP/UDP Layer"]
-    L -->|"Socket Buffers"| M["Socket Layer"]
-    M -->|"System Call"| N["Application<br/>(send/recv)"]
+    k8s_api -->|orchestrates| kubelet1
+    k8s_api -->|orchestrates| kubelet2
+    k8s_api -->|orchestrates| kubelet3
     
-    style G fill:#ffcccc
-    style N fill:#ccffcc
+    ceph_mon1 -.->|quorum| ceph_mon2
+    ceph_mon2 -.->|quorum| ceph_mon3
+    ceph_mon3 -.->|quorum| ceph_mon1
+    
+    osd1a -->|writes| rbd_pool
+    osd1b -->|writes| rbd_pool
+    osd2a -->|writes| rbd_pool
+    osd2b -->|writes| rbd_pool
+    osd3a -->|writes| rbd_pool
+    osd3b -->|writes| rbd_pool
+    
+    mgr1 -.->|monitors| osd1a
+    mgr1 -.->|monitors| osd2a
+    mgr1 -.->|monitors| osd3a
 ```
 
-**Network Performance Metrics**:
-- **Throughput ceiling**: 10GbE should achieve ~9.4 Gbps with TCP overhead.
-- **Latency baseline**: Intra-datacenter RTT typically 0.1-0.5ms.
-- **Retransmission rate**: Should be <0.1% in stable networks; higher indicates congestion or errors.
+---
 
-### 2.4 Disk I/O Saturation and Filesystem Profiling
+## Lab 1: Ceph Cluster Bootstrap and CRUSH Map Validation
+
+### Objective
+Deploy a production Ceph cluster, verify CRUSH map topology, and validate placement group distribution across failure domains.
+
+### Theory
+Ceph's CRUSH (Controlled Replication Under Scalable Hashing) algorithm deterministically places data across OSDs without central metadata lookup. The CRUSH map defines the cluster topology hierarchy (root → datacenter → rack → host → OSD) and placement rules. Understanding CRUSH is fundamental to data durability guarantees in HCI.
+
+### Step 1: Deploy Ceph with Rook Operator
+
+```yaml
+# rook-cluster.yaml
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  dataDirHostPath: /var/lib/rook
+  mon:
+    count: 3
+    allowMultiplePerNode: false
+  mgr:
+    count: 2
+    allowMultiplePerNode: false
+  dashboard:
+    enabled: true
+    ssl: false
+  storage:
+    useAllNodes: true
+    useAllDevices: false
+    deviceFilter: "^sd[b-c]"  # Use sdb, sdc on each node
+    config:
+      osdsPerDevice: "1"
+  network:
+    provider: host
+  placement:
+    mon:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - rook-ceph-mon
+          topologyKey: kubernetes.io/hostname
+  resources:
+    mon:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+    osd:
+      limits:
+        cpu: "4"
+        memory: "8Gi"
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+    mgr:
+      limits:
+        cpu: "2"
+        memory: "2Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+```
 
 ```bash
-# Disk I/O load with various patterns (requires fio)
-# Sequential write test
-sudo fio --name=seq-write --rw=write --bs=1M --size=2G --numjobs=4 --group_reporting --directory=/mnt/test
+# Deploy Rook operator
+kubectl create -f https://raw.githubusercontent.com/rook/rook/master/deploy/examples/crds.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/master/deploy/examples/common.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/master/deploy/examples/operator.yaml
 
-# Random read IOPS test
-sudo fio --name=rand-read --rw=randread --bs=4k --size=1G --numjobs=8 --iodepth=32 --group_reporting --directory=/mnt/test
+# Wait for operator
+kubectl -n rook-ceph wait --for=condition=ready pod -l app=rook-ceph-operator --timeout=300s
 
-# Mixed workload (70% read, 30% write)
-sudo fio --name=mixed --rw=randrw --rwmixread=70 --bs=4k --size=1G --numjobs=4 --iodepth=16 --runtime=60 --time_based --group_reporting --directory=/mnt/test
+# Deploy cluster
+kubectl create -f rook-cluster.yaml
 
-# Filesystem metadata stress
-sudo fio --name=metadata --rw=randwrite --bs=512 --size=100M --numjobs=16 --fsync=1 --group_reporting --directory=/mnt/test
+# Wait for cluster health
+kubectl -n rook-ceph wait --for=condition=ready pod -l app=rook-ceph-mon --timeout=600s
+```
 
-# Monitor I/O with iostat (extended statistics)
-sudo iostat -xz 1 10
-# Key metrics: r/s, w/s (IOPS), rkB/s, wkB/s (throughput), await (latency), %util (saturation)
+### Step 2: Inspect CRUSH Map and Verify Topology
 
-# Per-process I/O statistics
-sudo iotop -o -b -n 10  # Only show processes doing I/O
+```bash
+# Enter toolbox
+kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- bash
 
-# Block layer tracepoints
-sudo perf record -e 'block:*' -a -g -- sleep 10
-sudo perf script | head -100
+# Inside toolbox:
+# View CRUSH map hierarchy
+ceph osd tree
 
-# Disk I/O latency histogram with bpftrace
-sudo bpftrace -e 'tracepoint:block:block_rq_complete {
-  @latency_ms = hist((nsecs - @start[args->dev, args->sector]) / 1000000);
+# Expected output:
+# ID  CLASS  WEIGHT   TYPE NAME             STATUS  REWEIGHT  PRI-AFF
+# -1         0.29279  root default
+# -3         0.09760      host node1
+#  0    hdd  0.04880          osd.0             up   1.00000  1.00000
+#  1    hdd  0.04880          osd.1             up   1.00000  1.00000
+# -5         0.09760      host node2
+#  2    hdd  0.04880          osd.2             up   1.00000  1.00000
+#  3    hdd  0.04880          osd.3             up   1.00000  1.00000
+# -7         0.09760      host node3
+#  4    hdd  0.04880          osd.4             up   1.00000  1.00000
+#  5    hdd  0.04880          osd.5             up   1.00000  1.00000
+
+# Decompile CRUSH map to text
+ceph osd getcrushmap -o /tmp/crushmap.bin
+crushtool -d /tmp/crushmap.bin -o /tmp/crushmap.txt
+cat /tmp/crushmap.txt
+
+# Key sections to verify:
+# 1. Bucket hierarchy (root → host → osd)
+# 2. Placement rules (replicated_rule uses 'host' failure domain)
+# 3. Device classes (hdd, ssd, nvme)
+
+# View placement rules
+ceph osd crush rule ls
+ceph osd crush rule dump replicated_rule
+```
+
+**First Principles Explanation:**
+The CRUSH map is a weighted tree. Each OSD has a weight proportional to its capacity. When placing a PG replica, CRUSH walks the tree:
+1. Start at root bucket
+2. Select N distinct hosts using pseudo-random descent (hash PG ID + replica number)
+3. Within each host, select one OSD
+4. Ensures replicas never land on the same host (failure domain isolation)
+
+Weight affects selection probability: an OSD with weight 2.0 receives twice as many PGs as one with weight 1.0.
+
+### Step 3: Create Storage Pool and Verify PG Distribution
+
+```bash
+# Create replicated pool with 128 PGs, size=3, min_size=2
+ceph osd pool create test-pool 128 128 replicated
+ceph osd pool set test-pool size 3
+ceph osd pool set test-pool min_size 2
+
+# Enable RBD on pool
+ceph osd pool application enable test-pool rbd
+
+# Verify PG distribution
+ceph pg ls-by-pool test-pool | awk '{print $1, $15}' | sort -k2 | uniq -c
+
+# Check OSD PG counts (should be roughly equal)
+ceph osd df tree
+
+# Verify no single host has >1 replica of any PG
+for pg in $(ceph pg ls-by-pool test-pool -f json-pretty | jq -r '.pg_stats[].pgid'); do
+    acting=$(ceph pg $pg query | jq -r '.acting[]')
+    hosts=$(for osd in $acting; do ceph osd find $osd | jq -r '.crush_location.host'; done | sort | uniq -c)
+    if echo "$hosts" | awk '{if ($1 > 1) exit 1}'; then
+        :
+    else
+        echo "ERROR: PG $pg has multiple replicas on same host"
+    fi
+done
+```
+
+**Verification Checklist:**
+- [ ] All 6 OSDs have roughly equal PG count (±10%)
+- [ ] Each PG has exactly 3 acting OSDs
+- [ ] No PG has multiple replicas on the same host
+- [ ] Pool state is HEALTH_OK
+
+---
+
+## Lab 2: Storage Pool Rebalancing Under OSD Failure
+
+### Objective
+Simulate OSD failure, observe automated rebalancing, measure recovery time, and verify data integrity during backfill.
+
+### Theory
+Ceph maintains data durability through replication. When an OSD fails:
+1. Monitors detect failure (default: 5 min heartbeat timeout)
+2. Marks OSD 'down', waits for 'out' grace period (default: 10 min)
+3. CRUSH recalculates PG placements excluding failed OSD
+4. OSDs backfill underreplicated PGs from remaining replicas
+5. Cluster returns to HEALTH_OK when all PGs reach target replica count
+
+Rebalancing speed depends on: osd_max_backfills (default 1), osd_recovery_max_active (default 3), network bandwidth, and disk I/O capacity.
+
+### Step 1: Baseline Write Workload with fio
+
+```bash
+# Create RBD image
+rbd create test-pool/bench-image --size 10G
+
+# Map RBD device
+rbd map test-pool/bench-image
+# Returns: /dev/rbd0
+
+# Format and mount
+mkfs.ext4 /dev/rbd0
+mkdir -p /mnt/rbd-bench
+mount /dev/rbd0 /mnt/rbd-bench
+
+# Run baseline fio test
+fio --name=baseline \
+    --directory=/mnt/rbd-bench \
+    --size=4G \
+    --bs=4k \
+    --rw=randrw \
+    --rwmixread=70 \
+    --numjobs=4 \
+    --iodepth=16 \
+    --runtime=300 \
+    --time_based \
+    --group_reporting \
+    --output=baseline.json \
+    --output-format=json
+
+# Extract baseline IOPS
+cat baseline.json | jq '.jobs[0].read.iops + .jobs[0].write.iops'
+```
+
+### Step 2: Simulate OSD Failure and Monitor Rebalancing
+
+```bash
+# Before failure, capture PG state
+ceph pg dump pgs | awk '{print $1, $16, $17, $18}' > /tmp/pg_state_before.txt
+
+# Identify target OSD (e.g., osd.2)
+ceph osd df | grep osd.2
+
+# Mark OSD out (simulates permanent failure)
+ceph osd out osd.2
+
+# Observe cluster state changes
+watch -n 5 'ceph -s'
+
+# Monitor PG state transitions
+# HEALTH_WARN: Degraded data redundancy (PGs undersized)
+# HEALTH_WARN: Rebalancing after osd.2 failure (PGs recovering/backfilling)
+
+# Track recovery progress
+watch -n 10 'ceph pg stat'
+
+# Detailed recovery metrics
+ceph status | grep -A 10 'recovery\|backfill'
+
+# After recovery completes, capture final PG state
+ceph pg dump pgs | awk '{print $1, $16, $17, $18}' > /tmp/pg_state_after.txt
+
+# Compare PG mappings (acting sets will differ)
+diff /tmp/pg_state_before.txt /tmp/pg_state_after.txt | head -20
+```
+
+**Key Metrics to Observe:**
+- Time to detect failure (mon_osd_down_out_interval)
+- Number of degraded PGs (size < 3)
+- Backfill throughput (MB/s)
+- Time to HEALTH_OK (typically 10-30 min for 10GB data)
+
+### Step 3: Verify Data Integrity During Rebalancing
+
+```bash
+# Start continuous write load during recovery
+fio --name=integrity_test \
+    --directory=/mnt/rbd-bench \
+    --size=2G \
+    --bs=1M \
+    --rw=write \
+    --numjobs=1 \
+    --verify=crc32c \
+    --verify_fatal=1 \
+    --verify_dump=1 \
+    --runtime=600 \
+    --time_based \
+    --output=integrity.log &
+
+FIO_PID=$!
+
+# While fio runs, mark another OSD out
+sleep 60
+ceph osd out osd.4
+
+# Wait for fio to complete
+wait $FIO_PID
+
+# Check for verification errors
+if grep -q "verify" integrity.log; then
+    echo "ERROR: Data corruption detected"
+    cat integrity.log | grep -A 5 "verify"
+else
+    echo "SUCCESS: No data corruption during rebalancing"
+fi
+```
+
+### Step 4: Tune Recovery Parameters
+
+```bash
+# Accelerate recovery (use cautiously in production)
+ceph tell 'osd.*' injectargs '--osd-max-backfills 2'
+ceph tell 'osd.*' injectargs '--osd-recovery-max-active 5'
+ceph tell 'osd.*' injectargs '--osd-recovery-max-single-start 2'
+
+# Monitor impact on client I/O
+fio --name=client_impact \
+    --directory=/mnt/rbd-bench \
+    --size=1G \
+    --bs=4k \
+    --rw=randread \
+    --numjobs=4 \
+    --iodepth=8 \
+    --runtime=120 \
+    --time_based \
+    --output=during_recovery.json \
+    --output-format=json
+
+# Compare IOPS degradation
+BASELINE_IOPS=$(cat baseline.json | jq '.jobs[0].read.iops')
+RECOVERY_IOPS=$(cat during_recovery.json | jq '.jobs[0].read.iops')
+DEGRADATION=$(echo "scale=2; (1 - $RECOVERY_IOPS / $BASELINE_IOPS) * 100" | bc)
+echo "Client IOPS degradation during recovery: ${DEGRADATION}%"
+```
+
+**Verification Checklist:**
+- [ ] Cluster reached HEALTH_OK after OSD failure
+- [ ] All PGs returned to active+clean state
+- [ ] No data corruption detected by fio verify
+- [ ] Recovery time logged and within SLA
+- [ ] Client I/O degradation measured and acceptable
+
+---
+
+## Lab 3: Quorum Consensus and Split-Brain Simulation
+
+### Objective
+Test Ceph monitor quorum under network partition, validate split-brain prevention, and measure recovery time after partition heals.
+
+### Theory
+Ceph monitors form a Paxos quorum requiring strict majority (N/2 + 1) to make cluster state decisions. With 3 monitors, 2 must agree. Network partitions can create split-brain scenarios where:
+- Partition A: 2 monitors (has quorum, cluster operational)
+- Partition B: 1 monitor (no quorum, read-only mode)
+
+Ceph prevents split-brain by refusing writes when quorum is lost. When partition heals, the minority partition syncs from majority.
+
+### Step 1: Baseline Monitor Quorum Verification
+
+```bash
+# Verify monitor quorum status
+ceph quorum_status --format json-pretty
+
+# Expected output:
+# {
+#   "election_epoch": 12,
+#   "quorum": [0, 1, 2],
+#   "quorum_names": ["node1", "node2", "node3"],
+#   "quorum_leader_name": "node1",
+#   "monmap": { ... }
+# }
+
+# Test write operation with full quorum
+rbd create test-pool/quorum-test --size 1G
+rbd ls test-pool | grep quorum-test
+
+# Monitor latency histogram
+ceph daemon mon.node1 perf dump | jq '.paxos.commit_latency'
+```
+
+### Step 2: Simulate Network Partition Isolating One Monitor
+
+```bash
+# On node3, block traffic to/from node1 and node2
+ssh node3 << 'EOF'
+# Install iptables if needed
+apt-get install -y iptables
+
+# Block Ceph monitor ports (3300, 6789)
+iptables -A INPUT -s $(getent hosts node1 | awk '{print $1}') -p tcp --dport 3300 -j DROP
+iptables -A INPUT -s $(getent hosts node1 | awk '{print $1}') -p tcp --dport 6789 -j DROP
+iptables -A INPUT -s $(getent hosts node2 | awk '{print $1}') -p tcp --dport 3300 -j DROP
+iptables -A INPUT -s $(getent hosts node2 | awk '{print $1}') -p tcp --dport 6789 -j DROP
+
+iptables -A OUTPUT -d $(getent hosts node1 | awk '{print $1}') -p tcp --sport 3300 -j DROP
+iptables -A OUTPUT -d $(getent hosts node1 | awk '{print $1}') -p tcp --sport 6789 -j DROP
+iptables -A OUTPUT -d $(getent hosts node2 | awk '{print $1}') -p tcp --sport 3300 -j DROP
+iptables -A OUTPUT -d $(getent hosts node2 | awk '{print $1}') -p tcp --sport 6789 -j DROP
+EOF
+
+# Wait 30 seconds for detection
+sleep 30
+
+# Check quorum from majority partition (node1)
+ssh node1 "ceph quorum_status --format json-pretty"
+# Should show quorum: [0, 1] (node1, node2)
+
+# Attempt to check from minority partition (node3)
+timeout 10 ssh node3 "ceph -s" || echo "node3 cannot reach quorum (expected)"
+```
+
+### Step 3: Verify Write Availability in Majority Partition
+
+```bash
+# From node1 (has quorum), test write operations
+rbd create test-pool/partition-write --size 500M
+rbd info test-pool/partition-write
+
+# Verify OSD operations continue
+rados -p test-pool bench 60 write --no-cleanup
+
+# Check monitor logs for quorum events
+ssh node1 "journalctl -u ceph-mon@node1 --since '5 minutes ago' | grep -i quorum"
+```
+
+### Step 4: Heal Partition and Verify Reconvergence
+
+```bash
+# Remove iptables rules on node3
+ssh node3 << 'EOF'
+iptables -F INPUT
+iptables -F OUTPUT
+EOF
+
+# Monitor quorum reformation
+watch -n 2 'ceph quorum_status --format json-pretty | jq .quorum'
+
+# Wait for mon.node3 to rejoin
+# Expected: quorum changes from [0,1] to [0,1,2]
+
+# Verify monitor state synchronization
+ceph mon stat
+
+# Check for clock skew warnings (can cause quorum issues)
+ceph time-sync-status
+
+# Validate all monitors have consistent view
+for mon in node1 node2 node3; do
+    echo "=== $mon ==="
+    ssh $mon "ceph mon dump | grep epoch"
+done
+# All should show same epoch
+```
+
+### Step 5: Three-Way Partition Scenario (No Quorum)
+
+```bash
+# Create full network split (all monitors isolated)
+for node in node1 node2 node3; do
+    ssh $node << 'EOF'
+    for other in node1 node2 node3; do
+        if [ "$other" != "$(hostname)" ]; then
+            iptables -A INPUT -s $(getent hosts $other | awk '{print $1}') -p tcp --dport 3300 -j DROP
+            iptables -A INPUT -s $(getent hosts $other | awk '{print $1}') -p tcp --dport 6789 -j DROP
+        fi
+    done
+EOF
+done
+
+# Wait 60 seconds
+sleep 60
+
+# Verify no monitor has quorum
+for mon in node1 node2 node3; do
+    echo "=== $mon quorum status ==="
+    timeout 5 ssh $mon "ceph quorum_status 2>&1" || echo "No quorum on $mon"
+done
+
+# Attempt write operation (should timeout)
+timeout 10 rbd create test-pool/should-fail --size 100M || echo "Write correctly blocked without quorum"
+
+# Restore connectivity
+for node in node1 node2 node3; do
+    ssh $node "iptables -F"
+done
+
+# Wait for re-election
+sleep 30
+ceph quorum_status --format json-pretty
+```
+
+**Split-Brain Prevention Diagram:**
+
+```mermaid
+sequenceDiagram
+    participant Mon1
+    participant Mon2
+    participant Mon3
+    participant Client
+    
+    Note over Mon1,Mon3: Normal Operation (3-node quorum)
+    Client->>Mon1: Write Request
+    Mon1->>Mon2: Propose (Paxos)
+    Mon1->>Mon3: Propose (Paxos)
+    Mon2-->>Mon1: Accept
+    Mon3-->>Mon1: Accept
+    Mon1->>Client: Commit (quorum reached)
+    
+    Note over Mon3: Network Partition
+    rect rgb(255, 200, 200)
+        Mon1->>Mon2: Propose
+        Mon1-xMon3: Timeout
+        Mon2-->>Mon1: Accept
+        Note over Mon1,Mon2: Majority quorum (2/3)
+        Mon1->>Client: Commit
+    end
+    
+    rect rgb(200, 200, 255)
+        Client->>Mon3: Write Request
+        Mon3-xMon1: No quorum
+        Mon3-xMon2: No quorum
+        Mon3->>Client: UNAVAILABLE (quorum lost)
+    end
+    
+    Note over Mon3: Partition Heals
+    Mon3->>Mon1: Request State Sync
+    Mon1->>Mon3: Send Missing Paxos Proposals
+    Mon3->>Mon1: Join Quorum
+    Note over Mon1,Mon3: Full quorum restored (3/3)
+```
+
+**Verification Checklist:**
+- [ ] Majority partition (2 mons) maintained quorum and accepted writes
+- [ ] Minority partition (1 mon) refused writes and reported no quorum
+- [ ] After healing, all monitors rejoined quorum with same epoch
+- [ ] No data inconsistencies after partition healed
+- [ ] Full 3-way partition correctly blocked all writes
+
+---
+
+## Lab 4: Live Hypervisor Failover with Workload Migration
+
+### Objective
+Simulate compute node failure, trigger live VM/container migration, measure failover time, and verify storage connectivity persistence.
+
+### Theory
+Hyperconverged systems co-locate compute and storage. When a compute node fails:
+1. Kubernetes detects node failure (node status → NotReady)
+2. After tolerationSeconds (default 300s), evicts pods
+3. Scheduler places pods on surviving nodes
+4. Pods reconnect to RBD volumes (multi-attach for RWO requires fencing)
+5. Ceph handles OSD failure independently (Lab 2)
+
+For block storage (RBD), RWO volumes require I/O fencing to prevent data corruption from zombie processes. RWX requires shared filesystem (CephFS) or multi-attach capable CSI driver.
+
+### Step 1: Deploy Stateful Workload with RBD PVC
+
+```yaml
+# rbd-storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-block
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: test-pool
+  imageFormat: "2"
+  imageFeatures: layering
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+# stateful-app.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node2  # Pin to node2
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "testpassword"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - mysql
+            - -h
+            - localhost
+            - -e
+            - "SELECT 1"
+          initialDelaySeconds: 20
+          periodSeconds: 5
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+```
+
+```bash
+# Deploy workload
+kubectl apply -f rbd-storageclass.yaml
+kubectl apply -f stateful-app.yaml
+
+# Wait for pod running
+kubectl wait --for=condition=ready pod -l app=mysql --timeout=300s
+
+# Verify RBD mapping
+POD=$(kubectl get pod -l app=mysql -o jsonpath='{.items[0].metadata.name}')
+NODE=$(kubectl get pod $POD -o jsonpath='{.spec.nodeName}')
+echo "MySQL pod running on: $NODE"
+
+# Check RBD device on node
+ssh $NODE "rbd showmapped"
+# Should show: id pool namespace image snap device
+#              0  test-pool csi-vol-xxxxx - /dev/rbd0
+
+# Populate database
+kubectl exec -it $POD -- mysql -uroot -ptestpassword << 'EOF'
+CREATE DATABASE testdb;
+USE testdb;
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    message VARCHAR(255)
+);
+INSERT INTO events (message) VALUES ('Pre-failover baseline');
+SELECT * FROM events;
+EOF
+```
+
+### Step 2: Simulate Node Failure
+
+```bash
+# Cordon node to prevent new scheduling
+kubectl cordon node2
+
+# Simulate hard node failure (no graceful shutdown)
+ssh node2 "echo b > /proc/sysrq-trigger" &
+# This triggers kernel panic (immediate crash)
+
+# Alternative: Power off VM
+# ssh node2 "poweroff -f"
+
+# Monitor node status
+watch -n 5 'kubectl get nodes'
+
+# Node will transition:
+# Ready → NotReady (after ~40s, kubelet heartbeat timeout)
+
+# Monitor pod status
+watch -n 5 'kubectl get pods -l app=mysql -o wide'
+
+# Pod will transition:
+# Running → Terminating (after 300s, pod eviction timeout)
+# Terminating → Pending (scheduler assigns new node)
+# Pending → ContainerCreating (CSI attaches volume)
+# ContainerCreating → Running (application starts)
+```
+
+### Step 3: Measure Failover Timeline and Verify Data Persistence
+
+```bash
+# Capture detailed timeline
+START_TIME=$(date +%s)
+
+# Wait for pod to be rescheduled and running
+kubectl wait --for=condition=ready pod -l app=mysql --timeout=600s
+
+END_TIME=$(date +%s)
+FAILOVER_DURATION=$((END_TIME - START_TIME))
+echo "Total failover time: ${FAILOVER_DURATION}s"
+
+# Breakdown:
+# - Node detection: ~40s (kubelet heartbeat)
+# - Pod eviction: ~300s (default tolerationSeconds)
+# - CSI detach (old node): ~30s
+# - CSI attach (new node): ~20s
+# - Container start: ~30s
+# Total expected: ~420s (7 minutes)
+
+# Verify new pod location
+NEW_POD=$(kubectl get pod -l app=mysql -o jsonpath='{.items[0].metadata.name}')
+NEW_NODE=$(kubectl get pod $NEW_POD -o jsonpath='{.spec.nodeName}')
+echo "MySQL pod now running on: $NEW_NODE"
+
+# Verify data persistence
+kubectl exec -it $NEW_POD -- mysql -uroot -ptestpassword << 'EOF'
+USE testdb;
+INSERT INTO events (message) VALUES ('Post-failover verification');
+SELECT * FROM events;
+EOF
+
+# Should show both pre-failover and post-failover entries
+```
+
+### Step 4: Tune Failover Parameters
+
+```bash
+# Reduce eviction timeout for faster failover
+kubectl patch deployment mysql --type=json -p='[
+  {
+    "op": "add",
+    "path": "/spec/template/spec/tolerations",
+    "value": [
+      {
+        "key": "node.kubernetes.io/unreachable",
+        "operator": "Exists",
+        "effect": "NoExecute",
+        "tolerationSeconds": 30
+      },
+      {
+        "key": "node.kubernetes.io/not-ready",
+        "operator": "Exists",
+        "effect": "NoExecute",
+        "tolerationSeconds": 30
+      }
+    ]
+  }
+]'
+
+# Reduce CSI timeout (edit CSI configmap)
+kubectl -n rook-ceph edit configmap rook-ceph-operator-config
+# Add: CSI_PLUGIN_TIMEOUT: "60s"
+
+# Restart CSI pods
+kubectl -n rook-ceph rollout restart deployment csi-rbdplugin-provisioner
+```
+
+### Step 5: Test Concurrent Node and OSD Failure
+
+```bash
+# Deploy second stateful app on node3
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  storageClassName: rook-ceph-block
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node3
+      containers:
+      - name: postgres
+        image: postgres:15
+        env:
+        - name: POSTGRES_PASSWORD
+          value: testpass
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+EOF
+
+kubectl wait --for=condition=ready pod -l app=postgres --timeout=300s
+
+# Simultaneously fail node3 (compute) and osd.5 (storage)
+ssh node3 "systemctl stop kubelet && ceph-volume lvm zap /dev/sdc --destroy && reboot -f" &
+
+# Monitor cluster state
+watch -n 5 '
+echo "=== Nodes ==="
+kubectl get nodes
+echo "=== Pods ==="
+kubectl get pods -l app=postgres -o wide
+echo "=== Ceph Health ==="
+ceph -s
+'
+
+# Verify:
+# 1. Postgres pod migrates to node1/node2
+# 2. Ceph initiates OSD.5 backfill
+# 3. Both complete within 10 minutes
+```
+
+**Failover Timeline Diagram:**
+
+```mermaid
+gantt
+    title Node Failure Failover Timeline
+    dateFormat  ss
+    axisFormat  %Ss
+    
+    section Detection
+    Kubelet heartbeat timeout    :a1, 00, 40s
+    
+    section Eviction
+    Pod tolerationSeconds        :a2, 40, 300s
+    
+    section Storage
+    CSI detach (old node)        :a3, 340, 30s
+    RBD unmap with fence         :a4, 340, 30s
+    CSI attach (new node)        :a5, 370, 20s
+    RBD map                      :a6, 370, 20s
+    
+    section Scheduling
+    Pod rescheduling             :a7, 340, 10s
+    Image pull (if needed)       :a8, 390, 20s
+    
+    section Recovery
+    Container start              :a9, 410, 20s
+    Application ready            :a10, 430, 10s
+```
+
+**Verification Checklist:**
+- [ ] Pod successfully migrated to surviving node
+- [ ] Total failover time measured and documented
+- [ ] Data integrity verified (pre-failure records intact)
+- [ ] RBD volume properly detached from failed node
+- [ ] RBD volume attached to new node
+- [ ] No stale device mappings on failed node after recovery
+- [ ] Concurrent compute+storage failure handled gracefully
+
+---
+
+## Lab 5: Storage Performance Benchmarking and Bottleneck Analysis
+
+### Objective
+Establish baseline storage performance, identify bottlenecks across the I/O path (network, OSD, disk), and optimize for IOPS and throughput.
+
+### Theory
+HCI storage performance depends on:
+1. **Network**: 10GbE (1.25GB/s), 25GbE (3.125GB/s) limits throughput
+2. **OSD CPU**: Ceph protocol overhead, BlueStore RocksDB compaction
+3. **Disk**: HDD (100-200 IOPS), SSD (10k-100k IOPS), NVMe (100k-1M IOPS)
+4. **Replication**: 3x write amplification (client writes 1GB → OSDs write 3GB)
+5. **Client-side caching**: Kernel page cache, RBD cache layers
+
+Bottleneck identification requires measurement at each layer.
+
+### Step 1: Network Baseline with iperf3
+
+```bash
+# On node1, start iperf3 server
+ssh node1 "iperf3 -s -p 5201 &"
+
+# From node2, test TCP throughput
+ssh node2 "iperf3 -c node1 -p 5201 -t 30 -P 4"
+
+# Expected on 10GbE: ~9.4 Gbps (wire protocol overhead)
+# If significantly lower, check:
+# - MTU size (should be 9000 for jumbo frames)
+# - NIC driver offloads (TSO, GSO, GRO)
+
+# Test UDP with packet loss measurement
+ssh node2 "iperf3 -c node1 -p 5201 -u -b 10G -t 30"
+
+# Verify network interface stats
+ssh node1 "ethtool -S eth1 | grep -E 'tx_|rx_|drop|error'"
+```
+
+### Step 2: Raw OSD Throughput with rados bench
+
+```bash
+# Sequential write (bypass RBD layer)
+rados -p test-pool bench 60 write --no-cleanup -t 16 -b 4M
+
+# Key metrics:
+# - Bandwidth (MB/s): should approach network limit / 3 (replication)
+# - Average latency (ms): <10ms for SSD, <50ms for HDD
+
+# Sequential read
+rados -p test-pool bench 60 seq -t 16
+
+# Random read (tests OSD CPU and disk random I/O)
+rados -p test-pool bench 60 rand -t 16
+
+# Cleanup
+rados -p test-pool cleanup
+```
+
+**Expected Results (3-node, 10GbE, SSD):**
+```
+Write:
+  Bandwidth: ~400 MB/s (1200 MB/s total across 3 replicas ≈ 10Gbps network limit)
+  Latency: 8-12ms
+
+Seq Read:
+  Bandwidth: ~1000 MB/s (single replica, network limited)
+  Latency: 3-5ms
+
+Rand Read:
+  Bandwidth: ~300 MB/s
+  Latency: 15-25ms (disk seek time dominates)
+```
+
+### Step 3: RBD Block Device Performance with fio
+
+```bash
+# Create test RBD image
+rbd create test-pool/fio-bench --size 50G --image-feature layering
+
+# Map to block device
+rbd map test-pool/fio-bench
+# Returns /dev/rbd1
+
+# Test 1: Sequential Write Throughput
+fio --name=seq-write \
+    --filename=/dev/rbd1 \
+    --bs=1M \
+    --rw=write \
+    --iodepth=32 \
+    --numjobs=1 \
+    --direct=1 \
+    --size=10G \
+    --runtime=60 \
+    --time_based \
+    --group_reporting \
+    --output=seq_write.json \
+    --output-format=json
+
+# Test 2: Random Write IOPS (4K blocks)
+fio --name=rand-write-iops \
+    --filename=/dev/rbd1 \
+    --bs=4k \
+    --rw=randwrite \
+    --iodepth=64 \
+    --numjobs=4 \
+    --direct=1 \
+    --size=10G \
+    --runtime=60 \
+    --time_based \
+    --group_reporting \
+    --output=rand_write_iops.json \
+    --output-format=json
+
+# Test 3: Mixed Read/Write (70/30)
+fio --name=mixed-rw \
+    --filename=/dev/rbd1 \
+    --bs=4k \
+    --rw=randrw \
+    --rwmixread=70 \
+    --iodepth=32 \
+    --numjobs=4 \
+    --direct=1 \
+    --size=10G \
+    --runtime=120 \
+    --time_based \
+    --group_reporting \
+    --output=mixed_rw.json \
+    --output-format=json
+
+# Extract metrics
+cat seq_write.json | jq '{
+  write_bw_MB: (.jobs[0].write.bw / 1024),
+  write_iops: .jobs[0].write.iops,
+  write_lat_ms: (.jobs[0].write.lat_ns.mean / 1000000)
+}'
+
+cat rand_write_iops.json | jq '{
+  write_iops: .jobs[0].write.iops,
+  write_lat_ms: (.jobs[0].write.lat_ns.mean / 1000000),
+  write_lat_p99_ms: (.jobs[0].write.lat_ns.percentile."99.000000" / 1000000)
+}'
+
+cat mixed_rw.json | jq '{
+  read_iops: .jobs[0].read.iops,
+  write_iops: .jobs[0].write.iops,
+  total_iops: (.jobs[0].read.iops + .jobs[0].write.iops),
+  read_lat_ms: (.jobs[0].read.lat_ns.mean / 1000000),
+  write_lat_ms: (.jobs[0].write.lat_ns.mean / 1000000)
+}'
+```
+
+### Step 4: Identify Bottlenecks with OSD Profiling
+
+```bash
+# Enable OSD performance counters
+ceph tell 'osd.*' injectargs '--debug_osd 10/10'
+
+# Run fio workload
+fio --name=bottleneck-test \
+    --filename=/dev/rbd1 \
+    --bs=4k \
+    --rw=randwrite \
+    --iodepth=64 \
+    --numjobs=4 \
+    --direct=1 \
+    --runtime=60 \
+    --time_based &
+
+FIO_PID=$!
+
+# Collect OSD stats during workload
+sleep 10
+ceph daemon osd.0 perf dump > osd0_perf_start.json
+sleep 40
+ceph daemon osd.0 perf dump > osd0_perf_end.json
+
+wait $FIO_PID
+
+# Analyze OSD latency breakdown
+jq -s '
+{
+  commit_latency_ms: ((.[1].bluestore.commit_lat.sum - .[0].bluestore.commit_lat.sum) / 
+                      (.[1].bluestore.commit_lat.avgcount - .[0].bluestore.commit_lat.avgcount) / 1000000),
+  kv_sync_latency_ms: ((.[1].bluestore.kv_sync_lat.sum - .[0].bluestore.kv_sync_lat.sum) / 
+                       (.[1].bluestore.kv_sync_lat.avgcount - .[0].bluestore.kv_sync_lat.avgcount) / 1000000),
+  throttle_wait_ms: ((.[1].throttle.osd_client_bytes.wait.sum - .[0].throttle.osd_client_bytes.wait.sum) / 
+                     (.[1].throttle.osd_client_bytes.wait.avgcount - .[0].throttle.osd_client_bytes.wait.avgcount) / 1000000)
 }
-tracepoint:block:block_rq_issue {
-  @start[args->dev, args->sector] = nsecs;
-}'
+' osd0_perf_start.json osd0_perf_end.json
 
-# Filesystem cache hit ratio
-cat /proc/vmstat | grep -E "(pgpgin|pgpgout)"
-# Compare to actual block device I/O to estimate cache effectiveness
+# Interpretation:
+# - commit_latency: time to write data to disk (disk I/O bottleneck if >15ms)
+# - kv_sync_latency: RocksDB fsync time (SSD wear/fragmentation if high)
+# - throttle_wait: backpressure from slow OSDs (replication lag)
 
-# Direct I/O vs buffered I/O comparison
-sudo fio --name=direct --rw=write --bs=1M --size=1G --direct=1 --directory=/mnt/test
-sudo fio --name=buffered --rw=write --bs=1M --size=1G --direct=0 --directory=/mnt/test
+# Check OSD CPU usage
+ssh node1 "pidstat -u -C ceph-osd 5 5"
 
-# NVMe device statistics
-sudo nvme smart-log /dev/nvme0n1
-sudo cat /sys/block/nvme0n1/queue/scheduler  # Should be 'none' for NVMe
-
-# Device mapper and LVM statistics (if applicable)
-sudo dmsetup status
-sudo dmsetup table
-
-# Distributed storage I/O patterns (Ceph example)
-sudo ceph osd perf  # OSD performance statistics
-sudo rados bench -p <pool> 30 write --no-cleanup
-sudo rados bench -p <pool> 30 seq
+# Check disk utilization
+ssh node1 "iostat -x 5 5 /dev/sdb /dev/sdc"
+# Look for %util near 100% (disk saturated)
 ```
 
-**I/O Performance Baselines**:
-- **NVMe SSD**: 500K+ random read IOPS, <100µs latency at low queue depth.
-- **SATA SSD**: 80K-100K IOPS, ~200µs latency.
-- **HDD**: 100-200 IOPS, 5-10ms latency.
-- **Filesystem overhead**: XFS and ext4 add ~5-10% latency for metadata operations.
+### Step 5: Optimize for Latency-Sensitive Workloads
+
+```bash
+# Reduce RBD cache size (faster flush for write consistency)
+rbd config image set test-pool/fio-bench rbd_cache_writethrough_until_flush true
+
+# Tune OSD threadpool (more threads for parallel I/O)
+ceph tell 'osd.*' injectargs '--osd_op_num_threads_per_shard 2'
+
+# Enable bluestore write-ahead-log (WAL) on faster device
+# (Requires OSD recreation, do in maintenance window)
+# ceph-volume lvm create --bluestore --data /dev/sdb --block.wal /dev/nvme0n1p1
+
+# Disable scrubbing during peak hours (reduces background I/O)
+ceph osd set noscrub
+ceph osd set nodeep-scrub
+
+# Re-run fio and compare latency
+fio --name=optimized \
+    --filename=/dev/rbd1 \
+    --bs=4k \
+    --rw=randwrite \
+    --iodepth=64 \
+    --numjobs=4 \
+    --direct=1 \
+    --runtime=60 \
+    --time_based \
+    --output=optimized.json \
+    --output-format=json
+
+# Compare p99 latency before/after
+BEFORE_P99=$(cat rand_write_iops.json | jq '.jobs[0].write.lat_ns.percentile."99.000000" / 1000000')
+AFTER_P99=$(cat optimized.json | jq '.jobs[0].write.lat_ns.percentile."99.000000" / 1000000')
+IMPROVEMENT=$(echo "scale=2; (1 - $AFTER_P99 / $BEFORE_P99) * 100" | bc)
+echo "P99 latency improvement: ${IMPROVEMENT}%"
+```
+
+**Performance Tuning Reference:**
+
+| Metric | HDD Target | SSD Target | NVMe Target | Tuning Levers |
+|--------|-----------|-----------|-------------|---------------|
+| Seq Write (MB/s) | 80-120 | 300-500 | 1000-2000 | Network BW, OSD threads |
+| Rand Write IOPS | 200-500 | 5k-15k | 50k-200k | Queue depth, replication |
+| Write Latency (p50) | 15-30ms | 2-5ms | 0.5-1ms | WAL device, cache tuning |
+| Write Latency (p99) | 50-100ms | 10-20ms | 2-5ms | Scrub schedule, throttle |
+| Rand Read IOPS | 100-200 | 10k-30k | 100k-500k | Client cache, PG count |
+
+**Verification Checklist:**
+- [ ] Network throughput tested and meets 80% of link capacity
+- [ ] OSD write throughput measured (rados bench)
+- [ ] RBD performance profiled (fio)
+- [ ] Bottleneck identified (network, CPU, disk, or protocol)
+- [ ] Latency p50 and p99 recorded
+- [ ] Optimization applied and improvement quantified
 
 ---
 
-## Exercise 3: Fault Injection & Recovery Analysis
+## Lab 6: Multi-Tenant Storage Isolation and QoS
 
-This exercise simulates real-world failures to validate resilience mechanisms: network partitions, memory exhaustion, process crashes, and kernel panics. Observing recovery behavior under controlled faults is essential for building robust HCI systems.
+### Objective
+Configure Ceph storage classes with bandwidth limits, validate tenant isolation, and prevent noisy neighbor scenarios.
 
-### 3.1 Network Partition and Split-Brain Simulation
+### Theory
+In multi-tenant HCI, storage QoS prevents one tenant from exhausting cluster resources. Ceph provides:
+1. **Pool-level quotas**: max_objects, max_bytes
+2. **Client throttling**: client read/write BPS/IOPS limits
+3. **OSD backpressure**: throttle slow clients to protect cluster
+4. **RBD QoS**: IOPS and bandwidth caps per image
 
-```bash
-# Simulate complete network partition to specific IP
-sudo iptables -A OUTPUT -d <target-ip> -j DROP
-sudo iptables -A INPUT -s <target-ip> -j DROP
+Effective QoS requires limits at multiple layers: CSI driver (Kubernetes), RBD image, and OSD server.
 
-# Verify partition
-ping -c 5 <target-ip>  # Should timeout
-
-# Monitor distributed system behavior (Kubernetes example)
-kubectl get nodes  # Check node status
-kubectl describe node <node-name> | grep -A 10 Conditions
-
-# Simulate asymmetric partition (one-way drop)
-sudo iptables -A OUTPUT -d <target-ip> -j DROP
-# INPUT remains open, creating directional failure
-
-# Introduce latency instead of complete drop
-sudo tc qdisc add dev eth0 root netem delay 500ms 100ms distribution normal
-# 500ms mean delay with 100ms jitter
-
-# Introduce packet loss
-sudo tc qdisc change dev eth0 root netem loss 30%
-
-# Introduce packet reordering
-sudo tc qdisc change dev eth0 root netem delay 10ms reorder 25% 50%
-
-# Restore network connectivity
-sudo iptables -F OUTPUT
-sudo iptables -F INPUT
-sudo tc qdisc del dev eth0 root
-
-# Monitor recovery time
-watch -n 1 'kubectl get nodes'
-journalctl -u kubelet.service --since "1 minute ago" | grep -i "node.*ready"
-
-# Distributed storage split-brain detection (Ceph example)
-sudo ceph health detail
-sudo ceph osd tree
-```
-
-**Recovery Verification**:
-- **Kubernetes node recovery**: Typically 40-90 seconds (node-monitor-grace-period + node-monitor-period).
-- **Distributed storage**: Quorum-based systems (Ceph, etcd) should maintain read/write with majority availability.
-- **Connection re-establishment**: TCP connections should re-sync within RTT × 2 after partition heal.
-
-### 3.2 Memory Exhaustion and OOM Killer Behavior
+### Step 1: Create Tenant Isolation via Separate Pools
 
 ```bash
-# Gradually allocate memory until OOM trigger
-sudo stress-ng --vm 1 --vm-bytes 90% --vm-method all --timeout 60s
+# Create tenant-specific pools with quotas
+ceph osd pool create tenant-gold 64 64 replicated
+ceph osd pool create tenant-silver 32 32 replicated
+ceph osd pool create tenant-bronze 16 16 replicated
 
-# Monitor OOM killer invocation
-sudo dmesg -w | grep -i "oom\|killed"
+# Set pool quotas
+ceph osd pool set-quota tenant-gold max_bytes $((100 * 1024**3))  # 100GB
+ceph osd pool set-quota tenant-silver max_bytes $((50 * 1024**3))  # 50GB
+ceph osd pool set-quota tenant-bronze max_bytes $((20 * 1024**3))  # 20GB
 
-# Inspect OOM killer scores (lower score = higher protection)
-cat /proc/*/oom_score | sort -n
-cat /proc/*/oom_score_adj  # Adjustment value (-1000 to +1000)
+# Enable RBD on all pools
+for pool in tenant-gold tenant-silver tenant-bronze; do
+    ceph osd pool application enable $pool rbd
+done
 
-# Set OOM protection for critical process
-echo -1000 | sudo tee /proc/<critical-pid>/oom_score_adj
-
-# Memory cgroup OOM simulation (cgroup v2)
-sudo mkdir /sys/fs/cgroup/test_oom
-echo "100M" | sudo tee /sys/fs/cgroup/test_oom/memory.max
-echo $$ | sudo tee /sys/fs/cgroup/test_oom/cgroup.procs
-# Run memory-intensive process in this cgroup
-stress-ng --vm 1 --vm-bytes 200M --timeout 30s
-
-# View cgroup OOM events
-cat /sys/fs/cgroup/test_oom/memory.events | grep oom
-
-# Disable OOM killer (dangerous - system may deadlock)
-echo 2 | sudo tee /proc/sys/vm/panic_on_oom  # Panic instead of killing
-echo 0 | sudo tee /proc/sys/vm/overcommit_memory  # Strict accounting
-
-# Monitor memory pressure stall information
-cat /sys/fs/cgroup/memory.pressure
-# some: at least one task stalled, full: all tasks stalled
-
-# Analyze OOM victim selection
-sudo journalctl -k | grep "oom_reaper\|Out of memory"
+# Verify quotas
+ceph osd pool get-quota tenant-gold
+ceph osd pool get-quota tenant-silver
+ceph osd pool get-quota tenant-bronze
 ```
 
-**OOM Analysis**:
-- **Victim selection**: Kernel selects process with highest oom_score (adjusted by oom_score_adj).
-- **Memory overcommit**: `vm.overcommit_memory=0` (heuristic), `1` (always), `2` (never overcommit).
-- **Recovery time**: Typically <5 seconds for OOM reaper to free memory.
-
-### 3.3 Process Crash and Restart Verification
+### Step 2: Configure RBD QoS Limits
 
 ```bash
-# Identify target process PID
-systemctl status kubelet.service | grep "Main PID"
+# Create RBD images with QoS limits
+# Gold: 10k IOPS, 500 MB/s
+rbd create tenant-gold/gold-vol --size 10G \
+    --rbd-qos-write-iops-limit 10000 \
+    --rbd-qos-read-iops-limit 10000 \
+    --rbd-qos-write-bps-limit $((500 * 1024**2)) \
+    --rbd-qos-read-bps-limit $((500 * 1024**2))
 
-# Simulate abrupt termination (SIGKILL)
-sudo kill -9 <PID>
+# Silver: 5k IOPS, 250 MB/s
+rbd create tenant-silver/silver-vol --size 5G \
+    --rbd-qos-write-iops-limit 5000 \
+    --rbd-qos-read-iops-limit 5000 \
+    --rbd-qos-write-bps-limit $((250 * 1024**2)) \
+    --rbd-qos-read-bps-limit $((250 * 1024**2))
 
-# Monitor systemd restart behavior
-sudo journalctl -u kubelet.service -f
+# Bronze: 1k IOPS, 100 MB/s
+rbd create tenant-bronze/bronze-vol --size 2G \
+    --rbd-qos-write-iops-limit 1000 \
+    --rbd-qos-read-iops-limit 1000 \
+    --rbd-qos-write-bps-limit $((100 * 1024**2)) \
+    --rbd-qos-read-bps-limit $((100 * 1024**2))
 
-# Check restart policy and backoff
-sudo systemctl show kubelet.service | grep -E "(Restart|RestartSec)"
-
-# Verify process state transitions
-ps aux | grep kubelet
-
-# Simulate graceful shutdown (SIGTERM)
-sudo kill -15 <PID>
-
-# Monitor cleanup and shutdown hooks
-sudo strace -p <PID> -e trace=signal,exit_group
-
-# Crash with core dump generation
-ulimit -c unlimited
-sudo kill -SEGV <PID>
-ls -lh /var/lib/systemd/coredump/ || ls -lh core.*
-
-# Analyze core dump with gdb
-sudo coredumpctl list
-sudo coredumpctl debug <PID>
-# (gdb) bt  # Backtrace
-# (gdb) info threads
-
-# Test watchdog/liveness probe failure (Kubernetes example)
-kubectl exec <pod-name> -- rm /tmp/healthy
-kubectl describe pod <pod-name> | grep -A 5 Liveness
-kubectl get pod <pod-name> -w  # Watch restart
-
-# Distributed consensus recovery (etcd example)
-systemctl stop etcd
-etcdctl member list
-systemctl start etcd
-etcdctl endpoint health
+# Verify QoS settings
+for pool in tenant-gold tenant-silver tenant-bronze; do
+    echo "=== $pool ==="
+    rbd ls $pool | while read img; do
+        rbd config image get $pool/$img
+    done
+done
 ```
 
-**Restart Patterns**:
-- **Systemd restart**: Exponential backoff by default (RestartSec doubles each failure).
-- **Kubernetes pod restart**: CrashLoopBackOff with capped 5-minute backoff.
-- **State preservation**: Check for state files, WAL logs, or persistent volume claims.
+### Step 3: Deploy Kubernetes StorageClasses with QoS
 
-### 3.4 Controlled Kernel Panic for Recovery Testing
-
-**WARNING**: The following commands will immediately crash the kernel. Only execute on disposable test systems with no production workload.
-
-```bash
-# Enable SysRq key
-echo 1 | sudo tee /proc/sys/kernel/sysrq
-
-# Trigger kernel panic
-echo c | sudo tee /proc/sysrq-trigger
-
-# Alternative: trigger specific kernel bug
-# echo b | sudo tee /proc/sysrq-trigger  # Reboot
-# echo s | sudo tee /proc/sysrq-trigger  # Sync disks
-# echo u | sudo tee /proc/sysrq-trigger  # Unmount filesystems
-
-# After reboot, analyze crash dump (requires kdump)
-sudo crash /usr/lib/debug/boot/vmlinux-$(uname -r) /var/crash/*/vmcore
-# (crash) bt  # Backtrace
-# (crash) log  # Kernel log buffer
-
-# View last boot kernel panic
-sudo journalctl -b -1 -k | grep -i "panic\|oops"
-
-# Configure kdump for automatic crash dumps
-sudo systemctl enable kdump
-sudo systemctl start kdump
-cat /proc/cmdline | grep crashkernel
-```
-
-**Panic Recovery Verification**:
-- **Boot time**: Measure time from panic to login prompt (typically 30-90 seconds).
-- **Filesystem consistency**: ext4/XFS journal replay should be automatic.
-- **Service restoration**: Verify all systemd units reach "active" state.
-
-### 3.5 Distributed System Failure Cascade Analysis
-
-```bash
-# Simulate cascading pod failures (Kubernetes)
-kubectl delete pod -l app=frontend --grace-period=0 --force
-
-# Monitor deployment reconciliation
-kubectl get pods -l app=frontend -w
-
-# Check horizontal pod autoscaler response
-kubectl get hpa -w
-kubectl describe hpa <hpa-name>
-
-# Distributed storage node failure (Ceph example)
-sudo systemctl stop ceph-osd@0
-sudo ceph health detail
-sudo ceph osd tree  # Verify OSD marked 'down'
-
-# Monitor data rebalancing
-sudo ceph -w  # Watch cluster state changes
-
-# Restore failed node
-sudo systemctl start ceph-osd@0
-sudo ceph osd in osd.0
-
-# etcd quorum loss simulation (requires 3+ member cluster)
-systemctl stop etcd  # On 2 of 3 nodes
-etcdctl endpoint health --cluster  # Should show majority unavailable
-
-# Restore quorum
-systemctl start etcd  # On stopped nodes
-etcdctl member list
-```
-
-**Cascade Detection**:
-- **Kubernetes**: Watch for eviction events (`kubectl get events --sort-by='.lastTimestamp'`).
-- **Storage**: Monitor recovery I/O (`iostat`, `ceph osd perf`).
-- **Coordination**: etcd latency spikes indicate leader election or split-brain.
-
+```yaml
+# tenant-gold-sc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-gold
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: tenant-gold
+  imageFormat: "2"
+  imageFeatures: layering
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  # QoS parameters (CSI driver must support)
+  rbd-qos-write-iops-limit: "10000"
+  rbd-qos-read-iops-limit: "10000"
+  rbd-qos-write-bps-limit: "524288000"  # 500 MB/s
+  rbd-qos-read-bps-limit: "524288000"
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-silver
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: tenant-silver
+  imageFormat: "2"
+  imageFeatures: layering
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  rbd-qos-write-iops-limit: "5000"
+  rbd-qos-read-iops-limit: "5000"
+  rbd-qos-write-bps-limit: "262144000"  # 250 MB/s
+  rbd-qos-read-bps-limit: "262144000"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bronze
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: tenant-bronze
+  imageFormat: "2"
+  imageFeatures: layering
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  rbd-qos-write-iops-limit: "1000"
+  rbd-qos-read-iops-limit: "1000"
+  rbd-qos-write-bps-limit: "104857600"  # 100 MB/s
+  rbd-qos-read-bps-limit: "104857600"
+```
 
-## Diagnostic Cheat Sheet & Verification Checklist
+```bash
+kubectl apply -f tenant-gold-sc.yaml
+```
 
-### Quick Reference Commands
+### Step 4: Validate QoS Enforcement with Simultaneous Workloads
 
-| Category | Command | Purpose | Expected Baseline |
-|----------|---------|---------|-------------------|
-| **Memory** | `cat /proc/meminfo` | System-wide memory stats | MemAvailable > 20% MemTotal |
-| | `cat /proc/slabinfo \| head -20` | Kernel slab allocator state | No single cache >500MB |
-| | `numastat -c <process>` | NUMA allocation balance | <10% cross-node allocation |
-| **eBPF** | `bpftool prog show` | List loaded eBPF programs | Expected programs attached |
-| | `bpftool map show` | List BPF maps | No maps with excessive entries |
-| | `bpftool net show` | XDP/TC program attachments | XDP on high-throughput interfaces |
-| **Scheduling** | `cat /proc/schedstat` | Per-CPU runqueue stats | schedule_count < 100k/sec per CPU |
-| | `perf sched latency` | Scheduling latency histogram | Max latency <10ms |
-| | `cat /proc/<PID>/sched` | Process scheduling stats | nr_involuntary_switches < 1k/sec |
-| **Network** | `ip -s -s link show eth0` | Interface error counters | RX/TX errors < 0.01% |
-| | `ss -s` | Socket statistics summary | TCP memory pressure = 0 |
-| | `ethtool -S eth0` | NIC hardware counters | No queue drops |
-| | `tc qdisc show` | Traffic control qdisc state | Default: pfifo_fast or fq |
-| **I/O** | `iostat -xz 1` | Disk I/O utilization | await <10ms, %util <80% |
-| | `fio --name=test --rw=randread --bs=4k` | IOPS benchmark | NVMe: >100k IOPS |
-| | `cat /proc/vmstat \| grep pgpg` | Page-in/page-out rates | Major faults = 0 |
-| **CPU** | `perf stat -e cycles,instructions` | PMU event counting | IPC > 1.0 for compute workloads |
-| | `perf top -F 999` | Live CPU profiling | Uniform distribution or expected hotspots |
-| | `turbostat` | CPU frequency and C-states | P-states match workload |
-| **Logs** | `dmesg -T -l err,warn` | Kernel errors and warnings | No OOM, hardware errors, or crashes |
-| | `journalctl -u <service> --since today` | Service-specific logs | No failed starts or crashes |
-| | `ausearch -m AVC -ts recent` | SELinux denials | Zero denials in enforcing mode |
-| **Fault Injection** | `iptables -A OUTPUT -d <IP> -j DROP` | Network partition | Verify timeout and recovery |
-| | `stress-ng --vm 1 --vm-bytes 90%` | Memory exhaustion | OOM killer triggered, system stable |
-| | `kill -9 <PID>` | Process crash | Restart within RestartSec |
-| | `echo c > /proc/sysrq-trigger` | Kernel panic | System reboots, services recover |
-| **Recovery** | `systemctl status <service>` | Service state post-fault | Active (running) with recent start time |
-| | `kubectl get pods -w` | Pod restart monitoring | Running state within 60s |
-| | `ceph health detail` | Storage cluster health | HEALTH_OK after OSD recovery |
+```bash
+# Deploy gold tenant workload
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gold-pvc
+spec:
+  storageClassName: ceph-gold
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gold-fio
+spec:
+  containers:
+  - name: fio
+    image: ljishen/fio
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: gold-pvc
+EOF
 
-### Verification Workflow
+# Deploy bronze tenant workload
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bronze-pvc
+spec:
+  storageClassName: ceph-bronze
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bronze-fio
+spec:
+  containers:
+  - name: fio
+    image: ljishen/fio
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: bronze-pvc
+EOF
+
+kubectl wait --for=condition=ready pod gold-fio --timeout=300s
+kubectl wait --for=condition=ready pod bronze-fio --timeout=300s
+
+# Run simultaneous workloads
+kubectl exec -it gold-fio -- fio \
+    --name=gold-test \
+    --directory=/data \
+    --bs=4k \
+    --rw=randwrite \
+    --iodepth=64 \
+    --numjobs=4 \
+    --runtime=120 \
+    --time_based \
+    --output=/data/gold.json \
+    --output-format=json &
+
+kubectl exec -it bronze-fio -- fio \
+    --name=bronze-test \
+    --directory=/data \
+    --bs=4k \
+    --rw=randwrite \
+    --iodepth=64 \
+    --numjobs=4 \
+    --runtime=120 \
+    --time_based \
+    --output=/data/bronze.json \
+    --output-format=json &
+
+wait
+
+# Extract IOPS
+kubectl exec gold-fio -- cat /data/gold.json | jq '.jobs[0].write.iops'
+kubectl exec bronze-fio -- cat /data/bronze.json | jq '.jobs[0].write.iops'
+
+# Verify QoS enforcement:
+# Gold IOPS should be ~10k (within 5% of limit)
+# Bronze IOPS should be ~1k (within 5% of limit)
+# Bronze should NOT impact gold performance
+```
+
+### Step 5: Simulate Noisy Neighbor Attack
+
+```bash
+# Bronze tenant attempts to exceed quota
+kubectl exec -it bronze-fio -- dd if=/dev/zero of=/data/large-file bs=1M count=25000
+
+# Monitor pool usage
+watch -n 5 'ceph df | grep tenant-bronze'
+
+# Should stop at 20GB (quota limit)
+# Expected error: "No space left on device"
+
+# Verify gold tenant unaffected
+kubectl exec gold-fio -- fio \
+    --name=gold-concurrent \
+    --directory=/data \
+    --bs=1M \
+    --rw=write \
+    --size=1G \
+    --output=/data/gold-concurrent.json \
+    --output-format=json
+
+# Check latency (should remain low despite bronze quota exhaustion)
+kubectl exec gold-fio -- cat /data/gold-concurrent.json | jq '.jobs[0].write.lat_ns.mean / 1000000'
+```
+
+**QoS Enforcement Diagram:**
 
 ```mermaid
-graph TD
-    A["Start Verification"] --> B["Baseline Collection"]
-    B --> C["Memory State"]
-    B --> D["CPU Utilization"]
-    B --> E["Network Throughput"]
-    B --> F["Disk IOPS"]
+graph TB
+    subgraph kubernetes ["Kubernetes Layer"]
+        gold_pod["Gold Pod<br/>10k IOPS"]
+        silver_pod["Silver Pod<br/>5k IOPS"]
+        bronze_pod["Bronze Pod<br/>1k IOPS"]
+    end
     
-    C --> G["Load Generation"]
-    D --> G
-    E --> G
-    F --> G
+    subgraph csi ["CSI Driver Layer"]
+        gold_pvc["Gold PVC<br/>QoS: 10k IOPS"]
+        silver_pvc["Silver PVC<br/>QoS: 5k IOPS"]
+        bronze_pvc["Bronze PVC<br/>QoS: 1k IOPS"]
+    end
     
-    G --> H["Saturation Testing"]
-    H --> I["Measure Degradation"]
-    I --> J{"Within SLO?"}
+    subgraph ceph ["Ceph Storage Layer"]
+        gold_pool["(Gold Pool<br/>Quota: 100GB)"]
+        silver_pool["(Silver Pool<br/>Quota: 50GB)"]
+        bronze_pool["(Bronze Pool<br/>Quota: 20GB)"]
+    end
     
-    J -->|"Yes"| K["Fault Injection"]
-    J -->|"No"| L["Tune & Optimize"]
-    L --> G
+    subgraph osds ["OSD Layer"]
+        osd1["OSD.0<br/>BlueStore Throttle"]
+        osd2["OSD.1<br/>BlueStore Throttle"]
+        osd3["OSD.2<br/>BlueStore Throttle"]
+    end
     
-    K --> M["Network Partition"]
-    K --> N["Memory Exhaustion"]
-    K --> O["Process Crash"]
-    K --> P["Kernel Panic"]
+    gold_pod --> gold_pvc
+    silver_pod --> silver_pvc
+    bronze_pod --> bronze_pvc
     
-    M --> Q["Recovery Analysis"]
-    N --> Q
-    O --> Q
-    P --> Q
+    gold_pvc --> gold_pool
+    silver_pvc --> silver_pool
+    bronze_pvc --> bronze_pool
     
-    Q --> R{"Recovered?"}
-    R -->|"Yes"| S["Document Metrics"]
-    R -->|"No"| T["Debug & Fix"]
-    T --> K
+    gold_pool --> osd1
+    gold_pool --> osd2
+    silver_pool --> osd2
+    silver_pool --> osd3
+    bronze_pool --> osd1
+    bronze_pool --> osd3
     
-    S --> U["End Verification"]
+    style gold_pod fill:#ffd700
+    style silver_pod fill:#c0c0c0
+    style bronze_pod fill:#cd7f32
 ```
 
-### Performance SLO Targets for HCI
-
-| Metric | SLO Target | Measurement Method |
-|--------|------------|-------------------|
-| CPU Scheduler Latency | p99 < 5ms | `perf sched latency` |
-| Memory Allocation Latency | p99 < 100µs | `perf probe` on `__alloc_pages` |
-| Network RTT (intra-DC) | p50 < 500µs | `ping` with large sample |
-| Disk Read Latency (NVMe) | p99 < 1ms | `fio --randread --iodepth=1` |
-| Disk Write Latency (NVMe) | p99 < 2ms | `fio --randwrite --iodepth=1` |
-| Storage IOPS (4K random) | > 50K IOPS per OSD | `fio --bs=4k --iodepth=32` |
-| Network Throughput | > 9 Gbps per 10GbE | `iperf3 -P 4` |
-| VM Boot Time | < 30s (cold), < 5s (cached) | Time from `virsh start` to SSH |
-| Pod Restart Time | < 10s (healthy image) | `kubectl` event timestamps |
-| OOM Recovery Time | < 5s (process killed to stable) | `dmesg` timestamps |
-| Node Rejoin Time | < 90s (network partition heal) | `kubectl get nodes` watch |
-
-### Common Failure Signatures
-
-| Symptom | Likely Cause | Diagnostic Command |
-|---------|--------------|-------------------|
-| High `si/so` in vmstat | Memory pressure, swapping | `cat /proc/meminfo \| grep Swap` |
-| `%iowait` > 20% | Disk I/O bottleneck | `iostat -xz 1`, `iotop` |
-| TCP `RetransSegs` increasing | Network congestion or errors | `netstat -s`, `ss -ti` |
-| High `cs` in vmstat | Excessive context switching | `perf stat -e context-switches` |
-| `Load average` > 2× CPU count | CPU saturation or I/O wait | `uptime`, `perf top` |
-| `dmesg` OOM messages | Memory exhaustion | `cat /proc/sys/vm/overcommit_memory` |
-| XDP drops in `bpftool net` | Packet processing overload | `ethtool -S eth0 \| grep xdp` |
-| `nr_slab_unreclaimable` high | Kernel memory leak | `slabtop`, `cat /proc/slabinfo` |
-| etcd `etcd_disk_fsync_duration_seconds` high | Slow disk or overcommit | `etcdctl check perf` |
-| Ceph `slow ops` warnings | Network latency or OSD overload | `ceph health detail` |
+**Verification Checklist:**
+- [ ] Pool quotas enforced (bronze stops at 20GB)
+- [ ] RBD QoS limits verified with fio (IOPS within 5% of target)
+- [ ] Gold tenant unaffected by bronze overload
+- [ ] Simultaneous workloads run with predictable performance
+- [ ] OSD throttle metrics show backpressure on bronze tenant
 
 ---
 
-## Advanced Topics: Production Debugging Scenarios
+## Troubleshooting Guide
 
-### Scenario 1: Unexplained Network Latency Spikes
+### Cluster Won't Reach HEALTH_OK
 
 ```bash
-# Capture full packet headers during spike
-sudo tcpdump -i any -w latency_spike.pcap -s 256 "tcp" &
+# Check detailed health
+ceph health detail
 
-# Monitor TCP retransmissions in real-time
-sudo bpftrace -e 'tracepoint:tcp:tcp_retransmit_skb {
-  printf("%s retrans to %s:%d\n", comm, ntop(args->daddr), args->dport);
-}'
+# Common issues:
+# 1. Undersized PGs (not enough OSDs for replication)
+ceph osd pool set <pool-name> size 2  # Temporary workaround
 
-# Check for NIC interrupt coalescing issues
-ethtool -c eth0
-# Adjust if needed: ethtool -C eth0 rx-usecs 50
+# 2. Inactive PGs (monitor quorum lost)
+ceph mon stat
+systemctl restart ceph-mon@$(hostname)
 
-# Inspect CPU affinity of network interrupt handlers
-cat /proc/irq/*/smp_affinity_list | grep -v "0-$(nproc --all)"
-
-# Verify XPS (Transmit Packet Steering) configuration
-cat /sys/class/net/eth0/queues/tx-*/xps_cpus
+# 3. Slow requests (OSD overload)
+ceph daemon osd.X dump_historic_ops
+# Check for long op durations (>30s indicates problem)
 ```
 
-### Scenario 2: Distributed Storage Performance Degradation
+### PVCs Stuck in Pending
 
 ```bash
-# Identify slow OSDs (Ceph example)
-sudo ceph osd perf
-sudo ceph osd df tree
+# Check CSI provisioner logs
+kubectl -n rook-ceph logs deploy/csi-rbdplugin-provisioner
 
-# Trace storage backend latency
-sudo perf record -e 'block:block_rq_*' -a -g -- sleep 30
-sudo perf report --sort=dso,symbol --stdio | head -50
+# Common causes:
+# 1. Pool doesn't exist
+ceph osd pool ls
 
-# Check for NUMA misplacement
-sudo numastat -c ceph-osd
-# If remote allocation > 20%, consider pinning: numactl --cpunodebind=X --membind=X
+# 2. Insufficient quota
+ceph osd pool get-quota <pool-name>
 
-# Monitor rebalancing I/O
-watch -n 1 'ceph pg dump | grep "backfill\|recovery"'
+# 3. CSI secrets missing
+kubectl -n rook-ceph get secret rook-csi-rbd-provisioner
 ```
 
-### Scenario 3: Kubernetes Pod Eviction Storms
+### Performance Degradation After Node Failure
 
 ```bash
-# Identify eviction triggers
-kubectl get events --sort-by='.lastTimestamp' | grep -i evict
+# Check for stuck PGs
+ceph pg dump_stuck
 
-# Check node memory pressure
-kubectl describe nodes | grep -A 5 "MemoryPressure\|DiskPressure"
+# Force PG recovery priority
+ceph pg force-recovery <pgid>
+ceph pg force-backfill <pgid>
 
-# Analyze pod resource requests vs limits
-kubectl get pods -o custom-columns=NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory
+# Check network connectivity
+iperf3 -c <node-ip> -t 10
 
-# Monitor kubelet decision-making
-sudo journalctl -u kubelet -f | grep -i "evict\|threshold"
+# Check disk health
+smartctl -a /dev/sdb
+```
+
+### Monitor Quorum Stuck
+
+```bash
+# Check monitor connectivity
+ceph mon dump
+
+# Verify time sync (critical for Paxos)
+chronyc tracking
+
+# If time skew >0.05s, sync clocks
+systemctl restart chronyd
+
+# Remove stuck monitor (last resort)
+ceph mon remove <mon-name>
+# Then re-add after fixing issue
 ```
 
 ---
 
-This lab provides a systematic framework for operational verification of hyperconverged infrastructure core subsystems. Practitioners should adapt exercises to their specific HCI platform (Nutanix, VMware vSAN, Proxmox, OpenStack, etc.) while maintaining the fundamental diagnostic methodology: baseline → load → saturation → fault → recovery.
+## Production Readiness Checklist
+
+- [ ] Monitor quorum distributed across failure domains (3+ racks/zones)
+- [ ] OSD journals on separate SSDs from data
+- [ ] Dedicated storage network (separate from management traffic)
+- [ ] Automated scrubbing schedule during off-peak hours
+- [ ] Pool quotas configured for all tenants
+- [ ] Monitoring/alerting for HEALTH_WARN states
+- [ ] Backup/disaster recovery procedures tested
+- [ ] RBD snapshots scheduled for critical volumes
+- [ ] Node failure tested and documented (RTO/RPO)
+- [ ] Storage capacity planning (80% utilization threshold)
+
+---
+
+## Appendix: Key Performance Metrics Reference
+
+| Metric | Command | Healthy Range | Alert Threshold |
+|--------|---------|---------------|-----------------|
+| Cluster Health | `ceph -s` | HEALTH_OK | HEALTH_WARN |
+| Mon Quorum | `ceph quorum_status` | All mons in quorum | <N/2+1 mons |
+| OSD Utilization | `ceph osd df` | <80% full | >85% full |
+| PG State | `ceph pg stat` | 100% active+clean | Any inactive PGs |
+| Commit Latency | `ceph osd perf` | <10ms (SSD) | >50ms |
+| Network Throughput | `iperf3` | >8 Gbps (10GbE) | <5 Gbps |
+| Recovery Rate | `ceph -s` | >100 MB/s | Stalled >1 hour |
+
+---
+
+## References
+
+- Ceph Architecture: https://docs.ceph.com/en/latest/architecture/
+- CRUSH Algorithm: https://ceph.io/assets/pdfs/weil-crush-sc06.pdf
+- Rook Operator: https://rook.io/docs/rook/latest/
+- BlueStore Internals: https://docs.ceph.com/en/latest/rados/configuration/bluestore-config-ref/
+- fio User Guide: https://fio.readthedocs.io/

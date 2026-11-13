@@ -1,960 +1,1172 @@
-# Operational Verification Labs: 03 Longhorn Distributed Storage
+# Operational Verification Labs: Harvester Open-Source Hyperconverged Infrastructure
 
-## Objective & Environment Setup
+## Lab Environment Prerequisites
 
-Longhorn is a cloud-native distributed block storage system designed for Kubernetes, implementing a microservices-based architecture where each volume operates as an independent controller process coordinating multiple replica processes. Unlike traditional SAN/NAS systems that centralize storage management, Longhorn follows a disaggregated model where storage controllers run as pods alongside application workloads, enabling fine-grained failure domains and horizontal scalability.
+**Target Platform**: Harvester v1.3.x cluster (3+ nodes)  
+**Required Tools**: kubectl, virtctl, longhorn-ctl, ip, tcpdump  
+**Access Level**: Cluster admin privileges
 
-At its core, Longhorn employs a two-phase commit protocol for write operations across replicas, ensuring consistency without requiring distributed consensus algorithms like Raft or Paxos for the data path itself. The control plane uses Kubernetes Custom Resource Definitions (CRDs) as the source of truth, with the Longhorn Manager acting as a reconciliation controller that observes desired state and actuates changes through the Longhorn Engine processes.
+## Lab 1: KubeVirt Virtual Machine Lifecycle Verification
 
-This lab validates Longhorn's operational characteristics through three dimensions: subsystem state introspection, performance boundary testing, and chaos engineering. The exercises require root access to cluster nodes for kernel-level observability and the ability to inject controlled failures.
+### Objective
+Verify VM provisioning, runtime state management, and resource allocation through KubeVirt's virtualization layer on Kubernetes.
 
-### Architecture Overview
+### Theory Foundation
+
+KubeVirt extends Kubernetes with CustomResourceDefinitions (VirtualMachine, VirtualMachineInstance) to manage VMs as pods. Each VMI spawns a virt-launcher pod containing:
+- libvirtd process managing QEMU/KVM
+- virt-handler daemonset coordinating node-level operations
+- Compute resources isolated via cgroups
 
 ```mermaid
 graph TB
-    subgraph "Control Plane"
-        K8S["Kubernetes API Server"]
-        LM["Longhorn Manager<br/>(per node)"]
-        CRD["Volume/Replica CRDs"]
+    subgraph sub_control ["Control Plane"]
+        A[virt-controller]
+        B[virt-api]
     end
-    
-    subgraph "Data Plane - Volume A"
-        LE1["Longhorn Engine<br/>(Controller)"]
-        R1["Replica 1<br/>(Node 1)"]
-        R2["Replica 2<br/>(Node 2)"]
-        R3["Replica 3<br/>(Node 3)"]
+    subgraph sub_node ["Worker Node"]
+        C[virt-handler]
+        D[virt-launcher Pod]
+        E[QEMU Process]
+        F[libvirtd]
     end
-    
-    subgraph "Storage Backend"
-        D1["Local Disk<br/>(Node 1)"]
-        D2["Local Disk<br/>(Node 2)"]
-        D3["Local Disk<br/>(Node 3)"]
-    end
-    
-    APP["Application Pod"]
-    
-    APP -->|"iSCSI/NVMe"| LE1
-    LE1 -->|"gRPC Replication"| R1
-    LE1 -->|"gRPC Replication"| R2
-    LE1 -->|"gRPC Replication"| R3
-    R1 -->|"Sparse Files"| D1
-    R2 -->|"Sparse Files"| D2
-    R3 -->|"Sparse Files"| D3
-    LM -->|"Reconcile"| CRD
-    K8S --> CRD
-    LM -->|"Manage"| LE1
-    LM -->|"Manage"| R1
-    LM -->|"Manage"| R2
-    LM -->|"Manage"| R3
+    A -->|"Watch VMI"| C
+    B -->|"API Requests"| A
+    C -->|Spawn| D
+    D -->|Manage| F
+    F -->|Run| E
+    E -->|"Guest VM"| G[Virtual Machine]
 ```
 
-### Write Path and Consistency Model
+### Exercise 1.1: Create and Verify VM Instance
+
+**VM Manifest** (ubuntu-test-vm.yaml):
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu-test-vm
+  namespace: default
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: ubuntu-test-vm
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 2Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/ubuntu-container-disk:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: ubuntu
+            chpasswd: { expire: False }
+            ssh_pwauth: True
+```
+
+**Deployment and Verification**:
+```bash
+# Apply VM manifest
+kubectl apply -f ubuntu-test-vm.yaml
+
+# Verify VM object creation
+kubectl get vm ubuntu-test-vm -o yaml
+
+# Verify VMI instantiation
+kubectl get vmi ubuntu-test-vm -o wide
+
+# Inspect virt-launcher pod
+VMI_POD=$(kubectl get pods -l kubevirt.io/vm=ubuntu-test-vm -o jsonpath='{.items[0].metadata.name}')
+kubectl describe pod $VMI_POD
+
+# Verify QEMU process inside launcher
+kubectl exec $VMI_POD -c compute -- ps aux | grep qemu
+
+# Check libvirt domain definition
+kubectl exec $VMI_POD -c compute -- virsh list --all
+kubectl exec $VMI_POD -c compute -- virsh dumpxml 1
+```
+
+**Expected Output Analysis**:
+- VM Status: `Running: true`
+- VMI Phase: `Running`
+- virt-launcher pod: 2 containers (compute + istio-proxy if service mesh enabled)
+- QEMU process: Running with `-machine q35` and virtio devices
+- Libvirt domain: State `running`, memory 2097152 KiB
+
+### Exercise 1.2: VM Live Migration Verification
+
+**Migration Trigger**:
+```bash
+# Identify current node
+CURRENT_NODE=$(kubectl get vmi ubuntu-test-vm -o jsonpath='{.status.nodeName}')
+echo "VM currently on: $CURRENT_NODE"
+
+# Initiate live migration
+virtctl migrate ubuntu-test-vm
+
+# Monitor migration progress
+kubectl get virtualmachineinstancemigration -w
+
+# Verify target pod creation
+kubectl get pods -l kubevirt.io/vm=ubuntu-test-vm -o wide
+
+# Check migration status
+kubectl get vmi ubuntu-test-vm -o jsonpath='{.status.migrationState}' | jq .
+```
+
+**Deep Inspection During Migration**:
+```bash
+# Watch virt-handler logs on source node
+kubectl logs -n harvester-system -l app.kubernetes.io/component=virt-handler \
+  --tail=100 -f | grep ubuntu-test-vm
+
+# Monitor memory transfer via libvirt
+kubectl exec $VMI_POD -c compute -- \
+  virsh domjobinfo 1 --completed
+
+# Verify TCP connection for memory migration (source node)
+TARGET_NODE=$(kubectl get vmi ubuntu-test-vm -o jsonpath='{.status.migrationState.targetNode}')
+TARGET_IP=$(kubectl get node $TARGET_NODE -o jsonpath='{.status.addresses[0].address}')
+sudo tcpdump -i any host $TARGET_IP and port 49152:49252 -n
+```
+
+**Migration Phase Breakdown**:
+1. **Preparation**: Target virt-launcher pod created
+2. **Pre-copy**: Memory pages transferred while VM runs (iterative)
+3. **Stop-and-copy**: VM paused, remaining dirty pages transferred
+4. **Handoff**: Target pod takes over, source pod terminates
+
+### Exercise 1.3: CPU Pinning and NUMA Topology
+
+**NUMA-aware VM Manifest** (numa-vm.yaml):
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: numa-vm
+spec:
+  running: true
+  template:
+    metadata:
+      annotations:
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+    spec:
+      domain:
+        cpu:
+          cores: 4
+          dedicatedCpuPlacement: true
+          numa:
+            guestMappingPassthrough: {}
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+        resources:
+          requests:
+            memory: 4Gi
+          limits:
+            memory: 4Gi
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/cirros-container-disk-demo
+```
+
+**Verification**:
+```bash
+kubectl apply -f numa-vm.yaml
+
+# Verify CPU manager static policy applied
+NUMA_POD=$(kubectl get pods -l kubevirt.io/vm=numa-vm -o jsonpath='{.items[0].metadata.name}')
+kubectl get pod $NUMA_POD -o jsonpath='{.spec.containers[0].resources}' | jq .
+
+# Check actual CPU pinning on node
+NODE=$(kubectl get pod $NUMA_POD -o jsonpath='{.spec.nodeName}')
+POD_UID=$(kubectl get pod $NUMA_POD -o jsonpath='{.metadata.uid}')
+
+# SSH to node and verify cgroup cpuset
+ssh rancher@$NODE
+cat /sys/fs/cgroup/cpuset/kubepods.slice/kubepods-pod${POD_UID//-/_}.slice/cpuset.cpus
+
+# Verify inside VM
+virtctl console numa-vm
+# (inside VM)
+lscpu | grep -E "NUMA node|CPU\(s\)"
+```
+
+---
+
+## Lab 2: Longhorn Distributed Block Storage Replication
+
+### Objective
+Verify volume replication, snapshot consistency, and rebuild operations in Longhorn storage backend.
+
+### Theory Foundation
+
+Longhorn implements distributed block storage using:
+- **Volume**: Logical storage unit
+- **Replica**: Physical data copy on a node's local disk
+- **Engine**: Replication controller coordinating I/O to replicas
+- **Sync protocol**: Chain replication ensuring consistency
 
 ```mermaid
-sequenceDiagram
-    participant App
-    participant Engine
-    participant R1 as Replica 1
-    participant R2 as Replica 2
-    participant R3 as Replica 3
-    
-    App->>Engine: Write Block (offset, data)
-    Engine->>Engine: Increment Revision Counter
-    par Parallel Write Phase
-        Engine->>R1: Write(rev, offset, data)
-        Engine->>R2: Write(rev, offset, data)
-        Engine->>R3: Write(rev, offset, data)
+graph LR
+    subgraph sub_vol ["Longhorn Volume"]
+        A["Frontend: iSCSI/NVMe"]
+        B[Engine Process]
     end
-    
-    R1->>R1: Write to staging buffer
-    R2->>R2: Write to staging buffer
-    R3->>R3: Write to staging buffer
-    
-    R1-->>Engine: ACK (rev)
-    R2-->>Engine: ACK (rev)
-    R3-->>Engine: ACK (rev)
-    
-    Engine->>Engine: Wait for N/2+1 ACKs
-    
-    par Commit Phase
-        Engine->>R1: Commit(rev)
-        Engine->>R2: Commit(rev)
-        Engine->>R3: Commit(rev)
+    subgraph sub_rep1 ["Node 1"]
+        C[Replica 1]
+        D["Disk /var/lib/longhorn"]
     end
-    
-    R1->>R1: Persist to disk
-    R2->>R2: Persist to disk
-    R3->>R3: Persist to disk
-    
-    Engine-->>App: Write Complete
+    subgraph sub_rep2 ["Node 2"]
+        E[Replica 2]
+        F["Disk /var/lib/longhorn"]
+    end
+    subgraph sub_rep3 ["Node 3"]
+        G[Replica 3]
+        H["Disk /var/lib/longhorn"]
+    end
+    A --> B
+    B -->|Write| C
+    B -->|Write| E
+    B -->|Write| G
+    C --> D
+    E --> F
+    G --> H
 ```
 
-Longhorn uses a revision-based consistency protocol where each write is tagged with a monotonically increasing revision number. The Engine waits for a quorum (majority) of replicas to acknowledge the write before returning success to the application. This ensures that even if minority replicas fail, the committed data remains recoverable. Replicas maintain both a write-ahead log (for crash recovery) and the actual block data stored in sparse files, enabling efficient space utilization for thin-provisioned volumes.
+### Exercise 2.1: Volume Creation and Replica Distribution
 
-### Required CLI Tools
-
-| Tool | Version | Purpose |
-|------|---------|---------|
-| `kubectl` | v1.28+ | Kubernetes API interaction |
-| `bpftool` | v7.0+ | BPF program and map inspection |
-| `bpftrace` | v0.19+ | Dynamic kernel tracing with BPF |
-| `iproute2` | v6.0+ | Network configuration and monitoring |
-| `tcpdump` | v4.99+ | Network packet capture |
-| `strace` | v6.1+ | System call tracing |
-| `perf` | v6.1+ | CPU profiling and performance counters |
-| `fio` | v3.35+ | I/O workload generation and benchmarking |
-| `jq` | v1.6+ | JSON processing |
-| `curl` | v8.0+ | HTTP client for API calls |
-
-### Environment Configuration
-
-```bash
-# Verify Kubernetes cluster meets minimum requirements
-kubectl version --short
-kubectl get nodes -o wide
-
-# Validate kernel version supports BPF features (5.10+ required for BPF ring buffers)
-uname -r
-cat /boot/config-$(uname -r) | grep -E "CONFIG_BPF|CONFIG_DEBUG_INFO_BTF"
-
-# Confirm Longhorn installation and readiness
-kubectl get pods -n longhorn-system -o wide
-kubectl get storageclass -o yaml | grep -A 5 "provisioner: driver.longhorn.io"
-
-# Verify Longhorn CRDs are registered
-kubectl api-resources | grep longhorn.io
-
-# Check existing volumes and their health
-kubectl get volumes.longhorn.io -A
-kubectl get replicas.longhorn.io -A
-
-# Install fio for I/O benchmarking (on test pod)
-# This will be done per-exercise as needed
+**StorageClass with Replication** (longhorn-sc.yaml):
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-replicated
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "3"
+  staleReplicaTimeout: "30"
+  fromBackup: ""
+  dataLocality: "disabled"
+  replicaAutoBalance: "best-effort"
 ```
 
-## Exercise 1: Live State & Internal Subsystem Inspection
-
-This exercise dissects Longhorn's runtime state by examining control plane reconciliation loops, data plane replication streams, and kernel-level I/O behavior. Unlike black-box monitoring, this approach observes internal data structures, protocol state machines, and resource allocation patterns.
-
-### 1.1 Control Plane State: CRD Reconciliation and Manager Behavior
-
-The Longhorn Manager runs a set of Kubernetes controllers that watch CRD objects (Volumes, Replicas, Engines, Nodes, Settings) and reconcile actual state toward desired state. Each node runs a Manager instance that handles local operations while coordinating with the cluster-wide consensus stored in etcd via the Kubernetes API.
-
-```bash
-# Examine Longhorn Manager deployment architecture
-kubectl get daemonset longhorn-manager -n longhorn-system -o yaml | grep -A 20 "spec:"
-
-# Identify manager pods and their node assignments
-kubectl get pods -n longhorn-system -l app=longhorn-manager -o custom-columns=\
-"POD:.metadata.name,NODE:.spec.nodeName,STATUS:.status.phase,IP:.status.podIP"
-
-# Inspect manager process tree and resource consumption
-MANAGER_POD=$(kubectl get pods -n longhorn-system -l app=longhorn-manager -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n longhorn-system $MANAGER_POD -- ps auxf | grep -E "longhorn|PID"
-
-# Analyze controller reconciliation activity from structured logs
-kubectl logs -n longhorn-system $MANAGER_POD --tail=500 | jq -r 'select(.controller != null) | "\(.time) [\(.controller)] \(.msg)"'
-
-# Examine manager's view of cluster state
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s http://localhost:9500/v1/settings | jq '{
-  "BackupTarget": .backupTarget,
-  "DefaultReplicaCount": .defaultReplicaCount,
-  "StorageMinimalAvailablePercentage": .storageMinimalAvailablePercentage,
-  "StorageOverProvisioningPercentage": .storageOverProvisioningPercentage
-}'
-
-# Inspect node status and disk scheduling metadata
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s http://localhost:9500/v1/nodes | jq '.data[] | {
-  name: .name,
-  state: .state,
-  disks: [.disks[] | {path: .path, storageAvailable: .storageAvailable, storageMaximum: .storageMaximum, conditions: .conditions}]
-}'
-```
-
-**Expected Observations:**
-- Manager pods run as a DaemonSet (one per node) to handle node-local operations
-- Reconciliation logs show controller loops processing Volume, Replica, and Engine objects
-- Node objects reflect disk capacity, utilization, and scheduling eligibility
-- Settings govern global behavior like replica count and overprovisioning ratios
-
-### 1.2 Data Plane State: Engine and Replica Protocol Inspection
-
-Each Longhorn volume consists of an Engine process (the controller) and multiple Replica processes (the storage backend). The Engine exposes a block device to the host (via iSCSI or NVMe-oF) and coordinates writes across replicas using gRPC-based replication protocol.
-
-```bash
-# List all volumes and their controller/replica distribution
-kubectl get volumes.longhorn.io -A -o custom-columns=\
-"NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATE:.status.state,ROBUSTNESS:.status.robustness,\
-SIZE:.spec.size,REPLICAS:.spec.numberOfReplicas,FRONTEND:.spec.frontend"
-
-# Select a volume for detailed inspection
-VOLUME_NAME=$(kubectl get volumes.longhorn.io -A -o jsonpath='{.items[0].metadata.name}')
-VOLUME_NAMESPACE=$(kubectl get volumes.longhorn.io -A -o jsonpath='{.items[0].metadata.namespace}')
-
-# Examine volume controller (Engine) process
-kubectl get engines.longhorn.io -n $VOLUME_NAMESPACE -o yaml | yq eval ".items[] | select(.metadata.name == \"$VOLUME_NAME\")"
-
-# Identify Engine pod and its characteristics
-ENGINE_POD=$(kubectl get pods -n longhorn-system -l "longhorn.io/component=instance-manager,longhorn.io/instance-manager-type=engine" -o jsonpath='{.items[0].metadata.name}')
-kubectl describe pod -n longhorn-system $ENGINE_POD | grep -A 10 "Containers:"
-
-# Inspect Engine's view of replica health and synchronization state
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s "http://localhost:9500/v1/volumes/$VOLUME_NAME" | jq '{
-  name: .name,
-  state: .state,
-  robustness: .robustness,
-  replicas: [.replicas[] | {
-    name: .name,
-    mode: .mode,
-    hostId: .hostId,
-    running: .running,
-    address: .address
-  }],
-  controllers: [.controllers[] | {
-    hostId: .hostId,
-    endpoint: .endpoint,
-    running: .running
-  }]
-}'
-
-# Examine replica objects and their backing storage
-kubectl get replicas.longhorn.io -n $VOLUME_NAMESPACE -o custom-columns=\
-"NAME:.metadata.name,NODE:.spec.nodeID,STATE:.status.currentState,DISK:.spec.diskID,SIZE:.spec.volumeSize"
-
-REPLICA_NAME=$(kubectl get replicas.longhorn.io -n $VOLUME_NAMESPACE -o jsonpath='{.items[0].metadata.name}')
-kubectl get replica.longhorn.io -n $VOLUME_NAMESPACE $REPLICA_NAME -o yaml | yq eval '.spec, .status'
-
-# Identify replica process and inspect its data directory
-REPLICA_NODE=$(kubectl get replica.longhorn.io -n $VOLUME_NAMESPACE $REPLICA_NAME -o jsonpath='{.spec.nodeID}')
-ssh $REPLICA_NODE "sudo ls -lh /var/lib/longhorn/replicas/$REPLICA_NAME/"
-ssh $REPLICA_NODE "sudo du -sh /var/lib/longhorn/replicas/$REPLICA_NAME/"
-
-# Inspect replica metadata file (volume.meta)
-ssh $REPLICA_NODE "sudo cat /var/lib/longhorn/replicas/$REPLICA_NAME/volume.meta" | jq
-```
-
-**Expected Observations:**
-- Each volume has exactly one Engine (controller) and N replicas (typically 3)
-- Engine tracks replica modes: RW (read-write), RO (read-only), WO (write-only), ERR (failed)
-- Replicas store data as sparse files: volume-head.img (active writes) and volume-snap-*.img (snapshots)
-- Metadata file contains volume size, sector size, and head/snapshot chain
-
-### 1.3 Kernel-Level I/O Path Tracing with BPF
-
-BPF enables observation of kernel I/O subsystem behavior without instrumenting userspace code. This section traces block layer operations, system calls, and network sockets involved in Longhorn's data path.
-
-```bash
-# Verify BPF support and available programs
-sudo bpftool feature probe kernel | grep -E "program_type|map_type"
-sudo bpftool prog list | grep -E "kprobe|tracepoint"
-
-# Trace block I/O requests issued to Longhorn volumes
-# This captures bio (block I/O) submissions at the kernel level
-sudo bpftrace -e '
-tracepoint:block:block_bio_queue
-/comm == "fio" || comm == "dd"/
-{
-  printf("%-8s %-16s dev=%d:%d sector=%lu len=%d rw=%d\n",
-    strftime("%H:%M:%S", nsecs),
-    comm,
-    args->dev >> 20,
-    args->dev & ((1 << 20) - 1),
-    args->sector,
-    args->nr_sector * 512,
-    args->rwbs
-  );
-}' &
-
-# Generate test I/O for observation
-kubectl exec -n $VOLUME_NAMESPACE <pod-using-volume> -- dd if=/dev/zero of=/mnt/test bs=4k count=1000
-
-# Trace system calls made by replica processes
-REPLICA_POD=$(kubectl get pods -n longhorn-system -l "longhorn.io/component=instance-manager,longhorn.io/instance-manager-type=replica" -o jsonpath='{.items[0].metadata.name}')
-REPLICA_PID=$(kubectl exec -n longhorn-system $REPLICA_POD -- pgrep -f "longhorn.*replica")
-sudo strace -p $REPLICA_PID -e trace=write,pwrite64,fsync,fdatasync -f -ttt 2>&1 | head -100
-
-# Monitor network I/O between Engine and Replicas (gRPC replication protocol)
-# Longhorn uses port 10000+ for replica communication
-sudo tcpdump -i any -n 'tcp portrange 10000-10100' -c 100 -w /tmp/longhorn-replication.pcap
-tshark -r /tmp/longhorn-replication.pcap -T fields -e frame.number -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport -e frame.len | head -20
-
-# Trace file system operations on replica data directories
-sudo bpftrace -e '
-tracepoint:syscalls:sys_enter_openat,
-tracepoint:syscalls:sys_enter_write,
-tracepoint:syscalls:sys_enter_fsync
-/str(args->filename) =~ /longhorn/ || comm =~ /longhorn//
-{
-  printf("%-8s %-16s %-10s %s\n",
-    strftime("%H:%M:%S", nsecs),
-    comm,
-    probe,
-    str(args->filename)
-  );
-}'
-```
-
-**Expected Observations:**
-- Block layer traces show bio submissions with device major:minor numbers corresponding to iSCSI/NVMe devices
-- Replica processes perform pwrite64() calls to sparse files followed by fsync()/fdatasync() for durability
-- TCP packets between Engine and Replicas carry gRPC-encoded replication protocol messages
-- Filesystem tracing reveals writes to volume-head.img and periodic metadata updates
-
-### 1.4 Memory and CPU Resource Profiling
-
-Longhorn processes have distinct resource consumption patterns: Managers perform reconciliation logic (CPU-bound during cluster state changes), Engines handle I/O translation (memory-bound for buffering), and Replicas perform disk writes (I/O-bound).
-
-```bash
-# Profile CPU usage of Longhorn components
-kubectl top pods -n longhorn-system --sort-by=cpu
-
-# Deep dive into Manager process CPU consumption
-kubectl exec -n longhorn-system $MANAGER_POD -- sh -c 'top -b -n 1 | head -20'
-
-# Analyze memory allocation patterns
-kubectl exec -n longhorn-system $MANAGER_POD -- sh -c 'cat /proc/$(pgrep longhorn-manager)/status | grep -E "VmRSS|VmSwap|VmData|VmStk"'
-
-# Use perf to profile CPU hotspots in Engine process
-ENGINE_NODE=$(kubectl get pod -n longhorn-system $ENGINE_POD -o jsonpath='{.spec.nodeName}')
-ENGINE_PID=$(ssh $ENGINE_NODE "pgrep -f 'longhorn.*engine'")
-ssh $ENGINE_NODE "sudo perf record -F 99 -p $ENGINE_PID -g -- sleep 10"
-ssh $ENGINE_NODE "sudo perf report --stdio" | head -50
-
-# Analyze memory allocations with BPF
-sudo bpftrace -e '
-tracepoint:kmem:kmalloc,
-tracepoint:kmem:kmem_cache_alloc
-/comm =~ /longhorn//
-{
-  @bytes[comm] = sum(args->bytes_alloc);
-}
-interval:s:5 {
-  print(@bytes);
-  clear(@bytes);
-}'
-```
-
-**Expected Observations:**
-- Manager pods consume 50-200MB RSS, with CPU spikes during reconciliation
-- Engine pods consume memory proportional to I/O queue depth and buffer sizes
-- Replica pods show high iowait during sustained write workloads
-- perf profiles reveal hot paths in gRPC marshaling and filesystem operations
-
-## Exercise 2: Benchmarking & Saturation Profiling
-
-This exercise characterizes Longhorn's performance envelope by systematically varying workload parameters (I/O size, queue depth, read/write mix) and observing saturation points where throughput plateaus or latency degrades nonlinearly.
-
-### 2.1 Baseline Single-Volume I/O Performance
-
-```bash
-# Create a PVC backed by Longhorn
-cat <<EOF | kubectl apply -f -
+**PVC Creation**:
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: fio-benchmark-pvc
-  namespace: default
+  name: test-volume-claim
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: longhorn-replicated
   resources:
     requests:
       storage: 10Gi
-EOF
-
-# Wait for PVC to bind
-kubectl wait --for=condition=Bound pvc/fio-benchmark-pvc --timeout=60s
-
-# Deploy fio benchmarking pod
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: fio-benchmark
-  namespace: default
-spec:
-  containers:
-  - name: fio
-    image: dmonakhov/fio:latest
-    command: ["/bin/sh"]
-    args: ["-c", "sleep infinity"]
-    volumeMounts:
-    - name: benchmark-volume
-      mountPath: /mnt/test
-    resources:
-      limits:
-        cpu: "4"
-        memory: "4Gi"
-  volumes:
-  - name: benchmark-volume
-    persistentVolumeClaim:
-      claimName: fio-benchmark-pvc
-  restartPolicy: Never
-EOF
-
-kubectl wait --for=condition=Ready pod/fio-benchmark --timeout=120s
-
-# Sequential read throughput test
-kubectl exec fio-benchmark -- fio --name=seq-read \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=read \
-  --bs=128k \
-  --ioengine=libaio \
-  --iodepth=32 \
-  --numjobs=1 \
-  --time_based=1 \
-  --runtime=60 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/seq-read.json
-
-jq '.jobs[0] | {read_bw_MiB: (.read.bw / 1024), read_iops: .read.iops, read_lat_us_mean: .read.lat_ns.mean / 1000}' /tmp/seq-read.json
-
-# Sequential write throughput test
-kubectl exec fio-benchmark -- fio --name=seq-write \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=write \
-  --bs=128k \
-  --ioengine=libaio \
-  --iodepth=32 \
-  --numjobs=1 \
-  --time_based=1 \
-  --runtime=60 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/seq-write.json
-
-jq '.jobs[0] | {write_bw_MiB: (.write.bw / 1024), write_iops: .write.iops, write_lat_us_mean: .write.lat_ns.mean / 1000}' /tmp/seq-write.json
-
-# Random read IOPS test (4K blocks, high queue depth)
-kubectl exec fio-benchmark -- fio --name=rand-read-4k \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=randread \
-  --bs=4k \
-  --ioengine=libaio \
-  --iodepth=128 \
-  --numjobs=4 \
-  --time_based=1 \
-  --runtime=60 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/rand-read-4k.json
-
-jq '.jobs[0] | {read_iops: .read.iops, read_lat_us_p50: .read.lat_ns.percentile."50.000000" / 1000, read_lat_us_p99: .read.lat_ns.percentile."99.000000" / 1000}' /tmp/rand-read-4k.json
-
-# Random write IOPS test with fsync (durability simulation)
-kubectl exec fio-benchmark -- fio --name=rand-write-4k-sync \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=randwrite \
-  --bs=4k \
-  --ioengine=libaio \
-  --iodepth=32 \
-  --numjobs=4 \
-  --fsync=1 \
-  --time_based=1 \
-  --runtime=60 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/rand-write-4k-sync.json
-
-jq '.jobs[0] | {write_iops: .write.iops, write_lat_us_p50: .write.lat_ns.percentile."50.000000" / 1000, write_lat_us_p99: .write.lat_ns.percentile."99.000000" / 1000}' /tmp/rand-write-4k-sync.json
-
-# Mixed read/write workload (70/30 read/write ratio)
-kubectl exec fio-benchmark -- fio --name=mixed-rw \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=randrw \
-  --rwmixread=70 \
-  --bs=4k \
-  --ioengine=libaio \
-  --iodepth=64 \
-  --numjobs=4 \
-  --time_based=1 \
-  --runtime=60 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/mixed-rw.json
-
-jq '.jobs[0] | {read_iops: .read.iops, write_iops: .write.iops, total_iops: (.read.iops + .write.iops)}' /tmp/mixed-rw.json
 ```
 
-**Performance Analysis:**
-- Sequential throughput limited by network bandwidth between Engine and Replicas (typically 100-500 MB/s per volume)
-- Random read IOPS depend on backend disk random access performance (5K-20K IOPS typical for SSD-backed replicas)
-- Random write IOPS constrained by replication quorum latency (P99 latencies 5-20ms for 3-replica setup)
-- fsync operations amplify write latency due to coordinated durability across replicas
+**Verification Commands**:
+```bash
+kubectl apply -f longhorn-sc.yaml
+kubectl apply -f test-pvc.yaml
 
-### 2.2 Saturation Testing: Concurrent Volume Operations
+# Wait for PVC binding
+kubectl get pvc test-volume-claim -w
+
+# Identify Longhorn volume name
+LH_VOLUME=$(kubectl get pv $(kubectl get pvc test-volume-claim -o jsonpath='{.spec.volumeName}') \
+  -o jsonpath='{.spec.csi.volumeHandle}')
+
+# Inspect volume replicas
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME
+
+# Get replica distribution across nodes
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME \
+  -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeID,STATE:.status.currentState
+```
+
+### Exercise 2.2: Replica Failure and Rebuild
+
+**Simulate Node Failure**:
+```bash
+# Identify replica locations
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME -o wide
+
+# Cordon one node to simulate failure
+TARGET_NODE=$(kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME \
+  -o jsonpath='{.items[0].spec.nodeID}')
+kubectl cordon $TARGET_NODE
+
+# Delete instance-manager pod on that node (simulates node failure)
+IM_POD=$(kubectl -n longhorn-system get pods -l longhorn.io/node=$TARGET_NODE \
+  -l longhorn.io/component=instance-manager -o jsonpath='{.items[0].metadata.name}')
+kubectl -n longhorn-system delete pod $IM_POD --force --grace-period=0
+
+# Monitor replica rebuild
+watch kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME
+```
+
+**Rebuild Verification**:
+```bash
+# Check volume robustness
+kubectl -n longhorn-system get volume $LH_VOLUME -o jsonpath='{.status.robustness}'
+
+# Monitor engine logs during rebuild
+ENGINE_POD=$(kubectl -n longhorn-system get pods -l longhorn.io/component=instance-manager \
+  -l longhorn.io/engine=$LH_VOLUME -o jsonpath='{.items[0].metadata.name}')
+kubectl -n longhorn-system logs $ENGINE_POD -c engine-manager -f | grep -E "replica|sync"
+
+# Verify new replica created on different node
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOLUME \
+  -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeID,AGE:.metadata.creationTimestamp
+```
+
+### Exercise 2.3: Snapshot and Backup Verification
+
+**Create Volume Snapshot**:
+```yaml
+apiVersion: longhorn.io/v1beta2
+kind: Volume
+metadata:
+  name: test-volume
+  namespace: longhorn-system
+spec:
+  snapshotMaxCount: 5
+```
 
 ```bash
-# Create multiple PVCs for parallel testing
-for i in {1..5}; do
-  cat <<EOF | kubectl apply -f -
+# Trigger snapshot via API
+curl -X POST "http://longhorn-backend:9500/v1/volumes/$LH_VOLUME?action=snapshotCreate" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"manual-snapshot-1"}'
+
+# List snapshots
+kubectl -n longhorn-system get volume $LH_VOLUME \
+  -o jsonpath='{.status.snapshotList}' | jq .
+
+# Verify snapshot on disk (exec into replica pod)
+REPLICA_POD=$(kubectl -n longhorn-system get pods \
+  -l longhorn.io/component=instance-manager \
+  -l longhorn.io/replica=$LH_VOLUME \
+  -o jsonpath='{.items[0].metadata.name}')
+
+kubectl -n longhorn-system exec $REPLICA_POD -- \
+  ls -lh /var/lib/longhorn/replicas/$LH_VOLUME/
+```
+
+**Backup to S3 (Simulated)**:
+```yaml
+apiVersion: longhorn.io/v1beta2
+kind: BackupTarget
+metadata:
+  name: default
+  namespace: longhorn-system
+spec:
+  backupTargetURL: s3://longhorn-backup@us-east-1/
+  credentialSecret: minio-secret
+```
+
+```bash
+# Create backup from snapshot
+curl -X POST "http://longhorn-backend:9500/v1/volumes/$LH_VOLUME?action=snapshotBackup" \
+  -H "Content-Type: application/json" \
+  -d '{"snapshotName":"manual-snapshot-1"}'
+
+# Monitor backup progress
+kubectl -n longhorn-system get backup -w
+
+# Verify backup metadata
+kubectl -n longhorn-system get backup -l longhornvolume=$LH_VOLUME -o yaml
+```
+
+---
+
+## Lab 3: Multus CNI VLAN Bridge Networking
+
+### Objective
+Configure VLAN-tagged bridge networks for VM multi-homing with Linux bridge and Multus CNI.
+
+### Theory Foundation
+
+Multus enables attaching multiple network interfaces to pods/VMs:
+- **Primary network**: Cluster network (Flannel/Calico)
+- **Secondary networks**: VLAN bridges via NetworkAttachmentDefinition
+- **Bridge CNI**: Creates Linux bridge with VLAN filtering
+
+```mermaid
+graph TB
+    subgraph sub_host ["Physical Host"]
+        A[eth0 - Trunk Port]
+    end
+    subgraph sub_bridges ["Linux Bridges"]
+        B[br-vlan100]
+        C[br-vlan200]
+    end
+    subgraph sub_vm ["VM Pod"]
+        D[eth0 - Pod Network]
+        E[net1 - VLAN 100]
+        F[net2 - VLAN 200]
+    end
+    A -->|"VLAN 100"| B
+    A -->|"VLAN 200"| C
+    B --> E
+    C --> F
+    D -->|Cluster| G["kube-proxy/CNI"]
+```
+
+### Exercise 3.1: VLAN Bridge Configuration
+
+**NetworkAttachmentDefinition for VLAN 100** (vlan100-nad.yaml):
+```yaml
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan100-network
+  namespace: default
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "type": "bridge",
+      "bridge": "br-vlan100",
+      "vlan": 100,
+      "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.100.0/24",
+        "rangeStart": "192.168.100.10",
+        "rangeEnd": "192.168.100.100",
+        "gateway": "192.168.100.1"
+      }
+    }
+```
+
+**VLAN 200 Network** (vlan200-nad.yaml):
+```yaml
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan200-network
+  namespace: default
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "type": "bridge",
+      "bridge": "br-vlan200",
+      "vlan": 200,
+      "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.200.0/24",
+        "rangeStart": "192.168.200.10",
+        "rangeEnd": "192.168.200.100",
+        "gateway": "192.168.200.1"
+      }
+    }
+```
+
+**Node-level Bridge Setup** (run on each worker node):
+```bash
+# Create VLAN interfaces
+sudo ip link add link eth0 name eth0.100 type vlan id 100
+sudo ip link add link eth0 name eth0.200 type vlan id 200
+
+# Create bridges
+sudo ip link add name br-vlan100 type bridge
+sudo ip link add name br-vlan200 type bridge
+
+# Attach VLAN interfaces to bridges
+sudo ip link set eth0.100 master br-vlan100
+sudo ip link set eth0.200 master br-vlan200
+
+# Enable bridges
+sudo ip link set br-vlan100 up
+sudo ip link set br-vlan200 up
+sudo ip link set eth0.100 up
+sudo ip link set eth0.200 up
+
+# Verify bridges
+ip link show type bridge
+bridge link show
+```
+
+### Exercise 3.2: Multi-homed VM with VLAN Networks
+
+**VM with Multiple Networks** (multihomed-vm.yaml):
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: multihomed-vm
+  annotations:
+    k8s.v1.cni.cncf.io/networks: vlan100-network, vlan200-network
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: multihomed-vm
+      annotations:
+        k8s.v1.cni.cncf.io/networks: vlan100-network, vlan200-network
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+          - name: vlan100
+            bridge: {}
+          - name: vlan200
+            bridge: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      - name: vlan100
+        multus:
+          networkName: vlan100-network
+      - name: vlan200
+        multus:
+          networkName: vlan200-network
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/cirros-container-disk-demo
+```
+
+**Verification**:
+```bash
+kubectl apply -f vlan100-nad.yaml
+kubectl apply -f vlan200-nad.yaml
+kubectl apply -f multihomed-vm.yaml
+
+# Wait for VM to start
+kubectl wait --for=condition=Ready vmi/multihomed-vm --timeout=300s
+
+# Verify network interfaces in virt-launcher pod
+MULTI_POD=$(kubectl get pods -l kubevirt.io/vm=multihomed-vm -o jsonpath='{.items[0].metadata.name}')
+kubectl exec $MULTI_POD -c compute -- ip addr show
+
+# Expected: eth0 (pod network), net1 (VLAN 100), net2 (VLAN 200)
+
+# Verify bridge attachments on node
+NODE=$(kubectl get pod $MULTI_POD -o jsonpath='{.spec.nodeName}')
+ssh rancher@$NODE
+
+# List veth pairs connected to bridges
+sudo bridge fdb show br br-vlan100
+sudo bridge fdb show br br-vlan200
+
+# Verify VLAN tagging
+sudo tcpdump -i eth0 -e -n vlan 100 or vlan 200
+```
+
+### Exercise 3.3: VM-to-VM VLAN Communication Test
+
+**Deploy Second VM on Same VLAN**:
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: test-vm-vlan100
+  annotations:
+    k8s.v1.cni.cncf.io/networks: vlan100-network
+spec:
+  running: true
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: vlan100-network
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+          - name: vlan100
+            bridge: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      - name: vlan100
+        multus:
+          networkName: vlan100-network
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/cirros-container-disk-demo
+```
+
+**Connectivity Test**:
+```bash
+kubectl apply -f test-vm-vlan100.yaml
+
+# Get VLAN 100 IP of first VM
+virtctl console multihomed-vm
+# (inside VM)
+ip addr show eth1  # Note the 192.168.100.x address
+VLAN100_IP=192.168.100.x
+
+# From second VM, test connectivity
+virtctl console test-vm-vlan100
+# (inside VM)
+ip addr show eth1
+ping -c 4 $VLAN100_IP
+```
+
+**Packet Capture Verification** (on worker node):
+```bash
+# Capture on VLAN 100 bridge
+sudo tcpdump -i br-vlan100 -n icmp
+
+# Verify VLAN tags on trunk
+sudo tcpdump -i eth0 -e -n 'vlan 100 and icmp'
+```
+
+---
+
+## Lab 4: VM Migration Diagnostics and Troubleshooting
+
+### Objective
+Diagnose migration failures using virt-handler logs, libvirt migration monitoring, and network path analysis.
+
+### Exercise 4.1: Pre-flight Migration Checks
+
+**Migration Readiness Script**:
+```bash
+#!/bin/bash
+VM_NAME=$1
+
+# Check VMI exists and is running
+VMI_STATUS=$(kubectl get vmi $VM_NAME -o jsonpath='{.status.phase}')
+if [ "$VMI_STATUS" != "Running" ]; then
+  echo "ERROR: VMI not running (status: $VMI_STATUS)"
+  exit 1
+fi
+
+# Verify live migration feature gate
+FEATURE_GATES=$(kubectl get kubevirt kubevirt -n harvester-system \
+  -o jsonpath='{.spec.configuration.developerConfiguration.featureGates}')
+echo "Feature gates: $FEATURE_GATES"
+
+# Check if VM has migration-capable storage
+VOLUME_TYPES=$(kubectl get vmi $VM_NAME -o jsonpath='{.spec.volumes[*].persistentVolumeClaim}')
+if [ -z "$VOLUME_TYPES" ]; then
+  echo "WARNING: VM uses ephemeral storage (containerDisk)"
+fi
+
+# Verify sufficient resources on target nodes
+MEMORY_REQUEST=$(kubectl get vmi $VM_NAME -o jsonpath='{.spec.domain.resources.requests.memory}')
+kubectl get nodes -o custom-columns=\
+NAME:.metadata.name,\
+ALLOCATABLE:.status.allocatable.memory,\
+AVAILABLE:.status.capacity.memory
+
+# Check network policies allowing migration port range (49152-49252)
+kubectl get networkpolicies -A -o yaml | grep -E "49152|49252"
+```
+
+### Exercise 4.2: Migration Failure Analysis
+
+**Trigger Migration and Capture Logs**:
+```bash
+VM_NAME=ubuntu-test-vm
+
+# Start migration with verbose logging
+virtctl migrate $VM_NAME --dry-run=false
+
+# Monitor VMI migration object
+kubectl get virtualmachineinstancemigration -w &
+
+# Capture virt-handler logs from source node
+SOURCE_NODE=$(kubectl get vmi $VM_NAME -o jsonpath='{.status.nodeName}')
+kubectl logs -n harvester-system -l app.kubernetes.io/component=virt-handler \
+  --field-selector spec.nodeName=$SOURCE_NODE -f > /tmp/source-handler.log &
+
+# Capture target virt-handler logs
+TARGET_NODE=$(kubectl get vmi $VM_NAME -o jsonpath='{.status.migrationState.targetNode}')
+kubectl logs -n harvester-system -l app.kubernetes.io/component=virt-handler \
+  --field-selector spec.nodeName=$TARGET_NODE -f > /tmp/target-handler.log &
+
+# Wait for migration completion or failure
+kubectl wait --for=condition=Succeeded vmim/$(kubectl get vmim -o name | tail -n1) --timeout=600s
+RESULT=$?
+
+# Analyze logs if migration failed
+if [ $RESULT -ne 0 ]; then
+  echo "=== SOURCE NODE ERRORS ==="
+  grep -i "error\|failed" /tmp/source-handler.log | tail -20
+  
+  echo "=== TARGET NODE ERRORS ==="
+  grep -i "error\|failed" /tmp/target-handler.log | tail -20
+  
+  # Check migration object status
+  kubectl get vmim -o yaml | grep -A 20 status
+fi
+```
+
+**Common Failure Patterns**:
+
+1. **Network connectivity failure**:
+```bash
+# Symptom: Migration hangs in "Preparing target"
+# Diagnosis: Test TCP connectivity on migration port range
+
+# From source node
+nc -zv $TARGET_NODE_IP 49152
+
+# Verify firewall rules
+sudo iptables-save | grep 49152
+```
+
+2. **Disk I/O bottleneck**:
+```bash
+# Symptom: Migration timeout with "disk dirty rate too high"
+# Diagnosis: Check disk write activity
+
+# On source node during migration
+iostat -x 2 10 | grep -E "Device|vda"
+
+# Check dirty memory rate in libvirt
+kubectl exec $VMI_POD -c compute -- \
+  virsh domjobinfo 1 | grep -E "Memory.*dirty"
+```
+
+3. **Insufficient memory on target**:
+```bash
+# Symptom: "Insufficient memory" in target virt-handler logs
+# Diagnosis: Compare requested vs available memory
+
+# Memory request
+kubectl get vmi $VM_NAME -o jsonpath='{.spec.domain.resources.requests.memory}'
+
+# Available memory on target
+kubectl describe node $TARGET_NODE | grep -A 5 "Allocated resources"
+```
+
+### Exercise 4.3: Network Path Validation for Migration
+
+**MTU Verification**:
+```bash
+# MTU mismatch causes fragmentation and migration slowdown
+# Get VM pod IP
+VMI_POD_IP=$(kubectl get pod $VMI_POD -o jsonpath='{.status.podIP}')
+
+# From source node, test MTU to target
+ssh rancher@$SOURCE_NODE
+ping -M do -s 8972 -c 3 $TARGET_NODE_IP
+
+# If ping fails, reduce packet size to find MTU limit
+ping -M do -s 1472 -c 3 $TARGET_NODE_IP
+```
+
+**Latency and Bandwidth Test**:
+```bash
+# High latency or low bandwidth degrades live migration
+# Install iperf3 on both nodes
+
+# On target node
+ssh rancher@$TARGET_NODE
+iperf3 -s -p 49152
+
+# On source node
+ssh rancher@$SOURCE_NODE
+iperf3 -c $TARGET_NODE_IP -p 49152 -t 10 -P 4
+
+# Expected: >1 Gbps for acceptable migration performance
+```
+
+**TCP Dump During Migration**:
+```bash
+# Capture migration traffic on source node
+sudo tcpdump -i any -w /tmp/migration.pcap \
+  "host $TARGET_NODE_IP and portrange 49152-49252"
+
+# Analyze with tcpdump
+sudo tcpdump -r /tmp/migration.pcap -n | head -50
+
+# Or analyze with tshark
+tshark -r /tmp/migration.pcap -q -z io,stat,1
+```
+
+---
+
+## Lab 5: Integration Scenario - VM Failover with Storage Replication
+
+### Objective
+Simulate node failure and verify automated VM restart with Longhorn volume replica promotion.
+
+### Scenario Setup
+
+**Deploy Stateful VM with PVC**:
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: fio-pvc-$i
-  namespace: default
+  name: stateful-vm-disk
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: longhorn-replicated
   resources:
     requests:
-      storage: 5Gi
-EOF
-done
-
-kubectl wait --for=condition=Bound pvc/fio-pvc-{1..5} --timeout=120s
-
-# Deploy concurrent fio workers
-for i in {1..5}; do
-  cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: fio-worker-$i
-  namespace: default
-spec:
-  containers:
-  - name: fio
-    image: dmonakhov/fio:latest
-    command: ["/bin/sh"]
-    args:
-      - -c
-      - |
-        fio --name=concurrent-test \
-          --filename=/mnt/test/testfile \
-          --size=2G \
-          --direct=1 \
-          --rw=randrw \
-          --rwmixread=50 \
-          --bs=4k \
-          --ioengine=libaio \
-          --iodepth=32 \
-          --numjobs=2 \
-          --time_based=1 \
-          --runtime=300 \
-          --group_reporting \
-          --output-format=json+ > /tmp/result.json
-        sleep infinity
-    volumeMounts:
-    - name: test-volume
-      mountPath: /mnt/test
-  volumes:
-  - name: test-volume
-    persistentVolumeClaim:
-      claimName: fio-pvc-$i
-  restartPolicy: Never
-EOF
-done
-
-# Monitor system-wide resource consumption during saturation
-watch -n 5 'kubectl top nodes && echo "---" && kubectl top pods -n longhorn-system --sort-by=cpu | head -10'
-
-# Collect per-volume performance metrics
-for i in {1..5}; do
-  kubectl exec fio-worker-$i -- cat /tmp/result.json > /tmp/fio-worker-$i.json
-done
-
-# Aggregate results
-for i in {1..5}; do
-  echo "Worker $i:"
-  jq '.jobs[0] | {read_iops: .read.iops, write_iops: .write.iops, read_lat_us_p99: .read.lat_ns.percentile."99.000000" / 1000}' /tmp/fio-worker-$i.json
-done
-
-# Analyze Manager CPU usage under concurrent load
-kubectl exec -n longhorn-system $MANAGER_POD -- sh -c '
-  for i in {1..10}; do
-    ps aux | grep longhorn-manager | grep -v grep | awk "{print \$3}"
-    sleep 5
-  done
-' | awk '{sum+=$1; count++} END {print "Average CPU%:", sum/count}'
-```
-
-**Saturation Indicators:**
-- IOPS per volume decline as number of concurrent volumes increases due to shared node resources
-- P99 latencies increase nonlinearly when aggregate I/O exceeds backend disk IOPS capacity
-- Manager CPU usage rises with replica count due to status monitoring overhead
-- Network utilization approaches link capacity limits (observe via `iftop` or `nload` on nodes)
-
-### 2.3 Kernel-Level Bottleneck Identification
-
-```bash
-# Profile block layer queueing behavior
-sudo bpftrace -e '
-tracepoint:block:block_rq_issue {
-  @queue_time_us[comm] = hist((nsecs - args->start_time_ns) / 1000);
-}
-interval:s:10 {
-  print(@queue_time_us);
-  clear(@queue_time_us);
-}' &
-
-# Run sustained I/O workload
-kubectl exec fio-benchmark -- fio --name=stress \
-  --filename=/mnt/test/testfile \
-  --size=5G \
-  --direct=1 \
-  --rw=randrw \
-  --bs=4k \
-  --ioengine=libaio \
-  --iodepth=128 \
-  --numjobs=8 \
-  --time_based=1 \
-  --runtime=60
-
-# Analyze CPU scheduler behavior for replica processes
-sudo perf sched record -a -- sleep 30
-sudo perf sched latency | grep longhorn
-
-# Identify lock contention in kernel filesystem layer
-sudo bpftrace -e '
-kprobe:__mutex_lock_slowpath {
-  @lock_contention[kstack] = count();
-}
-interval:s:10 {
-  print(@lock_contention, 10);
-  clear(@lock_contention);
-}'
-```
-
-**Bottleneck Diagnostics:**
-- High block layer queue times indicate disk I/O saturation
-- CPU scheduler latencies >10ms for replica processes suggest CPU contention
-- Mutex contention in filesystem code paths (ext4, xfs) limits write throughput
-
-## Exercise 3: Fault Injection & Recovery Analysis
-
-This exercise validates Longhorn's resilience through controlled chaos engineering: network partitions, node failures, and disk corruption. The goal is to verify that the system maintains data consistency and availability within documented recovery time objectives (RTOs).
-
-### 3.1 Network Partition Between Engine and Replicas
-
-Longhorn's replication protocol requires quorum (N/2+1) acknowledgments. Partitioning minority replicas should allow the system to continue operating, while partitioning the majority should degrade volume availability.
-
-```bash
-# Identify replica distribution for a test volume
-VOLUME_NAME=$(kubectl get volumes.longhorn.io -A -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s "http://localhost:9500/v1/volumes/$VOLUME_NAME" | jq '.replicas[] | {name: .name, hostId: .hostId, address: .address}'
-
-# Select two replicas on different nodes
-REPLICA1_NODE=$(kubectl get replicas.longhorn.io -A -o jsonpath='{.items[0].spec.nodeID}')
-REPLICA2_NODE=$(kubectl get replicas.longhorn.io -A -o jsonpath='{.items[1].spec.nodeID}')
-
-# Partition first replica by blocking its replication port (10000+)
-REPLICA1_PORT=$(kubectl get replicas.longhorn.io -A -o jsonpath='{.items[0].status.port}')
-ssh $REPLICA1_NODE "sudo iptables -A INPUT -p tcp --dport $REPLICA1_PORT -j DROP"
-ssh $REPLICA1_NODE "sudo iptables -A OUTPUT -p tcp --sport $REPLICA1_PORT -j DROP"
-
-# Monitor volume robustness status (should remain "healthy" with 2/3 replicas)
-watch -n 2 "kubectl get volume.longhorn.io $VOLUME_NAME -o jsonpath='{.status.robustness}'"
-
-# Observe replica mode transitions in Manager logs
-kubectl logs -n longhorn-system -l app=longhorn-manager --tail=100 | grep -i "replica.*mode\|robustness"
-
-# Verify I/O continues to work
-kubectl exec fio-benchmark -- dd if=/dev/urandom of=/mnt/test/testfile bs=1M count=100 oflag=direct
-kubectl exec fio-benchmark -- md5sum /mnt/test/testfile
-
-# Restore network connectivity
-ssh $REPLICA1_NODE "sudo iptables -D INPUT -p tcp --dport $REPLICA1_PORT -j DROP"
-ssh $REPLICA1_NODE "sudo iptables -D OUTPUT -p tcp --sport $REPLICA1_PORT -j DROP"
-
-# Monitor replica resynchronization (rebuilding process)
-kubectl logs -n longhorn-system -l app=longhorn-manager --tail=200 | grep -i "rebuild\|sync"
-
-# Verify replica mode returns to RW (read-write)
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s "http://localhost:9500/v1/volumes/$VOLUME_NAME" | jq '.replicas[] | {name: .name, mode: .mode}'
-```
-
-**Expected Behavior:**
-- Volume robustness degrades from "healthy" to "degraded" when minority replicas are unavailable
-- Engine marks partitioned replica as WO (write-only) or ERR (error) after timeout (~10 seconds)
-- I/O operations continue uninterrupted with quorum replicas
-- Replica rebuild initiates after partition heals, copying missing revisions from healthy replicas
-- Rebuild duration proportional to divergence between replicas (typically MB/s to GB/s depending on backend disk speed)
-
-### 3.2 Simulated Node Failure and Volume Migration
-
-Node failures trigger Kubernetes pod eviction and Longhorn's volume migration logic. Longhorn must detach the volume from the failed node, reattach it to a healthy node, and restore I/O path availability.
-
-```bash
-# Create a test pod using a Longhorn volume
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: volume-consumer
-  namespace: default
-spec:
-  containers:
-  - name: app
-    image: busybox
-    command: ["/bin/sh", "-c"]
-    args:
-      - |
-        while true; do
-          date >> /mnt/data/heartbeat.log
-          sleep 5
-        done
-    volumeMounts:
-    - name: data
-      mountPath: /mnt/data
-  volumes:
-  - name: data
-    persistentVolumeClaim:
-      claimName: fio-benchmark-pvc
-EOF
-
-kubectl wait --for=condition=Ready pod/volume-consumer --timeout=60s
-
-# Identify node hosting the pod
-POD_NODE=$(kubectl get pod volume-consumer -o jsonpath='{.spec.nodeName}')
-
-# Record current heartbeat log state
-kubectl exec volume-consumer -- tail -n 10 /mnt/data/heartbeat.log
-
-# Simulate node failure by draining (prevents pod restart on same node)
-kubectl drain $POD_NODE --ignore-daemonsets --delete-emptydir-data --force
-
-# Monitor pod and volume status during migration
-watch -n 2 "kubectl get pod volume-consumer -o wide && echo '---' && kubectl get volume.longhorn.io -A | grep $VOLUME_NAME"
-
-# Observe volume detachment and reattachment events
-kubectl get events -n longhorn-system --sort-by='.lastTimestamp' | grep -E "Volume|Attach|Detach" | tail -20
-
-# Wait for pod to be rescheduled and volume to reattach (typically 30-120 seconds)
-kubectl wait --for=condition=Ready pod/volume-consumer --timeout=180s
-
-# Verify data continuity (heartbeat log should resume without gaps)
-kubectl exec volume-consumer -- tail -n 20 /mnt/data/heartbeat.log
-
-# Measure downtime by analyzing heartbeat gaps
-kubectl exec volume-consumer -- cat /mnt/data/heartbeat.log | awk '{print $4}' | while read line; do echo $(date -d "$line" +%s); done | awk 'NR>1 {print $1 - prev} {prev=$1}' | sort -n | tail -1
-
-# Restore node to schedulable state
-kubectl uncordon $POD_NODE
-```
-
-**Expected Behavior:**
-- Pod enters "Terminating" state when node is drained
-- Volume detaches from failed node after grace period (default 6 minutes)
-- Kubernetes reschedules pod to a healthy node
-- Longhorn attaches volume to new node and establishes I/O path
-- Total downtime typically 2-10 minutes depending on grace periods and storage backend
-- Data integrity preserved (no log entries lost or corrupted)
-
-### 3.3 Replica Disk Corruption and Automatic Rebuild
-
-Disk corruption simulates bit rot, hardware failures, or filesystem inconsistencies. Longhorn should detect corrupted replicas and automatically rebuild them from healthy replicas.
-
-```bash
-# Identify a replica's data directory
-VOLUME_NAME=$(kubectl get volumes.longhorn.io -A -o jsonpath='{.items[0].metadata.name}')
-REPLICA_NAME=$(kubectl get replicas.longhorn.io -A -o jsonpath='{.items[0].metadata.name}')
-REPLICA_NODE=$(kubectl get replicas.longhorn.io -A -o jsonpath='{.items[0].spec.nodeID}')
-REPLICA_DIR="/var/lib/longhorn/replicas/$REPLICA_NAME"
-
-# Corrupt replica data by writing random bytes to volume-head.img
-ssh $REPLICA_NODE "sudo dd if=/dev/urandom of=$REPLICA_DIR/volume-head-*.img bs=1M count=10 seek=100 conv=notrunc"
-
-# Trigger volume health check (Longhorn periodically verifies replica data)
-# Force immediate health check by restarting manager on replica node
-MANAGER_POD=$(kubectl get pods -n longhorn-system -l app=longhorn-manager -o jsonpath="{.items[?(@.spec.nodeName=='$REPLICA_NODE')].metadata.name}")
-kubectl delete pod -n longhorn-system $MANAGER_POD
-
-# Monitor replica status for corruption detection
-watch -n 5 "kubectl get replicas.longhorn.io -A | grep $REPLICA_NAME"
-
-# Observe manager logs for corruption events
-kubectl logs -n longhorn-system -l app=longhorn-manager --tail=200 | grep -i "corrupt\|fail\|error" | grep $REPLICA_NAME
-
-# Verify automatic rebuild is triggered
-kubectl get events -n longhorn-system --sort-by='.lastTimestamp' | grep -i rebuild | tail -10
-
-# Monitor rebuild progress
-kubectl exec -n longhorn-system $MANAGER_POD -- curl -s "http://localhost:9500/v1/volumes/$VOLUME_NAME" | jq '.replicas[] | select(.name == "'$REPLICA_NAME'") | {name: .name, mode: .mode, rebuildState: .rebuildState}'
-
-# Verify replica returns to healthy state after rebuild completes
-watch -n 5 "kubectl exec -n longhorn-system $MANAGER_POD -- curl -s http://localhost:9500/v1/volumes/$VOLUME_NAME | jq '.replicas[] | {name: .name, mode: .mode}'"
-```
-
-**Expected Behavior:**
-- Longhorn detects data corruption through checksum mismatches during read operations
-- Corrupted replica transitions to ERR mode
-- Controller initiates automatic rebuild from healthy replicas
-- New replica created on different disk/node if available
-- Volume robustness returns to "healthy" after successful rebuild
-
-### 3.4 Chaos Engineering: Simultaneous Multi-Failure Scenarios
-
-```bash
-# Install Chaos Mesh for advanced failure injection
-kubectl apply -f https://mirrors.chaos-mesh.org/v2.6.0/crd.yaml
-kubectl apply -f https://mirrors.chaos-mesh.org/v2.6.0/chaos-mesh.yaml
-
-# Wait for Chaos Mesh to be ready
-kubectl wait --for=condition=Ready pods -n chaos-mesh --all --timeout=180s
-
-# Create a chaos experiment: network latency + pod failure
-cat <<EOF | kubectl apply -f -
-apiVersion: chaos-mesh.org/v1alpha1
-kind: NetworkChaos
-metadata:
-  name: longhorn-network-delay
-  namespace: default
-spec:
-  action: delay
-  mode: all
-  selector:
-    namespaces:
-      - longhorn-system
-    labelSelectors:
-      app: longhorn-manager
-  delay:
-    latency: "100ms"
-    jitter: "50ms"
-  duration: "5m"
+      storage: 20Gi
 ---
-apiVersion: chaos-mesh.org/v1alpha1
-kind: PodChaos
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
 metadata:
-  name: longhorn-replica-kill
-  namespace: default
+  name: stateful-vm
 spec:
-  action: pod-kill
-  mode: one
-  selector:
-    namespaces:
-      - longhorn-system
-    labelSelectors:
-      longhorn.io/component: instance-manager
-      longhorn.io/instance-manager-type: replica
-  scheduler:
-    cron: "*/2 * * * *"
-  duration: "5m"
-EOF
-
-# Monitor volume health during chaos
-watch -n 5 "kubectl get volumes.longhorn.io -A -o custom-columns='NAME:.metadata.name,STATE:.status.state,ROBUSTNESS:.status.robustness'"
-
-# Run I/O workload to measure impact
-kubectl exec fio-benchmark -- fio --name=chaos-test \
-  --filename=/mnt/test/testfile \
-  --size=2G \
-  --direct=1 \
-  --rw=randrw \
-  --bs=4k \
-  --ioengine=libaio \
-  --iodepth=32 \
-  --numjobs=2 \
-  --time_based=1 \
-  --runtime=300 \
-  --group_reporting \
-  --output-format=json+ \
-  > /tmp/chaos-test.json
-
-# Analyze latency degradation during chaos
-jq '.jobs[0] | {
-  read_lat_us_p50: .read.lat_ns.percentile."50.000000" / 1000,
-  read_lat_us_p99: .read.lat_ns.percentile."99.000000" / 1000,
-  write_lat_us_p50: .write.lat_ns.percentile."50.000000" / 1000,
-  write_lat_us_p99: .write.lat_ns.percentile."99.000000" / 1000
-}' /tmp/chaos-test.json
-
-# Clean up chaos experiments
-kubectl delete networkchaos longhorn-network-delay
-kubectl delete podchaos longhorn-replica-kill
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: stateful-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: datadisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            bridge: {}
+        resources:
+          requests:
+            memory: 2Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: datadisk
+        persistentVolumeClaim:
+          claimName: stateful-vm-disk
 ```
 
-**Resilience Validation:**
-- System tolerates network latency up to 200-300ms before volume I/O timeouts
-- Replica pod kills trigger automatic restarts and resynchronization
-- Volume remains operational (degraded) with N/2+1 healthy replicas
-- P99 latencies increase 2-5x during active chaos but stabilize after failures resolve
+### Exercise 5.1: Write Test Data and Verify Replication
 
-## Diagnostic Cheat Sheet & Verification Checklist
+```bash
+kubectl apply -f stateful-vm.yaml
 
-### Quick Reference Commands
+# Wait for VM ready
+kubectl wait --for=condition=Ready vmi/stateful-vm --timeout=300s
 
-| Task | Command | Expected Output |
-|------|---------|-----------------|
-| List all volumes | `kubectl get volumes.longhorn.io -A` | Volumes in "attached" or "detached" state |
-| Check volume health | `kubectl get volume.longhorn.io <name> -o jsonpath='{.status.robustness}'` | "healthy", "degraded", or "faulted" |
-| View replica distribution | `kubectl get replicas.longhorn.io -A -o wide` | Replicas spread across nodes |
-| Inspect Manager logs | `kubectl logs -n longhorn-system -l app=longhorn-manager --tail=100` | Reconciliation events, errors |
-| Get volume metrics | `kubectl exec -n longhorn-system <manager-pod> -- curl -s http://localhost:9500/v1/volumes/<name>` | Volume state, replica modes, controller endpoint |
-| Monitor node disk usage | `kubectl get nodes.longhorn.io -o json \| jq '.items[].spec.disks'` | Disk capacity, availability, conditions |
-| Trace block I/O | `sudo bpftrace -e 'tracepoint:block:block_bio_queue { printf("%s\n", comm); }'` | Process names performing block I/O |
-| Profile CPU hotspots | `sudo perf top -p $(pgrep longhorn-manager)` | Top functions consuming CPU |
-| Capture replication traffic | `sudo tcpdump -i any -n 'tcp portrange 10000-10100' -w /tmp/capture.pcap` | gRPC packets between Engine and Replicas |
-| Verify replica data integrity | `ssh <node> "sudo ls -lh /var/lib/longhorn/replicas/<replica-name>/"` | volume-head.img, volume.meta present |
+# Write test data to disk
+virtctl console stateful-vm
+# (inside VM)
+sudo mkfs.ext4 /dev/vda
+sudo mkdir /mnt/data
+sudo mount /dev/vda /mnt/data
+echo "Test data at $(date)" | sudo tee /mnt/data/testfile.txt
+sudo sync
+exit
 
-### System Health Validation Matrix
+# Verify Longhorn replicas
+LH_VOL=$(kubectl get pv $(kubectl get pvc stateful-vm-disk -o jsonpath='{.spec.volumeName}') \
+  -o jsonpath='{.spec.csi.volumeHandle}')
 
-| Component | Check | Healthy Indicator |
-|-----------|-------|-------------------|
-| Managers | `kubectl get pods -n longhorn-system -l app=longhorn-manager` | All pods Running, 1/1 Ready |
-| Instance Managers | `kubectl get pods -n longhorn-system -l longhorn.io/component=instance-manager` | Pods Running, Engine and Replica types present |
-| CSI Plugins | `kubectl get pods -n longhorn-system -l app=csi-attacher,app=csi-provisioner` | All pods Running |
-| Volumes | `kubectl get volumes.longhorn.io -A` | State="attached", Robustness="healthy" |
-| Replicas | `kubectl get replicas.longhorn.io -A` | CurrentState="running", no FailedAt timestamp |
-| Nodes | `kubectl get nodes.longhorn.io` | AllowScheduling=true, Ready=true |
-| Storage Classes | `kubectl get storageclass longhorn` | Provisioner=driver.longhorn.io |
-
-### Troubleshooting Decision Tree
-
-```mermaid
-graph TD
-    A["Volume I/O Failure"] --> B{"Check Volume State"}
-    B -->|"Detached"| C["Inspect attachment events:<br/>kubectl get events"]
-    B -->|"Faulted"| D["Check replica count:<br/>kubectl get replicas"]
-    B -->|"Degraded"| E["Inspect failed replicas:<br/>replica logs, disk space"]
-    
-    D --> F{"<N/2+1 healthy replicas?"}
-    F -->|"Yes"| G["Trigger manual rebuild"]
-    F -->|"No"| H["Volume unrecoverable:<br/>restore from backup"]
-    
-    E --> I["Identify root cause:<br/>disk full, network partition, node down"]
-    I --> J["Resolve underlying issue"]
-    J --> K["Wait for auto-rebuild"]
-    
-    C --> L["Check node scheduling:<br/>kubectl describe node"]
-    L --> M{"Node cordoned or disk full?"}
-    M -->|"Yes"| N["Uncordon node or free disk space"]
-    M -->|"No"| O["Check CSI driver:<br/>kubectl logs csi-attacher"]
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOL \
+  -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeID,STATE:.status.currentState
 ```
 
-### Performance Baseline Expectations
+### Exercise 5.2: Simulate Node Failure and Verify Failover
 
-| Workload | Block Size | Queue Depth | Expected Throughput/IOPS | Expected P99 Latency |
-|----------|------------|-------------|-------------------------|---------------------|
-| Sequential Read | 128KB | 32 | 200-500 MB/s | <5ms |
-| Sequential Write | 128KB | 32 | 100-300 MB/s | <10ms |
-| Random Read | 4KB | 128 | 10K-30K IOPS | <5ms |
-| Random Write | 4KB | 32 | 3K-10K IOPS | <15ms |
-| Mixed 70/30 R/W | 4KB | 64 | 5K-15K IOPS | <20ms |
+```bash
+# Identify node running the VM
+VM_NODE=$(kubectl get vmi stateful-vm -o jsonpath='{.status.nodeName}')
+echo "VM running on: $VM_NODE"
 
-*Note: Actual performance varies based on backend disk type (NVMe SSD > SATA SSD > HDD), network latency between nodes, and replica count.*
+# Simulate hard node failure (do not drain, just power off or cordone + delete pod)
+kubectl cordon $VM_NODE
 
-### Recovery Time Objectives (RTOs)
+# Force delete virt-launcher pod
+VMI_POD=$(kubectl get pods -l kubevirt.io/vm=stateful-vm -o jsonpath='{.items[0].metadata.name}')
+kubectl delete pod $VMI_POD --force --grace-period=0
 
-| Failure Scenario | Detection Time | Recovery Time | Data Loss Risk |
-|------------------|----------------|---------------|----------------|
-| Single replica failure | <30 seconds | Automatic rebuild: minutes to hours (size-dependent) | Zero (quorum maintained) |
-| Minority replica partition | <30 seconds | Automatic resync after partition heals | Zero (quorum maintained) |
-| Node failure | 5-10 minutes (grace period) | Volume reattachment: 2-10 minutes | Zero (replicas on other nodes) |
-| Majority replica failure | <1 minute | Manual intervention required | Possible (volume faulted) |
-| Disk corruption (single replica) | Variable (next read/write) | Automatic rebuild | Zero (healthy replicas available) |
+# Monitor VM rescheduling
+kubectl get vmi stateful-vm -w
 
-This lab provides a comprehensive framework for operational validation of Longhorn distributed storage, enabling practitioners to verify system behavior under normal operation, saturation conditions, and various failure scenarios. The exercises combine Kubernetes-native observability with kernel-level tracing to provide deep visibility into both control plane logic and data plane performance.
+# Verify new node
+NEW_NODE=$(kubectl get vmi stateful-vm -o jsonpath='{.status.nodeName}')
+echo "VM rescheduled to: $NEW_NODE"
+
+# Check Longhorn volume attachment transferred
+kubectl -n longhorn-system get volume $LH_VOL -o jsonpath='{.status.kubernetesStatus}' | jq .
+```
+
+### Exercise 5.3: Data Integrity Verification
+
+```bash
+# Access VM on new node
+virtctl console stateful-vm
+# (inside VM)
+sudo mount /dev/vda /mnt/data
+cat /mnt/data/testfile.txt
+
+# Expected: Original test data intact
+
+# Verify filesystem consistency
+sudo fsck -n /dev/vda
+```
+
+**Failure Mode Analysis**:
+```bash
+# Check if any replica was promoted during failover
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOL \
+  -o jsonpath='{.items[*].status.currentState}'
+
+# Review Longhorn volume events
+kubectl -n longhorn-system describe volume $LH_VOL | tail -30
+
+# Verify replica count remains at 3
+kubectl -n longhorn-system get replicas -l longhornvolume=$LH_VOL --no-headers | wc -l
+```
+
+---
+
+## Lab 6: Performance Profiling and Resource Limits
+
+### Objective
+Profile VM CPU/memory usage, enforce resource limits, and validate QoS behavior under contention.
+
+### Exercise 6.1: CPU Pressure Testing
+
+**CPU-intensive VM** (cpu-stress-vm.yaml):
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: cpu-stress-vm
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: "2"
+          limits:
+            memory: 2Gi
+            cpu: "2"
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+```
+
+**Deploy and Stress Test**:
+```bash
+kubectl apply -f cpu-stress-vm.yaml
+virtctl console cpu-stress-vm
+
+# Inside VM, install stress-ng
+sudo dnf install -y stress-ng
+
+# Run CPU stress
+stress-ng --cpu 2 --timeout 60s --metrics-brief &
+
+# Monitor from host
+VMI_POD=$(kubectl get pods -l kubevirt.io/vm=cpu-stress-vm -o jsonpath='{.items[0].metadata.name}')
+kubectl top pod $VMI_POD --containers
+
+# Check cgroup CPU throttling
+NODE=$(kubectl get pod $VMI_POD -o jsonpath='{.spec.nodeName}')
+ssh rancher@$NODE
+
+POD_UID=$(kubectl get pod $VMI_POD -o jsonpath='{.metadata.uid}')
+cat /sys/fs/cgroup/cpu,cpuacct/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod${POD_UID//-/_}.slice/cpu.stat
+# Look for nr_throttled and throttled_time
+```
+
+### Exercise 6.2: Memory Overcommit Testing
+
+**Memory pressure VM**:
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: memory-test-vm
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: containerdisk
+            disk:
+              bus: virtio
+        resources:
+          requests:
+            memory: 4Gi
+          limits:
+            memory: 4Gi
+          overcommitGuestOverhead: true
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: quay.io/kubevirt/fedora-cloud-container-disk-demo
+```
+
+**Memory Stress Test**:
+```bash
+kubectl apply -f memory-test-vm.yaml
+virtctl console memory-test-vm
+
+# Inside VM
+stress-ng --vm 1 --vm-bytes 3G --timeout 60s
+
+# Monitor memory usage
+kubectl top pod $(kubectl get pods -l kubevirt.io/vm=memory-test-vm -o name)
+
+# Check for OOM events
+kubectl describe pod $(kubectl get pods -l kubevirt.io/vm=memory-test-vm -o name) | grep -A 10 Events
+```
+
+---
+
+## Lab 7: Network Performance and Packet Flow Analysis
+
+### Objective
+Profile network throughput between VMs, diagnose packet loss, and verify SR-IOV passthrough (if available).
+
+### Exercise 7.1: VM-to-VM iperf3 Benchmarking
+
+**Deploy Two VMs on Same VLAN**:
+```bash
+# Use multihomed-vm.yaml and test-vm-vlan100.yaml from Lab 3
+
+# On first VM (server)
+virtctl console multihomed-vm
+sudo dnf install -y iperf3
+iperf3 -s -B 192.168.100.x
+
+# On second VM (client)
+virtctl console test-vm-vlan100
+sudo dnf install -y iperf3
+iperf3 -c 192.168.100.x -t 30 -P 4
+
+# Expected throughput: Near line rate (adjust for virtio overhead)
+```
+
+**Packet Loss Detection**:
+```bash
+# UDP test with bandwidth limit
+iperf3 -c 192.168.100.x -u -b 1G -t 30
+
+# Capture on host bridge
+ssh rancher@$NODE
+sudo tcpdump -i br-vlan100 -n -c 1000 udp
+```
+
+### Exercise 7.2: Latency Measurement with qperf
+
+```bash
+# Install qperf in both VMs
+virtctl console multihomed-vm
+sudo dnf install -y qperf
+qperf
+
+# From second VM
+virtctl console test-vm-vlan100
+sudo dnf install -y qperf
+qperf 192.168.100.x tcp_lat udp_lat
+
+# Expected: <1ms RTT for VMs on same node
+```
+
+---
+
+## Validation Checklist
+
+After completing all labs, verify:
+
+- [ ] VMs successfully provision and migrate between nodes
+- [ ] Longhorn volumes maintain 3 replicas and survive node failures
+- [ ] VLAN networks allow VM-to-VM communication without cluster network involvement
+- [ ] Migration completes within predictable timeframes (<5 minutes for 2GB VM)
+- [ ] Replica rebuild completes automatically after simulated failures
+- [ ] Resource limits prevent VM overcommit from affecting node stability
+- [ ] Network throughput meets expected performance (>1 Gbps for virtio)
+
+## Troubleshooting Reference
+
+**Common Issues**:
+
+| Symptom | Diagnosis | Resolution |
+|---------|-----------|------------|
+| VM stuck in `Scheduling` | Check node resources | `kubectl describe vmi <name>` |
+| Migration timeout | Network latency >100ms | Verify MTU, firewall rules |
+| Longhorn replica failure | Disk full on node | Expand node disk or delete snapshots |
+| VLAN bridge not working | Bridge not in promiscuous mode | `ip link set br-vlan100 promisc on` |
+| VM crashes during migration | Insufficient target memory | Check `kubectl top nodes` |
+
+**Essential Commands Summary**:
+```bash
+# VM lifecycle
+virtctl start/stop/restart <vm>
+virtctl migrate <vm>
+virtctl console <vm>
+
+# Longhorn inspection
+kubectl -n longhorn-system get volumes
+kubectl -n longhorn-system get replicas -l longhornvolume=<vol>
+
+# Network debugging
+ip link show type bridge
+bridge fdb show br <bridge>
+tcpdump -i <interface> -e -n vlan <id>
+
+# Resource monitoring
+kubectl top pods -l kubevirt.io/vm=<name>
+kubectl get vmi <name> -o jsonpath='{.status.migrationState}'
