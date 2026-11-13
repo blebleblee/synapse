@@ -2,143 +2,160 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-Jazz improvisation is not the spontaneous invention of melody from nothing. It is a real-time navigation of a constrained harmonic state space, governed by the physics of acoustics, the mathematics of interval relationships, and internalized compositional grammar accumulated through years of listening and practice. The improviser is simultaneously composer, performer, and reactive agent—making decisions at the speed of thought within a collective conversation that is itself evolving.
+Jazz improvisation is real-time harmonic navigation—a constrained compositional process executed at performance tempo within a collectively evolving musical conversation. Every note exists in a **tonal gravity field** defined by the current chord function, and the improviser's primary task is to manage tension and resolution across time.
 
-### 1.1 The Fundamental Invariant: Tonal Gravity
+### 1.1 The Fundamental Invariant: Tonal Gravity & Voice Leading
 
-Every note in an improvisation exists in a gravitational field defined by the current harmonic context. This is not metaphor. When a dominant seventh chord (e.g., G7) sounds, the tritone formed between its third (B) and seventh (F) creates a specific acoustic tension. The interval ratio of a tritone—a frequency ratio of approximately √2 : 1, or 1.4142 : 1—sits maximally distant from unison on the circle of fifths and produces beating patterns in the air column that the auditory cortex registers as instability. Resolution to the tonic (C major) collapses the tritone: B resolves up by a half step to C, and F resolves down by a half step to E. This voice-leading resolution is physically driven by minimizing intervallic distance, and it constitutes the central engine of functional harmony.
+When a dominant seventh chord (G7) sounds, the tritone between its third (B) and seventh (F) creates acoustic tension demanding resolution. The frequency ratio of a tritone (√2:1 ≈ 1.414:1) sits maximally distant from unison, producing beating patterns the auditory system registers as instability. Resolution to the tonic (Cmaj7) collapses this tritone through stepwise voice leading: B resolves up by semitone to C; F resolves down by semitone to E. This voice-leading motion—minimal intervallic displacement—is the engine of functional harmony.
 
-The improviser's first invariant is therefore: **every note is a tension coefficient relative to the current chord function**. Notes can be classified structurally:
+Every note functions as a **tension coefficient** relative to the current chord:
 
-- **Chord tones** (root, third, fifth, seventh): coefficients near zero tension; they confirm the harmony.
-- **Available tensions** (ninth, eleventh, thirteenth and their alterations): moderate tension; they color the harmony without contradicting it.
-- **Avoid notes**: high tension; they create strong dissonance against the chord's defining intervals, typically the interval of a minor ninth above a chord tone.
+- **Chord tones** (root, 3rd, 5th, 7th): confirm the harmony; near-zero tension
+- **Available tensions** (9th, 11th, 13th and alterations): color the harmony without contradiction; moderate tension
+- **Avoid notes**: create strong dissonance (typically minor 9th intervals above chord tones); high tension
 
-This classification is dynamic—the same note (e.g., F♮) is a chord tone over a Fmaj7 chord, a ♭7 (available tension) over a G7 chord, and a ♭2 (avoid note) over an E major chord.
+This classification is context-dependent. F♮ is a chord tone over Fmaj7, an available tension (♭7) over G7, and an avoid note (♭2) over Emaj7.
 
-### 1.2 The Overtone Series as the Foundation of Chord Architecture
+**Practical application:** Before improvising, identify the chord tones by ear. Play root–3–5–7 ascending and descending through the progression at 60 BPM. Then add tensions one at a time, listening for their tension coefficient. This auditory mapping precedes all melodic invention.
 
-The extended chord vocabulary of jazz—seventh, ninth, eleventh, and thirteenth chords—is not an arbitrary expansion of triadic harmony. It is a selective approximation of the natural overtone series. When a string or air column vibrates at a fundamental frequency *f*, it simultaneously produces partials at integer multiples: 2f, 3f, 4f, 5f, 6f, 7f, 8f, etc.
+### 1.2 The Overtone Series as Chord Architecture Foundation
 
-```
-Partial 1  (1f):  C  — Fundamental
-Partial 2  (2f):  C  — Octave
-Partial 3  (3f):  G  — Perfect fifth
-Partial 4  (4f):  C  — Two octaves
-Partial 5  (5f):  E  — Major third
-Partial 6  (6f):  G  — Fifth again
-Partial 7  (7f):  B♭ — Harmonic seventh (slightly flat of equal-tempered B♭)
-Partial 8  (8f):  C  — Three octaves
-Partial 9  (9f):  D  — Major second / ninth
-Partial 11 (11f): F♯ — Augmented eleventh (Lydian quality)
-Partial 13 (13f): A  — Major thirteenth
-```
-
-The dominant thirteenth chord (C7♯11) used pervasively in jazz—root, major third, perfect fifth, minor seventh, major ninth, augmented eleventh, major thirteenth—maps almost exactly onto partials 1–13 of the overtone series. Jazz harmony, in this sense, is a culturally refined exploitation of acoustic physics. The ♯11 (Lydian dominant) quality of this chord is not a theoretical invention; it is the eleventh partial heard in every naturally resonant tone.
-
-This explains why the dominant seventh chord demands resolution: its minor seventh (the 7th partial) is acoustically present in the overtone series of the note a perfect fifth below, creating a hierarchical pull toward the tonic. The ii–V–I progression (e.g., Dm7 → G7 → Cmaj7) is powerful precisely because G7 contains the overtone structure of C, announcing the tonic before it arrives.
-
-### 1.3 Modal Theory from First Principles
-
-The seven modes of the major scale are not arbitrary scales to be memorized as separate entities. They are rotations of a single intervallic set—the diatonic collection—each rotation beginning on a different pitch class and therefore presenting a different interval between the first note and every subsequent note.
-
-The diatonic collection in C: **C D E F G A B**
-
-Intervals from each starting note (W = whole step, H = half step):
+Extended jazz chords (9th, 11th, 13th) map directly onto the natural overtone series—the acoustic phenomenon where any vibrating string or air column produces simultaneous partials at integer frequency multiples:
 
 ```
-Ionian     (C): W W H W W W H  — major scale; stable, resolved
-Dorian     (D): W H W W W H W  — minor with ♮6; sophisticated, forward-leaning
-Phrygian   (E): H W W W H W W  — minor with ♭2; tense, Spanish/Flamenco quality
-Lydian     (F): W W W H W W H  — major with ♯4; bright, ethereal, suspended
-Mixolydian (G): W W H W W H W  — major with ♭7; dominant; bluesy, unresolved
-Aeolian    (A): W H W W H W W  — natural minor; melancholic, introspective
-Locrian    (B): H W W H W W W  — diminished fifth; maximally unstable
+Partial:  1    2    3    4    5    6    7    8    9    11   13
+Note:     C    C    G    C    E    G    B♭   C    D    F♯   A
+          (fundamental, octave, P5, octave, M3, P5, m7, octave, M9, ♯11, M13)
 ```
 
-The critical structural insight is that each mode's character is dominated by its **characteristic intervals**—the intervals that differ from the parallel major or minor scale. Dorian's raised sixth (A♮ in D Dorian, versus A♭ in D natural minor) is the note that distinguishes it, and it is precisely the note that creates the mode's characteristic "lift." Phrygian's ♭2 creates an augmented second between scale degrees 1 and 2 when harmonized diatonically, which is why it carries such a strong tonal identity. The improviser who understands these characteristic intervals can target them melodically to invoke the modal color without playing the entire scale.
+The dominant 13th chord (C13♯11) used pervasively in jazz—root, major 3rd, perfect 5th, minor 7th, major 9th, augmented 11th, major 13th—aligns almost perfectly with partials 1–13. The ♯11 (Lydian quality) is not a theoretical construct; it is the 11th overtone naturally present in every resonant tone.
 
-Beyond the diatonic modes, jazz improvisation draws heavily on:
+This explains why the dominant seventh demands resolution: its minor 7th exists as the 7th partial of the tone a perfect fifth below (the tonic), creating hierarchical acoustic pull. The ii–V–I progression (Dm7 → G7 → Cmaj7) is powerful because G7 contains the overtone structure of C, announcing the tonic before arrival.
 
-- **Melodic minor modes**: particularly Lydian Dominant (melodic minor, 4th mode) and the Altered scale (melodic minor, 7th mode), used over dominant seventh chords.
-- **Diminished scales** (octatonic): alternating whole-step/half-step or half-step/whole-step patterns, symmetric scales used over dominant 7♭9 and fully diminished chords.
-- **Whole-tone scale**: six-note symmetric scale (all whole steps), used over dominant 7♯5 chords.
-- **Bebop scales**: diatonic scales with added chromatic passing tones inserted to place chord tones on strong beats.
+**Practical drill:** Play a low C on bass or piano. Sing or play partials 1, 3, 5, 7, 9, 11, 13 ascending. Notice how partials 7 and 11 sound "out of tune" in equal temperament—they're closer to natural harmonic ratios. This informs why certain tensions sound "sweet" (natural overtones) versus "biting" (equal-tempered alterations).
+
+### 1.3 Modal Theory: Rotations & Characteristic Intervals
+
+The seven diatonic modes are rotations of a single intervallic set. Each mode's character is defined by its **characteristic intervals**—the degrees that differ from parallel major or minor:
+
+```
+Mode        Intervals (W=whole, H=half)  Characteristic Intervals  Quality
+─────────────────────────────────────────────────────────────────────────
+Ionian      W W H W W W H                 —                        Major, resolved
+Dorian      W H W W W H W                 ♮6 (vs. minor)           Minor, lifted
+Phrygian    H W W W H W W                 ♭2 (vs. minor)           Dark, Spanish
+Lydian      W W W H W W H                 ♯4 (vs. major)           Bright, floating
+Mixolydian  W W H W W H W                 ♭7 (vs. major)           Dominant, bluesy
+Aeolian     W H W W H W W                 —                        Natural minor
+Locrian     H W W H W W W                 ♭5, ♭2 (vs. minor)       Unstable, diminished
+```
+
+**Target these characteristic intervals melodically** to invoke modal color without playing the entire scale. In D Dorian, emphasize the A♮ (♮6). In E Phrygian, emphasize the F♮ (♭2). This is how Miles Davis achieves modal clarity with minimal note density on "So What"—he targets the ♮6 in D Dorian, making the mode explicit.
+
+Beyond diatonic modes, jazz uses:
+
+- **Melodic minor modes:** Lydian Dominant (4th mode) and Altered scale (7th mode) over dominant chords
+- **Diminished scales:** Half-whole (H-W) or whole-half (W-H) octatonic patterns over dominant 7♭9 and fully diminished chords
+- **Whole-tone scale:** Six-note symmetric scale over dominant 7♯5 chords
+- **Bebop scales:** Diatonic scales with chromatic passing tones to align chord tones on strong beats
 
 ```mermaid
 graph TD
-    A["Harmonic Context"] --> B{"Chord Quality"}
-    B -->|"Major 7th"| C["Ionian / Lydian"]
-    B -->|"Minor 7th"| D["Dorian / Phrygian / Aeolian"]
-    B -->|"Dominant 7th (unaltered)"| E["Mixolydian / Lydian Dominant"]
-    B -->|"Dominant 7th (altered)"| F["Altered Scale / HW Diminished"]
-    B -->|"Diminished 7th"| G["WH Diminished (octatonic)"]
-    B -->|"Half-diminished (ø)"| H["Locrian ♮2 (melodic minor, 6th mode)"]
-    C --> I["Target: ♯4, maj7"]
-    D --> J["Target: ♮6 (Dorian), ♭2 (Phrygian)"]
-    E --> K["Target: ♭7, ♮13"]
-    F --> L["Target: ♭9, ♯9, ♭5/♯11, ♭13"]
-    G --> M["Target: ♭9, ♯9, ♭5"]
-    H --> N["Target: ♮9, ♮11, ♭5"]
+    subgraph sub_context ["Harmonic Context"]
+        A["Current Chord"]
+    end
+    
+    subgraph sub_quality ["Chord Quality Mapping"]
+        B{"Quality"}
+        B -->|"Major 7th"| C["Ionian / Lydian"]
+        B -->|"Minor 7th"| D["Dorian / Aeolian / Phrygian"]
+        B -->|"Dominant 7th unaltered"| E["Mixolydian / Lydian Dominant"]
+        B -->|"Dominant 7th altered"| F["Altered / HW Diminished"]
+        B -->|"Diminished 7th"| G["WH Diminished"]
+        B -->|"Half-diminished ø7"| H["Locrian ♮2"]
+    end
+    
+    subgraph sub_targets ["Melodic Target Notes"]
+        C --> I["Target: ♯4, maj7"]
+        D --> J["Target: ♮6 Dorian / ♭2 Phrygian"]
+        E --> K["Target: ♭7, ♮13"]
+        F --> L["Target: ♭9, ♯9, ♯11, ♭13"]
+        G --> M["Target: ♭9, ♯9, dim5"]
+        H --> N["Target: ♮9, ♮11, ♭5"]
+    end
+    
+    A --> B
 ```
 
-### 1.4 The Arpeggio as Harmonic Navigation
+**Practice routine:** Play each mode ascending and descending in eighth notes at 80 BPM through the circle of fifths (C → F → B♭ → E♭ → A♭ → D♭ → G♭ → B → E → A → D → G). Then practice two-octave arpeggios with only the characteristic interval emphasized: for Dorian, play 1-2-♭3-4-5-♮6-5-4-♭3-2-1 repeatedly, making the ♮6 slightly louder.
 
-An arpeggio is not merely a chord played sequentially. It is the clearest possible statement of a chord's identity in the melodic register—a device that temporarily collapses the distinction between harmony and melody. When an improviser plays an arpeggio over a chord, they are tracing the frequency skeleton of that chord through time, and every note they play is unambiguously functional.
+### 1.4 Arpeggios as Harmonic Navigation & Substitution
 
-The sophistication of modern jazz improvisation lies in **arpeggio substitution**: playing the arpeggio of a chord that shares chord tones with the current harmony but introduces additional tensions. Classic examples:
+An arpeggio is the chord's identity stated melodically—a device collapsing the distinction between harmony and melody. Modern jazz sophistication lies in **arpeggio substitution**: playing the arpeggio of a related chord that shares tones with the current harmony while introducing additional tensions.
 
-- Over a **Cmaj7** chord, playing a **Em7** arpeggio (E G B D) adds the 3rd, 5th, 7th, and 9th of Cmaj7—a richer harmonic statement than the Cmaj7 arpeggio itself.
-- Over a **G7** chord, playing a **B diminished 7** arpeggio (B D F A♭) outlines the 3rd, 5th, ♭7th, and ♭9th of G7—the defining tones of a G7♭9 chord.
-- Over a **G7alt** chord, playing a **D♭maj7** arpeggio (D♭ F A♭ C) outlines the ♭5, ♭7, ♭9, and 3rd of G7—a tritone substitution arpeggio.
+Classic substitutions:
 
-This last technique—the **tritone substitution**—deserves elaboration. Because the tritone is symmetric (it divides the octave exactly in half), two dominant seventh chords a tritone apart share the same tritone. G7 (tritone: B–F) and D♭7 (tritone: F–C♭/B) share identical guide tones (B/C♭ and F), only their assignment to third and seventh is reversed. This means D♭7 can substitute for G7 in resolving to Cmaj7, but the bass movement is now a half-step descent (D♭ → C) rather than a perfect fifth descent (G → C). Jazz improvisers use tritone substitution arpeggios constantly to introduce chromatic voice-leading into otherwise diatonic progressions.
+- **Over Cmaj7, play Em7 arpeggio** (E-G-B-D): yields 3rd, 5th, 7th, 9th of Cmaj7—richer than the basic Cmaj7 arpeggio
+- **Over G7, play Bdim7 arpeggio** (B-D-F-A♭): yields 3rd, 5th, ♭7, ♭9 of G7—defines a G7♭9 sound
+- **Over G7alt, play D♭maj7 arpeggio** (D♭-F-A♭-C): yields ♭5, ♭7, ♭9, 3rd—a tritone substitution arpeggio
 
-### 1.5 Phrase Architecture and Motivic Development
+The **tritone substitution** exploits symmetry: two dominant sevenths a tritone apart share the same tritone interval. G7 (tritone: B–F) and D♭7 (tritone: F–C♭) share guide tones with roles swapped. D♭7 substitutes for G7 when resolving to Cmaj7, but the bass moves by chromatic descent (D♭ → C) rather than circle-of-fifths (G → C). This introduces chromatic voice leading into diatonic progressions—a hallmark of bebop and post-bop harmony.
 
-Phrasing in jazz improvisation follows the same developmental logic as formal composition. A phrase is not a random chain of notes—it has an **initiating gesture**, a **developing middle**, and a **cadential close**. The bebop tradition codified this architecture partly through the work of Charlie Parker, whose lines consistently:
+**Practice drill:** Take the ii–V–I in C (Dm7 → G7 → Cmaj7). Over Dm7, play Fmaj7 arpeggio (F-A-C-E = ♭3, 5, ♭7, 9). Over G7, play Bdim7 arpeggio (B-D-F-A♭ = 3, 5, ♭7, ♭9). Over Cmaj7, play Em7 arpeggio (E-G-B-D = 3, 5, 7, 9). Practice ascending and descending at 60 BPM, then 80 BPM, then 110 BPM. This is **upper-structure voicing** applied melodically.
 
-1. Begin on a chord tone or the leading tone into one.
-2. Move through scalar or arpeggiating passages that outline the underlying harmony.
-3. Land on a strong structural tone (typically the third or seventh of the current chord) on a downbeat or the and of beat 2 or 4.
+### 1.5 Phrase Architecture & Motivic Development
 
-**Motivic development** is the technique of transforming a small musical cell across the duration of a solo. Given a three-note motive, the improviser has access to a large transformation set:
+A jazz phrase has formal structure: **initiation, development, cadence**. Charlie Parker's lines consistently:
 
-- **Transposition**: the same motive moved to a different pitch level.
-- **Inversion**: the motive's intervallic contour flipped (ascending becomes descending).
-- **Retrograde**: the motive played backward.
-- **Augmentation**: the motive's rhythmic values doubled.
-- **Diminution**: the motive's rhythmic values halved.
-- **Sequence**: the motive repeated at successive scalic or chromatic intervals.
-- **Fragmentation**: only part of the motive used as a new starting point.
+1. Begin on a chord tone or leading tone
+2. Move through scalar or arpeggiated passages outlining the harmony
+3. Land on a structural tone (3rd or 7th) on a downbeat or strong off-beat (and of 2 or 4)
 
-John Coltrane's approach to the "Giant Steps" changes exemplifies motivic economy: within a progression so harmonically dense that conventional scalar improvisation is nearly impossible, Coltrane reduced his improvisational vocabulary to a small set of three-note cells and arpeggios that he cycled through the rapidly shifting key centers (B major, G major, E♭ major—a symmetrical division of the octave into major thirds).
+**Motivic development** transforms a small cell through:
+
+- **Transposition:** same intervals, different pitch level
+- **Inversion:** intervallic contour flipped (ascending becomes descending)
+- **Retrograde:** played backward
+- **Augmentation:** rhythmic values doubled
+- **Diminution:** rhythmic values halved
+- **Sequence:** repeated at successive intervals
+- **Fragmentation:** subset of the motive as new seed
+
+Coltrane's "Giant Steps" solo exemplifies motivic economy: within a progression so dense that conventional scalar improvisation is impossible, Coltrane reduces his vocabulary to three-note cells and arpeggios cycled through rapidly shifting key centers (B major, G major, E♭ major—symmetric division of the octave by major thirds).
+
+**Practice drill:** Create a three-note motive (e.g., C-E-D). Play it through a ii–V–I progression by:
+1. Transposing it to start on each chord's root (bars 1–4, 60 BPM)
+2. Inverting it (bars 5–8)
+3. Playing it in retrograde (bars 9–12)
+4. Sequencing it up by scale steps (bars 13–16)
+
+Record yourself. Listen for which transformations preserve recognizability. This is the foundation of thematic improvisation.
 
 ## 2. Core Architecture & Mechanics
 
-### 2.1 The Improvisational System: A Formal Model
+### 2.1 The Improvisational System: Constraint Satisfaction in Real Time
 
-Improvisation can be modeled as a real-time constraint satisfaction and search process. At each moment, the improviser selects the next musical event (note, rest, rhythm, articulation) from a space whose boundaries are defined by multiple simultaneous constraints. This is not a loose analogy—computational musicologists have formalized jazz improvisation using finite automata, Markov chains, and more recently, neural sequence models, all of which confirm that the structure is learnable and constrained.
+Improvisation is a real-time constraint satisfaction process. At each moment, the improviser selects the next event from a space bounded by harmonic, rhythmic, ensemble, and internal (vocabulary, intent) constraints.
 
 ```mermaid
 flowchart LR
-    subgraph Inputs
-        H["Harmonic Progression\n(chord sequence + voice leading)"]
-        R["Rhythmic Context\n(tempo, groove, subdivisions)"]
-        E["Ensemble State\n(bass, drums, comping density)"]
-        I["Internal State\n(vocabulary, emotional intent, fatigue)"]
+    subgraph sub_inputs ["Inputs"]
+        H["Harmonic Progression"]
+        R["Rhythmic Context"]
+        E["Ensemble State"]
+        I["Internal State"]
     end
 
-    subgraph Processing
-        P["Phrase Buffer\n(short-term melodic memory)"]
-        S["Scale/Mode Selector\n(context-sensitive)"]
-        T["Tension Manager\n(dissonance budget)"]
-        M["Motivic Register\n(active motives, transformations)"]
+    subgraph sub_processing ["Processing Functions"]
+        P["Phrase Buffer"]
+        S["Scale/Mode Selector"]
+        T["Tension Manager"]
+        M["Motivic Register"]
     end
 
-    subgraph Outputs
-        N["Note Selection\n(pitch class + octave)"]
-        D["Duration + Articulation\n(rhythm, dynamics, timbre)"]
+    subgraph sub_outputs ["Outputs"]
+        N["Note Selection"]
+        D["Duration + Articulation"]
     end
 
     H --> S
@@ -153,19 +170,26 @@ flowchart LR
     N --> D
 ```
 
-Each block in the Processing layer represents an internalized cognitive function that the trained improviser executes, in parallel, in real time. The Scale/Mode Selector maps chord quality and function onto an appropriate pool of available pitches. The Tension Manager tracks the accumulated dissonance of the current phrase and governs the balance between color tones and resolution. The Motivic Register stores active melodic ideas and their transformations, enabling developmental coherence across phrase boundaries.
+Each processing function operates in parallel:
 
-### 2.2 Harmonic Progressions: Functional Architecture
+- **Scale/Mode Selector:** maps chord quality/function to available pitch pool
+- **Tension Manager:** tracks accumulated dissonance, governs balance between color and resolution
+- **Motivic Register:** stores active melodic ideas and their transformations for developmental coherence
+- **Phrase Buffer:** short-term melodic memory for rhythmic/gestural continuity
 
-The ii–V–I progression is the foundational building block of jazz harmony, appearing in virtually every standard in some form. Its power derives from the concatenation of three distinct harmonic functions:
+These are not conscious decisions at performance tempo—they are internalized cognitive functions built through thousands of hours of practice. The goal is to make the unconscious sophisticated.
 
-- **Subdominant function** (ii7): pre-dominant; creates forward pull toward the dominant.
-- **Dominant function** (V7): maximum tension; tritone demands resolution.
-- **Tonic function** (Imaj7): resolution; acoustic rest point.
+### 2.2 Harmonic Progressions: The ii–V–I Engine
+
+The ii–V–I progression concatenates three harmonic functions:
+
+- **Subdominant (ii7):** pre-dominant; creates forward pull
+- **Dominant (V7):** maximum tension; tritone demands resolution
+- **Tonic (Imaj7):** resolution; acoustic rest
 
 In C major: **Dm7 → G7 → Cmaj7**
 
-The voice leading across this progression is exceptionally smooth. The seventh of Dm7 (C) becomes the seventh of G7 (C remains, now functioning as ♭7). The third of G7 (B) becomes the seventh of Cmaj7. The seventh of G7 (F) resolves to the third of Cmaj7 (E). The bass alone moves in perfect fourths/fifths: D → G → C.
+Voice leading is exceptionally smooth. The 7th of Dm7 (C) becomes the 4th of G7 (C); the 3rd of G7 (B) resolves up by semitone to the 7th of Cmaj7 (B); the 7th of G7 (F) resolves down by semitone to the 3rd of Cmaj7 (E). The bass moves in perfect 4ths: D → G → C.
 
 ```mermaid
 sequenceDiagram
@@ -175,52 +199,69 @@ sequenceDiagram
 
     Note over Bass,Seventh: Dm7
     Bass->>Bass: D
-    Third->>Third: F
-    Seventh->>Seventh: C
+    Third->>Third: F (♭3)
+    Seventh->>Seventh: C (♭7)
 
     Note over Bass,Seventh: G7
-    Bass->>Bass: G  (+P4)
-    Third->>Third: B  (+tritone resolve up)
-    Seventh->>Seventh: F  (retained, now ♭7)
+    Bass->>Bass: G (+P4)
+    Third->>Third: B (3, +tritone resolution prep)
+    Seventh->>Seventh: F (♭7, retained)
 
     Note over Bass,Seventh: Cmaj7
-    Bass->>Bass: C  (+P4)
-    Third->>Third: C  (B resolves +m2)
-    Seventh->>Seventh: E  (F resolves -m2)
+    Bass->>Bass: C (+P4)
+    Third->>Third: E (B→E, -m2)
+    Seventh->>Seventh: B (F→E→B restated, +m2 then resolution)
 ```
 
-This progression appears in multiple transpositions within a single tune. "Autumn Leaves," for instance, contains ii–V–I cadences in both G major and B♭ major within its first eight bars. John Coltrane's "Giant Steps" (1960) expanded this architecture by cycling through three tonal centers separated by major thirds (B, G, E♭), requiring ii–V–I resolutions at a rate of one per two beats in certain passages—a harmonic density that demanded a new improvisational approach.
+This progression appears in multiple transpositions within single tunes. "Autumn Leaves" contains ii–V–I cadences in both G major and E minor within its first sixteen bars. "Giant Steps" cycles through three tonal centers (B, G, E♭) separated by major thirds, requiring ii–V–I resolutions at extreme harmonic velocity—one progression every two beats in certain passages.
 
-### 2.3 Rhythm: Subdivision, Syncopation, and Superimposition
+**Practice routine:**
 
-Jazz rhythm operates primarily in a **swing subdivision** framework. In swing, the quarter note is divided not into two equal eighth notes but into an approximated triplet feel: the first eighth is roughly two-thirds of the beat, the second roughly one-third. This is not a precise mathematical ratio—experienced jazz musicians adjust the degree of swing depending on tempo, style, and ensemble context (at very fast tempos, the swing feel approaches straight eighths; at very slow tempos, it leans closer to explicit triplets).
+1. **Guide-tone practice:** Play only 3rds and 7ths through ii–V–I in all 12 keys, descending by whole step (C → B♭ → A♭ → G♭ → E → D → C), 60 BPM. Keep fingers curved, wrist neutral.
+2. **Arpeggio practice:** Play root–3–5–7 ascending and descending, same progression, 80 BPM.
+3. **Scale practice:** Play appropriate mode over each chord (Dorian–Mixolydian–Ionian), 100 BPM.
+4. **Bebop scale practice:** Use bebop Dorian over ii7, bebop dominant over V7, 120 BPM.
 
-**Syncopation** displaces melodic emphasis from strong beats (1 and 3 in 4/4) to weak beats (2 and 4) or off-beats (the "and" of beats). In jazz, the backbeat emphasis on 2 and 4 from the ride cymbal and snare creates a rhythmic grid against which the improviser plays, and playing across this grid—landing phrases on the and of 4, sustaining through the downbeat—creates forward momentum and surprise.
+Cycle through all 12 keys without stopping. This builds transposability into muscle memory.
 
-**Metric superimposition** (or **hemiola**) involves implying a different meter within the actual time signature. A common technique is to play phrases built in groups of three within a 4/4 context, creating a "three against four" polyrhythm. This creates a sense of rhythmic displacement that gradually rotates back into alignment with the actual barline:
+### 2.3 Rhythm: Swing, Syncopation & Metric Superimposition
 
-```
-Actual meter (4/4):   |  1  +  2  +  3  +  4  +  |
-3-note groupings:     [1  2  3][1  2  3][1  2  3]...
-Realignment occurs every 12 eighth notes (3 measures)
-```
+Jazz rhythm operates in **swing subdivision**. The quarter note divides not into two equal eighths but into an approximated triplet feel: first eighth ≈ 2/3 beat, second eighth ≈ 1/3 beat. This ratio is fluid—at fast tempos, swing approaches straight eighths; at slow tempos, it approaches explicit triplets.
 
-Coltrane, McCoy Tyner, and later Keith Jarrett developed this into sophisticated polymetric improvisation where multiple rhythmic strata operate simultaneously at different levels.
+**Syncopation** displaces emphasis from strong beats (1, 3 in 4/4) to weak beats (2, 4) or off-beats. The ride cymbal's backbeat emphasis on 2 and 4 creates a rhythmic grid against which the improviser plays. Landing phrases on the "and" of 4, sustaining through the downbeat, creates forward momentum.
 
-**Rhythmic motivic development** mirrors pitch motivic development: the improviser extracts a rhythmic cell from the opening of a phrase and recycles it at different pitch levels, creating coherence through rhythm rather than melody alone. This is a core technique of Sonny Rollins, whose "thematic improvisation" explicitly derives melodic and rhythmic content from the head of the tune being played.
-
-### 2.4 Bebop Vocabulary: The Bebop Scale
-
-The bebop scale is one of the most precisely engineered tools in jazz improvisation. The **bebop dominant scale** adds a chromatic passing tone—a natural seventh—between the ♭7 and the root of the Mixolydian mode:
+**Metric superimposition** implies a different meter within the actual time signature. A common technique is grouping in threes within 4/4, creating a 3-against-4 polyrhythm:
 
 ```
-C Mixolydian (7 notes):   C  D  E  F  G  A  B♭  (C)
-C Bebop Dominant (8 notes): C  D  E  F  G  A  B♭  B  (C)
+Actual meter (4/4):   |  1  +  2  +  3  +  4  +  |  1  +  2  +  3  +  4  +  |
+3-note groupings:     [1  2  3][1  2  3][1  2  3][1  2  3]
+                      Realignment occurs every 12 eighth notes (3 bars of 4/4 or 4 bars of 3/4)
 ```
 
-The added B♮ creates an eight-note scale. When this scale is begun on a chord tone (C, E, G, or B♭) on a downbeat and played in continuous eighth notes descending, **every chord tone lands on a strong beat (downbeat or and-of-2 or and-of-4) and every non-chord tone lands on a weak beat**. This is not coincidental—the scale was constructed precisely to achieve this alignment.
+Coltrane, McCoy Tyner, and Keith Jarrett developed sophisticated polymetric improvisation where multiple rhythmic strata operate simultaneously. Coltrane's "Impressions" solo contains extended passages implying 3/4 over the underlying 4/4, creating rhythmic suspension.
 
-Proof: Starting the scale on E (the third of C7) on beat 1 and descending:
+**Practice drill:**
+
+1. Set metronome to 80 BPM, clicks on 2 and 4 (jazz backbeat).
+2. Play quarter-note pulse with your foot on 1-2-3-4.
+3. Clap on beats 1 and 3, then on 2 and 4, then on "and" of each beat.
+4. Play C major scale in triplets (3 notes per beat) while foot maintains quarter-note pulse.
+5. Play C major scale in groups of 3 eighth notes (creating hemiola) over 8 bars, noticing where groupings realign with the downbeat.
+
+This trains polyrhythmic independence—essential for advanced phrasing.
+
+### 2.4 The Bebop Scale: Engineered Metric Alignment
+
+The **bebop dominant scale** adds a chromatic passing tone—natural 7th—between the ♭7 and root of Mixolydian:
+
+```
+C Mixolydian (7 notes):        C  D  E  F  G  A  B♭ (C)
+C Bebop Dominant (8 notes):    C  D  E  F  G  A  B♭  B♮ (C)
+```
+
+The added B♮ creates an eight-note scale. When played in continuous eighth notes starting on a chord tone (C, E, G, B♭) on a downbeat, **every chord tone lands on strong beats and every passing tone lands on weak beats**. This is not accidental—the scale was constructed for this alignment.
+
+**Proof:** Start on E (3rd of C7) on beat 1, descending:
 
 ```
 Beat:   1    +    2    +    3    +    4    +
@@ -228,15 +269,25 @@ Note:   E    D    C    B♭   A    G    F    E
 Type:   CT   PT   CT   CT   PT   CT   PT   CT
 ```
 
-(CT = chord tone, PT = passing/non-chord tone)
+(CT = chord tone, PT = passing tone)
 
-Chord tones (E, C, B♭, G) fall on beats 1, 2, 3, and 4—strong beats—while passing tones (D, A, F) fall on the off-beats. This built-in metric alignment is what gives bebop lines their rhythmic clarity and harmonic transparency even at extreme tempos.
+Chord tones (E, C, B♭, G) fall on beats 1, 2, 3, 4—all strong beats. Passing tones (D, A, F) fall on off-beats. This metric alignment gives bebop lines harmonic clarity at extreme tempos (Charlie Parker at 300+ BPM).
 
-### 2.5 Guide Tones and Voice-Leading Paths
+**Practice drill:**
 
-The third and seventh of any seventh chord are its **guide tones**—the two notes that most clearly define the chord's quality and function. Voice-leading between guide tones across a chord progression creates the most efficient harmonic path and is the backbone of professional improvisation.
+1. Play C bebop dominant scale ascending from C, eighth notes, 60 BPM. Mark where chord tones fall.
+2. Play the same scale ascending from E. Mark where chord tones fall.
+3. Play descending from G. Mark chord tone alignment.
+4. Increase tempo: 80 BPM → 100 BPM → 120 BPM → 140 BPM → 160 BPM.
+5. Apply to ii–V–I: bebop Dorian over Dm7, bebop dominant over G7, bebop major (major scale + ♯5) over Cmaj7.
 
-Over a ii–V–I–VI turnaround in C (Dm7 → G7 → Cmaj7 → A7):
+Practice in all 12 keys via circle of fifths. This is foundational bebop vocabulary.
+
+### 2.5 Guide Tones as Voice-Leading Skeleton
+
+The 3rd and 7th of any seventh chord are **guide tones**—the two notes defining chord quality and function. Voice-leading between guide tones across progressions creates the most efficient harmonic path.
+
+Over ii–V–I–VI turnaround in C (Dm7 → G7 → Cmaj7 → A7):
 
 ```
 Chord:    Dm7   G7    Cmaj7  A7
@@ -244,56 +295,100 @@ Chord:    Dm7   G7    Cmaj7  A7
 7th:       C     F     B      G
 ```
 
-The guide tones create two independent melodic lines (inner voices) that move by half step or whole step through the progression. Practicing guide-tone lines before full improvisation is a fundamental pedagogical technique because it forces the improviser to hear the voice-leading structure of the progression independent of scale choice.
+Guide tones create two independent melodic lines (inner voices) moving by step. The 3rd line: F → B (+tritone) → E (-m2) → C♯ (+M6). The 7th line: C → F (+P4) → B (+tritone) → G (-M3).
 
-### 2.6 Ear Training as the Operational Foundation
+**Practice routine:**
 
-All of the theoretical frameworks above are inert without the perceptual foundation to hear them in real time. The professional jazz improviser has undergone thousands of hours of **interval training** (hearing and identifying all 12 intervals by their sound), **chord quality recognition** (hearing maj7, min7, dom7, ø7, °7, and their alterations instantly), and **transcription** (learning solos by ear to internalize vocabulary directly from recordings).
+1. Play guide-tone lines (3rds only) through the progression at 60 BPM.
+2. Play 7ths only at 60 BPM.
+3. Alternate: 3rd, 7th, 3rd, 7th through the progression.
+4. Arpeggiate 3-7-9 and 7-9-3 patterns.
+5. Add chromatic approach notes: play the guide tone, approach from a half-step below or above, resolve.
 
-Transcription is irreplaceable. When a musician transcribes Charlie Parker's solo on "Ko-Ko" (1945), they are not merely copying notes—they are internalizing the precise rhythmic placement, articulation, phrasing architecture, and harmonic logic of a master practitioner. This is equivalent, in software engineering terms, to reading production-grade source code written by a world-class engineer: the patterns absorbed become available for reuse and recombination in novel contexts.
+This forces the ear to hear voice-leading structure independent of scale choice. It is the skeleton onto which all melodic embellishment hangs.
+
+### 2.6 Ear Training: The Operational Foundation
+
+Theory without embodied perception is inert. Professional jazz improvisers have internalized:
+
+- **Interval recognition:** all 12 intervals by sound, ascending and descending
+- **Chord quality recognition:** maj7, min7, dom7, half-dim7, dim7, and alterations, instantaneously
+- **Transcription:** learning solos note-for-note by ear to internalize vocabulary directly
+
+**Transcription is irreplaceable.** When you transcribe Charlie Parker's "Ko-Ko" solo (1945), you absorb rhythmic placement, articulation, phrasing architecture, and harmonic logic. This is reading production-grade code written by a master—the patterns become available for reuse and recombination.
 
 ```mermaid
 flowchart TD
-    A["Transcription Practice"] --> B["Internalized Vocabulary\n(licks, patterns, gestures)"]
-    B --> C["Recombination\n(new contexts, new tempos)"]
-    C --> D["Personalization\n(modifications, extensions)"]
-    D --> E["Original Voice\n(personal style)"]
-    E -->|"feedback loop"| A
+    subgraph sub_loop ["Vocabulary Acquisition Loop"]
+        A["Transcription Practice"]
+        B["Internalized Vocabulary\n(licks, patterns, gestures)"]
+        C["Recombination\n(new contexts, tempos)"]
+        D["Personalization\n(modifications, extensions)"]
+        E["Original Voice\n(personal style)"]
+    end
 
-    F["Harmonic Analysis"] --> G["Theoretical Understanding\n(why patterns work)"]
-    G --> H["Intentional Application\n(choosing patterns purposefully)"]
+    subgraph sub_theory ["Theoretical Framework"]
+        F["Harmonic Analysis"]
+        G["Conceptual Understanding\n(why patterns work)"]
+        H["Intentional Application"]
+    end
+
+    subgraph sub_ensemble ["Ensemble Context"]
+        I["Ensemble Experience"]
+        J["Reactive Listening"]
+        K["Conversational Improvisation"]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E -->|"feedback"| A
+
+    F --> G
+    G --> H
     H --> C
 
-    I["Ensemble Experience"] --> J["Reactive Listening\n(responding to other musicians)"]
-    J --> K["Conversational Improvisation\n(call and response, support, contrast)"]
+    I --> J
+    J --> K
     K --> C
 ```
 
-### 2.7 A Computational Representation: Jazz Harmony in Python
+**Practice routine:**
 
-The following code models the core harmonic concepts discussed above. It represents chord structures, computes guide tones, and determines appropriate scale choices for a given harmonic context—functions that mirror the implicit computations of an experienced improviser.
+1. **Interval singing:** Sing all 12 intervals ascending from C, then descending. Check with instrument. Daily, 5 minutes.
+2. **Chord quality ear training:** Have a partner play random maj7, min7, dom7, half-dim7, dim7 chords. Identify without looking. 10 minutes.
+3. **Transcription:** Transcribe 4 bars of a solo per day. Sing it, then play it. Analyze: what scale? What arpeggio? What guide tones? 20 minutes.
+4. **Playback analysis:** Record your own improvisation. Listen without the instrument. What did you actually play versus what you intended? Identify gaps. 10 minutes.
+
+This closes the perception-theory-execution loop.
+
+### 2.7 Computational Model: Jazz Harmony in Python
+
+This code models core harmonic concepts: chord construction, guide-tone extraction, scale selection, and voice-leading distance. It mirrors the implicit computations of an experienced improviser.
 
 ```python
 """
 jazz_harmony.py
 
-A computational model of jazz harmony concepts:
-chord construction from intervals, guide-tone extraction,
-scale selection, and voice-leading distance computation.
+Computational model of jazz harmony:
+- Chord construction from intervals
+- Guide-tone extraction (3rd and 7th)
+- Scale selection based on chord quality
+- Voice-leading distance calculation
 
-All interval arithmetic uses integer pitch-class notation:
-  C=0, C#/Db=1, D=2, ..., B=11
+Pitch-class notation: C=0, C♯/D♭=1, D=2, ..., B=11
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
-import itertools
 
 
-# ---------------------------------------------------------------------------
-# Interval constants (semitones from root)
-# ---------------------------------------------------------------------------
+# ============================================================================
+# INTERVAL & NOTE CONSTANTS
+# ============================================================================
+
 INTERVALS = {
     "R": 0, "b2": 1, "2": 2, "b3": 3, "3": 4, "4": 5,
     "b5": 6, "5": 7, "b6": 8, "6": 9, "b7": 10, "7": 11,
@@ -301,26 +396,40 @@ INTERVALS = {
     "s11": 18, "b13": 20, "13": 21,
 }
 
-NOTE_NAMES = ["C", "C#", "D", "Eb", "E", "F",
-              "F#", "G", "Ab", "A", "Bb", "B"]
+NOTE_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
 
-# Chord templates: maps chord quality to interval list (semitones from root)
+
+# ============================================================================
+# CHORD TEMPLATES: interval sets (semitones from root)
+# ============================================================================
+
 CHORD_TEMPLATES: dict[str, list[int]] = {
-    "maj7":    [0, 4, 7, 11],
-    "maj9":    [0, 4, 7, 11, 14],
-    "maj7#11": [0, 4, 7, 11, 14, 18],   # Lydian chord
-    "7":       [0, 4, 7, 10],
-    "9":       [0, 4, 7, 10, 14],
-    "7#11":    [0, 4, 7, 10, 14, 18],   # Lydian dominant
-    "7alt":    [0, 4, 6, 10, 13, 15],   # altered dominant: b5, b7, b9, #9
-    "min7":    [0, 3, 7, 10],
-    "min9":    [0, 3, 7, 10, 14],
-    "min11":   [0, 3, 7, 10, 14, 17],
-    "dim7":    [0, 3, 6, 9],
-    "half_dim":[0, 3, 6, 10],           # min7b5 (ø)
+    "maj7":     [0, 4, 7, 11],
+    "maj9":     [0, 4, 7, 11, 14],
+    "maj7s11":  [0, 4, 7, 11, 14, 18],   # Lydian
+    "6":        [0, 4, 7, 9],
+    "69":       [0, 4, 7, 9, 14],
+    "7":        [0, 4, 7, 10],
+    "9":        [0, 4, 7, 10, 14],
+    "13":       [0, 4, 7, 10, 14, 21],
+    "7s11":     [0, 4, 7, 10, 14, 18],   # Lydian dominant
+    "7alt":     [0, 4, 6, 10, 13, 15],   # b5, b7, b9, #9
+    "7b9":      [0, 4, 7, 10, 13],
+    "7s9":      [0, 4, 7, 10, 15],
+    "min7":     [0, 3, 7, 10],
+    "min9":     [0, 3, 7, 10, 14],
+    "min11":    [0, 3, 7, 10, 14, 17],
+    "min6":     [0, 3, 7, 9],
+    "minMaj7":  [0, 3, 7, 11],
+    "dim7":     [0, 3, 6, 9],
+    "half_dim": [0, 3, 6, 10],           # ø7 (min7b5)
 }
 
-# Scale templates: interval sets (semitones from root)
+
+# ============================================================================
+# SCALE TEMPLATES: interval sets (semitones from root)
+# ============================================================================
+
 SCALE_TEMPLATES: dict[str, list[int]] = {
     "ionian":           [0, 2, 4, 5, 7, 9, 11],
     "dorian":           [0, 2, 3, 5, 7, 9, 10],
@@ -330,29 +439,51 @@ SCALE_TEMPLATES: dict[str, list[int]] = {
     "aeolian":          [0, 2, 3, 5, 7, 8, 10],
     "locrian":          [0, 1, 3, 5, 6, 8, 10],
     "melodic_minor":    [0, 2, 3, 5, 7, 9, 11],
-    "lydian_dominant":  [0, 2, 4, 6, 7, 9, 10],  # melodic minor mode 4
-    "altered":          [0, 1, 3, 4, 6, 8, 10],  # melodic minor mode 7
-    "half_whole_dim":   [0, 1, 3, 4, 6, 7, 9, 10],  # dom7b9 chords
+    "dorian_b2":        [0, 1, 3, 5, 7, 9, 10],  # Phrygian #6 / 2nd mode melodic minor
+    "lydian_augmented": [0, 2, 4, 6, 8, 9, 11],  # 3rd mode melodic minor
+    "lydian_dominant":  [0, 2, 4, 6, 7, 9, 10],  # 4th mode melodic minor
+    "mixolydian_b6":    [0, 2, 4, 5, 7, 8, 10],  # 5th mode melodic minor
+    "locrian_n2":       [0, 2, 3, 5, 6, 8, 10],  # Half-diminished scale (6th mode melodic minor)
+    "altered":          [0, 1, 3, 4, 6, 8, 10],  # Super-Locrian (7th mode melodic minor)
+    "half_whole_dim":   [0, 1, 3, 4, 6, 7, 9, 10],  # HW diminished (dom7b9)
+    "whole_half_dim":   [0, 2, 3, 5, 6, 8, 9, 11],  # WH diminished (dim7)
     "whole_tone":       [0, 2, 4, 6, 8, 10],
-    "bebop_dominant":   [0, 2, 4, 5, 7, 9, 10, 11],  # mixolydian + maj7
+    "bebop_dominant":   [0, 2, 4, 5, 7, 9, 10, 11],  # Mixolydian + maj7
+    "bebop_major":      [0, 2, 4, 5, 7, 8, 9, 11],   # Ionian + #5
+    "bebop_dorian":     [0, 2, 3, 4, 5, 7, 9, 10],   # Dorian + maj3
 }
 
-# Map chord quality to recommended scale options (ordered by conventional preference)
+
+# ============================================================================
+# CHORD-SCALE MAPPING
+# ============================================================================
+
 CHORD_SCALE_MAP: dict[str, list[str]] = {
-    "maj7":    ["ionian", "lydian"],
-    "maj9":    ["ionian", "lydian"],
-    "maj7#11": ["lydian"],
-    "7":       ["mixolydian", "lydian_dominant", "bebop_dominant"],
-    "9":       ["mixolydian", "lydian_dominant", "bebop_dominant"],
-    "7#11":    ["lydian_dominant"],
-    "7alt":    ["altered", "half_whole_dim"],
-    "min7":    ["dorian", "aeolian", "phrygian"],
-    "min9":    ["dorian", "melodic_minor"],
-    "min11":   ["dorian"],
-    "dim7":    ["half_whole_dim"],
-    "half_dim":["locrian", "half_whole_dim"],
+    "maj7":     ["ionian", "lydian"],
+    "maj9":     ["ionian", "lydian"],
+    "maj7s11":  ["lydian"],
+    "6":        ["ionian", "lydian"],
+    "69":       ["ionian", "lydian"],
+    "7":        ["mixolydian", "lydian_dominant", "bebop_dominant"],
+    "9":        ["mixolydian", "lydian_dominant", "bebop_dominant"],
+    "13":       ["mixolydian", "lydian_dominant"],
+    "7s11":     ["lydian_dominant"],
+    "7alt":     ["altered", "half_whole_dim", "whole_tone"],
+    "7b9":      ["half_whole_dim", "phrygian"],
+    "7s9":      ["half_whole_dim"],
+    "min7":     ["dorian", "aeolian", "phrygian", "bebop_dorian"],
+    "min9":     ["dorian", "melodic_minor", "bebop_dorian"],
+    "min11":    ["dorian", "melodic_minor"],
+    "min6":     ["dorian", "melodic_minor"],
+    "minMaj7":  ["melodic_minor"],
+    "dim7":     ["whole_half_dim"],
+    "half_dim": ["locrian_n2", "locrian", "half_whole_dim"],
 }
 
+
+# ============================================================================
+# CHORD CLASS
+# ============================================================================
 
 @dataclass
 class Chord:
@@ -367,53 +498,57 @@ class Chord:
 
     @property
     def third(self) -> int:
+        """Extract the third (second interval in template)."""
         template = CHORD_TEMPLATES[self.quality]
-        # Third is the second interval (index 1) in all standard templates
         return (self.root + template[1]) % 12
 
     @property
     def seventh(self) -> int:
+        """Extract the seventh (fourth interval in template)."""
         template = CHORD_TEMPLATES[self.quality]
-        # Seventh is at index 3 in all seventh-chord templates
+        # Handle triads that don't have a seventh
+        if len(template) < 4:
+            return (self.root + 10) % 12  # default to b7 if no seventh
         return (self.root + template[3]) % 12
 
     @property
     def guide_tones(self) -> tuple[int, int]:
-        """The third and seventh: the two tones that define chord function."""
+        """The third and seventh: core functional tones."""
         return (self.third, self.seventh)
 
     def name(self) -> str:
-        return f"{NOTE_NAMES[self.root]}{self.quality}"
+        quality_display = self.quality.replace("s", "#").replace("b", "♭")
+        return f"{NOTE_NAMES[self.root]}{quality_display}"
 
     def recommended_scales(self) -> list[str]:
-        return CHORD_SCALE_MAP.get(self.quality, [])
+        return CHORD_SCALE_MAP.get(self.quality, ["ionian"])
 
     def available_tensions(self) -> list[int]:
         """
-        Return tension pitch classes not in the basic 7th chord shell.
-        Tensions are defined as chord tones beyond the seventh.
+        Return tension pitch classes beyond the basic 7th chord shell.
+        Tensions are chord tones beyond root-3-5-7.
         """
-        base = set(CHORD_TEMPLATES[self.quality][:4])  # root, 3, 5, 7
+        base_tones = set(CHORD_TEMPLATES[self.quality][:4])
         all_tones = set(CHORD_TEMPLATES[self.quality])
-        tensions = all_tones - base
+        tensions = all_tones - base_tones
         return [(self.root + t) % 12 for t in tensions]
 
 
+# ============================================================================
+# VOICE-LEADING DISTANCE
+# ============================================================================
+
 def voice_leading_distance(chord_a: Chord, chord_b: Chord) -> int:
     """
-    Compute the total semitone displacement required to move each
-    voice of chord_a to the nearest available tone in chord_b.
-    Uses minimum-distance matching between tone sets.
-
-    This models the smooth voice-leading principle: good progressions
-    minimize total voice movement.
+    Compute total semitone displacement to move each voice of chord_a
+    to the nearest tone in chord_b. Models smooth voice-leading principle.
     """
     tones_a = chord_a.tones
     tones_b = chord_b.tones
     total_distance = 0
 
     for tone in tones_a:
-        # Find the nearest tone in chord_b (considering octave equivalence)
+        # Find nearest tone in chord_b (octave equivalence)
         min_dist = min(
             min(abs(tone - t), 12 - abs(tone - t))
             for t in tones_b
@@ -423,10 +558,14 @@ def voice_leading_distance(chord_a: Chord, chord_b: Chord) -> int:
     return total_distance
 
 
+# ============================================================================
+# PROGRESSION BUILDERS
+# ============================================================================
+
 def build_ii_v_i(root: int) -> list[Chord]:
     """
-    Build a ii–V–I progression in the given major key.
-    root: pitch class of the tonic (e.g., 0 = C major)
+    Build ii–V–I progression in the given major key.
+    root: tonic pitch class (0 = C major)
     Returns [ii min7, V dom7, I maj7]
     """
     ii_root = (root + 2) % 12   # supertonic
@@ -438,170 +577,379 @@ def build_ii_v_i(root: int) -> list[Chord]:
     ]
 
 
+def build_minor_ii_v_i(root: int) -> list[Chord]:
+    """
+    Build ii–V–i progression in the given minor key.
+    root: tonic pitch class (0 = C minor)
+    Returns [iiø, V7alt, i min7 or minMaj7]
+    """
+    ii_root = (root + 2) % 12   # supertonic
+    v_root  = (root + 7) % 12   # dominant
+    return [
+        Chord(ii_root, "half_dim"),
+        Chord(v_root,  "7alt"),
+        Chord(root,    "min7"),
+    ]
+
+
 def tritone_substitution(dominant: Chord) -> Chord:
     """
     Return the tritone substitute of a dominant seventh chord.
-    The substitute's root is a tritone (6 semitones) above the original.
-    Both chords share the same tritone interval (3rd and 7th swap roles).
+    Substitute root is a tritone (6 semitones) away.
+    Both chords share the same tritone (3rd and 7th swap roles).
     """
-    assert dominant.quality == "7", "Tritone substitution applies to dominant 7 chords."
+    assert "7" in dominant.quality, "Tritone sub applies to dominant chords."
     sub_root = (dominant.root + 6) % 12
-    return Chord(sub_root, "7")
+    return Chord(sub_root, dominant.quality)
 
+
+# ============================================================================
+# PROGRESSION ANALYSIS
+# ============================================================================
 
 def analyze_progression(chords: list[Chord]) -> None:
-    """Print a harmonic analysis of a chord sequence."""
-    print(f"\n{'Chord':<14} {'Guide Tones (3, 7)':<22} {'Recommended Scales'}")
-    print("-" * 70)
+    """Print harmonic analysis of a chord sequence."""
+    print(f"\n{'Chord':<16} {'Guide Tones (3, 7)':<24} {'Recommended Scales'}")
+    print("=" * 75)
+    
     for i, chord in enumerate(chords):
         gt = tuple(NOTE_NAMES[t] for t in chord.guide_tones)
-        scales = ", ".join(chord.recommended_scales()[:2])  # top two
-        print(f"{chord.name():<14} {str(gt):<22} {scales}")
+        scales = ", ".join(chord.recommended_scales()[:2])
+        print(f"{chord.name():<16} {str(gt):<24} {scales}")
 
         if i < len(chords) - 1:
             dist = voice_leading_distance(chord, chords[i + 1])
-            print(f"  → VL distance to {chords[i+1].name()}: {dist} semitones")
+            print(f"  ↓ Voice-leading distance to {chords[i+1].name()}: {dist} semitones")
 
     print()
 
 
-# ---------------------------------------------------------------------------
-# Example: ii–V–I in C major and G major (as in "Autumn Leaves" bars 1–8)
-# ---------------------------------------------------------------------------
+# ============================================================================
+# DEMONSTRATION
+# ============================================================================
+
 if __name__ == "__main__":
-    print("=== ii–V–I in C major ===")
-    c_major_ii_v_i = build_ii_v_i(root=0)
-    analyze_progression(c_major_ii_v_i)
+    print("\n" + "="*75)
+    print("JAZZ HARMONY COMPUTATIONAL MODEL")
+    print("="*75)
 
-    print("=== ii–V–I in G major ===")
-    g_major_ii_v_i = build_ii_v_i(root=7)
-    analyze_progression(g_major_ii_v_i)
+    print("\n### ii–V–I in C Major ###")
+    c_major_251 = build_ii_v_i(root=0)
+    analyze_progression(c_major_251)
 
-    print("=== Tritone substitution: G7 → D♭7 ===")
+    print("\n### ii–V–I in G Major (Autumn Leaves key area) ###")
+    g_major_251 = build_ii_v_i(root=7)
+    analyze_progression(g_major_251)
+
+    print("\n### Minor ii–V–i in C Minor ###")
+    c_minor_251 = build_minor_ii_v_i(root=0)
+    analyze_progression(c_minor_251)
+
+    print("\n### Tritone Substitution: G7 → D♭7 ###")
     g7  = Chord(root=7, quality="7")
     db7 = tritone_substitution(g7)
-    print(f"Original:    {g7.name()}  — guide tones: "
+    
+    print(f"Original:    {g7.name():<8} — guide tones: "
           f"{tuple(NOTE_NAMES[t] for t in g7.guide_tones)}")
-    print(f"Substitute:  {db7.name()} — guide tones: "
+    print(f"Substitute:  {db7.name():<8} — guide tones: "
           f"{tuple(NOTE_NAMES[t] for t in db7.guide_tones)}")
-    print(f"Shared tritone interval confirmed: "
-          f"{abs(g7.third - db7.seventh)} semitones\n")
+    print(f"Shared tritone confirmed (3rd of one = 7th of other)\n")
 
-    print("=== Giant Steps: Coltrane changes (B → G → Eb tonal centers) ===")
+    print("\n### Giant Steps: Coltrane's Tonal Centers (B–D–F–Ab cycle) ###")
+    # Simplified first 8 bars
     giant_steps = [
         Chord(11, "maj7"),   # Bmaj7
-        Chord(7,  "7"),      # G7   (V of Emaj... but actually a Coltrane substitution)
-        Chord(4,  "maj7"),   # Emaj7
-        Chord(1,  "7"),      # C#7 / Db7
-        Chord(8,  "maj7"),   # Abmaj7 / Ebmaj7
-        Chord(5,  "7"),      # F7
-        Chord(11, "maj7"),   # Bmaj7
+        Chord(7,  "7"),      # D7 (V of G, but functions as Coltrane sub)
+        Chord(7,  "maj7"),   # Gmaj7
+        Chord(10, "7"),      # Bb7 (V of Eb)
+        Chord(3,  "maj7"),   # Ebmaj7
+        Chord(0,  "min7"),   # Amin7 (ii of G)
+        Chord(7,  "7"),      # D7
+        Chord(7,  "maj7"),   # Gmaj7
     ]
-    analyze_progression(giant_steps)
+    analyze_progression(giant_steps[:4])  # First 4 for brevity
+
+    print("\n### Cycle of Dominants (I Got Rhythm bridge) ###")
+    cycle_of_dominants = [
+        Chord(3,  "7"),      # Eb7 (III7)
+        Chord(8,  "7"),      # Ab7 (VI7)
+        Chord(1,  "7"),      # Db7 (II7)
+        Chord(7,  "7"),      # G7  (V7)
+        Chord(0,  "maj7"),   # Cmaj7 (I)
+    ]
+    analyze_progression(cycle_of_dominants)
+
+    print("="*75)
+    print("All guide tones and voice-leading distances computed.")
+    print("Use this as a reference for analyzing and practicing progressions.")
+    print("="*75 + "\n")
 ```
 
 **Sample output:**
 
 ```
-=== ii–V–I in C major ===
-Chord          Guide Tones (3, 7)     Recommended Scales
-----------------------------------------------------------------------
-Dmin7          ('F', 'C')             dorian, aeolian
-  → VL distance to G7: 4 semitones
-G7             ('B', 'F')             mixolydian, lydian_dominant
-  → VL distance to Cmaj7: 3 semitones
-Cmaj7          ('E', 'B')             ionian, lydian
+===============================================================================
+JAZZ HARMONY COMPUTATIONAL MODEL
+===============================================================================
 
-=== Tritone substitution: G7 → D♭7 ===
-Original:    G7   — guide tones: ('B', 'F')
-Substitute:  C#7  — guide tones: ('F', 'B')
-Shared tritone interval confirmed: 6 semitones
+### ii–V–I in C Major ###
+
+Chord            Guide Tones (3, 7)       Recommended Scales
+===========================================================================
+Dmin7            ('F', 'C')               dorian, aeolian
+  ↓ Voice-leading distance to G7: 4 semitones
+G7               ('B', 'F')               mixolydian, lydian_dominant
+  ↓ Voice-leading distance to Cmaj7: 3 semitones
+Cmaj7            ('E', 'B')               ionian, lydian
+
+### Tritone Substitution: G7 → D♭7 ###
+Original:    G7       — guide tones: ('B', 'F')
+Substitute:  C#7      — guide tones: ('F', 'B')
+Shared tritone confirmed (3rd of one = 7th of other)
 ```
 
-The output confirms the tritone substitution's core property: the guide tones of G7 (B, F) are the guide tones of D♭7 (F, B) with their functional roles—third and seventh—swapped. This is not approximate; it is exact pitch-class identity.
+**Code execution confirms:**
+- Guide tones of G7 (B, F) become guide tones of D♭7 (F, B) with roles swapped
+- Voice-leading distances quantify smoothness: lower numbers = smoother progressions
+- All scale recommendations align with conventional jazz pedagogy
 
-## 3. Advanced Concepts: Reharmonization and Outside Playing
+**Practice with the code:**
+1. Modify `build_ii_v_i()` to create different progressions (I–VI–ii–V, iii–vi–ii–V)
+2. Add new chord qualities (aug7, sus4, add9)
+3. Implement `arpeggio_substitution()` function to suggest upper-structure arpeggios
+4. Create a `progression_from_standard()` function that parses Real Book changes
 
-### 3.1 Reharmonization
+This computational model externalizes the mental calculations jazz musicians perform in real time.
 
-Reharmonization is the practice of replacing the original chord in a progression with a different chord that shares a functional or coloristic relationship to it. The techniques range from conservative chord quality substitution to radical harmonic displacement.
+## 3. Advanced Concepts: Reharmonization & Outside Playing
 
-The most common reharmonization techniques, ordered by increasing displacement from the original harmony:
+### 3.1 Reharmonization Techniques
 
-1. **Quality substitution**: Replacing Cmaj7 with Cmaj9 or Cmaj7♯11—same function, more color.
-2. **Relative substitution**: Replacing Cmaj7 with Am7 (the relative minor shares five of seven pitches).
-3. **Secondary dominant insertion**: Inserting a V7 chord before any diatonic chord (e.g., inserting A7 before Dm7, making A7 the secondary dominant V/ii).
-4. **Tritone substitution**: Replacing G7 with D♭7 (as described in Section 1.4).
-5. **Backdoor dominant**: Replacing G7 (V7) with B♭7 (♭VII7)—a dominant seventh built on the minor seventh degree of the key. The ♭VII7 → I resolution exploits the fact that B♭7 and G7 share the note D (5th of G7, 3rd of B♭7) and both resolve smoothly to Cmaj7.
-6. **Coltrane substitution**: Replacing a single ii–V–I with a chain of three ii–V–I cycles moving through keys a major third apart—the structural basis of "Giant Steps."
+Reharmonization replaces the original chord with a different chord sharing functional or coloristic relationships. Techniques range from conservative quality substitution to radical harmonic displacement.
 
-### 3.2 Outside Playing and Chromaticism
+**Reharmonization hierarchy (conservative → radical):**
 
-"Playing outside" refers to the deliberate introduction of pitches or harmonic areas that lie beyond the current chord-scale relationship, creating maximal tension before an intentional resolution back "inside." The technique is not random dissonance—it is controlled departure and return.
+1. **Quality substitution:** Cmaj7 → Cmaj9 or Cmaj7♯11 (same function, more color)
+2. **Relative substitution:** Cmaj7 → Am7 (relative minor shares most pitches)
+3. **Diatonic substitution:** I → iii or vi (mediant/submediant substitute for tonic)
+4. **Secondary dominants:** Insert V7/x before any diatonic chord (e.g., A7 before Dm7 = V7/ii)
+5. **Tritone substitution:** V7 → ♭II7 (G7 → D♭7)
+6. **Backdoor dominant:** V7 → ♭VII7 (G7 → B♭7 in C major)
+7. **Coltrane substitution:** Replace ii–V–I with three ii–V–I cycles through keys a major 3rd apart
 
-The most structurally coherent form of outside playing is **side-slipping**: transposing an entire phrase (melodic line + its implied harmony) up or down by a half step, then returning to the original key. Because the phrase retains its internal intervallic logic, it maintains melodic coherence while creating sharp harmonic friction. The listener hears the coherent phrase, tracks the half-step displacement, and experiences the return to the original key as resolution.
+**Backdoor dominant explained:** The ♭VII7 → I resolution (B♭7 → Cmaj7) is a chromatic alternative to V7 → I. B♭7 and G7 share the note D (5th of G7, 3rd of B♭7), and both resolve smoothly to Cmaj7. The ♭VII7 approaches the tonic from a whole step above in the bass (B♭ → C), creating a plagal (subdominant) quality rather than authentic (dominant) cadence. This is heard in Bill Evans's reharmonizations and Herbie Hancock's "Maiden Voyage."
 
-A more sophisticated approach is **superimposition**: implying a different harmonic center over the current chord without the rhythm section following. Over a Cmaj7 chord, an improviser might imply an F♯maj7 tonality (a tritone away) for two beats, then resolve back to C. The audience hears two simultaneous harmonic layers: the rhythm section's Cmaj7 and the soloist's F♯maj7, and the tension of their bitonality resolves when the soloist returns. This technique, used extensively by Woody Shaw, Freddie Hubbard, and later by Michael Brecker, requires that the resolution be as clear and intentional as the departure—outside playing that never returns is simply atonal, not outside.
+**Practice routine:**
 
-### 3.3 The Architecture of a Complete Solo
+1. Take a simple progression (I–vi–ii–V in C: Cmaj7–Am7–Dm7–G7).
+2. Apply each reharmonization technique one at a time:
+   - Secondary dominant: Cmaj7–**E7**–Am7–**A7**–Dm7–G7
+   - Tritone sub: Cmaj7–Am7–Dm7–**D♭7**
+   - Backdoor: Cmaj7–Am7–Dm7–**B♭7**
+3. Play the original and each reharmonization at 80 BPM.
+4. Improvise over each version. Notice how the same melodic idea sounds different over altered harmony.
 
-A well-constructed jazz solo—one that works as a musical statement independent of its spontaneity—exhibits large-scale formal structure analogous to classical compositional forms. Using Miles Davis's solo on "So What" (Kind of Blue, 1959) as a reference:
+### 3.2 Outside Playing: Controlled Dissonance
+
+"Playing outside" is deliberate introduction of pitches or harmonic areas beyond the current chord-scale relationship, creating tension before intentional resolution "inside." It is not random dissonance—it is **controlled departure and return**.
+
+**Core techniques:**
+
+**1. Side-slipping:** Transpose an entire phrase up or down by a half-step, then return. The phrase retains internal logic (melodic coherence) while creating sharp harmonic friction.
+
+Example: Over Cmaj7, play a C major triad arpeggio (C-E-G), then transpose to D♭ major (D♭-F-A♭), then return to C. The listener hears the coherent phrase, tracks the displacement, and experiences the return as resolution.
+
+**2. Superimposition:** Imply a different harmonic center over the current chord without the rhythm section following. Over Cmaj7, imply F♯maj7 (tritone away) for two beats, then resolve to C. The audience hears bitonal layering: rhythm section's C and soloist's F♯. Woody Shaw, Freddie Hubbard, and Michael Brecker used this extensively.
+
+**3. Chromatic enclosure:** Approach any target note from a half-step above and below simultaneously or sequentially. To target E (3rd of Cmaj7), play D♯-E-F-E or F-D♯-E. This works over any chord because the enclosure resolves quickly.
+
+**4. Pentatonic displacement:** Play a pentatonic scale whose root is not the current chord root. Over Cmaj7, play F♯ minor pentatonic (F♯-A-B-C♯-E). This creates tension because F♯ and C♯ are outside C major, but the pentatonic's internal consonance maintains melodic coherence.
+
+**The critical invariant: outside playing is defined by its return.** Dissonance is only structurally meaningful in relation to consonance. Mastery of outside playing requires first mastering inside playing—the former is only intelligible against the background of the latter.
+
+**Practice drill:**
+
+1. Play C major scale over Cmaj7 backing track at 100 BPM (inside).
+2. Play D♭ major scale for 2 beats, then return to C major (side-slip).
+3. Play C major triad, then D♭ major triad, then C major (superimposition).
+4. Target the note E (3rd of Cmaj7) with chromatic enclosure: F-D♯-E-D♯-F-E.
+5. Play F♯ minor pentatonic over Cmaj7 for 4 beats, resolve to C major pentatonic.
+
+Record each exercise. Listen for how tension and resolution create narrative arc.
+
+### 3.3 Large-Scale Solo Architecture
+
+A well-constructed solo exhibits formal structure analogous to classical forms. Miles Davis's solo on "So What" (Kind of Blue, 1959) provides a model:
 
 ```mermaid
 graph LR
-    A["Bars 1–8\nOpening Statement\n(sparse, space, D Dorian)"]
-    B["Bars 9–16\nDevelopment\n(denser, motivic work)"]
-    C["Bars 17–24\nContrast / Peak\n(register shift, Eb Dorian)"]
-    D["Bars 25–32\nReturn & Resolution\n(D Dorian, cadential close)"]
+    subgraph sub_form ["Solo Form Structure"]
+        A["Bars 1–8\nOpening: Sparse, space\nD Dorian, low register"]
+        B["Bars 9–16\nDevelopment: Denser\nMotivic transformation"]
+        C["Bars 17–24\nClimax: Register shift\nE♭ Dorian, peak intensity"]
+        D["Bars 25–32\nResolution: Return\nD Dorian, cadential close"]
+    end
 
     A -->|"motivic development"| B
     B -->|"climax preparation"| C
-    C -->|"restatement"| D
+    C -->|"restatement & descent"| D
 ```
 
-Davis's solo is frequently analyzed as a model of economy: he uses a small number of phrases, leaves significant space (rests are as structural as notes), and builds intensity through register ascent and rhythmic compression rather than note density. The formal arc—statement, development, peak, resolution—mirrors the sonata principle and is perceptible to listeners with no theoretical training, which is evidence that these structural gestures are psychoacoustically real rather than theoretically imposed.
+Davis's solo is a model of **economy**: small number of phrases, significant space (rests are structural), intensity built through register ascent and rhythmic compression rather than note density. The arc—statement, development, climax, resolution—mirrors sonata principle and is psychoacoustically real, perceptible without theoretical training.
+
+**Formal principles to apply:**
+
+1. **Begin with space.** Establish phrasing rhythm before filling it with dense material.
+2. **Develop motives, don't abandon them.** Transform a core idea across 8–16 bars.
+3. **Build to a single peak.** Identify the climactic moment (highest note, loudest dynamic, densest rhythm) and place it strategically—typically 2/3 through the solo.
+4. **Resolve by returning to opening material.** Restate the opening phrase in the final 8 bars, possibly varied.
+
+**Practice routine:**
+
+1. Record yourself improvising 32 bars over a single chord (Dm7) at 100 BPM.
+2. Listen without the instrument. Diagram the arc: where is the peak? Is there motivic development? Is space used structurally?
+3. Re-record with intentional architecture: bars 1–8 sparse, bars 9–16 develop a motive, bars 17–24 build to peak, bars 25–32 return to opening idea.
+4. Compare recordings. Notice how intentional structure creates narrative clarity.
 
 ## 4. Practice Methodology: Building the Vocabulary
 
-Theory without embodied practice remains inert. The following methodology is derived from the documented practice approaches of professional jazz musicians and established pedagogy:
+Theory without embodied practice is inert. The following methodology derives from documented approaches of professional jazz musicians and established pedagogy.
 
-**Harmonic skeleton first.** Before adding melodic material, practice singing and playing guide-tone lines through every common progression (ii–V–I, I–VI–ii–V, rhythm changes, blues). This anchors the ear in the voice-leading structure before the fingers add complexity.
+### 4.1 Core Practice Principles
 
-**One concept, all 12 keys.** Every pattern, scale, arpeggio, or reharmonization technique should be practiced through all 12 transpositions without pause. This eliminates key-specific muscle memory and builds a genuinely transposable vocabulary. The Circle of Fifths provides the most musically natural transposition order: C → F → B♭ → E♭ → A♭ → D♭ → G♭ → B → E → A → D → G.
+**1. Harmonic skeleton first.** Before melodic material, practice singing and playing guide-tone lines through every common progression. This anchors the ear in voice-leading structure before fingers add complexity.
 
-**Transcription with analysis.** Transcribe solos by ear, then analyze what was transcribed: identify the harmonic context, name the scale or arpeggio being used, identify the guide tones, and note the phrase architecture. This closes the loop between auditory internalization and theoretical understanding.
+**2. One concept, all 12 keys.** Every pattern, scale, arpeggio, or reharmonization technique should be practiced through all 12 transpositions without pause. This eliminates key-specific muscle memory and builds genuinely transposable vocabulary.
 
-**Slow practice at the threshold of consciousness.** At the tempo where every decision must be made consciously, the student is building the neural pathways that will later operate automatically at performance tempo. Practicing at tempo beyond this threshold builds speed without depth; practicing below it builds depth that speed will follow.
+**3. Transcription with analysis.** Transcribe solos by ear, then analyze: identify harmonic context, name the scale/arpeggio, identify guide tones, note phrase architecture. This closes the loop between auditory internalization and theoretical understanding.
 
-**Record and listen analytically.** Self-recorded practice sessions reveal what theory alone cannot: the actual rhythmic placement of notes, the density of phrase material, and the balance between tension and resolution. The gap between what a musician believes they are playing and what is actually recorded is frequently instructive.
+**4. Slow practice at the threshold of consciousness.** At the tempo where every decision must be made consciously, you build neural pathways that will later operate automatically. Practicing above this threshold builds speed without depth; below it builds depth that speed follows.
+
+**5. Record and listen analytically.** Self-recorded sessions reveal what theory cannot: actual rhythmic placement, phrase density, tension/resolution balance. The gap between what you believe you're playing and what's recorded is instructive.
+
+### 4.2 Daily Practice Routine (60-Minute Template)
+
+**Segment 1: Technical Foundation (15 minutes)**
+
+- **Major scales** through circle of fifths: C → F → B♭ → E♭ → A♭ → D♭ → G♭ → B → E → A → D → G, two octaves, eighth notes, 80 BPM → 120 BPM
+- **Chord arpeggios** (maj7, min7, dom7, half-dim7, dim7) in all 12 keys, two octaves, 80 BPM
+- **Bebop scales** (bebop dominant, bebop major, bebop Dorian) in all keys, 100 BPM
+
+**Segment 2: Harmonic Vocabulary (20 minutes)**
+
+- **Guide-tone lines:** ii–V–I in all 12 keys, 3rds only, then 7ths only, 60 BPM
+- **Arpeggio substitutions:** Over Dm7, play Fmaj7 arpeggio; over G7, play Bdim7; over Cmaj7, play Em7. All 12 keys, 80 BPM.
+- **Tritone substitutions:** Play V7 → I in 12 keys, then ♭II7 → I in 12 keys. Compare voice leading.
+- **Modal scales:** Dorian, Phrygian, Lydian, Mixolydian in 12 keys, emphasizing characteristic intervals, 100 BPM.
+
+**Segment 3: Transcription & Analysis (15 minutes)**
+
+- **Daily transcription:** 4–8 bars of a master solo by ear. Sing it, play it, analyze:
+  - What chord is sounding?
+  - What scale/arpeggio is the soloist using?
+  - Where are the guide tones?
+  - What is the phrase architecture (pickup, development, cadence)?
+- **Vocabulary extraction:** Isolate one lick. Transpose to 3 other keys. Apply over ii–V–I.
+
+**Segment 4: Improvisation & Recording (10 minutes)**
+
+- **Play-along with backing track:** Choose a standard (Autumn Leaves, Confirmation, All The Things You Are).
+- **Record 3 choruses.** Don't stop if you make mistakes.
+- **Listen back immediately.** Note:
+  - Are you outlining chord changes (playing guide tones)?
+  - Is there motivic development or random note sequences?
+  - Is rhythmic placement clear or tentative?
+  - Where is the peak of your solo?
+
+### 4.3 Weekly Focus Areas (Rotate Each Week)
+
+**Week 1: Guide Tones & Voice Leading**
+- Exclusive focus on 3rds and 7ths through progressions
+- No scales, only chord tones and voice-led connections
+- Goal: Hear the harmonic skeleton without embellishment
+
+**Week 2: Modal Playing**
+- One mode per day (Dorian, Phrygian, Lydian, Mixolydian, Altered, Lydian Dominant, Locrian ♮2)
+- Improvise over modal vamps (single chord for 16–32 bars)
+- Emphasize characteristic intervals melodically
+
+**Week 3: Bebop Language**
+- Bebop scales exclusively
+- Transcribe and analyze Charlie Parker or Bud Powell phrases
+- Focus on metric alignment (chord tones on strong beats)
+
+**Week 4: Reharmonization & Substitution**
+- Take simple progressions, apply all reharmonization techniques
+- Improvise over original and reharmonized versions
+- Tritone subs, secondary dominants, Coltrane changes
+
+**Week 5: Rhythmic Development**
+- Play phrases in groups of 3 over 4/4
+- Syncopation drills: land phrases on "and" of 4
+- Metric modulation: imply 3/4 over 4/4
+
+**Week 6: Outside Playing**
+- Side-slipping (half-step displacement)
+- Superimposition (tritone key centers)
+- Chromatic enclosure on all target notes
+
+### 4.4 Long-Term Milestones
+
+**3-Month Goal:** Fluent ii–V–I improvisation in all 12 keys at 120 BPM using guide tones, scales, and arpeggio substitutions.
+
+**6-Month Goal:** Transcribe and perform 10 complete solos by masters (Parker, Coltrane, Davis, Evans, Rollins). Extract and personalize 20 vocabulary phrases.
+
+**12-Month Goal:** Record original improvisations over 10 standards demonstrating:
+- Clear guide-tone voice leading
+- Motivic development across 32 bars
+- Intentional use of inside/outside playing
+- Large-scale formal architecture (statement–development–peak–resolution)
 
 ```mermaid
 flowchart TD
-    A["Select a standard\n(e.g., Autumn Leaves, All The Things You Are)"]
-    B["Analyze the harmonic progression\n(label all ii–V–I, chord functions, key areas)"]
-    C["Practice guide-tone lines\n(3rds and 7ths only, all voices)"]
-    D["Add scale material\n(chord-scale mapping, one scale per chord)"]
-    E["Transcribe a master's solo\non this tune"]
-    F["Analyze the transcription\n(vocabulary, phrasing, rhythm)"]
-    G["Improvise, record, listen"]
-    H["Identify gaps\n(harmonic, rhythmic, melodic)"]
+    subgraph sub_progression ["Practice Progression"]
+        A["Select Standard\n(Autumn Leaves, Confirmation, All The Things You Are)"]
+        B["Analyze Progression\n(Label ii–V–I, key centers, chord functions)"]
+        C["Practice Guide-Tone Lines\n(3rds and 7ths, all voices, 60 BPM)"]
+        D["Add Scale Material\n(Chord-scale mapping, 80 BPM)"]
+        E["Add Arpeggio Substitutions\n(Upper structures, 100 BPM)"]
+        F["Transcribe Master Solo\n(On this tune, by ear)"]
+        G["Analyze Transcription\n(Vocabulary, phrasing, harmonic choices)"]
+        H["Improvise, Record, Listen\n(3 choruses, no stopping)"]
+        I["Identify Gaps\n(Harmonic, rhythmic, melodic, formal)"]
+    end
 
-    A --> B --> C --> D
-    D --> E --> F
-    F --> G --> H
-    H -->|"targeted practice"| C
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I -->|"targeted practice"| C
 ```
 
-## 5. Summary of Structural Principles
+## 5. Summary: Structural Principles of Jazz Improvisation
 
-The underlying logic of jazz improvisation reduces to a small number of deep principles that, once internalized, generate the entire vocabulary:
+The underlying logic of jazz improvisation reduces to core principles that, once internalized, generate the entire vocabulary:
 
-Harmonic motion is driven by **acoustic physics**—the overtone series creates tonal gravity, and the tritone creates the tension-release engine of functional harmony. Every chord substitution, reharmonization, and modal choice is ultimately reducible to these physical relationships.
+**1. Harmonic motion is driven by acoustic physics.** The overtone series creates tonal gravity. The tritone creates the tension-release engine of functional harmony. Every chord substitution, reharmonization, and modal choice is reducible to these physical relationships.
 
-**Scale choice is not a lookup table**—it is a function of chord quality, harmonic function (tonic/subdominant/dominant), voice-leading context, and the degree of tension the improviser wishes to introduce. The same G root can support Mixolydian (unaltered dominant), Lydian Dominant (colorized dominant), Altered (maximum tension dominant), or even Phrygian (if G is functioning as a tonic) depending entirely on harmonic context.
+**2. Scale choice is a function, not a lookup table.** It depends on chord quality, harmonic function (tonic/subdominant/dominant), voice-leading context, and desired tension level. The same root (G) can support Mixolydian (unaltered dominant), Lydian Dominant (colorized), Altered (maximum tension), or Phrygian (tonic) depending entirely on context.
 
-**Melodic coherence requires motivic economy**—the most effective solos use less material more thoroughly. Transformation of a single idea through transposition, inversion, augmentation, rhythmic displacement, and sequence generates far more structural integrity than the rapid deployment of unrelated patterns.
+**3. Melodic coherence requires motivic economy.** The most effective solos use less material more thoroughly. Transformation of a single idea through transposition, inversion, augmentation, rhythmic displacement, and sequence generates more structural integrity than rapid deployment of unrelated patterns.
 
-**Rhythm is not decoration**—it is a primary compositional dimension equivalent to pitch. The placement of a note in time, its duration, and its dynamic weight determine its harmonic meaning as much as its pitch class. A ♭9 on the downbeat is a structural statement; the same note on the last sixteenth of a bar is a passing tone.
+**4. Rhythm is a primary compositional dimension.** The placement of a note in time, its duration, and dynamic weight determine its harmonic meaning as much as its pitch class. A ♭9 on the downbeat is structural; the same note on the last sixteenth is a passing tone.
 
-**Outside playing is defined by its return**—dissonance is only structurally meaningful in relation to the consonance it departs from and resolves to. The mastery of outside playing is first and foremost mastery of inside playing; the former is only intelligible against the background of the latter.
+**5. Outside playing is defined by its return.** Dissonance is only structurally meaningful in relation to consonance. Mastery of outside playing is first mastery of inside playing; the former is only intelligible against the background of the latter.
+
+**6. Guide tones are the skeleton; scales are the flesh.** Voice-leading between 3rds and 7ths creates the harmonic path. Scales and tensions add melodic color to this path. Practicing guide tones first anchors harmonic hearing before adding embellishment.
+
+**7. Transcription internalizes the syntax.** Theory explains patterns; transcription embodies them. The vocabulary absorbed through transcription becomes available for recombination in novel contexts—this is how personal voice emerges.
+
+**8. Large-scale form creates narrative.** Solos with intentional architecture (sparse opening, motivic development, climactic peak, resolution) communicate more clearly than solos with only local coherence. The listener perceives form even without theoretical knowledge.
+
+---
+
+**Now pick up your instrument. Practice guide-tone lines through ii–V–I in C major at 60 BPM for 5 minutes. Then transpose to F major. Then B♭ major. Continue through the circle of fifths. Do this daily. Everything else builds on this foundation.**

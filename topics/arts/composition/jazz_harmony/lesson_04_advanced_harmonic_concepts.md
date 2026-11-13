@@ -1,167 +1,596 @@
-# Lesson 4: Advanced Harmonic Concepts in Jazz
+# Lesson 4: Advanced Harmonic Concepts in Jazz – Practical Voicing, Voice Leading & Reharmonization
 
-## 1. First-Principles Intuition & Invariants
+## 1. First-Principles Intuition & Invariants (15%)
 
-Jazz harmony extends the functional tonal system inherited from common-practice Western music by systematically exploiting chromaticism, voice-leading ambiguity, and upper-structure extensions. At its core, advanced jazz harmony is governed by three invariant principles: the tritone's functional demand for resolution, the symmetrical partitioning of the octave into equal divisions, and the voice-leading economy that privileges stepwise motion over leaps.
+Jazz harmony extends functional tonality through three core principles that govern every voicing decision you make at the keyboard or fretboard:
 
-### The Twelve-Tone Equal Temperament Foundation
+1. **The Tritone's Functional Demand:** The interval of three whole tones (600 cents, ratio ≈√2:1) lacks reinforcement from the natural harmonic series and creates instability. In V7 chords, the tritone between the 3rd and ♭7th resolves by contrary stepwise motion to the tonic's root and 3rd, generating the strongest harmonic pull in tonal music.
 
-The twelve-tone equal temperament (12-TET) system divides the octave into twelve logarithmically equal intervals, each representing a frequency ratio of $2^{1/12} \approx 1.05946$. This standardization permits modulation to any key and enables the construction of chords from any root. The semitone, the atomic unit of 12-TET, measures 100 cents, and all intervals derive from integer multiples of this value.
+2. **Symmetrical Octave Division:** Diminished 7th chords (four minor 3rds), augmented triads (three major 3rds), and whole-tone scales (six whole steps) partition the octave equally. These symmetries enable substitution, enharmonic respelling, and remote modulation—the harmonic "wormholes" that let you move between distant keys seamlessly.
 
-The diatonic scale—constructed from a specific pattern of whole (200 cents) and half (100 cents) steps—yields seven scale degrees. In the major scale, the pattern W-W-H-W-W-W-H produces the interval sequence: root, major second, major third, perfect fourth, perfect fifth, major sixth, and major seventh. Chords built by stacking thirds from these degrees form the diatonic harmonies that underpin functional tonality.
+3. **Voice-Leading Economy:** Efficient harmony moves each voice by the smallest possible interval—common tones stay put, others move by step. This reduces physical hand motion at the keyboard, clarifies harmonic progression for the listener, and is the foundation of all practical reharmonization.
 
-### The Dominant Seventh and the Tritone
+**Equal Temperament & The Dominant Seventh:** The 12-tone equal temperament system (12-TET) divides the octave into twelve semitones of 100 cents each, with frequency ratio 2^(1/12) ≈ 1.05946. The V7 chord's defining tritone interval sits exactly halfway through the octave at 600 cents, creating maximum harmonic tension. In G7 resolving to Cmaj7, the B→C and F→E resolutions represent the strongest available voice-leading pull—this is why ii–V–I progressions dominate jazz.
 
-The dominant seventh chord (V7) is the engine of tonal motion. Built from the fifth scale degree of the major scale, it comprises four pitch classes: root, major third, perfect fifth, and minor seventh. In the key of C major, the G7 chord contains G, B, D, and F. The critical feature is the tritone interval between the third (B) and seventh (F)—a dissonance spanning three whole tones (600 cents), precisely half an octave.
+**Altered Dominants & Chromaticism:** Jazz intensifies dominant function by raising or lowering the 5th and 9th: G7♭9, G7♯9, G7♭5, G7♯5. The altered scale (7th mode of melodic minor: G–A♭–B♭–B(C♭)–D♭–E♭–F) contains all four alterations simultaneously, creating saturated chromatic approach tones that converge on the tonic by semitone motion.
 
-The tritone's instability arises from its equal division of the octave. Unlike the perfect fifth (701.96 cents), which has a simple frequency ratio of 3:2 and strong harmonic stability, the tritone's ratio of approximately $\sqrt{2}:1$ lacks the reinforcement of low-order harmonics. This dissonance creates a functional demand: the third typically resolves upward by semitone to the tonic's root, while the seventh resolves downward by semitone to the tonic's third. In G7 resolving to C major, B ascends to C and F descends to E, creating efficient voice-leading with minimal motion.
+**Extended Harmony & The Overtone Series:** The 9th, 11th, and 13th correspond to partials 9, 11, and 13 of the natural harmonic series. Jazz voicings make these extensions explicit while omitting tones that add no color (5th) or create mud (root in low register, natural 11th clashing with the 3rd).
 
-### Altered Dominants: Chromatic Intensification
+## 2. Core Keyboard & Fretboard Mechanics (85%)
 
-Jazz composers intensify dominant function by altering the fifth and ninth scale degrees of the V7 chord. These alterations introduce additional chromatic tensions that sharpen the chord's resolution tendency. The altered dominant scale (also called the superlocrian or diminished whole-tone scale) contains all four possible alterations: flat nine (♭9), sharp nine (♯9), sharp eleven (♯11, enharmonically equivalent to ♭5), and flat thirteen (♭13, enharmonically equivalent to ♯5).
+### The ii–V–I Progression: Hand Shapes & Voice Leading
 
-Consider G7alt resolving to Cmaj7. The chord tones and alterations form the pitch-class set {G, B, D♭/C♯, E♭/D♯, F, A♭}. The altered tones create multiple chromatic resolutions: D♭ (♭5) resolves down to C, A♭ (♭13) resolves down to G, D♯ (♯9) resolves up to E, all converging onto the tonic triad through stepwise motion. This creates a saturated chromatic approach to resolution, maximizing voice-leading tension.
+The ii–V–I is the fundamental jazz cadence. Master these voicings first—all advanced harmony builds from here.
 
-The dominant seventh flat-nine (V7♭9) adds a minor ninth above the root, creating a half-step clash with the root an octave higher. This interval (113 cents in 12-TET) is one of the most dissonant in the chromatic scale. The V7♯9 chord, popularized by players like Jimi Hendrix (the "Hendrix chord") and ubiquitous in bebop, places a minor third (enharmonically an augmented second) above the root, creating simultaneous major and minor third implications—a polytonal ambiguity that enriches the dominant's color.
+**Piano: Rootless A & B Form Voicings (Left Hand Anchors)**
 
-### Diminished Seventh Chords: Symmetrical Division
+In C major: Dm7 → G7 → Cmaj7
 
-The diminished seventh chord partitions the octave into four equal minor thirds (300 cents each). This symmetry produces a unique property: the chord contains only three distinct transpositions under modulo-12 arithmetic. Any diminished seventh chord can be respelled to serve as a leading-tone chord to four different tonics, each a minor third apart.
-
-The fully diminished seventh chord built on the leading tone (vii°7) functions as a dominant substitute because it shares the tritone of the V7 chord. In C major, B°7 contains B, D, F, and A♭. The tritone between B and F is identical to that in G7, giving the chords equivalent functional pull toward C. This substitution is strengthened by voice-leading: B resolves to C, D moves to C or E, F descends to E, and A♭ descends to G, providing efficient chromatic motion to the tonic.
-
-Jazz exploits this symmetry through the diminished passing chord, which connects diatonic chords by chromatic motion. Moving from Cmaj7 to Dm7, a musician might insert C♯°7, creating the progression Cmaj7 → C♯°7 → Dm7. The diminished chord acts as a chromatic bridge, with each voice moving by semitone.
-
-### Extended Chords: Upper-Structure Harmonic Series
-
-Extended chords incorporate the ninth, eleventh, and thirteenth scale degrees, bringing the harmonic series into explicit compositional use. The harmonic series—the natural overtones produced by any vibrating string or air column—orders partials by integer multiples of the fundamental frequency. The seventh partial (roughly a minor seventh above two octaves) justifies the dominant seventh; the ninth partial justifies the ninth; the eleventh and thirteenth follow naturally.
-
-In practice, jazz voicings often omit certain chord tones to avoid muddiness and maintain clarity. The root is frequently omitted in comping because the bass player provides it. The perfect fifth is often omitted from extended chords because it adds no color. The eleventh is typically raised (♯11) in major chords to avoid a half-step clash with the third. A Cmaj13 voicing might contain only the third, seventh, ninth, and thirteenth (E, B, D, A), relying on the bass to supply C.
-
-### Set-Theoretic and Group-Theoretic Foundations
-
-Pitch-class set theory provides a formal framework for analyzing harmonic structures beyond functional tonality. A pitch-class set is an unordered collection of pitch classes (integers 0–11 modulo 12). Chords can be represented as sets and compared using operations like transposition (Tn) and inversion (TnI). The interval vector of a set catalogs all interval classes present, providing a harmonic fingerprint.
-
-The symmetrical properties of diminished and augmented chords correspond to specific group structures. The diminished seventh chord exhibits Z₄ symmetry (the cyclic group of order 4) under transposition by minor thirds. The augmented triad exhibits Z₃ symmetry under transposition by major thirds. These symmetries enable rich substitution possibilities and remote modulations that characterize advanced jazz harmony.
-
-## 2. Core Architecture & Mechanics
-
-The architecture of jazz harmony rests on three hierarchical layers: the functional progression (the large-scale tonal motion), the chord-scale relationship (the melodic-harmonic interface), and the voicing (the specific vertical arrangement of pitches). Understanding these layers reveals how jazz musicians construct harmonic complexity in real time.
-
-### Functional Progressions and Tonal Centers
-
-Functional harmony in jazz derives from the classical tonic-subdominant-dominant paradigm but enriches it through substitution and reharmonization. The ii-V-I progression is the archetypal jazz cadence, appearing in thousands of standards. In C major, Dm7 → G7 → Cmaj7 provides a strong tonal trajectory: the ii chord (supertonic) prepares the V chord (dominant), which resolves to I (tonic).
-
-Tritone substitution exploits the enharmonic symmetry of the tritone. Any dominant seventh chord can be replaced by a dominant seventh chord whose root lies a tritone away, because both chords share the same tritone interval. G7 (G-B-D-F) contains the tritone B-F. D♭7 (D♭-F-A♭-C♭/B) contains the tritone F-B (enharmonically F-C♭). Substituting D♭7 for G7 creates chromatic bass motion: Dm7 → D♭7 → Cmaj7, where the bass descends by semitones (D → D♭ → C).
-
-Modal interchange (borrowed chords) imports harmonies from parallel modes. In C major, a composer might borrow the iv chord from C minor (Fm) or the ♭VII chord (B♭). These chords introduce modal color and flatten the leading tone, weakening functional drive in favor of coloristic variety. Miles Davis's "So What" exemplifies modal harmony, anchoring long stretches on a single Dorian mode rather than cycling through functional progressions.
-
-### Chord-Scale Theory: Melodic Implications
-
-Each chord type implies a corresponding scale that supplies consonant melodic material. The chord-scale approach, codified by theorists like George Russell, systematizes improvisation by associating scales with chord symbols. This framework transforms harmonic symbols into melodic roadmaps.
-
-For major seventh chords (e.g., Cmaj7), the Ionian (major) scale or Lydian mode provides consonant extensions. The Lydian mode raises the fourth scale degree, avoiding the half-step clash between the fourth and third that can occur in Ionian. The raised fourth (♯11) is a characteristic jazz color tone, heard prominently in Cmaj7(♯11) voicings.
-
-For dominant seventh chords, multiple scale choices exist, each producing different alterations. The Mixolydian mode (major scale with a lowered seventh) is the diatonic choice. The Lydian dominant (Mixolydian with ♯4) yields a ♯11 extension. The altered scale (seventh mode of melodic minor, also called the superlocrian) produces all four alterations (♭9, ♯9, ♯11, ♭13). The whole-tone scale, which divides the octave into six equal steps, generates augmented fifths and flat/sharp ninths. The half-whole diminished scale (alternating half and whole steps) produces both ♭9 and ♯9 alongside a natural thirteenth.
-
-For minor seventh chords, the Dorian mode (natural minor with raised sixth) is standard. The Aeolian mode (natural minor) and the Phrygian mode (natural minor with lowered second) provide darker colors. The melodic minor scale itself, with its raised sixth and seventh, offers a brighter minor sonority.
-
-```mermaid
-graph TD
-    A["Harmonic Function"] --> B["Tonic (I)"]
-    A --> C["Subdominant (ii, IV)"]
-    A --> D["Dominant (V7)"]
-    
-    D --> E["Diatonic V7"]
-    D --> F["Altered V7 (♭9, ♯9, ♭5, ♯5)"]
-    D --> G["Tritone Substitute (♭II7)"]
-    D --> H["Diminished Substitute (vii°7)"]
-    
-    E --> I["Mixolydian Scale"]
-    F --> J["Altered Scale / Superlocrian"]
-    F --> K["Whole-Tone Scale"]
-    F --> L["Half-Whole Diminished"]
-    
-    H --> M["Whole-Half Diminished"]
-    
-    B --> N["Ionian / Lydian"]
-    C --> O["Dorian (ii)"]
-    C --> P["Lydian (IV)"]
-    
-    Q["Extended Chords"] --> R["9th Extension"]
-    Q --> S["11th Extension (often ♯11)"]
-    Q --> T["13th Extension"]
-    
-    R --> U["Add color, maintain function"]
-    S --> U
-    T --> U
+**A Form (7th on bottom):**
+```
+Dm7:       F–A–C–E    (♭7–9–11–5, root omitted)
+G7:        F–A–B–E    (♭7–9–3–13)
+Cmaj7:     E–G–B–D    (3–5–7–9)
 ```
 
-### Voicing Architecture: Vertical Organization
+**B Form (3rd on bottom):**
+```
+Dm7:       F–A–C–E    → (same as A form)
+G7:        B–E–F–A    (3–13–♭7–9)
+Cmaj7:     E–G–B–D    → (same result)
+```
 
-Voicing refers to the specific arrangement of chord tones across registers. Effective voicing balances clarity, color, and voice-leading economy. Jazz pianists and guitarists employ several standard voicing techniques.
+**Fingering (RH for melody/solo, LH for voicing):**
+- LH: 5–3–2–1 (pinky–middle–index–thumb) for four-note voicings
+- Practice: Hold each voicing for four beats at ♩=60, feeling the weight transfer from pinky to thumb
+- Common tones: F moves by semitone to E (Dm7 to Cmaj7); A stays put (Dm7 to G7)
 
-Drop-2 voicings take a close-position chord (all voices within an octave) and drop the second-highest voice down an octave. This creates a more open, orchestral sound suitable for guitar and piano comping. A Cmaj7 in close position (C-E-G-B) becomes E-G-C-E in drop-2 from the second inversion, spreading the voices for better resonance.
+**Physical Drill:**
+1. Play Dm7 (A form) in whole notes at ♩=60 BPM
+2. Move to G7: A stays, F stays, C→B, E→E (minimal motion!)
+3. Move to Cmaj7: G stays, A→B, F→E (stepwise motion)
+4. Repeat cycle 20× without looking at hands
+5. Increase tempo: ♩=80 → 100 → 120 BPM
+6. Add RH improvisation using D Dorian → G Mixolydian → C Ionian
 
-Rootless voicings omit the root, allowing the bass to supply it. A pianist playing G7 might voice only B-F-A-D (third, seventh, ninth, fifth), leaving G to the bassist. This avoids muddiness in the low register and focuses on the chord's color tones.
+**Guitar: Drop-2 Voicings (String Set 4–3–2–1)**
 
-Upper-structure triads treat the upper extensions (9, ♯11, 13) as a separate triad superimposed over the lower chord. A G13(♯11) can be voiced as a D major triad (D-F♯-A, representing the fifth, seventh, ninth) over a G root, with C♯ (the ♯11) added. This triadic thinking simplifies the construction of complex extended chords.
+In C major, starting with Dm7 on the 5th fret:
 
-Quartal voicings stack perfect fourths instead of thirds, creating an open, ambiguous sound associated with modal jazz. Bill Evans and McCoy Tyner pioneered these voicings, which avoid the tertian clarity of traditional harmony in favor of coloristic suspension.
+```
+Dm7 (root position):
+E|---5---  (A, 5th)
+B|---6---  (D, root)
+G|---5---  (A, 5th)
+D|---7---  (C, ♭7)
 
-### Reharmonization Techniques
+G7 (3rd inversion):
+E|---5---  (A, 9th)
+B|---5---  (F, ♭7)
+G|---4---  (B, 3rd)
+D|---5---  (G, root)
 
-Reharmonization replaces a progression's original chords with substitute harmonies that maintain or enhance the melodic line. Common techniques include:
+Cmaj7 (2nd inversion):
+E|---5---  (A, 13th)
+B|---5---  (E, 3rd)
+G|---4---  (B, 7th)
+D|---5---  (G, 5th)
+```
 
-**Diatonic substitution:** Chords sharing two or more common tones can substitute for each other. In C major, Am7 (A-C-E-G) can replace Cmaj7 (C-E-G-B) because they share C, E, and G. This shifts the harmonic color without violating the melody.
+**Voice-leading efficiency:** Only two fingers move between each chord; remaining fingers hold position or shift by one fret. This is the core of bebop comping—minimal hand motion, maximum harmonic clarity.
 
-**Secondary dominants:** Any diatonic chord can be tonicized by preceding it with its own V7. In C major, the progression Cmaj7 → Dm7 becomes Cmaj7 → A7 → Dm7, where A7 is the V7/ii (the dominant of Dm7). This technique chains dominant resolutions, creating harmonic momentum.
+### Tritone Substitution: Chromatic Bass Motion
 
-**Backdoor progressions:** The backdoor ii-V moves from iv to ♭VII7 to I, approaching the tonic from the flat side rather than the sharp side. In C major, Fm7 → B♭7 → Cmaj7 provides a smooth, descending voice-leading alternative to the traditional ii-V-I. The ♭VII7 chord functions as a substitute dominant, with its seventh (A♭) resolving down to G and its third (D) moving to E.
+**The Principle:** Any V7 can be replaced by the V7 a tritone away because both share the same tritone interval (enharmonically). G7 (G–B–D–F) contains tritone B–F. D♭7 (D♭–F–A♭–C♭) contains tritone F–C♭(B). Substitute D♭7 for G7 and the bass descends chromatically: D→D♭→C.
 
-**Coltrane changes:** Named for John Coltrane's "Giant Steps," this progression divides the octave into three major thirds (equidistant roots) and connects them through dominant motion. The cycle moves through three tonal centers (e.g., C, E, A♭) via their respective dominants (G7 → Cmaj7, B7 → Emaj7, E♭7 → A♭maj7), creating rapid, symmetrical modulation.
+**Piano Voicing (Tritone Sub in Practice):**
+
+Original progression:
+```
+Dm7:   F–A–C–E
+G7:    F–A–B–E
+Cmaj7: E–G–B–D
+```
+
+With tritone sub:
+```
+Dm7:   F–A–C–E
+D♭7:   C♭(B)–E–F–A♭   (♭7–9–3–♯11, enharmonic respelling)
+Cmaj7: E–G–B–D
+```
+
+**Voice leading:** The F and A are common tones (enharmonically, F=F and A=A), C moves to C♭(B), E stays as E. The bass drops chromatically D→D♭→C. This creates a smooth, descending chromatic line—instantly recognizable as "jazzy."
+
+**Practice Drill:**
+1. Play original ii–V–I in all 12 keys, A form voicings, ♩=60
+2. Substitute D♭7 for G7 in each key
+3. Sing the bass line while playing: "D—D-flat—C"
+4. Add RH bebop line using D♭ Lydian Dominant (D♭–E♭–F–G–A♭–B♭–C♭) over the sub
+5. Increase tempo to ♩=120 and comp in swing rhythm
+
+### Diminished 7th Chords: Symmetrical Substitution
+
+The fully diminished 7th chord (1–♭3–♭5–♭♭7) divides the octave into four equal minor 3rds (300 cents each). Any diminished chord can be respelled to tonicize four different roots a minor 3rd apart.
+
+**Example: B°7 as Dominant Substitute**
+
+B°7 contains B–D–F–A♭. This shares the tritone B–F with G7, making it a functional substitute for V7 in C major.
+
+**Piano Voicing:**
+```
+Dm7:   F–A–C–E
+B°7:   B–D–F–A♭   (or any inversion)
+Cmaj7: E–G–B–D
+```
+
+**Chromatic Passing Diminished:**
+
+Insert diminished chords between diatonic chords to create chromatic voice leading:
+
+```
+Cmaj7 → C♯°7 → Dm7
+E–G–B–D → E–G–B♭–C♯ → F–A–C–E
+```
+
+Each voice moves by semitone: E→E→F, G→G→A, B→B♭→C, D→C♯→E.
+
+**Guitar Application (Diminished Arpeggio Drill):**
+
+Play diminished 7th arpeggios across the neck using the 1-2-4 pattern:
+```
+String pattern (example C♯°7 starting on 6th string, 9th fret):
+E|---8---11---14---17---  (♭♭7 enharmonic cycle)
+B|---8---11---14---17---
+G|---8---11---14---17---
+D|---8---11---14---17---
+A|---9---12---15---18---
+E|---9---12---15---18---
+```
+
+Practice ascending and descending at ♩=60, then ♩=120. Insert these shapes between diatonic chords in any progression.
+
+### Altered Dominants: The Altered Scale & Practical Fingerings
+
+**The Altered Scale (7th Mode of Melodic Minor):**
+
+For G7alt resolving to Cmaj7, use A♭ melodic minor (G–A♭–B♭–C♭(B)–D♭–E♭–F):
+- Contains: ♭9 (A♭), ♯9 (B♭, enharmonic to A♯), ♯11 (C♯, enharmonic to D♭), ♭13 (E♭)
+- All chromatic tensions converge on C major: A♭→G, B♭→C, D♭→C, E♭→D
+
+**Piano Altered Voicing:**
+
+```
+G7alt: B–E♭–F–A♭  (3–♭13–♭7–♭9)
+       LH: 5–3–2–1 fingering
+```
+
+This voicing contains the essential tritone (B–F) plus two altered tensions (E♭ and A♭) for maximum chromatic saturation.
+
+**RH Altered Scale Fingering (Starting on G):**
+```
+G–A♭–B♭–B–D♭–E♭–F–G
+1–2–3–1–2–3–4–5 (thumb under on B)
+```
+
+Practice ascending/descending at ♩=60 in quarter notes, then eighth notes at ♩=100.
+
+**Guitar Altered Scale Shape (G7alt, 3rd fret root):**
+
+```
+E|---4---5---7---8---
+B|---4---6---7---9---
+G|---4---5---7---8---
+D|---3---5---6---8---
+A|---3---5---6---8---
+E|---3---4---6---7---
+```
+
+Play the scale ascending and descending, then improvise over a G7alt–Cmaj7 vamp. Focus on landing altered tensions (♭9, ♯9) on downbeats, resolving stepwise to chord tones of Cmaj7.
+
+### Extended Chords: Practical 9th, 11th, 13th Voicings
+
+**Maj7(♯11) Voicing (Lydian Sound):**
+
+Cmaj7(♯11) = C–E–G–B–F♯
+
+Piano voicing (rootless):
+```
+E–G–B–F♯  (3–5–7–♯11)
+LH: 5–4–2–1
+```
+
+The raised 4th (F♯ over C) creates the bright, floating "Lydian" color heard in Bill Evans, McCoy Tyner, and Herbie Hancock voicings.
+
+**13th Chords (Dominant Function):**
+
+G13 = G–B–D–F–A–E (root–3–5–♭7–9–13)
+
+Piano voicing (rootless, omit 5th):
+```
+B–E–F–A  (3–13–♭7–9)
+LH: 5–3–2–1
+```
+
+**Guitar G13 (Drop-2 voicing, 3rd fret):**
+
+```
+E|---5---  (E, 13th)
+B|---5---  (F, ♭7)
+G|---4---  (B, 3rd)
+D|---5---  (G, root)
+```
+
+**Practice Drill:**
+1. Play Cmaj7(♯11) for 4 bars
+2. Move to G13 (ii–V motion, treating Cmaj7 as "ii relative to G")
+3. Resolve to any target chord (Fmaj7, Dm7, etc.)
+4. Add RH improvisation using C Lydian over Cmaj7(♯11), G Mixolydian over G13
+
+### Chord-Scale Relationships: Practical Improvisation Maps
+
+**Major 7th Chords:**
+- **Ionian (major scale):** Diatonic choice, safe but potentially bland
+- **Lydian (major with ♯4):** Preferred jazz sound—avoids the 4th's clash with the major 3rd
+  - Example: Cmaj7 → C Lydian (C–D–E–F♯–G–A–B)
+
+**Dominant 7th Chords:**
+- **Mixolydian:** Diatonic (major with ♭7)
+- **Lydian Dominant:** Mixolydian with ♯4, produces ♯11 extension (G7♯11 → G Lydian Dominant: G–A–B–C♯–D–E–F)
+- **Altered Scale:** All four alterations (♭9, ♯9, ♯11, ♭13), maximum chromatic tension
+- **Half-Whole Diminished:** Alternating half/whole steps, produces ♭9, ♯9, natural 13 (G–A♭–B♭–B–C♯–D–E–F)
+- **Whole-Tone:** Six equal steps, produces augmented 5th and both 9th alterations (G–A–B–C♯–D♯–F)
+
+**Minor 7th Chords:**
+- **Dorian (natural minor with ♮6):** Standard jazz minor sound, bright and stable (Dm7 → D Dorian: D–E–F–G–A–B–C)
+- **Aeolian (natural minor):** Darker, more classical sound
+- **Phrygian (natural minor with ♭2):** Spanish/modal flavor, use sparingly
+
+**Practice Method:**
+1. Record or loop a ii–V–I progression in one key (Dm7–G7–Cmaj7)
+2. Improvise over Dm7 using D Dorian exclusively for 4 bars
+3. Switch to G altered scale over G7 for 2 bars
+4. Resolve with C Lydian over Cmaj7 for 4 bars
+5. Repeat cycle, gradually increasing phrase complexity
+6. Tempo progression: ♩=80 → 100 → 120 → 140 BPM
+
+### Reharmonization: Practical Substitution Techniques
+
+**Diatonic Substitution (Common-Tone Exchange):**
+
+In C major, Am7 (A–C–E–G) shares three notes with Cmaj7 (C–E–G–B). Substitute Am7 for Cmaj7 when the melody emphasizes C, E, or G.
+
+```
+Original: Cmaj7 | Dm7 | G7 | Cmaj7 |
+Reharmonized: Am7 | Dm7 | G7 | Cmaj7 |
+```
+
+**Secondary Dominants (Tonicization):**
+
+Precede any diatonic chord with its own V7. To tonicize Dm7 (ii), insert A7 (V7/ii).
+
+```
+Original: Cmaj7 | Dm7 | G7 | Cmaj7 |
+Reharmonized: Cmaj7 | A7 | Dm7 | G7 | Cmaj7 |
+```
+
+Piano voicing for A7 resolving to Dm7:
+```
+A7:    G–C♯–E–G   (♭7–3–5–♭7, doubled)
+Dm7:   F–A–C–E    (smooth voice leading: C♯→C, G→F)
+```
+
+**Backdoor ii–V (♭vii7 Substitute Dominant):**
+
+The backdoor progression iv–♭VII7–I provides a smooth, descending alternative to V7–I.
+
+```
+Original: Dm7 | G7 | Cmaj7 |
+Backdoor: Dm7 | Fm7 → B♭7 | Cmaj7 |
+```
+
+Piano voicing:
+```
+Fm7:   F–A♭–C–E♭
+B♭7:   A♭–D–E♭–F  (♭7–3–♯11–5, passing motion)
+Cmaj7: E–G–B–D    (smooth resolution: A♭→G, D→E)
+```
+
+The ♭VII7 chord (B♭7) functions as a substitute dominant: its ♭7 (A♭) resolves down to G (5th of Cmaj7), and its 3rd (D) moves to E (3rd of Cmaj7).
+
+**Coltrane Changes (Giant Steps Substitution):**
+
+Divide the octave into three major 3rds (C–E–A♭) and connect them via dominant motion. This creates rapid, symmetrical modulation.
+
+```
+| Cmaj7  | E7     | Amaj7  | C7     | 
+| Fmaj7  | A♭7    | D♭maj7 | G7     | Cmaj7 ||
+```
+
+Each dominant (E7, C7, A♭7, G7) resolves to a tonic a 5th below (Amaj7, Fmaj7, D♭maj7, Cmaj7). Practice this progression slowly (♩=60) in block chords before attempting improvisation at tempo (♩=240–280).
+
+**Guitar Coltrane Changes (Simplified Voicing):**
+
+Use drop-2 maj7 and dom7 voicings on strings 4–3–2–1, moving by major 3rds:
+
+```
+Cmaj7 (5th fret):
+E|---5---
+B|---5---
+G|---4---
+D|---5---
+
+E7 (7th fret):
+E|---7---
+B|---8---
+G|---7---
+D|---9---
+
+Amaj7 (9th fret):
+E|---9---
+B|---9---
+G|---9---
+D|---11---
+```
+
+Practice the cycle ascending and descending, focusing on minimal hand motion and accurate voicing spelling.
+
+```mermaid
+graph TB
+    subgraph sub_foundation ["Foundational Progressions"]
+        A["ii–V–I<br/>Dm7 → G7 → Cmaj7"]
+        B["Tritone Sub ii–V–I<br/>Dm7 → D♭7 → Cmaj7"]
+        C["Backdoor Progression<br/>Fm7 → B♭7 → Cmaj7"]
+    end
+    
+    subgraph sub_substitution ["Substitution Techniques"]
+        D["Diatonic Sub<br/>Am7 for Cmaj7"]
+        E["Secondary Dominant<br/>A7 → Dm7"]
+        F["Diminished Passing<br/>C♯°7 between Cmaj7–Dm7"]
+    end
+    
+    subgraph sub_dominant ["Dominant Alterations & Scales"]
+        G["Mixolydian<br/>Diatonic V7"]
+        H["Lydian Dominant<br/>V7♯11"]
+        I["Altered Scale<br/>♭9, ♯9, ♯11, ♭13"]
+        J["Half-Whole Diminished<br/>♭9, ♯9, ♮13"]
+        K["Whole-Tone<br/>♯5, altered 9ths"]
+    end
+    
+    subgraph sub_voicing ["Voicing Techniques"]
+        L["Rootless A/B Forms<br/>LH Piano Comping"]
+        M["Drop-2 Voicings<br/>Guitar 4-String Grips"]
+        N["Upper-Structure Triads<br/>Extensions as Triads"]
+        O["Quartal Voicings<br/>Stacked 4ths, Modal Sound"]
+    end
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    
+    L --> M
+    M --> N
+    N --> O
+    
+    A -.->|Apply Scales| G
+    B -.->|Voice Leading| L
+```
+
+## 3. Advanced Practice Drills & Performance Strategies
+
+### Daily Technical Routine (30-Minute Cycle)
+
+**Section 1: Voicing Drills (10 min)**
+1. **Rootless ii–V–I in 12 Keys (Piano):**
+   - A form voicings, whole notes, ♩=60
+   - Play through cycle of 4ths: C→F→B♭→E♭→A♭→D♭→G♭→B→E→A→D→G→C
+   - Focus: Common-tone retention, minimal hand motion
+   - Progress to B form voicings in second week
+
+2. **Drop-2 ii–V–I in 12 Keys (Guitar):**
+   - Start on 6th string roots, then 5th string roots
+   - String set 5–4–3–2, then 4–3–2–1
+   - ♩=60, quarter notes, strict time
+   - Week 2: Add tritone subs
+
+**Section 2: Scale Application (10 min)**
+1. **Dominant Scale Rotation:**
+   - Record/loop G7 vamp (4 bars)
+   - Bar 1-4: Mixolydian
+   - Bar 5-8: Lydian Dominant
+   - Bar 9-12: Altered Scale
+   - Bar 13-16: Half-Whole Diminished
+   - Start ♩=80, progress to ♩=140
+
+2. **Connecting Scales Through Changes:**
+   - Record Dm7 (4 bars) → G7 (4 bars) → Cmaj7 (4 bars)
+   - D Dorian → G Altered → C Lydian
+   - Focus on landing chord tones on beat 1 of each new chord
+   - Tempo: ♩=100 → 120 → 140
+
+**Section 3: Reharmonization Workshop (10 min)**
+1. **Tune Memo Reharmonization:**
+   - Choose a standard (e.g., "Autumn Leaves," "Rhythm Changes")
+   - Reharmonize 8 bars using:
+     - Two tritone subs
+     - One secondary dominant
+     - One diminished passing chord
+   - Write out voicings, play at ♩=60
+   - Goal: Create smooth, logical voice leading
+
+2. **Real-Time Substitution:**
+   - Play original changes to a standard at performance tempo
+   - Every 4th chorus, substitute one chord (tritone sub or secondary dominant)
+   - Gradually increase substitution density
+
+### Failure Modes & Troubleshooting
+
+**Problem: Altered Dominants Sound "Wrong" or Clash with Melody**
+
+**Diagnosis:** The melody contains natural extensions (e.g., natural 9th or 13th) that conflict with alterations.
+
+**Solution:**
+- If the melody has A (the natural 9th) over G7, do NOT voice ♭9 or ♯9
+- Use Lydian Dominant (G7♯11) or Mixolydian instead of Altered Scale
+- Rule: Match your alterations to the melody's note choices
+
+**Piano Troubleshooting:**
+```
+Melody note: A over G7
+✓ Correct: G7 with natural 9 (Mixolydian or Lydian Dominant)
+✗ Wrong:   G7♭9 or G7♯9 (creates half-step clash with melody)
+```
+
+**Problem: Low-Register Voicings Sound Muddy**
+
+**Diagnosis:** Overtones in the low register are spaced closely in absolute frequency, causing intermodulation distortion and perceptual blur.
+
+**Solution:**
+- Never voice chords below E2 (82.41 Hz) in close position
+- Use tenths (root + 10th) instead of octaves in LH bass register
+- Omit the 5th in LH voicings below middle C
+- Example: For Cmaj7, voice E2–G3–B3–D4 (wide spacing) rather than C2–E2–G2–B2 (muddy)
+
+**Problem: Reharmonization Obscures the Original Tune**
+
+**Diagnosis:** Too many substitutions, too rapidly, or on structurally important melody notes.
+
+**Solution:**
+- Preserve original harmony on key melody notes (climaxes, phrase starts/ends)
+- Limit substitutions to 25% of the progression initially
+- Test: Can a listener still recognize the tune? If not, reduce substitution density
+- Common safe zones: Passing beats, weak beats, interior measures of 4-bar phrases
+
+**Problem: Voice Leading Sounds Jumpy or Disconnected**
+
+**Diagnosis:** Voices leap unnecessarily rather than moving by step or holding common tones.
+
+**Solution:**
+- Identify common tones between consecutive chords—hold them in the same register
+- Move remaining voices by the smallest interval (step preferred over leap)
+- Example: Dm7 (F–A–C–E) → G7 (F–A–B–E)
+  - F and A are common tones → hold in place
+  - C→B (step down)
+  - E→E (common tone)
+
+**Problem: Quartal Voicings Sound Too Vague**
+
+**Diagnosis:** Lack of tritone means reduced functional drive; listener loses tonal bearings.
+
+**Solution:**
+- Reserve quartal voicings for modal sections or suspensions
+- When playing functional harmony (ii–V–I), include at least the 3rd and 7th to define chord quality
+- Hybrid voicing: Quartal in RH, functional in LH (e.g., LH plays 3rd+7th, RH plays stacked 4ths above)
+
+### Performance Context & Ensemble Awareness
+
+**In a Piano Trio (Piano, Bass, Drums):**
+- Omit roots in LH; bass covers them
+- Voice in mid-register (A2–D5 range) to avoid masking bass or clashing in low register
+- Leave space for bass and drum fills—don't comp on every beat
+- Typical comping rhythm: Beat 2 and 4 (backbeat accents), or syncopated off-beats
+
+**In a Big Band or Orchestral Setting:**
+- Write specific voicings for each section (saxes, brass)
+- Use drop-2 and drop-2-and-4 voicings for smooth, orchestral spread
+- Saxes: Close voicings (all within an octave) for blend
+- Brass: Open voicings (spread over 1.5–2 octaves) for power
+
+**In Solo Piano Performance:**
+- LH must supply both bass and harmonic foundation
+- Use stride bass (root on 1 and 3, chord on 2 and 4) or walking bass lines
+- RH carries melody and occasional comping chords
+- Practice independence: Hanon exercises, Bach Two-Part Inventions for hand separation
+
+### Real-World Repertoire Application
+
+**Standards for Practicing These Concepts:**
+
+1. **"Autumn Leaves" (Em or Gm):** Perfect for basic ii–V–I, secondary dominants, and tritone subs. Simple melody allows focus on reharmonization.
+
+2. **"All The Things You Are" (A♭ major):** Modulates through multiple keys, uses ♭II7 chords (Neapolitan), and backdoor progressions. Essential for intermediate players.
+
+3. **"Giant Steps" (Coltrane):** Rapid modulation by major 3rds, requires fluency with maj7 and dom7 voicings in all inversions. Advanced technical and harmonic challenge.
+
+4. **"Stella By Starlight" (B♭ major):** Dense reharmonization opportunities, half-diminished chords, altered dominants. Great for exploring chord-scale choices.
+
+5. **"Rhythm Changes" (I Got Rhythm, B♭ major):** Standard 32-bar AABA form with fast harmonic rhythm. Essential for bebop vocabulary development.
+
+**Practice Protocol for Standards:**
+1. Learn melody by ear first (sing it, then play without looking at sheet music)
+2. Comp through original changes at ♩=60, A and B voicings only
+3. Add one tritone sub per A section
+4. Add one secondary dominant per A section
+5. Experiment with altered scales over dominants
+6. Record yourself comping and soloing at tempo (♩=120–180)
+7. Transcribe one classic recording of the tune (Bill Evans, Oscar Peterson, Bud Powell, McCoy Tyner—your choice)
+
+### Further Study: Listening & Transcription
+
+**Essential Recordings for Harmonic Study:**
+
+- **Bill Evans Trio – "Portrait in Jazz" (1960):** Rootless voicings, Lydian major 7 chords, sensitive voice leading
+- **McCoy Tyner – "The Real McCoy" (1967):** Quartal voicings, modal harmony, pentatonic superimposition
+- **Herbie Hancock – "Maiden Voyage" (1965):** Suspended 4th chords, modal composition, upper-structure triads
+- **John Coltrane – "Giant Steps" (1960):** Coltrane changes, rapid modulation, altered scales at extreme tempo
+- **Oscar Peterson Trio – "Night Train" (1963):** Virtuosic ii–V–I execution, stride bass, blues reharmonization
+
+**Transcription Practice:**
+1. Choose a 2-bar voicing or lick from a master recording
+2. Slow the recording to 50% speed (use software: Transcribe!, Amazing Slow Downer)
+3. Write out every note, with fingerings
+4. Practice the voicing in all 12 keys at ♩=60
+5. Integrate into your improvisation over the same tune
 
 ```mermaid
 graph LR
-    A["Original Progression<br/>Dm7 → G7 → Cmaj7"] --> B["Tritone Substitution<br/>Dm7 → D♭7 → Cmaj7"]
-    A --> C["Diminished Substitution<br/>Dm7 → D♭°7 → Cmaj7"]
-    A --> D["Secondary Dominant<br/>A7 → Dm7 → G7 → Cmaj7"]
-    A --> E["Backdoor<br/>Fm7 → B♭7 → Cmaj7"]
+    subgraph sub_practice ["Daily Practice Cycle (30 min)"]
+        A["Voicing Drills<br/>10 min<br/>12-Key ii–V–I"]
+        B["Scale Application<br/>10 min<br/>Dorian→Altered→Lydian"]
+        C["Reharmonization<br/>10 min<br/>Substitute 2-4 chords/tune"]
+    end
     
-    F["Cmaj7"] --> G["Diatonic Sub<br/>Am7"]
-    F --> H["Modal Interchange<br/>Cm7 (from parallel minor)"]
+    subgraph sub_repertoire ["Repertoire Path"]
+        D["Standards: Autumn Leaves<br/>Simple changes, clear melody"]
+        E["Standards: All The Things<br/>Modulation, ♭II7 chords"]
+        F["Advanced: Giant Steps<br/>Rapid key changes"]
+    end
     
-    I["G7"] --> J["Altered Scale<br/>G7alt"]
-    I --> K["Lydian Dominant<br/>G7(♯11)"]
-    I --> L["Diminished<br/>G7(♭9,♯9,13)"]
+    subgraph sub_listening ["Transcription & Analysis"]
+        G["Bill Evans<br/>Rootless voicings"]
+        H["McCoy Tyner<br/>Quartal voicings"]
+        I["Coltrane<br/>Altered scales"]
+    end
+    
+    A --> B
+    B --> C
+    C --> A
+    
+    D --> E
+    E --> F
+    
+    G --> H
+    H --> I
+    
+    A -.->|Apply to| D
+    D -.->|Learn from| G
 ```
 
-## 3. High-Performance Optimization & Failure Modes
+## Summary: From Theory to Performance
 
-Jazz harmony in practice requires balancing theoretical sophistication with musical coherence. The densest reharmonization or the most altered dominant may be theoretically sound but musically ineffective if it obscures the melody, disrupts the groove, or overwhelms the ensemble's texture. This section examines performance optimization strategies and common failure modes.
+Advanced jazz harmony is not an abstract academic exercise—it is a set of physical keyboard and fretboard shapes, voice-leading habits, and listening choices that you internalize through thousands of repetitions. The tritone resolves because you *feel* the B–F tension in your fingers and hear it demand C and E. Rootless voicings work because your left hand learns to hold F–A–C–E while your right improvises. Altered scales sound "right" when your ear expects the chromatic approach tones A♭→G and D♭→C.
 
-### Voice-Leading Economy
+**Core Takeaways:**
+1. Master ii–V–I in 12 keys with rootless A/B forms (piano) or drop-2 voicings (guitar) before exploring substitutions.
+2. Match alterations to the melody—never force ♭9 when the melody has ♮9.
+3. Voice leading economy: Common tones stay, other voices move by step.
+4. Reharmonize 25% of a tune initially; preserve original harmony on structural melody notes.
+5. Practice with recordings: Transcribe voicings and licks from masters, integrate into your playing.
 
-Efficient voice-leading minimizes the distance each voice travels between chords, reducing cognitive load for the performer and creating smoother, more coherent harmonic motion for the listener. The principle of parsimonious voice-leading—inherited from classical counterpoint—dictates that voices should move by step when possible and by leap only when necessary.
-
-When moving from Dm7 (D-F-A-C) to G7 (G-B-D-F), efficient voice-leading holds the common tones D and F while moving A down to G (a whole step) and C down to B (a half step). This creates a sense of harmonic continuity. Contrast this with a voicing that leaps all four voices, which disrupts the sense of connection between chords.
-
-Tritone substitution gains its effectiveness from voice-leading efficiency. In the progression Dm7 → D♭7 → Cmaj7, the bass descends chromatically (D → D♭ → C), and the upper voices move by small intervals. If Dm7 is voiced D-A-C-F and D♭7 is voiced D♭-A♭-C♭-F, the C and F move by semitone while the A descends to A♭, creating maximal chromaticism with minimal motion.
-
-### Harmonic Rhythm and Placement
-
-Harmonic rhythm refers to the rate at which chords change. Too frequent changes create harmonic clutter and prevent the listener from settling into any tonal area. Too infrequent changes risk stasis and boredom. Effective jazz arranging balances harmonic motion with rhythmic stability.
-
-Bebop tunes often place chord changes on every two beats in fast tempos, creating a rapid harmonic surface suitable for virtuosic improvisation. Modal jazz slows harmonic rhythm to one chord per several measures, allowing improvisers to explore melodic development within a single scale. Ballads distribute chord changes irregularly, often placing harmonic motion at phrase boundaries rather than on a metronomic grid.
-
-### Register and Density Management
-
-Low-register voicings tend toward muddiness due to the close spacing of overtones in lower frequencies. The frequency ratio between adjacent semitones is constant (approximately 1.059), but the absolute frequency difference increases as pitch rises. A minor second between C2 (65.41 Hz) and C♯2 (69.30 Hz) spans only 3.89 Hz, while a minor second between C5 (523.25 Hz) and C♯5 (554.37 Hz) spans 31.12 Hz. This means low-register clusters produce more intermodulation and beating, leading to perceptual muddiness.
-
-To avoid this, jazz pianists voice chords with wider intervals in the left hand (often tenths rather than octaves) and closer intervals in the right hand. The bass player and pianist typically separate by at least an octave to avoid frequency masking. Extended chords are voiced with selective omissions: the fifth is often dropped, and the eleventh (if natural) is omitted or raised to avoid clashing with the third.
-
-### Failure Mode: Overuse of Alterations
-
-A common failure mode among developing jazz musicians is the indiscriminate application of alterations without attention to melodic implication or ensemble context. Altering every dominant seventh chord with all available tensions (♭9, ♯9, ♯11, ♭13) produces a saturated chromaticism that can obscure the melody and exhaust the listener.
-
-Effective use of alterations requires sensitivity to the melody. If the melody contains the natural ninth (e.g., A over G7 in C major), voicing a ♭9 creates a half-step clash that sounds like an error
+Now get to the keyboard or fretboard. Play every example in this lesson in all 12 keys at ♩=60, then ♩=100, then ♩=140. Record yourself. Listen back. Adjust. Repeat. This is how theory becomes music.
