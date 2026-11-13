@@ -1,643 +1,425 @@
-# Operational Verification Labs: Guitar — Acoustic Physics, Signal Processing, and Performance Analysis
+# Guitar Masterclass: Fretboard Mastery, Tone Craft, and Signal Chain Command
 
-## Objective & Laboratory Configuration
+## Overview and Learning Roadmap
 
-This laboratory provides rigorous, hands-on investigation of guitar performance through the lens of acoustic physics, signal chain analysis, and empirical measurement. Rather than treating the guitar as a black box, we decompose its behavior into measurable subsystems: mechanical vibration, electromagnetic transduction (for electric guitars), signal conditioning, and psychoacoustic perception.
+This masterclass moves through five progressive modules — from posture and physical mechanics to chord architecture, scale fluency, tone shaping, and fault diagnosis. Every concept is immediately playable. Theory appears only where it explains *why* a technique feels or sounds the way it does.
 
-**Core Learning Outcomes:**
+**What you'll master:**
 
-- Understand string vibration from first principles (wave equation, harmonic series, impedance matching)
-- Analyze signal flow from mechanical energy to digital representation
-- Quantify the effects of parameter variation using spectral analysis and dynamic range measurement
-- Identify fault modes in the physical instrument, signal chain, and digital processing pipeline
-- Apply measurement-driven debugging to diagnose and correct performance degradation
+- Left- and right-hand ergonomics that prevent injury and unlock speed
+- Open chords, barre chords, and rootless voicings with exact fingerings
+- Five CAGED positions across the entire fretboard with connecting runs
+- Pentatonic, blues, and modal soloing with phrasing drills
+- Signal chain command: pickup selection, gain staging, EQ decisions
+- Intonation, action, and nut setup diagnostics with a clear repair protocol
+- Acoustic feedback suppression and electrical fault diagnosis
 
-**Required Equipment:**
+**Equipment you'll use:**
 
-- **Guitar**: Acoustic or electric with stable intonation. For electric guitars, single-coil or humbucker pickups exhibit different frequency responses and noise rejection characteristics.
-- **Audio Interface**: Minimum 24-bit/48kHz ADC with input impedance ≥1MΩ for electric guitar direct input. Examples: Focusrite Scarlett, Universal Audio Apollo, RME Babyface.
-- **Digital Audio Workstation (DAW)**: Ableton Live, Reaper, Logic Pro, or equivalent with real-time spectrum analyzer, oscilloscope, and metering plugins.
-- **Spectrum Analyzer Plugin**: Voxengo SPAN (free), FabFilter Pro-Q 3, or iZotope Insight for frequency-domain analysis.
-- **Guitar Amp Simulator**: Neural DSP Archetype, Amplitube, Bias FX, or open-source alternatives for controlled parameter manipulation.
-- **Precision Tuner**: Hardware (e.g., Peterson StroboClip) or software (e.g., Waves Tune Real-Time) with ±0.1 cent accuracy.
-- **Metronome/Click Track**: DAW-integrated or hardware metronome for tempo reference.
-- **Reference Microphone** (for acoustic analysis): Small-diaphragm condenser with flat frequency response (e.g., Earthworks M30, DPA 4011).
+- Acoustic or electric guitar (exercises work on both; electric-specific sections are marked)
+- Metronome (hardware, DAW click, or free app — just use one consistently)
+- Tuner accurate to ±2 cents minimum (Peterson StroboClip, TC Electronic PolyTune, or similar)
+- DAW with spectrum analyzer (Voxengo SPAN is free; any will do)
+- Audio interface: 24-bit/48kHz minimum, input impedance ≥1MΩ for direct electric guitar
 
-**Software Environment Setup:**
+---
 
-```bash
-# Install essential audio analysis tools (Linux/macOS example)
-# For spectral analysis and visualization
-pip install numpy scipy matplotlib librosa soundfile
+## Module 1: Physical Mechanics — Posture, Hand Position, and Injury Prevention
 
-# Verify audio interface sample rate and bit depth
-# Linux ALSA example
-cat /proc/asound/card0/pcm0p/sub0/hw_params
+### 1.1 Seated Position and Guitar Angle
 
-# macOS Core Audio check
-system_profiler SPAudioDataType
+Your posture sets the ceiling on everything else. Bad posture creates tension that limits speed, causes injuries, and produces inconsistent tone.
+
+**Classical position** (recommended for precision work and fingerstyle):
+- Guitar body rests on the left thigh (right-handed player)
+- Guitar neck angled upward at approximately 45°
+- Left elbow hangs freely; wrist naturally aligns with the neck
+- Both feet flat on the floor or left foot on a footstool
+
+**Casual/rock position** (guitar on right thigh):
+- Guitar neck should still angle slightly upward — never horizontal or pointing down
+- A strap even while seated prevents the guitar from drifting forward during chord changes
+
+**Strap height (standing):**
+- Position the guitar so your fretting wrist sits in the same relationship to the neck as it does seated
+- Too low = wrist bends sharply backward = carpal tunnel risk
+- Too high = right arm angle becomes uncomfortable for strumming
+- A good starting reference: the guitar body sits at or slightly above your hip bone
+
+### 1.2 Left Hand (Fretting Hand) Mechanics
+
+The single most common beginner injury is fretting-hand tension. These mechanics eliminate it.
+
+**Thumb position:**
+- Thumb rests on the back of the neck, roughly opposite the middle finger (not the index)
+- Thumb should be vertical or slightly angled — never hooked over the top of the neck (this collapses the wrist and mutes the high strings)
+- Exception: deliberate thumb-over technique for muting the low E or playing chord melodies (advanced — establish the standard grip first)
+
+**Wrist alignment:**
+- Keep the wrist relatively straight, not curled under the neck
+- The knuckles should be roughly parallel to the neck, not tilted away from it
+- This positions your fingertips directly above the frets rather than coming in at an angle
+
+**Finger arch:**
+- Fingers approach the strings on the fingertip, not the pad
+- The first joint (DIP joint) should curve slightly — this prevents adjacent strings from being accidentally muted
+- Press the string down just behind the fretwire, not in the middle of the fret space
+- Use only as much pressure as needed to produce a clean tone — squeezing harder than necessary burns energy and creates tension
+
+**Fretting-hand drill — the spider crawl:**
+
+This exercise trains each finger independently and builds the arch naturally.
+
+```
+Strings: 6  5  4  3  2  1
+Fret:    1  1  1  1  1  1   (all index, one per string)
+         2  2  2  2  2  2   (all middle finger)
+         3  3  3  3  3  3   (all ring finger)
+         4  4  4  4  4  4   (all pinky)
 ```
 
-## Exercise 1: Foundational Acoustic Physics and Mechanical Vibration
+Play each note cleanly before moving to the next string. Then reverse direction (string 1 → string 6). Then try diagonal patterns (1-2-3-4 starting on different frets per string). Start at **♩= 50 BPM**, advance to **♩= 80 BPM** only when every note rings cleanly with zero buzzing.
 
-### Part A: String Vibration Theory and Harmonic Analysis
+### 1.3 Right Hand (Picking Hand) Mechanics
 
-**Theoretical Foundation:**
+**Pick grip:**
+- Hold the pick between the thumb pad and the side of the index finger (not the fingertip)
+- 3–5mm of pick tip exposed beyond the fingers
+- Light grip pressure — the pick should flex slightly on impact rather than locking rigid
+- Wrist anchored lightly on the bridge saddles or floating just above the strings — never resting heavily on the body
 
-A guitar string vibrates as a tensioned elastic medium. The fundamental frequency \(f_0\) is determined by:
+**Pick angle (slant):**
+- A slight downward slant of the pick (trailing edge tilted toward the floor) reduces resistance on downstrokes and is the natural resting position for most players
+- For fast alternate picking, a slight upward slant on the upstroke (trailing edge toward ceiling) produces a more consistent attack in both directions — this is called a "neutral" or "USX" (upstroke escape) position
 
-\[
-f_0 = \frac{1}{2L} \sqrt{\frac{T}{\mu}}
-\]
+**Alternate picking mechanics:**
+- The motion comes primarily from the wrist, not the elbow
+- Keep the motion small and controlled — large sweeping motions introduce latency and inconsistency
+- Practice on a single string at **♩= 60 BPM** (16th notes), increasing by 5 BPM increments only when the previous tempo is fully controlled
 
-where:
-- \(L\) = vibrating length (meters)
-- \(T\) = string tension (Newtons)
-- \(\mu\) = linear mass density (kg/m)
+**Fingerstyle right-hand position:**
+- Thumb (p) handles strings 4–6; index (i) string 3; middle (m) string 2; ring (a) string 1
+- Plant the thumb slightly ahead of the fingers (toward the neck)
+- Fingers pluck upward and slightly inward toward the palm (not outward away from the guitar)
+- The nail edge catches the string for brightness; the flesh alone produces a softer tone
 
-When a string is fretted at the \(n\)-th fret, the vibrating length becomes \(L' = L / 2^{n/12}\), raising the pitch by \(n\) semitones. This equal-tempered scaling is why fret spacing decreases exponentially toward the bridge.
+---
 
-The string vibrates not only at \(f_0\) but also at integer multiples (harmonics): \(2f_0, 3f_0, 4f_0\), etc. The amplitude distribution of these harmonics defines the timbre. Plucking closer to the bridge emphasizes higher harmonics (brighter tone); plucking near the neck emphasizes the fundamental (warmer tone).
+## Module 2: Open Chords, Barre Chords, and Voicing Architecture
 
-**Practical Implementation:**
+### 2.1 The Essential Open Chord Set
 
-1. **Open String Frequency Measurement**:
-   - Tune the low E string (E2) to 82.41 Hz using a precision tuner.
-   - Route the guitar signal into your DAW and insert a spectrum analyzer on the track.
-   - Pluck the open E string with moderate force at the 12th fret position (midpoint between bridge and nut).
-   - Observe the spectrum analyzer. You should see prominent peaks at:
-     - **Fundamental (f₀)**: 82.41 Hz
-     - **2nd harmonic (2f₀)**: 164.82 Hz
-     - **3rd harmonic (3f₀)**: 247.23 Hz
-     - **4th harmonic (4f₀)**: 329.64 Hz
-   - Record the relative amplitude (in dB) of each harmonic. The fundamental typically dominates, but the 2nd and 3rd harmonics contribute significantly to perceived brightness.
+Chord diagrams use this format: `[E A D G B e]` where numbers are fret positions and **x** = muted, **0** = open.
 
-2. **Fret Position Verification**:
-   - Calculate the expected frequency for the 12th fret (one octave above open string): \(f_{12} = 82.41 \times 2 = 164.82\) Hz.
-   - Fret the E string at the 12th fret and pluck. Verify the measured fundamental matches the calculated value within ±5 cents (±0.3%).
-   - Repeat for the 5th fret (A2, expected 110 Hz) and 7th fret (B2, expected 123.47 Hz).
-   - If measured frequencies deviate significantly, the guitar's intonation requires adjustment at the bridge saddle.
+**C Major** — `x 3 2 0 1 0`
 
-3. **Harmonic Content Variation by Plucking Position**:
-   - Pluck the open E string at three positions: near the bridge (position A), at the 12th fret (position B), and near the neck (position C).
-   - For each position, capture a 2-second recording and analyze the spectrum in the first 500ms (before harmonics decay significantly).
-   - Create a table documenting the relative amplitude of harmonics 2-6 for each plucking position:
+```
+  E  A  D  G  B  e
+  x  3  2  0  1  0
 
-| Pluck Position | f₀ (dB) | 2f₀ (dB) | 3f₀ (dB) | 4f₀ (dB) | 5f₀ (dB) | 6f₀ (dB) |
-|----------------|---------|----------|----------|----------|----------|----------|
-| Near Bridge    | 0 (ref) | -6       | -8       | -10      | -12      | -14      |
-| 12th Fret      | 0 (ref) | -12      | -15      | -18      | -22      | -25      |
-| Near Neck      | 0 (ref) | -18      | -22      | -28      | -32      | -38      |
+  Fingers:  x  3  2  0  1  0
+            (ring)(mid)(   )(idx)(   )
+```
 
-   - **Analysis**: Bridge plucking produces stronger high-frequency harmonics, resulting in a "twangy" or "bright" timbre. Neck plucking suppresses high harmonics, yielding a "mellow" or "warm" tone. This is why jazz guitarists often favor neck pickup positions and plucking near the neck.
+Watch: the ring finger on A/3rd fret must arch enough to let the open D and G strings ring free. If D buzzes, your ring finger pad is too flat.
+
+**G Major** — `3 2 0 0 0 3`
+
+```
+  E  A  D  G  B  e
+  3  2  0  0  0  3
+
+  Fingers: mid  idx  —  —  —  ring  (or pinky on e)
+```
+
+Alternate fingering: `2 1 0 0 0 3` (index on A, middle on E, pinky on e) — this voicing makes the transition to Cadd9 (`x 3 2 0 3 3`) instant by keeping the pinky anchored.
+
+**D Major** — `x x 0 2 3 2`
+
+```
+  E  A  D  G  B  e
+  x  x  0  2  3  2
+
+  Fingers: —  —  —  idx  ring  mid
+```
+
+**A Minor** — `x 0 2 2 1 0`
+
+```
+  E  A  D  G  B  e
+  x  0  2  2  1  0
+
+  Fingers: —  —  mid  ring  idx  —
+```
+
+**E Minor** — `0 2 2 0 0 0`
+
+```
+  E  A  D  G  B  e
+  0  2  2  0  0  0
+
+  Fingers: —  mid  ring  —  —  —
+```
+
+**F Major (barre, first position)** — `1 3 3 2 1 1`
+
+```
+  E  A  D  G  B  e
+  1  3  3  2  1  1
+
+  Fingers: idx(barre)  ring  pinky  mid  idx  idx
+```
+
+The F chord is where most players stall. The barre challenge is not strength — it's alignment. Roll your index finger slightly toward the nut (toward the tuning pegs), landing on the bony edge of the finger rather than the flat pad. This straightens the finger and naturally bridges the gap at the 1st fret B string where the finger naturally creases.
+
+**F Major (cheater voicing for beginners)** — `x x 3 2 1 1`
+
+```
+  E  A  D  G  B  e
+  x  x  3  2  1  1
+
+  Fingers: —  —  ring  mid  idx  idx (mini-barre)
+```
+
+This omits the low bass strings and is perfectly usable in a band context where a bassist covers the low F.
+
+### 2.2 Barre Chords: E-Shape and A-Shape
+
+Every open chord shape becomes a movable barre chord. The two most important shapes derive from E major and A major.
+
+**E-Shape Barre Chord (Root on low E string):**
+
+| Fret | Chord |
+|------|-------|
+| 1    | F     |
+| 2    | F#/Gb |
+| 3    | G     |
+| 5    | A     |
+| 7    | B     |
+| 8    | C     |
+| 10   | D     |
+| 12   | E     |
+
+Fingering: `barre(1) — mid(A) ring(D) pinky(G) — —` relative to barre fret. The index barres all six strings; ring and pinky form the 5th-and-6th-string root plus the 4th-string.
+
+**A-Shape Barre Chord (Root on A string):**
+
+| Fret | Chord |
+|------|-------|
+| 2    | B     |
+| 3    | C     |
+| 5    | D     |
+| 7    | E     |
+| 8    | F     |
+| 10   | G     |
+| 12   | A     |
+
+Fingering: Index barres from A string through high e (or just the top 5 strings). Ring finger barres D, G, B strings two frets up from the index (at fret+2). Some players prefer using ring, pinky, middle in a cluster — both work.
+
+**A-Shape minor barre (Am-shape):** Same as A-shape but remove the ring barre; use index-mid-ring individually on D, G, B.
+
+### 2.3 Chord Transition Drills
+
+The goal is **zero gap** between chords. The technique is **pivot fingers and anticipation**.
+
+**Pivot finger principle:** Identify any finger that stays on the same string/fret between two chords. Keep it planted and move everything else around it.
+
+- G → Cadd9: Both ring and pinky stay on B/e at the 3rd fret. Only index and middle move.
+- C → Am: Middle finger stays on D/2nd fret. Index moves from B/1 to G/2 and ring from A/3 to B/2.
+- D → G: No shared finger — lift all simultaneously, pre-shape the G in the air before landing.
+
+**Transition drill protocol:**
+
+Pick any two chords. Set metronome to **♩= 60 BPM**. Hold chord 1 for one full bar (4 beats), change on beat 1 of bar 2. Hold chord 2 for one bar. Continue alternating. Increase to **♩= 80 BPM** once changes are clean with no buzz or muting. Then try changing on beat 3 (half-bar changes), then every beat.
+
+Pairs to drill in order of difficulty:
+
+1. Em → Am (easy — index pivot)
+2. G → D (medium — no pivot, clean lift required)
+3. C → F (hard — barre entry)
+4. Am → F (hard — barre from open)
+5. Bm → G (hard — A-shape barre to open G)
+
+### 2.4 Power Chords and Shell Voicings
+
+**Power chords** (5th chords) omit the 3rd, making them tonally neutral (neither major nor minor). This is why they cut through distorted guitar without muddiness — the 3rd interval produces heavy intermodulation in overdriven signals.
+
+**E5** (root on low E): `0 2 2 x x x` — open E, A/2, D/2, mute strings 3–1 with the fretting hand.
+
+**Movable 5th chord:** Index on root string, ring on the string below 2 frets up. The pinky doubles the root an octave up on the string below the ring.
+
+```
+Root on E string:         Root on A string:
+  E  A  D  G  B  e          E  A  D  G  B  e
+  idx 2+idx  2+mid           x  idx 2+idx  2+mid
+  (1) (1+2) (1+2)            (x) (1) (1+2) (1+2)
+```
+
+**Shell voicings** (jazz/R&B — rootless triads and 7th chord fragments):
+
+For rhythm guitar in a band context, a bassist covers the root. These voicings sit in the midrange and voice-lead cleanly:
+
+| Chord  | Strings 4-3-2 (D-G-B) | Description          |
+|--------|------------------------|----------------------|
+| Cmaj7  | 3-2-0 (fret D/G/B)     | C shape, no A string |
+| G7     | 0-0-1                  | Open D-G, B/1st fret |
+| Am7    | 0-2-1 (D-G-B)          | Root omitted         |
+| Dm7    | 0-2-1 (A-D-G)          | 5-string shell        |
+
+---
+
+## Module 3: Fretboard Fluency — CAGED System and Scale Mastery
+
+### 3.1 The CAGED System: Five Positions, One Fretboard
+
+The CAGED system reveals that the same chord or scale appears in five overlapping shapes across the neck. Each shape is named after the open chord it resembles. The five shapes connect end-to-end and repeat at the 12th fret.
+
+For G major, the five CAGED positions sit at these fret ranges:
 
 ```mermaid
 graph LR
-    A["String Excitation<br/>(Pluck/Strike)"] --> B["Mechanical Vibration<br/>(Fundamental + Harmonics)"]
-    B --> C["Soundboard Coupling<br/>(Acoustic) or<br/>Magnetic Induction<br/>(Electric)"]
-    C --> D["Air Pressure Wave<br/>(Acoustic) or<br/>Electrical Signal<br/>(Electric)"]
-    D --> E["Transducer/Microphone<br/>or Pickup"]
-    E --> F["Audio Interface<br/>ADC Conversion"]
-    F --> G["Digital Signal<br/>(DAW/Analysis)"]
+    subgraph sub_caged ["CAGED System — G Major"]
+        C_shape["C Shape\nFrets 7–10\nRoot: B string/8th"]
+        A_shape["A Shape\nFrets 9–12\nRoot: A string/10th"]
+        G_shape["G Shape\nFrets 12–15\nRoot: low E/12th\n(open G moved up)"]
+        E_shape["E Shape\nFrets 2–5\nRoot: low E/3rd"]
+        D_shape["D Shape\nFrets 4–7\nRoot: B string/3rd"]
+    end
+    E_shape --> D_shape --> C_shape --> A_shape --> G_shape --> E_shape
 ```
 
-### Part B: Fretboard Geometry and Scale Construction
+**E-shape G major scale (frets 2–5, most common starting position):**
 
-**Theoretical Foundation:**
-
-The guitar fretboard implements a 12-tone equal temperament system. The frequency ratio between adjacent semitones is \(2^{1/12} \approx 1.0594631\). For a scale length \(L\) (distance from nut to bridge), the distance from the nut to the \(n\)-th fret is:
-
-\[
-d_n = L \left(1 - \frac{1}{2^{n/12}}\right)
-\]
-
-A standard guitar scale length is 25.5 inches (648mm, Fender style) or 24.75 inches (629mm, Gibson style). This formula ensures correct intonation when string height, tension, and saddle compensation are properly configured.
-
-**Practical Implementation:**
-
-1. **Major Scale Construction**:
-   - The C major scale comprises the intervals: root, major 2nd, major 3rd, perfect 4th, perfect 5th, major 6th, major 7th, octave.
-   - In semitones from C: 0, 2, 4, 5, 7, 9, 11, 12.
-   - On the A string (A2 = 110 Hz), play C major starting from the 3rd fret (C3 = 130.81 Hz):
-     - **C** (3rd fret): 130.81 Hz
-     - **D** (5th fret): 146.83 Hz
-     - **E** (7th fret): 164.81 Hz
-     - **F** (8th fret): 174.61 Hz
-     - **G** (10th fret): 196.00 Hz
-     - **A** (12th fret): 220.00 Hz
-     - **B** (14th fret): 246.94 Hz
-     - **C** (15th fret): 261.63 Hz
-   - Verify each frequency using the spectrum analyzer. Deviations indicate intonation errors.
-
-2. **CAGED System and Position Mapping**:
-   - The CAGED system organizes the fretboard into five overlapping shapes based on open chord voicings: C, A, G, E, D.
-   - Each shape can be moved up the neck to play any major chord. For example, the "E shape" barre chord moved to the 3rd fret produces a G major chord.
-   - Practice the C major scale in each CAGED position, focusing on smooth position shifts without audible discontinuities (glitches, buzzing).
-
-```mermaid
-graph TD
-    A["C Major Scale"] --> B["C Shape<br/>(Root on A string)"]
-    A --> C["A Shape<br/>(Root on G string)"]
-    A --> D["G Shape<br/>(Root on E string)"]
-    A --> E["E Shape<br/>(Root on D string)"]
-    A --> F["D Shape<br/>(Root on B string)"]
-    B --> G["Fretboard Coverage:<br/>Nut to 3rd fret"]
-    C --> H["Fretboard Coverage:<br/>2nd to 5th fret"]
-    D --> I["Fretboard Coverage:<br/>5th to 8th fret"]
-    E --> J["Fretboard Coverage:<br/>7th to 10th fret"]
-    F --> K["Fretboard Coverage:<br/>10th to 13th fret"]
+```
+String:  e  |--2--3--5--|
+         B  |--3--5-----|
+         G  |--2--4--5--|
+         D  |--2--4--5--|
+         A  |--2--3--5--|
+         E  |--2--3--5--|
 ```
 
-### Part C: Chord Voicings and Voice Leading
+Fingering: index = all 2nd fret notes, middle = 3rd fret, pinky = 5th fret. Ring finger handles 4th fret when it appears.
 
-**Practical Implementation:**
+**A-shape G major scale (frets 9–12):**
 
-Open chord voicings provide foundational harmonic structures. The following voicings are expressed in fret numbers from low E to high E:
-
-| Chord   | Voicing (E A D G B e) | Root Note | Intervals                     |
-|---------|-----------------------|-----------|-------------------------------|
-| C Major | x 3 2 0 1 0           | C (A str) | Root, 5th, Root, 3rd, 5th     |
-| G Major | 3 2 0 0 0 3           | G (E str) | Root, 3rd, 5th, Root, 3rd, 5th|
-| D Major | x x 0 2 3 2           | D (D str) | Root, 5th, Root, 3rd, 5th     |
-| A Minor | x 0 2 2 1 0           | A (A str) | Root, 5th, Root, ♭3rd, 5th    |
-| E Minor | 0 2 2 0 0 0           | E (E str) | Root, 5th, Root, ♭3rd, 5th, Root|
-| F Major | 1 3 3 2 1 1           | F (E str) | Root, 5th, Root, 3rd, 5th, Root|
-
-**Strumming Mechanics and Rhythmic Precision:**
-
-Strumming imparts mechanical energy to the strings. The attack transient (initial strike) contains broad-spectrum energy; the sustain phase exhibits decaying harmonics. Consistent strumming requires:
-
-- **Attack angle**: 30-45° relative to string plane minimizes string slippage.
-- **Follow-through**: Complete stroke motion reduces unwanted damping.
-- **Metronome sync**: Practice with a metronome at 60-120 BPM, incrementally increasing tempo once accuracy reaches 95%+ (measured via MIDI trigger or DAW tempo analysis).
-
-Common strumming patterns (down stroke = D, up stroke = U):
-
-| Pattern          | Notation       | Time Signature | Application                          |
-|------------------|----------------|----------------|--------------------------------------|
-| Down-Up          | D U D U        | 4/4            | Basic steady rhythm                  |
-| Down-Down-Up-Up-Down-Up | D D U U D U | 4/4         | Folk/country shuffle                 |
-| Down-Up-Down-Up (syncopated) | D - U - D U | 4/4 | Reggae off-beat emphasis         |
-
-Record a 16-bar strumming exercise and analyze timing accuracy:
-
-```python
-import librosa
-import numpy as np
-
-# Load recorded strumming pattern
-y, sr = librosa.load('strumming_test.wav', sr=44100)
-
-# Detect note onsets
-onset_frames = librosa.onset.onset_detect(y=y, sr=sr, units='time', hop_length=512)
-
-# Calculate inter-onset intervals (IOI)
-ioi = np.diff(onset_frames)
-
-# Expected IOI at 120 BPM, 8th note strumming = 0.25 seconds
-expected_ioi = 0.25
-timing_error = np.abs(ioi - expected_ioi)
-
-print(f"Mean timing error: {np.mean(timing_error)*1000:.2f} ms")
-print(f"Standard deviation: {np.std(timing_error)*1000:.2f} ms")
+```
+String:  e  |--9--10--12--|
+         B  |--10--12-----|
+         G  |--9--10--12--|
+         D  |--9--10--12--|
+         A  |--10--12-----|
+         E  |--9--10--12--|
 ```
 
-Target performance: mean error <20ms, standard deviation <10ms.
+**Connecting position drill:** Play the E-shape position ascending, then continue seamlessly into the D-shape without restarting from the low E. This is the key CAGED skill — flowing through positions rather than restarting at each one.
 
-## Exercise 2: Signal Chain Analysis, Parameter Variation, and Spectral Measurement
+### 3.2 Minor Pentatonic and Blues Scale
 
-### Part A: Electric Guitar Pickup Characterization
+The minor pentatonic is the most practical scale in rock, blues, pop, and country. It maps onto the CAGED positions; position 1 (the "box") is built from the E-shape minor chord.
 
-**Theoretical Foundation:**
+**A minor pentatonic — Position 1 (box):**
 
-Electric guitar pickups are electromagnetic transducers. String vibration modulates the magnetic flux through a coil, inducing a voltage via Faraday's law:
-
-\[
-V(t) = -N \frac{d\Phi_B}{dt}
-\]
-
-where \(N\) is the number of coil turns and \(\Phi_B\) is the magnetic flux. Pickup types exhibit distinct frequency responses:
-
-- **Single-coil**: Higher treble response, susceptible to 50/60Hz hum due to lack of hum-canceling.
-- **Humbucker**: Two coils in series with opposite polarity cancel hum but attenuate high frequencies slightly due to increased inductance and capacitance.
-
-Pickup output impedance typically ranges from 5kΩ to 15kΩ. Impedance matching with the amplifier input stage is critical; low-impedance loads (e.g., 10kΩ) roll off high frequencies, while high-impedance loads (1MΩ+) preserve treble but may introduce noise.
-
-**Practical Implementation:**
-
-1. **Direct Pickup Frequency Response Measurement**:
-   - Connect the guitar directly to a high-impedance audio interface input (≥1MΩ).
-   - Play a chromatic scale from low E (82.41 Hz) to high E (329.63 Hz), recording each note with consistent pick attack.
-   - Measure the RMS amplitude of the fundamental frequency for each note using a spectrum analyzer.
-   - Plot frequency (Hz) vs. amplitude (dBFS). A single-coil pickup typically shows a resonant peak around 2-4 kHz; a humbucker peaks lower, around 1.5-3 kHz.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.io import wavfile
-
-# Load recording of chromatic scale
-sr, data = wavfile.read('chromatic_scale.wav')
-data = data / np.max(np.abs(data))  # Normalize
-
-# Define note frequencies (equal temperament)
-notes = ['E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3']
-freqs = [82.41 * (2**(i/12)) for i in range(len(notes))]
-
-# Extract RMS amplitude for each note (manual segmentation required)
-amplitudes_db = []  # Populate via FFT analysis of each segment
-
-plt.figure(figsize=(10, 6))
-plt.semilogx(freqs, amplitudes_db, marker='o')
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Amplitude (dBFS)')
-plt.title('Pickup Frequency Response')
-plt.grid(True, which='both', ls='-', alpha=0.2)
-plt.show()
+```
+String:  e  |--5--8--|
+         B  |--5--8--|
+         G  |--5--7--|
+         D  |--5--7--|
+         A  |--5--7--|
+         E  |--5--8--|
 ```
 
-2. **Impedance Loading Experiment**:
-   - Insert a resistive load (10kΩ, 100kΩ, 1MΩ) in parallel with the guitar output using a passive attenuator circuit.
-   - Re-measure the frequency response for each load impedance.
-   - **Expected result**: Lower impedances roll off treble due to the RC low-pass filter formed by pickup inductance and cable capacitance. This explains why long guitar cables (high capacitance) dull the tone.
+Root notes (A) fall at: low E/5th fret, D/7th fret, G/5th fret, B/8th fret, high e/5th fret.
 
-```mermaid
-graph LR
-    A["Guitar Pickup<br/>(Voltage Source)"] --> B["Pickup Output Impedance<br/>(5-15kΩ + inductance)"]
-    B --> C["Cable Capacitance<br/>(100-500 pF)"]
-    C --> D["Amplifier Input Impedance<br/>(10kΩ - 1MΩ)"]
-    D --> E["Input Buffer/Preamp"]
-    E --> F["Tone Stack<br/>(EQ)"]
-    F --> G["Power Amp"]
-    G --> H["Speaker"]
+**Blues scale:** Add the ♭5 (flat five, "blue note") to the minor pentatonic:
+
+- In A minor pentatonic position 1, add the ♭5 at D-string/6th fret and G-string/6th fret.
+
+```
+String:  e  |--5--8------|
+         B  |--5--8------|
+         G  |--5--6--7---|  ← 6th fret is the ♭5 blue note
+         D  |--5--6--7---|  ← 6th fret is the ♭5 blue note
+         A  |--5--7------|
+         E  |--5--8------|
 ```
 
-### Part B: Amplifier and Effects Signal Processing
+**Phrasing drill — call and response:**
 
-**Gain Staging and Distortion Mechanisms:**
+Blues phrasing lives in short, deliberate phrases with space between them. Practice this pattern at **♩= 70 BPM** (swing feel, 12/8):
 
-Guitar amplifiers introduce both linear (EQ) and nonlinear (distortion) signal processing. Overdrive occurs when the input signal exceeds the linear operating region of a gain stage, causing waveform clipping. Types of distortion:
-
-- **Hard clipping**: Abrupt waveform truncation, generates odd harmonics (3f, 5f, 7f), perceived as "harsh" or "aggressive."
-- **Soft clipping**: Gradual saturation (e.g., tube amplifiers), generates both even and odd harmonics, perceived as "warm" or "smooth."
-
-**Practical Implementation:**
-
-1. **Clean Tone Baseline**:
-   - Load a clean amp model (e.g., Fender Blackface emulation) with gain at minimum, flat EQ.
-   - Play a power chord (E5: E2 + B2 + E3) and record the output.
-   - Analyze the spectrum: you should see only the fundamental frequencies and their natural harmonics, with minimal intermodulation distortion.
-
-2. **Distortion Parameter Sweep**:
-   - Gradually increase the gain control from 0 to 100% in 10% increments.
-   - For each gain setting, record a 2-second E5 power chord.
-   - Measure total harmonic distortion (THD) using:
-
-\[
-\text{THD} = \frac{\sqrt{P_2^2 + P_3^2 + P_4^2 + \cdots}}{P_1} \times 100\%
-\]
-
-where \(P_n\) is the power of the \(n\)-th harmonic.
-
-   - Plot THD (%) vs. Gain (%). Expect exponential growth as clipping becomes more severe.
-
-3. **Parametric EQ Characterization**:
-   - Set gain to moderate level (50%).
-   - Sweep the bass control (50 Hz - 200 Hz shelf) from -12dB to +12dB.
-   - Record the output and generate a frequency response curve for each EQ setting.
-   - Repeat for mid (500 Hz - 2 kHz) and treble (3 kHz - 8 kHz) controls.
-   - Document the center frequencies and Q factors (bandwidth) of each EQ band using spectral analysis.
-
-| EQ Control | Center Frequency | Shelf/Peak Type | Typical Boost/Cut Range |
-|------------|------------------|-----------------|-------------------------|
-| Bass       | 80-150 Hz        | Shelf           | ±12 dB                  |
-| Mid        | 500-1000 Hz      | Peak (Bell)     | ±12 dB, Q=1.0-2.0       |
-| Treble     | 3-5 kHz          | Shelf           | ±12 dB                  |
-
-4. **Reverb Impulse Response**:
-   - Enable reverb with 100% wet signal.
-   - Generate an impulse (sharp transient, e.g., plucking muted strings then releasing) and record the decay.
-   - The reverb impulse response reveals early reflections (10-50ms) and late reverberation tail (>100ms).
-   - Measure decay time (RT60): time for signal to decay by 60dB.
-
-```python
-import numpy as np
-from scipy.signal import hilbert
-
-# Load reverb impulse response
-y, sr = librosa.load('reverb_impulse.wav', sr=44100)
-
-# Compute envelope via Hilbert transform
-analytic_signal = hilbert(y)
-envelope = np.abs(analytic_signal)
-
-# Convert to dB
-envelope_db = 20 * np.log10(envelope / np.max(envelope))
-
-# Find RT60 (time to decay by 60dB)
-threshold_idx = np.where(envelope_db < -60)[0]
-if len(threshold_idx) > 0:
-    rt60 = threshold_idx[0] / sr
-    print(f"RT60: {rt60:.2f} seconds")
+```
+Bar 1: | A(5) → C(8) → D(10) → bend D up a whole step | rest rest rest |
+Bar 2: | A(5) → C(8) → slide C→D | A(5) | rest |
 ```
 
-### Part C: Dynamic Range and Articulation Analysis
+The bend on the D note (high e / 10th fret in A) is the defining sound of blues guitar. Push the string upward (toward the ceiling) rather than down. A whole-step bend raises D to E. The pitch target must be exact — verify by fretting the E at the 12th fret of the same string, then bending the 10th fret until they match in pitch.
 
-**Fingerpicking vs. Plectrum Dynamics:**
+### 3.3 Major Scale Positions and Modal Thinking
 
-Different picking techniques impart distinct attack transients and sustain characteristics:
+The major scale across all five CAGED positions gives you full-neck coverage. Each position also implies a mode depending on where you hear the root.
 
-- **Plectrum (pick)**: Sharp attack, high initial amplitude, faster decay.
-- **Fingerstyle**: Softer attack, more controlled dynamics, longer sustain due to flesh contact damping high frequencies.
+**G major scale — all 5 positions summary:**
 
-**Practical Implementation:**
+| Position | Shape | Lowest Fret | Highest Fret | Root Locations           |
+|----------|-------|-------------|--------------|--------------------------|
+| 1        | E     | 2           | 5            | E string/3, G string/5   |
+| 2        | D     | 4           | 8            | D string/5, B string/8   |
+| 3        | C     | 7           | 10           | A string/10, e string/8  |
+| 4        | A     | 9           | 12           | A string/10, e string/12 |
+| 5        | G     | 12          | 15           | E string/15, E string/3  |
 
-1. **Dynamic Range Measurement**:
-   - Play a C major scale using fingerstyle (thumb, index, middle, ring rotation).
-   - Repeat using a plectrum with moderate force.
-   - Measure the peak amplitude and RMS amplitude for each note.
-   - Calculate crest factor: \(\text{Crest Factor (dB)} = 20 \log_{10}(\text{Peak} / \text{RMS})\).
-   - **Expected result**: Plectrum playing exhibits higher crest factor (10-15 dB) due to sharper transients; fingerstyle is lower (6-10 dB).
+**Three-notes-per-string (3NPS) alternative:** More ergonomic for fast runs. Each string gets exactly three notes; the pattern shifts predictably across the neck. The index covers the first note per string, middle the second, pinky the third (with ring as a flex finger on occasional stretches).
 
-2. **Travis Picking Pattern**:
-   - Travis picking alternates bass notes (thumb) with treble notes (fingers), creating a syncopated rhythm.
-   - **Pattern** (on C major chord): T(5) - I(3) - T(4) - M(2) - T(5) - I(3) - T(4) - M(1)
-     - T = Thumb (bass notes on 4th, 5th, 6th strings)
-     - I = Index (3rd string)
-     - M = Middle (2nd string)
-     - Numbers indicate string (1=high E, 6=low E)
-   - Record the pattern at 80 BPM and analyze the inter-note timing consistency using onset detection (Python librosa).
+G major 3NPS starting from the low E string at the 2nd fret:
 
-```python
-# Travis picking timing analysis
-y, sr = librosa.load('travis_picking.wav', sr=44100)
-onset_times = librosa.onset.onset_detect(y=y, sr=sr, units='time')
-
-# Expected: 8th note pattern at 80 BPM = 375ms inter-onset interval
-expected_ioi = 0.375
-ioi = np.diff(onset_times)
-timing_error = np.abs(ioi - expected_ioi)
-
-print(f"Mean error: {np.mean(timing_error)*1000:.2f} ms")
-print(f"Max error: {np.max(timing_error)*1000:.2f} ms")
+```
+E:  2-3-5
+A:  2-3-5
+D:  2-4-5
+G:  2-4-5
+B:  3-5-7
+e:  3-5-7
 ```
 
-## Exercise 3: Fault Injection, Diagnosis, and Recovery Protocols
+This pattern has a consistent 1-2-4 fingering on most strings (index-middle-pinky), which keeps the hand frame stable.
 
-### Part A: Mechanical Failure Modes — Intonation and Setup
+### 3.4 Connecting Scales to Chord Changes
 
-**Theoretical Foundation:**
+The critical skill beyond playing scales is tracking the chord underneath and landing on chord tones at phrase endpoints.
 
-Proper intonation ensures that fretted notes match their theoretical frequencies. Two primary failure modes:
+**Target-note approach:** When soloing over a chord, aim to land on and linger on the root, 3rd, or 5th of that chord. Scale notes are passing tones between targets.
 
-1. **String height (action) too high**: Fretting stretches the string excessively, sharpening the pitch.
-2. **Incorrect saddle position**: If the 12th fret harmonic and fretted note don't match, the scale length is incorrect.
+Over a I–IV–V progression in A (A–D–E):
 
-**Practical Implementation:**
+- Over A major: target A (root), C# (3rd), E (5th) — in A pentatonic, C# is not in the scale, so target A and E strongly
+- Over D major: target D (root), F# (3rd), A (5th) — shift your resolution notes to D/A
+- Over E major: target E (root), G# (3rd), B (5th) — B and E are in A minor pentatonic; G# is not, use a half-step bend from G
 
-1. **Intentional Intonation Fault**:
-   - Adjust the bridge saddle for the high E string forward by 2mm (shortening the scale length).
-   - Tune the open string to E4 (329.63 Hz).
-   - Play the 12th fret. Measure the frequency. It should be flat (lower than expected 659.26 Hz).
-   - **Diagnosis**: If the fretted note is flat, the saddle is too far forward; move it back. If sharp, move it forward.
-   - **Verification**: The 12th fret fretted note and 12th fret harmonic should match within ±2 cents.
+**Chord-tone drill at ♩= 80 BPM:**
 
-2. **Action Height Impact on Intonation**:
-   - Measure the string height at the 12th fret using a ruler (typical: 1.5-2.5mm for high E).
-   - Raise the action by 1mm and re-measure the 12th fret frequency.
-   - **Expected result**: Higher action increases pitch sharpness due to additional string tension when fretting.
+Play a simple two-bar phrase over each chord in a I–IV–V. Constraint: the last note of each phrase must be a chord tone of the upcoming chord. Record yourself and check.
 
-3. **Nut Slot Depth**:
-   - If the nut slot is too high, open strings will be in tune, but notes at the 1st-3rd frets will be sharp.
-   - Intentionally raise the nut slot by inserting a shim (thin plastic or paper).
-   - Play the 1st fret on each string and measure frequency deviation.
-   - **Recovery**: File the nut slot to the correct depth (string should sit just above the slot surface).
+---
 
-```mermaid
-flowchart TD
-    A["Check Open String Tuning"] --> B{Open string in tune?}
-    B -- Yes --> C["Check 12th Fret Harmonic"]
-    B -- No --> Z["Tune open string"]
-    C --> D["Play 12th Fret Fretted Note"]
-    D --> E{Fretted = Harmonic?}
-    E -- Yes --> F["Intonation Correct"]
-    E -- No, Fretted Flat --> G["Move Saddle Back<br/>(Lengthen Scale)"]
-    E -- No, Fretted Sharp --> H["Move Saddle Forward<br/>(Shorten Scale)"]
-    G --> C
-    H --> C
+## Module 4: Rhythm Guitar — Strumming, Travis Picking, and Groove
+
+### 4.1 Strumming Mechanics
+
+The strumming stroke comes from the wrist, not the elbow. The elbow can initiate the motion on wide, slow strums, but all controlled rhythm playing uses a relaxed wrist rotation with a light grip.
+
+**Attack angle:** Hold the pick at a slight angle to the string plane (15–30°, trailing edge tilted toward the floor on downstrokes). This reduces the "click" of the pick catching each string and creates a smoother brush across the strings.
+
+**Muting techniques:**
+- **Palm mute:** Right-hand edge rests lightly on the strings just ahead of the bridge saddles. Too far from the bridge = dead thuds; too close = no muting effect.
+- **Left-hand release mute:** Lighten fretting pressure between strums without fully lifting fingers — strings go from ringing to muted without any percussive click.
+- **Scratch stroke:** Upstroke across muted strings (left hand fully relaxed) creates a percussive "ch" sound that fills rhythmic subdivisions without adding harmonic content.
+
+### 4.2 Core Strumming Patterns
+
+Notation: D = downstroke, U = upstroke, — = rest/mute (keep arm moving in rhythm but don't strike strings)
+
+**4/4 patterns:**
+
 ```
-
-### Part B: Electrical Fault Injection — Signal Chain Integrity
-
-**Common Electrical Failure Modes:**
-
-1. **Ground loop hum**: 50/60Hz noise from multiple ground paths.
-2. **Intermittent connection**: Crackling due to oxidized jack or solder joint.
-3. **Impedance mismatch**: Tone loss from incorrect loading.
-
-**Practical Implementation:**
-
-1. **Ground Loop Simulation**:
-   - Connect the guitar to the audio interface, then connect both the audio interface and amplifier to separate power strips (creating multiple ground paths).
-   - Record the output with no playing. Analyze the spectrum for 50/60Hz fundamental and harmonics (120Hz, 180Hz).
-   - **Diagnosis**: Ground loops create spectral peaks at AC line frequency and harmonics.
-   - **Recovery**: Use a ground lift adapter or DI box with ground lift switch to break the loop.
-
-2. **Cable Degradation Test**:
-   - Use a guitar cable with a partially damaged conductor (intentionally crimp or sever some strands).
-   - Play and move the cable while recording. Listen for crackling or dropouts.
-   - **Diagnosis**: Intermittent connection causes transient noise spikes (visible as sharp vertical lines in waveform view).
-   - **Verification**: Replace cable and confirm clean signal.
-
-3. **Overdrive Saturation Recovery**:
-   - Set amplifier gain to maximum, producing severe clipping and potential aliasing artifacts in digital domain.
-   - Analyze the spectrum: clipped signals generate high-frequency harmonics that may exceed the Nyquist frequency (sr/2), causing aliasing.
-   - **Recovery**: Reduce gain until THD falls below 5%, or enable oversampling in the amp simulator to prevent aliasing.
-
-### Part C: Acoustic Feedback and Resonance Control
-
-**Theoretical Foundation:**
-
-Acoustic feedback occurs when amplified sound from a speaker re-enters the pickup or microphone, creating a positive feedback loop. The system oscillates at resonant frequencies of the instrument body or room modes.
-
-**Practical Implementation:**
-
-1. **Feedback Induction**:
-   - Position an electric guitar in front of an amplifier speaker at high volume.
-   - Gradually increase volume until the guitar begins to sustain indefinitely without playing.
-   - Note the frequency of the feedback tone (use spectrum analyzer).
-   - **Expected result**: Feedback typically occurs at the body resonance (acoustic guitars: 80-120Hz for the fundamental air resonance) or at pickup resonance (electric: 2-4kHz).
-
-2. **Notch Filter Suppression**:
-   - Insert a parametric EQ with a narrow notch filter (Q=10-20) at the feedback frequency.
-   - Sweep the notch frequency until feedback is suppressed.
-   - Document the notch frequency and required attenuation (-12dB to -20dB typical).
-
-3. **Phase Cancellation Test**:
-   - Record feedback-induced oscillation.
-   - Invert the phase of the signal and blend 50% with the original.
-   - **Expected result**: Complete cancellation of the feedback tone, leaving only the desired signal.
-
-## Practical Cheat Sheet & Quick Reference
-
-### String Tuning and Harmonic Frequencies
-
-| String | Note | Open Frequency (Hz) | 12th Fret (Hz) | 12th Harmonic (Hz) |
-|--------|------|---------------------|----------------|--------------------|
-| 1 (e)  | E4   | 329.63              | 659.26         | 659.26             |
-| 2 (B)  | B3   | 246.94              | 493.88         | 493.88             |
-| 3 (G)  | G3   | 196.00              | 392.00         | 392.00             |
-| 4 (D)  | D3   | 146.83              | 293.66         | 293.66             |
-| 5 (A)  | A2   | 110.00              | 220.00         | 220.00             |
-| 6 (E)  | E2   | 82.41               | 164.82         | 164.82             |
-
-### Signal Chain Gain Staging
-
-| Stage                  | Typical Level (dBu) | Impedance       | Notes                                   |
-|------------------------|---------------------|-----------------|-----------------------------------------|
-| Pickup Output          | -20 to -10          | 5-15kΩ          | High impedance, sensitive to loading    |
-| Preamp/Buffer Output   | -10 to 0            | 600Ω - 10kΩ     | Impedance conversion for long cable runs|
-| Effects Loop Send      | -10 to 0            | 600Ω - 10kΩ     | Line level for effects processors       |
-| Power Amp Input        | 0 to +4             | 10kΩ - 100kΩ    | Final gain stage before speaker         |
-
-### Frequency Ranges and Tonal Character
-
-| Frequency Range | Tonal Characteristic                          | EQ Adjustment Strategy                   |
-|-----------------|-----------------------------------------------|------------------------------------------|
-| 60-80 Hz        | Low-end thump, fundamental bass               | Boost for bass-heavy styles, cut to reduce muddiness |
-| 80-200 Hz       | Body, warmth                                  | Moderate boost for fullness              |
-| 200-500 Hz      | Mud zone, low-mid buildup                     | Often cut to improve clarity             |
-| 500-1000 Hz     | Presence, midrange body                       | Boost for lead guitar projection         |
-| 1-3 kHz         | Attack, pick definition                       | Boost for articulation, cut if harsh     |
-| 3-6 kHz         | Brightness, string noise                      | Boost for sparkle, cut if sibilant       |
-| 6-12 kHz        | Air, shimmer                                  | Subtle boost for openness                |
-
-### Intonation Adjustment Protocol
-
-1. Tune open string to pitch using precision tuner (±0.1 cent).
-2. Play 12th fret harmonic, verify frequency matches 2× open string.
-3. Fret 12th fret firmly, measure frequency.
-4. **If fretted note is sharp**: move saddle away from nut (lengthen scale).
-5. **If fretted note is flat**: move saddle toward nut (shorten scale).
-6. Re-tune open string and repeat until 12th fret fretted and harmonic match within ±2 cents.
-7. Verify intonation at 5th and 7th frets (common checkpoints).
-
-### Common Failure Modes and Diagnostics
-
-| Symptom                          | Likely Cause                               | Diagnostic Test                          | Corrective Action                        |
-|----------------------------------|--------------------------------------------|------------------------------------------|------------------------------------------|
-| All notes sharp                  | Strings stretched, temperature change      | Check tuning across all strings          | Retune, allow instrument to acclimate    |
-| Low frets sharp, high frets in tune | Nut slots too high                        | Measure string height at 1st fret        | File nut slots to correct depth          |
-| 12th fret sharp                  | Saddle too close to nut                    | Compare 12th fret harmonic vs fretted    | Move saddle away from nut                |
-| 12th fret flat                   | Saddle too far from nut                    | Compare 12th fret harmonic vs fretted    | Move saddle toward nut                   |
-| 50/60Hz hum                      | Ground loop or unshielded pickup           | Check spectrum for line frequency peaks  | Ground lift, shielding, hum-canceling pickups |
-| Crackling, dropouts              | Intermittent connection                    | Wiggle cable, check solder joints        | Replace cable, resolder connections      |
-| High-frequency loss              | Impedance mismatch, cable capacitance      | Measure frequency response               | Buffer pedal, shorter cable, high-impedance input |
-
-### Python Utilities for Signal Analysis
-
-```python
-import numpy as np
-import librosa
-import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
-
-def analyze_harmonic_content(audio_file, sr=44100, n_harmonics=6):
-    """
-    Analyze harmonic content of a guitar note recording.
-    
-    Args:
-        audio_file: Path to audio file
-        sr: Sample rate (Hz)
-        n_harmonics: Number of harmonics to analyze
-    
-    Returns:
-        dict: Harmonic frequencies and amplitudes
-    """
-    # Load audio
-    y, sr = librosa.load(audio_file, sr=sr)
-    
-    # Compute FFT
-    fft = np.fft.rfft(y)
-    freqs = np.fft.rfftfreq(len(y), 1/sr)
-    magnitude = np.abs(fft)
-    
-    # Find peaks (harmonics)
-    peaks, _ = find_peaks(magnitude, height=np.max(magnitude)*0.01, distance=sr//100)
-    peak_freqs = freqs[peaks]
-    peak_mags = magnitude[peaks]
-    
-    # Sort by magnitude
-    sorted_indices = np.argsort(peak_mags)[::-1]
-    
-    # Extract top harmonics
-    harmonics = {}
-    for i, idx in enumerate(sorted_indices[:n_harmonics]):
-        harmonics[f'f{i}'] = {
-            'frequency': peak_freqs[idx],
-            'amplitude_db': 20 * np.log10(peak_mags[idx] / np.max(magnitude))
-        }
-    
-    return harmonics
-
-def measure_timing_accuracy(audio_file, expected_bpm, sr=44100):
-    """
-    Measure timing accuracy of strumming or picking patterns.
-    
-    Args:
-        audio_file: Path to audio file
-        expected_bpm: Expected tempo in beats per minute
-        sr: Sample rate (Hz)
-    
-    Returns:
-        dict: Timing statistics
-    """
-    y, sr = librosa.load(audio_file, sr=sr)
-    
-    # Detect onsets
-    onset_times = librosa.onset.onset_detect(y=y, sr=sr, units='time', backtrack=False)
-    
-    # Calculate inter-onset intervals
-    ioi = np.diff(onset_times)
-    
-    # Expected IOI from BPM (assuming 8th notes)
-    expected_ioi = 60 / (expected_bpm * 2)
-    
-    # Calculate errors
-    timing_errors = (ioi - expected_ioi) * 1000  # Convert to milliseconds
-    
-    return {
-        'mean_error_ms': np.mean(np.abs(timing_errors)),
-        'std_error_ms': np.std(timing_errors),
-        'max_error_ms': np.max(np.abs(timing_errors)),
-        'onset_count': len(onset_times)
-    }
-
-def plot_frequency_response(frequencies, amplitudes_db, title="Frequency Response"):
-    """
-    Plot frequency response curve.
-    
-    Args:
-        frequencies: Array of frequencies (Hz)
-        amplitudes_db: Array of amplitudes (dB)
-        title: Plot title
-    """
-    plt.figure(figsize=(10, 6))
-    plt.semilogx(frequencies, amplitudes_db, marker='o', linewidth=2)
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Amplitude (dB)')
-    plt.title(title)
-    plt.grid(True, which='both', ls='-', alpha=0.3)
-    plt.xlim([20, 20000])
-    plt.show()
-```
-
-### Summary and Best Practices
-
-- **Always verify tuning before sessions**: Temperature and humidity affect string tension. Tune to within ±2 cents for accurate intonation.
-- **Monitor signal levels**: Maintain -18dBFS to -12dBFS average levels during recording to preserve headroom and avoid clipping.
-- **Document parameter changes**: When experimenting with amp settings, log each parameter value and corresponding spectral measurement for reproducibility.
-- **Use spectrum analysis for diagnosis**: Many performance issues (feedback, hum, intonation errors) have distinct spectral signatures that guide targeted correction.
-- **Prioritize mechanical setup**: Proper action, intonation, and nut height eliminate 80% of tuning and playability issues before signal processing is even considered.
-
-This laboratory has demonstrated measurement-driven analysis of guitar performance from mechanical vibration to digital signal processing. By quantifying string behavior, pickup response, amplifier nonlinearity, and timing accuracy, you can diagnose and correct performance issues systematically rather than relying on subjective perception alone. Apply these techniques to optimize your instrument setup, validate signal chain integrity, and achieve consistent, predictable results in recording and live performance environments.
+Pattern 1

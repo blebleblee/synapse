@@ -1,458 +1,652 @@
-# Lesson 3: Scales and Modes
+# Lesson 3: Scales, Modes & Fretboard Mastery
 
-## 1. First-Principles Intuition & Invariants
+## 1. First-Principles Intuition (The 15%)
 
-### 1.1 The Physics of Vibrating Strings
+### 1.1 Why Scales Sound the Way They Do
 
-The guitar operates on the principle of transverse wave propagation in finite, tensioned strings. When a string is displaced from equilibrium and released, it vibrates according to the one-dimensional wave equation:
+Every guitar string vibrates at a fundamental frequency plus a cascade of overtones at integer multiples: 2×, 3×, 4×, 5×, and so on. The intervals we hear as most consonant — octave (2:1), perfect fifth (3:2), perfect fourth (4:3) — are simply the strongest, lowest overtones in that series. When you play two notes whose frequencies share a simple ratio, their overtones align and reinforce each other. When the ratio is complex, overtones clash and you hear beating — tension.
 
-$$\frac{\partial^2 y}{\partial t^2} = v^2 \frac{\partial^2 y}{\partial x^2}$$
+Scales are curated collections of pitches selected so that most note pairs maintain simple-enough ratios to feel stable, with just enough dissonance to create forward motion. The major scale's W-W-H-W-W-W-H interval pattern (whole and half steps) is a centuries-refined answer to the question: *what seven pitches give the richest harmonic variety while staying mostly consonant?*
 
-where $y(x,t)$ is the transverse displacement, $v = \sqrt{T/\mu}$ is the wave velocity, $T$ is string tension, and $\mu$ is linear mass density. For a string of length $L$ fixed at both ends, boundary conditions ($y(0,t) = y(L,t) = 0$) constrain solutions to standing waves with frequencies:
-
-$$f_n = \frac{n}{2L}\sqrt{\frac{T}{\mu}} = nf_1$$
-
-where $n \in \mathbb{Z}^+$ and $f_1$ is the fundamental frequency. This harmonic series—$f_1, 2f_1, 3f_1, 4f_1, ...$—is universal to all vibrating strings and forms the acoustic foundation for tonal relationships in Western music.
-
-The intervals perceived as most consonant correspond to simple integer ratios in the harmonic series. The octave (2:1), perfect fifth (3:2), and perfect fourth (4:3) emerge naturally as the second, third, and fourth harmonics relative to the fundamental. These ratios minimize acoustic beating—the interference pattern created when two frequencies are close but not identical—which the human auditory system interprets as dissonance. The basilar membrane in the cochlea exhibits logarithmic frequency response, explaining why pitch perception is roughly logarithmic: equal frequency ratios produce equal perceived intervals.
+**Equal temperament** — the tuning system your guitar uses — slightly compromises every interval except the octave so that all 12 keys work equally well. Each fret raises pitch by exactly one semitone (a frequency ratio of 2^(1/12) ≈ 1.0595). The practical payoff: every scale pattern you learn works identically at any position on the neck.
 
 ```mermaid
 graph TD
-    A["Fundamental f₁<br/>String Length L"] -->|"2:1 ratio"| B["Octave 2f₁<br/>L/2"]
-    A -->|"3:2 ratio"| C["Perfect Fifth 3f₁/2<br/>2L/3"]
-    A -->|"4:3 ratio"| D["Perfect Fourth 4f₁/3<br/>3L/4"]
-    A -->|"5:4 ratio"| E["Major Third 5f₁/4<br/>4L/5"]
-    
-    B --> F["Simple Integer Ratios<br/>→ Consonance"]
-    C --> F
-    D --> F
-    E --> F
-    
-    F --> G["Harmonic Series Foundation<br/>for Scale Construction"]
+    subgraph sub_harmonic_series ["Harmonic Series → Interval Hierarchy"]
+        H1["1st Harmonic: Fundamental f₁"] -->|"2:1 ratio"| H2["2nd Harmonic: Octave"]
+        H2 -->|"3:2 ratio"| H3["3rd Harmonic: Perfect 5th"]
+        H3 -->|"4:3 ratio"| H4["4th Harmonic: Perfect 4th"]
+        H4 -->|"5:4 ratio"| H5["5th Harmonic: Major 3rd"]
+        H5 -->|"6:5 ratio"| H6["6th Harmonic: Minor 3rd"]
+    end
+
+    subgraph sub_practical_result ["Practical Result for Scales"]
+        R1["Simple ratios → Consonant intervals → Scale foundations"]
+        R2["Complex ratios → Dissonance → Tension notes (b2, tritone)"]
+    end
+
+    H2 --> R1
+    H3 --> R1
+    H6 --> R2
 ```
 
-### 1.2 From Harmonic Series to Scale Systems
+### 1.2 Modes in One Sentence
 
-The major scale derives from selectively extracting pitches from the harmonic series that form stable intervallic relationships. The diatonic major scale in just intonation uses frequency ratios relative to the tonic: 1:1 (unison), 9:8 (major second), 5:4 (major third), 4:3 (perfect fourth), 3:2 (perfect fifth), 5:3 (major sixth), 15:8 (major seventh), 2:1 (octave). These ratios create a pattern of whole steps (9:8 ratio, approximately 204 cents) and half steps (16:15 ratio, approximately 112 cents) with the sequence: W-W-H-W-W-W-H.
-
-However, just intonation creates practical problems: different keys produce different absolute frequency ratios, making modulation impossible without retuning. Equal temperament solves this by dividing the octave into twelve geometrically equal semitones, where each semitone ratio is $2^{1/12} \approx 1.05946$. This creates slight detuning from just intervals—the equal-tempered fifth is approximately 2 cents flat compared to the pure 3:2 ratio—but enables unrestricted modulation across all keys.
-
-The major scale's interval pattern in equal temperament becomes: 0-2-4-5-7-9-11-12 semitones from the root. This structure can be expressed as a cyclic group operation on $\mathbb{Z}_{12}$, where transposition is equivalent to addition modulo 12. The set of all major scales forms an orbit under the action of the transposition group.
-
-Natural minor scales follow the pattern 0-2-3-5-7-8-10-12. The minor third interval (3 semitones, approximately 300 cents vs. 316 cents in just intonation) introduces a flattened third degree relative to major. Psychoacoustic studies demonstrate that this interval produces measurable differences in emotional response: minor thirds activate different neural pathways in the auditory cortex compared to major thirds, correlating with reported feelings of sadness or introspection. This is not cultural conditioning but reflects the way harmonic complexity is processed by mammalian auditory systems.
-
-### 1.3 Modal Systems as Rotational Transformations
-
-The seven diatonic modes—Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian—are rotations of the major scale's interval structure. Each mode begins on a different scale degree while preserving the interval sequence:
-
-- **Ionian (I)**: 0-2-4-5-7-9-11-12 (major scale)
-- **Dorian (II)**: 0-2-3-5-7-9-10-12 (minor with raised 6th)
-- **Phrygian (III)**: 0-1-3-5-7-8-10-12 (minor with lowered 2nd)
-- **Lydian (IV)**: 0-2-4-6-7-9-11-12 (major with raised 4th)
-- **Mixolydian (V)**: 0-2-4-5-7-9-10-12 (major with lowered 7th)
-- **Aeolian (VI)**: 0-2-3-5-7-8-10-12 (natural minor)
-- **Locrian (VII)**: 0-1-3-5-6-8-10-12 (diminished, unstable)
+The seven diatonic modes are **the same seven notes heard from seven different tonal centers**. D Dorian and C Ionian use identical pitches. What changes is which note functions as home base — and therefore which intervals the ear measures against that root. D Dorian has a minor 3rd (F) and a *major* 6th (B) above its root. C Ionian has a major 3rd (E) and major 6th (A). Same notes, completely different emotional gravity.
 
 ```mermaid
 graph LR
-    subgraph sub_modal_rotation_from_c_major_scal ["Modal Rotation from C Major Scale"]
-        A["C Ionian<br/>C-D-E-F-G-A-B"] -->|"Start on 2nd degree"| B["D Dorian<br/>D-E-F-G-A-B-C"]
-        B -->|"Start on 3rd degree"| C["E Phrygian<br/>E-F-G-A-B-C-D"]
-        C -->|"Start on 4th degree"| D["F Lydian<br/>F-G-A-B-C-D-E"]
-        D -->|"Start on 5th degree"| E["G Mixolydian<br/>G-A-B-C-D-E-F"]
-        E -->|"Start on 6th degree"| F["A Aeolian<br/>A-B-C-D-E-F-G"]
-        F -->|"Start on 7th degree"| G["B Locrian<br/>B-C-D-E-F-G-A"]
-        G -.->|"Return to root"| A
+    subgraph sub_modal_rotation ["One Parent Scale → Seven Modes (C Major)"]
+        C["C Ionian ①<br/>C D E F G A B<br/>Major sound"]
+        D["D Dorian ②<br/>D E F G A B C<br/>Minor + bright 6th"]
+        E["E Phrygian ③<br/>E F G A B C D<br/>Spanish / dark b2"]
+        F["F Lydian ④<br/>F G A B C D E<br/>Dreamy #4"]
+        G["G Mixolydian ⑤<br/>G A B C D E F<br/>Dominant / bluesy b7"]
+        A["A Aeolian ⑥<br/>A B C D E F G<br/>Natural minor"]
+        B["B Locrian ⑦<br/>B C D E F G A<br/>Diminished b5 — unstable"]
+
+        C -->|"start on 2nd degree"| D
+        D -->|"start on 3rd degree"| E
+        E -->|"start on 4th degree"| F
+        F -->|"start on 5th degree"| G
+        G -->|"start on 6th degree"| A
+        A -->|"start on 7th degree"| B
+        B -.->|"octave — back to root"| C
     end
 ```
 
-Each mode produces distinct harmonic implications through its characteristic intervals. Lydian's raised 4th (augmented fourth) creates a bright, unstable quality due to the tritone between the root and 4th degree. Phrygian's lowered 2nd (minor second above the root) generates a dark, exotic character common in flamenco and Middle Eastern music. These are not subjective associations but measurable differences in harmonic tension based on interval content.
+---
 
-The Locrian mode, with its diminished fifth (6 semitones from root), lacks a perfect fifth—one of the most consonant intervals. This makes it harmonically unstable and rarely used as a tonal center in Western music. Its instability reflects the absence of a strong harmonic anchor in the overtone series.
+## 2. The Fretboard as a Pitch Map
 
-### 1.4 The Guitar's Fretboard as a Discrete Pitch Space
+### 2.1 Standard Tuning and the G-B Asymmetry
 
-The guitar fretboard implements equal temperament through fret positioning governed by the equation:
-
-$$d_n = L - \frac{L}{2^{n/12}}$$
-
-where $d_n$ is the distance from the nut to the $n$-th fret, and $L$ is the scale length (typically 24.75" for Gibson, 25.5" for Fender). This logarithmic spacing ensures each fret raises pitch by exactly one semitone. The decreasing fret spacing reflects the logarithmic relationship between frequency and perceived pitch.
-
-Standard tuning (E-A-D-G-B-E, from low to high) creates a two-dimensional pitch lattice with non-uniform intervals: perfect fourths between adjacent strings except for the major third between G and B strings. This asymmetry is not arbitrary—it optimizes chord voicings by placing common chord tones within comfortable finger reach while maintaining reasonable string tension across all strings.
+Standard tuning — **E A D G B E** (low to high) — uses perfect 4th intervals (5 semitones) between every adjacent string pair *except* G to B, which is a major 3rd (4 semitones). This one asymmetry is the single biggest source of confusion when transferring patterns across strings.
 
 ```mermaid
 graph TD
-    subgraph sub_standard_tuning_interval_structu ["Standard Tuning Interval Structure"]
-        E1["E (6th String)<br/>82.4 Hz"] -->|"Perfect 4th<br/>+5 semitones"| A["A (5th String)<br/>110 Hz"]
-        A -->|"Perfect 4th<br/>+5 semitones"| D["D (4th String)<br/>146.8 Hz"]
-        D -->|"Perfect 4th<br/>+5 semitones"| G["G (3rd String)<br/>196 Hz"]
-        G -->|"Major 3rd<br/>+4 semitones"| B["B (2nd String)<br/>246.9 Hz"]
-        B -->|"Perfect 4th<br/>+5 semitones"| E2["E (1st String)<br/>329.6 Hz"]
+    subgraph sub_standard_tuning ["Standard Tuning String Map"]
+        E6["6th String: E  82.4 Hz"] -->|"P4 +5 frets"| A5["5th String: A  110 Hz"]
+        A5 -->|"P4 +5 frets"| D4["4th String: D  146.8 Hz"]
+        D4 -->|"P4 +5 frets"| G3["3rd String: G  196 Hz"]
+        G3 -->|"M3 +4 frets ⚠️"| B2["2nd String: B  246.9 Hz"]
+        B2 -->|"P4 +5 frets"| E1["1st String: E  329.6 Hz"]
     end
-    
-    style G fill:#ffcccc
-    style B fill:#ffcccc
+
+    style G3 fill:#ffe0e0,stroke:#cc0000
+    style B2 fill:#ffe0e0,stroke:#cc0000
 ```
 
-The major third between G and B strings introduces a discontinuity that requires positional adjustment when transferring scale patterns across strings. This asymmetry has profound implications for scale fingerings and chord voicings, creating both challenges and opportunities for harmonic exploration.
+**Practical rule:** Any scale box you play on strings 6-5-4-3 shifts *one fret lower* on strings 2 and 1 to stay in tune. Burn this into muscle memory — it corrects 90% of "my pattern sounds wrong on the high strings" problems.
 
-## 2. Core Architecture & Mechanics
+### 2.2 The CAGED System — Your Fretboard GPS
 
-### 2.1 Scale Construction as Algorithmic Pattern Mapping
-
-Scale construction on the guitar is a pattern-matching problem: mapping a one-dimensional sequence of intervals onto a two-dimensional fretboard lattice. For any scale with interval sequence $S = [s_1, s_2, ..., s_n]$ (measured in semitones), we seek finger positions $(string, fret)$ that produce these intervals while minimizing hand movement and maximizing ergonomic efficiency.
-
-A scale fingering can be represented as a sequence of states in a finite state machine:
-
-$$\text{State} = (s, f, h)$$
-
-where $s \in \{1,2,3,4,5,6\}$ is the string number, $f \in \{0,1,...,24\}$ is the fret number, and $h \in \{1,2,3,4\}$ is the finger used. Valid state transitions must satisfy:
-
-1. **Fret distance constraint**: $|f_{i+1} - f_i| \leq 4$ (one-finger-per-fret within a four-fret span)
-2. **String crossing**: $s_{i+1} - s_i \in \{0, -1\}$ for ascending scales (same string or move to higher-pitched string)
-3. **Ergonomic continuity**: minimize large position shifts
-
-The three-note-per-string system maximizes melodic speed by distributing notes evenly across strings, using fingers 1, 2, and 4 (index, middle, pinky) in most positions. For a major scale starting on the 6th string:
-
-**Position 1 (Root on 6th string, fret 3 = G major)**
-```
-e|--2--4--5--|
-B|--2--3--5--|
-G|--2--4--5--|
-D|--2--4--5--|
-A|--2--3--5--|
-E|--2--3--5--|
-```
-
-This pattern uses fingers 1-2-4 on each string, covering a seven-fret span but maintaining a four-fret hand position by shifting during string transitions.
-
-```python
-def generate_three_note_per_string_pattern(root_string: int, 
-                                           root_fret: int, 
-                                           scale_intervals: list[int]) -> list[tuple[int, int]]:
-    """
-    Generate three-note-per-string scale pattern.
-    
-    Args:
-        root_string: Starting string (6=low E, 1=high E)
-        root_fret: Starting fret position
-        scale_intervals: Interval sequence in semitones [0,2,4,5,7,9,11,12]
-    
-    Returns:
-        List of (string, fret) tuples representing the scale pattern
-    """
-    positions = []
-    current_string = root_string
-    current_fret = root_fret
-    interval_index = 0
-    notes_on_string = 0
-    
-    # String-to-string interval offsets (accounting for G-B major third)
-    string_intervals = [5, 5, 5, 4, 5]  # E-A, A-D, D-G, G-B, B-E
-    
-    while current_string >= 1 and interval_index < len(scale_intervals):
-        # Calculate absolute pitch from root
-        target_pitch = scale_intervals[interval_index]
-        
-        # Calculate required fret on current string
-        if current_string == root_string:
-            required_fret = root_fret + target_pitch
-        else:
-            # Account for string tuning offsets
-            string_offset = sum(string_intervals[root_string-current_string-1:root_string-1])
-            required_fret = root_fret + target_pitch - string_offset
-        
-        positions.append((current_string, required_fret))
-        notes_on_string += 1
-        interval_index += 1
-        
-        # Move to next string after three notes
-        if notes_on_string == 3:
-            current_string -= 1
-            notes_on_string = 0
-    
-    return positions
-
-# Example: G major scale, three-note-per-string
-g_major_intervals = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24]
-g_major_pattern = generate_three_note_per_string_pattern(6, 3, g_major_intervals)
-
-for string, fret in g_major_pattern:
-    print(f"String {string}, Fret {fret}")
-```
-
-### 2.2 The CAGED System as a Covering Space
-
-The CAGED system provides five overlapping fingering templates that tile the fretboard, enabling navigation across the entire neck. Each shape is derived from an open-position chord (C, A, G, E, D) transposed up the neck by barring across a fret.
-
-The system forms a cyclic structure: moving up the neck from any shape leads to the next shape in the sequence C→A→G→E→D→C. This cycle repeats every 12 frets (one octave), creating a helical topology where the fretboard wraps around itself at the 12th fret.
+CAGED maps five open-chord shapes across the neck in a continuous cycle. Each shape links to the next moving up the neck, covering all 12 frets before the cycle repeats at the octave.
 
 ```mermaid
 graph LR
-    subgraph sub_caged_system_cycle ["CAGED System Cycle"]
-        C["C Shape<br/>Root on 5th string"] -->|"Up 2-3 frets"| A["A Shape<br/>Root on 5th string"]
-        A -->|"Up 2-3 frets"| G["G Shape<br/>Root on 6th string"]
-        G -->|"Up 2-3 frets"| E["E Shape<br/>Root on 6th string"]
-        E -->|"Up 2-3 frets"| D["D Shape<br/>Root on 4th string"]
-        D -.->|"Up 2-3 frets<br/>+12 frets"| C
+    subgraph sub_caged_cycle ["CAGED Cycle — G Major Example"]
+        Cs["C Shape<br/>Frets 9-12<br/>Root: B string fret 10"]
+        As["A Shape<br/>Frets 10-14<br/>Root: A string fret 10"]
+        Gs["G Shape<br/>Open / Frets 12-15<br/>Root: low E fret 3 or 15"]
+        Es["E Shape<br/>Frets 3-7<br/>Root: low E fret 3"]
+        Ds["D Shape<br/>Frets 5-9<br/>Root: D string fret 5"]
+
+        Es -->|"+2-3 frets"| Ds
+        Ds -->|"+2-3 frets"| Cs
+        Cs -->|"+2-3 frets"| As
+        As -->|"+2-3 frets"| Gs
+        Gs -.->|"+12 frets / octave"| Es
     end
-    
-    style C fill:#e1f5e1
-    style A fill:#ffe1e1
-    style G fill:#e1e1ff
-    style E fill:#fff5e1
-    style D fill:#f5e1ff
+
+    style Es fill:#e8f5e9
+    style As fill:#fff3e0
+    style Gs fill:#e3f2fd
+    style Ds fill:#fce4ec
+    style Cs fill:#f3e5f5
 ```
 
-Each CAGED shape contains embedded scale patterns. For example, the E shape major chord (root on 6th string) contains the following scale degrees:
+Each shape gives you an **embedded triad, pentatonic box, and diatonic scale** — all in the same hand position. Learn one shape completely (chord + scale + arpeggios) before moving to the next.
+
+---
+
+## 3. Scale Shapes: Complete Fingering Reference
+
+> **Notation key:** Numbers inside the grid = fretting fingers (1=index, 2=middle, 3=ring, 4=pinky). `R` = root note. Fret numbers shown to the left of each diagram.
+
+### 3.1 G Major Scale — Five CAGED Positions
+
+---
+
+**Position 1: E Shape (Frets 2–5, root on 6th string fret 3)**
 
 ```
-e|-----0-----2-----4-----|  (5th, 6th, 7th scale degrees)
-B|-----0-----2-----4-----|  (root, 2nd, 3rd)
-G|-----1-----2-----4-----|  (3rd, 4th, 5th)
-D|-----1-----2-----4-----|  (7th, root, 2nd)
-A|-----2-----4-----5-----|  (5th, 6th, 7th)
-E|-----0-----2-----4-----|  (root, 2nd, 3rd)
+         Fret: 2   3   4   5
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|--2--|-----|--4--|
+G  |-----|--1--|-----|--3--|--4--|
+D  |-----|--1--|-----|--3--|--4--|
+A  |-----|--1--|--2--|-----|--4--|
+E  |-----|--1--|--2--|-----|--4--|
+         (open)  R
 ```
 
-The CAGED system can be formalized as a quotient space. Define the pitch class space $P = \mathbb{Z}_{12}$ and the position space $F = \{(s,f) : s \in \{1,...,6\}, f \in \{0,...,24\}\}$. The projection $\pi: F \rightarrow P$ maps each fretboard position to its pitch class. The CAGED shapes partition $F$ into equivalence classes where positions within a shape produce the same chord voicing structure.
+Roots: 6th string fret 3 (G), 4th string fret 5 (G), 1st string fret 3 (G).
 
-### 2.3 Modal Fingerings and Pattern Shifts
+---
 
-Each mode can be fingered using the parent major scale pattern but emphasizing different root notes. For C major (C-D-E-F-G-A-B), the seven modes are:
+**Position 2: D Shape (Frets 4–8, root on 4th string fret 5)**
 
-- **C Ionian**: Root on C (standard major pattern)
-- **D Dorian**: Root on D (same pattern, different tonal center)
-- **E Phrygian**: Root on E
-- **F Lydian**: Root on F
-- **G Mixolydian**: Root on G
-- **A Aeolian**: Root on A (natural minor)
-- **B Locrian**: Root on B
+```
+         Fret: 4   5   6   7
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|-----|--3--|--4--|
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|-----|--R--|-----|-----|
+           (slide up — root shifts)
+```
+
+Full box:
+```
+         Fret: 4   5   6   7
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|-----|--3--|--4--|
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|--1--|--R--|--3--|-----|
+A  |-----|-----|--1--|--2--|--4--|
+E  |-----|-----|-----|--2--|--4--|
+```
+
+---
+
+**Position 3: C Shape (Frets 7–10, root on 5th string fret 10)**
+
+```
+         Fret: 7   8   9   10
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|-----|--3--|--4--|
+G  |-----|-----|--1--|--2--|--4--|
+D  |-----|-----|--1--|--2--|--4--|
+A  |-----|-----|--1--|--2--|--R--|
+E  |-----|--1--|--2--|-----|--4--|
+```
+
+---
+
+**Position 4: A Shape (Frets 9–12, root on 5th string fret 10)**
+
+```
+         Fret: 9   10  11  12
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--2--|-----|-----|--4--|
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|--1--|--2--|-----|--4--|
+A  |-----|--1--|--R--|-----|--4--|
+E  |-----|--1--|--2--|-----|--4--|
+```
+
+---
+
+**Position 5: G Shape (Frets 12–15, root on 6th string fret 15 / open G shape)**
+
+```
+         Fret: 12  13  14  15
+e  |-----|-----|--2--|--3--|--4--|
+B  |-----|--1--|--2--|--3--|-----|
+G  |-----|-----|--1--|--2--|--4--|
+D  |-----|-----|--1--|--2--|--4--|
+A  |-----|-----|--1--|--2--|--4--|
+E  |-----|-----|--2--|--3--|--R--|
+```
+
+---
+
+### 3.2 A Natural Minor (A Aeolian) — Box Positions
+
+**Box 1 — Root Position (5th fret)**
+
+```
+         Fret: 5   6   7   8
+e  |-----|--1--|-----|--3--|--4--|
+B  |-----|--1--|-----|--3--|--4--|
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|--1--|--2--|-----|--4--|
+A  |-----|--R--|-----|--3--|--4--|
+E  |-----|--1--|-----|--3--|--4--|
+```
+
+Roots at: A string fret 5, G string fret 2, E string fret 5 and 17.
+
+**Box 2 — 2nd Position (7th fret)**
+
+```
+         Fret: 7   8   9   10
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|--2--|-----|--4--|
+G  |-----|--1--|-----|--3--|--4--|
+D  |-----|--1--|--2--|--3--|-----|
+A  |-----|-----|--1--|--2--|--4--|
+E  |-----|--1--|--2--|-----|--4--|
+```
+
+---
+
+### 3.3 Minor Pentatonic — All Five Boxes (A Minor)
+
+The workhorse of blues, rock, and lead playing. Master all five positions and their connections.
+
+**Box 1 — Root at 5th fret (most common starting point)**
+
+```
+         Fret: 5       8
+e  |-----|--1--|-------|--4--|
+B  |-----|--1--|-------|--4--|
+G  |-----|--1--|-------|--4--|  ← shift 1 fret for G-B
+D  |-----|--1--|-------|--4--|
+A  |-----|--R--|-------|--4--|
+E  |-----|--1--|-------|--4--|
+```
+
+Notes: A C D E G
+
+**Box 2 — Root at 7th fret (high E string)**
+
+```
+         Fret: 7   8       10
+e  |-----|--1--|--2--|-------|--4--|
+B  |-----|--1--|--2--|-------|--4--|
+G  |-----|-----|--1--|-------|--4--|
+D  |-----|-----|--1--|--2----|-----|
+A  |-----|-----|--2--|-------|--4--|
+E  |-----|--1--|--2--|-------|--4--|
+```
+
+**Box 3 — 10th position**
+
+```
+         Fret: 10      12
+e  |-----|--1--|-------|--4--|
+B  |-----|--1--|-------|--4--|
+G  |-----|--1--|--2----|-----|
+D  |-----|--1--|-------|--4--|
+A  |-----|--1--|-------|--4--|
+E  |-----|--1--|-------|--4--|
+```
+
+**Box 4 — 12th position**
+
+```
+         Fret: 12      15
+e  |-----|--1--|-------|--4--|
+B  |-----|--1--|-------|--4--|
+G  |-----|--1--|-------|--4--|
+D  |-----|--1--|--2----|-----|
+A  |-----|--1--|--2----|-----|
+E  |-----|--1--|-------|--4--|
+```
+
+**Box 5 — 3rd position (connects back to Box 1)**
+
+```
+         Fret: 3       5
+e  |-----|--1--|-------|--4--|
+B  |-----|--1--|-------|--4--|
+G  |-----|--1--|--2----|-----|
+D  |-----|--1--|-------|--4--|
+A  |-----|--1--|-------|--R--|
+E  |-----|--1--|-------|--4--|
+```
+
+**Connecting the boxes — the full neck view:**
+
+```
+e  |--5--|--8--|--10--|--12--|--15--|--17--|
+B  |--5--|--8--|--10--|--12--|--15--|--17--|
+G  |--5--|--7--|--9---|--12--|--14--|--17--|
+D  |--5--|--7--|--10--|--12--|--14--|--17--|
+A  |--5--|--7--|--10--|--12--|--14--|--17--|
+E  |--5--|--8--|--10--|--12--|--15--|--17--|
+      B1   B2    B3    B4    B5    B1+oct
+```
+
+---
+
+### 3.4 Three-Note-Per-String Patterns (Speed & Legato)
+
+Three-note-per-string (3NPS) distributes scale notes evenly: 3 notes per string, 2 strings per octave. It enables faster alternate picking and fluid legato runs because each string uses the same rhythmic grouping.
+
+**G Major 3NPS — starting on 6th string, 3rd fret**
+
+```
+e  |--2--|--4--|--5--|
+B  |--2--|--3--|--5--|
+G  |--2--|--4--|--5--|
+D  |--2--|--4--|--5--|
+A  |--2--|--3--|--5--|
+E  |--2--|--3--|--5--|
+```
+
+Finger assignment per string: 1-2-4 (most strings) or 1-3-4 where stretch applies.
+
+> **G-B Compensation:** On the B string, the pattern shifts 1 fret lower than you'd expect from pure arithmetic. In the diagram above, B string reads 2-3-5 (not 3-4-6) — that's the compensation built in.
+
+---
+
+## 4. Modal Shapes with Characteristic Tones Marked
+
+Understanding which note defines each mode's personality tells you exactly which notes to target in improvisation.
+
+```mermaid
+graph TD
+    subgraph sub_mode_identities ["Modal Identity — Characteristic Tones vs. Major/Minor"]
+        ION["Ionian (Major)<br/>W-W-H-W-W-W-H<br/>Characteristic: M7 (bright, resolved)"]
+        DOR["Dorian<br/>W-H-W-W-W-H-W<br/>★ Characteristic: M6 (minor but bright)"]
+        PHR["Phrygian<br/>H-W-W-W-H-W-W<br/>★ Characteristic: b2 (dark, Spanish)"]
+        LYD["Lydian<br/>W-W-W-H-W-W-H<br/>★ Characteristic: #4 (dreamy, floating)"]
+        MIX["Mixolydian<br/>W-W-H-W-W-H-W<br/>★ Characteristic: b7 (dominant, bluesy)"]
+        AEO["Aeolian (Nat. Minor)<br/>W-H-W-W-H-W-W<br/>Characteristic: b6 (melancholic)"]
+        LOC["Locrian<br/>H-W-W-H-W-W-W<br/>★ Characteristic: b5 (unstable, avoid as center)"]
+    end
+```
+
+### 4.1 D Dorian — Shape and Characteristic Tone
+
+D Dorian uses the same notes as C major but roots on D. The major 6th (B natural) is what separates it from D Aeolian (which has Bb). Target that B natural prominently.
+
+```
+D Dorian — 10th position (root on 5th string fret 5, also fret 10 on 6th string)
+
+         Fret: 5   7   8   10
+e  |-----|--1--|-----|--3--|--4--|
+B  |-----|--1--|-----|--3--|--4--|    ← B natural is the ★ M6
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|--R--|--2--|-----|--4--|
+A  |-----|--1--|-----|--3--|--4--|
+E  |-----|--1--|-----|--3--|--4--|
+```
+
+**Dorian improv cue:** Play minor pentatonic, then add the major 6th (B) and major 2nd (E). Those two additions shift the sound from generic minor to D Dorian immediately.
+
+### 4.2 G Mixolydian — Shape and Characteristic Tone
+
+G Mixolydian = G major with a flatted 7th (F natural instead of F#). This is the sound of classic rock, country, and funk. Target the F natural on strong beats over a G7 chord.
+
+```
+G Mixolydian — 2nd/3rd position
+
+         Fret: 2   3   5
+e  |-----|--1--|--2--|-----|--4--|
+B  |-----|--1--|--2--|-----|--4--|
+G  |-----|--1--|--2--|-----|--4--|
+D  |-----|--1--|--2--|-----|--4--|
+A  |-----|--1--|--2--|-----|--4--|    ← F♮ at fret 3 is the ★ b7
+E  |-----|--1--|--2--|-----|--4--|
+     F♮   G
+```
+
+**Mixolydian improv cue:** Play the G major pentatonic (G A B D E), then slide in the F natural on beat 1 of a G7 chord. That single note instantly colors the sound.
+
+### 4.3 E Phrygian — Shape and Characteristic Tone
+
+The b2 (F natural over an E root) creates the flamenco/metal sound. It's literally one semitone above the root — a minor second.
+
+```
+E Phrygian — open position (also movable from 12th fret)
+
+         Fret: 0   1   2   3
+e  |--0--|--1--|-----|--3--|
+B  |--0--|--1--|-----|--3--|
+G  |--0--|-----|--2--|-----|
+D  |--0--|--1--|-----|--3--|
+A  |-----|--1--|--2--|-----|    ← F♮ fret 1 is the ★ b2
+E  |--0--|--1--|-----|--3--|
+      E   F♮
+```
+
+---
+
+## 5. Essential Practice Drills
+
+### 5.1 Hand Mechanics First
+
+Before running any scale at speed, establish clean mechanics:
+
+- **Curved fingers:** Fingertips contact strings, not pads. Arch over adjacent strings to avoid muting.
+- **Thumb position:** Thumb behind middle finger on the back of the neck, roughly parallel to the frets.
+- **Wrist angle:** Slight forward rotation (supination) keeps the wrist clear of the neck edge. No bent-wrist death-gripping.
+- **Minimum pressure:** Use just enough force to fret cleanly. Test by gradually releasing pressure until the note buzzes, then apply the minimum beyond that.
+- **Prepared fingers:** The next finger hovers and descends *as* the current finger lands — no lifting and replacing.
+
+### 5.2 Drill 1 — Single-Position Clean Execution
+
+Target: G major, Box 1 (E shape, frets 2-5).
+
+**Phase 1 — Synchronization (60 BPM, quarter notes)**
+- Pick every note with strict alternate picking: down-up-down-up.
+- One note per click. Ascend fully, descend fully.
+- If any note buzzes or sounds muted, stop and fix finger placement before continuing.
+
+**Phase 2 — Eighth notes (60 BPM = 120 notes/min)**
+- Two notes per click. Maintain even pick strokes.
+- Record yourself and listen back. Timing inconsistencies are easier to hear than feel.
+
+**Phase 3 — Tempo ladder**
+- 60 → 70 → 80 → 90 → 100 → 110 → 120 BPM
+- Only advance when current tempo sounds *effortless*, not just possible.
+- If you rush ahead and get sloppy, drop back two increments.
+
+**Phase 4 — Triplet groupings (70 BPM = triplets at ~210 notes/min)**
+- Three notes per beat emphasizes different scale degrees on downbeats.
+- This is the foundation for 3NPS legato phrasing.
+
+### 5.3 Drill 2 — Connecting Adjacent Boxes
+
+The goal is seamless position shifts — no hesitation, no dead notes during the transition.
+
+**Pivot-note exercise:**
+1. Play Box 1 (G major, E shape) ascending to the top note.
+2. The top note of Box 1 is *also* the first note of Box 2. Use it as the pivot.
+3. Continue ascending in Box 2 (D shape) without pausing.
+4. Descend back through Box 2, pivot at the bottom, return through Box 1.
+
+```
+Box 1 (frets 2-5) → pivot at e-string fret 5 → Box 2 (frets 4-8)
+
+Box 1 top notes:    ...4-5 (e string frets 4-5)
+                              ↕ pivot
+Box 2 bottom notes: 4-5... (e string frets 5-7)
+```
+
+**Tempo targets:** 50 BPM (quarter notes) → 70 BPM → 90 BPM. Prioritize zero dead notes over speed.
+
+### 5.4 Drill 3 — Intervallic Patterns in Scale
+
+Playing scales in diatonic intervals builds melodic vocabulary and trains the ear to hear harmony inside a single-note line.
+
+**Thirds (skip one scale degree):**
+```
+G major ascending in thirds from low E:
+
+G-B, A-C, B-D, C-E, D-F#, E-G, F#-A...
+
+Tab (starting 3rd fret, 6th string):
+e  |-----|-----|-----|-----|
+B  |--2--|--3--|--5--|-----|
+G  |-----|--2--|--4--|--5--|
+D  |-----|--2--|--4--|--5--|
+A  |--2--|--3--|--5--|-----|
+E  |--3--|--5--|-----|-----|
+     G-B  A-C  B-D  C-E...
+```
+
+**Sixths (skip four scale degrees):**
+```
+e  |--2--|--4--|--5--|--7--|
+B  |-----|-----|-----|-----|
+G  |-----|-----|-----|-----|
+D  |-----|-----|-----|-----|
+A  |--2--|--3--|--5--|--7--|
+E  |-----|-----|-----|-----|
+     G-E  A-F# B-G  C-A
+```
+
+**Tempo for intervallic drills:** Start 50 BPM (quarter notes). The mental demand is higher than straight scales, so give the brain time to process.
+
+### 5.5 Drill 4 — Sequence Patterns
+
+Sequences impose rhythmic and melodic structure on a scale, training the fingers to execute *musical* phrases, not just up-down runs.
+
+**Sequence 1 — Ascending triads (groups of 3, step up 1 each time)**
+
+```
+G major: G-A-B, A-B-C, B-C-D, C-D-E, D-E-F#, E-F#-G, F#-G-A...
+
+Tab fragment (starting Box 1, 6th string):
+E  |--3--5--7--|--5--7--8--|--7--8--10-|...
+      G  A  B    A  B  C    B  C   D
+```
+
+Play as triplets at 60 BPM. Each group of 3 starts on a new downbeat.
+
+**Sequence 2 — Four-note enclosure (1-2-3-1, 2-3-4-2...)**
+
+```
+G-A-B-G, A-B-C-A, B-C-D-B, C-D-E-C...
+
+This pattern sits naturally in 16th notes at 70-90 BPM.
+```
+
+**Sequence 3 — Reverse 4s (descending groups of 4)**
+
+```
+G: ...E-D-C-B, D-C-B-A, C-B-A-G
+Sounds like classic rock shredding because every group resolves downward.
+```
+
+### 5.6 Drill 5 — Modal Target Practice
+
+This drill trains your ear to hear modal color, not just run a pattern.
+
+**Setup:** Get a drone or static backing track on the target root (e.g., D for D Dorian). A simple looped power chord or single bass note works fine.
+
+**Procedure:**
+1. Play the full D Dorian scale slowly (D-E-F-G-A-B-C-D).
+2. Hover on the characteristic note (B natural, the M6) for two full beats. Listen.
+3. Build a 4-bar phrase that *begins and ends on D*, with the B natural landing on beat 1 or beat 3 of a bar at least once.
+4. Add the minor 3rd (F) on a weak beat as a passing tone — it spices without destabilizing.
+
+```
+Example D Dorian phrase (over D drone, 4/4):
+
+Beat: 1  +  2  +  3  +  4  +  | 1  +  2  +  3  +  4  +  |
+      D     F     A     F       G     B     A     G     D
+      R     b3    5     b3      4   ★M6    5     4     R
+
+Tab (D at 5th fret, A string):
+A |--5-----|--8--|--7--|--8-----|-----|
+D |--------|-----|-----|--------|--7--|--5--|
+              F    A    F          G    B       (B = M6 ★)
+```
+
+Repeat this process for each mode: same structure, different characteristic tone target.
+
+### 5.7 Drill 6 — Pentatonic to Diatonic Expansion
+
+This bridges the gap between the safety of pentatonic playing and full modal fluency.
+
+**Step 1:** Play A minor pentatonic Box 1 freely over an Am backing track. Get comfortable.
+
+**Step 2:** Add *one* note — the major 2nd (B, fret 7 on A string). This turns the pentatonic into a 6-note scale (A-B-C-D-E-G). Notice how B adds melodic color without disrupting the minor feel.
+
+**Step 3:** Add the major 6th (F#, fret 9 on A string). Now you have A Dorian. The minor pentatonic is still the backbone — you're just accessing two additional tones.
+
+**Step 4:** Swap the F# for F natural (fret 8). Now you have A Aeolian. Compare how the two 6ths (F vs. F#) feel against the A root.
+
+```
+Pentatonic → Dorian expansion (A, Box 1 area, 5th position):
+
+Pentatonic:  A  C  D  E  G
+Add B:       A  B  C  D  E  G     (6-note)
+Add F#:      A  B  C  D  E  F#  G (A Dorian)
+Swap F♮:     A  B  C  D  E  F   G (A Aeolian)
+
+Fret positions (A string as root reference):
+A: 5th fret
+B: 7th fret  ← add first
+C: 8th fret
+D: 10th fret
+E: 12th fret
+F: 13th fret (Aeolian b6)
+F#:14th fret (Dorian M6 ★)
+G: 15th fret
+```
+
+---
+
+## 6. Putting It Together — Improvisation Framework
 
 ```mermaid
 flowchart TD
-    subgraph sub_c_major_scale_positions ["C Major Scale Positions"]
-        A["Fret 3 on 6th string:<br/>G note"] 
-        B["Fret 5 on 6th string:<br/>A note"]
-        C["Fret 7 on 6th string:<br/>B note"]
-        D["Fret 8 on 6th string:<br/>C note"]
+    subgraph sub_improv_decision_tree ["Modal Improvisation Decision Tree"]
+        A["What chord or key center is playing?"]
+        A -->|"Major chord (I)"| B["Ionian or Lydian<br/>Safe: major pentatonic + M7<br/>Color: add #4 for Lydian lift"]
+        A -->|"Dominant 7th chord (V7)"| C["Mixolydian<br/>Safe: major pentatonic + b7<br/>Color: target b7 on strong beats"]
+        A -->|"Minor chord (ii or vi)"| D["Dorian or Aeolian<br/>Bright minor: Dorian (M6)<br/>Dark minor: Aeolian (b6)"]
+        A -->|"Minor chord with b2 in bass"| E["Phrygian<br/>Target b2 immediately — it defines the sound"]
+        A -->|"Major chord with #11 feel"| F["Lydian<br/>Sustain the #4 — let it float"]
+        A -->|"Half-diminished chord (vii°)"| G["Locrian<br/>Avoid as tonal center — use as passing color only"]
     end
-    
-    subgraph sub_modal_interpretation ["Modal Interpretation"]
-        E["G Mixolydian<br/>(5th mode)"]
-        F["A Aeolian<br/>(6th mode)"]
-        G["B Locrian<br/>(7th mode)"]
-        H["C Ionian<br/>(1st mode)"]
-    end
-    
-    A --> E
-    B --> F
-    C --> G
-    D --> H
 ```
 
-The modal approach requires mental reframing: the finger pattern remains constant, but the harmonic function and tonal gravity shift based on which note is treated as the root. This is analogous to basis transformation in linear algebra—the underlying vector space (pitch space) remains invariant, but the choice of basis (modal root) changes the coordinate representation.
+### 6.1 Chord-Scale Pairing Reference
 
-### 2.4 Pentatonic Scales as Sparse Encodings
+| Chord Type | Best Scale | Characteristic Note | Avoid |
+|---|---|---|---|
+| Cmaj7 | C Ionian or C Lydian | M7 (B) or #4 (F#) | b7 |
+| G7 | G Mixolydian | b7 (F) | M7 |
+| Dm7 | D Dorian | M6 (B) | M7 |
+| Am7 | A Aeolian | b6 (F) | M6 (unless Dorian) |
+| E7sus4 | E Phrygian | b2 (F) | M2 |
+| Fmaj7#11 | F Lydian | #4 (B) | P4 |
+| Bm7b5 | B Locrian | b5 (F) | Treat as passing chord |
 
-The pentatonic scale omits the 4th and 7th degrees of the major scale, creating a five-note structure: 0-2-4-7-9-12 (major pentatonic) or 0-3-5-7-10-12 (minor pentatonic). This sparse encoding eliminates the most dissonant intervals (minor second and tritone), producing a scale that is nearly universally consonant.
+### 6.2 Five-Minute Daily Practice Routing
+
+This is a sustainable, results-producing routine that covers all the technical bases:
 
 ```
-Minor Pentatonic (A minor): A-C-D-E-G
-Pattern (5th fret, 6th string root):
-
-e|--5--8--|
-B|--5--8--|
-G|--5--7--|
-D|--5--7--|
-A|--5--7--|
-E|--5--8--|
+Minute 1    — Single-position scale, slow and clean (60 BPM, full Box 1 ascend/descend)
+Minute 2    — Intervallic drill: same box in diatonic thirds (70 BPM)
+Minute 3    — Sequence pattern: ascending triads or reverse 4s (60 BPM)
+Minute 4    — Position connection: Boxes 1-2 pivot exercise (50 BPM)
+Minute 5    — Modal target practice over drone: 2 bars each of characteristic tone hovering
 ```
 
-The pentatonic scale's consonance derives from its structure: every interval formed between scale degrees is either a major second, minor third, major third, perfect fourth, perfect fifth, or their inversions/compounds. Tritones and minor seconds are absent, making it robust for improvisation—any two pentatonic notes can be played simultaneously without severe dissonance.
+Rotate the target scale each day: Day 1 G major, Day 2 A minor, Day 3 D Dorian, Day 4 G Mixolydian. Full rotation every four days.
 
-This property makes pentatonic scales ubiquitous across cultures. From blues to Chinese traditional music to sub-Saharan African music, pentatonic structures appear independently, suggesting that the five-note framework represents a cognitive attractor in auditory pattern recognition.
+---
 
-### 2.5 Biomechanics and Technique Optimization
+## 7. Common Problems and Fixes
 
-Efficient scale execution requires biomechanical optimization. The hand operates as a kinematic chain with constraints:
+| Problem | Cause | Fix |
+|---|---|---|
+| Scale sounds "off" on B and e strings | Forgetting the G-B major 3rd shift | Move the pattern 1 fret lower when crossing from G to B string |
+| Notes buzz on ring/pinky | Shared tendon between fingers 3-4 pulling finger off fret | Slow to 40 BPM; isolate ring-pinky trill exercise 2 min/day |
+| Position shifts sound hesitant | No pivot note identified | Mark the common tone between boxes; always shift *on* that note |
+| Modes sound identical | Playing patterns, not targeting characteristic tones | Use the drone drill (§5.6); make the characteristic note land on beat 1 |
+| Speed plateau around 100 BPM | Motor program not consolidated | Drop to 80 BPM for a week, then re-approach. Consolidation, not repetition, breaks plateaus |
+| Picking and fretting out of sync | Hands not starting together | Slow to 50 BPM; click metronome on beats 2 and 4 (backbeat) only. Forces you to feel the beat, not follow it |
 
-1. **Finger independence**: The tendons controlling fingers 3 and 4 (ring and pinky) share anatomical connections, limiting independent movement.
-2. **Span limitations**: Most players can comfortably span four frets without shifting; five-fret stretches require specific training.
-3. **Angular constraints**: The wrist angle affects force transmission and fatigue; excessive ulnar or radial deviation increases injury risk.
+---
 
-Optimal technique minimizes unnecessary motion. The principles:
+## 8. Next Steps
 
-- **Economy of motion**: Use the smallest movement required to reach the next note.
-- **Prepared fingers**: Fingers should anticipate upcoming notes, hovering above the next fret before descending.
-- **Relaxed tension**: Only apply the minimum force required to fret cleanly; excess tension accumulates fatigue.
+Once G major boxes, A minor Dorian/Aeolian, and all five pentatonic positions are fluid at 100+ BPM, the natural progression is:
 
-For fast alternate picking (down-up-down-up), synchronization between fretting and picking hands is critical. Asynchrony greater than approximately 10-15ms becomes perceptible as sloppiness. Metronome practice develops temporal precision in motor programs stored in the cerebellum and basal ganglia.
+- **Harmonic minor** (natural minor with raised 7th) — adds exotic tension, essential for metal and flamenco. Same CAGED framework, shifted b7 becomes M7.
+- **Melodic minor** (ascending: raise b6 and b7; classical descends as natural minor) — jazz and fusion cornerstone. Generates Lydian Dominant and other powerful altered sounds.
+- **Symmetrical scales** — whole tone (all M2 intervals), diminished (alternating W-H), and augmented. These don't fit the CAGED system neatly; they have their own repeating 3-fret or 4-fret patterns.
+- **Arpeggios over scales** — superimposing chord arpeggios inside a scale position is what separates scalar playing from genuine melodic construction. Learn triad and 7th chord arpeggio shapes inside each CAGED box.
+- **Outside playing** — once a mode feels like home, deliberately play a half-step *above* the target note before resolving. Controlled chromaticism requires deep internalization of "inside" first.
 
-```rust
-// Pseudocode model for biomechanical efficiency scoring
-
-struct HandPosition {
-    fret: u8,
-    string: u8,
-    finger: u8,
-}
-
-fn calculate_transition_cost(from: &HandPosition, to: &HandPosition) -> f32 {
-    let fret_distance = (to.fret as i16 - from.fret as i16).abs() as f32;
-    let string_distance = (to.string as i16 - from.string as i16).abs() as f32;
-    
-    // Cost components
-    let position_shift_cost = if fret_distance > 4.0 { 
-        fret_distance * 2.0  // High cost for position shifts
-    } else { 
-        fret_distance * 0.5  // Low cost for within-position movement
-    };
-    
-    let string_crossing_cost = string_distance * 0.3;
-    
-    // Penalize finger independence violations (ring-pinky coordination difficulty)
-    let finger_independence_penalty = if (from.finger == 3 && to.finger == 4) ||
-                                          (from.finger == 4 && to.finger == 3) {
-        if from.string == to.string { 1.5 } else { 0.5 }
-    } else {
-        0.0
-    };
-    
-    position_shift_cost + string_crossing_cost + finger_independence_penalty
-}
-
-fn optimize_fingering(scale: &[u8], root_position: HandPosition) -> Vec<HandPosition> {
-    // Dynamic programming approach to find minimum-cost fingering path
-    // (Implementation would use Dijkstra's algorithm or similar pathfinding)
-    // Returns sequence of hand positions that minimizes total transition cost
-    vec![]  // Placeholder
-}
-```
-
-### 2.6 Advanced Scale Visualization: Interval Content Analysis
-
-Understanding scale construction at the interval level reveals deeper structural properties. For any scale, construct the interval vector—a histogram of all interval classes present:
-
-For C major: C-D-E-F-G-A-B
-- Minor 2nd: 0 instances
-- Major 2nd: 5 instances (C-D, D-E, F-G, G-A, A-B)
-- Minor 3rd: 2 instances (E-G, A-C)
-- Major 3rd: 3 instances (C-E, F-A, G-B)
-- Perfect 4th: 4 instances (C-F, D-G, E-A, G-C)
-- Tritone: 1 instance (F-B)
-- Perfect 5th: 4 instances (inverse of 4ths)
-
-Modes of the same parent scale share identical interval vectors but differ in which intervals are formed relative to the tonic. This explains why modes have distinct harmonic flavors despite containing the same notes—the relationship between the root and other scale degrees changes.
-
-```mermaid
-graph TD
-    subgraph sub_c_major_interval_content ["C Major Interval Content"]
-        Root["Tonic: C"]
-        Root -->|"Major 2nd"| A["D: 2 semitones"]
-        Root -->|"Major 3rd"| B["E: 4 semitones"]
-        Root -->|"Perfect 4th"| C["F: 5 semitones"]
-        Root -->|"Perfect 5th"| D["G: 7 semitones"]
-        Root -->|"Major 6th"| E["A: 9 semitones"]
-        Root -->|"Major 7th"| F["B: 11 semitones"]
-    end
-    
-    subgraph sub_d_dorian_interval_content__same ["D Dorian Interval Content (same notes, different root)"]
-        Root2["Tonic: D"]
-        Root2 -->|"Major 2nd"| A2["E: 2 semitones"]
-        Root2 -->|"Minor 3rd"| B2["F: 3 semitones"]
-        Root2 -->|"Perfect 4th"| C2["G: 5 semitones"]
-        Root2 -->|"Perfect 5th"| D2["A: 7 semitones"]
-        Root2 -->|"Major 6th"| E2["B: 9 semitones"]
-        Root2 -->|"Minor 7th"| F2["C: 10 semitones"]
-    end
-    
-    style B2 fill:#ffcccc
-    style F2 fill:#ffcccc
-```
-
-The Dorian mode's characteristic sound comes from its minor 3rd and major 6th relative to the root—a combination not found in natural minor (Aeolian), which has a minor 6th.
-
-## 3. Practice Applications and Advanced Techniques
-
-### 3.1 Systematic Scale Practice Methodology
-
-Efficient scale mastery requires structured, progressive practice:
-
-1. **Single-position mastery**: Learn one scale pattern in one position until it can be executed cleanly at 60 BPM, then gradually increase tempo in 5 BPM increments to target speed (120-140 BPM for most players).
-
-2. **Position shifting**: Practice transitioning between adjacent CAGED positions, using common tones as pivot points.
-
-3. **Intervallic practice**: Play scales in intervals (thirds, fourths, sixths) to develop melodic fluency and ear training simultaneously.
-
-4. **Sequence patterns**: Apply systematic patterns such as:
-   - 1-2-3, 2-3-4, 3-4-5... (ascending triads)
-   - 1-2-3-1, 2-3-4-2, 3-4-5-3... (enclosure patterns)
-   - 1-3-2-4, 2-4-3-5... (leaping intervals)
-
-5. **Harmonic integration**: Play scales over backing tracks in the target key, focusing on resolving phrases to chord tones on strong beats.
-
-```python
-def generate_interval_exercise(scale: list[int], interval: int) -> list[tuple[int, int]]:
-    """
-    Generate scale practice pattern in specified intervals.
-    
-    Args:
-        scale: List of scale degrees (e.g., [0,2,4,5,7,9,11,12])
-        interval: Interval size in scale degrees (e.g., 3 for thirds)
-    
-    Returns:
-        List of note pairs forming the specified interval
-    """
-    pairs = []
-    for i in range(len(scale) - interval + 1):
-        pairs.append((scale[i], scale[i + interval - 1]))
-    return pairs
-
-# Example: C major scale in thirds
-c_major = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24]
-thirds = generate_interval_exercise(c_major, 3)
-
-print("C Major Scale in Thirds:")
-for note1, note2 in thirds:
-    print(f"Interval: {note1} - {note2}")
-```
-
-### 3.2 Modal Improvisation Strategies
-
-Modal improvisation requires understanding the characteristic tones that define each mode's identity:
-
-- **Dorian**: Major 6th (raised 6th compared to natural minor)
-- **Phrygian**: Minor 2nd (flattened 2nd compared to natural minor)
-- **Lydian**: Augmented 4th (raised 4th compared to major)
-- **Mixolydian**: Minor 7th (flattened 7th compared to major)
-- **Locrian**: Diminished 5th (flattened 5th)
-
-Effective modal playing emphasizes these characteristic intervals by:
-1. Beginning and ending phrases on the tonic
-2. Landing on characteristic tones on strong beats
-3. Using the characteristic intervals melodically (e.g., in Lydian, melodic movement from root to #4 emphasizes the mode)
-4. Avoiding extensive use of notes that belong to other modes sharing the same tonic
-
-### 3.3 Polymodal and Outside Playing
-
-Advanced improvisers superimpose modes from different parent scales over the same harmonic background, creating tension and chromaticism. For example, over a C major chord, one might play:
-- C Lydian (characteristic #4)
-- C major pentatonic (safe, consonant foundation)
-- C Mixolydian (introduces b7 for bluesy flavor)
-- C harmonic major (major scale with b6, exotic sound)
-
-The principle is controlled dissonance: introducing notes outside the underlying harmony creates tension that resolves when returning to consonant chord tones. This requires deep internalization of scale patterns and strong harmonic awareness to target and resolve tensions appropriately.
-
-## 4. Conclusion and Next Steps
-
-Scales and modes represent the mathematical and acoustic foundations of melodic construction on the guitar. Mastery requires understanding both the theoretical underpinnings—harmonic series, interval ratios, modal structures—and the practical biomechanics of executing patterns efficiently across the fretboard. The CAGED system provides a comprehensive map of the neck, while modal thinking enables sophisticated harmonic and melodic expression.
-
-Further study should explore:
-- Harmonic minor and melodic minor scale systems
-- Symmetrical scales (whole-tone, diminished, augmented)
-- Non-Western scale systems (maqamat, ragas, Japanese scales)
-- Chord-scale relationships and jazz theory
-- Integration of scales with arpeggios for comprehensive fretboard visualization
-
-The goal is not merely technical facility but musical fluency—the ability to translate musical ideas directly into physical execution without conscious calculation. This fluency emerges from sustained, deliberate practice that integrates theoretical understanding, physical technique, and musical expression.
+The technical goal of this lesson is not to memorize 35 scale diagrams. It's to hear a chord, know immediately which scale colors are available, find any root on the neck, and start building musical phrases from there. That loop — hear → identify → locate → phrase — is what transforms scale practice into guitar playing.
