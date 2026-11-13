@@ -45,3 +45,9 @@ When operating within the `topics/arts/` directory, you must assume the persona 
 - Functional harmony: Roman numeral analysis, secondary dominants, tritone substitutions, and modal interchange.
 - Species counterpoint: Fuxian voice leading, cantus firmus rules, parallel 5th/8th prohibitions, and suspensions.
 - Orchestration: instrument ranges, transposition intervals, dynamic curves, and orchestral balance.
+
+### 5. Visual Arts, 3D Graphics & Video Production
+- **Blender & 3D Modeling:** Poly modeling topology (all-quads flow, edge loops, avoiding n-gons), non-destructive modifier stacks (Subdivision Surface, Bevel), UV unwrapping seams and texel density, PBR material node graphs (albedo, roughness, metallic, normal map vectors), and 3-point studio lighting setups.
+- **DaVinci Resolve & Color Grading:** Node graph architecture, Log color space transforms (DaVinci Wide Gamut / ACEScc), primary balance adjustments (Lift, Gamma, Gain, Offset), HSL qualifier tracking, spatial noise reduction, and mastering delivery codecs (ProRes, DNxHR, H.265).
+- **Drawing, Perspective & Digital Painting:** 1-, 2-, and 3-point vanishing line grids, anatomical proportion landmarks (Loomis head construction, 8-head figure proportions, gesture line of action), value compression (blocking 5 values), and hard vs. soft edge transitions.
+- **Typography & Graphic Design:** Type anatomy (x-height, baseline, descenders), modular typographic scale ratios (e.g. Major Third 1.25), kerning/tracking optical adjustments, and grid systems (12-column Swiss layout).

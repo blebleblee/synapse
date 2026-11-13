@@ -5,20 +5,28 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
 echo "=================================================="
-echo " 🚀 SYNAPSE DUAL PIPELINE: ARTS -> FRONTIER COMPUTING"
+echo " 🚀 SYNAPSE TRIPLE PIPELINE: ARTS ENHANCE -> ARTS EXPAND -> FRONTIER COMPUTING"
 echo "=================================================="
 
-# Phase 1: Arts Masterclass Enhancement (33 topics)
+# Phase 1A: Arts Masterclass Enhancement (33 existing music topics)
 echo ""
-echo "[*] [Phase 1/2] Enhancing Arts domain (33 topics) with Claude Opus 5.5..."
+echo "[*] [Phase 1A/3] Enhancing Arts domain (33 topics) with Claude Opus 5.5..."
 python3 scripts/generate_all.py --domain arts --enhance
 
 echo ""
-echo "[✔] Phase 1 Complete: All Arts topics enhanced and published to Gitea!"
+echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published to Gitea!"
 
-# Phase 2: Frontier Computing Generation (94 unwritten topics)
+# Phase 1B: Generate Unwritten Arts Topics (34 missing visual arts, 3D graphics, and modular audio topics)
 echo ""
-echo "[*] [Phase 2/2] Generating Frontier & Software Computing topics (94 topics)..."
+echo "[*] [Phase 1B/3] Generating unwritten Arts topics (34 courses: Blender, DaVinci, Modular Synthesis, ZBrush)..."
+python3 scripts/generate_all.py --domain arts
+
+echo ""
+echo "[✔] Phase 1B Complete: All 34 missing Arts topics generated and published!"
+
+# Phase 2: Frontier Computing Generation (117 unwritten topics)
+echo ""
+echo "[*] [Phase 2/3] Generating Frontier & Software Computing topics (117 courses: Quantum, Swarms, Web3, Cilium, ArgoCD)..."
 python3 scripts/generate_all.py --domain computing
 
 echo ""
@@ -27,4 +35,4 @@ echo "[✔] ALL PIPELINE PHASES COMPLETE!"
 echo "=================================================="
 
 # Trigger macOS notification chime
-osascript -e 'display notification "Arts enhancement and Frontier Computing generation complete!" with title "Synapse Pipeline" sound name "Glass"' 2>/dev/null || true
+osascript -e 'display notification "All Arts and Frontier Computing topics generated successfully!" with title "Synapse Pipeline" sound name "Glass"' 2>/dev/null || true
