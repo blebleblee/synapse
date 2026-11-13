@@ -1,714 +1,657 @@
-# Operational Verification Labs: 01 — Technique and Fretboard Mechanics
+# Bass Guitar Masterclass — Lab 01: Technique and Fretboard Mechanics
 
-## Preface: Why Mechanics Precede Music
+## Why Mechanics Come First
 
-Bass guitar occupies a singular structural role in Western tonal music: it simultaneously anchors harmonic root motion and defines rhythmic pulse. Unlike guitar or piano, where both hands share melodic and harmonic duties, the bassist operates at the intersection of the rhythm section and the harmony. Every physical mechanic — where your thumb rests, how much finger pad contacts the string, the angle of attack during slap — has direct and measurable acoustic consequences. This lab treats those mechanics as engineering problems with physical first principles, not stylistic preferences to be discovered by feel alone.
+The bass guitar sits at the intersection of rhythm and harmony. Your low E fundamental at 41 Hz locks with the kick drum; your root motion defines what every chord above you means to the listener. Unlike guitar or piano — where both hands share melody, harmony, and color — the bassist makes one binary decision on every note: *is this anchoring the pulse, or is it voice-leading toward the next chord?* Every physical choice you make feeds that decision.
 
-Understanding *why* a technique produces a given sound requires grounding in the underlying physics: string vibration modes, the relationship between contact point and harmonic content, how wood density and bridge mass affect sustain. This material develops that understanding systematically. The exercises are not rote drills; they are structured experiments designed to build a mental model of the instrument that persists across all musical contexts.
+This lab treats your hands as precision instruments with specific mechanical constraints. Thumb angle, palm contact distance from the bridge, the exact joint that strikes the string during slap — these are not stylistic preferences. They are physical parameters with measurable acoustic consequences. We will measure them.
 
 ---
 
-## Lab Setup and Prerequisite Knowledge
+## Gear Setup
 
-### Instrument Requirements
+### What You Need
 
-**Electric bass guitar** (4-string, standard scale 34 inches / 864 mm) is the primary instrument for all exercises. A 34-inch scale length is used as the reference point for all fret distance calculations in this lab. Short-scale (30 inches) and medium-scale (32 inches) instruments are acoustically equivalent in pitch, but the reduced string tension alters left-hand technique — specifically, the force required for clean fretting.
-
-**Acoustic/electric bass** is acceptable for Exercises 1 and 2. Exercise 3 (slap/pop) requires amplification to accurately assess tonal variation; an acoustic instrument does not project adequately for comparative analysis.
-
-### Toolchain
-
-| Tool | Purpose | Recommended Options |
+| Item | Purpose | Recommended Options |
 |---|---|---|
-| Chromatic tuner | Reference pitch, intonation verification | TC Electronic PolyTune 3, Peterson StroboStomp HD, or DAW plugin |
-| Metronome | Tempo and subdivision reference | Physical or DAW-integrated click track |
-| Audio interface | Capture dry signal for analysis | Focusrite Scarlett 2i2, Universal Audio Volt 1 |
+| Electric bass (4-string, 34" scale) | Primary instrument | Standard scale is the reference for all fret positions in this lab |
+| Chromatic tuner | Pitch reference and intonation check | TC Electronic PolyTune 3, Peterson StroboStomp HD, or DAW plugin |
+| Metronome | Subdivision reference | Physical click or DAW grid — both work |
+| Audio interface | Capture dry signal | Focusrite Scarlett 2i2, UA Volt 1 |
 | DAW | Waveform, spectrum, and transient analysis | Reaper (free/low cost), Logic Pro, Ableton Live |
-| Spectrum analyzer plugin | FFT-based tone comparison | SPAN by Voxengo (free), FabFilter Pro-Q 3 |
+| Spectrum analyzer | Real-time FFT display | SPAN by Voxengo (free), FabFilter Pro-Q 3 |
 
-### Standard Tuning Reference
+A short-scale (30") or medium-scale (32") bass is acoustically identical in pitch but has lower string tension. This *reduces* the fretting force needed in the first five frets, which changes the proprioceptive feedback you get from these exercises. Use a standard 34" if you have one.
 
-Standard bass tuning (EADG) assigns the following fundamental frequencies to open strings:
+### Standard Tuning (EADG)
 
-| String | Note | Frequency (Hz) | MIDI Note Number |
+Tune before every session. Verify with a strobe tuner if you have one — needle tuners carry ±3 cent accuracy variance, which is audible on sustained notes against a chord track.
+
+| String | Note | Frequency | MIDI # |
 |---|---|---|---|
 | 4 (thickest) | E1 | 41.20 Hz | 28 |
 | 3 | A1 | 55.00 Hz | 33 |
 | 2 | D2 | 73.42 Hz | 38 |
 | 1 (thinnest) | G2 | 98.00 Hz | 43 |
 
-Each fret raises pitch by one equal-tempered semitone, a frequency ratio of 2^(1/12) ≈ 1.0595. The physical fret distance from fret *n* to fret *n+1* decreases logarithmically toward the body. The distance from the nut to fret *n* on a 34-inch scale is given by:
-
-```
-d(n) = scale_length × (1 - 2^(-n/12))
-```
-
-For a 34-inch scale, the distance from nut to fret 5 is:
-
-```
-d(5) = 34 × (1 - 2^(-5/12))
-     = 34 × (1 - 0.7491)
-     = 34 × 0.2509
-     ≈ 8.53 inches
-```
-
-This calculation explains why fretting closer to the nut requires greater left-hand reach, and why beginners encounter more intonation problems in the first five frets versus the upper register.
+Each fret raises pitch by one equal-tempered semitone (frequency ratio ≈ 1.0595). Fret spacing decreases logarithmically toward the body — this is why open-position playing demands more left-hand reach than 7th-position playing, and why beginners experience more intonation problems below fret 5.
 
 ---
 
-## Fretboard Architecture: First Principles
+## The Fretboard: What You Are Actually Looking At
 
-### The Equal-Tempered Chromatic Scale
+### Full 4-String Note Map (Frets 0–12)
 
-The 12-tone equal temperament (12-TET) system divides the octave into 12 logarithmically equal semitones. This is a deliberate acoustic compromise: no interval other than the octave is acoustically pure in 12-TET, but all intervals are equally impure, allowing the instrument to play in any key without retuning. The perfect fifth in 12-TET is 700 cents, versus the just-intonation fifth of 701.96 cents — a 1.96-cent deviation that most listeners cannot detect in isolation.
-
-### Full 4-String Fretboard Map (Frets 0–12)
-
-The following diagram maps every note across all four strings for the first 12 frets. Fret 12 reproduces the open string pitch one octave higher, which is why the pattern repeats.
+Memorize this. Everything else in bass playing — scales, arpeggios, walking lines, position shifts — is a navigation problem on this grid.
 
 ```
 Fret:  0    1    2    3    4    5    6    7    8    9    10   11   12
-G2:    G    Ab   A    Bb   B    C    Db   D    Eb   E    F    Gb   G
-D2:    D    Eb   E    F    Gb   G    Ab   A    Bb   B    C    Db   D
-A1:    A    Bb   B    C    Db   D    Eb   E    F    Gb   G    Ab   A
-E1:    E    F    Gb   G    Ab   A    Bb   B    C    Db   D    Eb   E
+G:     G    Ab   A    Bb   B    C    Db   D    Eb   E    F    Gb   G
+D:     D    Eb   E    F    Gb   G    Ab   A    Bb   B    C    Db   D
+A:     A    Bb   B    C    Db   D    Eb   E    F    Gb   G    Ab   A
+E:     E    F    Gb   G    Ab   A    Bb   B    C    Db   D    Eb   E
 ```
 
-The same pitch appears in multiple locations. For example, A2 (110 Hz) is available at:
+**Key insight — multiple positions for the same pitch.** The note A2 (110 Hz) lives at:
 - E string, fret 5
-- A string, open (A1 is 55 Hz — this is A1, not A2; A2 = A string fret 12)
-- D string, fret 7 (this gives A2)
-- G string, fret 2 (this gives A2)
+- A string, fret 12
+- D string, fret 7
+- G string, fret 2
 
-Choosing *which* position to play a given note is a core left-hand decision governed by phrasing, timbre, and shifting economy.
+Choosing *which* position to play is a core left-hand decision. It is governed by phrase direction, tonal color (open strings ring brighter than fretted notes), and hand position economy — where will your hand need to be for the *next* note?
 
-### Fretboard Position Relationships
+### The Moveable Root-Box Pattern
+
+Before learning scales, internalize this five-note box. It gives you the root, octave, and primary chord tones for any key — moveable to any fret.
+
+```
+Root on E string (example: A at fret 5):
+
+E: ——|——|——|——|——|
+A: ——|——|——|——|——|
+D: ——|——|——|——|——|
+G: ——|——|——|——|——|
+       R        Oct
+  Root: A str fret 5 → E string fret 5 (same note, one octave lower... wait)
+```
+
+Let's be precise. Here is the root-box with finger assignments for root on the **A string**, key of **C** (A string fret 3):
+
+```
+String  Fret    Note    Finger    Function
+E       ——      ——      ——        ——
+A        3      C       1         Root
+A        5      D       3         Major 2nd (passing)
+A        6      Eb      4         Minor 3rd (Cm7 chord tone)
+D        3      F       1         Perfect 4th / b7 of G7
+D        5      G       3         Perfect 5th
+G        3      Bb      1         Minor 7th (Cm7 chord tone)
+G        5      C       3         Octave
+```
+
+**Finger assignments use Simandl 1-2-4** in frets 1–5 (index=1, middle=2, pinky=4 — ring finger rests against pinky for support). Use one-finger-per-fret (OFPF) from fret 7 upward where fret spacing has narrowed enough to make four-finger spans comfortable.
+
+### Fretboard Position Architecture
 
 ```mermaid
 graph TD
-    A["E String Fret 5 = A1 (55 Hz)"] --> B["A String Open = A1 (55 Hz)"]
-    B --> C["Same Pitch, Different Timbre"]
-    D["Open string — bright, more sustain, more overtones near nut"] --> C
-    E["Fretted string — slightly darker, fret buzz risk, left-hand control"] --> C
-    C --> F["Selection Criteria"]
-    F --> G["Phrasing / Position Economy"]
-    F --> H["Tonal Color Needed"]
-    F --> I["Upcoming Note Requires Specific Hand Position"]
+    subgraph sub_positions ["Left Hand Position Zones"]
+        P1["Open Position — Frets 0–4\nWidest fret spacing\nSimandl 1-2-4 required\nHigh sympathetic ring risk"]
+        P2["2nd Position — Frets 2–5\nOne shift from open\nBeginners standard zone"]
+        P3["5th Position — Frets 5–8\nOctave pattern center\nFret spacing moderates\nOFPF viable"]
+        P4["7th Position — Frets 7–10\nBlues / pentatonic center\nFull OFPF comfortable"]
+        P5["12th Position — Frets 12+\nOctave = open pitch\nEntire map repeats"]
+    end
+
+    subgraph sub_shift_triggers ["What Triggers a Position Shift"]
+        S1["Next note unreachable in current span"]
+        S2["Phrasing requires open-string color"]
+        S3["Upcoming chord demands different root position"]
+        S4["Walking line approach note is > 4 frets away"]
+    end
+
+    P1 -->|"Shift up when"| S1
+    P2 -->|"Shift up when"| S2
+    P3 -->|"Shift up when"| S3
+    P4 -->|"Shift up when"| S4
 ```
 
 ---
 
-## Exercise 1: Foundational Mechanics
+## Exercise 1: Left-Hand Foundational Mechanics
 
-### 1A — Left-Hand Finger Placement and the Physics of Clean Fretting
+### 1A — Clean Fretting: Where Your Finger Goes and Why
 
-#### Biomechanics of Fretting
+#### The Physics in One Paragraph
 
-The left hand must generate sufficient string displacement to bring the string into firm contact with the fret wire without excessive force. The minimum force required to produce a clean note depends on:
+The string must be displaced far enough to contact the fret wire cleanly. The minimum force to achieve that contact depends on string gauge (heavier = more tension = more force needed), action height (the gap between string and fret), and your finger's position relative to the fret. Placing your fingertip on the **leading edge** of the fret — the body-side wall of the fret slot — maximizes mechanical advantage because you are leveraging the string directly over the contact point, not trying to bow it down from a distance.
 
-1. **String gauge and tension** — heavier strings (e.g., .105 for E) require more force than lighter strings (.045 for G).
-2. **Action height** — the gap between the string and the fret at a given position. High action demands more force; low action risks fret buzz.
-3. **Finger placement relative to the fret** — placing the fingertip as close as possible to the *leading edge* (body side) of the fret wire minimizes the force required, because the mechanical advantage of string deflection is greatest there.
+The mental model: you are not pressing *down* on the string. You are pressing it *forward* into the fret.
 
-The correct position is not "press down" but rather "press forward toward the fret." This distinction matters for two reasons: it reduces muscle fatigue, and it eliminates dead-note artifacts caused by the string vibrating against the fret further down the neck.
+#### Simandl 1-2-4 Fingering (Frets 1–5)
 
-#### One-Finger-Per-Fret (OFPF) Framework
+In open position, the stretch between frets 1 and 4 is roughly 65–75 mm on a 34" scale — too wide for comfortable one-finger-per-fret without risking extensor tendon strain. The Simandl system resolves this:
 
-The standard foundational framework assigns one fretting finger per semitone across four adjacent frets:
+```
+Finger 1 (index)  — covers one fret
+Finger 2 (middle) — covers the adjacent fret
+Finger 4 (pinky)  — covers TWO frets above finger 1
+Ring finger (3)   — rests alongside pinky for lateral support, never frets alone
+```
 
-| Finger | Fret (example, starting at fret 2) |
-|---|---|
-| Index (1) | 2 |
-| Middle (2) | 3 |
-| Ring (3) | 4 |
-| Pinky (4) | 5 |
+Practical example, E string, frets 1–4:
 
-This framework distributes lateral hand stretch evenly. In lower positions (frets 1–5), the stretch between frets is wider due to the logarithmic fret spacing described above, making OFPF more physically demanding than in upper positions (frets 7–12).
+```
+Fret 1 (F1)   → Finger 1
+Fret 2 (F#1)  → Finger 2
+Fret 3 (G1)   → Finger 4 (stretching back one fret)
+Fret 4 (Ab1)  → Finger 4 (now on its natural fret)
+```
 
-#### Exercise Protocol
+Thumb position: centered on the back of the neck, roughly opposite finger 2 (middle finger). Keep your wrist straight — the neck elevation of your strap does most of the work. A sharply bent left wrist is the primary vector for carpal tunnel syndrome on bass.
 
-1. Tune to EADG using a chromatic tuner. Verify each string against its target frequency with a strobe tuner if available, as standard needle tuners have ±3 cent accuracy variance.
-2. With OFPF starting at fret 2, play E string frets 2-3-4-5 ascending, then descending. Use only downstrokes with the right-hand index finger at this stage.
-3. Record a 30-second clip. Load into your DAW and visually inspect the waveform for:
-   - Consistent amplitude across all four notes (indicates even fretting pressure)
-   - Absence of buzz artifacts (sharp transient spikes in the waveform body)
-   - Consistent note duration (indicates rhythm accuracy)
-4. Advance the OFPF starting position to fret 5, then fret 7. Observe how reduced fret spacing in higher positions decreases the stretch demand on the left hand.
+#### Drill — Chromatic Crawl
 
-### 1B — Right-Hand Muting: Technique, Acoustics, and Palm Position
+This is your warm-up for every session and your diagnostic tool today.
 
-#### Why Muting Matters Acoustically
+**Setup:** Metronome at 60 BPM, quarter notes. Play each note for one beat.
 
-An unmuted bass string rings sympathetically when adjacent strings are played, creating harmonic interference that muddies the low-frequency mix. The floating sympathetic resonances at the fundamentals and harmonics of open strings are particularly problematic in a band context because they overlap with kick drum and bass frequencies (40–200 Hz). Professional bass playing requires continuous, unconscious right-hand muting as a default state, not an occasional action.
+```
+Step 1: E string, frets 1-2-3-4, ascending (Simandl 1-2-4-4)
+Step 2: A string, frets 1-2-3-4, ascending
+Step 3: D string, frets 1-2-3-4, ascending
+Step 4: G string, frets 1-2-3-4, ascending
+Step 5: Reverse — G descending, D descending, A descending, E descending
+```
 
-#### Palm Muting: The Physics
+This is one full pass. Do four passes without stopping.
 
-Resting the right-hand palm edge (the hypothenar eminence — the fleshy pad below the pinky) lightly on the strings near the bridge applies a damping force that absorbs string energy into the hand's mass. The position of this contact point relative to the bridge saddle determines the degree of muting:
+**What to listen for:**
+- Every note rings clean with no buzz — if you get buzz, your finger is too far from the fret wire
+- Consistent volume across all four strings — uneven pressure is the most common issue
+- No "dead" notes — if a note thuds instead of rings, an adjacent finger is accidentally touching that string
 
-- **Very close to saddle (< 5 mm):** Minimal damping — primarily removes extreme high-frequency overtones, leaves fundamental intact. Produces a tight, punchy tone.
-- **5–15 mm from saddle:** Moderate damping — reduces sustain, emphasizes fundamental, removes upper harmonics above approximately the 4th partial. This is the standard "palm mute" tone.
-- **> 20 mm from saddle (toward middle of string):** Heavy damping — produces a thuddy, almost percussive tone with very short sustain. Associated with Motown-era upright bass emulation on electric.
+**Advance to frets 5-6-7-8 using OFPF once the 1-4 position is clean.** The reduced fret spacing will feel noticeably easier.
 
-The muting position is a continuous tonal parameter, not a binary mute/unmute switch. Players who understand this exploit the full dynamic range of the technique.
+**Tempo targets:** 60 BPM → 80 BPM → 100 BPM. Only advance when you can complete four full passes without a single buzz or dead note.
 
-#### Right-Hand Thumb Anchor
+---
 
-The right-hand thumb serves a dual purpose: as a muting anchor on the pickup or the low string, and as a pivot point that stabilizes the hand position during finger plucking. The floating thumb technique — where the thumb moves to mute the string just below the one being played — is the professional standard and should be developed from the beginning:
+### 1B — Right-Hand Fingerstyle: Alternating Index-Middle
+
+#### The Mechanics
+
+Right-hand fingerstyle uses the **pad of the index finger (i) and middle finger (m)** alternating on each stroke. The motion is a **pulling stroke toward the palm** — not a downward push. The fingertip catches the string, pulls slightly toward the palm, then the string releases and snaps back against the fretboard.
+
+**Stroke mechanics:**
+- After each stroke, the finger comes to **rest against the string below** (the string toward the floor). This is called the rest stroke (*apoyando*), and it provides a natural muting mechanism for the string you just played.
+- Right-hand thumb anchors on the pickup housing (when playing E string) or floats to the string just below the one being played (floating thumb).
+
+#### The Floating Thumb — Your Automatic Muting System
+
+This is the single most important right-hand technique to develop from the start. The thumb does not stay fixed on the pickup. It follows your playing hand across the strings, always resting on the string one below the one you are playing:
 
 ```mermaid
 graph LR
-    A["Playing G string"] --> B["Thumb anchors on D string"]
-    C["Playing D string"] --> D["Thumb anchors on A string"]
-    E["Playing A string"] --> F["Thumb anchors on E string"]
-    G["Playing E string"] --> H["Thumb anchors on pickup housing"]
+    A["Playing G string\n(thinnest)"] --> B["Thumb rests on D string"]
+    C["Playing D string"] --> D["Thumb rests on A string"]
+    E["Playing A string"] --> F["Thumb rests on E string"]
+    G["Playing E string\n(thickest)"] --> H["Thumb rests on pickup housing"]
 ```
 
-This eliminates sympathetic ringing from lower strings without requiring the player to consciously manage each string independently.
+This eliminates sympathetic ringing from lower (thicker) strings without any conscious effort. An unmuted open E string vibrating sympathetically under a D-string melody line adds 41 Hz mud to your low-frequency mix and clashes with the kick drum in a band context. The floating thumb makes this a non-issue.
 
-#### Exercise Protocol
+#### Drill — Two-Finger Alternation, Single String
 
-1. Play a quarter-note pulse on E string, fret 5 (A1) at 60 BPM. Keep thumb on pickup.
-2. Record. Listen for sympathetic ring on A, D, G strings in the sustain portion of each note.
-3. Reposition thumb to float on E string. Play the same pulse on A string, fret 5 (D2). Record.
-4. Advance to playing a two-string pattern: E string fret 5, A string fret 5, alternating. Each time you move to a higher string, the thumb drops to mute the string below. Verify with recording that no sympathetic ring persists.
+**60 BPM, quarter notes. E string, open.**
 
-### 1C — Walking Bass Lines: Harmonic and Voice-Leading Architecture
+```
+Beat:    1    2    3    4    1    2    3    4
+Finger:  i    m    i    m    i    m    i    m
+```
 
-#### What a Walking Bass Line Actually Does
+Then move to the OFPF chromatic crawl from 1A, but now use strict i-m alternation. The goal is that you never pluck the same finger twice in a row. This takes conscious effort at first. At 80 BPM it will begin to feel automatic.
 
-A walking bass line is not a melody played on the bass, nor is it arbitrary. It is a voice-leading structure that fulfills three simultaneous functions:
+**Common error:** Starting a phrase or returning from a rest with the same finger every time. Record yourself and check — if your hand naturally resets to index on every beat 1, you are not building true alternation independence.
 
-1. **Root confirmation** — typically establishes the chord root on beat 1, anchoring the harmony for the listener.
-2. **Chromatic approach** — uses chromatic passing tones, diatonic approach notes, and chord-tone arpeggiation to create forward momentum toward the next chord's root.
-3. **Rhythmic subdivison** — the quarter-note pulse of a walking line in a jazz context locks with the ride cymbal and defines the tempo's internal subdivision.
+---
 
-The classic four-beat walking pattern over a single chord follows this construction logic:
+### 1C — Right-Hand Muting: Palm Position Is a Tonal Parameter
+
+#### Why Muting Is Not Binary
+
+Most beginners treat palm muting as "muted vs. not muted." Professional players treat it as a continuous knob that shapes the harmonic content of every note. The position of your palm edge (the **hypothenar eminence** — the fleshy pad below your pinky) relative to the bridge saddle determines which harmonic partials are attenuated:
+
+| Palm Distance from Bridge | Spectral Effect | Practical Sound |
+|---|---|---|
+| No contact | Full harmonic series, full sustain | Melodic solo lines |
+| 2–5 mm from saddle | Slight top-end reduction, full fundamental intact | Standard fingerstyle punch |
+| 5–15 mm from saddle | Reduced sustain, strong fundamental, upper harmonics cut | Funk/R&B pocket groove |
+| 20–30 mm from saddle | Short sustain, thuddy fundamental, most harmonics gone | Motown upright-emulation |
+| 50+ mm (mid-string) | Percussive thud, almost no pitch definition | Special effect |
+
+This relationship is monotonically consistent: every step toward the neck removes progressively lower harmonics. You can hear it in real time with SPAN on your DAW.
+
+#### Drill — Muting Spectrum Walk
+
+Set SPAN in your DAW to display 20–5000 Hz. Play A string fret 5 (D2, 73 Hz) with a consistent picking force at each palm position listed above. Hold each position for 4 beats at 60 BPM. Watch the spectrum change in real time.
+
+After you can hear the difference clearly, record each position separately and label the files `no_mute.wav`, `palm_5mm.wav`, `palm_15mm.wav`, `palm_25mm.wav`. You will use these in Exercise 2A.
+
+---
+
+### 1D — Walking Bass Lines: Voice Leading in Four Beats
+
+#### What a Walking Line Actually Is
+
+A walking bass line is a **voice-leading structure**, not a scale run. It has three jobs simultaneously:
+
+1. **Confirm the chord root on beat 1** — this is non-negotiable in jazz and most funk contexts
+2. **Arpeggiate chord tones on beats 2 and 3** — establishing the chord identity
+3. **Approach the next chord's root by semitone on beat 4** — this chromatic leading tone creates forward harmonic momentum
+
+The four-beat blueprint:
 
 ```
 Beat 1: Root (R)
-Beat 2: 3rd or 5th of the chord (chord tone)
-Beat 3: Chromatic or diatonic passing note toward beat 4 target
-Beat 4: Leading tone (semitone above or below) the next chord's root
+Beat 2: 3rd or 5th of the chord
+Beat 3: Diatonic or chromatic passing note
+Beat 4: Chromatic leading tone to next chord's root (semitone above or below)
 ```
 
-#### Chord Tones for the Exercise Progressions
+Beat 4 is the most important voice-leading note in the bar. A leading tone a semitone *below* the target root (the classic approach) creates maximum pull. A semitone *above* creates a chromatic encirclement when combined with the diatonic approach on beat 3.
 
-**Progression 1: Cm7 — F7 — G7 — Cm7** (each chord for one bar)
+#### Chord Tone Reference: Two Essential Progressions
+
+**Progression 1 — Cm7 | F7 | G7 | Cm7** (one bar each, 4/4)
+
+| Chord | Root | Minor/Major 3rd | 5th | 7th |
+|---|---|---|---|---|
+| Cm7 | C | Eb (minor 3rd) | G | Bb |
+| F7 | F | A (major 3rd) | C | Eb |
+| G7 | G | B (major 3rd) | D | F |
+
+Walking line — basic version:
+
+```
+Bar 1 (Cm7): C  - Eb - G  - Bb
+Bar 2 (F7):  F  - A  - C  - Eb
+Bar 3 (G7):  G  - B  - D  - F
+Bar 4 (Cm7): C  - Eb - G  - Bb
+```
+
+Walking line — with chromatic leading tones on beat 4:
+
+```
+Bar 1 (Cm7): C  - Eb - G  - E    ← E is semitone below F, pulls into bar 2
+Bar 2 (F7):  F  - A  - C  - F#   ← F# is semitone below G, tritone sub approach
+Bar 3 (G7):  G  - B  - D  - B    ← B is semitone above C... or use Db→C approach
+Bar 4 (Cm7): C  - Eb - G  - Bb
+```
+
+The F# on beat 4 of bar 2 deserves explanation: G7's root is G, and F# is one semitone below G. This is the strongest possible voice-leading approach (tritone substitution or simply a chromatic leading tone) and is the most common convention in jazz walking bass. You will hear this move constantly in Ray Brown, Paul Chambers, and Ron Carter.
+
+**Progression 2 — Dm7 | G7 | A7 | Dm7** (ii–V–i in D minor)
 
 | Chord | Root | 3rd | 5th | 7th |
 |---|---|---|---|---|
-| Cm7 | C | Eb | G | Bb |
-| F7 | F | A | C | Eb |
-| G7 | G | B | D | F |
-
-A well-constructed walking line for this progression:
-
-```
-Bar 1 (Cm7): C - Eb - G - Bb
-Bar 2 (F7):  F - A  - C - Eb
-Bar 3 (G7):  G - B  - D - F
-Bar 4 (Cm7): C - Eb - G - Bb
-```
-
-Beat 4 of bar 2 (Eb) is a half-step above D — this is a leading tone into G7's root (G) only by a minor 3rd, which is a weaker approach. A stronger approach uses a chromatic leading tone (F# → G):
-
-```
-Bar 2 (F7):  F - A - C - F#   (tritone substitution approach note)
-Bar 3 (G7):  G - B - D - F
-```
-
-This F# (Gb) is one semitone below G and creates maximal forward pull through voice leading — this is the most common jazz walking bass convention.
-
-**Progression 2: Dm7 — G7 — A7 — Dm7** (ii-V-I in D minor)
-
-| Chord | Root | 3rd | 5th | 7th |
-|---|---|---|---|---|
-| Dm7 | D | F | A | C |
-| G7 | G | B | D | F |
-| A7 | A | C# | E | G |
+| Dm7 | D | F (minor 3rd) | A | C |
+| G7 | G | B (major 3rd) | D | F |
+| A7 | A | C# (major 3rd) | E | G |
 
 Walking line:
-```
-Bar 1 (Dm7): D - F - A - C
-Bar 2 (G7):  G - B - D - Ab  (Ab is b2 of A, chromatic approach)
-Bar 3 (A7):  A - C# - E - G
-Bar 4 (Dm7): D - F - A - C
-```
-
-#### Fretboard Mapping for Progression 1 (Cm7)
 
 ```
-Beat 1 — C: A string fret 3
-Beat 2 — Eb: A string fret 6  (or D string open and shift — less preferred)
-Beat 3 — G: E string fret 3   (position shift) or D string fret 5
-Beat 4 — Bb: A string fret 1  (requires position shift for bar 2 F)
+Bar 1 (Dm7): D  - F  - A  - C
+Bar 2 (G7):  G  - B  - D  - Ab  ← Ab is semitone above A (encirclement from above)
+Bar 3 (A7):  A  - C# - E  - G
+Bar 4 (Dm7): D  - F  - A  - C
 ```
 
-Efficient fingering minimizes lateral position shifts. Practice each bar in isolation before connecting them.
+#### Fretboard Mapping — Progression 1, Bar 1 (Cm7)
 
-#### Exercise Protocol
+Efficient fingering minimizes lateral hand travel between beats:
 
-1. Set metronome to 60 BPM. Play Cm7 walking line in isolation, looping bar 1 until note-to-note transitions are seamless and the tempo is locked.
-2. Connect bar 1 (Cm7) to bar 2 (F7). The transition point is beat 4 of Cm7 leading into beat 1 of F7. Record 8 repetitions of this two-bar loop.
-3. Extend to the full four-bar progression. Record.
-4. Increase tempo to 80 BPM, then 100 BPM. The target functional tempo for a walking bass line is 120 BPM — work toward it incrementally.
-5. Repeat the entire protocol with Progression 2.
+```
+Beat 1 — C:  A string, fret 3   (finger 1)
+Beat 2 — Eb: A string, fret 6   (finger 4, Simandl stretch from fret 3)
+Beat 3 — G:  D string, fret 5   (finger 3, hand shifts up one position)
+Beat 4 — Bb: A string, fret 1   (finger 1, hand shifts back to open position)
+  → Bar 2 opens on F: A string, fret 8 OR E string, fret 1
+```
 
-### 1D — Slap/Pop Mechanics: Physics and Execution
+The beat 4 → beat 1 transition (Bb → F) is the most common position-shift problem for beginners. Practice this specific two-beat connection in isolation before playing the full bar.
 
-#### The Physics of Slap Bass
+**Alternative fingering for smaller hands** — keep everything on the A and E strings:
 
-Slap bass produces its characteristic percussive sound through a fundamentally different excitation mechanism than fingerstyle or plectrum playing. In standard fingerstyle, the string is displaced laterally (parallel to the fretboard face) and released, producing a relatively smooth attack transient. In slap technique:
+```
+Beat 1 — C:  A string, fret 3
+Beat 2 — Eb: A string, fret 6
+Beat 3 — G:  E string, fret 3   (string cross, same position)
+Beat 4 — Bb: E string, fret 6   (or A string fret 1 for a half-step lower Bb)
+```
 
-1. **Thumb strike (slap):** The bony knuckle of the right thumb strikes the string at a point directly over the last fret of the neck (typically the 24th fret area or the neck-body junction). The string is struck with enough force to momentarily contact the fret wire, producing a percussive "clack" transient that is rich in high-frequency energy (2–8 kHz). This is not incidental fret noise — it is the defining acoustic event of slap tone.
+#### Walking Bass Drill — Isolation Protocol
 
-2. **Index/middle finger pop:** The player hooks the index or middle finger under the G or D string and pulls it away from the body of the bass perpendicularly to the fretboard face, then releases it. The string snaps back and strikes the frets, producing a sharp high-frequency crack similar to the thumb strike but with a different tonal character due to the string gauge and lateral pull direction.
+1. **60 BPM.** Play only bar 1 (Cm7) in a loop until all four notes are clean, in time, and smoothly connected. No hesitation between beats.
+2. **Connect bar 1 → bar 2.** The transition point is beat 4 of Cm7 into beat 1 of F7. Loop this two-bar phrase eight times.
+3. **Full four bars.** Record eight full passes.
+4. **Advance: 80 BPM → 100 BPM → 120 BPM.** Target performance tempo for most jazz and funk walking contexts is 120 BPM. Only advance when the previous tempo is clean.
+5. **Repeat the entire protocol with Progression 2.**
 
-The resulting tone has a heavily compressed, percussive attack with strong upper harmonic content, which explains why slap bass is associated with funk genres where it needs to cut through dense rhythm section arrangements.
+---
+
+### 1E — Slap/Pop Mechanics: Physics and Execution
+
+#### How Slap Tone Actually Happens
+
+Slap bass sounds the way it does because of a fundamentally different string excitation mechanism. In fingerstyle, the string is displaced laterally (parallel to the fretboard face) and released — a smooth attack. In slap:
+
+**Thumb strike:** The bony outer knuckle of the right thumb strikes the string at the neck/body junction (over the last fret or the pickup). The strike is forceful enough to briefly push the string *into contact with the fret wire*. That momentary string-fret contact produces the defining "clack" transient — a burst of energy in the 2–8 kHz range. This is not accidental fret buzz. It is the sound.
+
+**Pop:** The index finger hooks under the G (or D) string and pulls it **perpendicular to the fretboard** — away from the body of the bass — approximately 5–10 mm. Release. The string snaps back, strikes the frets, and produces a sharp crack with a bright fundamental. Pulling more than 10 mm degrades pitch accuracy and increases fret wear. Pulling less than 5 mm produces no audible pop.
 
 ```mermaid
 sequenceDiagram
     participant T as Thumb
     participant S as String (E or A)
     participant F as Fret Wire
-    participant A as Amplifier/DAW
+    participant O as Output Signal
 
-    T->>S: Rotational strike at neck/body junction
-    S->>F: Momentary string-fret contact
+    T->>S: Rotational forearm strike at neck/body junction
+    S->>F: Momentary string-fret contact during strike
     F-->>S: String rebounds, full vibration begins
-    S->>A: Signal: sharp transient + fundamental + rich harmonics
-    Note over A: Spectrum: strong 2–8 kHz region
+    S->>O: Sharp 2–8 kHz transient + sustained fundamental (41–110 Hz)
+    Note over O: Percussive attack, compressed tone, high harmonic content
 ```
 
-#### Thumb Strike Mechanics
+#### Thumb Strike — The Rotational Motion
 
-The thumb does not press down or stay on the string. The motion is a **rotational forearm movement** (forearm supination) that causes the thumb to strike the string and immediately rebound. If the thumb remains in contact with the string after the strike, it damps the vibration and kills the sustain. The motion is analogous to a drumstick stroke — impact and immediate rebound.
+The thumb does not press or stay. The motion is **forearm supination** (rotating the forearm so the palm faces upward) that carries the thumb into the string and immediately away. If the thumb rests on the string after the strike, it damps the vibration — you get a thud instead of a note.
 
-Correct thumb contact point: the outer edge of the distal joint of the thumb (the bony knuckle), not the pad or the tip.
+**Contact point:** The outer edge of the distal joint — the bony knuckle. Not the pad, not the tip. The knuckle has the mass and hardness to produce the fret-contact transient.
 
-#### Pop Mechanics
+Practice this motion on the open E string with no fretting. Twenty strikes. Listen for: sharp transient attack + 1–2 seconds of sustain. The sustain is what tells you the thumb rebounded. No sustain = thumb rested.
 
-The pop is executed on the G or D string (occasionally the A string in some styles). Hook the index finger pad under the string with just enough purchase to pull it approximately 5–10 mm perpendicular to the fretboard. Release. The string snaps back against the frets. Excessive pull distance degrades pitch accuracy and increases fret wear. Insufficient pull produces no audible pop.
+#### Foundational Slap/Pop Pattern — 16th-Note Grid
 
-#### Basic Slap/Pop Pattern
-
-The foundational pattern is a 16th-note grid with slap on beats 1 and 3 (downbeats) and pop on the "and" of 2 and 4 (the backbeat subdivision):
+The classic Larry Graham groove structure. At 80 BPM:
 
 ```
 16th note grid:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
-Technique:       S  -  -  -  -  -  P  -  S  -  -  -  -  -  P  -
+Technique:       T  .  .  .  .  .  P  .  T  .  .  .  .  .  P  .
+String:          E  .  .  .  .  .  G  .  E  .  .  .  .  .  G  .
 ```
 
-Where S = slap (thumb on E string), P = pop (index on G string). This is the foundational pattern used in Larry Graham's approach and forms the basis of Flea's (Red Hot Chili Peppers), Marcus Miller's, and Victor Wooten's more complex polyrhythmic extensions.
+T = thumb slap on E string. P = index finger pop on G string.
 
-#### Exercise Protocol
+The pops land on the "and" of 2 and "and" of 4 — the classic backbeat subdivision. This aligns slap with the kick drum and pop with the snare.
 
-1. Practice the thumb rotational motion on the open E string without worrying about pitch. Focus exclusively on immediate rebound. The tone should have a sharp, percussive attack with 1–2 seconds of sustain. Record 20 strikes and examine the attack transients in your DAW.
-2. Practice the pop motion on the open G string. Each pop should produce a clear "crack" with consistent amplitude. Record and compare 20 pops.
-3. Combine: Slap E string beat 1, pop G string beat 3. No subdivision yet — just alternating at 60 BPM quarter notes.
-4. Add the 16th-note grid pattern above at 60 BPM. Increase to 80 BPM once pattern is clean.
+**Add a hammer-on for the classic octave slap fill:**
+
+```
+16th note grid:  1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
+Technique:       T  .  H  .  .  .  P  .  T  .  H  .  .  .  P  .
+Fret:            0  .  7  .  .  .  G  .  0  .  7  .  .  .  G  .
+(T = open E slap, H = hammer-on to E string fret 7 = B1, P = pop G string open)
+```
+
+This is the building block of Flea's and Marcus Miller's pocket grooves.
+
+#### Slap/Pop Drill Protocol
+
+1. **Thumb isolation:** 20 strikes, open E, no fretting. Focus only on rebound. Record and check in DAW — you want a sharp transient followed by clear sustain.
+2. **Pop isolation:** 20 pops, open G string. Each pop should be consistent in amplitude (verify ±2 dB in DAW). Index finger only.
+3. **Alternating at quarter notes:** Slap E on beat 1, pop G on beat 3. 60 BPM. No subdivision yet.
+4. **Full 16th-note pattern:** 60 BPM → 80 BPM. Target 100 BPM for a usable funk groove tempo.
 
 ---
 
-## Exercise 2: Parameter Variation and Empirical Analysis
+## Exercise 2: Empirical Parameter Analysis
 
-### 2A — Muting Position Mapping
+### 2A — Muting Position Spectrum Mapping
 
-This exercise quantifies how right-hand palm position affects tonal spectrum. Set up your DAW with a spectrum analyzer (SPAN or equivalent) in real-time display mode.
+This is a measurement exercise, not a playing exercise. Use the four recordings you made in Exercise 1C.
 
-Play the same note (A string fret 5, D2) with consistent force and velocity, varying only the palm muting contact point. Hold each position for 4 beats at 60 BPM and capture the spectrum.
+Load all four files into your DAW on separate tracks. Open SPAN on each track. Compare:
 
-| Palm Position | Expected Spectral Effect | Practical Use Case |
-|---|---|---|
-| No palm mute | Full harmonic series, long sustain | Solo lines, melodic passages |
-| 2–5 mm from bridge | Slight top-end reduction, full fundamental | Standard fingerstyle tone |
-| 5–15 mm from bridge | Reduced sustain, punchy midrange | Funk, R&B pocket playing |
-| 20–30 mm from bridge | Short sustain, strong fundamental, weak upper partials | Motown-style, upright bass emulation |
-| 50+ mm (mid-string) | Severe damping, nearly percussive thud | Special effect, not standard technique |
+1. Where does the first significant harmonic disappear as you move from bridge toward neck?
+2. What is the amplitude of the fundamental (around 73 Hz for D2) at each position? Does it change, or only the harmonics?
+3. How long is the sustain at each position? Use the waveform display — measure from the attack peak to where the signal reaches -40 dBFS.
 
-Record each position. Load all clips into your DAW on separate tracks. Use the spectrum analyzer to compare the harmonic content. Document the frequency of the first partial that disappears at each muting position. The relationship should be monotonically decreasing: each step toward the neck removes higher harmonics first.
+**What you should find:**
+- The fundamental amplitude changes very little with palm position. Muting attenuates harmonics, not the fundamental.
+- The first partial to disappear is the highest one. Each step toward the neck removes progressively lower harmonics.
+- Sustain shortens monotonically as you move toward the neck.
 
-### 2B — Walking Bass Line: Rhythmic Subdivision Variation
+This is the empirical basis for understanding why a Motown-style palm mute sounds dark and thumpy — the fundamental dominates, all color harmonics are gone — while a lightly muted fingerstyle line sounds full and present.
 
-The quarter-note walking line is the foundation, but walking lines derive forward momentum from rhythmic displacement within the beat. This exercise introduces subdivision variation.
+### 2B — Walking Line: Swing Feel vs. Straight Eighth
 
-**Variation 1: Triplet feel (12/8 implied over 4/4)**
+A quarter-note walking line in jazz does not sit precisely on the grid. The "swing feel" comes from a **15–20 ms delay on the attack of beats 2 and 4** relative to strict metronomic placement. This is not an error. It is intentional rhythmic placement.
 
-Play each beat of the walking line with a slight triplet delay on beats 2 and 4 — this gives the classic swing feel. The difference is approximately 15–20 ms of delay on the second and fourth beats' attacks relative to a strict grid. This is not a technique error; it is intentional rhythmic placement that defines the difference between jazz feel and straight-eighth feel.
+Record two versions of Progression 1's walking line:
+- **Version A:** Strict grid, every beat precisely on the click
+- **Version B:** Intentionally relaxed placement — think of beats 2 and 4 as arriving just slightly late
 
-**Variation 2: Ghost note integration**
+Load both into your DAW. Zoom into the waveform grid display and look at where the attack transients fall relative to the bar lines. Version B's beat 2 and beat 4 peaks will sit slightly to the right of the grid lines. This visual confirmation is what "laying back" looks like in a DAW.
 
-Add a right-hand ghost note (muted string pluck, producing a percussive click with no defined pitch) on the "and" of beat 2 within each bar of the walking line. The left hand mutes the string being plucked by releasing fretting pressure without lifting the finger. This technique adds rhythmic density without harmonic interference and is central to funk and soul bass playing.
+The swing feel is not random looseness. It is a *specific, consistent* delay. If beat 2 lags 15 ms, beat 4 should lag approximately the same amount. Practice until the delay is intentional and repeatable.
 
-**Rhythmic notation for ghost note integration:**
+### 2C — Ghost Note Integration
+
+A **ghost note** is a right-hand pluck executed while the left hand releases fretting pressure (but does not lift off the string), producing a muted percussive click with no defined pitch. It adds rhythmic density without harmonic interference.
+
+Add ghost notes on the "and" of beat 2 in each bar of the Cm7 walking line:
 
 ```
 Beat:    1    +    2    +    3    +    4    +
-Notes:   C    -   Eb    x    G    -   Bb    -
-(x = ghost note, muted click)
+Notes:   C    .   Eb    x    G    .   Bb    .
+(x = ghost note — left hand releases pressure, right hand plucks D or A string)
 ```
 
-Record both variations. Compare the waveform shapes: the swing variation will show slightly irregular peak spacing on a grid display; the ghost note variation will show additional low-amplitude transients between the primary note peaks.
+The ghost note is typically played on the string adjacent to the last fretted note. In bar 1, after playing Eb on A string, the ghost note can land on A or D string — whichever your right hand reaches most naturally in the flow.
 
-### 2C — Slap/Pop Force Mapping
+In your DAW waveform, the ghost note will show as a small-amplitude transient between the larger note peaks. This is the visual signature of a groove that has rhythmic density.
 
-Slap tone is highly sensitive to strike force because the degree of string-fret contact during the strike changes with force:
+### 2D — Slap Force Mapping
 
-- **Low force (barely perceptible "clack"):** String barely contacts fret. Output is essentially a pizzicato note with enhanced attack. Weak high-frequency content.
-- **Medium force (clean pop with sustain):** String contacts fret cleanly and rebounds immediately. Balanced attack and sustain. This is the target for most applications.
-- **High force (aggressive, compressed attack):** String contacts multiple frets. Increases high-frequency transient at the expense of pitch clarity and sustain. Can produce unintended fret buzz on adjacent frets.
+Play 10 open-E slaps at three distinct force levels. Record each set separately.
 
-Record 10 strikes at each force level on E string, open. Load all clips into the DAW. Use a transient analyzer or the spectrum analyzer in peak-hold mode to compare the following measurements:
+| Force Level | Expected Acoustic Result | DAW Measurement |
+|---|---|---|
+| Light (barely a tap) | Minimal fret contact, essentially a pizzicato note | Transient: soft, short; fundamental clear but weak |
+| Medium (clean controlled strike) | Clean fret contact, full rebound | Sharp transient + strong sustained fundamental — this is the target |
+| Heavy (aggressive strike) | Multi-fret contact, aggressive transient | Very sharp transient, compressed sustain, possible buzz on adjacent frets |
 
-1. **Peak transient amplitude (dBFS):** Should increase linearly with force up to a saturation point.
-2. **Transient duration (ms):** The duration of the initial "clack" before the sustained tone begins. Longer transient duration indicates more fret contact time.
-3. **Fundamental-to-harmonic ratio:** At higher force levels, the ratio of harmonic energy (above 1 kHz) to fundamental energy (around 41 Hz) will increase.
+Load all three sets into SPAN with peak-hold enabled. Compare:
+- **Peak transient amplitude (dBFS):** Increases with force, then saturates
+- **Fundamental-to-harmonic balance:** Heavy strikes skew the spectrum toward upper harmonics (above 1 kHz)
+- **Transient duration (ms):** Longer at heavy force = more fret-contact time
+
+Medium force is correct. Heavy force is a technique error that masquerades as intensity.
 
 ---
 
-## Exercise 3: Fault Injection and Stress Testing
+## Exercise 3: Fault Injection — Deliberate Error Analysis
 
-### Understanding Fault Injection in a Physical Skill Context
-
-Fault injection in software engineering deliberately introduces errors into a system to test its robustness and recovery characteristics. Applied to physical skill development, it means intentionally using incorrect technique to develop:
-
-1. **Kinesthetic recognition** — the ability to feel when technique has degraded, before an audible problem occurs.
-2. **Recovery pathways** — specific motor corrections that return the technique to correct execution.
-3. **Tolerance boundaries** — an empirical understanding of how much deviation from ideal form is acceptable before the output quality degrades measurably.
-
-Each fault injection test below specifies the fault, the expected acoustic signature of the fault, the recovery action, and the diagnostic signal that confirms recovery.
+Fault injection means intentionally using incorrect technique to develop kinesthetic recognition (feeling the error before you hear it) and fast recovery pathways. Each test below specifies the fault, what it sounds like, how to recover, and what confirms the fix.
 
 ### 3A — Muting Faults
 
-**Fault 1: Index finger muting instead of palm mute**
+**Fault 1: Index finger bar-mute instead of palm mute**
 
-Place the index finger across all strings near the bridge (a barre position) rather than using the palm mute. Play a walking line.
+Place your index finger flat across all strings near the bridge (a barre position) rather than using the palm edge. Play a walking line.
 
-- *Expected acoustic signature:* Uneven muting across strings — the index finger contacts each string at a different pressure point and angle, producing inconsistent note lengths and spectral content across the four strings. The muted tone will have more high-frequency content than a palm mute, because a narrow surface area concentrates contact at a single point rather than distributing it.
-- *Recovery action:* Transition to palm position in real time while maintaining the pulse. Do not stop — practice the recovery at tempo.
-- *Diagnostic signal:* Consistent note length and tonal character restored across all four strings. Spectrum analyzer shows consistent harmonic roll-off pattern.
+- *Acoustic signature:* Uneven muting — the index finger contacts each string at different pressure, producing inconsistent note lengths and spectral content across strings. More high-frequency content than palm muting because the contact area is narrow.
+- *Recovery:* Transition to palm position *without stopping*. Keep the pulse going. Practice the recovery at tempo.
+- *Confirmation:* Consistent note length and tonal character restored across all four strings on the spectrum display.
 
-**Fault 2: Over-muting (eliminating fundamental)**
+**Fault 2: Over-muting (eliminating the fundamental)**
 
-Apply extreme palm mute pressure, pressing the palm firmly against the strings rather than resting lightly.
+Press the palm firmly into the strings instead of resting lightly.
 
-- *Expected acoustic signature:* Notes become indistinct thuds with no perceptible pitch. The fundamental at 41–98 Hz will drop 10–20 dB or disappear in the spectrum analyzer. At extreme pressure, fret buzz may increase as strings are forced against frets.
-- *Recovery action:* Reduce palm contact pressure until the fundamental is audible and the note has a recognizable pitch.
-- *Diagnostic signal:* Spectrum analyzer shows fundamental peak returning to within 6 dB of the strongest harmonic.
-
-### 3B — Walking Bass Line Faults
-
-**Fault 1: Chromatic note substitution (wrong notes)**
-
-Play the Cm7 walking line but substitute random chromatic notes for the correct chord tones:
-
-```
-Incorrect: C - E - Ab - B  (non-diatonic, non-chord-tone substitution)
-Correct:   C - Eb - G - Bb
-```
-
-- *Expected acoustic signature:* Harmonic tension increases dramatically. The E natural (instead of Eb) creates a major 3rd against a minor chord, producing strong dissonance. The Ab creates a diminished 5th against C, and B creates a major 7th — all increasing instability.
-- *Recovery action:* Return to the correct chord tones in real time, without stopping. Identify the first incorrect note by ear and correct from that beat forward.
-- *Diagnostic signal:* Harmonic tension resolves. If you have a chord playback track in your DAW, the bass line should sit without clashing against the chord voicings.
-
-**Fault 2: Rhythmic displacement (beat 1 displacement)**
-
-Play the walking line with all notes shifted one eighth note late (beat 1 note lands on the "and" of 1). This simulates the common beginner error of late entrances.
-
-- *Expected acoustic signature:* The bass line feels "behind" the beat. If playing with a metronome, the clicks will fall at the beginning of each note's sustain rather than at the attack. The groove loses forward momentum.
-- *Recovery action:* Lock onto the click on beat 1 and anticipate the note — place the attack fractionally *before* the click rather than on it. This "front of the beat" placement is what gives a walking line its drive.
-- *Diagnostic signal:* Waveform attack peaks align with or slightly precede the click transients visible in the DAW grid.
-
-### 3C — Slap/Pop Faults
-
-**Fault 1: Thumb resting (no rebound)**
-
-Strike the E string with the thumb but allow the thumb to rest on the string after impact rather than rebounding.
-
-- *Expected acoustic signature:* The struck string is immediately damped. Output is a dull thud with no sustain. High-frequency content from fret contact is present (the slap transient still occurs) but the subsequent fundamental tone is killed. This is the most common slap technique error for beginners.
-- *Recovery action:* Focus on the rotational forearm motion and practice the rebound independently (without worrying about pitch or fretting) until it is reflexive.
-- *Diagnostic signal:* Recording shows a sharp transient attack followed by a sustaining fundamental — not just a click.
-
-**Fault 2: Middle finger pop instead of index finger**
-
-Use the middle finger for the pop motion on the G string.
-
-- *Expected acoustic signature:* The middle finger has a larger mass and a different anatomical hook profile than the index finger. The pop will be slightly harder to control, and the string pull distance will be less consistent due to reduced tactile feedback. Tone will not differ substantially, but consistency and timing precision will degrade.
-- *Recovery action:* Return to index finger immediately. This fault is used to demonstrate that the index finger's specific anatomy (shorter, greater tactile sensitivity) is mechanically suited to the pop motion.
-- *Diagnostic signal:* Amplitude consistency across 10 consecutive pops within ±2 dB (verify in DAW).
-
-**Fault 3: Pop on wrong string (D instead of G)**
-
-Execute the pop motion on the D string instead of the G string.
-
-- *Expected acoustic signature:* The D string (73 Hz fundamental) produces a much darker, lower-pitched pop tone. The D string also requires more pull force to produce the characteristic snap due to its heavier gauge. In the context of a slap/pop groove, this inverts the expected frequency relationship (low slap on E, high pop on G), creating a tonal imbalance.
-- *Recovery action:* Identify the string under the finger before striking. Develop the proprioceptive habit of feeling for the gap between G and D strings as a tactile reference before executing the pop.
-- *Diagnostic signal:* Fundamental frequency of the pop returns to approximately 98 Hz (G2 open string) rather than 73 Hz (D2).
+- *Acoustic signature:* Notes become pitchless thuds. The fundamental (41–98 Hz depending on string) drops 10–20 dB or disappears entirely from the spectrum. Fret buzz may increase as strings are forced into frets.
+- *Recovery:* Lighten palm contact until the note has a recognizable pitch. The fundamental should return to within 6 dB of the strongest harmonic.
+- *Confirmation:* Fundamental peak visible in SPAN at approximately its expected frequency.
 
 ---
 
-## Fretboard Mechanics: Integrated Position Map
+### 3B — Left-Hand Faults
 
-The following diagram represents the logical architecture of fretboard navigation — how positions, shifts, and string crossings relate to each other in a systematic way.
+**Fault 1: Wrong note substitution in walking line**
+
+Play the Cm7 bar with non-chord tones replacing correct chord tones:
+
+```
+Incorrect: C - E  - Ab - B   (E natural, Ab, B natural — none are Cm7 chord tones)
+Correct:   C - Eb - G  - Bb
+```
+
+- *Acoustic signature:* E natural creates a major 3rd against a minor chord — strong dissonance. Ab creates a diminished 5th against C. B creates a major 7th. The combined effect is that the bar sounds unstable and unresolved, pulling away from the harmony instead of confirming it.
+- *Recovery:* Identify the first wrong note by ear and correct from that beat forward. Do not stop to restart.
+- *Confirmation:* If you have a chord track in your DAW, the corrected line sits inside the voicing without clashing.
+
+**Fault 2: Late beat 1 — eighth-note displacement**
+
+Play the walking line with every note shifted one eighth note late (beat 1 note lands on the "and" of 1).
+
+- *Acoustic signature:* The line feels dragged and "behind." With a metronome, the clicks fall during the sustain of each note rather than at the attack. The groove loses forward momentum entirely.
+- *Recovery:* Lock onto beat 1 of the click and **anticipate** the note — place the attack fractionally *before* the click. "Front of the beat" placement is what gives a walking line its drive.
+- *Confirmation:* In the DAW waveform, attack peaks align with or slightly precede the grid lines.
+
+---
+
+### 3C — Slap/Pop Faults
+
+**Fault 1: Thumb resting on string after strike (no rebound)**
+
+Strike the E string but allow the thumb to rest on the string after impact.
+
+- *Acoustic signature:* The characteristic clack transient still occurs (the string-fret contact happens during the strike), but the thumb immediately damps the fundamental. Output is a click with no sustain — just a thud. This is the single most common slap error for beginners.
+- *Recovery:* Practice the rotational forearm motion with no fretting, focusing only on the rebound. Twenty strikes, isolating the motion. The thumb must leave the string before the string's first full oscillation completes.
+- *Confirmation:* Recording shows a sharp transient attack followed by a sustaining fundamental. Not just a click.
+
+**Fault 2: Thumb pad instead of knuckle contact**
+
+Strike with the fleshy pad of the thumb rather than the outer bony knuckle.
+
+- *Acoustic signature:* The pad has much higher impedance — it absorbs more energy from the string rather than transferring it into the fret wire. Output is a soft, warm attack with far less high-frequency transient content. It sounds like a heavy fingerstyle pluck, not a slap.
+- *Recovery:* Rotate the forearm slightly further so the knuckle edge leads the strike. Practice in front of a mirror to verify contact point.
+- *Confirmation:* Sharp 2–8 kHz transient returns in the spectrum display.
+
+**Fault 3: Pop on D string instead of G string**
+
+Execute the pop on D string.
+
+- *Acoustic signature:* The D string (73 Hz fundamental, .070" typical gauge) produces a much darker, lower-pitched pop. The heavier gauge requires more pull force for the same snap amplitude. In a groove context, this inverts the expected high-low relationship (low slap on E, high pop on G), collapsing the frequency contrast that defines funk slap tone.
+- *Recovery:* Develop the proprioceptive habit of feeling for the gap between G and D strings as a tactile reference before each pop. The G string is thinner — you can feel it.
+- *Confirmation:* Pop fundamental returns to approximately 98 Hz (G2) rather than 73 Hz (D2). Verify in SPAN.
+
+---
+
+## Fretboard Navigation Architecture
 
 ```mermaid
 graph TD
-    subgraph sub_left_hand_position_system ["Left Hand Position System"]
-        P1["Open Position (Frets 0-4)\nMax stretch, widest fret spacing\nHigh sympathetic ring risk"]
-        P2["2nd Position (Frets 2-6)\nOne-position shift from open\nStandard beginner zone"]
-        P3["5th Position (Frets 5-8)\nReduced fret spacing\nOctave pattern center"]
-        P4["7th Position (Frets 7-10)\nHalf-step above tritone\nBlues/pentatonic center"]
-        P5["12th Position (Frets 12+)\nOctave = open string pitch\nPattern repeats exactly"]
+    subgraph sub_right_hand ["Right Hand Techniques"]
+        RT1["Fingerstyle — i/m alternating\nSmooth tone, full sustain\nFloating thumb muting"]
+        RT2["Palm Mute + Fingerstyle\nPunchy, defined, rhythmic\nPosition = tonal parameter"]
+        RT3["Slap — Thumb rotational strike\nPercussive transient, 2–8 kHz\nFret contact = tone source"]
+        RT4["Pop — Index perpendicular pull\nSharp crack, bright sustain\n5–10mm pull distance"]
+        RT5["Plectrum\nBright, aggressive, consistent\nPick noise is part of tone"]
     end
 
-    subgraph sub_right_hand_technique_map ["Right Hand Technique Map"]
-        RT1["Fingerstyle (index/middle alternating)\nSmoothest tone, most control"]
-        RT2["Palm Mute + Fingerstyle\nPunchy, defined, rhythmic"]
-        RT3["Slap Thumb\nPercussive, high harmonic content"]
-        RT4["Pop (index/middle)\nSharp attack, upper register emphasis"]
-        RT5["Plectrum (pick)\nBright, aggressive, consistent attack"]
-    end
-
-    subgraph sub_tonal_outcomes ["Tonal Outcomes"]
+    subgraph sub_tonal ["Tonal Outcomes"]
         T1["Full harmonic series, long sustain"]
         T2["Compressed, defined, mid-forward"]
         T3["Percussive transient + fundamental"]
         T4["Sharp crack + bright sustain"]
-        T5["Bright, articulate, pick noise"]
+        T5["Bright, articulate, pick attack"]
     end
 
-    RT1 --> T1
-    RT2 --> T2
-    RT3 --> T3
-    RT4 --> T4
-    RT5 --> T5
+    subgraph sub_context ["Musical Context"]
+        C1["Melodic lines, jazz, ballads"]
+        C2["Funk pocket, R&B, locked groove"]
+        C3["Funk downbeats, kick reinforcement"]
+        C4["Backbeat accents, snare reinforcement"]
+        C5["Rock, metal, punk, country"]
+    end
 
-    P1 --> RT1
-    P1 --> RT3
-    P3 --> RT1
-    P3 --> RT2
-    P4 --> RT3
-    P4 --> RT4
+    RT1 --> T1 --> C1
+    RT2 --> T2 --> C2
+    RT3 --> T3 --> C3
+    RT4 --> T4 --> C4
+    RT5 --> T5 --> C5
 ```
 
 ---
 
-## Acoustic Measurement: Python Analysis Scripts
+## Tempo Architecture: The Diagnostic Principle
 
-The following Python script automates tonal analysis of recorded bass exercises. It computes the fundamental frequency via autocorrelation, plots the FFT spectrum, and measures the transient attack duration — all three metrics used in the exercises above.
-
-```python
-"""
-Bass Guitar Exercise Acoustic Analyzer
-Requires: numpy, scipy, matplotlib, soundfile
-Install: pip install numpy scipy matplotlib soundfile
-"""
-
-import numpy as np
-import soundfile as sf
-import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
-from scipy.fft import rfft, rfftfreq
-
-
-def load_audio(filepath: str) -> tuple[np.ndarray, int]:
-    """Load mono or stereo audio file, downmix to mono if stereo."""
-    data, sample_rate = sf.read(filepath, always_2d=True)
-    mono = np.mean(data, axis=1)  # downmix stereo to mono
-    return mono, sample_rate
-
-
-def compute_fft_spectrum(signal: np.ndarray, sample_rate: int) -> tuple[np.ndarray, np.ndarray]:
-    """Compute magnitude spectrum in dB using real FFT."""
-    n = len(signal)
-    window = np.hanning(n)
-    windowed = signal * window
-    spectrum = np.abs(rfft(windowed))
-    # Avoid log(0) by clipping to small positive value
-    spectrum = np.clip(spectrum, 1e-10, None)
-    spectrum_db = 20 * np.log10(spectrum / np.max(spectrum))
-    freqs = rfftfreq(n, d=1.0 / sample_rate)
-    return freqs, spectrum_db
-
-
-def find_fundamental(freqs: np.ndarray, spectrum_db: np.ndarray,
-                     freq_min: float = 30.0, freq_max: float = 300.0) -> float:
-    """
-    Estimate fundamental frequency by finding the highest-amplitude peak
-    within the expected bass guitar fundamental range (30–300 Hz).
-    """
-    band_mask = (freqs >= freq_min) & (freqs <= freq_max)
-    band_spectrum = spectrum_db[band_mask]
-    band_freqs = freqs[band_mask]
-    peak_indices, _ = find_peaks(band_spectrum, height=-40.0, distance=5)
-    if len(peak_indices) == 0:
-        return 0.0
-    dominant_idx = peak_indices[np.argmax(band_spectrum[peak_indices])]
-    return float(band_freqs[dominant_idx])
-
-
-def measure_attack_duration(signal: np.ndarray, sample_rate: int,
-                             threshold_db: float = -20.0) -> float:
-    """
-    Measure transient attack duration in milliseconds.
-    Attack is defined as the interval from onset to the point where
-    the signal envelope first drops below the peak by threshold_db.
-    """
-    # Compute RMS envelope with 5ms window
-    window_samples = int(0.005 * sample_rate)
-    envelope = np.array([
-        np.sqrt(np.mean(signal[i:i + window_samples] ** 2))
-        for i in range(0, len(signal) - window_samples, window_samples)
-    ])
-    envelope_db = 20 * np.log10(np.clip(envelope, 1e-10, None))
-    peak_idx = np.argmax(envelope_db)
-    peak_db = envelope_db[peak_idx]
-    # Find first point after peak where level drops below threshold
-    post_peak = envelope_db[peak_idx:]
-    drop_indices = np.where(post_peak < (peak_db + threshold_db))[0]
-    if len(drop_indices) == 0:
-        return float('inf')
-    attack_samples = (peak_idx + drop_indices[0]) * window_samples
-    return (attack_samples / sample_rate) * 1000.0  # return milliseconds
-
-
-def analyze_muting_position(filepath: str) -> dict:
-    """
-    Full analysis pipeline for muting position experiment.
-    Returns fundamental frequency, attack duration, and peak spectrum.
-    """
-    signal, sr = load_audio(filepath)
-    freqs, spectrum = compute_fft_spectrum(signal, sr)
-    fundamental = find_fundamental(freqs, spectrum)
-    attack_ms = measure_attack_duration(signal, sr)
-
-    return {
-        "fundamental_hz": round(fundamental, 2),
-        "attack_duration_ms": round(attack_ms, 2),
-        "peak_frequency_hz": round(float(freqs[np.argmax(spectrum)]), 2),
-    }
-
-
-def plot_comparative_spectra(filepaths: list[str], labels: list[str]) -> None:
-    """
-    Plot overlaid FFT spectra for multiple recordings.
-    Used for muting position comparison (Exercise 2A).
-    """
-    fig, ax = plt.subplots(figsize=(12, 6))
-    for filepath, label in zip(filepaths, labels):
-        signal, sr = load_audio(filepath)
-        freqs, spectrum = compute_fft_spectrum(signal, sr)
-        # Plot only 20–5000 Hz range for bass analysis
-        mask = (freqs >= 20) & (freqs <= 5000)
-        ax.plot(freqs[mask], spectrum[mask], label=label, linewidth=1.5)
-
-    ax.set_xlabel("Frequency (Hz)", fontsize=12)
-    ax.set_ylabel("Magnitude (dB, normalized)", fontsize=12)
-    ax.set_title("Muting Position Spectral Comparison", fontsize=14)
-    ax.set_xscale("log")
-    ax.set_xlim(20, 5000)
-    ax.set_ylim(-80, 0)
-    ax.grid(True, which="both", alpha=0.3)
-    ax.legend()
-    plt.tight_layout()
-    plt.savefig("muting_comparison.png", dpi=150)
-    plt.show()
-
-
-# Example usage for Exercise 2A:
-if __name__ == "__main__":
-    # Replace filenames with your actual recordings from Exercise 2A
-    recordings = [
-        ("no_mute.wav", "No Mute"),
-        ("palm_2mm.wav", "Palm 2-5mm"),
-        ("palm_10mm.wav", "Palm 5-15mm"),
-        ("palm_25mm.wav", "Palm 20-30mm"),
-    ]
-    filepaths, labels = zip(*recordings)
-
-    print("=== Muting Position Analysis ===")
-    for fp, label in zip(filepaths, labels):
-        try:
-            result = analyze_muting_position(fp)
-            print(f"\n{label}:")
-            print(f"  Fundamental:    {result['fundamental_hz']} Hz")
-            print(f"  Attack duration: {result['attack_duration_ms']} ms")
-            print(f"  Peak frequency: {result['peak_frequency_hz']} Hz")
-        except FileNotFoundError:
-            print(f"  [File not found — record {fp} first]")
-
-    # Comparative plot (requires all files to exist)
-    # plot_comparative_spectra(list(filepaths), list(labels))
-```
-
----
-
-## Tempo Progression and Practice Architecture
-
-### Why 60 BPM Is Not the Target — It Is the Diagnostic
-
-Beginning at 60 BPM is not about playing slowly. It is about playing at a tempo slow enough that every error is audible and every mechanical decision is conscious. The target practice architecture is:
+60 BPM is not about playing slowly. It is about playing at the speed where **every error is conscious and audible** before it becomes automatic. The only way a technique can be consolidated at 120 BPM is if it was first clean at 60 BPM.
 
 ```mermaid
 graph LR
-    A["60 BPM\nFull conscious control\nIdentify all errors"] --> B["80 BPM\nMechanical transitions\nbecome semi-automatic"]
-    B --> C["100 BPM\nConsistency test:\ncan you maintain form?"]
-    C --> D["120 BPM\nFunctional performance tempo\nfor most jazz/funk contexts"]
-    D --> E["140+ BPM\nAdvanced application\n(fast swing, fusion)"]
-    
-    B -->|"Errors reappear"| A
-    C -->|"Errors reappear"| B
-    D -->|"Errors reappear"| C
+    A["60 BPM\nFull conscious control\nAll errors audible\nIdentify and fix each one"] --> B["80 BPM\nMechanical transitions\nbegin to automate\nErrors less frequent"]
+    B --> C["100 BPM\nConsistency test\nForm should hold\nunder light pressure"]
+    C --> D["120 BPM\nFunctional performance tempo\nJazz, funk, most repertoire"]
+    D --> E["140+ BPM\nFast swing, fusion\nAdvanced application"]
+
+    B -->|"Errors reappear → not consolidated"| A
+    C -->|"Errors reappear → not consolidated"| B
+    D -->|"Errors reappear → not consolidated"| C
 ```
 
-The diagnostic rule is: **if technique degrades at a new tempo, the previous tempo is not yet consolidated.** Return to the lower tempo and add five additional minutes of deliberate practice before attempting the increase. This is not regression — it is accurate assessment.
+**The rule:** If technique degrades at a new tempo, the previous tempo is not yet consolidated. Return one step and add five minutes of deliberate repetition before attempting the increase. This is accurate self-assessment, not regression.
 
 ### Practice Session Structure
 
-A productive session follows this architecture, not an arbitrary time division:
-
 | Phase | Duration | Focus |
 |---|---|---|
-| Warm-up (physical) | 5–8 min | Slow OFPF chromatic crawl, all strings, frets 1–12, no tempo pressure |
-| Technique isolation | 15–20 min | Single technique from this lab: muting, walking, or slap — not all three |
-| Integration | 10–15 min | Combine technique with a chord progression at functional tempo |
-| Recording and review | 5–10 min | Listen back critically; identify one specific error to target next session |
+| Physical warm-up | 5–8 min | Slow chromatic crawl 1A, all strings, frets 1–12. No tempo pressure. |
+| Technique isolation | 15–20 min | One technique only: muting, walking, or slap. Not all three. |
+| Integration | 10–15 min | Apply isolated technique to a chord progression at functional tempo. |
+| Recording review | 5–10 min | Listen back critically. Identify one specific error to target next session. |
 
-Total productive session: 35–55 minutes. Sessions beyond 90 minutes produce diminishing returns in skill acquisition and increase injury risk (tendinitis, carpal tunnel syndrome, ulnar nerve compression — all documented occupational hazards for bassists).
+Total: 35–55 minutes. Sessions beyond 90 minutes produce diminishing returns in motor consolidation and increase injury risk. Consistency across days beats length in a single day.
 
 ---
 
-## Quick Reference: Fretboard, Technique, and Acoustic Parameters
+## Quick Reference Tables
 
-### Note Identification at Critical Fret Positions
+### Fretboard Note Map — Critical Positions
 
 | Fret | E String | A String | D String | G String |
 |---|---|---|---|---|
 | Open | E1 (41 Hz) | A1 (55 Hz) | D2 (73 Hz) | G2 (98 Hz) |
-| 2 | F#1/Gb1 | B1 | E2 | A2 |
-| 3 | G1 | C2 | F2 | Ab2/Bb2 |
+| 1 | F1 | Bb1 | Eb2 | Ab2 |
+| 2 | F#1 | B1 | E2 | A2 |
+| 3 | G1 | C2 | F2 | Bb2 |
 | 5 | A1 | D2 | G2 | C3 |
 | 7 | B1 | E2 | A2 | D3 |
-| 9 | C#2/Db2 | F#2/Gb2 | B2 | E3 |
+| 9 | C#2 | F#2 | B2 | E3 |
 | 12 | E2 (82 Hz) | A2 (110 Hz) | D3 (147 Hz) | G3 (196 Hz) |
 
-*Note: Fret 12 is exactly one octave above the open string — double the frequency.*
+Fret 12 = exactly one octave above open string. The entire fretboard map repeats from fret 12 onward.
 
 ### Technique Diagnostic Matrix
 
 | Symptom | Probable Cause | Correction |
 |---|---|---|
-| Fret buzz on fretted notes | Finger too far from fret wire; insufficient pressure; action too low | Move finger toward leading edge of fret; increase pressure slightly |
-| Sympathetic string ring | Inadequate floating thumb muting | Implement floating thumb: anchor on string below the one being played |
-| Dead/muted notes when fretting | Finger pad inadvertently touching adjacent string | Increase arch in finger; approach fret more perpendicularly |
-| Slap tone lacks percussive "crack" | Thumb not rebounding; striking with pad instead of knuckle | Practice rotational rebound motion independently |
-| Walking line loses tempo on chord changes | Position shift too slow; finger travel distance too great | Map chord transitions for minimal hand movement; practice transition points in isolation |
-| Pop produces inconsistent amplitude | Inconsistent pull distance; wrong finger anatomy | Standardize pull to 5–8 mm; use index finger exclusively |
-| Tone muddy and undefined | Palm mute position too far from bridge | Move palm contact point closer to bridge saddle |
+| Fret buzz on fretted notes | Finger too far from fret wire; insufficient pressure; action too low | Move fingertip to leading edge of fret (body side); apply forward pressure not downward |
+| Sympathetic ring on adjacent strings | No floating thumb muting | Implement floating thumb: anchor on string directly below the one being played |
+| Dead/muted notes when fretting | Finger pad touching adjacent string | Increase finger arch; approach string more perpendicularly |
+| Slap tone has no sustain — just a thud | Thumb resting on string after strike | Practice rotational rebound motion; thumb must leave string immediately |
+| Slap has no high-frequency crack | Striking with thumb pad, not knuckle | Rotate forearm so bony outer knuckle contacts the string |
+| Pop inconsistent amplitude | Inconsistent pull distance; using middle finger | Fix pull to 5–8 mm perpendicular; index finger only |
+| Walking line loses tempo on chord changes | Position shift too slow; finger travel too far | Map each chord change for minimum hand movement; drill the transition points in isolation |
+| Tone muddy and undefined | Palm too far from bridge | Move palm contact point closer to the bridge saddle |
+| Left wrist pain after playing | Wrist bent sharply downward in open position | Raise strap height so neck elevation straightens the left wrist |
 
-### Equal Temperament Reference: First Twelve Semitones
+### Interval Reference — Equal Temperament
 
-| Semitones from Reference | Interval Name | Frequency Ratio | Example (from C) |
+| Semitones | Interval | Freq Ratio | From C |
 |---|---|---|---|
 | 0 | Unison | 1.000 | C |
 | 1 | Minor 2nd | 1.0595 | Db |
@@ -716,7 +659,7 @@ Total productive session: 35–55 minutes. Sessions beyond 90 minutes produce di
 | 3 | Minor 3rd | 1.1892 | Eb |
 | 4 | Major 3rd | 1.2599 | E |
 | 5 | Perfect 4th | 1.3348 | F |
-| 6 | Tritone (aug 4th / dim 5th) | 1.4142 | Gb |
+| 6 | Tritone | 1.4142 | Gb |
 | 7 | Perfect 5th | 1.4983 | G |
 | 8 | Minor 6th | 1.5874 | Ab |
 | 9 | Major 6th | 1.6818 | A |
@@ -726,24 +669,271 @@ Total productive session: 35–55 minutes. Sessions beyond 90 minutes produce di
 
 ---
 
-## Injury Prevention: Biomechanical Constraints
+## Acoustic Analysis: DAW Measurement Scripts
 
-Bass guitar playing involves sustained repetitive motion under moderate loads. The following risks are real and documented:
+The following Python script automates tonal analysis of your recorded exercises. It computes the fundamental frequency via autocorrelation, plots overlaid FFT spectra for the muting position comparison, and measures transient attack duration — the three metrics you need for Exercises 2A and 2D.
 
-**Carpal tunnel syndrome** results from sustained wrist flexion compressing the median nerve. The left-hand position is high risk when the wrist is bent sharply downward to reach low-position frets. The mitigation is to position the instrument so the neck is elevated (strap set so the neck rises toward the shoulder), keeping the left wrist as straight as possible.
+```python
+"""
+Bass Guitar Exercise Acoustic Analyzer
+Covers: Exercises 2A (muting spectrum), 2D (slap force mapping)
 
-**Ulnar nerve compression** occurs when the right elbow rests hard on the instrument body for extended periods. The floating forearm technique — where the forearm rests lightly on the instrument rather than the sharp edge of the body — reduces ulnar nerve pressure.
+Dependencies:
+    pip install numpy scipy matplotlib soundfile
+"""
 
-**Extensor tendinitis** in the right hand is associated with excessive slap force and high-repetition pop practice. The 20-minute technique isolation limit per session is a clinical recommendation, not a stylistic preference.
+import numpy as np
+import soundfile as sf
+import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+from scipy.fft import rfft, rfftfreq
+from pathlib import Path
 
-If pain, numbness, or tingling occurs in any finger during or after practice, stop immediately and consult a physician. Nerve and tendon damage from overuse is cumulative and potentially career-ending. No practice target in this or any lab justifies playing through pain.
+
+# ---------------------------------------------------------------------------
+# Audio I/O
+# ---------------------------------------------------------------------------
+
+def load_mono(filepath: str) -> tuple[np.ndarray, int]:
+    """Load audio file, downmix to mono if stereo."""
+    data, sr = sf.read(filepath, always_2d=True)
+    return np.mean(data, axis=1), sr
+
+
+# ---------------------------------------------------------------------------
+# FFT Spectrum
+# ---------------------------------------------------------------------------
+
+def compute_spectrum(signal: np.ndarray, sr: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Compute normalized magnitude spectrum in dB using real FFT.
+    Returns (frequencies_hz, magnitude_db).
+    """
+    window = np.hanning(len(signal))
+    windowed = signal * window
+    magnitudes = np.abs(rfft(windowed))
+    magnitudes = np.clip(magnitudes, 1e-10, None)
+    db = 20.0 * np.log10(magnitudes / np.max(magnitudes))
+    freqs = rfftfreq(len(signal), d=1.0 / sr)
+    return freqs, db
+
+
+# ---------------------------------------------------------------------------
+# Fundamental detection
+# ---------------------------------------------------------------------------
+
+def find_fundamental(
+    freqs: np.ndarray,
+    db: np.ndarray,
+    freq_min: float = 30.0,
+    freq_max: float = 300.0,
+) -> float:
+    """
+    Find the highest-amplitude spectral peak within the bass guitar fundamental
+    range (30–300 Hz). Returns the peak frequency in Hz, or 0.0 if none found.
+    """
+    mask = (freqs >= freq_min) & (freqs <= freq_max)
+    band_db = db[mask]
+    band_freqs = freqs[mask]
+    peaks, _ = find_peaks(band_db, height=-40.0, distance=5)
+    if len(peaks) == 0:
+        return 0.0
+    dominant = peaks[np.argmax(band_db[peaks])]
+    return float(band_freqs[dominant])
+
+
+# ---------------------------------------------------------------------------
+# Attack duration measurement
+# ---------------------------------------------------------------------------
+
+def measure_attack_ms(
+    signal: np.ndarray,
+    sr: int,
+    threshold_db: float = -20.0,
+    envelope_window_ms: float = 5.0,
+) -> float:
+    """
+    Measure transient attack duration in milliseconds.
+
+    Definition: time from the onset peak to the first point where the RMS
+    envelope drops more than `threshold_db` below the peak.
+    """
+    window_samples = max(1, int((envelope_window_ms / 1000.0) * sr))
+    num_frames = (len(signal) - window_samples) // window_samples
+
+    envelope = np.array([
+        np.sqrt(np.mean(signal[i * window_samples:(i + 1) * window_samples] ** 2))
+        for i in range(num_frames)
+    ])
+    envelope_db = 20.0 * np.log10(np.clip(envelope, 1e-10, None))
+
+    peak_idx = int(np.argmax(envelope_db))
+    peak_level = envelope_db[peak_idx]
+    post_peak = envelope_db[peak_idx:]
+    drop = np.where(post_peak < (peak_level + threshold_db))[0]
+
+    if len(drop) == 0:
+        return float("inf")
+
+    attack_samples = (peak_idx + drop[0]) * window_samples
+    return (attack_samples / sr) * 1000.0
+
+
+# ---------------------------------------------------------------------------
+# Single-file analysis
+# ---------------------------------------------------------------------------
+
+def analyze_recording(filepath: str) -> dict:
+    """
+    Full pipeline: load → FFT → fundamental → attack duration.
+    Returns a dict suitable for printing or logging.
+    """
+    signal, sr = load_mono(filepath)
+    freqs, db = compute_spectrum(signal, sr)
+    fundamental = find_fundamental(freqs, db)
+    attack_ms = measure_attack_ms(signal, sr)
+    peak_freq = float(freqs[np.argmax(db)])
+
+    return {
+        "file": Path(filepath).name,
+        "fundamental_hz": round(fundamental, 1),
+        "attack_ms": round(attack_ms, 1),
+        "peak_freq_hz": round(peak_freq, 1),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Comparative spectrum plot (Exercise 2A — muting positions)
+# ---------------------------------------------------------------------------
+
+def plot_muting_comparison(
+    recordings: list[tuple[str, str]],
+    output_png: str = "muting_comparison.png",
+    freq_range: tuple[float, float] = (20.0, 5000.0),
+) -> None:
+    """
+    Overlay FFT spectra for multiple recordings on a log-frequency axis.
+
+    Args:
+        recordings: list of (filepath, label) tuples
+        output_png: output image filename
+        freq_range: (low_hz, high_hz) display range
+    """
+    fig, ax = plt.subplots(figsize=(12, 6))
+    colors = plt.cm.viridis(np.linspace(0, 0.85, len(recordings)))
+
+    for (filepath, label), color in zip(recordings, colors):
+        signal, sr = load_mono(filepath)
+        freqs, db = compute_spectrum(signal, sr)
+        mask = (freqs >= freq_range[0]) & (freqs <= freq_range[1])
+        ax.plot(freqs[mask], db[mask], label=label, linewidth=1.8, color=color)
+
+        # Mark fundamental with a vertical dotted line
+        f0 = find_fundamental(freqs, db)
+        if f0 > 0:
+            ax.axvline(f0, color=color, linestyle=":", linewidth=0.9, alpha=0.6)
+
+    ax.set_xlabel("Frequency (Hz)", fontsize=12)
+    ax.set_ylabel("Magnitude (dB, normalized to 0)", fontsize=12)
+    ax.set_title("Palm Muting Position — Spectral Comparison (Exercise 2A)", fontsize=14)
+    ax.set_xscale("log")
+    ax.set_xlim(*freq_range)
+    ax.set_ylim(-80, 2)
+    ax.grid(True, which="both", alpha=0.25)
+    ax.legend(fontsize=10)
+    plt.tight_layout()
+    plt.savefig(output_png, dpi=150)
+    print(f"Saved: {output_png}")
+    plt.show()
+
+
+# ---------------------------------------------------------------------------
+# Slap force comparison (Exercise 2D)
+# ---------------------------------------------------------------------------
+
+def compare_slap_forces(
+    recordings: list[tuple[str, str]],
+) -> None:
+    """
+    Print a formatted table comparing attack transient amplitude, duration,
+    and fundamental-to-harmonic ratio across slap force levels.
+    """
+    print(f"\n{'Label':<25} {'Fundamental (Hz)':<18} {'Attack (ms)':<14} {'Peak Freq (Hz)'}")
+    print("-" * 70)
+    for filepath, label in recordings:
+        try:
+            r = analyze_recording(filepath)
+            print(
+                f"{label:<25} {r['fundamental_hz']:<18} {r['attack_ms']:<14} {r['peak_freq_hz']}"
+            )
+        except (FileNotFoundError, Exception) as exc:
+            print(f"{label:<25} [Error: {exc}]")
+
+
+# ---------------------------------------------------------------------------
+# Entry point — replace filenames with your Exercise 2A and 2D recordings
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    # ----- Exercise 2A: Muting position comparison -----
+    muting_recordings = [
+        ("no_mute.wav",     "No Mute — full sustain"),
+        ("palm_5mm.wav",    "Palm 2–5 mm from bridge"),
+        ("palm_15mm.wav",   "Palm 5–15 mm from bridge"),
+        ("palm_25mm.wav",   "Palm 20–30 mm from bridge"),
+    ]
+
+    print("=== Exercise 2A: Muting Position Analysis ===")
+    for filepath, label in muting_recordings:
+        try:
+            r = analyze_recording(filepath)
+            print(f"\n  {label}")
+            print(f"    Fundamental : {r['fundamental_hz']} Hz")
+            print(f"    Attack time : {r['attack_ms']} ms")
+            print(f"    Peak freq   : {r['peak_freq_hz']} Hz")
+        except FileNotFoundError:
+            print(f"\n  {label} — [file not found: record {filepath} first]")
+
+    # Uncomment to generate the comparative spectrum plot:
+    # plot_muting_comparison(muting_recordings)
+
+    # ----- Exercise 2D: Slap force comparison -----
+    slap_recordings = [
+        ("slap_light.wav",  "Light force"),
+        ("slap_medium.wav", "Medium force (target)"),
+        ("slap_heavy.wav",  "Heavy force"),
+    ]
+
+    print("\n\n=== Exercise 2D: Slap Force Analysis ===")
+    compare_slap_forces(slap_recordings)
+```
 
 ---
 
-## Summary
+## Injury Prevention
 
-This lab establishes bass guitar technique through physics-grounded mechanics rather than imitation. The key architectural principles are:
+Bass playing involves sustained repetitive motion under moderate muscular load. These risks are real and documented in occupational medicine literature.
 
-The fretboard is a logarithmically scaled frequency-to-position mapping, and understanding its geometry directly reduces left-hand position shift inefficiency. Right-hand muting is a continuous spectral parameter, not a binary state — its position relative to the bridge saddle determines which harmonic partials are attenuated. Walking bass lines are voice-leading structures built on chord tones and chromatic approach notes, not arbitrary scale runs. Slap technique derives its tone from momentary string-fret contact during a rotational thumb strike, not from downward pressing force. Every technique has a measurable acoustic signature that can be objectively verified with readily available DAW tools.
+**Carpal tunnel syndrome** — median nerve compression from sustained left-wrist flexion. The open-position frets are the highest risk zone because reaching low frets on a horizontally-held bass forces the wrist into flexion. Mitigation: raise your strap so the neck is elevated toward your shoulder, keeping the left wrist as straight as possible.
 
-The practice architecture — slow tempo for diagnosis, incremental increases, isolation before integration, recording for review — applies to all subsequent labs in this curriculum.
+**Ulnar nerve compression** — from resting the right elbow sharply on the instrument body edge. Keep the right forearm resting on the instrument's curved upper bout, not the sharp binding edge.
+
+**Extensor tendinitis** in the right hand — from excessive slap force and high-repetition pop practice. The 15–20 minute technique isolation limit per session is a clinical recommendation. Slap technique is high-impact on the index finger's flexor mechanism.
+
+**The non-negotiable rule:** If pain, numbness, or tingling occurs in any finger during or after practice — stop immediately. Nerve and tendon damage from overuse is cumulative and potentially permanent. No tempo target or practice goal justifies playing through pain.
+
+---
+
+## Lab Summary
+
+The fretboard is a logarithmically scaled frequency-to-position map. Understanding its geometry reduces left-hand position shift inefficiency because you can predict fret distances and plan hand movements before you need them.
+
+Right-hand palm muting is a continuous spectral parameter, not a switch. Its distance from the bridge saddle determines which harmonic partials survive — this is a tone-shaping tool used in every genre.
+
+Walking bass lines are voice-leading structures built on chord tones and chromatic approach notes. The beat-4 leading tone is the engine of harmonic momentum — neglect it and the line loses forward drive.
+
+Slap technique derives its tone from momentary string-fret contact during a rotational thumb strike. Force and pad contact produce a thud. Rotational rebound with the knuckle produces the tone.
+
+Every technique covered in this lab has a measurable acoustic signature verifiable with the DAW tools and Python script provided. Use them. Objective measurement is faster feedback than ear alone.
+
+The practice architecture — 60 BPM for diagnosis, incremental tempo increases, one technique at a time, recording for review — is the template for all subsequent labs in this curriculum.
