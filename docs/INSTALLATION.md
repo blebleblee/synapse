@@ -14,13 +14,67 @@ Download pre-compiled Release Candidate binaries from the **[Releases](https://g
 | :--- | :--- | :--- |
 | **macOS (Apple Silicon)** | **`.dmg` (Disk Image Installer)** | Open `Synapse-Workbench-1.0.0-arm64.dmg`, drag **Synapse Workbench** to `/Applications`, and launch from Spotlight or Launchpad. |
 | **macOS (Portable Bundle)** | **`.zip` (App Archive)** | Decompress `Synapse-Workbench-1.0.0-arm64-mac.zip` and launch **Synapse Workbench.app** directly. |
-| **Windows / Linux** | **Docker Compose** | See Docker Deployment below. |
+| **Linux / Windows (WSL2)** | **`.whl` (Python Wheel)** | See Python Wheel Installation below. |
+| **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
 *The native desktop shell includes automatic background sidecar lifecycle management, native window framing, and connects automatically to your local Ollama cluster on `127.0.0.1:11434`.*
 
 ---
 
-## 🐳 2. 1-Click Docker Compose Deployment
+## 📦 2. Python Wheel (`.whl`) Installation (Linux, macOS & Windows WSL2)
+
+The `.whl` package (`synapse-1.0.0-py3-none-any.whl`) is pure Python and runs across **Linux**, **macOS**, and **Windows (via WSL2)**.
+
+### A. Linux Installation (Ubuntu, Debian, Fedora, Arch, SUSE)
+Linux is a first-class citizen with 100% native POSIX PTY terminal support:
+
+```bash
+# 1. Ensure Python 3.10+ and venv are installed
+sudo apt update && sudo apt install -y python3 python3-venv  # Debian/Ubuntu
+# or: sudo dnf install python3                              # Fedora/RHEL
+
+# 2. Create and activate an isolated environment
+python3 -m venv ~/synapse-env
+source ~/synapse-env/bin/activate
+
+# 3. Install the official Synapse wheel directly from Gitea
+pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+
+# 4. Launch Synapse Workbench
+synapse serve --port 8000
+```
+Open **`http://localhost:8000`** in any web browser.
+
+### B. Windows Installation (via WSL2)
+For full native terminal drawer support on Windows, run inside **WSL2** (Windows Subsystem for Linux):
+
+1. Open PowerShell and ensure WSL2 is active:
+   ```powershell
+   wsl --install
+   ```
+2. Launch your WSL2 terminal (Ubuntu) and execute the standard Linux commands:
+   ```bash
+   python3 -m venv ~/synapse-env
+   source ~/synapse-env/bin/activate
+   pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+   synapse serve --port 8000
+   ```
+3. Open **`http://localhost:8000`** in Chrome, Edge, or Firefox in Windows.
+
+*(Note: On raw native Windows Command Prompt or PowerShell without WSL, the CLI curriculum engine functions normally, but the interactive in-browser PTY terminal requires POSIX drivers provided by WSL).*
+
+### C. Useful CLI Commands
+Once the wheel is installed, the global `synapse` command is available in your environment:
+```bash
+synapse serve --port 8000       # Start the Socratic Workbench server
+synapse doctor                  # Run environment, GPU, and Ollama cluster diagnostics
+synapse audit                   # Run semantic linter & quality checks
+synapse generate --domain arts  # Autonomous curriculum generation
+```
+
+---
+
+## 🐳 3. 1-Click Docker Compose Deployment
 
 Run the complete Socratic Workbench inside an isolated, multi-stage production container with zero local toolchain setup.
 

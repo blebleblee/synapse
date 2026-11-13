@@ -118,11 +118,35 @@ Download the standalone, zero-dependency desktop application from the **[Release
 | :--- | :--- | :--- |
 | **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
 | **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases)** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Windows / Linux** | **Docker Compose** | See Docker Deployment below. |
+| **Linux / Windows (WSL2)** | **[`synapse-1.0.0-py3-none-any.whl`](https://gitea.2464.cz/ai/synapse/releases)** | See Python Wheel Installation below. |
+| **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
 ---
 
-### Option 2: 1-Click Docker Compose
+### Option 2: Python Wheel (`.whl`) Installation (Linux, macOS, Windows WSL2)
+
+Install and run Synapse via standard Python packaging across Linux, macOS, or Windows (WSL2):
+
+```bash
+# 1. Create and activate a virtual environment
+python3 -m venv synapse-env
+source synapse-env/bin/activate
+
+# 2. Install the official wheel from Gitea
+pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+
+# 3. Launch the Socratic Workbench
+synapse serve --port 8000
+# Open http://localhost:8000 in your browser
+```
+
+* **Linux:** 100% native support out of the box with embedded POSIX PTY terminal drivers.
+* **Windows:** Run inside **WSL2** (`wsl --install`) for full terminal PTY and Docker sandbox capabilities.
+* **CLI Utilities:** Once installed, use `synapse doctor` for system diagnostics or `synapse audit` for curriculum verification.
+
+---
+
+### Option 3: 1-Click Docker Compose
 Run the full Socratic Workbench in an isolated, multi-stage production container:
 
 ```bash
@@ -141,7 +165,7 @@ docker compose down
 
 ---
 
-### Option 3: Developer & Source Setup
+### Option 4: Developer & Source Setup
 
 ```bash
 # 1. Clone repository
