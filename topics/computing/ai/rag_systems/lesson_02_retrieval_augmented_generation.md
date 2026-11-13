@@ -44,7 +44,7 @@ A production RAG system consists of two primary pipelines: an **offline indexing
 
 ```mermaid
 graph TD
-    subgraph "Offline Indexing Pipeline"
+    subgraph sub_offline_indexing_pipeline ["Offline Indexing Pipeline"]
         A["Raw Documents\n(PDF, HTML, DB, API)"] --> B["Document Loader\n& Preprocessor"]
         B --> C["Text Chunker\n(recursive / semantic)"]
         C --> D["Embedding Model\n(e.g., text-embedding-3-large)"]
@@ -53,7 +53,7 @@ graph TD
         E --- F
     end
 
-    subgraph "Online Inference Pipeline"
+    subgraph sub_online_inference_pipeline ["Online Inference Pipeline"]
         G["User Query"] --> H["Query Rewriter\n(optional HyDE / expansion)"]
         H --> I["Embedding Model\n(same as indexing)"]
         I --> J["ANN Search\nk candidates"]

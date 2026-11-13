@@ -28,6 +28,38 @@ def get_node_name(host: str) -> str:
 # Retained as empty dict for backwards compatibility
 CLUSTER_HOST_SPECS: Dict[str, Dict[str, Any]] = {}
 
+def repair_mermaid_diagrams(content: str) -> str:
+    """
+    Normalizes Mermaid diagram code blocks to ensure strict syntax compliance:
+    - Normalizes subgraphs: subgraph "Title" -> subgraph sub_id ["Title"]
+    - Normalizes edge labels with spaces or parens: -->|Text (parens)| -> -->|"Text (parens)"|
+    - Normalizes node labels with parens: A[Text (parens)] -> A["Text (parens)"]
+    """
+    def sanitize_block(match):
+        block = match.group(1)
+
+        def repl_subgraph(m):
+            title = m.group(1).strip()
+            safe_id = re.sub(r"[^a-zA-Z0-9_]", "_", title).lower()[:32].strip("_")
+            if not safe_id:
+                safe_id = "group"
+            return f'subgraph sub_{safe_id} ["{title}"]'
+
+        block = re.sub(r'subgraph\s+"([^"\n]+)"?', repl_subgraph, block)
+        block = re.sub(r'subgraph\s+([A-Za-z0-9_-]+[ \t]+[^\n\[]+)(?=\n|$)', repl_subgraph, block)
+
+        def repl_edge_label(m):
+            lbl = m.group(1).strip()
+            if (" " in lbl or "(" in lbl or "/" in lbl) and not lbl.startswith('"'):
+                return f'-->|"{lbl}"| '
+            return m.group(0)
+
+        block = re.sub(r'-->\s*\|\s*([^"|\n]+?)\s*\|\s*', repl_edge_label, block)
+        block = re.sub(r'([A-Za-z0-9_-]+)\[([^"\]\n]*[\(\)\/\+\=\*\&][^"\]\n]*)\]', r'\1["\2"]', block)
+        return f"```mermaid\n{block.strip()}\n```"
+
+    return re.sub(r'```mermaid\n([\s\S]*?)```', sanitize_block, content)
+
 def validate_generation_output(content: str) -> str:
     """
     Validates LLM output before persisting to disk.
@@ -40,19 +72,37 @@ def validate_generation_output(content: str) -> str:
     if cleaned.startswith("{") and '"done":true' in cleaned.replace(" ", ""):
         raise ValueError(f"LLM returned raw model metadata instead of generated content: {cleaned[:120]}")
 
-    if cleaned.startswith("```markdown\n") and cleaned.endswith("\n```"):
-        cleaned = cleaned[12:-4].strip()
-    elif cleaned.startswith("```") and cleaned.endswith("```"):
-        lines = cleaned.splitlines()
-        if len(lines) > 2 and lines[0].startswith("```"):
-            cleaned = "\n".join(lines[1:-1]).strip()
+    # Strip outer markdown fencing even if truncated at max_tokens or missing closing fence
+    if cleaned.startswith("```markdown\n"):
+        cleaned = cleaned[12:].strip()
+    elif cleaned.startswith("```md\n"):
+        cleaned = cleaned[6:].strip()
+    elif cleaned.startswith("```\n") and not cleaned.startswith("```mermaid"):
+        cleaned = cleaned[4:].strip()
 
-    return cleaned
+    if cleaned.endswith("\n```"):
+        cleaned = cleaned[:-4].strip()
+    elif cleaned.endswith("```"):
+        cleaned = cleaned[:-3].strip()
+
+    return repair_mermaid_diagrams(cleaned)
 
 def load_env_file():
-    env_file = WORKSPACE_ROOT / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
+    # User-level private config takes precedence over inherited shell env vars
+    user_env = Path.home() / ".config" / "synapse" / "env"
+    if user_env.exists():
+        for line in user_env.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k:
+                    os.environ[k] = v
+
+    workspace_env = WORKSPACE_ROOT / ".env"
+    if workspace_env.exists():
+        for line in workspace_env.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
@@ -597,7 +647,7 @@ class AnthropicProvider(LLMProvider):
     Supports official Anthropic API as well as custom base URLs/proxies.
     Loads settings from config/settings.json or environment.
     """
-    def __init__(self, model: str = "claude-3-5-sonnet-20241022", api_key: Optional[str] = None, base_url: Optional[str] = None):
+    def __init__(self, model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None):
         settings = get_settings()
         anthropic_cfg = settings.get("anthropic", {})
 
@@ -610,20 +660,23 @@ class AnthropicProvider(LLMProvider):
 
         self.api_key = (
             api_key or 
-            os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             os.environ.get("ANTHROPIC_API_KEY") or 
+            os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             anthropic_cfg.get("api_key")
         )
-        self.model = self._resolve_model_name(model)
+        resolved_req_model = model or os.environ.get("ANTHROPIC_MODEL") or anthropic_cfg.get("model") or "claude-opus-5-5"
+        self.model = self._resolve_model_name(resolved_req_model)
 
     def _resolve_model_name(self, model: str) -> str:
-        if "aiapiflow" in self.base_url:
+        if "aiapiflow" in self.base_url or "vnaipro" in self.base_url:
             m_lower = model.lower()
             if "opus" in m_lower:
-                return "claude-opus-5"
+                return "claude-opus-5-5"
             if "fable" in m_lower or "haiku" in m_lower:
                 return "claude-fable-5"
-            return "claude-sonnet-5"
+            if "sonnet" in m_lower:
+                return "claude-sonnet-5"
+            return "claude-opus-5-5"
         return model
 
     def _get_url(self) -> str:
@@ -642,18 +695,26 @@ class AnthropicProvider(LLMProvider):
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
-    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 4096) -> str:
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 8192, retries: int = 3) -> str:
         """
-        Generates full completion by consuming generate_stream under the hood.
-        This continuously streams SSE tokens across the wire, preventing Cloudflare
-        edge proxy timeouts (Error 524 / 100-second idle disconnects).
+        Generates full completion by consuming generate_stream with automatic retry
+        on transient network or read timeouts.
         """
-        chunks = []
-        for chunk in self.generate_stream(prompt, system_instruction=system_instruction, max_tokens=max_tokens):
-            chunks.append(chunk)
-        return validate_generation_output("".join(chunks))
+        last_err = None
+        for attempt in range(1, retries + 1):
+            try:
+                chunks = []
+                for chunk in self.generate_stream(prompt, system_instruction=system_instruction, max_tokens=max_tokens):
+                    chunks.append(chunk)
+                return validate_generation_output("".join(chunks))
+            except Exception as e:
+                last_err = e
+                if attempt < retries:
+                    time.sleep(attempt * 2)
+                    continue
+        raise last_err or RuntimeError("Anthropic generation failed after retries")
 
-    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 4096):
+    def generate_stream(self, prompt: str, system_instruction: str = "", max_tokens: int = 8192):
         if not self.api_key:
             raise RuntimeError("ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is not set.")
 
@@ -678,7 +739,7 @@ class AnthropicProvider(LLMProvider):
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=300) as resp:
+            with urllib.request.urlopen(req, timeout=600) as resp:
                 for line in resp:
                     if not line:
                         continue

@@ -72,7 +72,7 @@ graph LR
     subgraph Kernel
         init[Kernel Initialization]
         mm[Memory Management]
-        io[Input/Output Management]
+        io[\"Input/Output Management\"]
         interrupts[Interrupt Handling]
     end
 

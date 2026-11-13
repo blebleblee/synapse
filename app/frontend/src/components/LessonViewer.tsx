@@ -376,8 +376,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
     return (
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
-        <h2>Select a Topic from the Tree</h2>
-        <p>Explore 504 masterclass technical courses across 80 disciplines and 12 engineering, scientific, and polymath domains.</p>
+        <h2>Select a Topic to Begin</h2>
+        <p>Choose a subject from the curriculum tree on the left to explore in-depth lessons, practice with hands-on terminal labs, or consult the Socratic mentor.</p>
       </div>
     );
   }

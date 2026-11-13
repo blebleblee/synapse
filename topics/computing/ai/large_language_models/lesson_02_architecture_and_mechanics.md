@@ -1,4 +1,3 @@
-```markdown
 # Lesson 2: Core Architecture & Algorithmic Mechanics
 
 ## 1. Tensor Transformations and Dimensional Flows

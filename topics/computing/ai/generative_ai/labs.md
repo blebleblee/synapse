@@ -16,18 +16,18 @@ BLIP-2 (Bootstrapping Language-Image Pre-training, Salesforce 2023) solves align
 
 ```mermaid
 graph TD
-    subgraph "Vision Branch (Frozen)"
+    subgraph sub_vision_branch__frozen ["Vision Branch (Frozen)"]
         IMG["Input Image\n(H × W × 3)"] --> PATCH["Patch Embedding\n(ViT-L/14 or EVA-CLIP)"]
         PATCH --> VENC["Vision Encoder\nFrozen ViT\n(196 patch tokens + CLS)"]
     end
 
-    subgraph "Q-Former (Trainable)"
+    subgraph sub_q_former__trainable ["Q-Former (Trainable)"]
         VENC --> XATTN["Cross-Attention Layers\n(Visual Self-Attn + Cross-Attn)"]
         QUERIES["N Learned Query Tokens\n(N=32, dim=768)"] --> XATTN
         XATTN --> QOUT["Query Outputs\n(32 × 768)"]
     end
 
-    subgraph "Language Branch (Frozen)"
+    subgraph sub_language_branch__frozen ["Language Branch (Frozen)"]
         QOUT --> PROJ["Linear Projection\n(768 → LLM hidden dim)"]
         TEXT["Tokenized Prompt"] --> TEMB["Text Embeddings"]
         PROJ --> CONCAT["Prefix Concatenation\n[visual tokens | text tokens]"]
@@ -1214,16 +1214,16 @@ Production deployment demands minimizing VRAM consumption without unacceptable a
 
 ```mermaid
 graph LR
-    subgraph "FP16 Baseline"
+    subgraph sub_fp16_baseline ["FP16 Baseline"]
         W16["Weight Matrix W\nfloat16\n(2 bytes/param)"]
     end
-    subgraph "INT8 Quantization (LLM.int8)"
+    subgraph sub_int8_quantization__llm_int8 ["INT8 Quantization (LLM.int8)"]
         W16 --> ABS["Compute per-row\nmax absolute value"]
         ABS --> SCALE["Scale = absmax / 127"]
         SCALE --> QUANT8["Quantized W_int8\n= round(W / scale)\n(1 byte/param)"]
         QUANT8 --> DEQUANT8["Dequantize on-the-fly\nduring matmul"]
     end
-    subgraph "NF4 Quantization (QLoRA)"
+    subgraph sub_nf4_quantization__qlora ["NF4 Quantization (QLoRA)"]
         W16 --> BLOCK["Divide into 64-param blocks"]
         BLOCK --> NF4MAP["Map to NF4 codebook\n(4-bit normal float)\n(0.5 bytes/param)"]
         NF4MAP --> DEQUANT4["Dequantize to BF16\nper-block during compute"]
@@ -1387,12 +1387,12 @@ Ollama provides a REST API for running quantized LLMs locally, including multimo
 
 ```mermaid
 graph TD
-    subgraph "HuggingFace Path"
+    subgraph sub_huggingface_path ["HuggingFace Path"]
         HF_PY["Python Process"] --> HF_MODEL["Model Weights\nin VRAM (direct)"]
         HF_MODEL --> HF_CUDA["CUDA Kernel\nexecution"]
     end
 
-    subgraph "Ollama Path"
+    subgraph sub_ollama_path ["Ollama Path"]
         PYTHON["Python Client\n(ollama library)"] -->|"HTTP POST\n/api/generate\n(JSON)"| OLLAMA_SRV["ollama serve\n(daemon process)"]
         OLLAMA_SRV --> LLAMA_CPP["llama.cpp backend\n(GGUF quantized)"]
         LLAMA_CPP --> GPU2["GPU or CPU\n(via Metal / CUDA / Vulkan)"]
@@ -1615,10 +1615,10 @@ flowchart TD
     START["Choose Decoding Strategy"] --> Q1{"Require determinism?"}
     Q1 -->|Yes| GREEDY["Greedy Search\nnum_beams=1\ndo_sample=False"]
     Q1 -->|No| Q2{"Quality priority?"}
-    Q2 -->|High quality| BEAM["Beam Search\nnum_beams=4-8\ndo_sample=False\nrepetition_penalty=1.2-1.4"]
-    Q2 -->|Diversity / creativity| SAMPLE["Sampling\nnum_beams=1\ndo_sample=True\ntop_p=0.9\ntemperature=0.7-1.0"]
+    Q2 -->|"High quality"| BEAM["Beam Search\nnum_beams=4-8\ndo_sample=False\nrepetition_penalty=1.2-1.4"]
+    Q2 -->|"Diversity / creativity"| SAMPLE["Sampling\nnum_beams=1\ndo_sample=True\ntop_p=0.9\ntemperature=0.7-1.0"]
     BEAM --> Q3{"Latency budget?"}
-    Q3 -->|Tight SLA| BEAMSMALL["num_beams=3-4\nmax_new_tokens=50"]
+    Q3 -->|"Tight SLA"| BEAMSMALL["num_beams=3-4\nmax_new_tokens=50"]
     Q3 -->|Flexible| BEAMLARGE["num_beams=5-8\nmax_new_tokens=100-200"]
     SAMPLE --> Q4{"Avoid repetition?"}
     Q4 -->|Yes| REPPEN["repetition_penalty=1.2-1.4\nno_repeat_ngram_size=3"]

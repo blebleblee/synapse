@@ -420,21 +420,21 @@ Standard MHA uses $H$ independent K/V projections. MQA (Shazeer, 2019) uses a si
 
 ```mermaid
 graph LR
-    subgraph "Multi-Head Attention (MHA)"
+    subgraph sub_multi_head_attention__mha ["Multi-Head Attention (MHA)"]
         Q1["Q head 1"] --> K1V1["K1, V1"]
         Q2["Q head 2"] --> K2V2["K2, V2"]
         Q3["Q head 3"] --> K3V3["K3, V3"]
         Q4["Q head 4"] --> K4V4["K4, V4"]
     end
 
-    subgraph "Grouped-Query Attention (GQA, G=2)"
+    subgraph sub_grouped_query_attention__gqa__g ["Grouped-Query Attention (GQA, G=2)"]
         QA1["Q head 1"] --> KVAB["K_A, V_A"]
         QA2["Q head 2"] --> KVAB
         QB1["Q head 3"] --> KVCD["K_B, V_B"]
         QB2["Q head 4"] --> KVCD
     end
 
-    subgraph "Multi-Query Attention (MQA)"
+    subgraph sub_multi_query_attention__mqa ["Multi-Query Attention (MQA)"]
         QM1["Q head 1"] --> KVSHARED["K, V (shared)"]
         QM2["Q head 2"] --> KVSHARED
         QM3["Q head 3"] --> KVSHARED
@@ -706,7 +706,7 @@ flowchart TD
 
     DEV --> TOK --> EMB --> POS --> TRF --> HEAD --> SAMPLE --> DETOK --> CODE
 
-    subgraph "Single Transformer Block (Pre-Norm)"
+    subgraph sub_single_transformer_block__pre_no ["Single Transformer Block (Pre-Norm)"]
         direction TB
         LN1b["LayerNorm"]
         MHA2["Multi-Head Causal Attention\nQ,K,V projections\n+ causal mask\n+ KV-cache at inference"]

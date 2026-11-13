@@ -24,6 +24,18 @@ def test_build_chat_system_instruction_with_active_lesson():
     assert "Live Student Terminal Output" in instruction
     assert "connection refused" in instruction
 
+def test_build_chat_system_instruction_with_language_mandate():
+    """Verify non-English language parameter injects proper language directive."""
+    instruction = build_chat_system_instruction(
+        domain="computing",
+        category="systems",
+        subtopic="linux_kernel",
+        language="cs"
+    )
+    assert "MANDATORY LANGUAGE DIRECTIVE" in instruction
+    assert "Czech" in instruction
+    assert "Čeština" in instruction
+
 def test_api_check_mentor_connectivity():
     """Functional check for /api/check-mentor-connectivity endpoint."""
     res = client.post("/api/check-mentor-connectivity", json={"host": "http://127.0.0.1:11434"})

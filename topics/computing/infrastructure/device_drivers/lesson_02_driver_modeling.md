@@ -23,7 +23,7 @@ Here is a simplified Mermaid diagram illustrating the driver's architecture:
 graph TD
     Device Model -->|config|> I/O Manager
     Device Model -->|registers|> Interrupt Handler
-    I/O Manager -->|data transfer|> Device Model
+    I/O Manager -->|"data transfer"| > Device Model
     Interrupt Handler -->|interrupts|> I/O Manager
 ```
 This diagram highlights the key interactions between the driver's components, including the exchange of data between the device model and I/O manager, and the handling of interrupts by the interrupt handler.

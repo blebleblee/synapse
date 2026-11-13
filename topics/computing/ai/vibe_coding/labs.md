@@ -1622,7 +1622,7 @@ sequenceDiagram
     OLLAMA->>LCPP: Prefill: process full prompt tokens in parallel
     Note over LCPP: KV cache populated for all prompt tokens\n(compute-bound: O(prompt_len² × d_model))
     LCPP-->>OLLAMA: Prefill complete → first token generated
-    OLLAMA-->>BENCH: (streaming) first token\n[TTFT = prompt_eval_duration]
+    OLLAMA-->>BENCH: (streaming) first token\n[\"TTFT = prompt_eval_duration\"]
     loop Decode: one token per step
         LCPP->>LCPP: Attend to KV cache\n(memory-bandwidth-bound)
         LCPP-->>OLLAMA: next token

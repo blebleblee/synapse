@@ -122,7 +122,7 @@ The sentence "make a thing that finds stuff in a list" and "implement a binary s
 
 ```mermaid
 graph TD
-    subgraph "Embedding Space (Conceptual)"
+    subgraph sub_embedding_space__conceptual ["Embedding Space (Conceptual)"]
         NL["Natural Language Embedding\n'binary search, sorted, index, Err'"]
         CODE["Code Embedding\n'fn binary_search<T: Ord>(...)'\n'Result<usize, ()>'"]
         NL -->|"High cosine similarity\n(cross-modal alignment\nlearned from training corpus)"| CODE

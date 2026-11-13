@@ -1,4 +1,3 @@
-```markdown
 # Lesson 3: Counterfactual Explanations and What-If Analysis
 
 ## 1. First-Principles Intuition and Causal Foundations

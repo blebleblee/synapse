@@ -16,7 +16,7 @@ Let's dissect the internal data structures and algorithms used by Grafana to ren
 
 ```mermaid
 graph TD;
-    A["Prometheus"] -->|Push Gateway|> B["Grafana"];
+    A["Prometheus"] -->|"Push Gateway"| > B["Grafana"];
     B -->|Query|> C["Prometheus Data Model"];
     C -->|Render|> D["Panel"];
     D -->|Layout|> E["Dashboard"];

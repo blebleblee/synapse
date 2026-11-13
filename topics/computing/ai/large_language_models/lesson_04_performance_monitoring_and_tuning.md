@@ -293,11 +293,11 @@ For transformer blocks, the MLP is split as column-parallel GELU then row-parall
 ```mermaid
 graph TD
     subgraph GPU0 ["GPU 0 (TP rank 0)"]
-        W0["W_col[:, 0:d/2]\n W_row[0:d/2, :]"]
+        W0["W_col[\":, 0:d/2\"]\n W_row[\"0:d/2, :\"]"]
         C0["Partial output Y0"]
     end
     subgraph GPU1 ["GPU 1 (TP rank 1)"]
-        W1["W_col[:, d/2:d]\n W_row[d/2:d, :]"]
+        W1["W_col[\":, d/2:d\"]\n W_row[\"d/2:d, :\"]"]
         C1["Partial output Y1"]
     end
 

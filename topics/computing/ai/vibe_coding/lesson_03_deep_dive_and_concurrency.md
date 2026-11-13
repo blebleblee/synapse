@@ -24,18 +24,18 @@ The practical consequence is that **optimizing inference throughput means minimi
 
 ```mermaid
 graph TD
-    subgraph "H100 SXM5 Hardware Limits"
+    subgraph sub_h100_sxm5_hardware_limits ["H100 SXM5 Hardware Limits"]
         COMPUTE["Peak BF16 Compute\n989 TFLOPS"]
         BW["HBM3 Bandwidth\n3.35 TB/s"]
         RIDGE["Ridge Point\n~295 FLOPs/byte"]
     end
 
-    subgraph "Inference Phase Arithmetic Intensity"
+    subgraph sub_inference_phase_arithmetic_inten ["Inference Phase Arithmetic Intensity"]
         DECODE["Decode Phase\n~2 FLOPs/byte\n148x below ridge\nMemory-bound ALWAYS"]
         PREFILL["Prefill Phase\n~2p FLOPs/byte\nCompute-bound when p > 148\nBenefits from tensor cores"]
     end
 
-    subgraph "GPU Memory Hierarchy"
+    subgraph sub_gpu_memory_hierarchy ["GPU Memory Hierarchy"]
         REG["Registers\n~1 cycle latency"]
         SRAM["L1/SRAM Cache\n228 KB per SM\n~30 cycle latency"]
         L2["L2 Cache\n50 MB shared\n~200 cycle latency"]
@@ -158,21 +158,21 @@ This architecture eliminates external fragmentation entirely: every block in the
 
 ```mermaid
 graph TB
-    subgraph "Traditional Contiguous Allocation"
+    subgraph sub_traditional_contiguous_allocatio ["Traditional Contiguous Allocation"]
         direction LR
         TA1["Seq 0: 2048 slots pre-allocated\n50 tokens used → 97.6% waste"]
         TA2["Seq 1: 2048 slots pre-allocated\n200 tokens used → 90.2% waste"]
         TA3["Seq 2: 2048 slots pre-allocated\n800 tokens used → 60.9% waste"]
     end
 
-    subgraph "PagedAttention: Block Tables"
+    subgraph sub_pagedattention__block_tables ["PagedAttention: Block Tables"]
         direction TB
         BT0["Seq 0 block table\n[B3, B7, B15] refcount: B3=2, B7=2"]
         BT1["Seq 1 block table\n[B3, B7, B12] refcount: B3=2, B7=2"]
         BT2["Seq 2 block table\n[B1, B9]"]
     end
 
-    subgraph "Physical Block Pool (16 tokens/block)"
+    subgraph sub_physical_block_pool__16_tokens_b ["Physical Block Pool (16 tokens/block)"]
         B1["Block 1\n16 tokens (Seq 2)"]
         B3["Block 3\n16 tokens\nSHARED: Seq 0 + Seq 1\nrefcount=2"]
         B7["Block 7\n16 tokens\nSHARED: Seq 0 + Seq 1\nrefcount=2"]
@@ -379,7 +379,7 @@ Post-training quantization (PTQ) methods avoid re-training the model while pushi
 
 ```mermaid
 graph LR
-    subgraph "PTQ Method Selection"
+    subgraph sub_ptq_method_selection ["PTQ Method Selection"]
         START["Model to quantize"] --> Q1{"Have calibration\ndata available?"}
         Q1 -->|"Yes (small dataset)"| Q2{"Target bit width?"}
         Q1 -->|"No"| NAIVE["INT8 per-channel W8A16\nSimple, 2x compression\n< 0.5% accuracy loss\nNo calibration needed"]
@@ -422,10 +422,10 @@ This results in exactly **two all-reduce operations per transformer layer**: one
 
 ```mermaid
 graph LR
-    subgraph "Single Transformer Layer - Tensor Parallelism (N=4 GPUs)"
+    subgraph sub_single_transformer_layer___tenso ["Single Transformer Layer - Tensor Parallelism (N=4 GPUs)"]
         INPUT["Input X\n[batch, seq, d_model]\nReplicated on all GPUs"]
 
-        subgraph "GPU 0"
+        subgraph sub_gpu_0 ["GPU 0"]
             G0_QKV["QKV col-parallel\nheads 0-7"]
             G0_ATT["Attn heads 0-7"]
             G0_OUT["Output proj\nrow-parallel partial sum"]
@@ -433,7 +433,7 @@ graph LR
             G0_FF2["FFN row-parallel\npartial sum"]
         end
 
-        subgraph "GPU 1"
+        subgraph sub_gpu_1 ["GPU 1"]
             G1_QKV["QKV col-parallel\nheads 8-15"]
             G1_ATT["Attn heads 8-15"]
             G1_OUT["Output proj\nrow-parallel partial sum"]
@@ -488,7 +488,7 @@ The practical rule for distributed inference: **use tensor parallelism within no
 
 ```mermaid
 graph TB
-    subgraph "Node 0 (8x H100, NVLink 900 GB/s)"
+    subgraph sub_node_0__8x_h100__nvlink_900_gb_s ["Node 0 (8x H100, NVLink 900 GB/s)"]
         G0["GPU 0\nLayers 0-9\nTP rank 0"]
         G1["GPU 1\nLayers 0-9\nTP rank 1"]
         G2["GPU 2\nLayers 0-9\nTP rank 2"]
@@ -501,7 +501,7 @@ graph TB
         G0 & G1 & G2 & G3 & G4 & G5 & G6 & G7 --- NVL0
     end
 
-    subgraph "Node 1 (8x H100, NVLink 900 GB/s)"
+    subgraph sub_node_1__8x_h100__nvlink_900_gb_s ["Node 1 (8x H100, NVLink 900 GB/s)"]
         G8["GPU 8\nLayers 10-19\nTP rank 0"]
         G9["GPU 9\nLayers 10-19\nTP rank 1"]
         NVL1["NVLink Switch\n900 GB/s bisection"]
@@ -605,7 +605,7 @@ The continuous batching scheduler must solve a bin-packing problem at each step:
 
 ```mermaid
 graph TD
-    subgraph "Static Batching (naive)"
+    subgraph sub_static_batching__naive ["Static Batching (naive)"]
         SB1["t=0: Batch [Req A (long), Req B (short), Req C (medium)]\nAll start together"]
         SB2["t=100: Req B done but BLOCKED\nwaiting for Req A"]
         SB3["t=300: Req C done but BLOCKED\nwaiting for Req A"]
@@ -613,7 +613,7 @@ graph TD
         SB1 --> SB2 --> SB3 --> SB4
     end
 
-    subgraph "Continuous Batching (Orca)"
+    subgraph sub_continuous_batching__orca ["Continuous Batching (Orca)"]
         CB1["t=0: Begin decoding Req A, B, C"]
         CB2["t=100: Req B completes\nIMMEDIATELY returned\nReq D inserted into batch"]
         CB3["t=300: Req C completes\nIMMEDIATELY returned\nReq E inserted into batch"]
@@ -836,7 +836,7 @@ Different task categories have fundamentally different reliability profiles for 
 
 ```mermaid
 graph TB
-    subgraph "LLM Code Generation Reliability Spectrum"
+    subgraph sub_llm_code_generation_reliability ["LLM Code Generation Reliability Spectrum"]
         HIGH["HIGH RELIABILITY\nBoilerplate, data classes\nCommon algorithms\nStandard library usage\nDocumentation\nRegex, format parsing\n→ Accept with light review"]
 
         MED["MEDIUM RELIABILITY\nAsync/concurrent code\nNumerical algorithms\nDatabase queries\nAPI client code\nError handling\n→ Review carefully, test with edge cases"]
@@ -844,7 +844,7 @@ graph TB
         LOW["LOW RELIABILITY\nCryptographic code\nSecurity/auth logic\nDistributed protocols\nUnsafe memory management\nFinancial calculations\n→ Expert review required, treat as scaffolding only"]
     end
 
-    subgraph "Risk Amplifiers"
+    subgraph sub_risk_amplifiers ["Risk Amplifiers"]
         NOVEL["Novel/obscure APIs\n(less training data)"]
         LONG["Long generations\n(error probability compounds)"]
         SUBTLE["Subtle correctness criteria\n(hard to test automatically)"]

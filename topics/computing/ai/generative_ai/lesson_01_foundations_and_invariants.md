@@ -130,7 +130,7 @@ graph LR
 
 ```mermaid
 graph TB
-    subgraph "Training Loop"
+    subgraph sub_training_loop ["Training Loop"]
         Z["Latent z ~ N(0, I)"] -->| "G_θ(z)" | GX["Generated x_fake"]
         RD["Real data x_real"] --> DISC["Discriminator D_φ"]
         GX --> DISC
@@ -140,7 +140,7 @@ graph TB
         GUPD -.->| "Iterate" | Z
         DUPD -.->| "Iterate" | Z
     end
-    subgraph "Inference"
+    subgraph sub_inference ["Inference"]
         Z2["z ~ N(0, I)"] -->| "G_θ(z)" | OUT["Generated sample"]
     end
 ```
@@ -149,7 +149,7 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "Encoder q_φ(z|x)"
+    subgraph sub_encoder_q___z_x ["Encoder q_φ(z|x)"]
         X["Input x"] --> ENC["Encoder Network"]
         ENC --> MU["μ_φ(x)"]
         ENC --> SIGMA["σ_φ(x)"]
@@ -172,17 +172,17 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "Forward Process q (fixed, no learning)"
+    subgraph sub_forward_process_q__fixed__no_lea ["Forward Process q (fixed, no learning)"]
         X0["x_0 (clean image)"] -->| "Add noise β_1" | X1["x_1"]
         X1 -->| "Add noise β_2" | X2["x_2"]
         X2 -->| "..." | XT["x_T (pure noise)"]
     end
-    subgraph "Reverse Process p_θ (learned)"
+    subgraph sub_reverse_process_p____learned ["Reverse Process p_θ (learned)"]
         XT2["x_T ~ N(0, I)"] -->| "Denoise step T" | U1["x_{T-1}"]
         U1 -->| "ε_θ(x_t, t)" | U2["x_{T-2}"]
         U2 -->| "..." | X0HAT["x_0 (generated)"]
     end
-    subgraph "Training Objective"
+    subgraph sub_training_objective ["Training Objective"]
         X0TR["x_0"] -->| "Sample t, add noise ε" | XTN["x_t, ε"]
         XTN --> NET["U-Net ε_θ(x_t, t)"]
         NET --> PRED["Predicted ε̂"]

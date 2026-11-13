@@ -39,6 +39,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const isDraggingRef = useRef(false);
   const reconnectTimerRef = useRef<any>(null);
   const isUnmountedRef = useRef(false);
+  const lastSizeRef = useRef<{ cols: number; rows: number }>({ cols: 0, rows: 0 });
 
   const fitTerminal = () => {
     if (!termRef.current || !containerRef.current || !isOpen || !fitAddonRef.current) return;
@@ -48,7 +49,14 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       const cols = termRef.current.cols;
       const rows = termRef.current.rows;
 
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && cols > 0 && rows > 0) {
+      if (
+        wsRef.current &&
+        wsRef.current.readyState === WebSocket.OPEN &&
+        cols > 0 &&
+        rows > 0 &&
+        (cols !== lastSizeRef.current.cols || rows !== lastSizeRef.current.rows)
+      ) {
+        lastSizeRef.current = { cols, rows };
         wsRef.current.send(JSON.stringify({
           type: 'resize',
           cols,
@@ -81,6 +89,7 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       setConnected(true);
       onConnectionChange?.(true);
       fitTerminal();
+      termRef.current?.focus();
     };
 
     ws.onmessage = (event) => {
@@ -192,11 +201,9 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
 
   useEffect(() => {
     if (isOpen) {
-      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-        connectWs(terminalEnv);
-      }
       const timer = setTimeout(() => {
         fitTerminal();
+        termRef.current?.focus();
       }, 50);
       return () => clearTimeout(timer);
     }
@@ -216,8 +223,10 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
       try {
         const buffer = termRef.current.buffer.active;
         const lines: string[] = [];
-        const startLine = Math.max(0, buffer.length - lineCount);
-        for (let i = startLine; i < buffer.length; i++) {
+        // Scan around active cursor position (baseY + cursorY) to avoid trailing blank viewport rows
+        const currentActiveLine = Math.min(buffer.length - 1, buffer.baseY + buffer.cursorY + 1);
+        const startLine = Math.max(0, currentActiveLine - lineCount);
+        for (let i = startLine; i <= currentActiveLine; i++) {
           const line = buffer.getLine(i);
           if (line) {
             const str = line.translateToString(true);
@@ -345,7 +354,12 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
         </div>
       )}
 
-      <div className="terminal-body" ref={containerRef} style={{ display: isOpen ? 'block' : 'none' }} />
+      <div
+        className="terminal-body"
+        ref={containerRef}
+        onClick={() => termRef.current?.focus()}
+        style={{ display: isOpen ? 'block' : 'none' }}
+      />
     </div>
   );
 });

@@ -15,6 +15,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
+import { getUIStrings } from '../utils/i18n';
 
 interface TutorChatProps {
   topic: TopicDetails | null;
@@ -26,6 +27,7 @@ interface TutorChatProps {
   isTerminalConnected?: boolean;
   mentorConnected: 'checking' | 'connected' | 'error';
   onToggleTerminal?: () => void;
+  targetLanguage?: string;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
@@ -38,7 +40,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({
   isTerminalConnected = false,
   mentorConnected,
   onToggleTerminal,
+  targetLanguage,
 }) => {
+  const ui = getUIStrings(targetLanguage);
   // ... existing component logic ...
   const [input, setInput] = useState('');
   const [personaExpanded, setPersonaExpanded] = useState(false);
@@ -153,7 +157,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
-                <span className="persona-label">Socratic Mentor</span>
+                <span className="persona-label">{ui.mentorTitle}</span>
                 <span className="persona-badge">{topic?.domain ? topic.domain.replace('_', ' ') : 'Polymath'}</span>
                 {personaExpanded ? <ChevronUp size={12} className="persona-chevron" /> : <ChevronDown size={12} className="persona-chevron" />}
               </div>
@@ -168,33 +172,29 @@ export const TutorChat: React.FC<TutorChatProps> = ({
               className={`mentor-status-badge ${mentorConnected}`}
               title={
                 mentorConnected === 'connected'
-                  ? "AI Mentor Online & Active"
+                  ? ui.mentorOnline
                   : mentorConnected === 'checking'
-                  ? "AI Mentor: Probing cluster node..."
-                  : "AI Mentor: Offline. Verify Settings ⚙"
+                  ? ui.mentorConnecting
+                  : ui.mentorOffline
               }
             >
-              {mentorConnected === 'connected' ? '● Mentor Online' : mentorConnected === 'checking' ? '○ Connecting...' : '○ Mentor Offline'}
+              {mentorConnected === 'connected' ? `● ${ui.mentorOnline}` : mentorConnected === 'checking' ? `○ ${ui.mentorConnecting}` : `○ ${ui.mentorOffline}`}
             </span>
             <button
               type="button"
               className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
               onClick={onToggleTerminal}
-              title={
-                isTerminalConnected
-                  ? "Live Terminal Linked: AI Mentor reads your terminal output & errors. Click to toggle terminal drawer."
-                  : "Terminal in Standby. Click to open terminal drawer and connect."
-              }
+              title={ui.terminalConnected}
             >
               <Terminal size={11} />
-              <span>{isTerminalConnected ? "Terminal Live" : "Terminal Standby"}</span>
+              <span>{isTerminalConnected ? ui.terminalConnected : ui.terminal}</span>
             </button>
             {onClearChat && (
               <button
                 type="button"
                 className="chat-action-btn"
                 onClick={async () => {
-                  if (confirm('Permanently clear all chat sessions?')) {
+                  if (confirm(ui.clearChat + '?')) {
                     try {
                       await fetch('/api/clean', {
                         method: 'POST',
@@ -208,7 +208,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                   }
                 }}
                 disabled={history.length === 0}
-                title="Clear conversation history"
+                title={ui.clearChat}
               >
                 <Trash2 size={13} />
               </button>
@@ -232,7 +232,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 title="Ask mentor to explain this lesson"
               >
                 <Lightbulb size={10} />
-                <span>Explain</span>
+                <span>{ui.chipExplain}</span>
               </button>
               <button
                 type="button"
@@ -241,7 +241,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 title="Ask for a practical example"
               >
                 <Sparkles size={10} />
-                <span>Example</span>
+                <span>{ui.chipExample}</span>
               </button>
               <button
                 type="button"
@@ -250,7 +250,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
                 title="Ask about common pitfalls"
               >
                 <HelpCircle size={10} />
-                <span>Pitfall</span>
+                <span>{ui.chipPitfall}</span>
               </button>
             </div>
           </div>
@@ -356,7 +356,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
       <form className="chat-input-bar" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder={topic ? `Ask ${personaRole}...` : "Ask Socratic Mentor across 12 domains or about your terminal..."}
+          placeholder={topic ? ui.askMentor : ui.mentorPlaceholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={isChatting}
@@ -365,7 +365,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           type="submit"
           className="send-btn"
           disabled={!input.trim() || isChatting}
-          title="Send inquiry (Enter)"
+          title={ui.send}
         >
           <Send size={15} />
         </button>

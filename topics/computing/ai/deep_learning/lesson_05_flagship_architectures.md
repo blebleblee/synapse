@@ -32,9 +32,9 @@ Inception is a family of architectures that introduced the concept of parallel c
 
 ```mermaid
 graph TD
-    A[Conv2D(1x1)] --> B[BN] --> C[ReLU]
-    D[Conv2D(3x3)] --> E[BN] --> F[ReLU]
-    G[Conv2D(5x5)] --> H[BN] --> I[ReLU]
+    A[\"Conv2D(1x1)\"] --> B[BN] --> C[ReLU]
+    D[\"Conv2D(3x3)\"] --> E[BN] --> F[ReLU]
+    G[\"Conv2D(5x5)\"] --> H[BN] --> I[ReLU]
     J[MaxPool2D] --> K[BN] --> L[ReLU]
     C --> L
     F --> L

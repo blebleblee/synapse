@@ -202,3 +202,23 @@
 - **Unity Engine Architecture and ECS Systems** (`software/unity/`)
 - **Unreal Engine Architecture Nanite and Lumen** (`software/unreal_engine/`)
 - **DLSS and Neural Super Sampling Pipelines** (`graphics/dlss/`)
+
+### AI: Advanced Architectures and Agentic Swarms
+- **Reinforcement Learning and PPO** (`ai/reinforcement_learning/`)
+- **Agentic Swarms and Multi-Agent Systems** (`ai/agentic_swarms/`)
+- **Mixture of Experts MoE Architecture** (`ai/mixture_of_experts/`)
+- **State Space Models and Mamba** (`ai/state_space_models/`)
+
+### Infrastructure: Serverless and Event-Driven
+- **Serverless Architecture AWS Lambda** (`infrastructure/serverless/`)
+- **Event-Driven Microservices** (`infrastructure/event_driven/`)
+
+### Systems: Quantum and Future Compute
+- **Quantum Computing Theory** (`systems/quantum_computing/`)
+- **Quantum Cryptography** (`systems/quantum_cryptography/`)
+- **Neuromorphic Engineering** (`systems/neuromorphic/`)
+
+### Software: Web3 and Decentralized Systems
+- **Blockchain Consensus Mechanisms** (`software/blockchain_consensus/`)
+- **Smart Contract Auditing and EVM** (`software/smart_contracts/`)
+- **Zero Knowledge Proofs zkSNARKs** (`software/zero_knowledge_proofs/`)

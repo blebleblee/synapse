@@ -4,16 +4,43 @@ Multi-Topic Parallel Curriculum Generator
 Uses a work-stealing queue to saturate all Ollama cluster nodes simultaneously.
 """
 
+import os
+import sys
+import argparse
 import threading
 import subprocess
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from learning_engine.topic_manager import get_topic_tree
-from learning_engine.generator import generate_subtopic_content
-from learning_engine.models import OllamaCluster
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+if str(WORKSPACE_ROOT) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_ROOT))
+
+LOG_FILE = WORKSPACE_ROOT / "generator.log"
+
+class TeeLogger:
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.logfile = open(filename, "a", encoding="utf-8", buffering=1)
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.terminal.flush()
+        self.logfile.write(message)
+        self.logfile.flush()
+
+    def flush(self):
+        self.terminal.flush()
+        self.logfile.flush()
+
+sys.stdout = TeeLogger(LOG_FILE)
+sys.stderr = sys.stdout
+
+from learning_engine.topic_manager import get_topic_tree
+from learning_engine.generator import generate_subtopic_content
+from learning_engine.models import OllamaCluster, AnthropicProvider
+from learning_engine.enhancer import enhance_existing_topic
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
 GIT_QUEUE = Queue()
 
@@ -22,13 +49,20 @@ def git_worker():
         task = GIT_QUEUE.get()
         if task is None:
             break
-        subtopic_dir, subtopic_id = task
-        try:
-            subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT))
-            subprocess.run(["git", "commit", "-m", f"gen({subtopic_id}): masterclass curriculum"], check=False, cwd=str(WORKSPACE_ROOT))
-            print(f"[✔] Published: {subtopic_id}")
-        except Exception as e:
-            print(f"[✘] Git error for {subtopic_id}: {e}")
+        subtopic_dir, subtopic_id, prefix = task
+        published = False
+        for attempt in range(5):
+            try:
+                subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                subprocess.run(["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                print(f"[✔] Published & Pushed to Gitea: {subtopic_id}")
+                published = True
+                break
+            except Exception:
+                time.sleep(1.5)
+        if not published:
+            print(f"[✘] Git error for {subtopic_id}: lock contention after 5 attempts")
         GIT_QUEUE.task_done()
 
 def is_topic_complete(subtopic_dir: Path) -> bool:
@@ -39,7 +73,7 @@ def is_topic_complete(subtopic_dir: Path) -> bool:
     has_labs = (subtopic_dir / "labs.md").exists()
     return has_lesson and has_labs
 
-def worker(task_queue: Queue, total_tasks: int, progress_counter: list):
+def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider_override=None, enhance_mode=False):
     while True:
         task = task_queue.get()
         if task is None:
@@ -48,20 +82,28 @@ def worker(task_queue: Queue, total_tasks: int, progress_counter: list):
         domain, category, subtopic_id, subtopic_dir = task
         progress_counter[0] += 1
         idx = progress_counter[0]
+        
+        mode_str = "Enhancing" if enhance_mode else "Generating"
         print(f"\n==================================================")
-        print(f"[*] [{idx}/{total_tasks}] Generating: {domain}/{category}/{subtopic_id}...")
+        print(f"[*] [{idx}/{total_tasks}] {mode_str}: {domain}/{category}/{subtopic_id}...")
         print(f"==================================================")
         
         try:
-            generate_subtopic_content(
-                domain=domain,
-                category=category,
-                subtopic_id=subtopic_id,
-                subtopic_dir=subtopic_dir,
-                force=False
-            )
-            GIT_QUEUE.put((subtopic_dir, subtopic_id))
-            print(f"[✔] Successfully generated topic: {subtopic_id}")
+            if enhance_mode:
+                success = enhance_existing_topic(domain, subtopic_id, subtopic_dir, provider_override)
+                if success:
+                    GIT_QUEUE.put((subtopic_dir, subtopic_id, "enhance"))
+            else:
+                generate_subtopic_content(
+                    domain=domain,
+                    category=category,
+                    subtopic_id=subtopic_id,
+                    subtopic_dir=subtopic_dir,
+                    provider=provider_override,
+                    force=False
+                )
+                GIT_QUEUE.put((subtopic_dir, subtopic_id, "gen"))
+                print(f"[✔] Successfully generated topic: {subtopic_id}")
             
         except Exception as e:
             print(f"[✘] Failed {subtopic_id}: {e}")
@@ -69,33 +111,54 @@ def worker(task_queue: Queue, total_tasks: int, progress_counter: list):
         task_queue.task_done()
 
 def main():
+    parser = argparse.ArgumentParser(description="Multi-Topic Parallel Curriculum Generator")
+    parser.add_argument("--provider", choices=["anthropic", "ollama", "auto"], default="auto", help="Provider to use for generation")
+    parser.add_argument("--model", type=str, default=None, help="Model override (e.g. claude-opus-5-5)")
+    parser.add_argument("--domain", type=str, default=None, help="Target specific domain only")
+    parser.add_argument("--enhance", action="store_true", help="Enhance existing (completed) topics instead of generating new ones")
+    args = parser.parse_args()
+
+    provider_override = None
+    if args.provider == "anthropic" or (args.provider == "auto" and os.environ.get("ANTHROPIC_API_KEY")):
+        target_model = args.model or os.environ.get("ANTHROPIC_MODEL", "claude-opus-5-5")
+        provider_override = AnthropicProvider(model=target_model)
+        print(f"[*] Engine: Anthropic Claude [{provider_override.model}] via {provider_override.base_url}")
+    else:
+        print("[*] Engine: Ollama Multi-Node Local Cluster")
+
     tree = get_topic_tree()
     task_queue = Queue()
     
-    # Identify pending topics
-    pending_tasks = []
+    # Identify pending or completed topics based on mode
+    tasks = []
     for domain, ddata in tree.items():
+        if args.domain and domain != args.domain:
+            continue
         for disc, categories in ddata.get("categories", {}).items():
             for sub_slug, sdata in categories.items():
                 p = Path(sdata["full_path"])
-                if not is_topic_complete(p):
-                    pending_tasks.append((domain, disc, sub_slug, p))
+                is_complete = is_topic_complete(p)
+                
+                if args.enhance and is_complete:
+                    tasks.append((domain, disc, sub_slug, p))
+                elif not args.enhance and not is_complete:
+                    tasks.append((domain, disc, sub_slug, p))
 
-    total_unwritten = len(pending_tasks)
-    print(f"[*] Queue initialized: {total_unwritten} unwritten topics queued for cluster generation.")
+    total_tasks = len(tasks)
+    mode_label = "completed topics queued for ENHANCEMENT" if args.enhance else "unwritten topics queued for GENERATION"
+    print(f"[*] Queue initialized: {total_tasks} {mode_label}.")
 
-    for item in pending_tasks:
+    for item in tasks:
         task_queue.put(item)
 
-    # Concurrency: 1 topic at a time allows generate_topic_parallel to
-    # fully saturate all cluster nodes simultaneously across its 4-6 lessons without socket collisions.
+    # Use 1 worker for Claude to avoid extreme rate limit saturation, or standard logic for Ollama
     num_workers = 1
     progress_counter = [0]
     threading.Thread(target=git_worker, daemon=True).start()
     
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         for _ in range(num_workers):
-            executor.submit(worker, task_queue, total_unwritten, progress_counter)
+            executor.submit(worker, task_queue, total_tasks, progress_counter, provider_override, args.enhance)
         
         task_queue.join()
         
@@ -106,7 +169,7 @@ def main():
     GIT_QUEUE.join()
 
     subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT))
-    print("[✔] All topics drafted and pushed.")
+    print(f"[✔] All topics processed and pushed.")
 
 if __name__ == "__main__":
     main()

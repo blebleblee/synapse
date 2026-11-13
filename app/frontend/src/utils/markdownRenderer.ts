@@ -26,11 +26,16 @@ function sanitizeAndRepairMermaid(diagramText: string): string {
     return match;
   });
 
-  // Fix subgraphs with spaces in titles: subgraph Storage Class -> subgraph "Storage Class"
-  cleaned = cleaned.replace(/subgraph\s+([A-Za-z0-9_-]+\s+[^\n]+)/g, (match, title) => {
+  // Fix subgraphs with quoted or multi-word titles: subgraph "Title" or subgraph Title Here -> subgraph sub_id ["Title"]
+  cleaned = cleaned.replace(/subgraph\s+"([^"\n]+)"/g, (_, title) => {
+    const id = 'sub_' + title.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
+    return `subgraph ${id} ["${title}"]`;
+  });
+  cleaned = cleaned.replace(/subgraph\s+([A-Za-z0-9_-]+[ \t]+[^\n[]+)(?=\n|$)/g, (match, title) => {
     const trimmed = title.trim();
-    if (trimmed.startsWith('"') && trimmed.endsWith('"')) return match;
-    return `subgraph "${trimmed}"`;
+    if (trimmed.startsWith('"')) return match;
+    const id = 'sub_' + trimmed.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
+    return `subgraph ${id} ["${trimmed}"]`;
   });
 
   // Enclose node labels in double quotes if they contain parentheses, slashes, or arithmetic characters
@@ -46,8 +51,23 @@ function sanitizeAndRepairMermaid(diagramText: string): string {
 export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath = false): string {
   if (!rawMarkdown) return '';
 
+  let processed = rawMarkdown.trim();
+
+  // Strip accidental outer document code fencing (e.g. ```markdown\n# Title... or ```md\n)
+  if (processed.startsWith('```markdown\n')) {
+    processed = processed.slice(12).trim();
+    if (processed.endsWith('```')) {
+      processed = processed.slice(0, -3).trim();
+    }
+  } else if (processed.startsWith('```md\n')) {
+    processed = processed.slice(6).trim();
+    if (processed.endsWith('```')) {
+      processed = processed.slice(0, -3).trim();
+    }
+  }
+
   // Strip redundant diagram meta-headers
-  let processed = rawMarkdown
+  processed = processed
     .replace(/^###?\s*(?:Ascii diagram|Mermaid flowchart|ASCII Architecture|System Diagram)[\s:]*$/gim, '')
     .trim();
 

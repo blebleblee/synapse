@@ -1,4 +1,3 @@
-```markdown
 # Lesson 1: Foundations & Mathematical Formulation
 
 ## Curriculum Roadmap

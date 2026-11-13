@@ -27,7 +27,7 @@ graph TD
     A -->| "Fingers Slap" | B
     B -->| "Thumb Pops" | C
     A -->| "E String" | C
-    subgraph "Hand_Positioning
+    subgraph sub_hand_positioning ["Hand_Positioning"]
         A -->| "Curved Fingers" | B"
         B -->| "Thumb Behind String" | C
     end

@@ -16,14 +16,14 @@ The KV cache is therefore the central artifact worth caching. A naive output cac
 
 ```mermaid
 flowchart TD
-    subgraph "Prefill Phase (compute-bound)"
+    subgraph sub_prefill_phase__compute_bound ["Prefill Phase (compute-bound)"]
         P["Input Prompt Tokens\n[t₁, t₂, ..., tₙ]"]
         ATT["Multi-Head Attention\nQ·Kᵀ / √d → softmax → ·V"]
         KVC["KV Cache\n{K_l, V_l} for l=1..L"]
         P --> ATT --> KVC
     end
 
-    subgraph "Decode Phase (bandwidth-bound)"
+    subgraph sub_decode_phase__bandwidth_bound ["Decode Phase (bandwidth-bound)"]
         NT["New Token tₙ₊ᵢ"]
         QP["Compute Q for tₙ₊ᵢ"]
         ATTN2["Attend over full\nK/V cache (HBM read)"]
@@ -33,7 +33,7 @@ flowchart TD
 
     KVC -->|"seed decode"| ATTN2
 
-    subgraph "Prefix Cache Hit"
+    subgraph sub_prefix_cache_hit ["Prefix Cache Hit"]
         STORED["Stored KV tensors\nfor shared prefix"]
         RESTORE["Restore to GPU memory"]
         SKIP["Skip prefill entirely"]
@@ -801,13 +801,13 @@ Benchmarking LLM inference correctly requires care: the first call is always slo
 
 ```mermaid
 flowchart LR
-    subgraph "Benchmark Harness"
+    subgraph sub_benchmark_harness ["Benchmark Harness"]
         WARM["Warm-up: 3 passes\n(discard results)"]
         TRIAL["N=20 timed trials\nper condition"]
         STAT["Statistics:\nmean, p50, p95, p99, std"]
     end
 
-    subgraph "Conditions"
+    subgraph sub_conditions ["Conditions"]
         C1["No cache"]
         C2["Exact cache (cold)"]
         C3["Exact cache (warm)"]

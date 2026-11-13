@@ -53,11 +53,11 @@ graph LR
         title Kernel
         Process Scheduling[Process Scheduling]
         Memory Management[Memory Management]
-        I/O Operations[I/O Operations]
+        I/O Operations[\"I/O Operations\"]
         Security[Security]
     end
 
-    subgraph User Space
+    subgraph sub_user_space ["User Space"]
         title User Space
         Applications[Applications]
         Libraries[Libraries]
@@ -67,14 +67,14 @@ graph LR
         title Hardware
         CPU[CPU]
         Memory[Memory]
-        I/O Devices[I/O Devices]
+        I/O Devices[\"I/O Devices\"]
     end
 
     Kernel -->|Scheduling|> User Space
-    Kernel -->|Memory Management|> User Space
-    Kernel -->|I/O Operations|> Hardware
+    Kernel -->|"Memory Management"| > User Space
+    Kernel -->|"I/O Operations"| > Hardware
     User Space -->|Libraries|> Kernel
-    Hardware -->|I/O Devices|> Kernel
+    Hardware -->|"I/O Devices"| > Kernel
 ```
 
 This diagram illustrates the kernel's role as a mediator between user-level applications, hardware, and other system components. The kernel provides a platform for user-level applications to execute, while ensuring system integrity and correctness through its invariant properties.

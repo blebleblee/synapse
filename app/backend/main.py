@@ -30,16 +30,27 @@ import threading
 from collections import deque
 from typing import Dict, List, Optional, Any
 
-ANSI_ESCAPE_RE = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+ANSI_ESCAPE_RE = re.compile(r'\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 MAX_TERMINAL_LINE_LENGTH = 10000
 TERMINAL_HISTORY: deque[str] = deque(maxlen=150)
+LAST_TERMINAL_COMMAND: str = ""
+
+def resolve_backspaces(s: str) -> str:
+    chars = []
+    for c in s:
+        if c == '\b':
+            if chars:
+                chars.pop()
+        elif c != '\r':
+            chars.append(c)
+    return "".join(chars)
 
 def append_terminal_bytes(raw_bytes: bytes):
     try:
         text = raw_bytes.decode("utf-8", errors="replace")
         clean = ANSI_ESCAPE_RE.sub("", text)
         for line in clean.splitlines():
-            stripped = line.strip()
+            stripped = resolve_backspaces(line).strip()
             if stripped:
                 if len(stripped) > MAX_TERMINAL_LINE_LENGTH:
                     stripped = stripped[:MAX_TERMINAL_LINE_LENGTH] + "... [TRUNCATED]"
@@ -136,7 +147,9 @@ class ChatRequest(BaseModel):
     lesson_id: Optional[str] = Field(None, pattern=r'^[a-z0-9_-]*$')
     lesson_title: Optional[str] = Field(None, max_length=200)
     terminal_context: Optional[str] = Field(None, max_length=50000)
+    last_terminal_command: Optional[str] = Field(None, max_length=1000)
     lesson_content: Optional[str] = Field(None, max_length=50000)
+    language: Optional[str] = Field("en", max_length=10)
     stream: Optional[bool] = False
     provider: Optional[str] = None
     model: Optional[str] = None
@@ -834,13 +847,22 @@ def api_clean(req: Dict[str, bool] = {}):
     count = perform_cleanup(clean_sessions=sessions, clean_exports=exports)
     return {"success": True, "cleaned": count}
 
+LANGUAGE_MANDATES = {
+    "cs": "MANDATORY LANGUAGE DIRECTIVE: The student has selected Czech (Čeština). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent Czech. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in Czech.",
+    "de": "MANDATORY LANGUAGE DIRECTIVE: The student has selected German (Deutsch). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent German. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in German.",
+    "es": "MANDATORY LANGUAGE DIRECTIVE: The student has selected Spanish (Español). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent Spanish. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in Spanish.",
+    "ru": "MANDATORY LANGUAGE DIRECTIVE: The student has selected Russian (Русский). You MUST converse, explain concepts, and formulate all responses strictly in natural, fluent Russian. Preserve exact technical keywords, CLI flags, and code syntax, but formulate all explanations, questions, and guidance in Russian.",
+}
+
 def build_chat_system_instruction(
     domain: str,
     category: str,
     subtopic: str,
     active_lesson: Optional[str] = None,
     active_lesson_title: Optional[str] = None,
-    terminal_context: Optional[str] = None
+    terminal_context: Optional[str] = None,
+    last_command: Optional[str] = None,
+    language: Optional[str] = "en"
 ) -> str:
     domain_titles = {
         "computing": "Systems Software, Kernel Architecture & Distributed Systems",
@@ -859,6 +881,10 @@ def build_chat_system_instruction(
         f"You are a concise, high-signal Socratic Mentor specializing in {specialty}.",
         f"The student is actively working on: '{sub_title}' (Discipline: {category}).",
     ]
+
+    lang_code = (language or "en").lower()
+    if lang_code in LANGUAGE_MANDATES:
+        prompt_lines.append(f"\n{LANGUAGE_MANDATES[lang_code]}")
     lesson_display = active_lesson_title or (active_lesson.replace("_", " ").title() if active_lesson else None)
     if lesson_display:
         prompt_lines.append(f"Current Lesson Displayed on Student's Screen: '{lesson_display}'.")
@@ -873,34 +899,51 @@ def build_chat_system_instruction(
         "5. ACTIVE LESSON GROUNDING: Always refer to the specific definitions, formulas, or architecture presented in the active lesson on screen."
     ])
 
+    if last_command and last_command.strip():
+        prompt_lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
+
     if terminal_context and terminal_context.strip():
         prompt_lines.extend([
-            "\n### Live Student Terminal Output (Recent Commands / Error Logs):",
+            "\n### Live Student Terminal Output & Workspace Session (Commands & Results):",
             "```text",
-            terminal_context.strip()[-2500:],
+            terminal_context.strip()[-3500:],
             "```",
-            "INSTRUCTION: The student ran commands in their workspace terminal. If they ask about an error or command failure, directly diagnose the root cause from the terminal output above and state the fix concisely in 1-3 sentences."
+            "CRITICAL TERMINAL DIRECTIVE: The student has an integrated terminal open in their workspace. If the student asks about what they typed, a command they ran (such as their last command noted above), an error, exit code, or terminal output, you MUST directly inspect the terminal text and last command above, identify the command/output, explain it clearly, and guide them on what to do next with first-principles clarity."
         ])
 
     return "\n".join(prompt_lines)
 
-def build_neutral_workspace_instruction(terminal_context: Optional[str] = None) -> str:
+def build_neutral_workspace_instruction(
+    terminal_context: Optional[str] = None,
+    last_command: Optional[str] = None,
+    language: Optional[str] = "en"
+) -> str:
     lines = [
         "You are a versatile, high-signal Socratic Mentor for the Synapse Polymath Workspace.",
         "No specific curriculum topic is currently selected. The student is exploring across all 12 domains (Computing, Engineering, Formal Sciences, Natural Sciences, etc.).",
+    ]
+
+    lang_code = (language or "en").lower()
+    if lang_code in LANGUAGE_MANDATES:
+        lines.append(f"\n{LANGUAGE_MANDATES[lang_code]}")
+
+    lines.extend([
         "\n### Core Directives:",
         "1. ULTRA-CONCISE: Limit answers strictly to 2-4 sentences max. Never lecture or dump long text.",
         "2. NEUTRAL & MULTIDISCIPLINARY: Answer questions across any engineering, mathematical, or scientific subject with first-principles rigor.",
         "3. TOPIC SELECTION: If the student asks what to study, guide them to pick a domain or topic from the sidebar tree.",
         "4. CASUAL GREETINGS: If greeted ('hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what engineering, computing, or science subject they would like to explore or troubleshoot."
-    ]
+    ])
+    if last_command and last_command.strip():
+        lines.append(f"\n### Student's Last Executed Terminal Command: `{last_command.strip()}`")
+
     if terminal_context and terminal_context.strip():
         lines.extend([
-            "\n### Live Student Terminal Output (Recent Commands / Error Logs):",
+            "\n### Live Student Terminal Output & Workspace Session (Commands & Results):",
             "```text",
-            terminal_context.strip()[-2500:],
+            terminal_context.strip()[-3500:],
             "```",
-            "INSTRUCTION: The student ran commands in their workspace terminal. If they ask about an error or command output, directly diagnose the root cause from the terminal output above and state the fix concisely in 1-3 sentences."
+            "CRITICAL TERMINAL DIRECTIVE: The student has an integrated terminal open in their workspace. If the student asks about what they typed, a command they ran (such as their last command noted above), an error, exit code, or terminal output, you MUST directly inspect the terminal text and last command above, identify the command/output, explain it clearly, and guide them on what to do next with first-principles clarity."
         ])
     return "\n".join(lines)
 
@@ -934,7 +977,8 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
 def get_terminal_buffer(session_id: str = "default", lines: int = 50):
     return {
         "lines": get_terminal_lines(lines),
-        "text": get_terminal_text(lines)
+        "text": get_terminal_text(lines),
+        "last_command": LAST_TERMINAL_COMMAND
     }
 
 @app.post("/api/chat")
@@ -944,6 +988,8 @@ async def chat_with_tutor(req: ChatRequest):
     terminal_ctx = req.terminal_context
     if not terminal_ctx or not terminal_ctx.strip():
         terminal_ctx = get_terminal_text(50)
+
+    last_cmd = req.last_terminal_command or LAST_TERMINAL_COMMAND
 
     # Resolve active lesson text directly from payload or disk fallback
     lesson_text = req.lesson_content or ""
@@ -968,11 +1014,17 @@ async def chat_with_tutor(req: ChatRequest):
             subtopic=sub,
             active_lesson=req.lesson_id,
             active_lesson_title=req.lesson_title,
-            terminal_context=terminal_ctx
+            terminal_context=terminal_ctx,
+            last_command=last_cmd,
+            language=req.language
         )
     else:
         sub_path = None
-        system_instruction = build_neutral_workspace_instruction(terminal_context=terminal_ctx)
+        system_instruction = build_neutral_workspace_instruction(
+            terminal_context=terminal_ctx,
+            last_command=last_cmd,
+            language=req.language
+        )
 
     try:
         provider, used_model = get_chat_provider(model=req.model, host=req.host)
@@ -998,12 +1050,21 @@ async def chat_with_tutor(req: ChatRequest):
         else:
             r = getattr(m, "role", "student")
             c = getattr(m, "content", "")
-        conversation_text.append(f"{str(r).capitalize()}: {c}")
+        if c and c.strip():
+            conversation_text.append(f"{str(r).capitalize()}: {c}")
 
-    # Inject terminal buffer directly into prompt so LLM sees it immediately
+    # Avoid duplicating current message if client passed it in history
+    if conversation_text and conversation_text[-1].strip() == f"Student: {req.message}".strip():
+        conversation_text.pop()
+
+    # Inject last command and terminal buffer directly into prompt so LLM sees it immediately
+    if last_cmd and last_cmd.strip():
+        conversation_text.append(
+            f"[Student's Most Recent Terminal Command]: `{last_cmd.strip()}`"
+        )
     if terminal_ctx and terminal_ctx.strip():
         conversation_text.append(
-            f"[Live Terminal Buffer Context]:\n```text\n{terminal_ctx.strip()[-2000:]}\n```"
+            f"[Live Student Terminal Session]:\n```text\n{terminal_ctx.strip()[-3000:]}\n```\n(The student's terminal session shows their recent commands and output above. If the student refers to what they typed or command results, reference this block directly.)"
         )
 
     conversation_text.append(f"Student: {req.message}")
@@ -1228,6 +1289,7 @@ Output clean, production-ready Markdown."""
 
 @app.websocket("/ws/terminal")
 async def terminal_websocket(websocket: WebSocket):
+    global LAST_TERMINAL_COMMAND
     await websocket.accept()
 
     env_type = websocket.query_params.get("env", "host")
@@ -1240,6 +1302,13 @@ async def terminal_websocket(websocket: WebSocket):
         # Default terminal size (80 cols, 24 rows)
         winsize = struct.pack("HHHH", 24, 80, 0, 0)
         fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
+
+        try:
+            attrs = termios.tcgetattr(slave)
+            attrs[0] |= termios.ICRNL
+            termios.tcsetattr(slave, termios.TCSANOW, attrs)
+        except Exception:
+            pass
     except OSError:
         pty_available = False
 
@@ -1299,6 +1368,8 @@ async def terminal_websocket(websocket: WebSocket):
     zshrc_path = zdot_dir / ".zshrc"
     zshrc_path.write_text(
         'if [ -f "$HOME/.zshrc" ]; then source "$HOME/.zshrc"; fi\n'
+        'export PROMPT_EOL_MARK=""\n'
+        'unsetopt PROMPT_SP 2>/dev/null\n'
         'alias ps="ps -ww"\n'
         'alias rm="rm -i"\n'
         'alias cp="cp -i"\n'
@@ -1438,6 +1509,8 @@ async def terminal_websocket(websocket: WebSocket):
     input_line_buffer = ""
     pending_dangerous_cmd = None
     confirm_buffer = ""
+    current_cols = 80
+    current_rows = 24
 
     try:
         while True:
@@ -1454,12 +1527,15 @@ async def terminal_websocket(websocket: WebSocket):
                         if evt.get("type") == "resize":
                             cols = evt.get("cols", 80)
                             rows = evt.get("rows", 24)
-                            new_size = struct.pack("HHHH", rows, cols, 0, 0)
-                            fcntl.ioctl(master, termios.TIOCSWINSZ, new_size)
-                            try:
-                                os.killpg(os.getpgid(pid), signal.SIGWINCH)
-                            except Exception:
-                                pass
+                            if cols != current_cols or rows != current_rows:
+                                current_cols = cols
+                                current_rows = rows
+                                new_size = struct.pack("HHHH", rows, cols, 0, 0)
+                                fcntl.ioctl(master, termios.TIOCSWINSZ, new_size)
+                                try:
+                                    os.killpg(os.getpgid(pid), signal.SIGWINCH)
+                                except Exception:
+                                    pass
                             continue
                     except Exception:
                         pass
@@ -1507,6 +1583,9 @@ async def terminal_websocket(websocket: WebSocket):
                 intercept_enter = False
                 for b in raw_bytes:
                     if b in (13, 10):  # Enter key
+                        cmd_executed = input_line_buffer.strip()
+                        if cmd_executed:
+                            LAST_TERMINAL_COMMAND = cmd_executed
                         if is_dangerous_host_command(input_line_buffer):
                             intercept_enter = True
                             pending_dangerous_cmd = input_line_buffer
@@ -1530,11 +1609,19 @@ async def terminal_websocket(websocket: WebSocket):
                 if intercept_enter:
                     continue
 
-            os.write(master, raw_bytes)
+            if b"\r" in raw_bytes and b"\n" not in raw_bytes:
+                raw_bytes = raw_bytes.replace(b"\r", b"\n")
+
+            try:
+                os.write(master, raw_bytes)
+            except OSError:
+                break
     except WebSocketDisconnect:
         pass
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"TERMINAL WS EXCEPTION: {type(e)}: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
     finally:
         read_task.cancel()
         try:

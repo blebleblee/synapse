@@ -1,4 +1,3 @@
-```markdown
 # Lesson 2: Feature Importance and Sensitivity Analysis in AI Safety
 
 ## 1. First-Principles Foundations

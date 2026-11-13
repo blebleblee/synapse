@@ -1,4 +1,3 @@
-```markdown
 # Lesson 4: Integration with AI — Vibe Coding
 
 ## First-Principles Intuition & Invariants
@@ -87,25 +86,25 @@ An AI-integrated development environment for vibe coding is not a monolith. It i
 
 ```mermaid
 graph TB
-    subgraph "Context Assembly"
+    subgraph sub_context_assembly ["Context Assembly"]
         A["Codebase Index\n(AST + embeddings)"] --> B["Retrieval Engine\n(semantic + structural)"]
         C["Conversation History\n(compressed)"] --> B
         D["Type Definitions\n& API Docs"] --> B
     end
 
-    subgraph "Prompt Processing"
+    subgraph sub_prompt_processing ["Prompt Processing"]
         B --> E["Prompt Structuring\n(system + user + tool schemas)"]
         F["Developer Intent\n(natural language)"] --> E
         E --> G["Token Budget Manager\n(greedy selection)"]
     end
 
-    subgraph "Code Generation"
+    subgraph sub_code_generation ["Code Generation"]
         G --> H["LLM Inference\n(autoregressive decoding)"]
         H --> I["Output Parser\n(extract diff / tool calls)"]
         I --> J["Diff Generator\n(unified diff format)"]
     end
 
-    subgraph "Verification"
+    subgraph sub_verification ["Verification"]
         J --> K["Type Checker\n(mypy / tsc / pyright)"]
         J --> L["Test Runner\n(pytest / jest)"]
         J --> M["Linter & SAST\n(ruff / semgrep / bandit)"]

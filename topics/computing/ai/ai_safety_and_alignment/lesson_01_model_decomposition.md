@@ -233,12 +233,12 @@ This architecture has a critical implication for decomposition: the MLP is a **s
 
 ```mermaid
 graph LR
-    subgraph "Residual Stream (d=512)"
+    subgraph sub_residual_stream__d_512 ["Residual Stream (d=512)"]
         RS_in["x_in ∈ ℝ⁵¹²"]
         RS_out["x_out ∈ ℝ⁵¹²"]
     end
 
-    subgraph "MLP Block (d_ff=2048)"
+    subgraph sub_mlp_block__d_ff_2048 ["MLP Block (d_ff=2048)"]
         W1["W₁ ∈ ℝ²⁰⁴⁸ˣ⁵¹²\n(up-projection)"]
         GELU["GELU activation\n(elementwise)"]
         W2["W₂ ∈ ℝ⁵¹²ˣ²⁰⁴⁸\n(down-projection)"]
@@ -708,18 +708,18 @@ The patching effect landscape visualizes as a heatmap over layers and sequence p
 
 ```mermaid
 graph LR
-    subgraph "Activation Patching Workflow"
+    subgraph sub_activation_patching_workflow ["Activation Patching Workflow"]
         CI["Clean Input\nx_clean"]
         KI["Corrupted Input\nx_corrupt"]
         
-        subgraph "Clean Forward Pass"
+        subgraph sub_clean_forward_pass ["Clean Forward Pass"]
             CL0["Layer 0\nActivations"]
             CL1["Layer 1\nActivations"]
             CLn["Layer N\nActivations"]
             CL0 --> CL1 --> CLn
         end
         
-        subgraph "Patched Forward Pass"
+        subgraph sub_patched_forward_pass ["Patched Forward Pass"]
             PL0["Layer 0"]
             PL1["Layer 1 ← PATCH"]
             PLn["Layer N\nOutput"]
@@ -818,25 +818,25 @@ The techniques described in this lesson form a layered stack. Each layer provide
 
 ```mermaid
 graph TD
-    subgraph "Level 4: Circuit-Level (Mechanistic)"
+    subgraph sub_level_4__circuit_level__mechanis ["Level 4: Circuit-Level (Mechanistic)"]
         C1["Activation Patching\n(causal localization)"]
         C2["Sparse Autoencoder\n(feature discovery)"]
         C3["Attention Pattern Analysis\n(information routing)"]
     end
 
-    subgraph "Level 3: Neuron / Component Level"
+    subgraph sub_level_3__neuron___component_leve ["Level 3: Neuron / Component Level"]
         N1["Probing Classifiers\n(linear decodability)"]
         N2["LRP / GradCAM\n(layerwise attribution)"]
         N3["Logit Lens\n(intermediate predictions)"]
     end
 
-    subgraph "Level 2: Post-Hoc Attribution"
+    subgraph sub_level_2__post_hoc_attribution ["Level 2: Post-Hoc Attribution"]
         P1["TreeSHAP / DeepSHAP\n(Shapley values)"]
         P2["LIME\n(local surrogates)"]
         P3["Integrated Gradients\n(path attribution)"]
     end
 
-    subgraph "Level 1: Intrinsic Architecture"
+    subgraph sub_level_1__intrinsic_architecture ["Level 1: Intrinsic Architecture"]
         I1["Linear Models\n(exact coefficient attribution)"]
         I2["Decision Trees\n(rule extraction)"]
         I3["Monotonic Networks\n(constrained structure)"]

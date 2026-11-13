@@ -14,11 +14,15 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Search
+  Search,
+  Wrench
 } from 'lucide-react';
 
 export interface AppSettings {
-  theme: 'studio' | 'titanium' | 'monokai' | 'nordic';
+  theme: 'studio' | 'titanium' | 'monokai' | 'nordic' | 'github_dimmed' | 'dracula' | 'solarized';
+  fontFamily: 'sans' | 'serif' | 'mono';
+  accentColor: 'gold' | 'cyan' | 'emerald' | 'amethyst' | 'rose';
+  lineHeight: 'dense' | 'balanced' | 'relaxed';
   fontSize: 'compact' | 'standard' | 'large';
   readerWidth: 'full' | 'constrained';
   language: 'en' | 'cs' | 'de' | 'es' | 'ru';
@@ -38,6 +42,9 @@ export interface AppSettings {
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'studio',
+  fontFamily: 'sans',
+  accentColor: 'gold',
+  lineHeight: 'balanced',
   fontSize: 'standard',
   readerWidth: 'full',
   language: 'en',
@@ -62,7 +69,7 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
-  initialTab?: 'appearance' | 'cluster' | 'models' | 'store';
+  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance';
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -72,7 +79,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveSettings,
   initialTab,
 }) => {
-  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models' | 'store'>('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models' | 'store' | 'maintenance'>('appearance');
 
   useEffect(() => {
     if (isOpen && initialTab) {
@@ -388,6 +395,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <Package size={14} />
             <span>Curriculum Store & Addons</span>
           </button>
+          <button
+            type="button"
+            className={`settings-nav-tab ${activeTab === 'maintenance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('maintenance')}
+          >
+            <Wrench size={14} />
+            <span>System & Maintenance</span>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="settings-form">
@@ -396,17 +411,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="settings-section">
               <div className="section-title">
                 <Palette size={14} />
-                <span>Theme & Appearance</span>
+                <span>Theme & Custom Appearance</span>
               </div>
 
               <div className="form-group">
-                <label>Color Scheme</label>
+                <label>Color Scheme Theme</label>
                 <div className="theme-options-grid">
                   {[
-                    { id: 'studio', label: 'Studio Obsidian', desc: 'Deep Carbon & Electric Blue / Gold' },
-                    { id: 'titanium', label: 'Titanium Daybreak', desc: 'High-Contrast Clean Light Mode' },
+                    { id: 'studio', label: 'Studio Obsidian', desc: 'Deep OLED Carbon & Gold' },
+                    { id: 'github_dimmed', label: 'GitHub Dimmed', desc: 'Slate Navy & High Contrast' },
+                    { id: 'nordic', label: 'Nordic Frost', desc: 'Polar Night & Arctic Cyan' },
                     { id: 'monokai', label: 'Monokai Pro', desc: 'Toasted Espresso & Neon Pastels' },
-                    { id: 'nordic', label: 'Nordic Frost', desc: 'Deep Polar Navy & Arctic Cyan' },
+                    { id: 'dracula', label: 'Dracula Noir', desc: 'Deep Violet Indigo & Pink' },
+                    { id: 'solarized', label: 'Solarized Dark', desc: 'Teal Oceanic & Warm Amber' },
+                    { id: 'titanium', label: 'Titanium Daybreak', desc: 'Clean High-Contrast Light Mode' },
                   ].map((t) => (
                     <button
                       type="button"
@@ -424,7 +442,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="settings-row-3col">
+              <div className="form-group" style={{ marginTop: '14px' }}>
+                <label>Accent Highlight Color</label>
+                <div className="accent-options-row">
+                  {[
+                    { id: 'gold', label: 'Amber Gold', color: '#fbbf24' },
+                    { id: 'cyan', label: 'Electric Cyan', color: '#06b6d4' },
+                    { id: 'emerald', label: 'Matrix Emerald', color: '#10b981' },
+                    { id: 'amethyst', label: 'Royal Amethyst', color: '#a855f7' },
+                    { id: 'rose', label: 'Crimson Rose', color: '#f43f5e' },
+                  ].map((a) => (
+                    <button
+                      type="button"
+                      key={a.id}
+                      className={`accent-chip ${formData.accentColor === a.id ? 'active' : ''}`}
+                      onClick={() => setFormData({ ...formData, accentColor: a.id as any })}
+                    >
+                      <span className="accent-dot" style={{ backgroundColor: a.color }} />
+                      <span>{a.label}</span>
+                      {formData.accentColor === a.id && <Check size={12} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="settings-row-4col" style={{ marginTop: '14px' }}>
+                <div className="form-group compact">
+                  <label>Reading Typography</label>
+                  <select
+                    value={formData.fontFamily || 'sans'}
+                    onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
+                  >
+                    <option value="sans">Modern Sans (Inter / UI)</option>
+                    <option value="serif">Academic Serif (Charter / Book)</option>
+                    <option value="mono">Technical Mono (JetBrains Code)</option>
+                  </select>
+                </div>
+
+                <div className="form-group compact">
+                  <label>Reader Line Spacing</label>
+                  <select
+                    value={formData.lineHeight || 'balanced'}
+                    onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
+                  >
+                    <option value="dense">Compact (1.45 - Reference)</option>
+                    <option value="balanced">Balanced (1.68 - Standard)</option>
+                    <option value="relaxed">Relaxed (1.92 - Longform)</option>
+                  </select>
+                </div>
+
                 <div className="form-group compact">
                   <label>UI Font Size</label>
                   <select
@@ -447,20 +513,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <option value="constrained">Comfortable Column (860px)</option>
                   </select>
                 </div>
+              </div>
 
-                <div className="form-group compact">
-                  <label>Reading Language</label>
-                  <select
-                    value={formData.language || 'en'}
-                    onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
-                  >
-                    <option value="en">English (Original Source)</option>
-                    <option value="cs">Czech (Čeština)</option>
-                    <option value="de">German (Deutsch)</option>
-                    <option value="es">Spanish (Español)</option>
-                    <option value="ru">Russian (Русский)</option>
-                  </select>
-                </div>
+              <div className="form-group compact" style={{ marginTop: '12px' }}>
+                <label>Curriculum Translation Language</label>
+                <select
+                  value={formData.language || 'en'}
+                  onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
+                >
+                  <option value="en">English (Original Masterclass Source)</option>
+                  <option value="cs">Czech (Čeština)</option>
+                  <option value="de">German (Deutsch)</option>
+                  <option value="es">Spanish (Español)</option>
+                  <option value="ru">Russian (Русский)</option>
+                </select>
               </div>
             </div>
           )}
@@ -715,35 +781,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               </div>
 
-              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
-                <h4 className="panel-box-heading">Runtime Maintenance</h4>
-                <div className="form-group compact">
-                  <label>Transient Artifact Cleanup</label>
-                  <span className="field-hint">Clears chat session logs and cached export bundles (safe to run)</span>
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    style={{ marginTop: '6px', width: 'fit-content' }}
-                    onClick={async () => {
-                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
-                        try {
-                          const res = await fetch('/api/clean', { method: 'POST' });
-                          if (res.ok) {
-                            const data = await res.json();
-                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
-                          }
-                        } catch (err) {
-                          alert('Cleanup failed.');
-                        }
-                      }
-                    }}
-                  >
-                    <Trash2 size={12} />
-                    <span>Clear Runtime Data</span>
-                  </button>
-                </div>
-              </div>
-
               {storeMessage && (
                 <div className={`store-message-banner ${storeMessage.type}`}>
                   {storeMessage.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
@@ -892,6 +929,103 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                     </div>
                   ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'maintenance' && (
+            <div className="settings-section">
+              <div className="section-title">
+                <Wrench size={14} />
+                <span>System Health & Runtime Maintenance</span>
+              </div>
+
+              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
+                <h4 className="panel-box-heading">Workspace Transient Data</h4>
+                <div className="form-group compact">
+                  <label>Session & Cache Artifacts</label>
+                  <span className="field-hint">
+                    Clears temporary markdown chat sessions (.workspace_sessions) and cached export bundles.
+                    Safe to run at any time; never touches curriculum courses or your private memory.
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    style={{ marginTop: '8px', width: 'fit-content' }}
+                    onClick={async () => {
+                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
+                        try {
+                          const res = await fetch('/api/clean', { method: 'POST' });
+                          if (res.ok) {
+                            const data = await res.json();
+                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
+                          }
+                        } catch {
+                          alert('Cleanup failed.');
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <span>Clear Transient Artifacts</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
+                <h4 className="panel-box-heading">Inference Cluster & Model Pinning</h4>
+                <div className="form-group compact">
+                  <label>Node Model Pins (.synapse_node_pins.json)</label>
+                  <span className="field-hint">
+                    Resets any manually pinned models for cluster hosts back to auto-discovery mode.
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    style={{ marginTop: '8px', width: 'fit-content' }}
+                    onClick={async () => {
+                      if (confirm('Reset all cluster node pins back to automatic model selection?')) {
+                        try {
+                          const res = await fetch('/api/settings/cluster-pins', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pins: {} })
+                          });
+                          if (res.ok) {
+                            alert('Node model pins reset successfully.');
+                          }
+                        } catch {
+                          alert('Failed to reset pins.');
+                        }
+                      }
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                    <span>Reset Model Pins</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="settings-panel-box">
+                <h4 className="panel-box-heading">Database & Workspace Storage</h4>
+                <div className="maintenance-info-grid">
+                  <div className="maintenance-info-item">
+                    <span className="info-label">Runtime DB</span>
+                    <span className="info-val">data/synapse.db (SQLite)</span>
+                  </div>
+                  <div className="maintenance-info-item">
+                    <span className="info-label">Curriculum Dir</span>
+                    <span className="info-val">topics/ (504 Courses)</span>
+                  </div>
+                  <div className="maintenance-info-item">
+                    <span className="info-label">Engine Log</span>
+                    <span className="info-val">generator.log</span>
+                  </div>
+                  <div className="maintenance-info-item">
+                    <span className="info-label">User Credentials</span>
+                    <span className="info-val">~/.config/synapse/env</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}

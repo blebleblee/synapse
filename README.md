@@ -3,83 +3,133 @@
   <h1>Synapse</h1>
   <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
-  <a href="https://github.com/yourusername/synapse/actions">
+  <a href="https://gitea.2464.cz/ai/synapse">
     <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status">
   </a>
-  <a href="https://github.com/yourusername/synapse/blob/main/LICENSE">
+  <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   </a>
-  <a href="#desktop-shell">
+  <a href="#-quick-start--installation">
     <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platforms">
   </a>
   <a href="https://fastapi.tiangolo.com/">
     <img src="https://img.shields.io/badge/FastAPI-1.0-teal" alt="FastAPI">
   </a>
   <a href="https://vitejs.dev/">
-    <img src="https://img.shields.io/badge/Vite%20%2B%20React-18-blueviolet" alt="React">
+    <img src="https://img.shields.io/badge/Vite%20%2B%20React-19-blueviolet" alt="React 19">
+  </a>
+  <a href="https://anthropic.com">
+    <img src="https://img.shields.io/badge/Claude%20Opus-5.5-orange" alt="Claude Opus 5.5">
   </a>
 </div>
 
 <br />
 
-**Synapse** is an advanced, self-hosted Learning Workspace and automated Curriculum Engine. It autonomously generates textbook-grade masterclasses, operational labs, and flashcards across a strict taxonomy of 12 domains and 80 disciplines using multi-node local LLM clusters.
+**Synapse** is an advanced, self-hosted AI Learning Workspace and automated Curriculum Engine. It autonomously researches, scopes, drafts, peer-reviews, and enhances textbook-grade masterclasses and hands-on operational labs across a canonical taxonomy of **12 engineering, scientific, and polymath domains** and **80 disciplines**.
 
-Once the curriculum is generated, Synapse provides a rich native **Socratic Workbench** (available as a web app or standalone Electron desktop shell) featuring a dual-pane markdown reader, an integrated PTY terminal, and an interactive AI Mentor.
+Once the curriculum is assembled, Synapse provides a native **Socratic Workbench** (available as a web app or standalone Electron desktop application) featuring a dual-pane reader, an integrated PTY terminal with smart command synthesis, and an interactive, multilingual AI Mentor.
 
 ---
 
-## 🎯 Features
+## 🎯 Key Features & Capabilities
 
-- **Automated Curriculum Generation (`generate_all.py`):** Automatically scopes, drafts, audits, and refines textbook-grade, multi-lesson sequential masterclasses (Foundations & Invariants, Architecture & Mechanics, Deep Dive & Concurrency, Operational Diagnostics) and hands-on terminal labs according to the PostgreSQL standard.
-- **Multi-Node Cluster Orchestration:** Distributes LLM workloads across a fleet of local instances (e.g., Ollama, LocalAI) and cloud providers (Anthropic Claude 3.5), employing cross-model adversarial peer review.
-- **Native Socratic Workbench:** A beautiful, responsive Electron / React frontend featuring:
-  - **Topic Tree Navigation:** Canonical 3-level taxonomy hierarchy.
-  - **Dynamic Lesson Reader:** Supports Mermaid.js diagrams, KaTeX math blocks, and markdown rendering.
-  - **AI Mentor Chat:** Context-aware AI tutor hooked directly into your current lesson.
-  - **Integrated PTY Terminal:** Live WebSocket-bridged host terminal for executing operational labs and interactive verification.
-- **SynPack Curriculum Store:** Export and sideload full topic masterclasses as portable `.synpack` archives via the integrated Addon Store.
-- **Mastery & Knowledge Graph:** Track learning progress, unlock prerequisites, and export Anki-compatible `.csv` flashcard decks.
+### 1. Autonomous Masterclass Curriculum Engine
+- **Textbook-Grade Depth:** Automatically authors sequential, multi-module masterclasses following the rigorous O'Reilly / MIT Press standard:
+  - *Foundations & Invariants:* First-principles mathematical and theoretical groundwork.
+  - *Architecture & Mechanics:* Internal data structures, execution pipelines, and clean ASCII/Mermaid diagrams.
+  - *Deep Dive & Concurrency:* Memory models, locking mechanisms, failure modes, and mitigation patterns.
+  - *Operational Verification Labs:* Hands-on terminal diagnostics, benchmarks, and chaos testing scenarios.
+- **Parallel Multi-Node Generation (`generate_all.py`):** Orchestrates generation across local multi-node Ollama clusters or cloud providers (**Anthropic Claude Opus 5.5 / Sonnet 5**) using work-stealing queues and multi-threaded parallel drafting.
+- **Deep Content Enhancer (`--enhance`):** Rigorously audits existing lessons and labs, purging hallucinations, standardizing Mermaid.js diagrams, expanding real-world code (C, Rust, Go, Python, SQL), and enriching architectural explanations.
+- **Live Terminal Monitor (`monitor.py`):** Dedicated terminal dashboard with auto-updating progress counters, active worker status, file insertion statistics, and live log tailing (`--watch`, `--tail`).
+
+### 2. Native Socratic Workbench UI
+- **Canonical Topic Tree:** Fast navigation across 12 domains and 80 disciplines with completion badges, multi-lesson expansion, and a redesigned **`icon-btn-sm`** sort toggle (`ArrowDownAZ` / `TrendingUp`).
+- **Dynamic Math & Diagram Reader:** Real-time rendering of KaTeX display and inline math (`$$...$$`), syntax-highlighted code blocks, and self-healing **Mermaid.js** architecture graphs.
+- **Smart Terminal Command Synthesizer:** Intelligently wraps code blocks (SQL, Kubernetes manifests, Python, C, Rust) into safe, executable shell wraps ready to run directly in your terminal with one click.
+- **Visual DAG Knowledge Graph:** Toggle between an interactive DAG pipeline view and a detailed timeline to visualize prerequisites, domain pathways, and learning trajectories.
+- **Bilingual & Polyglot Reader:** Side-by-side bilingual reading mode supporting on-the-fly language comparisons.
+
+### 3. Socratic AI Mentor
+- **Active Lesson Grounding:** Chat prompts are continuously grounded in the active lesson or lab open on your screen.
+- **Live Terminal Context Interception:** Automatically tracks your active shell session, executed commands (`LAST_TERMINAL_COMMAND`), and console outputs, directly diagnosing exit codes, errors, and syntax without confusion.
+- **Full Multilingual Fluency:** Seamlessly converses in **English, Czech (Čeština), German (Deutsch), Spanish (Español), or Russian (Русский)** while keeping code identifiers exact.
+- **Resilient Model Fallback:** Auto-discovers local models, handles single-model nodes automatically, and cascades to Cloud Claude Opus/Sonnet if local Ollama is offline.
+
+### 4. Deep Theme & Appearance Engine
+- **7 Curated Base Themes:** Studio Obsidian, GitHub Dimmed, Nordic Frost, Monokai Pro, Dracula Noir, Solarized Dark, and Titanium Daybreak.
+- **5 Accent Highlight Colors:** Amber Gold, Electric Cyan, Matrix Emerald, Royal Amethyst, and Crimson Rose.
+- **Reading Typography:** Modern Sans (Inter), Academic Serif (Charter/Merriweather), or Technical Mono (JetBrains Mono).
+- **Line Spacing & Density:** Configurable reader line height (Compact 1.45, Balanced 1.68, Relaxed 1.92).
+
+### 5. Dedicated System & Maintenance Hub
+- Dedicated settings tab for transient session cleanup (`.workspace_sessions`), cluster model pin resets (`.synapse_node_pins.json`), database health (`data/synapse.db`), and generation log viewing.
 
 ---
 
 ## 🏗 Architecture
 
-Synapse is separated into three highly decoupled components:
+```mermaid
+graph TB
+    subgraph Frontend ["Presentation Layer (React 19 + TypeScript + Vite / Electron)"]
+        UI["Topic Tree & Lesson Viewer"]
+        Graph["Visual DAG Knowledge Graph"]
+        Chat["Socratic Mentor Panel"]
+        Term["Integrated xterm.js PTY Terminal"]
+        Synthesizer["Smart Command Synthesizer"]
+    end
 
-1. **`learning_engine/` (Python):** The core intelligence layer. Manages the LLM orchestration, taxonomy enforcement, `.synpack` packaging, and the knowledge DAG.
-2. **`app/backend/` (FastAPI):** A lightweight asynchronous REST and WebSocket server. Bridges the frontend to the local file system and handles the live PTY terminal session.
-3. **`app/frontend/` & `app/desktop/` (React/Vite & Electron):** The UI presentation layer. Can run as a web app served by FastAPI or bundled into a native desktop `.app` / `.exe`.
+    subgraph Backend ["Application Layer (FastAPI Asynchronous Gateway)"]
+        API["REST Endpoints (/api/tree, /api/chat, /api/settings)"]
+        WS["PTY WebSocket Bridge (/ws/terminal)"]
+        Safety["Host Safety Command Interceptor"]
+        Buffer["Terminal Buffer & Command History"]
+    end
+
+    subgraph Engine ["Intelligence Layer (Python Learning Engine)"]
+        Cluster["Ollama Multi-Node Cluster & Host Pinner"]
+        Claude["Anthropic Claude Provider (Opus 5.5 / Sonnet 5)"]
+        Generator["Parallel Curriculum Generator"]
+        Enhancer["Deep Content Enhancer & Mermaid Normalizer"]
+        Store["SynPack Addon Packager & Exporter"]
+        DB[(SQLite Cache & Mastery DB: synapse.db)]
+    end
+
+    UI --> API
+    Chat --> API
+    Term <--> WS
+    WS --> Safety --> Buffer
+    API --> Engine
+    Generator --> Claude
+    Generator --> Cluster
+```
 
 ---
 
 ## 🚀 Quick Start & Installation
 
-Most users do not need to install Python, Node.js, or build packages from source. Choose the installation method that fits your workflow:
-
 ### Option 1: 1-Click Desktop App (Zero Build Required)
-Download the standalone, zero-dependency desktop application directly from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
+Download the standalone, zero-dependency desktop application from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
 
 | Platform | Download | Instructions |
 | :--- | :--- | :--- |
-| **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases/tag/v1.0.0-rc.1)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
-| **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases/tag/v1.0.0-rc.1)** | Unzip and launch **Synapse Workbench.app** directly. |
-
-*The desktop shell automatically manages its internal backend sidecar, connects to your local Ollama instance on `127.0.0.1:11434`, and requires zero terminal setup.*
+| **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
+| **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases)** | Unzip and launch **Synapse Workbench.app** directly. |
+| **Windows / Linux** | **Docker Compose** | See Docker Deployment below. |
 
 ---
 
-### Option 2: 1-Click Docker Compose (Universal Container)
-Run the full Synapse Socratic Workbench in an isolated, multi-stage production container:
+### Option 2: 1-Click Docker Compose
+Run the full Socratic Workbench in an isolated, multi-stage production container:
 
 ```bash
-# Clone and launch in one command
 git clone https://gitea.2464.cz/ai/synapse.git && cd synapse
 docker compose up -d
 ```
 
 - **Open:** Visit **`http://localhost:8000`** in your browser.
-- **Persistence:** Local curriculum (`./topics`), SQLite mastery database (`./data`), and exported packages (`./exports`) are automatically volume-mounted and persisted on your host machine.
-- **Host Ollama Bridge:** Pre-configured with `host.docker.internal:host-gateway` to connect seamlessly to local Ollama running on your host machine.
+- **Persistence:** Local curriculum (`./topics`), SQLite mastery database (`./data`), and exported packages (`./exports`) are volume-mounted.
+- **Ollama Host Bridge:** Pre-configured with `host.docker.internal:host-gateway` to connect seamlessly to local Ollama on your host machine.
 
 To shut down:
 ```bash
@@ -89,7 +139,6 @@ docker compose down
 ---
 
 ### Option 3: Developer & Source Setup
-For contributors developing the Python learning engine or React UI:
 
 ```bash
 # 1. Clone repository
@@ -106,69 +155,67 @@ npm install
 npm run build
 cd ../..
 
-# 4. Launch Web Workbench
-./bin/synapse serve --port 8000
+# 4. Launch Synapse Web Workbench
+.venv/bin/uvicorn app.backend.main:app --host 127.0.0.1 --port 8000
 # Open http://localhost:8000 in your browser
 ```
 
-To run the native desktop shell from source:
+For hot-reloading frontend development:
 ```bash
-./bin/synapse desktop
+npm --prefix app/frontend run dev
+# Open http://localhost:5173
 ```
 
 ---
 
-## 📦 Building Standalone Binaries (Release Candidates)
+## 🧠 Curriculum Generation & Enhancement
 
-Synapse can be packaged into zero-dependency native desktop applications using `electron-builder`.
+Synapse can autonomously research, author, or deeply enhance curriculum units using Claude Opus 5.5 or local Ollama clusters.
 
+### Running the Parallel Generator
 ```bash
-cd app/desktop
-npm install
+# Enhance all existing topics in the computing domain with Claude Opus 5.5
+python3 scripts/generate_all.py --domain computing --enhance
 
-# Build for macOS (.app and .dmg)
-npm run build:mac
+# Draft all unwritten topics across the entire taxonomy
+python3 scripts/generate_all.py --provider anthropic
 
-# Build for Windows (.exe / NSIS)
-npm run build:win
-
-# Build for Linux (.AppImage / .deb)
-npm run build:linux
+# Target a specific domain with local Ollama
+python3 scripts/generate_all.py --domain formal_sciences --provider ollama
 ```
-Compiled binaries will be output to `dist/desktop/`.
 
----
-
-## 🧠 Generating Curriculum
-
-You can command the `learning_engine` to autonomously research and write masterclasses for empty topics in your syllabus. 
-
+### Live Generation Monitoring
 ```bash
-# Generate all missing topics across all 12 domains using your local cluster
-./bin/synapse generate --domain all
+# Follow the live token stream and elapsed times in real time
+tail -f generator.log
 
-# Generate a specific topic using Anthropic's Claude 3.5 Sonnet
-./bin/synapse generate --topic computing/systems/bash --provider anthropic
+# Open the auto-updating visual terminal dashboard
+python3 scripts/monitor.py --watch
+
+# Print a one-time status snapshot
+python3 scripts/monitor.py
 ```
 
 ---
 
-## 🛡️ Terminal Security & Host Safety
+## 🛡️ Security, Host Safety & Credential Isolation
 
-Synapse features an integrated WebSocket PTY terminal that binds to your local host shell (`zsh` or `bash`). 
-To prevent accidental destruction of your host machine during operational labs, Synapse employs an **in-stream command verification interceptor**.
-
-If a destructive command is detected (e.g., `rm -rf /`, `mkfs`, fork bombs), the terminal will pause execution, intercept the keystroke, and require you to type `CONFIRM` to proceed.
+- **Isolated Credentials:** Cloud API keys (Anthropic, Gemini) are stored strictly outside the repository tree in `~/.config/synapse/env` with restricted `600` file permissions. They are never committed to git.
+- **Host Safety Guard:** The integrated PTY terminal actively intercepts destructive command patterns (`rm -rf /`, `mkfs`, raw block writes, fork bombs) and pauses execution until you explicitly type `CONFIRM`.
+- **Root-Anchored Runtime DB:** Runtime caches and SQLite databases (`/data/`, `/exports/`) are anchored to root in `.gitignore`, guaranteeing authored topics in `topics/computing/data/` are never accidentally ignored.
 
 ---
 
-## 📚 Documentation
+## 📚 Documentation Index
 
-For detailed multi-platform guides and operational procedures, see the `docs/` directory:
+For detailed guides, see the `docs/` directory:
 
-- [Installation & Multi-Platform Guide (macOS, Windows, Linux)](docs/INSTALLATION.md)
-- [Terminal Sandboxes: Rancher Desktop, Docker, k3s & Host Safety](docs/CONTAINERS_AND_SANDBOX.md)
-- [SynPack Curriculum Distributions & Addon Store](docs/PACKAGES_AND_STORE.md)
+- [Curriculum Generation & Models Guide](docs/CURRICULUM_GENERATION_AND_MODELS.md)
+- [Socratic Workbench & UI Architecture](docs/SOCRATIC_WORKBENCH_AND_UI.md)
+- [Configuration, Node Pinning & Security](docs/CONFIG_AND_SECURITY.md)
+- [Terminal Sandboxes: Docker, k3s & Host Safety](docs/CONTAINERS_AND_SANDBOX.md)
+- [Installation & Multi-Platform Guide](docs/INSTALLATION.md)
+- [SynPack Distributions & Addon Store](docs/PACKAGES_AND_STORE.md)
 - [Clean Packaging & Workspace Data Management](docs/CLEANUP_AND_DATA_MANAGEMENT.md)
 
 ---

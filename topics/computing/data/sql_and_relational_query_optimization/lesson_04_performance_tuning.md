@@ -16,16 +16,16 @@ To better understand the performance characteristics of a system, it's essential
 
 ```mermaid
 graph LR
-    subgraph "Storage Layer"
+    subgraph sub_storage_layer ["Storage Layer"]
         Storage Engine[Storage Engine]
         Disk[Disk]
     end
-    subgraph "Query Execution Layer"
+    subgraph sub_query_execution_layer ["Query Execution Layer"]
         Parser[Parser]
         Optimizer[Optimizer]
         Executor[Executor]
     end
-    subgraph "Memory Management Layer"
+    subgraph sub_memory_management_layer ["Memory Management Layer"]
         Buffer Pool[Buffer Pool]
         Page Cache[Page Cache]
     end

@@ -28,7 +28,7 @@ At a 128K token context, a single sequence's KV-cache consumes `320 KB × 131072
 
 ```mermaid
 graph TD
-    subgraph "Transformer Decoder Layer L"
+    subgraph sub_transformer_decoder_layer_l ["Transformer Decoder Layer L"]
         X["Input Activation\n[B, S, d_model]"]
         Q["Query Projection\nW_Q: [d_model, d_q]"]
         K["Key Projection\nW_K: [d_model, d_k]"]
@@ -177,7 +177,7 @@ Scaling LLM inference across multiple devices requires composing three orthogona
 
 ```mermaid
 graph LR
-    subgraph "Data Parallelism"
+    subgraph sub_data_parallelism ["Data Parallelism"]
         DP1["Replica 1\n(full model)"]
         DP2["Replica 2\n(full model)"]
         DP3["Replica N\n(full model)"]
@@ -187,15 +187,15 @@ graph LR
         DPR -->|"req_N"| DP3
     end
 
-    subgraph "Tensor Parallelism (Megatron-LM style)"
-        GPU1["GPU 0\nW_col[:, 0:N/2]"]
-        GPU2["GPU 1\nW_col[:, N/2:N]"]
+    subgraph sub_tensor_parallelism__megatron_lm ["Tensor Parallelism (Megatron-LM style)"]
+        GPU1["GPU 0\nW_col[\":, 0:N/2\"]"]
+        GPU2["GPU 1\nW_col[\":, N/2:N\"]"]
         AG["AllReduce / AllGather\nafter each layer"]
         GPU1 --> AG
         GPU2 --> AG
     end
 
-    subgraph "Pipeline Parallelism"
+    subgraph sub_pipeline_parallelism ["Pipeline Parallelism"]
         S1["Stage 0\nLayers 0–19"]
         S2["Stage 1\nLayers 20–39"]
         S3["Stage 2\nLayers 40–59"]

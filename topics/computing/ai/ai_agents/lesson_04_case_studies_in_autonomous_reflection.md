@@ -85,7 +85,7 @@ This process repeats for thousands of iterations (AlphaGo used approximately 1,6
 
 ```mermaid
 graph TB
-    subgraph "MCTS Reflection Cycle"
+    subgraph MCTS ["MCTS Reflection Cycle"]
         A["Current Board State s"] -->|"1. Selection"| B["Tree Traversal via UCT"]
         B --> C["Leaf Node s'"]
         C -->|"2. Expansion"| D["Add Legal Moves"]
@@ -578,7 +578,7 @@ Voyager consists of three interconnected components:
 
 ```mermaid
 graph TB
-    subgraph "Voyager Autonomous Learning Loop"
+    subgraph Voyager ["Voyager Autonomous Learning Loop"]
         A["Current State: Inventory, Position, Skills"] --> B["Curriculum Generator"]
         B -->|"Propose Goal"| C["Goal: 'Craft iron pickaxe'"]
         C --> D["Skill Retrieval"]

@@ -16,7 +16,7 @@ import {
   Languages,
   Briefcase,
   TrendingUp,
-  ArrowUpDown,
+  ArrowDownAZ,
   Settings,
   Package,
   ChevronsDownUp,
@@ -341,12 +341,12 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
 
         <button
           type="button"
-          className={`sort-pill-btn ${sortMode === 'progress' ? 'active' : ''}`}
+          className={`icon-btn-sm sort-toggle-btn ${sortMode === 'progress' ? 'active' : ''}`}
           onClick={toggleSortMode}
-          title={sortMode === 'az' ? 'Sorted: A-Z (Click to sort by % Completion)' : 'Sorted: % Completion (Click to sort A-Z)'}
+          title={sortMode === 'az' ? 'Sort: Alphabetical (Click to sort by % Completion)' : 'Sort: % Completion (Click to sort A-Z)'}
+          aria-label="Toggle domain sort mode"
         >
-          <ArrowUpDown size={11} />
-          <span className="sort-pill-label">{sortMode === 'az' ? 'A-Z' : 'DONE'}</span>
+          {sortMode === 'az' ? <ArrowDownAZ size={13} /> : <TrendingUp size={13} />}
         </button>
       </div>
 

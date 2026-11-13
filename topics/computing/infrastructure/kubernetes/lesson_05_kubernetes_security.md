@@ -34,7 +34,7 @@ graph TD
     "NetworkPolicy" -->| contains | "Rule"
     "Rule" -->| specifies | "Allowed Traffic"
     "Rule" -->| specifies | "Denied Traffic"
-    "Pod" -->| is subject to | "NetworkPolicy"
+    "Pod" -->|"is subject to"| "NetworkPolicy"
 ```
 
 ### Secret Management

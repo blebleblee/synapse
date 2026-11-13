@@ -1,147 +1,252 @@
-# Operational Verification Labs: Operating System Theory & Kernel Subsystems
+```markdown
+# Operating System Theory & Kernel Subsystems: Operational Verification Lab
 
-## Objective & Environment Setup
+## Preface: Architectural Context
 
-### Objective
-This operational lab provides hands-on diagnostic verification of foundational operating system abstractions: virtual memory management, page tables, process address space layout (VMA), system call boundaries, and VFS file descriptor mechanics. Exercises utilize standard OS inspection utilities (`pmap`, `perf`, `strace`, `valgrind`, and the Linux `/proc` pseudo-filesystem).
+This lab is not a surface-level survey of shell commands. Each exercise is grounded in kernel source-level mechanics. Before touching a tool, understand *why* the abstraction exists and what invariants the kernel enforces.
+
+The Linux kernel enforces the following memory isolation model: every process operates against a private virtual address space backed by a multi-level page table (four levels on x86-64: PGD → P4D → PUD → PMD → PTE). The CPU's Memory Management Unit (MMU) translates virtual addresses to physical frame numbers on every load/store. The Translation Lookaside Buffer (TLB) caches recent translations; a TLB miss triggers a page-table walk by the hardware page-table walker (or a software handler on architectures like RISC-V). A page fault is raised when the PTE is absent, permission bits are violated, or the page has been swapped out.
+
+The kernel VFS layer inserts an indirection between file descriptors and on-disk inodes, permitting page-cache sharing, copy-on-write fork semantics, demand paging, and memory-mapped I/O all within a unified object model. Understanding this unified model is the prerequisite for every exercise below.
+
+---
+
+## Environment Setup
 
 ### Required Tooling
-Ensure operating system diagnostic utilities are installed:
-- `procps` (`ps`, `pmap`, `sysctl`, `free`)
-- `perf` (Linux performance counters)
-- `strace` (System call tracer)
-- Standard C compiler toolchain (`gcc`, `make`)
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install -y \
+    procps \
+    linux-tools-$(uname -r) \
+    strace \
+    gcc \
+    make \
+    sysstat \
+    valgrind \
+    bpftrace \
+    util-linux
+
+# RHEL/Fedora
+sudo dnf install -y \
+    procps-ng \
+    perf \
+    strace \
+    gcc \
+    make \
+    sysstat \
+    valgrind \
+    bpftrace \
+    util-linux
+```
+
+Verify kernel version and feature availability:
+
+```bash
+uname -r
+# Confirm CONFIG_PERF_EVENTS, CONFIG_FTRACE, CONFIG_PROC_FS are enabled
+zcat /proc/config.gz 2>/dev/null | grep -E "CONFIG_PERF_EVENTS|CONFIG_FTRACE|CONFIG_PROC_FS" \
+    || grep -E "CONFIG_PERF_EVENTS|CONFIG_FTRACE|CONFIG_PROC_FS" /boot/config-$(uname -r)
+```
+
+---
+
+## Architectural Map: Kernel Memory Subsystems
+
+```mermaid
+graph TD
+    subgraph "Userspace Process (Ring 3)"
+        A["User Virtual Address Space\n(0x0000 – 0x0000_7FFF_FFFF_FFFF)"]
+        B["malloc / mmap / brk"]
+    end
+
+    subgraph "Kernel Virtual Space (Ring 0)"
+        C["VMA List\nmm_struct → vm_area_struct"]
+        D["Page Table Walker\nPGD → P4D → PUD → PMD → PTE"]
+        E["Physical Page Allocator\nBuddy System + SLAB/SLUB"]
+        F["Page Cache\nradix_tree / xarray"]
+        G["Swap Subsystem\nswap_map + swap_entry_t"]
+        H["OOM Killer\noom_score / oom_badness()"]
+    end
+
+    subgraph "Hardware"
+        I["MMU + TLB"]
+        J["DRAM Physical Frames"]
+        K["Block Device / NVMe"]
+    end
+
+    A -->|"syscall: mmap/brk"| C
+    B --> A
+    C --> D
+    D -->|"PTE lookup"| I
+    I -->|"TLB hit → phys addr"| J
+    I -->|"TLB miss → page fault"| D
+    D -->|"page not present"| E
+    E -->|"alloc_page()"| J
+    E -->|"file-backed fault"| F
+    F -->|"cache miss → readahead"| K
+    E -->|"memory pressure"| G
+    G --> K
+    H -->|"select_bad_process()"| C
+```
 
 ---
 
 ## Exercise 1: Process Virtual Address Space & Page Table Inspection
 
-Inspect how the operating system kernel isolates process memory, builds Virtual Memory Areas (VMAs), and maps physical page frames.
+### Theory: Virtual Memory Areas and the `mm_struct`
 
-### 1.1 Process Memory Mapping & Segment Layout
-Inspect the segment boundaries (Text, Data, BSS, Heap, Memory Mapped Files, Stack) for a target process:
+Every Linux process carries an `mm_struct` (defined in `include/linux/mm_types.h`). This structure holds:
+
+- `pgd`: pointer to the process's Page Global Directory (the root of the hardware page table).
+- A red-black tree and linked list of `vm_area_struct` nodes, each representing a contiguous VMA with uniform permissions and a backing object (anonymous memory, a file, or a device mapping).
+- `brk`/`start_brk`: current heap boundary managed by the `brk(2)` syscall.
+- `start_stack`: stack base address, growing downward on x86.
+
+The kernel never pre-populates PTEs for a newly allocated VMA. Memory is **demand-paged**: the first access raises a `#PF` exception (page fault), the kernel's `handle_mm_fault()` determines whether to allocate a new anonymous page, fetch a page from the page cache, or trigger a COW split, then installs the PTE and returns to userspace. This model is why `malloc(1 GB)` returns instantly — no physical RAM is consumed until writes occur.
+
+### 1.1 Process VMA Layout Inspection
 
 ```bash
-# Launch a background process or target shell
+# Spawn a long-lived process
 sleep 300 &
 PID=$!
 
-# Dissect process Virtual Memory Areas (VMAs)
+# Dump all VMAs with permissions, offsets, and backing paths
 pmap -X $PID
 ```
 
-Examine detailed memory allocation in `/proc/$PID/smaps`:
+The columns produced by `pmap -X` map directly to `/proc/$PID/smaps` fields:
+
+| pmap Column | smaps Field | Meaning |
+| :--- | :--- | :--- |
+| `RSS` | `Rss` | Resident Set Size — pages currently in RAM |
+| `PSS` | `Pss` | Proportional Set Size — RSS divided by share count |
+| `Dirty` | `Private_Dirty` | Modified pages not yet written back; COW copies |
+| `Swap` | `Swap` | Pages evicted to swap device |
+| `Flags` | `VmFlags` | Kernel VMA permission and hint flags (`rd`, `wr`, `ex`, `sh`, `mg`, `hg`) |
+
 ```bash
-# Inspect Private/Shared Dirty pages and RSS allocation
-cat /proc/$PID/smaps | grep -E "(Size|Rss|Pss|Shared_Clean|Private_Dirty)" | head -n 20
+# Structured smaps inspection: filter the most diagnostic fields
+cat /proc/$PID/smaps | awk '
+/^[0-9a-f]/ { region = $0 }
+/^(Size|Rss|Pss|Shared_Clean|Shared_Dirty|Private_Clean|Private_Dirty|Referenced|Anonymous|Swap):/ {
+    printf "%-60s %s\n", region, $0
+    region = ""
+}' | head -60
 ```
 
-### 1.2 Copy-On-Write (COW) Memory Verification
-Compile and run a small C harness demonstrating fork-time Copy-On-Write behavior:
+Faster rollup for a quick summary (Linux ≥ 4.14):
 
 ```bash
-cat << 'EOF' > cow_test.c
+cat /proc/$PID/smaps_rollup
+```
+
+The `smaps_rollup` interface aggregates all VMAs into a single synthetic entry, avoiding the O(n) scan cost of reading the full `smaps` file for large processes with thousands of VMAs (JVM, V8, etc.).
+
+### 1.2 Address Space Layout Visualization
+
+The canonical x86-64 Linux process address space layout (kernel 5.x, non-PIE vs. PIE):
+
+```mermaid
+graph TD
+    subgraph "x86-64 Virtual Address Space (128 TiB user half)"
+        S1["0xFFFF_FFFF_FFFF_FFFF\n────── Kernel Space (not mapped) ──────"]
+        S2["0x0000_7FFF_FFFF_FFFF\n────── Stack (grows ↓) ──────\nvDSO, vsyscall page"]
+        S3["────── Memory-Mapped Region (mmap base) ──────\nShared libs (.so), anonymous mmap,\nfile-backed mappings"]
+        S4["────── Heap (grows ↑) ──────\nbrk() / sbrk() managed"]
+        S5["────── BSS Segment ──────\nZero-initialized globals\n(anonymous, demand-zeroed)"]
+        S6["────── Data Segment ──────\nInitialized globals\n(.data section, file-backed)"]
+        S7["0x0000_0000_0040_0000\n────── Text Segment ──────\nExecutable code (.text)\nRead-only, file-backed, shared"]
+        S8["0x0000_0000_0000_0000\n────── NULL guard page ──────"]
+    end
+    S1 --- S2 --- S3 --- S4 --- S5 --- S6 --- S7 --- S8
+```
+
+Verify these regions experimentally:
+
+```bash
+cat /proc/$PID/maps
+```
+
+Each line format is: `address_range perms offset dev inode pathname`
+
+Permissions encode: `r` read, `w` write, `x` execute, `p` private (COW), `s` shared.
+
+### 1.3 Copy-On-Write (COW) Verification
+
+**Mechanism:** When `fork(2)` is called, the kernel clones the parent's `mm_struct` and page tables but marks all writable PTEs as read-only in *both* parent and child. The physical page frame is shared. When either process writes to a shared page, the MMU raises a protection fault. `handle_mm_fault()` → `do_wp_page()` detects the COW condition, allocates a new physical frame, copies the content, installs a writable PTE in the faulting process, and decrements the reference count on the original frame. If the original frame's reference count drops to 1, the remaining process's PTE is upgraded to writable in-place (no copy needed) — an optimization called *COW break*.
+
+```c
+/* cow_test.c — demonstrates COW page splitting across fork */
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
-int main() {
-    size_t size = 64 * 1024 * 1024; // 64 MB
-    char *buf = malloc(size);
-    memset(buf, 'A', size);
-    printf("Parent PID: %d, Allocated 64MB\n", getpid());
-    
-    if (fork() == 0) {
-        printf("Child PID: %d created (COW shared pages)\n", getpid());
-        sleep(5);
-        // Trigger page fault and copy by writing
-        memset(buf, 'B', size);
-        printf("Child PID: %d dirtied pages (Private Dirty split)\n", getpid());
-        sleep(10);
+static void print_smaps_rollup(pid_t pid, const char *label) {
+    char path[64];
+    char line[256];
+    snprintf(path, sizeof(path), "/proc/%d/smaps_rollup", pid);
+    FILE *f = fopen(path, "r");
+    if (!f) { perror("fopen smaps_rollup"); return; }
+    printf("\n=== %s (PID %d) ===\n", label, pid);
+    while (fgets(line, sizeof(line), f)) {
+        if (strstr(line, "Rss:")          ||
+            strstr(line, "Pss:")          ||
+            strstr(line, "Private_Dirty:") ||
+            strstr(line, "Shared_Clean:") ||
+            strstr(line, "Swap:")) {
+            printf("  %s", line);
+        }
+    }
+    fclose(f);
+}
+
+int main(void) {
+    const size_t SIZE = 64UL * 1024 * 1024; /* 64 MiB */
+    char *buf = mmap(NULL, SIZE,
+                     PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANONYMOUS,
+                     -1, 0);
+    if (buf == MAP_FAILED) { perror("mmap"); return 1; }
+
+    /* Touch every page to bring them resident (defeat demand-zero) */
+    memset(buf, 'A', SIZE);
+    printf("[parent %d] Allocated and dirtied 64 MiB\n", getpid());
+    print_smaps_rollup(getpid(), "Parent before fork");
+
+    pid_t child = fork();
+    if (child < 0) { perror("fork"); return 1; }
+
+    if (child == 0) {
+        /* Child: pages are still physically shared with parent */
+        printf("[child  %d] Just forked — pages are COW-shared\n", getpid());
+        print_smaps_rollup(getpid(), "Child before write (COW shared)");
+
+        /* Writing triggers page faults → COW splits → Private_Dirty rises */
+        memset(buf, 'B', SIZE);
+        printf("[child  %d] Dirtied all pages — COW split complete\n", getpid());
+        print_smaps_rollup(getpid(), "Child after write (Private_Dirty)");
         exit(0);
     }
-    sleep(15);
+
+    /* Parent: wait for child to write, then inspect */
+    sleep(1); /* give child time to fault in pages */
+    print_smaps_rollup(getpid(), "Parent after child write");
+    waitpid(child, NULL, 0);
     return 0;
 }
-EOF
-
-gcc -O2 cow_test.c -o cow_test
-./cow_test &
 ```
-
-While running, compare `Shared_Clean` vs `Private_Dirty` before and after the child writes:
-```bash
-grep -E "(Rss|Private_Dirty|Shared_Clean)" /proc/$(pgrep -n cow_test)/smaps_rollup
-```
-
----
-
-## Exercise 2: System Call Boundaries & Context Switch Profiling
-
-Measure CPU mode transitions from userspace (Ring 3) to kernel space (Ring 0) and profile involuntary context switches.
-
-### 2.1 Syscall Latency & Frequency Profiling
-Profile system call overhead and CPU time distribution using `strace`:
 
 ```bash
-# Collect syscall count, time, and error summary for a target workload
-strace -c dd if=/dev/zero of=/dev/null bs=1k count=100000
+gcc -O2 -Wall -o cow_test cow_test.c
+./cow_test
 ```
 
-### 2.2 Voluntary vs. Involuntary Context Switching
-Measure scheduling preemption and CPU cache thrashing during high thread contention:
-
-```bash
-# Measure context switches and CPU migrations
-perf stat -e context-switches,cpu-migrations,page-faults,cycles,instructions sleep 2
-```
-
----
-
-## Exercise 3: VFS Inode Tables, Page Cache & Out-Of-Memory (OOM) Testing
-
-Examine kernel page cache write-back mechanics, dirty memory limits, and the OOM killer scoring system.
-
-### 3.1 Kernel Page Cache & Dirty Page Flushing
-Observe page cache dynamics during heavy unbuffered I/O:
-
-```bash
-# Monitor kernel dirty memory state
-cat /proc/meminfo | grep -E "(Cached|Dirty|Writeback)"
-
-# Trigger kernel page cache drop
-sync
-echo 3 | sudo tee /proc/sys/vm/drop_caches
-
-# Re-inspect dropped page cache counters
-cat /proc/meminfo | grep -E "(Cached|Dirty|Writeback)"
-```
-
-### 3.2 OOM Score & Process Priority Mechanics
-Inspect how the kernel calculates process kill priority during physical memory exhaustion:
-
-```bash
-# Inspect a process OOM badness score (0 = immune, 1000 = prime candidate)
-cat /proc/$PID/oom_score
-cat /proc/$PID/oom_score_adj
-```
-
-Adjust OOM score adjustment to protect critical system processes:
-```bash
-echo -1000 | sudo tee /proc/$PID/oom_score_adj
-```
-
----
-
-## Operating System Theory Diagnostic Cheat Sheet
-
-| Subsystem | Command / Interface | Diagnostic Purpose |
-| :--- | :--- | :--- |
-| **Address Space** | `pmap -x <PID>` | Inspect process segment boundaries and RSS |
-| **Memory Map** | `/proc/<PID>/smaps_rollup` | Fast summary of PSS, USS, and Private Dirty memory |
-| **Syscall Cost** | `strace -c <command>` | Aggregate syscall execution frequency and latency |
-| **Scheduling** | `perf stat -e context-switches` | Measure voluntary and involuntary preemption |
-| **Page Faults** | `sar -B 1 5` | Monitor minor (memory) and major (disk I/O) page faults |
-| **Page Cache** | `/proc/meminfo` | Inspect Active/Inactive, Dirty, and Writeback memory |
-| **OOM Engine** | `/proc/<PID>/oom_score` | Determine kernel termination priority under memory pressure |
+Expected observation: immediately after `fork`, both parent and child show high `Shared_Clean` and near-zero `Private_Dirty`. After

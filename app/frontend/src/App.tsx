@@ -65,6 +65,9 @@ export function App() {
     document.documentElement.setAttribute('data-theme', settings.theme);
     document.documentElement.setAttribute('data-fontsize', settings.fontSize);
     document.documentElement.setAttribute('data-readerwidth', settings.readerWidth);
+    document.documentElement.setAttribute('data-fontfamily', settings.fontFamily || 'sans');
+    document.documentElement.setAttribute('data-accent', settings.accentColor || 'gold');
+    document.documentElement.setAttribute('data-lineheight', settings.lineHeight || 'balanced');
     
     checkConnectivity();
   }, [settings, checkConnectivity]);
@@ -344,16 +347,18 @@ export function App() {
     setIsChatting(true);
     try {
       let terminalOutput = terminalRef.current?.getRecentOutput?.(40) || '';
-      if (!terminalOutput.trim()) {
-        try {
-          const termRes = await fetch('/api/terminal/buffer?lines=40');
-          if (termRes.ok) {
-            const termData = await termRes.json();
+      let lastTerminalCommand = '';
+      try {
+        const termRes = await fetch('/api/terminal/buffer?lines=40');
+        if (termRes.ok) {
+          const termData = await termRes.json();
+          if (!terminalOutput.trim()) {
             terminalOutput = termData.text || '';
           }
-        } catch {
-          // ignore
+          lastTerminalCommand = termData.last_command || '';
         }
+      } catch {
+        // ignore
       }
 
       // Extract clean lesson markdown content and title from topicDetails
@@ -380,9 +385,11 @@ export function App() {
           lesson_id: activeLessonId,
           lesson_title: lessonTitle,
           message: msg,
-          history: updatedHistory,
+          history: unifiedChatHistory,
           terminal_context: terminalOutput,
+          last_terminal_command: lastTerminalCommand,
           lesson_content: lessonContent,
+          language: settings.language,
           stream: true,
           model: settings.mentorModel || undefined,
           host: settings.ollamaHost || undefined,
@@ -678,6 +685,7 @@ export function App() {
         isTerminalConnected={terminalConnected}
         mentorConnected={mentorConnected}
         onToggleTerminal={() => setTerminalOpen((prev: boolean) => !prev)}
+        targetLanguage={settings.language}
       />
 
       <SearchModal

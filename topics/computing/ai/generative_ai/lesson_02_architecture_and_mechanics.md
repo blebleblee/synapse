@@ -428,7 +428,7 @@ where `phi` is a feature map that approximates the exponential kernel `exp(q·k)
 
 ```mermaid
 flowchart LR
-    subgraph "Standard Attention (HBM-bound)"
+    subgraph sub_standard_attention__hbm_bound ["Standard Attention (HBM-bound)"]
         A1["Q, K in HBM"] --> B1["Load to SRAM,\nCompute QK^T"]
         B1 --> C1["Write scores\nto HBM"]
         C1 --> D1["Load scores,\nCompute softmax"]
@@ -437,7 +437,7 @@ flowchart LR
         F1 --> G1["Output in HBM"]
     end
 
-    subgraph "FlashAttention (SRAM-fused)"
+    subgraph sub_flashattention__sram_fused ["FlashAttention (SRAM-fused)"]
         A2["Q, K, V in HBM"] --> B2["Tile into\nSRAM blocks"]
         B2 --> C2["Online softmax:\nCompute QK^T,\nsoftmax, W·V\nin one pass"]
         C2 --> D2["Output in HBM\n(T×T never\nwritten to HBM)"]
@@ -657,13 +657,13 @@ Generation is a T-step iterative process: start from `x_T ~ N(0, I)`, predict an
 
 ```mermaid
 flowchart LR
-    subgraph "Forward Process q (fixed)"
+    subgraph sub_forward_process_q__fixed ["Forward Process q (fixed)"]
         X0["x_0\n(clean data)"] --> X1["x_1 = sqrt(1-β₁)·x₀ + sqrt(β₁)·ε₁"]
         X1 --> XD["..."]
         XD --> XT["x_T ≈ N(0,I)\n(pure noise)"]
     end
 
-    subgraph "Reverse Process p_θ (learned)"
+    subgraph sub_reverse_process_p____learned ["Reverse Process p_θ (learned)"]
         XT2["x_T ~ N(0,I)"] --> DN1["Denoise step T:\nx_{T-1} = f(x_T, ε_θ(x_T,T))"]
         DN1 --> DN2["Denoise step T-1:\n..."]
         DN2 --> DN3["Denoise step 1:\nx_0_hat"]
@@ -694,7 +694,7 @@ flowchart TD
     LM --> LOGITS["Logits [N, T, vocab_size]"]
     LOGITS --> LOSS["Cross-Entropy Loss\n(teacher-forced next-token prediction)"]
 
-    subgraph "Transformer Block (Decoder)"
+    subgraph sub_transformer_block__decoder ["Transformer Block (Decoder)"]
         direction TB
         IN_B["Input [N, T, d_model]"] --> LN1_B["LayerNorm"]
         LN1_B --> ATTN_B["Causal MHA\n(masked self-attention)"]
@@ -807,7 +807,7 @@ This means parameters and tokens should be scaled equally. Kaplan-era models (GP
 
 ```mermaid
 graph LR
-    subgraph "Compute-Optimal Frontier"
+    subgraph sub_compute_optimal_frontier ["Compute-Optimal Frontier"]
         C1["Small C:\nN_opt small\nD_opt small"] --> C2["Medium C:\nN_opt medium\nD_opt medium"]
         C2 --> C3["Large C:\nN_opt large\nD_opt large"]
     end

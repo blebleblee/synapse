@@ -34,7 +34,7 @@ Every modern deep learning framework (PyTorch, JAX, TensorFlow) represents a mod
 
 ```mermaid
 graph TD
-    subgraph "Forward Pass — Computation Graph"
+    subgraph sub_forward_pass___computation_graph ["Forward Pass — Computation Graph"]
         I["Input Tensor x ∈ ℝ^(B×T×D)"]
         E["Token Embedding\nW_E ∈ ℝ^(V×D)"]
         P["Positional Encoding\nRoPE / Sinusoidal"]
@@ -740,7 +740,7 @@ Training a Sparse Autoencoder requires collecting hundreds of millions of activa
 
 ```mermaid
 flowchart LR
-    subgraph "Data Collection"
+    subgraph sub_data_collection ["Data Collection"]
         C["Text Corpus\n(The Pile, C4, etc.)"]
         TOK["Tokenizer"]
         BATCH["Batched Forward Pass\n(frozen model, no grad)"]
@@ -748,14 +748,14 @@ flowchart LR
         BUF["Ring Buffer\n(streaming to disk)"]
     end
 
-    subgraph "SAE Training"
+    subgraph sub_sae_training ["SAE Training"]
         SHARD["Activation Shards\n(.pt files on NFS/S3)"]
         LOADER["Streaming DataLoader\n(shuffle across shards)"]
         SAE_TRAIN["SAE Training Loop\n(Adam + L1 + decoder renorm)"]
         CKPT["SAE Checkpoint"]
     end
 
-    subgraph "Analysis"
+    subgraph sub_analysis ["Analysis"]
         TOP_ACT["Top-k Activating Examples\nper feature"]
         INTERP["Human Annotation\nof feature semantics"]
         EVAL["Downstream eval:\nautointerpretability,\ncausal intervention"]
@@ -782,7 +782,7 @@ The ring buffer prevents OOM by never materializing all activations simultaneous
 
 ```mermaid
 flowchart TD
-    subgraph "Threat Model for Interpretability Failures"
+    subgraph sub_threat_model_for_interpretabilit ["Threat Model for Interpretability Failures"]
         F1["Unfaithful Explanations\n(explanation ≠ actual computation)"]
         F2["Gradient Saturation\n(dead ReLU neurons, flat regions)"]
         F3["Adversarial Explanation Manipulation\n(change map without changing output)"]
@@ -790,7 +790,7 @@ flowchart TD
         F5["Superposition\n(polysemantic neurons)"]
     end
 
-    subgraph "Mitigations"
+    subgraph sub_mitigations ["Mitigations"]
         M1["Use Integrated Gradients\nor SHAP (completeness axiom)"]
         M2["Use GeLU/SwiGLU activations;\nIG traverses transition region"]
         M3["Activation patching\n(causal, not gradient-based)"]
