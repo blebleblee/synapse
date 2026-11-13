@@ -5,7 +5,7 @@ interface SearchResult {
   domain: string;
   category: string;
   subtopic: string;
-  level: string;
+  level?: string;
   file: string;
   path: string;
   section: string;
@@ -107,7 +107,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               key={idx}
               className="search-result-item"
               onClick={() => {
-                onSelectTopic(r.path, r.level !== 'root' ? r.level : undefined);
+                onSelectTopic(r.path, r.level && r.level !== 'root' ? r.level : undefined);
                 onClose();
               }}
             >
@@ -117,7 +117,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 <span className="result-cat">{r.category}</span>
                 <span className="result-sep">/</span>
                 <span className="result-sub">{r.subtopic}</span>
-                {r.level !== 'root' && (
+                {r.level && r.level !== 'root' && (
                   <span className="result-level-tag">{r.level.toUpperCase()}</span>
                 )}
               </div>

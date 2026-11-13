@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import type { TopicDetails, QuizQuestion } from '../types';
 import { renderMarkdownWithMathAndMermaid, renderMermaidDiagramsInElement } from '../utils/markdownRenderer';
+import { synthesizeTerminalCommand } from '../utils/commandSynthesizer';
 import { SocraticQuizView } from './SocraticQuizView';
 import { speakText, stopSpeaking } from '../utils/speech';
 import { getUIStrings } from '../utils/i18n';
@@ -272,10 +273,29 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
 
-    // Executable sandbox code block runner
+    // Clipboard Copy code button runner with animated confirmation
+    const copyBtn = target.closest('.btn-copy-code') as HTMLElement | null;
+    if (copyBtn && copyBtn.dataset.code) {
+      navigator.clipboard.writeText(copyBtn.dataset.code).then(() => {
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="btn-icon">✔</span> Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHtml;
+          copyBtn.classList.remove('copied');
+        }, 1800);
+      }).catch((err) => {
+        console.warn('Clipboard write failed:', err);
+      });
+      return;
+    }
+
+    // Context-aware Smart Terminal runner
     const runBtn = target.closest('.btn-run-code') as HTMLElement | null;
     if (runBtn && runBtn.dataset.code) {
-      onRunInTerminal(runBtn.dataset.code);
+      const lang = runBtn.dataset.lang || '';
+      const synth = synthesizeTerminalCommand(runBtn.dataset.code, lang);
+      onRunInTerminal(synth.command);
       return;
     }
 
@@ -357,7 +377,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       <div className="viewer-empty">
         <BookOpen size={48} className="empty-icon" />
         <h2>Select a Topic from the Tree</h2>
-        <p>Explore over 700 calibrated technical topics across 12 engineering, scientific, and polymath domains.</p>
+        <p>Explore 504 masterclass technical courses across 80 disciplines and 12 engineering, scientific, and polymath domains.</p>
       </div>
     );
   }

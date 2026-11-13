@@ -73,6 +73,7 @@ def search_curriculum(query: str, max_results: int = 25) -> List[Dict[str, Any]]
             "domain": domain,
             "category": category,
             "subtopic": subtopic,
+            "level": "masterclass",
             "file": md_path.name,
             "path": f"{domain}/{category}/{subtopic}",
             "section": section,

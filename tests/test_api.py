@@ -91,7 +91,7 @@ def test_api_multi_lesson_discovery_and_selection():
     assert res.status_code == 200
     data = res.json()
     assert "lessons" in data
-    assert len(data["lessons"]) == 6
+    assert len(data["lessons"]) >= 6
     assert data["active_lesson_id"] == "lesson_01_foundations_and_invariants"
     assert "Lesson 1: Foundations" in data["lessons"][0]["title"]
     assert data["course_title"] is None

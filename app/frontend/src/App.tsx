@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TopicTree } from './components/TopicTree';
 import { LessonViewer } from './components/LessonViewer';
 import { TutorChat } from './components/TutorChat';
@@ -13,6 +13,7 @@ import './App.css';
 
 export function App() {
   const [tree, setTree] = useState<TopicTreeData>({});
+  const [mentorConnected, setMentorConnected] = useState<'checking' | 'connected' | 'error'>('checking');
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceStatus | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [topicDetails, setTopicDetails] = useState<TopicDetails | null>(null);
@@ -42,11 +43,31 @@ export function App() {
     }
   });
 
+  const checkConnectivity = useCallback(async () => {
+    setMentorConnected('checking');
+    try {
+      const res = await fetch('/api/check-mentor-connectivity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          host: settings.ollamaHost,
+          model: settings.mentorModel
+        }),
+      });
+      const data = await res.json();
+      setMentorConnected(data.connected ? 'connected' : 'error');
+    } catch {
+      setMentorConnected('error');
+    }
+  }, [settings.ollamaHost, settings.mentorModel]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.theme);
     document.documentElement.setAttribute('data-fontsize', settings.fontSize);
     document.documentElement.setAttribute('data-readerwidth', settings.readerWidth);
-  }, [settings]);
+    
+    checkConnectivity();
+  }, [settings, checkConnectivity]);
 
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
@@ -335,10 +356,20 @@ export function App() {
         }
       }
 
-      // Extract current lesson content from LessonViewer DOM
+      // Extract clean lesson markdown content and title from topicDetails
       let lessonContent = '';
-      if (contentRef.current) {
-        lessonContent = contentRef.current.innerText || '';
+      let lessonTitle = '';
+
+      if (activeTab === 'labs') {
+        lessonTitle = 'Operational Labs';
+        lessonContent = topicDetails?.labs || '';
+      } else if (activeLessonId && activeLessonId !== 'all' && topicDetails?.lessons) {
+        const current = topicDetails.lessons.find((l) => l.id === activeLessonId);
+        lessonTitle = current?.title || '';
+        lessonContent = current?.content || topicDetails?.lesson || '';
+      } else {
+        lessonTitle = topicDetails?.active_lesson_title || (topicDetails?.subtopic ? topicDetails.subtopic.replace(/_/g, ' ') : 'Curriculum Guide');
+        lessonContent = topicDetails?.lesson || topicDetails?.full_content || topicDetails?.foundation || '';
       }
 
       const res = await fetch('/api/chat', {
@@ -347,6 +378,7 @@ export function App() {
         body: JSON.stringify({
           query: selectedPath || '',
           lesson_id: activeLessonId,
+          lesson_title: lessonTitle,
           message: msg,
           history: updatedHistory,
           terminal_context: terminalOutput,
@@ -412,7 +444,7 @@ export function App() {
         ...updatedHistory,
         {
           role: 'tutor',
-          content: `⚠️ **Unable to connect to AI Mentor** (${detail}).\n\n**To resolve:**\n1. Ensure Ollama is running on \`${settings.ollamaHost || 'http://localhost:11434'}\` with an active model (e.g. \`ollama run qwen2.5-coder:7b\`).\n2. Or open **Settings ⚙ → AI Models & Cloud API** to point to an external cluster node, or enter an Anthropic / Gemini API key for instant cloud mentoring.`
+          content: `⚠️ **Unable to connect to AI Mentor** (${detail}).\n\n**To resolve:**\n1. Verify active cluster nodes in **Settings ⚙ → AI Models & Cloud API**.\n2. Ensure your Ollama or LocalAI node is online with a loaded model.\n3. Or enter an Anthropic or Gemini API key for instant cloud mentoring.`
         }
       ]);
     } finally {
@@ -561,6 +593,16 @@ export function App() {
 
   const currentQuiz = selectedPath ? quizQuestions[`${selectedPath}/${currentLevel}`] || [] : [];
 
+  const activeLessonTitle = useMemo(() => {
+    if (!topicDetails) return null;
+    if (activeTab === 'labs') return 'Operational Labs';
+    if (activeLessonId && activeLessonId !== 'all' && topicDetails.lessons) {
+      const cur = topicDetails.lessons.find((l) => l.id === activeLessonId);
+      return cur?.title || topicDetails.active_lesson_title || 'Active Lesson';
+    }
+    return topicDetails.active_lesson_title || (topicDetails.subtopic ? topicDetails.subtopic.replace(/_/g, ' ') : 'Complete Masterclass');
+  }, [topicDetails, activeTab, activeLessonId]);
+
   return (
     <div className="workbench-layout">
       <TopicTree
@@ -628,11 +670,14 @@ export function App() {
 
       <TutorChat
         topic={topicDetails}
+        activeLessonTitle={activeLessonTitle}
         history={unifiedChatHistory}
         isChatting={isChatting}
         onSendMessage={handleSendMessage}
         onClearChat={() => setUnifiedChatHistory([])}
         isTerminalConnected={terminalConnected}
+        mentorConnected={mentorConnected}
+        onToggleTerminal={() => setTerminalOpen((prev: boolean) => !prev)}
       />
 
       <SearchModal

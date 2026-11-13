@@ -37,6 +37,8 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   const [terminalEnv, setTerminalEnv] = useState<'host' | 'docker' | 'k8s'>('host');
   const [showSetupGuide, setShowSetupGuide] = useState(false);
   const isDraggingRef = useRef(false);
+  const reconnectTimerRef = useRef<any>(null);
+  const isUnmountedRef = useRef(false);
 
   const fitTerminal = () => {
     if (!termRef.current || !containerRef.current || !isOpen || !fitAddonRef.current) return;
@@ -59,6 +61,11 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
   };
 
   const connectWs = (env = terminalEnv) => {
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+
     if (wsRef.current) {
       wsRef.current.close();
     }
@@ -89,6 +96,11 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     ws.onclose = () => {
       setConnected(false);
       onConnectionChange?.(false);
+      if (!isUnmountedRef.current) {
+        reconnectTimerRef.current = setTimeout(() => {
+          connectWs(env);
+        }, 2500);
+      }
     };
     ws.onerror = () => {
       setConnected(false);
@@ -166,6 +178,10 @@ export const TerminalDrawer = forwardRef<TerminalDrawerHandle, TerminalDrawerPro
     window.addEventListener('mouseup', handleMouseUp);
 
     return () => {
+      isUnmountedRef.current = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
       resizeObserver.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);

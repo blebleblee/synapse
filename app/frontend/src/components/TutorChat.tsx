@@ -10,27 +10,36 @@ import {
   ChevronUp,
   Sparkles,
   Terminal,
-  Trash2
+  Trash2,
+  BookOpen,
+  HelpCircle
 } from 'lucide-react';
 import type { ChatMessage, TopicDetails } from '../types';
 
 interface TutorChatProps {
   topic: TopicDetails | null;
+  activeLessonTitle?: string | null;
   history: ChatMessage[];
   isChatting: boolean;
   onSendMessage: (message: string) => Promise<void>;
   onClearChat?: () => void;
   isTerminalConnected?: boolean;
+  mentorConnected: 'checking' | 'connected' | 'error';
+  onToggleTerminal?: () => void;
 }
 
 export const TutorChat: React.FC<TutorChatProps> = ({
   topic,
+  activeLessonTitle,
   history,
   isChatting,
   onSendMessage,
   onClearChat,
   isTerminalConnected = false,
+  mentorConnected,
+  onToggleTerminal,
 }) => {
+  // ... existing component logic ...
   const [input, setInput] = useState('');
   const [personaExpanded, setPersonaExpanded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -140,7 +149,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           >
             <div className="persona-avatar-wrapper">
               <Bot size={18} className="persona-icon" />
-              <span className="persona-online-dot" />
+              <span className={`persona-online-dot ${mentorConnected}`} />
             </div>
             <div className="persona-text">
               <div className="persona-label-row">
@@ -156,16 +165,30 @@ export const TutorChat: React.FC<TutorChatProps> = ({
 
           <div className="chat-header-actions">
             <span
+              className={`mentor-status-badge ${mentorConnected}`}
+              title={
+                mentorConnected === 'connected'
+                  ? "AI Mentor Online & Active"
+                  : mentorConnected === 'checking'
+                  ? "AI Mentor: Probing cluster node..."
+                  : "AI Mentor: Offline. Verify Settings ⚙"
+              }
+            >
+              {mentorConnected === 'connected' ? '● Mentor Online' : mentorConnected === 'checking' ? '○ Connecting...' : '○ Mentor Offline'}
+            </span>
+            <button
+              type="button"
               className={`terminal-link-badge ${isTerminalConnected ? 'online' : 'offline'}`}
+              onClick={onToggleTerminal}
               title={
                 isTerminalConnected
-                  ? "Live Terminal Output Linked (Mentor automatically reads your terminal output & errors)"
-                  : "Terminal Disconnected (Click terminal drawer to reconnect)"
+                  ? "Live Terminal Linked: AI Mentor reads your terminal output & errors. Click to toggle terminal drawer."
+                  : "Terminal in Standby. Click to open terminal drawer and connect."
               }
             >
               <Terminal size={11} />
-              <span>{isTerminalConnected ? "Terminal Live" : "Terminal Offline"}</span>
-            </span>
+              <span>{isTerminalConnected ? "Terminal Live" : "Terminal Standby"}</span>
+            </button>
             {onClearChat && (
               <button
                 type="button"
@@ -193,10 +216,43 @@ export const TutorChat: React.FC<TutorChatProps> = ({
           </div>
         </div>
 
-        {topic && (
-          <div className="chat-subject-row" title={`Active Topic: ${topic.display_title || topic.subtopic}`}>
-            <span className="chat-subject-label">Subject:</span>
-            <span className="chat-subject-title">{topic.display_title || topic.subtopic?.replace(/_/g, ' ')}</span>
+        {/* Active Lesson Context Bar */}
+        {activeLessonTitle && (
+          <div className="chat-lesson-context-bar">
+            <div className="context-bar-header">
+              <BookOpen size={11} className="context-icon" />
+              <span className="context-label">Active Lesson:</span>
+              <span className="context-title" title={activeLessonTitle}>{activeLessonTitle}</span>
+            </div>
+            <div className="context-quick-chips">
+              <button
+                type="button"
+                className="context-quick-chip"
+                onClick={() => onSendMessage(`Please explain the core invariants of '${activeLessonTitle}' in 2-3 direct sentences.`)}
+                title="Ask mentor to explain this lesson"
+              >
+                <Lightbulb size={10} />
+                <span>Explain</span>
+              </button>
+              <button
+                type="button"
+                className="context-quick-chip"
+                onClick={() => onSendMessage(`Can you give me a practical, hands-on example of '${activeLessonTitle}'?`)}
+                title="Ask for a practical example"
+              >
+                <Sparkles size={10} />
+                <span>Example</span>
+              </button>
+              <button
+                type="button"
+                className="context-quick-chip"
+                onClick={() => onSendMessage(`What is the most common pitfall or misconception when applying '${activeLessonTitle}'?`)}
+                title="Ask about common pitfalls"
+              >
+                <HelpCircle size={10} />
+                <span>Pitfall</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

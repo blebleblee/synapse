@@ -74,6 +74,7 @@ export interface TopicDetails {
   lesson: string;
   lessons?: LessonItem[];
   active_lesson_id?: string;
+  active_lesson_title?: string;
   labs: string;
   full_content?: string;
   has_content: boolean;

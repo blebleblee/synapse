@@ -30,7 +30,7 @@ Once the curriculum is generated, Synapse provides a rich native **Socratic Work
 
 ## 🎯 Features
 
-- **Automated Curriculum Generation (`generate_all.py`):** Automatically drafts, audits, and refines multi-stage technical lessons (Beginner, Intermediate, Advanced) and hands-on terminal labs.
+- **Automated Curriculum Generation (`generate_all.py`):** Automatically scopes, drafts, audits, and refines textbook-grade, multi-lesson sequential masterclasses (Foundations & Invariants, Architecture & Mechanics, Deep Dive & Concurrency, Operational Diagnostics) and hands-on terminal labs according to the PostgreSQL standard.
 - **Multi-Node Cluster Orchestration:** Distributes LLM workloads across a fleet of local instances (e.g., Ollama, LocalAI) and cloud providers (Anthropic Claude 3.5), employing cross-model adversarial peer review.
 - **Native Socratic Workbench:** A beautiful, responsive Electron / React frontend featuring:
   - **Topic Tree Navigation:** Canonical 3-level taxonomy hierarchy.

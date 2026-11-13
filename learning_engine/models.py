@@ -64,6 +64,85 @@ def load_env_file():
 load_env_file()
 
 CLUSTER_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_cluster.json"
+NODE_PINS_CONFIG_PATH = WORKSPACE_ROOT / ".synapse_node_pins.json"
+
+def normalize_host_key(host: str) -> str:
+    """Normalizes host string to hostname:port or hostname without protocol."""
+    clean = host.strip().rstrip("/")
+    clean = clean.replace("http://", "").replace("https://", "")
+    return clean
+
+def get_configured_node_pins() -> Dict[str, str]:
+    """
+    Returns mapping of normalized host/node key -> pinned model name.
+    Loaded from environment, .synapse_node_pins.json, or SQLite settings.
+    Includes default model pin for known local cluster nodes (e.g. 192.168.200.60).
+    """
+    pins: Dict[str, str] = {
+        "192.168.200.60:8080": "qwopus3.6-27b-coder-mtp:latest",
+        "192.168.200.60": "qwopus3.6-27b-coder-mtp:latest",
+    }
+
+    if NODE_PINS_CONFIG_PATH.exists():
+        try:
+            data = json.loads(NODE_PINS_CONFIG_PATH.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                for k, v in data.items():
+                    if k and v:
+                        pins[normalize_host_key(k)] = str(v).strip()
+        except Exception:
+            pass
+
+    try:
+        from .config_manager import get_settings
+        st = get_settings()
+        db_pins = st.get("node_pins")
+        if isinstance(db_pins, dict):
+            for k, v in db_pins.items():
+                if k and v:
+                    pins[normalize_host_key(k)] = str(v).strip()
+    except Exception:
+        pass
+
+    env_pins = os.environ.get("OLLAMA_NODE_PINS")
+    if env_pins:
+        try:
+            if env_pins.strip().startswith("{"):
+                parsed = json.loads(env_pins)
+                for k, v in parsed.items():
+                    pins[normalize_host_key(k)] = str(v).strip()
+            else:
+                for pair in env_pins.split(","):
+                    if "=" in pair:
+                        h, m = pair.split("=", 1)
+                        pins[normalize_host_key(h)] = m.strip()
+        except Exception:
+            pass
+
+    return pins
+
+def get_node_pin(host: str) -> Optional[str]:
+    """Resolves pinned model for a given host or None if not pinned."""
+    pins = get_configured_node_pins()
+    norm = normalize_host_key(host)
+    if norm in pins:
+        return pins[norm]
+    host_only = norm.split(":")[0]
+    if host_only in pins:
+        return pins[host_only]
+    return None
+
+def save_configured_node_pins(pins: Dict[str, str]) -> Dict[str, str]:
+    cleaned = {normalize_host_key(k): str(v).strip() for k, v in pins.items() if k and v}
+    NODE_PINS_CONFIG_PATH.write_text(json.dumps(cleaned, indent=2) + "\n", encoding="utf-8")
+    try:
+        from .config_manager import get_settings, save_settings
+        st = get_settings()
+        st["node_pins"] = cleaned
+        save_settings(st)
+    except Exception:
+        pass
+    return cleaned
 
 def get_configured_hosts() -> List[str]:
     """Get Ollama hosts from .synapse_cluster.json or SQLite settings, falling back to localhost."""
@@ -134,6 +213,7 @@ class OllamaProvider(LLMProvider):
 
     @classmethod
     def list_models(cls, host: str = "http://localhost:11434") -> List[str]:
+        raw_models: List[str] = []
         # 1. Native Ollama format
         try:
             req = urllib.request.Request(f"{host.rstrip('/')}/api/tags", headers={"User-Agent": "LearningEngine"})
@@ -141,18 +221,35 @@ class OllamaProvider(LLMProvider):
                 data = json.loads(resp.read().decode("utf-8"))
                 models = [m["name"] for m in data.get("models", [])]
                 if models:
-                    return models
+                    raw_models = models
         except Exception:
             pass
 
         # 2. LocalAI / OpenAI /v1/models format
-        try:
-            req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return [m["id"] for m in data.get("data", [])]
-        except Exception:
-            return []
+        if not raw_models:
+            try:
+                req = urllib.request.Request(f"{host.rstrip('/')}/v1/models", headers={"User-Agent": "LearningEngine"})
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    raw_models = [m["id"] for m in data.get("data", [])]
+            except Exception:
+                pass
+
+        # Filter out non-LLM models (e.g. image diffusion models like flux, sd, etc.)
+        non_llm_patterns = ["flux", "diffusion", "krea", "stable-diffusion", "dall-e", "midjourney"]
+        filtered = [
+            m for m in raw_models
+            if not any(pat in m.lower() for pat in non_llm_patterns)
+        ]
+
+        # Prioritize pinned model if configured for this host
+        pinned = get_node_pin(host)
+        if pinned:
+            if pinned in filtered:
+                filtered.remove(pinned)
+            filtered.insert(0, pinned)
+
+        return filtered or raw_models
 
     @classmethod
     def pull_model(cls, host: str, model_name: str) -> bool:
@@ -166,11 +263,32 @@ class OllamaProvider(LLMProvider):
             print(f"[!] Error pulling model {model_name} on {host}: {e}")
             return False
 
-    def generate(self, prompt: str, system_instruction: str = "") -> str:
+    @classmethod
+    def check_connectivity(cls, host: str, model: Optional[str] = None) -> bool:
+        """Verifies if a specific Ollama/LocalAI node and model are available."""
+        try:
+            # Check if host is up
+            if not cls.is_available(host):
+                return False
+            
+            # If a model is specified, verify it's available on that host
+            if model:
+                models = cls.list_models(host)
+                return model in models
+                
+            return True
+        except Exception:
+            return False
+
+    def generate(self, prompt: str, system_instruction: str = "", host: Optional[str] = None, model: Optional[str] = None) -> str:
+        # Use provided overrides if available, otherwise use instance defaults
+        target_host = host or self.host
+        target_model = model or self.model
+        
         # Try native Ollama API first
-        ollama_url = f"{self.host}/api/generate"
+        ollama_url = f"{target_host.rstrip('/')}/api/generate"
         ollama_payload = {
-            "model": self.model,
+            "model": target_model,
             "prompt": prompt,
             "system": system_instruction,
             "stream": False,
@@ -191,14 +309,14 @@ class OllamaProvider(LLMProvider):
             pass
 
         # Fallback to LocalAI / OpenAI compatible chat completions
-        v1_url = f"{self.host}/v1/chat/completions"
+        v1_url = f"{target_host.rstrip('/')}/v1/chat/completions"
         messages = []
         if system_instruction:
             messages.append({"role": "system", "content": system_instruction})
         messages.append({"role": "user", "content": prompt})
 
         v1_payload = {
-            "model": self.model,
+            "model": target_model,
             "messages": messages,
             "temperature": 0.2
         }
@@ -233,6 +351,7 @@ class OllamaProvider(LLMProvider):
         req = urllib.request.Request(ollama_url, data=data, headers={"Content-Type": "application/json"})
 
         try:
+            has_streamed = False
             with urllib.request.urlopen(req, timeout=40) as resp:
                 for line in resp:
                     if not line:
@@ -241,12 +360,56 @@ class OllamaProvider(LLMProvider):
                         chunk = json.loads(line.decode("utf-8"))
                         text = chunk.get("response", "")
                         if text:
+                            has_streamed = True
                             yield text
                         if chunk.get("done", False):
                             break
                     except Exception:
                         continue
-                return
+                if has_streamed:
+                    return
+        except Exception:
+            pass
+
+        # Fallback to LocalAI / OpenAI compatible streaming
+        try:
+            v1_url = f"{self.host}/v1/chat/completions"
+            messages = []
+            if system_instruction:
+                messages.append({"role": "system", "content": system_instruction})
+            messages.append({"role": "user", "content": prompt})
+            v1_payload = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": 0.2,
+                "max_tokens": max_tokens,
+                "stream": True
+            }
+            data = json.dumps(v1_payload).encode("utf-8")
+            req = urllib.request.Request(v1_url, data=data, headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                has_streamed = False
+                for line in resp:
+                    if not line:
+                        continue
+                    line_str = line.decode("utf-8", errors="replace").strip()
+                    if line_str.startswith("data: "):
+                        data_part = line_str[6:].strip()
+                        if data_part == "[DONE]":
+                            break
+                        try:
+                            parsed = json.loads(data_part)
+                            choices = parsed.get("choices", [])
+                            if choices:
+                                delta = choices[0].get("delta", {})
+                                text = delta.get("content", "")
+                                if text:
+                                    has_streamed = True
+                                    yield text
+                        except Exception:
+                            continue
+                if has_streamed:
+                    return
         except Exception:
             pass
 
@@ -278,7 +441,14 @@ class OllamaCluster(LLMProvider):
         def probe_node(h: str) -> Tuple[str, Dict[str, Any]]:
             up = OllamaProvider.is_available(h)
             models = OllamaProvider.list_models(h) if up else []
-            return h, {"online": up, "models": models}
+            pinned = get_node_pin(h)
+            pref = pinned or (models[0] if models else None)
+            return h, {
+                "online": up,
+                "models": models,
+                "pinned_model": pinned,
+                "preferred_model": pref
+            }
 
         with ThreadPoolExecutor(max_workers=min(8, len(self.hosts) or 1)) as executor:
             for h, res in executor.map(probe_node, self.hosts):
@@ -289,7 +459,7 @@ class OllamaCluster(LLMProvider):
 
     def select_node_for_model(self, model: Optional[str] = None) -> Tuple[str, str]:
         """
-        Finds the best (host, model) pair across the cluster.
+        Finds the best (host, model) pair across the cluster, honoring pinned models.
         """
         status = self.get_cluster_status()
         online_hosts = [h for h, data in status.items() if data["online"]]
@@ -303,6 +473,12 @@ class OllamaCluster(LLMProvider):
             for h in online_hosts:
                 if target_model in status[h]["models"]:
                     return h, target_model
+
+        # Check if any online host has a pinned model
+        for h in online_hosts:
+            pinned = status[h].get("pinned_model")
+            if pinned and pinned in status[h]["models"]:
+                return h, pinned
 
         # Model preference hierarchy
         preferred_models = [
@@ -555,9 +731,23 @@ def get_provider(provider_type: Optional[str] = None, model: Optional[str] = Non
 def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -> Tuple[LLMProvider, str]:
     """
     Returns a model provider optimized for interactive Socratic mentoring.
-    Checks user-specified host/model first, then scans online cluster nodes,
-    and falls back to Anthropic Claude or Google Gemini if Ollama is unreachable.
+    Respects explicit user-specified host/model, falling back to auto-discovery
+    or cloud services if necessary.
     """
+    # 1. Validate explicitly requested configuration
+    if host and model:
+        if OllamaProvider.check_connectivity(host, model):
+            return OllamaProvider(model=model, host=host), model
+    elif host:
+        # Host requested, but model auto-selection needed
+        if OllamaProvider.is_available(host):
+            pinned = get_node_pin(host)
+            models = OllamaProvider.list_models(host)
+            # Use pinned model if available, else requested model, else first available
+            selected_model = model if (model and model in models) else (pinned if pinned else (models[0] if models else "qwen2.5-coder:7b"))
+            return OllamaProvider(model=selected_model, host=host), selected_model
+
+    # 2. Check cluster status if no valid explicit config
     fast_models = [
         "qwen2.5-coder:7b",
         "llama3.1:8b",
@@ -566,21 +756,6 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         "qwen2.5:3b",
         "qwen2.5-coder:32b"
     ]
-
-    # 1. User-specified Ollama host
-    if host:
-        clean_host = host.strip().rstrip("/")
-        if OllamaProvider.is_available(clean_host):
-            models = OllamaProvider.list_models(clean_host)
-            if model and model in models:
-                return OllamaProvider(model=model, host=clean_host), model
-            for fm in fast_models:
-                if fm in models:
-                    return OllamaProvider(model=fm, host=clean_host), fm
-            selected = models[0] if models else "qwen2.5-coder:7b"
-            return OllamaProvider(model=selected, host=clean_host), selected
-
-    # 2. Check cluster status
     cluster = OllamaCluster()
     status = cluster.get_cluster_status()
 
@@ -589,6 +764,12 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         for h, h_data in status.items():
             if h_data.get("online") and model in h_data.get("models", []):
                 return OllamaProvider(model=model, host=h), model
+
+    # Pinned model on online cluster node priority
+    for h, h_data in status.items():
+        if h_data.get("online") and h_data.get("pinned_model"):
+            pinned = h_data["pinned_model"]
+            return OllamaProvider(model=pinned, host=h), pinned
 
     # Localhost priority
     local_key = "http://127.0.0.1:11434"
@@ -627,5 +808,5 @@ def get_chat_provider(model: Optional[str] = None, host: Optional[str] = None) -
         return GeminiProvider(model="gemini-2.5-flash", api_key=gemini_key), "gemini-2.5-flash"
 
     # 4. Fallback to cluster best selection
-    node, mod = cluster.select_best_node(model=model or "qwen2.5-coder:7b")
+    node, mod = cluster.select_node_for_model(model=model or "qwen2.5-coder:7b")
     return OllamaProvider(model=mod, host=node), mod

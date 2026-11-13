@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, X, ArrowRight, Search } from 'lucide-react';
+import { Compass, X, ArrowRight, Search, GitBranch, Layers } from 'lucide-react';
 
 interface PathwayStep {
   step: number;
@@ -342,6 +342,21 @@ interface GraphModalProps {
   onSelectTopic: (path: string) => void;
 }
 
+function getDomainColor(domain: string): string {
+  switch (domain) {
+    case 'computing': return '#38bdf8';
+    case 'engineering': return '#fb923c';
+    case 'motorsports': return '#f87171';
+    case 'arts': return '#fbbf24';
+    case 'health_sciences': return '#34d399';
+    case 'humanities': return '#c084fc';
+    case 'formal_sciences': return '#818cf8';
+    case 'natural_sciences': return '#4ade80';
+    case 'business': return '#facc15';
+    default: return '#cfa858';
+  }
+}
+
 export const GraphModal: React.FC<GraphModalProps> = ({
   isOpen,
   onClose,
@@ -349,6 +364,7 @@ export const GraphModal: React.FC<GraphModalProps> = ({
 }) => {
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'dag' | 'timeline'>('dag');
 
   if (!isOpen) return null;
 
@@ -396,6 +412,25 @@ export const GraphModal: React.FC<GraphModalProps> = ({
             </select>
           </div>
 
+          <div className="view-mode-toggle">
+            <button
+              className={`toggle-btn ${viewMode === 'dag' ? 'active' : ''}`}
+              onClick={() => setViewMode('dag')}
+              title="Visual DAG Pipeline Graph View"
+            >
+              <GitBranch size={13} />
+              <span>DAG Pipeline</span>
+            </button>
+            <button
+              className={`toggle-btn ${viewMode === 'timeline' ? 'active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+              title="Detailed Step Timeline View"
+            >
+              <Layers size={13} />
+              <span>Timeline</span>
+            </button>
+          </div>
+
           <div className="search-filter-box">
             <Search size={14} className="search-icon" />
             <input
@@ -430,40 +465,82 @@ export const GraphModal: React.FC<GraphModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="track-steps-timeline">
-                    {track.steps.map((st, idx) => (
-                      <div key={idx} className="timeline-step-row">
-                        <div className="step-indicator">
-                          <span className="step-num">{st.step}</span>
-                          {idx < track.steps.length - 1 && <div className="step-line" />}
-                        </div>
-
-                        <div className="step-card">
-                          <div className="step-card-header">
-                            <span className="step-domain-tag">{st.domain.replace(/_/g, ' ')}</span>
-                            <span className="step-tag">Prerequisite Stage</span>
+                  {viewMode === 'dag' ? (
+                    <div className="track-dag-pipeline">
+                      <div className="dag-flow-scroll">
+                        {track.steps.map((st, idx) => (
+                          <React.Fragment key={idx}>
+                            <div
+                              className="dag-node-card"
+                              style={{ borderTop: `3px solid ${getDomainColor(st.domain)}` }}
+                              onClick={() => {
+                                onSelectTopic(st.path);
+                                onClose();
+                              }}
+                              title={`Click to open lesson: ${st.title}`}
+                            >
+                              <div className="dag-node-header">
+                                <span className="dag-step-badge">Stage {st.step}</span>
+                                <span
+                                  className="dag-domain-chip"
+                                  style={{ color: getDomainColor(st.domain), borderColor: `${getDomainColor(st.domain)}40` }}
+                                >
+                                  {st.domain.replace(/_/g, ' ')}
+                                </span>
+                              </div>
+                              <h5 className="dag-node-title">{st.title}</h5>
+                              <p className="dag-node-desc">{st.whyLearnFirst}</p>
+                              <div className="dag-node-action">
+                                <span>Study Topic</span>
+                                <ArrowRight size={11} />
+                              </div>
+                            </div>
+                            {idx < track.steps.length - 1 && (
+                              <div className="dag-connector">
+                                <div className="dag-line" />
+                                <div className="dag-arrow">▶</div>
+                              </div>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="track-steps-timeline">
+                      {track.steps.map((st, idx) => (
+                        <div key={idx} className="timeline-step-row">
+                          <div className="step-indicator">
+                            <span className="step-num">{st.step}</span>
+                            {idx < track.steps.length - 1 && <div className="step-line" />}
                           </div>
 
-                          <h5 className="step-unit-title">{st.title}</h5>
-                          <p className="step-rationale">
-                            <strong>Why Learn First:</strong> {st.whyLearnFirst}
-                          </p>
+                          <div className="step-card">
+                            <div className="step-card-header">
+                              <span className="step-domain-tag">{st.domain.replace(/_/g, ' ')}</span>
+                              <span className="step-tag">Prerequisite Stage</span>
+                            </div>
 
-                          <button
-                            className="btn btn-secondary-sm step-study-btn"
-                            onClick={() => {
-                              onSelectTopic(st.path);
-                              onClose();
-                            }}
-                            title={`Jump directly to study ${st.title}`}
-                          >
-                            <span>Study This Topic</span>
-                            <ArrowRight size={12} />
-                          </button>
+                            <h5 className="step-unit-title">{st.title}</h5>
+                            <p className="step-rationale">
+                              <strong>Why Learn First:</strong> {st.whyLearnFirst}
+                            </p>
+
+                            <button
+                              className="btn btn-secondary-sm step-study-btn"
+                              onClick={() => {
+                                onSelectTopic(st.path);
+                                onClose();
+                              }}
+                              title={`Jump directly to study ${st.title}`}
+                            >
+                              <span>Study This Topic</span>
+                              <ArrowRight size={12} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { synthesizeTerminalCommand } from './commandSynthesizer';
 
 let mermaidInitialized = false;
 
@@ -107,21 +108,28 @@ export function renderMarkdownWithMathAndMermaid(rawMarkdown: string, enableMath
       </div>`;
     }
 
-    const isExecutable = ['bash', 'sh', 'zsh', 'shell', 'python', 'c', 'rust', 'sql', 'psql'].includes(language);
+    const synth = synthesizeTerminalCommand(text, language);
     const escapedCode = text
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
 
-    const runBtn = isExecutable
-      ? `<button class="btn-run-code" data-code="${escapedCode}" title="Execute in Sandbox Terminal (Docker / k8s / Host)">
-          <span class="btn-icon">▶</span> Run in Sandbox
+    const copyBtn = `<button class="btn-copy-code" data-code="${escapedCode}" title="Copy code snippet to clipboard">
+      <span class="btn-icon">📋</span> Copy
+    </button>`;
+
+    const runBtn = synth.isExecutable
+      ? `<button class="btn-run-code" data-code="${escapedCode}" data-lang="${language}" title="${synth.explanation}">
+          <span class="btn-icon">${synth.displayLabel}</span>
         </button>`
       : '';
 
     return `<div class="code-block-wrapper">
       <div class="code-block-header">
         <span class="code-lang">${language || 'code'}</span>
-        ${runBtn}
+        <div class="code-block-actions">
+          ${copyBtn}
+          ${runBtn}
+        </div>
       </div>
       <pre><code class="language-${language}">${text}</code></pre>
     </div>`;
@@ -142,25 +150,35 @@ export async function renderMermaidDiagramsInElement(container: HTMLElement) {
     if (!mermaidInitialized) {
       mermaid.initialize({
         startOnLoad: false,
-        theme: 'dark',
+        theme: 'base',
         securityLevel: 'loose',
         suppressErrorRendering: true,
         fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        fontSize: 14,
+        fontSize: 13,
         flowchart: {
           useMaxWidth: false,
           htmlLabels: true,
           curve: 'basis',
-          nodeSpacing: 45,
-          rankSpacing: 45,
+          nodeSpacing: 50,
+          rankSpacing: 50,
         },
         themeVariables: {
-          primaryColor: '#1e2430',
-          primaryTextColor: '#f0f3f6',
+          darkMode: true,
+          background: '#0d1117',
+          mainBkg: '#161b22',
+          primaryColor: '#1c2128',
+          primaryTextColor: '#f0f6fc',
           primaryBorderColor: '#cfa858',
           lineColor: '#cfa858',
-          secondaryColor: '#1a1f29',
-          tertiaryColor: '#161a22',
+          secondaryColor: '#21262d',
+          tertiaryColor: '#0d1117',
+          nodeBorder: '#cfa858',
+          clusterBkg: '#161b22',
+          clusterBorder: '#30363d',
+          defaultLinkColor: '#cfa858',
+          fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: '13px',
+          edgeLabelBackground: '#1c2128',
         }
       });
       mermaidInitialized = true;

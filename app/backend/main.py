@@ -134,6 +134,7 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=10000)
     history: List[Any] = []
     lesson_id: Optional[str] = Field(None, pattern=r'^[a-z0-9_-]*$')
+    lesson_title: Optional[str] = Field(None, max_length=200)
     terminal_context: Optional[str] = Field(None, max_length=50000)
     lesson_content: Optional[str] = Field(None, max_length=50000)
     stream: Optional[bool] = False
@@ -236,9 +237,35 @@ def api_test_ollama(req: TestOllamaRequest):
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
+class CheckConnectivityRequest(BaseModel):
+    host: Optional[str] = None
+    model: Optional[str] = None
+
+@app.post("/api/check-mentor-connectivity")
+def api_check_mentor_connectivity(req: CheckConnectivityRequest):
+    """
+    Pre-flight check for the Mentor AI connection.
+    Verifies the configured host and model are accessible.
+    """
+    host = req.host or "http://localhost:11434"
+    model = req.model
+    
+    # 1. Direct check
+    if OllamaProvider.check_connectivity(host, model):
+        return {"connected": True}
+        
+    # 2. Check if cluster has any node online if no specific model/host match
+    cluster = OllamaCluster()
+    status = cluster.get_cluster_status()
+    if any(d.get("online") for d in status.values()):
+        return {"connected": True, "warning": "Specified host/model unreachable, but cluster has other active nodes."}
+        
+    return {"connected": False, "error": "Unable to connect to Ollama/LocalAI cluster."}
+
 @app.get("/api/settings/cluster-status")
 def api_cluster_status():
     import time
+    from learning_engine.models import get_node_pin
     hosts = get_configured_hosts()
     results = {}
     for h in hosts:
@@ -246,12 +273,28 @@ def api_cluster_status():
         up = OllamaProvider.is_available(h)
         elapsed_ms = int((time.time() - start) * 1000)
         models = OllamaProvider.list_models(h) if up else []
+        pin = get_node_pin(h)
         results[h] = {
             "online": up,
             "latency_ms": elapsed_ms if up else None,
-            "models": models
+            "models": models,
+            "pinned_model": pin
         }
     return results
+
+@app.get("/api/settings/cluster-pins")
+def api_get_cluster_pins():
+    from learning_engine.models import get_configured_node_pins
+    return {"pins": get_configured_node_pins()}
+
+class ClusterPinsRequest(BaseModel):
+    pins: Dict[str, str]
+
+@app.post("/api/settings/cluster-pins")
+def api_save_cluster_pins(req: ClusterPinsRequest):
+    from learning_engine.models import save_configured_node_pins
+    saved = save_configured_node_pins(req.pins)
+    return {"ok": True, "pins": saved}
 
 @app.get("/api/settings/discovered-models")
 def api_discovered_models():
@@ -796,6 +839,7 @@ def build_chat_system_instruction(
     category: str,
     subtopic: str,
     active_lesson: Optional[str] = None,
+    active_lesson_title: Optional[str] = None,
     terminal_context: Optional[str] = None
 ) -> str:
     domain_titles = {
@@ -815,9 +859,10 @@ def build_chat_system_instruction(
         f"You are a concise, high-signal Socratic Mentor specializing in {specialty}.",
         f"The student is actively working on: '{sub_title}' (Discipline: {category}).",
     ]
-    if active_lesson:
-        clean_lesson = active_lesson.replace("_", " ").title()
-        prompt_lines.append(f"Current Lesson Focus: '{clean_lesson}'.")
+    lesson_display = active_lesson_title or (active_lesson.replace("_", " ").title() if active_lesson else None)
+    if lesson_display:
+        prompt_lines.append(f"Current Lesson Displayed on Student's Screen: '{lesson_display}'.")
+        prompt_lines.append("The student can see this lesson directly in the reader window. If they ask 'explain this', 'what does this mean', 'summarize this', or ask for examples or code walkthroughs, directly ground your explanation in the active lesson text provided.")
 
     prompt_lines.extend([
         "\n### Core Directives for Socratic Dialogue:",
@@ -825,6 +870,7 @@ def build_chat_system_instruction(
         "2. SOCRATIC GUIDANCE: Provide the single most direct intuition immediately, then follow with ONE targeted question to test or deepen their understanding.",
         "3. CASUAL GREETINGS: If greeted (e.g. 'hi', 'hello'), respond warmly in 1-2 friendly sentences and ask what specific concept or intuition from the lesson they want to discuss.",
         "4. FIRST-PRINCIPLES: Use accurate technical terminology without conversational fluff.",
+        "5. ACTIVE LESSON GROUNDING: Always refer to the specific definitions, formulas, or architecture presented in the active lesson on screen."
     ])
 
     if terminal_context and terminal_context.strip():
@@ -863,7 +909,7 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
         if sub_path:
             sessions_dir = sub_path / "sessions"
         else:
-            sessions_dir = TOPICS_DIR / ".workspace_sessions"
+            sessions_dir = WORKSPACE_ROOT / "topics" / ".workspace_sessions"
         sessions_dir.mkdir(parents=True, exist_ok=True)
 
         active_session_file = sessions_dir / "active_session.md"
@@ -873,7 +919,10 @@ def save_chat_session(sub_path: Optional[Path], user_msg: str, tutor_reply: str,
             f.write(entry)
 
         history_file = sessions_dir / "chat_history.json"
-        updated_history = [m.dict() if hasattr(m, 'dict') else m for m in history] + [
+        updated_history = [
+            m if isinstance(m, dict) else (m.dict() if hasattr(m, 'dict') else vars(m))
+            for m in history
+        ] + [
             {"role": "student", "content": user_msg},
             {"role": "tutor", "content": tutor_reply}
         ]
@@ -896,13 +945,29 @@ async def chat_with_tutor(req: ChatRequest):
     if not terminal_ctx or not terminal_ctx.strip():
         terminal_ctx = get_terminal_text(50)
 
+    # Resolve active lesson text directly from payload or disk fallback
+    lesson_text = req.lesson_content or ""
     if target:
         domain, cat, sub, sub_path = target
+        if not lesson_text and sub_path:
+            if req.lesson_id and req.lesson_id != "all":
+                if req.lesson_id == "labs":
+                    cand = sub_path / "labs.md"
+                else:
+                    cand = sub_path / f"{req.lesson_id}.md"
+                if cand.exists():
+                    lesson_text = cand.read_text(encoding="utf-8")
+            if not lesson_text:
+                for f in sorted(sub_path.glob("lesson_*.md")):
+                    lesson_text = f.read_text(encoding="utf-8")
+                    break
+
         system_instruction = build_chat_system_instruction(
             domain=domain,
             category=cat,
             subtopic=sub,
             active_lesson=req.lesson_id,
+            active_lesson_title=req.lesson_title,
             terminal_context=terminal_ctx
         )
     else:
@@ -918,19 +983,27 @@ async def chat_with_tutor(req: ChatRequest):
         )
 
     conversation_text = []
+
+    # Inject active lesson context prominently at top of prompt
+    if lesson_text and lesson_text.strip():
+        clean_excerpt = lesson_text.strip()[:8000]
+        conversation_text.append(
+            f"[Active Lesson in Reader Window - '{req.lesson_title or req.lesson_id or 'Current Lesson'}']:\n```markdown\n{clean_excerpt}\n```\n(INSTRUCTION: The student is looking at this lesson right now. If they ask 'explain this' or inquire about concepts, code, or formulas, ground your explanation in this lesson text.)"
+        )
+
     for m in req.history[-6:]:
-        conversation_text.append(f"{m.role.capitalize()}: {m.content}")
+        if isinstance(m, dict):
+            r = m.get("role", "student")
+            c = m.get("content", "")
+        else:
+            r = getattr(m, "role", "student")
+            c = getattr(m, "content", "")
+        conversation_text.append(f"{str(r).capitalize()}: {c}")
 
     # Inject terminal buffer directly into prompt so LLM sees it immediately
     if terminal_ctx and terminal_ctx.strip():
         conversation_text.append(
             f"[Live Terminal Buffer Context]:\n```text\n{terminal_ctx.strip()[-2000:]}\n```"
-        )
-    
-    # Inject active lesson context if provided
-    if req.lesson_content and req.lesson_content.strip():
-        conversation_text.append(
-            f"[Active Curriculum Context]:\n```markdown\n{req.lesson_content.strip()[-5000:]}\n```"
         )
 
     conversation_text.append(f"Student: {req.message}")

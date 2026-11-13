@@ -103,8 +103,10 @@ def cmd_status(args):
         name = get_node_name(clean_host).upper()
         is_online = h_data.get("online", False)
         status_str = "ONLINE " if is_online else "OFFLINE"
-        pref_model = h_data.get("preferred_model") or (h_data.get("models") and h_data["models"][0]) or "none"
-        print(f"    - [{name:10s}] {status_str} | Model: {pref_model}")
+        pinned = h_data.get("pinned_model")
+        pref_model = pinned or h_data.get("preferred_model") or (h_data.get("models") and h_data["models"][0]) or "none"
+        pin_label = " [PINNED]" if pinned and is_online else ""
+        print(f"    - [{name:10s}] {status_str} | Model: {pref_model}{pin_label}")
     
     if os.environ.get("ANTHROPIC_API_KEY"):
         print(f"    - [ANTHROPIC] ONLINE    | Tier: cloud    | Model: claude-3-5-sonnet-20241022")
