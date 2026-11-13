@@ -1,824 +1,1545 @@
-# Operational Verification Labs: Brass Acoustics and Performance Mechanics
+# Brass Instrument Masterclass: Performance Mechanics, Acoustics & Practice Labs
 
-## Objective & Lab Architecture
+## Overview & How to Use This Material
 
-This laboratory provides rigorous, measurement-driven investigation of brass instrument acoustics, examining the coupled fluid-structure interactions between player physiology, instrument resonance, and acoustic radiation. The work synthesizes physical modeling, spectral analysis, and empirical performance data to build quantitative understanding of embouchure mechanics, valve-induced impedance discontinuities, and aeroacoustic energy transfer.
+This masterclass operates on two tracks simultaneously. The **performance track** (Sections 1–4) gives you immediately playable drills, fingering patterns, embouchure cues, and practice routines with metronome targets — material you can use at the stand today. The **acoustics lab track** (Section 5) provides measurement-driven investigation for those who want quantitative understanding of what their body and instrument are doing physically.
 
-Unlike introductory performance instruction, this lab treats the brass instrument as a complex nonlinear oscillator where the player's lips function as a self-sustaining valve mechanism. The instrument's bore profile, bell flare geometry, and valve network create frequency-dependent acoustic impedances that couple back to the lip oscillation, producing the characteristic timbre and pitch control of brass instruments. We will measure these phenomena directly.
-
-### Required Infrastructure
-
-**Physical Instruments and Transducers:**
-- Brass instrument (trumpet, horn, trombone, or tuba) with known bore profile
-- Pressure transducer (±10 kPa range, >10 kHz bandwidth) for mouthpiece pressure measurement
-- Calibrated measurement microphone (flat response 20 Hz–20 kHz, ≥120 dB SPL capability)
-- Contact accelerometer (piezoelectric, >5 kHz bandwidth) for bell vibration analysis
-
-**Signal Acquisition:**
-- Audio interface (≥96 kHz sample rate, ≥24-bit resolution, <5 ms latency)
-- Synchronization capability for multi-channel recording (pressure, acoustic, accelerometer)
-- Professional monitoring headphones (closed-back, flat frequency response)
-
-**Analysis Environment:**
-- Digital Audio Workstation: Reaper, Pro Tools, or Logic Pro with plugin host capability
-- Spectral analysis: FFT plugin with ≥8192-point resolution and Hamming/Blackman-Harris windowing
-- Programming environment: Python 3.10+ with NumPy, SciPy, librosa, matplotlib
-- Optional: MATLAB/Octave for transfer function analysis
-
-**Reference Materials:**
-- Chromatic tuner (±0.1 cent resolution) or frequency counter
-- Equal-tempered frequency reference table (A440 standard)
-- Orchestral excerpt library spanning dynamic and register extremes
-- Valve slide position measurement tools (digital caliper, ±0.01 mm precision)
-
-## Exercise 1: Embouchure Mechanics and Lip-Valve Oscillation
-
-### Exercise 1a: Bernoulli Flow and Lip Aperture Dynamics
-
-The brass embouchure operates as a flow-controlled valve. When pressurized air flows through the lip aperture, Bernoulli's principle creates a pressure drop proportional to flow velocity squared. This negative pressure draws the lips toward closure, but lip elasticity and downstream pressure from the instrument bore oppose this motion. The result is a self-sustaining oscillation at frequencies determined by lip tension and the instrument's acoustic impedance peaks.
-
-**Theoretical Foundation:**
-
-The Bernoulli equation for incompressible flow gives:
-
-```
-P_mouth + (1/2)ρv_aperture² = P_downstream + (1/2)ρv_bore²
-```
-
-Where:
-- P_mouth: static pressure in oral cavity (typically 2-8 kPa above atmospheric)
-- ρ: air density (~1.2 kg/m³)
-- v_aperture: flow velocity through lip aperture
-- P_downstream: pressure just inside mouthpiece cup
-
-The lip opening area A varies cyclically. For small perturbations around equilibrium aperture A₀:
-
-```
-A(t) = A₀[1 + ε·sin(2πft)]
-```
-
-The flow rate Q = A(t)·v couples to the acoustic pressure wave in the instrument bore. The instrument's input impedance Z(f) = P/U (pressure/volume velocity) peaks at resonant frequencies, providing maximum feedback to sustain oscillation at those frequencies.
-
-**Procedure:**
-
-1. **Baseline Pressure Mapping**: Install pressure transducer in mouthpiece shank. Play sustained tones from pedal C (≈65 Hz for trumpet) through high C (≈1047 Hz). Record mouthpiece pressure waveform synchronized with acoustic output. Maintain mezzo-forte dynamic (≈80 dB SPL at 1 m).
-
-2. **Embouchure Pressure Variation**: Select concert Bb (≈466 Hz, trumpet open fingering). Perform five trials with systematically varied mouthpiece contact force:
-   - Trial 1: Minimal contact (lips barely touching rim)
-   - Trial 2: Light contact (~0.5 N estimated force)
-   - Trial 3: Moderate contact (~1.0 N, typical performance level)
-   - Trial 4: Firm contact (~2.0 N)
-   - Trial 5: Excessive contact (~3.0 N, unsustainable for extended playing)
-
-   Record 4-second sustained tones for each trial. Measure RMS acoustic level, spectral centroid (brightness indicator), and pressure waveform peak-to-peak amplitude.
-
-3. **Aperture Geometry Experiment**: Using embouchure corners as adjustable parameters, produce the same pitch (Bb) with three aperture configurations:
-   - Narrow aperture: corners forward, small opening (higher velocity, brighter tone)
-   - Medium aperture: neutral position
-   - Wide aperture: corners retracted (lower velocity, darker tone)
-
-   Quantify aperture width if possible using high-speed video (≥240 fps) with oblique mirror setup.
-
-4. **Spectral Analysis Protocol**:
-   ```python
-   import numpy as np
-   import scipy.signal as sig
-   import matplotlib.pyplot as plt
-   from scipy.io import wavfile
-
-   # Load synchronized recordings
-   fs, acoustic = wavfile.read('trial_acoustic.wav')
-   _, pressure = wavfile.read('trial_pressure.wav')
-
-   # Extract steady-state segment (avoid attack transient)
-   start_sample = int(0.5 * fs)  # Skip first 500ms
-   duration = int(2.0 * fs)       # Analyze 2s steady-state
-   
-   acoustic_seg = acoustic[start_sample:start_sample+duration]
-   pressure_seg = pressure[start_sample:start_sample+duration]
-
-   # Compute power spectral density
-   f_ac, Pxx_ac = sig.welch(acoustic_seg, fs, nperseg=8192, 
-                             window='blackmanharris', scaling='density')
-   f_pr, Pxx_pr = sig.welch(pressure_seg, fs, nperseg=8192,
-                             window='blackmanharris', scaling='density')
-
-   # Extract fundamental and harmonics
-   peak_indices, _ = sig.find_peaks(10*np.log10(Pxx_ac), height=-60, distance=50)
-   fundamental_hz = f_ac[peak_indices[0]]
-   harmonics_hz = f_ac[peak_indices[1:11]]  # First 10 harmonics
-   
-   # Spectral centroid (brightness measure)
-   spectral_centroid = np.sum(f_ac * Pxx_ac) / np.sum(Pxx_ac)
-   
-   # Harmonic energy distribution (even vs odd harmonics)
-   even_energy = np.sum(Pxx_ac[peak_indices[1::2]])
-   odd_energy = np.sum(Pxx_ac[peak_indices[::2]])
-   
-   print(f"Fundamental: {fundamental_hz:.2f} Hz")
-   print(f"Spectral centroid: {spectral_centroid:.1f} Hz")
-   print(f"Even/Odd harmonic ratio: {even_energy/odd_energy:.3f}")
-   ```
-
-5. **Expected Outcomes**: Increased embouchure pressure typically shifts spectral centroid upward (brighter tone) but reduces oscillation amplitude if contact force becomes excessive. The pressure-acoustic cross-correlation reveals phase relationships: optimal embouchure shows pressure leading acoustic output by 30-90° (indicating efficient energy transfer). Narrow apertures increase high-frequency harmonic content; wide apertures produce darker spectra dominated by low-order harmonics.
-
-### Exercise 1b: Valve Network Acoustics and Intonation Perturbation
-
-Piston valves introduce tubing sections that increase total acoustic path length, lowering pitch by specific intervals. The ideal valve system would lower pitch by exact semitone (1.0595:1 frequency ratio) or whole-tone (1.1225:1) increments, but real valves deviate from equal temperament due to nonlinear coupling between valve loop lengths.
-
-**Acoustic Length Theory:**
-
-For a cylindrical tube open at one end (simplified brass bore model), resonant frequencies occur at:
-
-```
-f_n = (2n-1)c / (4L_eff)
-```
-
-Where:
-- n: mode number (1, 2, 3, ...)
-- c: speed of sound (~343 m/s at 20°C)
-- L_eff: effective acoustic length (physical length plus end correction)
-
-Valve 1 adds length ΔL₁ to lower pitch by whole tone (≈12.2% length increase). Valve 2 adds ΔL₂ for semitone (≈5.9% increase). Valve 3 adds ΔL₃ for minor third (≈18.9% increase). When valves combine, total length L_total = L₀ + ΔL₁ + ΔL₂ + ΔL₃ (additive). However, the percentage increase needed depends on current total length, creating cumulative intonation error.
-
-**Procedure:**
-
-1. **Valve Length Calibration**: Measure valve slide extensions using digital caliper:
-   - Remove each valve slide
-   - Measure fully inserted position to centerline
-   - Record extension length in mm
-   - Calculate ΔL for each valve
-
-2. **Chromatic Scale Intonation Survey**: Play descending chromatic scale from open C (or concert Bb for trumpet) through all seven valve combinations (open, 2, 1, 1+2, 2+3, 1+3, 1+2+3). For each fingering:
-   - Sustain pitch for 3 seconds at mezzo-forte
-   - Record acoustic signal
-   - Use tuner to measure deviation from equal temperament in cents
-
-   Create intonation matrix:
-   
-   | Fingering | Expected Note | Measured Frequency | Deviation (cents) |
-   |-----------|---------------|-------------------|-------------------|
-   | Open      | C (523.25 Hz) | [measure]         | [calculate]       |
-   | 2         | B (493.88 Hz) | [measure]         | [calculate]       |
-   | 1         | Bb (466.16 Hz)| [measure]         | [calculate]       |
-   | 1+2       | A (440.00 Hz) | [measure]         | [calculate]       |
-   | ...       | ...           | ...               | ...               |
-
-3. **Impedance Peak Analysis**: Using recorded audio, extract resonance frequencies:
-   ```python
-   # Compute input impedance estimate from impulse response
-   # (Requires specialized mouthpiece excitation, advanced setup)
-   
-   # Alternative: Extract harmonic series from sustained tone
-   def extract_harmonic_series(signal, fs, n_harmonics=16):
-       f, Pxx = sig.welch(signal, fs, nperseg=16384, window='blackmanharris')
-       peaks, props = sig.find_peaks(10*np.log10(Pxx), height=-40, distance=20)
-       
-       # Identify fundamental (lowest strong peak)
-       f0 = f[peaks[0]]
-       
-       # Theoretical harmonic frequencies
-       harmonic_freqs = np.array([k*f0 for k in range(1, n_harmonics+1)])
-       
-       # Measure actual peak frequencies near theoretical positions
-       measured_freqs = []
-       for h_freq in harmonic_freqs:
-           search_range = np.abs(f - h_freq) < 10  # ±10 Hz window
-           if np.any(search_range):
-               peak_in_range = peaks[np.isin(peaks, np.where(search_range)[0])]
-               if len(peak_in_range) > 0:
-                   measured_freqs.append(f[peak_in_range[0]])
-               else:
-                   measured_freqs.append(np.nan)
-       
-       return f0, np.array(measured_freqs)
-   
-   # Deviation from ideal harmonic series indicates impedance irregularities
-   f0, measured_harmonics = extract_harmonic_series(acoustic_signal, fs)
-   ideal_harmonics = np.arange(1, len(measured_harmonics)+1) * f0
-   harmonic_deviations = 1200 * np.log2(measured_harmonics / ideal_harmonics)
-   ```
-
-4. **Valve Combination Cumulative Error**: Plot intonation deviation vs. total valve tubing added. Fit linear model to quantify systematic sharpness in multi-valve combinations. Typical trumpet shows +10 to +30 cent error for 1+2+3 combination relative to equal temperament.
-
-5. **Slide Position Correction**: For sharp combinations (1+2, 1+3, 1+2+3), adjust main tuning slide or individual valve slides. Measure new intonation and iterate. Document optimal slide positions for each problematic fingering.
-
-```mermaid
-graph TD
-    A["Open Tube Length L₀"] -->|"Valve 2: +ΔL₂"| B["L₀ + ΔL₂<br/>(semitone lower)"]
-    A -->|"Valve 1: +ΔL₁"| C["L₀ + ΔL₁<br/>(whole tone lower)"]
-    B -->|"Add Valve 1"| D["L₀ + ΔL₁ + ΔL₂<br/>(minor 3rd lower)"]
-    C -->|"Add Valve 2"| D
-    C -->|"Add Valve 3: +ΔL₃"| E["L₀ + ΔL₁ + ΔL₃<br/>(perfect 4th lower)"]
-    D -->|"Add Valve 3"| F["L₀ + ΔL₁ + ΔL₂ + ΔL₃<br/>(tritone lower)"]
-    
-    style D fill:#ffcccc
-    style E fill:#ffcccc
-    style F fill:#ff9999
-    
-    G["Intonation Error"] -.->|"Cumulative sharpness"| D
-    G -.->|"Increasing error"| E
-    G -.->|"Maximum error"| F
-```
-
-**Expected Results**: Open fingering and single-valve combinations typically achieve ±5 cent accuracy. Multi-valve combinations (1+2, 2+3, 1+2+3) show progressive sharpening, with 1+2+3 often +20 to +40 cents sharp. This necessitates alternative fingerings (e.g., using valve 3 alone instead of 1+2) or slide adjustments during performance.
-
-## Exercise 2: Aeroacoustic Energy Transfer and Dynamic Control
-
-### Exercise 2a: Breath Pressure, Flow Rate, and Acoustic Power
-
-Acoustic power radiated by a brass instrument scales with both breath pressure and flow rate, but the relationship is nonlinear due to lip-valve dynamics and turbulent flow effects. At low dynamics (pianissimo), flow is nearly laminar and embouchure aperture remains small. At fortissimo dynamics, increased pressure forces wider aperture opening, higher flow rates, and stronger harmonic generation from flow turbulence.
-
-**Fundamental Relationships:**
-
-Acoustic power P_acoustic relates to mouth pressure P_mouth and volume flow rate U:
-
-```
-P_acoustic ≈ η · P_mouth · U
-```
-
-Where η is radiation efficiency (typically 0.1-0.3 for brass instruments, frequency-dependent). Volume flow rate U depends on aperture area A and pressure drop:
-
-```
-U = A · sqrt(2·ΔP/ρ)
-```
-
-The embouchure acts as a variable orifice. Small aperture (high velocity) produces higher harmonic content but lower overall power. Large aperture (high flow rate) produces greater power but requires proportionally higher breath pressure to maintain pitch stability.
-
-**Procedure:**
-
-1. **Dynamic Range Mapping**: Perform crescendo-decrescendo exercise on sustained Bb (concert pitch, trumpet open fingering):
-   - Start pianissimo (target 60 dB SPL at 1 m)
-   - Gradually crescendo to fortissimo (target 100 dB SPL at 1 m) over 8 seconds
-   - Gradually decrescendo back to pianissimo over 8 seconds
-   - Record acoustic signal and mouthpiece pressure simultaneously
-
-2. **Acoustic Measurement Setup**: Position calibrated microphone 1 meter from bell centerline, on-axis. Use A-weighted SPL meter or compute RMS level from recording:
-   ```python
-   def compute_spl_timeseries(signal, fs, window_ms=50):
-       """Compute time-varying sound pressure level"""
-       window_samples = int(window_ms * fs / 1000)
-       hop_samples = window_samples // 2
-       
-       n_frames = (len(signal) - window_samples) // hop_samples
-       spl_db = np.zeros(n_frames)
-       time_axis = np.zeros(n_frames)
-       
-       p_ref = 20e-6  # Reference pressure (20 μPa)
-       
-       for i in range(n_frames):
-           start = i * hop_samples
-           frame = signal[start:start+window_samples]
-           rms = np.sqrt(np.mean(frame**2))
-           spl_db[i] = 20 * np.log10(rms / p_ref)
-           time_axis[i] = start / fs
-       
-       return time_axis, spl_db
-   
-   time, spl = compute_spl_timeseries(acoustic_signal, fs)
-   plt.plot(time, spl)
-   plt.xlabel('Time (s)')
-   plt.ylabel('SPL (dB)')
-   plt.title('Dynamic Range Profile')
-   ```
-
-3. **Pressure-Acoustic Power Correlation**: Extract simultaneous pressure and acoustic RMS values. Plot acoustic power (proportional to squared RMS) vs. mouth pressure:
-   ```python
-   # Align and extract corresponding pressure/acoustic segments
-   acoustic_rms = np.sqrt(np.mean(acoustic_seg**2))
-   pressure_rms = np.sqrt(np.mean(pressure_seg**2))
-   
-   # Convert to physical units (requires calibration)
-   # Pressure transducer: e.g., 1V = 1kPa
-   # Microphone: calibrated sensitivity in V/Pa
-   
-   pressure_kpa = pressure_rms * calibration_factor_pressure
-   acoustic_pa = acoustic_rms * calibration_factor_mic
-   
-   # Acoustic power scales as pressure² at constant distance
-   acoustic_power_rel = acoustic_pa**2
-   
-   plt.scatter(pressure_kpa, acoustic_power_rel)
-   plt.xlabel('Mouth Pressure (kPa)')
-   plt.ylabel('Relative Acoustic Power (Pa²)')
-   
-   # Fit power law: P_ac ∝ P_mouth^α
-   log_pressure = np.log(pressure_kpa)
-   log_power = np.log(acoustic_power_rel)
-   coeffs = np.polyfit(log_pressure, log_power, 1)
-   alpha = coeffs[0]  # Exponent should be ~1.5-2.5
-   print(f"Power law exponent: {alpha:.2f}")
-   ```
-
-4. **Spectral Evolution with Dynamics**: Extract spectral centroids at each dynamic level. Increased dynamics typically shift centroid higher (brighter tone) due to enhanced harmonic generation:
-   ```python
-   # Segment recording by SPL bins
-   spl_bins = np.arange(60, 105, 5)  # 5 dB bins from pp to ff
-   
-   for i in range(len(spl_bins)-1):
-       mask = (spl >= spl_bins[i]) & (spl < spl_bins[i+1])
-       segments = extract_segments(signal, time, time_axis[mask], fs)
-       
-       centroid_values = []
-       for seg in segments:
-           f, Pxx = sig.welch(seg, fs, nperseg=4096)
-           centroid = np.sum(f * Pxx) / np.sum(Pxx)
-           centroid_values.append(centroid)
-       
-       mean_centroid = np.mean(centroid_values)
-       print(f"SPL {spl_bins[i]}-{spl_bins[i+1]} dB: "
-             f"Centroid = {mean_centroid:.0f} Hz")
-   ```
-
-5. **Breathing Technique Comparison**: Repeat crescendo exercise using three breath support approaches:
-   - **Clavicular breathing**: Shallow chest expansion (inefficient, rapid pressure decay)
-   - **Intercostal breathing**: Rib expansion (moderate efficiency)
-   - **Diaphragmatic breathing**: Abdominal engagement (optimal efficiency and control)
-
-   Measure pressure stability (standard deviation during sustained segment) and maximum sustainable duration for each technique.
-
-**Expected Outcomes**: Acoustic power scales approximately as P_mouth^2 at constant pitch, but embouchure adjustments modify this relationship. Diaphragmatic breathing provides 30-50% longer sustainable forte dynamics and ±0.5 kPa lower pressure variability compared to clavicular breathing. Spectral centroid increases ~200-500 Hz from pianissimo to fortissimo, reflecting enhanced harmonic excitation.
-
-### Exercise 2b: Articulation Mechanisms and Transient Analysis
-
-Articulation defines note onset and release characteristics. Tongue position controls airflow initiation, while lip tension and aperture adjustment shape the attack transient. Different articulation styles (legato, staccato, marcato, sforzando) modify both temporal envelope and spectral evolution during the first 50-200 ms of each note.
-
-**Procedure:**
-
-1. **Articulation Taxonomy**: Perform four-note pattern (Bb-C-D-Eb) using each articulation:
-   - **Legato**: No tongue interruption, smooth pitch transitions
-   - **Detached**: Brief tongue stop between notes (~50 ms silence)
-   - **Staccato**: Sharp tongue attack, shortened note duration (~30% of beat)
-   - **Marcato**: Heavy accent, emphasized attack transient
-   - **Sforzando**: Maximum initial pressure, rapid decay to mezzo-forte
-
-   Tempo: quarter note = 80 BPM. Record with high temporal resolution (≥96 kHz).
-
-2. **Onset Detection and Characterization**:
-   ```python
-   import librosa
-   
-   # Detect note onsets
-   onset_frames = librosa.onset.onset_detect(y=signal, sr=fs, 
-                                              units='samples',
-                                              backtrack=True,
-                                              pre_max=20, post_max=20,
-                                              pre_avg=100, post_avg=100,
-                                              delta=0.1, wait=10)
-   
-   # Analyze each onset
-   for idx, onset_sample in enumerate(onset_frames):
-       # Extract 200ms segment starting from onset
-       attack_segment = signal[onset_sample:onset_sample + int(0.2*fs)]
-       
-       # Compute attack time (5% to 90% of peak amplitude)
-       envelope = np.abs(sig.hilbert(attack_segment))
-       peak_level = np.max(envelope)
-       
-       thresh_5pct = 0.05 * peak_level
-       thresh_90pct = 0.90 * peak_level
-       
-       idx_5pct = np.where(envelope >= thresh_5pct)[0][0]
-       idx_90pct = np.where(envelope >= thresh_90pct)[0][0]
-       
-       attack_time_ms = (idx_90pct - idx_5pct) / fs * 1000
-       
-       print(f"Onset {idx}: Attack time = {attack_time_ms:.1f} ms")
-       
-       # Spectral analysis of attack vs steady-state
-       attack_fft = np.fft.rfft(attack_segment[:int(0.05*fs)])
-       steady_fft = np.fft.rfft(attack_segment[int(0.1*fs):])
-       
-       attack_spectrum = np.abs(attack_fft)
-       steady_spectrum = np.abs(steady_fft)
-       
-       # Compute spectral flux (change from attack to steady-state)
-       flux = np.sum((steady_spectrum - attack_spectrum)**2)
-       print(f"  Spectral flux = {flux:.2e}")
-   ```
-
-3. **Staccato Duration Analysis**: For staccato articulations, measure note duration and inter-note gap:
-   ```python
-   # Detect note offsets using amplitude envelope
-   envelope = np.abs(sig.hilbert(signal))
-   threshold = 0.1 * np.max(envelope)  # 10% of peak
-   
-   # Find segments above threshold
-   above_thresh = envelope > threshold
-   transitions = np.diff(above_thresh.astype(int))
-   
-   note_starts = np.where(transitions == 1)[0]
-   note_ends = np.where(transitions == -1)[0]
-   
-   for i in range(min(len(note_starts), len(note_ends))):
-       duration_ms = (note_ends[i] - note_starts[i]) / fs * 1000
-       if i < len(note_starts) - 1:
-           gap_ms = (note_starts[i+1] - note_ends[i]) / fs * 1000
-           print(f"Note {i}: Duration = {duration_ms:.0f} ms, "
-                 f"Gap = {gap_ms:.0f} ms")
-   ```
-
-4. **Tongue Position Effect**: Record identical staccato passage with three tongue positions:
-   - **Dental**: Tongue tip at teeth/alveolar ridge (crisp attack, short duration)
-   - **Mid-palate**: Tongue arch at hard palate (moderate attack)
-   - **Velar**: Back of tongue at soft palate (soft attack, longer duration)
-
-   Compare attack times and spectral characteristics.
-
-**Expected Results**: Legato shows attack times >100 ms with minimal spectral flux. Staccato achieves attack times <20 ms with high-frequency emphasis during transient. Marcato produces attack times ~30-50 ms with 3-6 dB initial overshoot. Dental tongue position yields shortest attack times; velar position doubles attack duration.
-
-```mermaid
-graph LR
-    A["Rest State"] -->|"Tongue Release"| B["Attack Transient<br/>0-50 ms"]
-    B -->|"Embouchure Stabilization"| C["Steady State<br/>50-500 ms"]
-    C -->|"Tongue Interruption"| D["Release/Decay<br/>10-50 ms"]
-    D -->|"Next Note"| B
-    D -->|"End Phrase"| E["Silence"]
-    
-    B -.->|"High spectral flux<br/>Broadband energy"| F["Spectral Characteristics"]
-    C -.->|"Harmonic structure<br/>Stable pitch"| F
-    D -.->|"Rapid energy decay<br/>Pitch drop"| F
-    
-    style B fill:#ffccaa
-    style C fill:#aaffcc
-    style D fill:#ccaaff
-```
-
-## Exercise 3: Fault Injection and Performance Degradation Analysis
-
-### Exercise 3a: Valve Impedance Discontinuity and Intonation Collapse
-
-Valve malfunctions introduce acoustic impedance discontinuities that disrupt the resonant structure of the instrument. Partial valve depression, worn valve guides, or foreign objects in the bore create reflection points that add parasitic resonances or damp primary modes, degrading intonation and response.
-
-**Procedure:**
-
-1. **Baseline Reference**: Record chromatic scale from low C to high C with all valves functioning normally. Document frequency accuracy (±2 cents) for each fingering.
-
-2. **Controlled Valve Obstruction**: Insert calibrated obstruction into valve 2 tubing:
-   - Trial A: Insert 10 mm diameter foam plug 50 mm into valve loop
-   - Trial B: Insert 15 mm diameter plug (tighter fit, greater impedance mismatch)
-   - Trial C: Partially depress valve 2 (50% travel) during open notes
-
-   For each trial, attempt to play chromatic scale. Record which notes are playable, frequency deviation, and subjective effort required.
-
-3. **Impedance Analysis**: Compare spectral content of obstructed vs. normal valve:
-   ```python
-   # Load recordings
-   normal_signal, fs = librosa.load('normal_valve2.wav', sr=None)
-   obstructed_signal, _ = librosa.load('obstructed_valve2.wav', sr=None)
-   
-   # Compute transfer function estimate
-   freq, H_normal = sig.welch(normal_signal, fs, nperseg=8192)
-   _, H_obstructed = sig.welch(obstructed_signal, fs, nperseg=8192)
-   
-   # Ratio reveals impedance perturbation effect
-   transfer_ratio = H_obstructed / (H_normal + 1e-10)
-   
-   plt.figure(figsize=(10,6))
-   plt.semilogx(freq, 10*np.log10(transfer_ratio))
-   plt.xlabel('Frequency (Hz)')
-   plt.ylabel('Magnitude Ratio (dB)')
-   plt.title('Impedance Perturbation Due to Valve Obstruction')
-   plt.grid(True, which='both', alpha=0.3)
-   ```
-
-4. **Pitch Instability Quantification**: For notes requiring obstructed valve, measure pitch standard deviation over sustained 2-second tone:
-   ```python
-   # Extract instantaneous frequency using Hilbert transform
-   analytic_signal = sig.hilbert(note_segment)
-   instantaneous_phase = np.unwrap(np.angle(analytic_signal))
-   instantaneous_freq = np.diff(instantaneous_phase) * fs / (2*np.pi)
-   
-   # Compute statistics
-   mean_freq = np.mean(instantaneous_freq)
-   std_freq = np.std(instantaneous_freq)
-   
-   # Convert to cents relative to target pitch
-   target_freq = 440  # Example: A4
-   cents_deviation = 1200 * np.log2(instantaneous_freq / target_freq)
-   
-   print(f"Mean: {mean_freq:.2f} Hz ({np.mean(cents_deviation):.1f} cents)")
-   print(f"Std Dev: {std_freq:.2f} Hz ({np.std(cents_deviation):.1f} cents)")
-   ```
-
-5. **Response Time Degradation**: Measure note onset latency (time from tongue release to stable pitch):
-   ```python
-   # Detect tongue release point (pressure spike in mouthpiece signal)
-   pressure_diff = np.diff(pressure_signal)
-   release_point = np.argmax(pressure_diff)
-   
-   # Detect pitch stabilization (freq std dev < 5 cents for 50 ms)
-   stable_threshold = 5  # cents
-   window_size = int(0.05 * fs)  # 50 ms
-   
-   for i in range(release_point, len(instantaneous_freq) - window_size):
-       window = cents_deviation[i:i+window_size]
-       if np.std(window) < stable_threshold:
-           stabilization_point = i
-           break
-   
-   latency_ms = (stabilization_point - release_point) / fs * 1000
-   print(f"Note onset latency: {latency_ms:.1f} ms")
-   ```
-
-**Expected Results**: 10 mm obstruction typically shifts affected fingerings +15 to +40 cents sharp and increases pitch standard deviation from <5 cents to >15 cents. Response latency doubles (from ~40 ms to >80 ms). 15 mm obstruction may render certain fingerings unplayable. Partial valve depression introduces ±20-50 cent frequency instability and weak, airy tone quality.
-
-### Exercise 3b: Respiratory Fatigue and Pressure Decay Modeling
-
-Sustained playing exhausts respiratory muscles, reducing achievable breath pressure and flow rate. This degrades tone quality, pitch accuracy, and dynamic range. We model respiratory fatigue as exponential pressure decay.
-
-**Procedure:**
-
-1. **Maximum Sustainable Pressure**: Perform extended fortissimo passage (30 seconds continuous without breath):
-   - Select simple repeating pattern: Bb-C-Bb-C-Bb-C... at quarter note = 120 BPM
-   - Maintain fortissimo dynamic (target 100 dB SPL)
-   - Record mouthpiece pressure and acoustic output
-   - Continue until pressure drops below 70% of initial value or tone collapses
-
-2. **Pressure Decay Curve Fitting**:
-   ```python
-   # Extract envelope of mouthpiece pressure signal
-   pressure_envelope = np.abs(sig.hilbert(pressure_signal))
-   
-   # Smooth envelope
-   window_size = int(0.1 * fs)  # 100 ms smoothing
-   pressure_smooth = sig.savgol_filter(pressure_envelope, window_size, 3)
-   
-   # Fit exponential decay model: P(t) = P0 * exp(-t/τ) + P_baseline
-   from scipy.optimize import curve_fit
-   
-   def exponential_decay(t, P0, tau, P_baseline):
-       return P0 * np.exp(-t/tau) + P_baseline
-   
-   time_array = np.arange(len(pressure_smooth)) / fs
-   
-   # Initial guesses
-   P0_guess = np.max(pressure_smooth) - np.min(pressure_smooth)
-   tau_guess = 10  # seconds
-   P_baseline_guess = np.min(pressure_smooth)
-   
-   params, covariance = curve_fit(exponential_decay, time_array, pressure_smooth,
-                                   p0=[P0_guess, tau_guess, P_baseline_guess],
-                                   maxfev=10000)
-   
-   P0_fit, tau_fit, P_baseline_fit = params
-   
-   print(f"Initial pressure: {P0_fit:.2f} kPa")
-   print(f"Decay time constant: {tau_fit:.1f} s")
-   print(f"Baseline pressure: {P_baseline_fit:.2f} kPa")
-   
-   # Plot fit
-   plt.plot(time_array, pressure_smooth, label='Measured')
-   plt.plot(time_array, exponential_decay(time_array, *params), 
-            label=f'Fit: τ={tau_fit:.1f}s', linestyle='--')
-   plt.xlabel('Time (s)')
-   plt.ylabel('Pressure (kPa)')
-   plt.legend()
-   ```
-
-3. **Acoustic Degradation Tracking**: Correlate pressure decay with spectral and intonation changes:
-   ```python
-   # Segment recording into 2-second windows
-   segment_duration = 2.0
-   segment_samples = int(segment_duration * fs)
-   n_segments = len(signal) // segment_samples
-   
-   frequency_drift = []
-   spectral_centroid_drift = []
-   spl_drift = []
-   
-   for i in range(n_segments):
-       segment = signal[i*segment_samples:(i+1)*segment_samples]
-       
-       # Pitch tracking
-       f0, voiced_flag, _ = librosa.pyin(segment, fmin=librosa.note_to_hz('C3'),
-                                         fmax=librosa.note_to_hz('C6'), sr=fs)
-       mean_f0 = np.nanmean(f0)
-       frequency_drift.append(mean_f0)
-       
-       # Spectral centroid
-       centroid = librosa.feature.spectral_centroid(y=segment, sr=fs)
-       spectral_centroid_drift.append(np.mean(centroid))
-       
-       # SPL
-       rms = np.sqrt(np.mean(segment**2))
-       spl_drift.append(20*np.log10(rms/20e-6))
-   
-   time_segments = np.arange(n_segments) * segment_duration
-   
-   fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
-   axes[0].plot(time_segments, frequency_drift)
-   axes[0].set_ylabel('Frequency (Hz)')
-   axes[0].set_title('Pitch Drift Due to Fatigue')
-   
-   axes[1].plot(time_segments, spectral_centroid_drift)
-   axes[1].set_ylabel('Spectral Centroid (Hz)')
-   
-   axes[2].plot(time_segments, spl_drift)
-   axes[2].set_ylabel('SPL (dB)')
-   axes[2].set_xlabel('Time (s)')
-   ```
-
-4. **Recovery Dynamics**: After exhaustion, rest for 2 minutes. Repeat single fortissimo note every 20 seconds during recovery. Measure pressure recovery curve using same exponential fit (inverted: rising exponential).
-
-**Expected Results**: Decay time constant τ ranges from 8-15 seconds for trained players, 4-8 seconds for beginners. Pressure drops ~40-60% before tone quality becomes unacceptable. Pitch typically sags 10-30 cents as pressure decays. Spectral centroid drops ~300-600 Hz (darker tone). Recovery follows similar exponential with τ_recovery ≈ 40-90 seconds for 90% restoration.
-
-## Practical Reference & Measurement Protocol Summary
-
-### Acoustic Measurement Standards
-
-**Sound Pressure Level (SPL):**
-- Reference: 20 μPa (threshold of human hearing)
-- Measurement distance: 1 meter from bell centerline, on-axis
-- Typical brass instrument ranges:
-  - Pianissimo: 60-70 dB SPL
-  - Mezzo-forte: 80-90 dB SPL
-  - Fortissimo: 95-110 dB SPL
-
-**Frequency Accuracy:**
-- Equal temperament reference: f(n) = 440 Hz × 2^((n-69)/12), where n is MIDI note number
-- Professional tolerance: ±5 cents (0.3% frequency deviation)
-- Tuner resolution requirement: ±0.1 cent for research applications
-
-**Spectral Metrics:**
-```python
-# Standard spectral descriptors for brass timbre analysis
-def compute_spectral_features(signal, fs):
-    """Compute comprehensive spectral feature set"""
-    
-    # Power spectral density
-    f, Pxx = sig.welch(signal, fs, nperseg=8192, window='blackmanharris')
-    
-    # Spectral centroid (brightness)
-    centroid = np.sum(f * Pxx) / np.sum(Pxx)
-    
-    # Spectral spread (bandwidth)
-    spread = np.sqrt(np.sum(((f - centroid)**2) * Pxx) / np.sum(Pxx))
-    
-    # Spectral rolloff (95% energy threshold)
-    cumulative_energy = np.cumsum(Pxx)
-    rolloff_idx = np.where(cumulative_energy >= 0.95 * cumulative_energy[-1])[0][0]
-    rolloff_freq = f[rolloff_idx]
-    
-    # Spectral flatness (tonalness vs noisiness)
-    geometric_mean = np.exp(np.mean(np.log(Pxx + 1e-10)))
-    arithmetic_mean = np.mean(Pxx)
-    flatness = geometric_mean / arithmetic_mean
-    
-    # Harmonic-to-noise ratio estimate
-    peaks, _ = sig.find_peaks(10*np.log10(Pxx), height=-40, distance=20)
-    harmonic_energy = np.sum(Pxx[peaks])
-    total_energy = np.sum(Pxx)
-    hnr_db = 10 * np.log10(harmonic_energy / (total_energy - harmonic_energy + 1e-10))
-    
-    return {
-        'centroid_hz': centroid,
-        'spread_hz': spread,
-        'rolloff_hz': rolloff_freq,
-        'flatness': flatness,
-        'hnr_db': hnr_db
-    }
-```
-
-### Brass Acoustics Formulas
-
-**Resonance Frequencies (Cylindrical Approximation):**
-```
-f_n = n · c / (2L)  for closed-open cylinder (n = 1, 2, 3, ...)
-f_n = (2n-1) · c / (4L)  for closed-closed cylinder (n = 1, 2, 3, ...)
-```
-Where c ≈ 343 m/s at 20°C, L = effective acoustic length
-
-**Temperature Dependence:**
-```
-c(T) = 331.3 + 0.606 · T  [m/s, T in °C]
-Δf/f = 0.5 · ΔT  [fractional frequency shift, T in °C]
-```
-Example: +10°C temperature increase → +0.5% frequency increase → ~+8.5 cents sharp
-
-**Valve Length Calculation:**
-```
-ΔL/L = 2^(s/12) - 1
-```
-Where s = semitone interval (s=1 for semitone, s=2 for whole tone, s=3 for minor third)
-
-**Harmonic Series Deviation (Inharmonicity):**
-```
-f_n = n·f_0·(1 + β·n²)
-```
-Where β is inharmonicity coefficient (~10^-5 to 10^-4 for brass instruments due to bore taper)
-
-### Debugging Checklist
-
-**Intonation Issues:**
-1. Verify valve slide positions (pull 1st and 3rd slides for 1+3, 1+2+3 combinations)
-2. Check valve alignment (remove valve, verify rotation stop position)
-3. Confirm temperature stability (±2°C variation → ±3.5 cents)
-4. Measure valve loop lengths with caliper
-5. Test with electronic tuner reference (verify tuner calibration: A=440 Hz)
-
-**Tone Quality Degradation:**
-1. Inspect mouthpiece rim for damage (burrs, dents)
-2. Check valve compression (should move freely, no binding)
-3. Verify bore cleanliness (no obstructions, debris)
-4. Test mouthpiece pressure seal (no air leaks)
-5. Analyze spectral flatness (low values <0.1 indicate pure tone; high >0.3 suggest noisy/airy tone)
-
-**Response Latency:**
-1. Check valve spring tension (weak springs → slow return)
-2. Verify valve guide alignment (wear causes sticking)
-3. Test lip buzzing alone (isolate embouchure from instrument response)
-4. Measure valve travel time mechanically (should be <15 ms)
-
-### Data Logging Template
-
-```python
-# Comprehensive experimental data structure
-experimental_log = {
-    'session_metadata': {
-        'date': '2024-01-15',
-        'instrument': 'Yamaha YTR-8335 Bb Trumpet',
-        'player_id': 'P001',
-        'room_temp_celsius': 22.5,
-        'humidity_percent': 45,
-    },
-    'calibration': {
-        'microphone_sensitivity_v_per_pa': 0.050,
-        'pressure_transducer_v_per_kpa': 1.000,
-        'reference_frequency_hz': 440.00,
-    },
-    'measurements': [
-        {
-            'exercise': '1a',
-            'trial': 1,
-            'fingering': 'open',
-            'target_pitch': 'Bb4',
-            'measured_frequency_hz': 466.3,
-            'deviation_cents': +4.2,
-            'spl_db': 85.7,
-            'spectral_centroid_hz': 1850,
-            'mouth_pressure_kpa': 3.2,
-            'audio_file': 'trial_1a_01.wav',
-            'notes': 'Moderate embouchure pressure'
-        },
-        # ... additional trials
-    ]
-}
-
-# Export to JSON for archival
-import json
-with open('brass_lab_session_20240115.json', 'w') as f:
-    json.dump(experimental_log, f, indent=2)
-```
-
-## Verification and Validation
-
-After completing all exercises, compile comprehensive lab report including:
-
-1. **Quantitative Results Summary**:
-   - Intonation accuracy matrix (all fingerings, deviation in cents)
-   - Dynamic range measurements (SPL vs. mouth pressure)
-   - Spectral feature distributions (centroid, spread, HNR across dynamics)
-   - Attack time statistics by articulation type
-
-2. **Comparative Analysis**:
-   - Embouchure pressure effect size (ANOVA or t-test)
-   - Valve combination intonation errors (cumulative error model fit)
-   - Breathing technique efficiency comparison (sustainable duration, pressure stability)
-   - Fault condition impact quantification (% performance degradation)
-
-3. **Acoustic Models**:
-   - Resonance frequency predictions vs. measurements
-   - Impedance peak identification from harmonic series
-   - Pressure decay exponential fit parameters
-   - Temperature correction factors
-
-4. **Error Analysis**:
-   - Measurement uncertainty propagation
-   - Statistical significance of observed effects
-   - Systematic vs. random error sources
-   - Outlier detection and handling
+Work through Section 1 before anything else. Every advanced technique in this document is built on the postural and embouchure foundation established there.
 
 ```mermaid
 flowchart TD
-    Start["Lab Session Start"] --> Calibrate["Calibrate All Sensors<br/>(Microphone, Pressure, Tuner)"]
-    Calibrate --> Ex1["Exercise 1:<br/>Embouchure & Valve Acoustics"]
-    Ex1 --> Data1["Collect: Frequency, SPL,<br/>Pressure, Spectra"]
-    Data1 --> Ex2["Exercise 2:<br/>Dynamics & Articulation"]
-    Ex2 --> Data2["Collect: Time-series SPL,<br/>Attack Transients"]
-    Data2 --> Ex3["Exercise 3:<br/>Fault Injection"]
-    Ex3 --> Data3["Collect: Degraded Performance<br/>Metrics"]
-    Data3 --> Analyze["Statistical Analysis<br/>(Python/MATLAB)"]
-    Analyze --> Validate["Validate Against<br/>Acoustic Theory"]
-    Validate --> Report["Generate Lab Report<br/>(Plots, Tables, Models)"]
-    Report --> End["Lab Complete"]
-    
-    style Calibrate fill:#ffffcc
-    style Ex1 fill:#ccffcc
-    style Ex2 fill:#ccffcc
-    style Ex3 fill:#ccffcc
-    style Analyze fill:#ccccff
-    style Validate fill:#ffccff
+    subgraph sub_foundation ["Foundation — Do This First"]
+        A["§1 Posture, Breath & Embouchure"]
+    end
+    subgraph sub_technique ["Core Technique Tracks"]
+        B["§2 Register, Range & Lip Slurs"]
+        C["§3 Articulation & Tonguing"]
+        D["§4 Intonation & Valve Management"]
+    end
+    subgraph sub_lab ["Acoustics Lab Track"]
+        E["§5 Measurement Exercises"]
+        F["§5a Embouchure & Lip-Valve Analysis"]
+        G["§5b Valve Intonation Measurement"]
+        H["§5c Dynamics & Articulation Analysis"]
+    end
+    A --> B
+    A --> C
+    A --> D
+    B --> E
+    C --> E
+    D --> E
+    E --> F
+    E --> G
+    E --> H
+
+    style sub_foundation fill:#e8f5e9
+    style sub_technique fill:#e3f2fd
+    style sub_lab fill:#fce4ec
 ```
 
-This laboratory provides rigorous, measurement-based investigation of brass instrument physics. The exercises move beyond subjective performance evaluation to quantitative characterization of embouchure mechanics, acoustic resonance, and aerodynamic energy transfer. Completion yields publishable data on brass acoustics and practical insight into the coupled nonlinear dynamics that define brass instrument performance.
+**Instruments covered:** Bb trumpet, F/Bb double horn, tenor trombone (with B♭/F attachment), and Bb tuba/euphonium. All concert pitches are marked (C.P.) where transposition matters.
+
+---
+
+## Section 1: Foundation — Posture, Breath Support & Embouchure
+
+### 1.1 Seated and Standing Posture
+
+Poor posture is the single largest inhibitor of breath support and tone quality. Fix it before you pick up the horn.
+
+**Seated position (orchestra/band chair):**
+- Sit at the front half of the chair — do not lean back into the seatback.
+- Both feet flat on the floor, hip-width apart.
+- Spine long and neutral: imagine a string pulling the crown of your head toward the ceiling.
+- Bell faces forward and slightly down (5–10°) on trumpet/tuba; horn bell points backward and down at roughly 45° to the floor.
+- Shoulders dropped and relaxed — rolled-forward "computer shoulders" collapse the chest cavity by 15–20%.
+
+**Standing position (soloist/jazz):**
+- Weight distributed slightly forward onto the balls of the feet.
+- Knees unlocked — a locked knee creates tension that travels up through the hip into the diaphragm.
+- Instrument comes to your face; your face does not go to the instrument.
+
+**Common fault:** Craning the neck forward to meet the mouthpiece. This compresses the trachea and shortens your sustainable phrase by 20–30%. If you're doing this, your music stand is too low.
+
+---
+
+### 1.2 Breathing Mechanics: The Three-Zone Model
+
+Brass playing demands maximum breath capacity and pressure-controlled release. Understand what moves and why.
+
+```mermaid
+flowchart LR
+    subgraph sub_zones ["Three Breathing Zones"]
+        Z1["Zone 1: Clavicular<br/>Collarbone rises<br/>Least capacity<br/>DO NOT rely on this alone"]
+        Z2["Zone 2: Intercostal<br/>Ribcage expands laterally<br/>Moderate capacity<br/>Active in forte playing"]
+        Z3["Zone 3: Diaphragmatic<br/>Belly moves forward/out<br/>Largest capacity<br/>PRIMARY zone for brass"]
+    end
+    Z3 --> Z2 --> Z1
+
+    style Z1 fill:#ffcccc
+    style Z2 fill:#ffffcc
+    style Z3 fill:#ccffcc
+```
+
+**The filling sequence (inhalation):**
+1. Release the belly forward first — the diaphragm drops and abdominal organs displace outward.
+2. Ribcage expands laterally (think "360° expansion" around the torso, not just forward).
+3. Upper chest lifts last and minimally.
+4. Total inhalation time for a full breath: 1–2 seconds. Faster than this produces shallow, clavicular-dominant breathing.
+
+**Breath support during playing:**
+- The abdominal wall does not go slack after the initial breath. Maintain gentle inward pressure of the abdominal muscles throughout the phrase — this is "support."
+- Think "air speed" rather than "air pressure." Pressure builds as a consequence of the diaphragm pushing against a partially closed lip aperture, not from squeezing the throat or chest.
+- The throat remains open at all times. Confirm this: hiss "haahhh" freely — that open throat position is correct. Hissing "heee" or "tsss" closes the throat. Never play from a closed throat.
+
+**Breathing drill — 4-count breath cycle:**
+
+Repeat without the instrument until automatic:
+
+| Count | Action |
+|-------|--------|
+| 1–2 | Inhale (belly first, ribs second) |
+| 3 | Hold briefly with open throat |
+| 4 | Release air freely (simulate a supported tone) |
+
+Target: complete this 20 times without any tension creeping into the jaw, neck, or shoulders.
+
+---
+
+### 1.3 Embouchure Construction: Step-by-Step
+
+The embouchure is a valve, not a seal. Its job is to vibrate at precise frequencies controlled by aperture size, lip tension, and air speed — not by gripping or pressing.
+
+**Building the embouchure from scratch:**
+
+**Step 1 — Lip position:**
+Say the syllable "M" and stop at the moment the lips touch. That resting lip contact — no pucker, no smile, no grimace — is your neutral starting position. The upper and lower lip centers should align vertically.
+
+**Step 2 — Aperture formation:**
+From the neutral position, say "mmm-PUHHH" and stop at the moment the lips part for the "P." A small oval aperture roughly 3–5 mm wide will form naturally. This is your low-register aperture for trumpet. For tuba, the aperture will be wider; for horn, slightly narrower.
+
+**Step 3 — Mouthpiece placement:**
+- Trumpet/trombone/tuba: approximately 2/3 upper lip, 1/3 lower lip inside the mouthpiece cup. The exact ratio varies by player anatomy — do not force a 50/50 split.
+- French horn: typically more centered (50/50), but placement often shifts due to the smaller rim diameter.
+- Never press the mouthpiece hard against the face. Resting contact pressure is enough to create a seal. Excessive pressure compresses lip tissue, reduces vibration efficiency, and causes bruising.
+
+**Step 4 — Mouthpiece pressure check:**
+Hold the mouthpiece between only your left thumb (behind) and left index finger (under the shank). Play a simple scale. If tone collapses without right-hand support, you are relying on pressure, not embouchure development.
+
+**Common embouchure faults and fixes:**
+
+| Fault | Symptom | Fix |
+|-------|---------|-----|
+| "Smiling" embouchure (corners pulled back) | Thin, pinched tone; poor high register | Bring corners forward/inward, as if saying "PUHHH" |
+| "Puckering" (lips pushed forward excessively) | Weak core tone, poor response | Flatten lips slightly, maintain firm corner anchor |
+| Chin bunching (chin muscle tightens) | Stuffy, resistant low register | Flatten chin by thinking "long chin" or "chin down" |
+| Off-center placement | Mouthpiece rotated to one side | Align with mirror; track both lips equally in the cup |
+| Mouthpiece too high/low | Upper or lower partials collapse | Adjust until midpoint of aperture aligns with cup center |
+
+---
+
+### 1.4 Mouthpiece Buzzing Drills (Before Every Practice Session)
+
+Buzzing on the mouthpiece alone eliminates the instrument's acoustic feedback and forces your embouchure to do all the work. Five minutes of mouthpiece buzzing = twenty minutes of instrument practice for embouchure development.
+
+**Drill 1 — Free buzzing (no mouthpiece, no instrument):**
+Press lips loosely together. Without the instrument, produce a "BRRR" with air. Aim for a recognizable pitch. This requires significant air support. If you can sustain 5 seconds of free buzzing on a consistent pitch, your embouchure is engaged. Beginners often cannot do this for the first few weeks — that is normal.
+
+**Drill 2 — Mouthpiece long tones:**
+On the mouthpiece alone, sustain the following pitches. These concert pitches assume a Bb trumpet mouthpiece; adjust for horn/tuba proportionally:
+
+```
+Pitch target (mouthpiece alone → concert pitch on trumpet):
+  Low G (sounds like C below the staff)    → 60 BPM, 8 counts each
+  Middle C (sounds like middle of staff)   → 60 BPM, 8 counts each
+  G above the staff                        → 60 BPM, 8 counts each
+  High C (top of staff)                    → 60 BPM, 4 counts each (target)
+```
+
+Sustain each pitch with a full, centered tone. Wavering or pitch drift means air support dropped. Reconnect the abdominal wall.
+
+**Drill 3 — Mouthpiece glissandi:**
+Sustain a mid-range tone on the mouthpiece, then slide smoothly up a perfect 5th and back down. This trains continuous embouchure adjustment. No articulation — legato only. 10 repetitions per practice session.
+
+---
+
+## Section 2: Tone Production, Register Extension & Lip Slurs
+
+### 2.1 Long Tone Practice — The Core of Everything
+
+Long tones are non-negotiable. No matter how advanced you are, long tones reveal the current state of your embouchure, breath support, and instrument response.
+
+**Long tone protocol — daily practice template:**
+
+Tempo: quarter note = 60 BPM. Each pitch lasts 8 counts (8 quarter notes). Rest 2 counts between pitches. Use a tuner; every pitch must stay within ±5 cents.
+
+**Trumpet long tone sequence (written pitch):**
+```
+G4 → F#4 → F4 → E4 → Eb4 → D4 → Db4 → C4
+(one octave descent, then ascend back up)
+```
+
+**Dynamics progression (perform each sequence at four dynamics):**
+1. **pp (pianissimo):** Barely audible. This is the hardest. Requires maximum embouchure control and no reliance on pressure.
+2. **mp (mezzo-piano):** Relaxed, natural tone.
+3. **mf (mezzo-forte):** Full core sound.
+4. **ff (fortissimo):** Maximum resonance without pressing. The tone should bloom outward, not become harsh.
+
+**What to listen for:**
+- Is the core of the tone round and stable, or does it wobble and thin out?
+- Is the pitch stable throughout the full 8 counts, or does it drift flat at the end (breath support dropping)?
+- Do adjacent harmonics ring sympathetically? (They should.)
+
+**Vibrato:** Do not add vibrato to long tones during practice. Vibrato masks pitch and tone problems. Save it for performance.
+
+---
+
+### 2.2 The Harmonic Series and Why It Governs Everything
+
+Every note you play on a brass instrument is a member of a harmonic series determined by your effective tube length. Understanding this directly explains valve fingerings, lip slur mechanics, and register playing.
+
+The harmonic series for a Bb trumpet at open (no valves):
+
+```
+Partial:    1     2     3     4     5     6     7     8
+Concert:    Bb1   Bb2   F3    Bb3   D4    F4    Ab4*  Bb4
+Trumpet:    C2    C3    G3    C4    E4    G4    Bb4*  C5
+
+(* 7th partial is naturally flat — approximately 30 cents below equal temperament)
+```
+
+This is not an abstraction — it is the roadmap of your instrument. Every lip slur moves between adjacent partials. Every register shift is a jump from one row of this table to the next.
+
+**Practical implication for the high register:**
+As you ascend the series, partials get closer together. G4–A♭4–A4–B♭4 are all reachable on the same fingering by increasing air speed and embouchure tension. The instrument does not change; your embouchure changes.
+
+---
+
+### 2.3 Lip Slur Exercises — Progressive Development
+
+Lip slurs move between partials without tonguing. They are the primary tool for developing register flexibility and are the foundation of all technical playing.
+
+**Trumpet fingering reference for lip slur drills:**
+
+| Fingering | Partials Available (Written) |
+|-----------|------------------------------|
+| Open (0) | C, G, C, E, G, Bb, C (and above) |
+| 1 | B, F#, B, D#, F#, A, B |
+| 2 | Bb, F, Bb, D, F, Ab, Bb |
+| 1+2 | A, E, A, C#, E, G, A |
+| 2+3 | Ab, Eb, Ab, C, Eb, Gb, Ab |
+| 1+3 | G, D, G, B, D, F, G |
+| 1+2+3 | F#, C#, F#, A#, C#, E, F# |
+
+**Drill 1 — Two-partial slur (beginner):**
+
+On open fingering only. Slur between 2nd and 3rd partials (C4 to G4 on trumpet, written pitch). Keep the air stream constant — the only change is a small increase in lip tension and air speed for the ascending note.
+
+```
+Pattern: C4 — G4 — C4 — G4 — C4
+Tempo: 60 BPM, each note = 1 beat
+Articulate the first note only ("Tu"), then slur the rest
+Repeat 4 times, then switch to fingering 2 (down a whole step)
+```
+
+**Drill 2 — Three-partial slur (intermediate):**
+
+```
+Pattern (open fingering, written trumpet):
+C4 — G4 — C5 — G4 — C4
+(2nd → 3rd → 4th → 3rd → 2nd partials)
+Tempo: 60 BPM → 80 BPM → 100 BPM
+4 repetitions per fingering
+Complete on all 7 fingerings
+```
+
+**Drill 3 — Four-partial slur with valve changes (advanced):**
+
+This drill trains the coordination of valve changes with partial shifts, which is the core skill of technical brass playing.
+
+```
+Bar 1 (open):   C4 — G4 — C5 — E5
+Bar 2 (valve 2): Bb3 — F4 — Bb4 — D5
+Bar 3 (valve 1): B3 — F#4 — B4 — D#5
+Bar 4 (1+2):    A3 — E4 — A4 — C#5
+
+Slur throughout. Tempo: 60 BPM → 80 BPM → 100 BPM
+One bar per fingering, no pause between bars
+```
+
+**What to focus on during lip slurs:**
+- The air does not stop between notes. Think of the slur as one continuous stream of air with a momentary change in direction/speed at each note.
+- Avoid "bumping" (a pop or glitch between notes). Bumping means the air stopped momentarily. Keep it connected.
+- The face does not move. Chin does not bob, jaw does not thrust. Only the internal lip tension and air speed change.
+
+---
+
+### 2.4 Register Extension — Systematic High-Note Development
+
+There is no shortcut to the high register, but there is a systematic path. The following protocol extends range by approximately one partial (a perfect 4th to 5th) over 6–8 weeks of consistent daily practice.
+
+**Principle:** You cannot manufacture high notes through pressure. The high register is achieved by increased air speed (not volume) through a smaller aperture. Think "fast and narrow" for high, "slow and wide" for low.
+
+**Step 1 — Find your current comfortable ceiling:**
+Play a chromatic scale ascending from middle register. Note the pitch at which the tone begins to thin, spread, or crack. That is your current working ceiling. For most intermediate trumpet players this is around A5 to C6 (written).
+
+**Step 2 — Pedal tone development:**
+Pedal tones (below the fundamental, below the staff) are acoustically paradoxical but physically demanding. Playing them consistently strengthens the lips in a way normal range playing does not.
+
+```
+Pedal tone sequence (trumpet written pitch):
+F#2 — F2 — E2 — Eb2 — D2 — Db2 — C2
+Tempo: 60 BPM, 4 counts each, full tone (not airy)
+One pedal tone sequence before every high-register practice session
+```
+
+**Step 3 — Flexibility exercises targeting one half-step above your ceiling:**
+
+Do not attempt to jump to the top of the range all at once. Add one note at a time.
+
+```
+If your ceiling is Bb5 (written trumpet):
+Day 1–7:  Lip slur C5 — G5 — C6 (stop here, do not force higher)
+Day 8–14: Lip slur C5 — G5 — C6 — D6 (add D)
+Day 15–21: Lip slur C5 — G5 — C6 — D6 — E6
+...etc.
+Tempo: 60 BPM. Never force. If a note cracks, rest 2 minutes, try again.
+```
+
+**Step 4 — Never practice tired embouchure:**
+When the tone loses core quality (becomes thin, buzzy, or pressed), stop. Rest is not laziness — fatigued lip tissue cannot build strength correctly. Maximum productive embouchure practice per session: 20–30 minutes of active technical work, with 5-minute rests between exercises.
+
+---
+
+### 2.5 Instrument-Specific Register Considerations
+
+**French Horn:**
+The horn's narrower mouthpiece and conical bore make register navigation more treacherous. The partials sit closer together in the high register, which means minimal embouchure adjustment separates adjacent notes.
+
+- Use right-hand position in the bell to fine-tune pitch (pushing hand deeper flattens pitch by up to a half-step; opening hand raises pitch).
+- Stopped horn (hand fully closing the bell) raises pitch by approximately a half-step — use this for stopped (+) marked passages.
+- The horn's 1st-line F fingering: T (thumb, Bb side) + 1+2+3. The horn's lowest playable note on the F side: pedal C (8va below middle C).
+
+**Trombone:**
+Trombone has no valves (or one trigger for Bb/F) — all pitch relationships come from slide position and partial selection.
+
+Slide position reference (Bb tenor):
+
+| Position | Interval | Approximate distance |
+|----------|----------|---------------------|
+| 1st | Open (Bb) | Fully retracted |
+| 2nd | A | ~1.5 cm extension |
+| 3rd | Ab | ~3 cm extension |
+| 4th | G | ~5 cm extension |
+| 5th | Gb | ~7 cm extension |
+| 6th | F | ~10 cm extension |
+| 7th | E | ~12 cm extension |
+
+The F attachment (trigger) adds the F trombone's tubing, extending the low range and providing alternate positions. Bb–F pedal tone: 1st position with trigger.
+
+**Tuba/Euphonium:**
+The tuba's large mouthpiece requires significantly more air volume (not more pressure) than trumpet. The common beginner mistake is using high breath pressure to compensate for underdeveloped abdominal support — this produces a thin, strained tone. Lead with air volume; let the embouchure respond naturally.
+
+Euphonium fingerings are identical to trumpet fingerings with the addition of the compensating 4th valve (lowers pitch by a perfect 4th, used to correct sharp intonation on 1+3 and 1+2+3 combinations).
+
+---
+
+## Section 3: Articulation — Tonguing, Legato & Stylistic Variety
+
+### 3.1 Tongue Mechanics and Syllable Vocabulary
+
+The tongue's role in brass playing is to interrupt or initiate airflow at the moment of attack. It does not create the sound — the embouchure and air do that. The tongue is a gate.
+
+**Tongue position taxonomy:**
+
+```mermaid
+flowchart TD
+    subgraph sub_tongue ["Tongue Position vs. Articulation Character"]
+        T1["Dental<br/>'Tu' or 'Ti'<br/>Tip at upper teeth<br/>→ Crisp, bright attack<br/>→ Shortest attack transient"]
+        T2["Alveolar<br/>'Ta' or 'Da'<br/>Tip at alveolar ridge (behind teeth)<br/>→ Clear, centered attack<br/>→ Standard orchestral default"]
+        T3["Mid-Palate<br/>'Ka' or 'Ga'<br/>Arch of tongue at hard palate<br/>→ Double/triple tonguing mechanism<br/>→ Less precise solo"]
+        T4["Velar<br/>'Hah' (no tongue contact)<br/>Soft palate / no stop<br/>→ Legato breath accent<br/>→ Used for sfp, fp markings"]
+    end
+    T1 --> T2 --> T3 --> T4
+
+    style T1 fill:#cce5ff
+    style T2 fill:#d4edda
+    style T3 fill:#fff3cd
+    style T4 fill:#f8d7da
+```
+
+**Standard syllable guide by context:**
+
+| Style | Syllable | Register | Attack Character |
+|-------|----------|----------|-----------------|
+| Orchestral staccato | "Ti" | High (above G5 trumpet) | Very crisp, short |
+| Orchestral staccato | "Tu" | Mid/low register | Crisp, centered |
+| Legato/slurred | No tongue | All | No interruption |
+| Soft legato attack | "Du" | All | Gentle initiation |
+| Marcato accent | "Tah!" | All | Heavy, weighted |
+| Sforzando | "Tahff" (burst) | All | Explosive onset |
+| Double tongue T-K | "Tu-Ku" | 120 BPM+ 16ths | Rapid repeated notes |
+| Triple tongue | "Tu-Tu-Ku" or "Tu-Ku-Tu" | Triplet patterns | 3-note groupings |
+
+---
+
+### 3.2 Single Tongue Development Drills
+
+**Drill 1 — Tongue speed building (tongued 8th notes):**
+
+```
+Pattern: Bb4, single-pitched repeated notes, staccato
+Metronome progression:
+  Week 1: 60 BPM (eighth notes = 2 tongues per beat)
+  Week 2: 80 BPM
+  Week 3: 100 BPM
+  Week 4: 120 BPM (target: clean single tongue)
+
+8 beats per breath. Rest 4 beats. Repeat 8 times.
+Focus: even spacing between notes — no "machine gun" rushing.
+```
+
+**Drill 2 — Accent patterns (musical tonguing):**
+
+```
+4/4 meter, Bb major scale ascending/descending, 60 → 100 BPM
+
+Pattern A (downbeat accent):
+  > . . .  > . . .  (accent beat 1, articulate beats 2-3-4 lightly)
+
+Pattern B (backbeat accent):
+  . . > .  . . > .  (accent beat 3)
+
+Pattern C (syncopated):
+  . > . >  . > . >  (accent beats 2 and 4)
+```
+
+---
+
+### 3.3 Double and Triple Tonguing
+
+Double and triple tonguing are essential for fast repeated-note passages (Haydn Trumpet Concerto fast movement, Mahler symphony excerpts, big band shakes).
+
+**The T-K coordination problem:**
+Most players' "K" articulation is weaker than "T" because the back-of-tongue mechanism is less developed. The fix is to isolate K practice.
+
+**K isolation drill (mouthpiece only, no instrument):**
+
+```
+Day 1–3:   Buzz only "Ka Ka Ka Ka" — no T at all.
+           60 BPM, 4 K's per beat. 2 minutes.
+
+Day 4–7:   "Ka Ka Ka Ka Ka Ka Ka Ka" — steady stream.
+           80 BPM, 4 K's per beat. 2 minutes.
+
+Day 8–14:  Alternate: "Tu-Ku Tu-Ku Tu-Ku Tu-Ku"
+           80 BPM. T and K must sound identical in clarity and weight.
+
+Day 15+:   Add to instrument. Scale + arpeggios, double tongue.
+           Start 80 BPM, target 160 BPM over 4 weeks.
+```
+
+**Triple tongue patterns:**
+
+Pattern 1 (T-T-K): Works best for triplet groupings
+```
+♩. = 60 BPM, triplets
+"Tu - Tu - Ku / Tu - Tu - Ku / Tu - Tu - Ku / Tu - Tu - Ku"
+Bb major arpeggio: Bb4 - D5 - F5 / Bb4 - D5 - F5 / ...
+```
+
+Pattern 2 (T-K-T): Works best for continuous rapid passages
+```
+"Tu - Ku - Tu / Ku - Tu - Ku / Tu - Ku - Tu / Ku - Tu - Ku"
+(alternating grouping — seamless continuation)
+Scale run: Bb4 - C5 - D5 / Eb5 - F5 - G5 / ...
+```
+
+---
+
+### 3.4 Articulation in Context — Orchestral Excerpt Drills
+
+Theory means nothing without real-world application. The following excerpts isolate specific articulation challenges.
+
+**Excerpt 1 — Stravinsky Petrushka (Bb Trumpet, fig. 1):**
+Aggressive, dry staccato in the upper register. Use "Ti" syllable. Keep the note length to exactly 50% of the written value. No decay — cut off cleanly.
+
+Preparatory drill:
+```
+Key: Bb major (written). Tempo: 126 BPM (target from score).
+Practice tempo: 80 BPM → 100 BPM → 116 BPM → 126 BPM.
+Isolate the first 4 bars. Play staccato pattern on a single pitch (Bb5) first.
+Add pitches only when staccato character is clean and even.
+```
+
+**Excerpt 2 — Mahler Symphony No. 5 (Bb Trumpet, opening solo):**
+Funeral march articulation — marked, weighted, but not staccato. Use "Tah" syllable with full note value. The opening D (concert Db) must have gravitas, not brightness. Keep the spectral centroid dark by keeping the aperture slightly wider than a normal forte setting.
+
+Preparatory drill:
+```
+Key: D minor (concert Db minor, written D minor for Bb trumpet).
+Tempo: 76 BPM. Practice the first 8 bars alone.
+Recorded reference: compare your tone against Bruno Weil/Mahler Chamber Orchestra recording.
+Target: attack time 30–50 ms per note (felt, not measured in practice).
+```
+
+**Excerpt 3 — Brahms Symphony No. 1 (Horn in F, mvt. IV solo):**
+Lyrical, legato. No articulation except the first note of each phrase. Breath support must remain completely constant throughout the slurred passage. Any dip in support = pitch sagging.
+
+Preparatory drill:
+```
+Isolate bars 1–4. Play on the instrument at 50% tempo first.
+Then sing the passage. Match your instrumental tone to your singing tone — this is the target.
+Return to 100% tempo: 72 BPM.
+```
+
+---
+
+## Section 4: Intonation, Valve Management & Performance Setup
+
+### 4.1 Understanding Why Brass Instruments Are Inherently Out of Tune
+
+No brass instrument plays perfectly in tune on its own. Knowing why prevents frustration and enables intelligent correction.
+
+**The core problem — additive valve tubing:**
+
+Each valve lowers pitch by adding a fixed length of tubing. But the percentage length increase needed to lower a note by a given interval depends on the starting total length. When you combine multiple valves, the tubing added is calculated for each valve independently — but the total length is now longer than when each valve was designed.
+
+Result: multi-valve combinations are systematically sharp.
+
+```
+Trumpet (Bb, concert):
+  Open                 → ~±2 cents (excellent)
+  Valve 2 alone       → ~+2 to +5 cents (good)
+  Valve 1 alone       → ~+2 to +5 cents (good)
+  1+2 together        → ~+10 to +20 cents SHARP
+  2+3 together        → ~+10 to +20 cents SHARP
+  1+3 together        → ~+15 to +30 cents SHARP
+  1+2+3 together      → ~+20 to +40 cents SHARP
+```
+
+This is not a defect — it is physics. It is compensated by: (1) alternate fingerings, (2) slide adjustment, (3) embouchure adjustment.
+
+---
+
+### 4.2 Slide Management — When and How to Pull Slides
+
+**On trumpet:**
+
+| Combination | Problem | Correction |
+|-------------|---------|------------|
+| 1+3 (G#3/A♭ area) | +20 to +30 cents sharp | Pull 3rd valve slide out ~1 cm with right ring finger |
+| 1+2+3 (D3/Eb area) | +30 to +40 cents sharp | Pull 1st valve slide out ~2 mm AND 3rd slide ~1.5 cm |
+| 1+2 (A3) | +10 to +20 cents sharp | Lip down or pull 1st slide slightly |
+
+**Slide pulling technique (trumpet):**
+- The right ring finger hooks through the saddle or ring on the 3rd valve slide.
+- Pulling out 1 mm lowers pitch by approximately 2–3 cents (varies by instrument).
+- Practice pulling/pushing during scale passages until it becomes automatic.
+- Mark your 3rd slide with a paint pen at the "home" position and at the "1+3 pulled" position so you can find it by feel in performance.
+
+**On trombone:**
+Every combination has a unique slide position. The fundamental skill is knowing where "exact" position is for every note by ear, not by memory of a position number.
+
+**On horn:**
+Right-hand position in the bell provides continuous fine-tuning. Pushing the hand deeper flattens pitch; opening the bell raises it. Use this for constant micro-intonation correction.
+
+---
+
+### 4.3 Alternate Fingerings — Practical Chart (Trumpet)
+
+Memorize these before you need them in performance:
+
+| Note (Concert) | Standard | Alternate | Notes |
+|----------------|----------|-----------|-------|
+| F#4/Gb4 | 2+3 | 1+2+3 (pull 3rd) | 2+3 is sharp; 1+2+3 with slide = better |
+| G#4/Ab4 | 1+2+3 | 2+3 | 2+3 plays slightly flat here — use as alternate |
+| A4 | 1+2 | No good alt | Pull 1st slide ~1–2 mm |
+| Bb4 | 1 or 2+3 | Open (12th partial on some instruments) | |
+| D5 | 1+3 | 1+2+3 (slide pulled) | Standard D is sharp — ring finger ready |
+| C#5/Db5 | 1+2 | — | Pull slides |
+| Low F#2/Gb2 | 2+3 | 1+2+3 | Weak register — 1+2+3 sometimes responds better |
+
+---
+
+### 4.4 Warm-Up Routine — Complete Daily Template
+
+This 20-minute warm-up covers embouchure activation, flexibility, intonation, and articulation in an efficient sequence. Use it before every practice session and before every performance.
+
+```
+Minutes 0–2:   Mouthpiece buzzing
+               → Long tones, C4 to G4 range (mouthpiece pitch reference)
+               → Glissandi up a 5th and back, 10 reps
+
+Minutes 2–6:   Long tones on instrument
+               → pp to ff dynamic exploration on G4, F4, Eb4, C4 (trumpet written)
+               → Hold each 8 counts, tune with drone (A=440 Hz reference)
+
+Minutes 6–10:  Lip slurs
+               → 2-partial slur on all 7 fingerings (Drill 2.3-1 above)
+               → 3-partial slur, tempo 72 BPM
+
+Minutes 10–14: Tonguing
+               → Single tongue repeated notes: 60 → 80 → 100 BPM
+               → Scale with accent patterns A and B (Drill 3.2-2)
+
+Minutes 14–17: Scales
+               → Bb major, one octave, legato, 72 BPM quarter notes
+               → Chromatic scale, C to C, staccato, 80 BPM
+
+Minutes 17–20: Intonation check
+               → Play with tuner drone
+               → Identify and correct sharp fingering combinations
+               → Mark any persistent intonation problems for focused practice
+```
+
+---
+
+## Section 5: Acoustics Lab — Measurement-Driven Investigation
+
+This section is for players who want quantitative insight into their own physiology and instrument behavior. You do not need a laboratory — a modern smartphone (96 kHz capable audio interfaces are under $100) and free analysis software cover most of these exercises.
+
+### 5.1 Lab Infrastructure
+
+**Minimum viable setup (practical):**
+- Brass instrument in known condition
+- Audio interface: Focusrite Scarlett Solo (2nd gen+) at 96 kHz / 24-bit
+- Calibrated measurement microphone: Dayton Audio EMM-6 or Behringer ECM8000 (~$30–60)
+- Chromatic tuner: Korg TM-60 or iPhone app "Tonal Energy" (±0.1 cent resolution)
+- Python 3.10+ with NumPy, SciPy, librosa, matplotlib
+
+**Enhanced setup (research-grade):**
+- Pressure transducer: ±10 kPa, >10 kHz bandwidth, installed in mouthpiece shank
+- Contact accelerometer (piezoelectric) for bell vibration analysis
+- Synchronized multi-channel recording (mouthpiece pressure + acoustic simultaneously)
+
+**Analysis environment setup:**
+
+```bash
+# Create isolated Python environment
+python -m venv brass_lab
+source brass_lab/bin/activate  # macOS/Linux
+# brass_lab\Scripts\activate   # Windows
+
+# Install dependencies (pinned versions for reproducibility)
+pip install numpy==1.26.4 scipy==1.13.0 librosa==0.10.2 \
+            matplotlib==3.9.0 soundfile==0.12.1 sounddevice==0.4.7
+```
+
+---
+
+### 5.2 Lab A: Embouchure Mechanics & Lip-Valve Analysis
+
+#### Lab A1 — Mouthpiece Pressure Mapping Across the Register
+
+**Objective:** Quantify how mouth pressure varies across the instrument's range and confirm the relationship between pressure, partial number, and embouchure tension.
+
+**Setup:**
+- Position microphone 1 meter from bell, on-axis.
+- If pressure transducer available: install in mouthpiece shank. If not, use acoustic analysis only (see alternate method in Step 4 below).
+- Record at 96 kHz / 24-bit to capture high-frequency embouchure noise.
+
+**Procedure:**
+
+1. Play each note in the following chromatic sequence, sustaining each for 4 seconds at mezzo-forte (target 85 dB SPL at 1 m). Rest 2 seconds between notes.
+
+```
+Trumpet written sequence (adjust by transposition for other instruments):
+C4 — Db4 — D4 — Eb4 — E4 — F4 — F#4 — G4 — Ab4 — A4 — Bb4 — B4 — C5 — D5 — E5 — F5 — G5
+```
+
+2. Save individual audio files named by note: `C4.wav`, `Db4.wav`, etc.
+
+3. Run analysis:
+
+```python
+import numpy as np
+import scipy.signal as sig
+import matplotlib.pyplot as plt
+import soundfile as sf
+from pathlib import Path
+
+def analyze_note(filepath: str, fs_target: int = 96000) -> dict:
+    """
+    Load a recorded brass note and extract key acoustic features.
+    Returns dict with fundamental frequency, SPL, spectral centroid, 
+    and harmonic-to-noise ratio.
+    """
+    audio, fs = sf.read(filepath)
+    
+    # Normalize to mono
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+    
+    # Extract steady-state segment: skip first 500ms (attack), 
+    # use 2s steady-state window
+    start = int(0.5 * fs)
+    end   = int(2.5 * fs)
+    if end > len(audio):
+        end = len(audio)
+    segment = audio[start:end]
+    
+    # --- Fundamental frequency via autocorrelation ---
+    # Reliable for monophonic instruments
+    corr = np.correlate(segment, segment, mode='full')
+    corr = corr[len(corr)//2:]  # Keep positive lags only
+    # Find first peak beyond the trivial peak at lag=0
+    min_lag = int(fs / 1500)  # Above 1500 Hz — won't mistake harmonics
+    max_lag = int(fs / 50)    # Below 50 Hz
+    peak_indices, _ = sig.find_peaks(corr[min_lag:max_lag], height=0)
+    if len(peak_indices) == 0:
+        f0 = np.nan
+    else:
+        f0 = fs / (peak_indices[0] + min_lag)
+    
+    # --- Power spectral density (Blackman-Harris window for low sidelobes) ---
+    f_axis, Pxx = sig.welch(segment, fs, nperseg=8192, 
+                             window='blackmanharris', scaling='density')
+    
+    # --- SPL (assumes microphone calibration at 1m; adjust ref if calibrated) ---
+    p_ref = 20e-6  # 20 μPa reference
+    rms = np.sqrt(np.mean(segment**2))
+    spl = 20.0 * np.log10(rms / p_ref) if rms > 0 else -np.inf
+    
+    # --- Spectral centroid ---
+    centroid = np.sum(f_axis * Pxx) / (np.sum(Pxx) + 1e-12)
+    
+    # --- Harmonic-to-noise ratio estimate ---
+    if not np.isnan(f0):
+        harmonic_bw = 20  # Hz each side of harmonic peak
+        harmonic_energy = 0.0
+        for k in range(1, 12):
+            h_freq = k * f0
+            if h_freq > f_axis[-1]:
+                break
+            mask = np.abs(f_axis - h_freq) < harmonic_bw
+            harmonic_energy += np.sum(Pxx[mask])
+        total_energy = np.sum(Pxx)
+        noise_energy  = total_energy - harmonic_energy
+        hnr_db = 10.0 * np.log10(harmonic_energy / (noise_energy + 1e-12))
+    else:
+        hnr_db = np.nan
+    
+    return {
+        'f0_hz':       f0,
+        'spl_db':      spl,
+        'centroid_hz': centroid,
+        'hnr_db':      hnr_db,
+        'f_axis':      f_axis,
+        'Pxx':         Pxx,
+    }
+
+
+# --- Run across all note files ---
+note_names = ['C4','Db4','D4','Eb4','E4','F4','F#4','G4',
+              'Ab4','A4','Bb4','B4','C5','D5','E5','F5','G5']
+
+results = {}
+audio_dir = Path('./recordings')
+
+for note in note_names:
+    fpath = audio_dir / f'{note}.wav'
+    if fpath.exists():
+        results[note] = analyze_note(str(fpath))
+        r = results[note]
+        print(f"{note:5s}  f0={r['f0_hz']:7.2f} Hz  "
+              f"SPL={r['spl_db']:5.1f} dB  "
+              f"Centroid={r['centroid_hz']:6.0f} Hz  "
+              f"HNR={r['hnr_db']:5.1f} dB")
+    else:
+        print(f"  File not found: {fpath}")
+
+
+# --- Plot spectral centroid vs register ---
+valid = [(n, r) for n, r in results.items() if not np.isnan(r['f0_hz'])]
+if valid:
+    note_labels  = [n for n, _ in valid]
+    f0_values    = [r['f0_hz']       for _, r in valid]
+    cent_values  = [r['centroid_hz'] for _, r in valid]
+    hnr_values   = [r['hnr_db']      for _, r in valid]
+
+    fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True)
+    
+    axes[0].bar(note_labels, cent_values, color='steelblue')
+    axes[0].set_ylabel('Spectral Centroid (Hz)')
+    axes[0].set_title('Tone Brightness vs. Register — Brass Instrument Survey')
+    axes[0].grid(axis='y', alpha=0.4)
+    
+    axes[1].bar(note_labels, hnr_values, color='darkorange')
+    axes[1].set_ylabel('Harmonic-to-Noise Ratio (dB)')
+    axes[1].set_xlabel('Note (Written Trumpet Pitch)')
+    axes[1].grid(axis='y', alpha=0.4)
+    
+    plt.tight_layout()
+    plt.savefig('register_survey.png', dpi=150)
+    plt.show()
+```
+
+**What to look for:** Spectral centroid should rise monotonically with register — higher notes are brighter. If centroid drops unexpectedly at a specific note, that note's embouchure setup or fingering is suboptimal. HNR should stay above +20 dB for clean tone; values below +10 dB indicate a noisy, airy tone (insufficient lip seal or insufficient air support).
+
+---
+
+#### Lab A2 — Embouchure Aperture Effect on Timbre
+
+**Objective:** Measure how intentional aperture width changes affect spectral content on the same pitch.
+
+**Procedure:**
+
+Sustain concert Bb4 (trumpet open/valve 2 written Bb4 or Bb3) using three deliberate aperture setups:
+- **Narrow aperture:** Corners pulled forward ("fish lips"). Bright, tight tone.
+- **Normal aperture:** Neutral embouchure as described in Section 1.3.
+- **Wide aperture:** Corners slightly relaxed and open. Darker, fuller tone.
+
+Record 4 seconds each. Save as `aperture_narrow.wav`, `aperture_normal.wav`, `aperture_wide.wav`.
+
+```python
+import numpy as np
+import scipy.signal as sig
+import matplotlib.pyplot as plt
+import soundfile as sf
+
+def overlay_spectra(files: dict, fs_analysis_nperseg: int = 8192):
+    """
+    Overlay power spectra from multiple recordings on a single plot.
+    files: dict mapping label string to file path string.
+    """
+    fig, ax = plt.subplots(figsize=(12, 5))
+    colors = ['#e63946', '#457b9d', '#2a9d8f']
+    
+    for (label, fpath), color in zip(files.items(), colors):
+        audio, fs = sf.read(fpath)
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+        # Steady-state window
+        segment = audio[int(0.5*fs):int(2.5*fs)]
+        
+        f, Pxx = sig.welch(segment, fs, nperseg=fs_analysis_nperseg,
+                           window='blackmanharris', scaling='density')
+        Pxx_db = 10.0 * np.log10(Pxx + 1e-12)
+        
+        # Spectral centroid
+        centroid = np.sum(f * Pxx) / (np.sum(Pxx) + 1e-12)
+        
+        ax.plot(f, Pxx_db, label=f'{label}  (centroid={centroid:.0f} Hz)', 
+                color=color, linewidth=1.5, alpha=0.9)
+    
+    ax.set_xscale('log')
+    ax.set_xlim(100, 8000)
+    ax.set_ylim(-80, 20)
+    ax.set_xlabel('Frequency (Hz)', fontsize=12)
+    ax.set_ylabel('Power Spectral Density (dB/Hz)', fontsize=12)
+    ax.set_title('Embouchure Aperture Effect on Spectrum (Same Pitch)', fontsize=13)
+    ax.legend(fontsize=10)
+    ax.grid(True, which='both', alpha=0.3)
+    plt.tight_layout()
+    plt.savefig('aperture_spectra.png', dpi=150)
+    plt.show()
+
+
+overlay_spectra({
+    'Narrow aperture': 'recordings/aperture_narrow.wav',
+    'Normal aperture': 'recordings/aperture_normal.wav',
+    'Wide aperture':   'recordings/aperture_wide.wav',
+})
+```
+
+**Expected results:** Narrow aperture spectral centroid will be 300–700 Hz higher than wide aperture on the same pitch. The wide aperture spectrum will show stronger low-order harmonics (harmonics 2–4) relative to high-order harmonics (8–16). This is the acoustic fingerprint of dark vs. bright tone color.
+
+---
+
+### 5.3 Lab B: Valve Intonation Measurement
+
+#### Lab B1 — Chromatic Scale Intonation Survey
+
+**Objective:** Quantify deviation from equal temperament for all seven valve combinations, identify problem fingerings, and document required slide corrections.
+
+**Procedure:**
+
+Play the following sequence of pitches, one sustained note per valve combination, 3 seconds each at mezzo-forte. Use a simultaneous tuner reference (Tonal Energy app works well). Record audio separately for post-analysis.
+
+```python
+import numpy as np
+import scipy.signal as sig
+import soundfile as sf
+
+# Equal temperament frequency reference (A4 = 440 Hz)
+def et_freq(midi_note: int) -> float:
+    return 440.0 * 2.0**((midi_note - 69) / 12.0)
+
+def measure_fundamental(filepath: str) -> float:
+    """
+    Estimate fundamental frequency from a sustained brass note recording
+    using the autocorrelation method. Returns frequency in Hz.
+    """
+    audio, fs = sf.read(filepath)
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+    
+    # Steady-state window (skip attack)
+    segment = audio[int(0.5*fs):int(2.5*fs)]
+    
+    # Normalize
+    segment = segment / (np.max(np.abs(segment)) + 1e-12)
+    
+    # Autocorrelation
+    corr = np.correlate(segment, segment, mode='full')
+    corr = corr[len(corr)//2:]
+    
+    # Search range: 50 Hz to 2000 Hz
+    min_lag = max(1, int(fs / 2000))
+    max_lag = int(fs / 50)
+    
+    peaks, props = sig.find_peaks(corr[min_lag:max_lag],
+                                  height=0.1 * corr[0],
+                                  distance=int(fs/2200))
+    
+    if len(peaks) == 0:
+        return np.nan
+    
+    # Highest-correlation peak = fundamental period
+    best_lag = peaks[np.argmax(props['peak_heights'])] + min_lag
+    return fs / best_lag
+
+
+def cents_deviation(measured_hz: float, target_hz: float) -> float:
+    """Return deviation in cents: positive = sharp."""
+    if target_hz <= 0 or measured_hz <= 0 or np.isnan(measured_hz):
+        return np.nan
+    return 1200.0 * np.log2(measured_hz / target_hz)
+
+
+# --- Trumpet fingering intonation survey ---
+# (Written pitches for Bb trumpet; concert = written - whole step)
+fingerings = [
+    # (label,         written_note, written_MIDI, filename)
+    ('Open',          'C5',  72,  'open.wav'),
+    ('Valve 2',       'B4',  71,  'valve2.wav'),
+    ('Valve 1',       'Bb4', 70,  'valve1.wav'),
+    ('1+2',           'A4',  69,  'valve12.wav'),
+    ('2+3',           'Ab4', 68,  'valve23.wav'),
+    ('1+3',           'G4',  67,  'valve13.wav'),
+    ('1+2+3',         'F#4', 66,  'valve123.wav'),
+]
+
+print(f"\n{'Fingering':<10} {'Note':<6} {'Target Hz':>10} {'Measured Hz':>12} {'Deviation':>12}")
+print("-" * 55)
+
+from pathlib import Path
+audio_dir = Path('./recordings/intonation')
+
+survey_results = []
+for label, note, midi, fname in fingerings:
+    target  = et_freq(midi)
+    fpath   = audio_dir / fname
+    if fpath.exists():
+        measured = measure_fundamental(str(fpath))
+        dev_c    = cents_deviation(measured, target)
+        survey_results.append((label, note, target, measured, dev_c))
+        status = "SHARP" if dev_c > 10 else ("FLAT" if dev_c < -10 else "OK")
+        print(f"{label:<10} {note:<6} {target:>10.2f} {measured:>12.2f} "
+              f"{dev_c:>+10.1f}¢  {status}")
+    else:
+        print(f"{label:<10} {note:<6} {target:>10.2f}  [file not found]")
+
+
+# --- Bar chart visualization ---
+if survey_results:
+    import matplotlib.pyplot as plt
+    labels  = [r[0] for r in survey_results]
+    devs    = [r[4] for r in survey_results]
+    colors  = ['#c0392b' if d > 10 else ('#2980b9' if d < -10 else '#27ae60') 
+               for d in devs]
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    bars = ax.bar(labels, devs, color=colors, edgecolor='black', linewidth=0.8)
+    ax.axhline(0,   color='black',  linewidth=1.0)
+    ax.axhline(+10, color='orange', linewidth=0.8, linestyle='--', label='+10¢ threshold')
+    ax.axhline(-10, color='orange', linewidth=0.8, linestyle='--', label='-10¢ threshold')
+    ax.set_ylabel('Deviation from Equal Temperament (cents)', fontsize=11)
+    ax.set_title('Valve Combination Intonation Survey — Bb Trumpet', fontsize=12)
+    ax.set_ylim(-25, 50)
+    ax.legend()
+    ax.grid(axis='y', alpha=0.4)
+    plt.tight_layout()
+    plt.savefig('intonation_survey.png', dpi=150)
+    plt.show()
+```
+
+Valve intonation flow for multi-valve combinations:
+
+```mermaid
+flowchart TD
+    subgraph sub_open ["Open / Single Valve"]
+        S1["Open → ±5¢ (normal)"]
+        S2["Valve 2 → ±5¢"]
+        S3["Valve 1 → ±5¢"]
+    end
+    subgraph sub_double ["Double Valve Combinations"]
+        D1["1+2 → typically +10 to +20¢ SHARP"]
+        D2["2+3 → typically +10 to +20¢ SHARP"]
+        D3["1+3 → typically +15 to +30¢ SHARP"]
+    end
+    subgraph sub_triple ["Triple Valve Combination"]
+        T1["1+2+3 → typically +20 to +40¢ SHARP"]
+    end
+    subgraph sub_fix ["Corrections"]
+        F1["Embouchure lip-down (small corrections <10¢)"]
+        F2["Pull 3rd valve slide with ring finger (1+3, 1+2+3)"]
+        F3["Use alternate fingering (e.g., valve 3 alone for Eb4)"]
+        F4["Pull 1st valve slide (1+2 and 1+2+3)"]
+    end
+
+    S1 --> D1
+    S2 --> D1
+    S2 --> D2
+    S3 --> D1
+    S3 --> D3
+    D1 --> T1
+    D2 --> T1
+    D3 --> T1
+    D1 --> F1
+    D1 --> F4
+    D3 --> F2
+    T1 --> F2
+    T1 --> F4
+    D2 --> F3
+
+    style D1 fill:#ffe0b2
+    style D2 fill:#ffe0b2
+    style D3 fill:#ffccbc
+    style T1 fill:#ffcdd2
+    style F2 fill:#c8e6c9
+    style F3 fill:#c8e6c9
+```
+
+---
+
+### 5.4 Lab C: Dynamics, Articulation & Breath Analysis
+
+#### Lab C1 — Articulation Transient Analysis
+
+**Objective:** Measure attack times and spectral evolution for different articulation styles. This turns subjective "this articulation feels right" into quantitative benchmarks.
+
+**Procedure:**
+
+Record each articulation style on a 4-note pattern (Bb4–C5–D5–Eb5) at quarter note = 80 BPM. File naming: `articulation_legato.wav`, `articulation_staccato.wav`, `articulation_marcato.wav`, `articulation_sforzando.wav`.
+
+```python
+import numpy as np
+import scipy.signal as sig
+import soundfile as sf
+import librosa
+import matplotlib.pyplot as plt
+
+
+def analyze_articulations(files: dict, bpm: float = 80.0):
+    """
+    For each articulation recording, detect note onsets, measure attack time
+    (5% to 90% of peak envelope), and compute spectral flux during the attack.
+    
+    files: dict mapping articulation label to .wav file path.
+    bpm:   tempo used during recording (for expected onset spacing validation).
+    """
+    beat_duration_s = 60.0 / bpm
+    
+    all_stats = {}
+    
+    for label, fpath in files.items():
+        audio, fs = sf.read(fpath)
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+        
+        # Normalize
+        audio = audio / (np.max(np.abs(audio)) + 1e-12)
+        
+        # Onset detection (librosa spectral flux method)
+        hop_length = 512
+        onset_frames = librosa.onset.onset_detect(
+            y=audio, sr=fs,
+            hop_length=hop_length,
+            units='frames',
+            backtrack=True,
+            pre_max=5, post_max=5,
+            pre_avg=20, post_avg=20,
+            delta=0.07, wait=4
+        )
+        onset_samples = librosa.frames_to_samples(onset_frames, hop_length=hop_length)
+        
+        attack_times_ms  = []
+        spectral_flux_vals = []
+        
+        # Hilbert envelope for attack time measurement
+        envelope = np.abs(sig.hilbert(audio))
+        # Smooth envelope (10 ms window)
+        win = int(0.01 * fs)
+        envelope = sig.savgol_filter(envelope, max(win | 1, 11), 3)
+        
+        for onset_samp in onset_samples:
+            # 200 ms analysis window per note
+            window_end = min(onset_samp + int(0.2 * fs), len(audio))
+            if window_end <= onset_samp:
+                continue
+            
+            env_window = envelope[onset_samp:window_end]
+            if len(env_window) < 10:
+                continue
+            
+            peak = np.max(env_window)
+            if peak < 1e-4:
+                continue
+            
+            thresh_5pct  = 0.05 * peak
+            thresh_90pct = 0.90 * peak
+            
+            above_5   = np.where(env_window >= thresh_5pct)[0]
+            above_90  = np.where(env_window >= thresh_90pct)[0]
+            
+            if len(above_5) == 0 or len(above_90) == 0:
+                continue
+            
+            attack_time_ms = (above_90[0] - above_5[0]) / fs * 1000.0
+            attack_times_ms.append(max(attack_time_ms, 0.5))
+            
+            # Spectral flux: energy change from first 30ms (attack) 
+            # to 60-150ms (steady state)
+            attack_seg = audio[onset_samp : onset_samp + int(0.03 * fs)]
+            steady_seg = audio[onset_samp + int(0.06*fs) : 
+                               onset_samp + int(0.15*fs)]
+            
+            if len(attack_seg) < 64 or len(steady_seg) < 64:
+                continue
+            
+            # Short FFT for each segment
+            atk_fft = np.abs(np.fft.rfft(attack_seg, n=1024))
+            sdy_fft = np.abs(np.fft.rfft(steady_seg, n=1024))
+            
+            # Normalize to avoid amplitude bias
+            atk_fft = atk_fft / (np.sum(atk_fft) + 1e-12)
+            sdy_fft = sdy_fft / (np.sum(sdy_fft) + 1e-12)
+            
+            flux = float(np.sum((sdy_fft - atk_fft)**2))
+            spectral_flux_vals.append(flux)
+        
+        if attack_times_ms:
+            mean_atk  = float(np.mean(attack_times_ms))
+            std_atk   = float(np.std(attack_times_ms))
+            mean_flux = float(np.mean(spectral_flux_vals)) if spectral_flux_vals else 0.0
+            all_stats[label] = {
+                'mean_attack_ms': mean_atk,
+                'std_attack_ms':  std_atk,
+                'mean_spectral_flux': mean_flux,
+                'n_onsets': len(onset_samples),
+            }
+            print(f"{label:<12}  Attack: {mean_atk:5.1f} ± {std_atk:4.1f} ms  "
+                  f"Flux: {mean_flux:.4f}  Onsets detected: {len(onset_samples)}")
+        else:
+            print(f"{label:<12}  No valid onsets detected — check threshold or recording.")
+    
+    # --- Grouped bar chart ---
+    if all_stats:
+        labels_list = list(all_stats.keys())
+        atk_means   = [all_stats[l]['mean_attack_ms'] for l in labels_list]
+        atk_stds    = [all_stats[l]['std_attack_ms']  for l in labels_list]
+        
+        fig, ax = plt.subplots(figsize=(9, 5))
+        x = np.arange(len(labels_list))
+        bars = ax.bar(x, atk_means, yerr=atk_stds, capsize=5,
+                      color=['#4e9af1','#f4a261','#e63946','#8338ec'],
+                      edgecolor='black', linewidth=0.8)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels_list, fontsize=11)
+        ax.set_ylabel('Mean Attack Time (ms)', fontsize=11)
+        ax.set_title('Articulation Attack Time Comparison', fontsize=12)
+        ax.grid(axis='y', alpha=0.4)
+        plt.tight_layout()
+        plt.savefig('articulation_attack_times.png', dpi=150)
+        plt.show()
+    
+    return all_stats
+
+
+stats = analyze_articulations({
+    'Legato':     'recordings/articulation_legato.wav',
+    'Staccato':   'recordings/articulation_staccato.wav',
+    'Marcato':    'recordings/articulation_marcato.wav',
+    'Sforzando':  'recordings/articulation_sforzando.wav',
+})
+```
+
+Articulation transient state machine:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Rest
+    Rest --> Attack: Tongue release + air pressure
+    Attack --> SteadyState: Embouchure stabilizes (10–150 ms)
+    SteadyState --> Release: Tongue interrupt or air cut
+    Release --> Rest: Silence gap
+    Release --> Attack: Next note (legato overlap)
+
+    note right of Attack
+        Staccato: 5–20 ms
+        Marcato: 30–50 ms
+        Legato: 80–150 ms
+        Sforzando: 5–15 ms then dynamic drop
+    end note
+
+    note right of SteadyState
+        Harmonics lock in
+        Pitch stabilizes
+        HNR peaks
+    end note
+```
+
+**Expected benchmarks:**
+
+| Articulation | Typical Attack Time | HNR at Steady State | Character |
+|-------------|--------------------|--------------------|-----------|
+| Legato | 80–150 ms | >25 dB | Smooth onset, continuous air |
+| Staccato | 5–20 ms | 15–25 dB | Crisp, dry, 50% note length |
+| Marcato | 30–50 ms | 20–28 dB | Weighted, full value |
+| Sforzando | 5–15 ms | 10–20 dB | Explosive onset, rapid decay |
+
+---
+
+#### Lab C2 — Breath Support and Dynamic Range Profile
+
+**Objective:** Confirm diaphragmatic vs. shallow breathing produces measurable differences in pitch stability and dynamic sustainability.
+
+**Procedure:**
+
+Perform a crescendo-decrescendo on a sustained Bb4 (8 seconds crescendo from pp to ff, 8 seconds decrescendo back to pp). Record three trials:
+1. Deliberate clavicular (shallow) breathing.
+2. Normal intercostal breathing.
+3. Full diaphragmatic support.
+
+```python
+import numpy as np
+import scipy.signal as sig
+import soundfile as sf
+import matplotlib.pyplot as plt
+
+
+def breath_support_analysis(filepaths: dict):
+    """
+    Compute time-varying SPL and pitch stability for three breathing approaches.
+    filepaths: dict mapping label to .wav path.
+    """
+    window_ms   = 100   # 100 ms RMS window
+    hop_ms      = 50    # 50 ms hop
+    p_ref       = 20e-6 # Pa reference
+
+    fig, axes = plt.subplots(2, 1, figsize=(13, 8), sharex=True)
+    colors = ['#c0392b', '#f39c12', '#27ae60']
+    
+    for (label, fpath), color in zip(filepaths.items(), colors):
+        audio, fs = sf.read(fpath)
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+        
+        win_samp = int(window_ms / 1000 * fs)
+        hop_samp = int(hop_ms    / 1000 * fs)
+        
+        # Time-varying SPL
+        n_frames = (len(audio) - win_samp) // hop_samp
+        spl_arr  = np.zeros(n_frames)
+        t_arr    = np.zeros(n_frames)
+        
+        for i in range(n_frames):
+            s = i * hop_samp
+            frame = audio[s : s + win_samp]
+            rms = np.sqrt(np.mean(frame**2))
+            spl_arr[i] = 20.0 * np.log10(rms / p_ref) if rms > 1e-12 else 0.0
+            t_arr[i] = s / fs
+        
+        # Pitch tracking via librosa pyin (requires librosa ≥ 0.9)
+        import librosa
+        f0, voiced_flag, voiced_probs = librosa.pyin(
+            audio,
+            fmin=librosa.note_to_hz('C3'),
+            fmax=librosa.note_to_hz('C6'),
+            sr=fs,
+            hop_length=512
+        )
+        t_f0 = librosa.frames_to_time(np.arange(len(f0)), sr=fs, hop_length=512)
+        
+        # Pitch stability metric: rolling std of f0 in cents over 500 ms
+        f0_cents = 1200.0 * np.log2(f0 / 466.16)   # Reference: Bb4 concert = 466.16 Hz
+        # Suppress unvoiced frames
+        f0_cents[~voiced_flag] = np.nan
+        
+        axes[0].plot(t_arr, spl_arr, color=color, linewidth=1.8,
+                     label=label, alpha=0.9)
+        axes[1].plot(t_f0, f0_cents, color=color, linewidth=1.4,
+                     label=label, alpha=0.85)
+    
+    axes[0].set_ylabel('SPL (dB)', fontsize=11)
+    axes[0].set_title('Dynamic Profile: Breath Support Comparison', fontsize=12)
+    axes[0].legend(fontsize=10)
+    axes[0].grid(alpha=0.35)
+    axes[0].set_ylim(50, 115)
+    
+    axes[1].set_ylabel('Pitch Deviation from Bb4 (cents)', fontsize=11)
+    axes[1].set_xlabel('Time (s)', fontsize=11)
+    axes[1].axhline(0, color='gray', linewidth=0.8, linestyle='--')
+    axes[1].axhline(+10, color='orange', linewidth=0.6, linestyle=':')
+    axes[1].axhline(-10, color='orange', linewidth=0.6, linestyle=':')
+    axes[1].set_ylim(-40, 40)
+    axes[1].legend(fontsize=10)
+    axes[1].grid(alpha=0.35)
+    
+    plt.tight_layout()
+    plt.savefig('breath_support_comparison.png', dpi=150)
+    plt.show()
+
+
+breath_support_analysis({
+    'Clavicular (shallow)': 'recordings/breath_clavicular.wav',
+    'Intercostal':          'recordings/breath_intercostal.wav',
+    'Diaphragmatic':        'recordings/breath_diaphragmatic.wav',
+})
+```
+
+**Expected findings:**
+- Diaphragmatic breathing: pitch stays within ±5 cents throughout the full 16-second crescendo-decrescendo. Dynamic range 60–105 dB achievable.
+- Clavicular breathing: pitch sags 10–25 cents flat during the decrescendo as abdominal support drops. Maximum sustainable forte drops by 5–8 dB. SPL curve shows an irregular drop before the end of the decrescendo.
+- Intercostal breathing: intermediate performance, pitch ±8–12 cents.
+
+---
+
+### 5.5 Fault Diagnosis — Practical Troubleshooting
+
+```mermaid
+flowchart TD
+    subgraph sub_symptoms ["Symptom Identification"]
+        SYM1["Pitch sharp on specific fingering combination"]
+        SYM2["Tone airy/fuzzy, no center"]
+        SYM3["Sluggish valve response / note pops late"]
+        SYM4["Pitch sags during long notes or forte passages"]
+        SYM5["Cracking between register changes"]
+        SYM6["Embouchure fatigue after 15 minutes"]
+    end
+    subgraph sub_causes ["Root Causes"]
+        C1["Multi-valve tubing cumulative length error"]
+        C2["Insufficient lip seal / wide aperture / weak air"]
+        C3["Weak valve springs / worn guides / dirty valves"]
+        C4["Insufficient diaphragmatic breath support"]
+        C5["Embouchure not adjusting aperture between partials"]
+        C6["Excessive mouthpiece pressure compensating for weak embouchure"]
+    end
+    subgraph sub_fixes ["Actionable Fixes"]
+        F1["Pull 3rd valve slide with ring finger; use alternate fingerings"]
+        F2["Mouthpiece buzzing drill (5 min/day), breath support check"]
+        F3["Clean valves with valve oil; replace springs; check alignment"]
+        F4["Breathing exercises (Section 1.2); diaphragmatic drill"]
+        F5["Lip slur drills Section 2.3; isolate the interval that cracks"]
+        F6["Mouthpiece pressure check (hold mouthpiece with 2 fingers only)"]
+    end
+
+    SYM1 --> C1 --> F1
+    SYM2 --> C2 --> F2
+    SYM3 --> C3 --> F3
+    SYM4 --> C4 --> F4
+    SYM5 --> C5 --> F5
+    SYM6 --> C6 --> F6
+
+    style sub_symptoms fill:#fce4ec
+    style sub_causes fill:#fff3e0
+    style sub_fixes fill:#e8f5e9
+```
+
+**Quick reference checklist:**
+
+**Intonation problems:**
+1. Check tuner calibration: A = 440 Hz exactly.
+2. Play open note (no valves). If this is out of tune, adjust main tuning slide.
+3. Play each single-valve combination. If sharp by >10 cents, the individual valve slide may need adjustment.
+4. Play multi-valve combinations. If sharp by >15 cents: pull 3rd slide (1+3, 1+2+3), pull 1st slide (1+2).
+5. Check room temperature: every +10°C warms the instrument and raises pitch ~8.5 cents. Cold instrument = flat; warmed instrument = in tune.
+
+**Tone quality degradation:**
+1. Inspect mouthpiece rim: even a small dent or burr changes embouchure contact and ruins tone.
+2. Check valve oil: dry valves cause sluggish response and sometimes leaks that add noise.
+3. Check bore for obstructions: remove all slides, run a brass instrument snake brush through each section.
+4. Test embouchure without instrument (buzzing section) — if buzzing tone is centered and clear but instrument tone is not, the problem is in the instrument. If buzzing tone is also poor, the problem is embouchure.
+
+**Response latency:**
+1. Remove valve and re-oil. Reinsert aligned to rotation stop.
+2. Test valve spring tension: each valve should return in <15 ms after full depression. Sluggish return = replace spring.
+3. Confirm valve guide alignment: worn guides cause the piston to rock slightly, creating a brief seal failure.
+
+---
+
+### 5.6 Data Logging Template (Python)
+
+Use this for structured session records across all Lab exercises:
+
+```python
+import json
+from datetime import datetime
+from pathlib import Path
+
+
+def create_session_log(
+    instrument: str,
+    player_id: str,
+    room_temp_c: float,
+    humidity_pct: float,
+    mic_sensitivity_v_per_pa: float = None,
+    pressure_transducer_v_per_kpa: float = None,
+) -> dict:
+    """
+    Initialize a brass acoustics lab session log.
+    Returns a dict ready for measurements to be appended.
+    """
+    return {
+        'session_metadata': {
+            'date':            datetime.now().isoformat(),
+            'instrument':      instrument,
+            'player_id':       player_id,
+            'room_temp_c':     room_temp_c,
+            'humidity_pct':    humidity_pct,
+            'a440_reference':  440.0,
+        },
+        'calibration': {
+            'mic_sensitivity_v_per_pa':        mic_sensitivity_v_per_pa,
+            'pressure_transducer_v_per_kpa':   pressure_transducer_v_per_kpa,
+            'notes': 'Set mic_sensitivity from calibration sheet; '
+                     'None = uncalibrated (relative measurements only)',
+        },
+        'measurements': [],
+    }
+
+
+def log_measurement(
+    session: dict,
+    exercise: str,
+    trial: int,
+    fingering: str,
+    target_pitch: str,
+    measured_f0_hz: float,
+    spl_db: float,
+    centroid_hz: float,
+    hnr_db: float,
+    mouth_pressure_kpa: float = None,
+    audio_file: str = '',
+    notes: str = '',
+) -> None:
+    """Append a single measurement entry to the session log."""
+    # Compute ET target frequency from note name
+    note_to_midi = {
+        'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
+        'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
+        'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11,
+    }
+    # Simple parse: last character is octave number, rest is note name
+    octave     = int(target_pitch[-1])
+    note_name  = target_pitch[:-1]
+    midi_note  = note_to_midi.get(note_name, 69) + (octave + 1) * 12
+    target_hz  = 440.0 * 2.0**((midi_note - 69) / 12.0)
+    
+    import numpy as np
+    deviation_cents = (1200.0 * np.log2(measured_f0_hz / target_hz)
+                       if measured_f0_hz > 0 else float('nan'))
+    
+    session['measurements'].append({
+        'exercise':           exercise,
+        'trial':              trial,
+        'fingering':          fingering,
+        'target_pitch':       target_pitch,
+        'target_hz':          round(target_hz, 3),
+        'measured_f0_hz':     round(measured_f0_hz, 3),
+        'deviation_cents':    round(deviation_cents, 2),
+        'spl_db':             round(spl_db, 2),
+        'spectral_centroid_hz': round(centroid_hz, 1),
+        'hnr_db':             round(hnr_db, 2),
+        'mouth_pressure_kpa': mouth_pressure_kpa,
+        'audio_file':         audio_file,
+        'notes':              notes,
+    })
+
+
+def save_session(session: dict, output_dir: str = '.') -> str:
+    """Save session log as JSON. Returns the saved file path."""
+    out_dir  = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    date_str = datetime.now().strftime('%Y%m%d_%H%M')
+    fname    = out_dir / f'brass_lab_{date_str}.json'
+    with open(fname, 'w') as f:
+        json.dump(session, f, indent=2)
+    print(f"Session saved: {fname}")
+    return str(fname)
+
+
+# --- Usage example ---
+session = create_session_log(
+    instrument  = 'Yamaha YTR-8335RS Bb Trumpet',
+    player_id   = 'P001',
+    room_temp_c = 22.0,
+    humidity_pct = 48.0,
+    mic_sensitivity_v_per_pa = 0.050,
+)
+
+# After measuring a note (using analyze_note() from Lab A1):
+# result = analyze_note('recordings/open.wav')
+# log_measurement(session,
+#     exercise='Lab_B1', trial=1, fingering='Open',
+#     target_pitch='C5',
+#     measured_f0_hz=result['f0_hz'],
+#     spl_db=result['spl_db'],
+#     centroid_hz=result['centroid_hz'],
+#     hnr_db=result['hnr_db'],
+#     audio_file='recordings/open.wav',
+#     notes='Standard warm-up temperature'
+# )
+
+save_session(session, output_dir='./lab_data')
+```
+
+---
+
+## Quick Reference — Brass Performance Summary
+
+### Acoustic Constants
+
+| Parameter | Value | Context |
+|-----------|-------|---------|
+| Speed of sound at 20°C | 343 m/s | Increases ~0.6 m/s per °C |
+| Temperature pitch shift | +0.85 cents / °C | Cold instrument = flat |
+| Semitone frequency ratio | 1.05946 | 2^(1/12) |
+| 1 cent in frequency | 0.058% | 2^(1/1200) − 1 |
+| Professional intonation tolerance | ±5 cents | Live orchestral standard |
+| Mouthpiece pressure range | 2–8 kPa above atmosphere | pp to ff dynamics |
+| Typical brass SPL range | 60–110 dB @ 1 m | pp to fff |
+| Harmonic-to-noise ratio (clean tone) | > 20 dB | Below 10 dB = airy/noisy |
+
+### Practice Priority Ladder
+
+```
+Every day (non-negotiable):
+  → Mouthpiece buzzing (5 min)
+  → Long tones with tuner (5 min)
+  → Lip slurs on 3–4 fingerings (5 min)
+
+Three times per week:
+  → Articulation drills: single tongue speed, accent patterns
+  → Scale/arpeggio work: all 12 keys, legato and tongued
+  → Excerpts or repertoire: target specific technical passages
+
+Weekly (or when problems appear):
+  → Intonation survey: check all valve combinations with tuner
+  → Register extension: systematic one-note-at-a-time approach
+  → Double/triple tongue isolation: K-tongue alone, then T-K pairs
+```
+
+### Troubleshooting at a Glance
+
+| Problem | First thing to check | Second thing to check |
+|---------|---------------------|----------------------|
+| Sharp multi-valve notes | Pull 3rd slide | Alternate fingering |
+| Airy/unfocused tone | Mouthpiece buzzing quality | Air support (belly engagement) |
+| High-note cracking | Lip slur drills below the crack | Aperture — are you pressing instead? |
+| Sluggish valve | Oil and clean valve | Spring tension |
+| Pitch sags on long notes | Diaphragmatic support | Main tuning slide position |
+| Embouchure fatigue < 20 min | Mouthpiece pressure check | Reduce daily volume, increase rest |
+| Attack inconsistency | Tongue syllable ("Tu" vs "Ti") | Tongue position (dental vs alveolar) |
