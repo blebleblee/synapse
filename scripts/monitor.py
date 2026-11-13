@@ -8,6 +8,7 @@ Usage:
 """
 
 import sys
+import re
 import time
 import subprocess
 from pathlib import Path
@@ -34,32 +35,18 @@ def get_current_diff_stat():
     )
     return res.stdout.strip()
 
-def get_active_topic():
-    procs = get_process_status()
-    if not procs:
-        return "All 45 topics successfully enhanced & published to Gitea!"
-    res = subprocess.run(
-        ["git", "status", "-s", "topics/"],
-        capture_output=True, text=True, cwd=str(WORKSPACE_ROOT)
-    )
-    for line in res.stdout.splitlines():
-        parts = line.strip().split()
-        if len(parts) >= 2:
-            p = Path(parts[1])
-            if len(p.parts) >= 4:
-                return f"{p.parts[1]}/{p.parts[2]}/{p.parts[3]}"
-    return "Finalizing topic synchronization..."
-
-def count_enhanced_topics():
-    procs = get_process_status()
-    if not procs:
-        return 45
-    res = subprocess.run(
-        ["git", "log", "--grep=^enhance(", "--oneline"],
-        capture_output=True, text=True, cwd=str(WORKSPACE_ROOT)
-    )
-    count = len([l for l in res.stdout.splitlines() if l.strip()])
-    return min(45, count + 8) if count >= 30 else count
+def get_batch_progress():
+    if not LOG_FILE.exists():
+        return 0, 0, "Initializing pipeline..."
+    try:
+        content = LOG_FILE.read_text(encoding="utf-8", errors="replace")
+        matches = re.findall(r"\[\*\] \[(\d+)/(\d+)\] (?:Enhancing|Generating): (.+)", content)
+        if matches:
+            curr, total, topic = matches[-1]
+            return int(curr), int(total), topic.strip(" .")
+    except Exception:
+        pass
+    return 0, 0, "Scanning queue..."
 
 def get_latest_log_lines(n=8):
     if not LOG_FILE.exists():
@@ -72,23 +59,25 @@ def get_latest_log_lines(n=8):
 
 def render():
     procs = get_process_status()
-    enhanced_count = count_enhanced_topics()
-    target_count = 45
-    active_topic = get_active_topic()
+    curr, total, topic_from_log = get_batch_progress()
+    target_count = total if total > 0 else 45
+    enhanced_count = curr if total > 0 else 0
+
+    active_topic = topic_from_log if procs else "Pipeline complete & pushed to Gitea!"
     diff_stat = get_current_diff_stat()
     commits = get_recent_commits()
     log_tail = get_latest_log_lines(8)
 
     output = []
     output.append("=" * 70)
-    output.append(" 🧠 SYNAPSE CURRICULUM ENHANCEMENT MONITOR (LIVE DETAIL)")
+    output.append(" 🧠 SYNAPSE CURRICULUM PIPELINE MONITOR (LIVE DETAIL)")
     output.append("=" * 70)
 
     if procs:
         pid = procs[0].split()[0]
         output.append(f" Engine Status:  🟢 ACTIVE (PID: {pid}) - 3 Parallel Claude Opus Workers")
     else:
-        output.append(" Engine Status:  ⚪ IDLE / RESTARTING")
+        output.append(" Engine Status:  🏁 COMPLETE / IDLE")
 
     pct = min(100.0, (enhanced_count / target_count) * 100) if target_count > 0 else 0
     bar_len = 25
