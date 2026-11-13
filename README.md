@@ -3,6 +3,9 @@
   <h1>Synapse</h1>
   <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
+  <a href="CHANGELOG.md">
+    <img src="https://img.shields.io/badge/version-1.0.0-emerald?style=flat" alt="Version 1.0.0">
+  </a>
   <a href="https://gitea.2464.cz/ai/synapse">
     <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status">
   </a>
