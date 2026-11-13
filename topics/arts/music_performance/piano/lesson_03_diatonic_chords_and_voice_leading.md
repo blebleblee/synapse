@@ -1,395 +1,490 @@
-# Lesson 1: Introduction to Diatonic Chords
+# Lesson 1: Diatonic Chords at the Piano — From Keyboard Geometry to Musical Fluency
 
-## 1. First-Principles Intuition & Invariants
+## 1. First-Principles Intuition (The 15%)
 
-Diatonic chords constitute the harmonic foundation of Western tonal music. Built from the seven pitches of a diatonic scale, these structures govern harmonic progression from Renaissance polyphony through jazz and contemporary popular music. Understanding their construction requires engagement with the physics of sound, the psychoacoustics of consonance, and the mathematical regularities that underlie equal temperament.
+Diatonic chords are the seven chords that live entirely within a single key — no borrowed notes, no accidentals. Every chord in a major or natural minor key is built by stacking every-other scale degree: root, skip one, third, skip one, fifth. That stacking interval is a third, and the specific size of each third (major = 4 semitones, minor = 3 semitones) determines whether the resulting triad sounds bright (major), dark (minor), or tense (diminished).
 
-### The Physical Basis: Equal Temperament and the Semitone
+The reason thirds stack into consonant chords connects directly to the overtone series. When you play a low C on the piano, the string vibrates at 261 Hz but also produces ghost tones at 522 Hz (octave), 783 Hz (fifth above that), 1044 Hz (two octaves), 1305 Hz (major third above two octaves), and so on. The major triad C–E–G mirrors this natural harmonic alignment almost exactly — the fifth and third are acoustically "baked in" to the fundamental. That is why major chords feel stable and complete with no acoustic justification needed. Minor chords slightly distort this alignment (the minor third sits slightly lower), which gives them their characteristic introspective quality. Diminished chords stack two minor thirds and produce a tritone (augmented fourth / diminished fifth) spanning exactly half the octave — maximally ambiguous, maximally tense, demanding resolution.
 
-Modern keyboard instruments employ equal temperament, a tuning system that divides the octave into twelve logarithmically equal intervals. The frequency ratio between adjacent semitones is $2^{1/12} \approx 1.05946$. For any pitch with fundamental frequency $f_0$, the frequency $n$ semitones above is:
+That is all the physics you need. Everything else in this lesson is hands-on.
 
-$$f_n = f_0 \cdot 2^{n/12}$$
+---
 
-This tuning system sacrifices the pure integer ratios of just intonation (where a perfect fifth has ratio 3:2 and a major third 5:4) in favor of uniform transposability. In equal temperament, a perfect fifth spans seven semitones with ratio $2^{7/12} \approx 1.4983$, differing from 3:2 by approximately 2 cents. A major third spans four semitones with ratio $2^{4/12} \approx 1.2599$, differing from 5:4 by approximately 14 cents. These compromises are perceptually tolerable and enable modulation to any key without retuning.
+## 2. Keyboard Geometry: Where Diatonic Chords Live
 
-The diatonic scale itself predates equal temperament by millennia. In C major, the pattern of whole steps (W) and half steps (H) is: W-W-H-W-W-W-H, yielding the pitches C, D, E, F, G, A, B. This pattern derives from the Pythagorean construction of stacked perfect fifths, subsequently adjusted to fit within an octave. The intervallic structure creates seven unique scale degrees, each serving a distinct harmonic function.
+Before touching a chord, you need to see the keyboard as a visual map. Here is the fundamental truth about white-key triads in C major: **three shapes cover all seven chords.**
 
-### Consonance, Dissonance, and the Overtone Series
+### The Three White-Key Triad Shapes
 
-The perceptual quality of musical intervals derives from the overtone series. When a string or air column vibrates, it produces not only a fundamental frequency $f$ but also overtones at integer multiples: $2f, 3f, 4f, 5f, \ldots$. These partials blend to form a single perceived pitch, but their presence profoundly affects how we hear intervals.
+Look at any three consecutive white keys that form a triad. The black-key gaps between them create a visual fingerprint:
 
-Consonant intervals align their overtone series with minimal beating. The octave (2:1) is maximally consonant because every overtone of the upper pitch coincides with an overtone of the lower. The perfect fifth (approximately 3:2) places the second overtone of the upper pitch near the third of the lower. The major third (approximately 5:4) aligns the fourth and fifth overtones. Dissonant intervals, such as the minor second (16:15) or tritone (approximately $2^{1/2}:1$), create complex beating patterns that the auditory system interprets as tension requiring resolution.
+```
+Shape A (Major: C, F, G)    — gap on LEFT and MIDDLE
+  [C] [_] [E] [F] [G]
+   ●       ●       ●
+   Root   3rd    5th
+   Black key between 1-2, black key between 2-3
 
-This acoustic reality shapes chord construction. Triads—three-note chords built from stacked thirds—exploit the consonance of fifths and thirds while introducing sufficient variety to support functional harmony.
+Shape B (Minor: D, E, A)    — gap on MIDDLE and RIGHT  
+   but visually: Root and 3rd are closer, 3rd and 5th wider
 
-### Diatonic Triads: Construction and Quality
-
-Diatonic triads are constructed by selecting alternate scale degrees: root (1), third (3), and fifth (5) above the root. The quality of each triad—major, minor, or diminished—depends on the intervallic content of the scale.
-
-In C major, stacking thirds on each scale degree yields:
-
-| Degree | Chord | Pitches | Quality | Interval Structure |
-|--------|-------|---------|---------|-------------------|
-| I | C | C–E–G | Major | M3 + m3 |
-| ii | Dm | D–F–A | Minor | m3 + M3 |
-| iii | Em | E–G–B | Minor | m3 + M3 |
-| IV | F | F–A–C | Major | M3 + m3 |
-| V | G | G–B–D | Major | M3 + m3 |
-| vi | Am | A–C–E | Minor | m3 + M3 |
-| vii° | Bdim | B–D–F | Diminished | m3 + m3 |
-
-Major triads contain a major third (4 semitones) below a minor third (3 semitones), spanning a perfect fifth (7 semitones) overall. Minor triads invert this: minor third below major third, also spanning a perfect fifth. The diminished triad contains two minor thirds, spanning a diminished fifth (6 semitones), also called a tritone. This interval is highly dissonant and demands resolution.
-
-In A natural minor, the diatonic triads are:
-
-| Degree | Chord | Pitches | Quality | Interval Structure |
-|--------|-------|---------|---------|-------------------|
-| i | Am | A–C–E | Minor | m3 + M3 |
-| ii° | Bdim | B–D–F | Diminished | m3 + m3 |
-| III | C | C–E–G | Major | M3 + m3 |
-| iv | Dm | D–F–A | Minor | m3 + M3 |
-| v | Em | E–G–B | Minor | m3 + M3 |
-| VI | F | F–A–C | Major | M3 + m3 |
-| VII | G | G–B–D | Major | M3 + m3 |
-
-The harmonic minor scale, which raises the seventh degree, alters the v chord to V (E major), introducing a leading tone that strengthens cadential motion. This modification also creates an augmented second between the sixth and seventh degrees (F to G♯), a characteristic interval of harmonic minor.
-
-### Voice Leading and Harmonic Motion
-
-Voice leading governs the horizontal motion of individual voices through a chord progression. Classical voice leading prioritizes smooth motion and the independent coherence of each voice. Three fundamental principles:
-
-**Common-tone retention:** When two chords share a pitch, that pitch should remain in the same voice. In the progression C → F (I → IV), the pitch C appears in both chords and should be sustained.
-
-**Stepwise motion:** Voices should move by step (whole or half step) whenever possible. In C → G (I → V), the voice on E moves to D (down a whole step), while G can be retained as a common tone.
-
-**Avoiding parallel perfect intervals:** Consecutive perfect fifths or octaves between the same pair of voices create a perceptual merging that undermines independence. The prohibition derives from Renaissance counterpoint and reflects the acoustic reality that parallel perfect intervals collapse the textural stratification essential to polyphonic music.
-
-**Resolution of dissonance:** The tritone in the dominant seventh chord (G7: G–B–D–F in C major) contains B (the leading tone) and F (the fourth scale degree). Voice-leading convention dictates that B resolves upward to C and F downward to E, forming the tonic triad C major. This resolution is both acoustically motivated (the tendency of dissonance to seek consonance) and culturally codified through centuries of practice.
-
-The circle of fifths governs large-scale harmonic motion. Moving through the progression I → IV → vii° → iii → vi → ii → V → I traces a path where each chord root descends by perfect fifth (or ascends by perfect fourth). This motion exploits the strong acoustic relationship of the perfect fifth and creates a sense of directed harmonic flow culminating in the tonic.
-
-## 2. Core Architecture & Mechanics
-
-### Scale Degree Systems and Interval Calculus
-
-A robust model for diatonic harmony treats scale degrees as elements of a modular arithmetic system. In a major scale, the intervallic pattern from the tonic is: 0, 2, 4, 5, 7, 9, 11 semitones. To construct a triad on scale degree $n$, we select scale degrees $n$, $n+2$, and $n+4$ (modulo 7), then map these to semitone offsets.
-
-For C major (pitches C, D, E, F, G, A, B corresponding to MIDI note numbers 60, 62, 64, 65, 67, 69, 71):
-
-```python
-import numpy as np
-
-# Define the major scale as semitone offsets from the tonic
-MAJOR_SCALE = np.array([0, 2, 4, 5, 7, 9, 11])
-
-def build_diatonic_triad(tonic_midi, scale_degree):
-    """
-    Construct a diatonic triad in root position.
-    
-    Parameters:
-    - tonic_midi: MIDI note number of the tonic (e.g., 60 for C4)
-    - scale_degree: 0-indexed scale degree (0 = tonic, 1 = supertonic, etc.)
-    
-    Returns:
-    - Array of three MIDI note numbers representing the triad
-    """
-    if not (0 <= scale_degree < 7):
-        raise ValueError("Scale degree must be in range [0, 6]")
-    
-    # Select scale degrees for root, third, fifth
-    degrees = np.array([scale_degree, (scale_degree + 2) % 7, (scale_degree + 4) % 7])
-    
-    # Map to semitone offsets
-    offsets = MAJOR_SCALE[degrees]
-    
-    # Adjust octave if necessary (wrap-around in modular arithmetic)
-    if degrees[1] < scale_degree:
-        offsets[1] += 12
-    if degrees[2] < scale_degree:
-        offsets[2] += 12
-    
-    # Construct MIDI note numbers
-    return tonic_midi + offsets
-
-# Example: Build all diatonic triads in C major
-tonic = 60  # C4
-for degree in range(7):
-    triad = build_diatonic_triad(tonic, degree)
-    print(f"Scale degree {degree}: MIDI notes {triad}")
+Shape C (Diminished: B)     — both gaps are smaller (all white, tight)
 ```
 
-Output:
+Stop trying to memorize shapes abstractly. Instead, use this physical anchor:
+
+**C major:** thumb on C (white, left edge of two-black group), middle finger on E (white, right of two-black group), pinky on G (white, left of three-black group). Your hand makes a natural arc.
+
+**D minor:** index on D (white, between two-black group), middle on F (white, left of three-black group), pinky on A (white, between three-black group). Slightly more stretch.
+
+**E minor:** thumb on E, middle on G, pinky on B. Almost identical stretch to D minor, shifted right.
+
+**F major:** thumb on F, middle on A, pinky on C (next octave). Wide span — 8 white keys, but only 7 semitone positions. This one feels like C major mirrored.
+
+**G major:** thumb on G, middle on B, ring on D (next octave). The B–D gap is tight because there is no black key between B and C.
+
+**A minor:** thumb on A, middle on C, pinky on E. Identical shape to C major, just starting from A.
+
+**B diminished:** thumb on B, middle on D, pinky on F. The tightest-feeling chord — both intervals are minor thirds.
+
+### Full Diatonic Chord Map — C Major
+
+| Roman | Chord | Pitches | Quality | RH Fingering (root pos.) |
+|-------|-------|---------|---------|--------------------------|
+| I | C | C E G | Major | 1 – 3 – 5 |
+| ii | Dm | D F A | Minor | 1 – 3 – 5 |
+| iii | Em | E G B | Minor | 1 – 3 – 5 |
+| IV | F | F A C | Major | 1 – 3 – 5 |
+| V | G | G B D | Major | 1 – 2 – 5 |
+| vi | Am | A C E | Minor | 1 – 3 – 5 |
+| vii° | B° | B D F | Diminished | 1 – 3 – 5 |
+
+> **Note on V chord (G major):** Finger 2 on B instead of 3 because B–D is a tight minor third with no black key — using 2–5 gives your hand more natural arch over the gap.
+
+### Full Diatonic Chord Map — A Natural Minor
+
+| Roman | Chord | Pitches | Quality | RH Fingering |
+|-------|-------|---------|---------|--------------|
+| i | Am | A C E | Minor | 1 – 3 – 5 |
+| ii° | B° | B D F | Diminished | 1 – 3 – 5 |
+| III | C | C E G | Major | 1 – 3 – 5 |
+| iv | Dm | D F A | Minor | 1 – 3 – 5 |
+| v | Em | E G B | Minor | 1 – 3 – 5 |
+| VI | F | F A C | Major | 1 – 3 – 5 |
+| VII | G | G B D | Major | 1 – 2 – 5 |
+
+> **Harmonic minor raises the 7th:** In A harmonic minor, the v chord becomes V (E **major**: E–G♯–B). This introduces a leading tone (G♯) that pulls strongly toward the tonic A. Use fingering 1–3–5 on E–G♯–B.
+
+---
+
+## 3. Hand Posture and Ergonomics at the Piano
+
+This is non-negotiable before you play a single chord. Poor posture causes tendinitis and blocks technique.
+
+**Bench height:** Sit so your forearms are roughly parallel to the floor, elbows slightly below the keyboard level. Too high creates downward-angling wrists; too low causes upward-angling wrists. Both create tension.
+
+**Wrist position:** Float the wrist — never let it collapse below the keyboard surface or stiffen above it. The wrist should be a suspension bridge, not a roadblock. Imagine holding a small water balloon in each hand: curved fingers, relaxed palm, no gripping.
+
+**Finger curve:** Strike keys with the fleshy pad of the fingertip, not the flat of the finger. Each finger should curve like a small arch. This transfers the weight of your forearm down through the finger into the key — that forearm-weight mechanism is the source of a full, singing tone.
+
+**Thumb placement (finger 1):** The thumb plays on its side-tip, not its flat face. When playing a chord, the thumb should be slightly under the hand, not sticking out horizontally.
+
+**Forearm weight transfer:** To play chords with resonance, lean your forearm weight toward the keys as you depress them, then release the weight as the keys come back up. This is fundamentally different from pushing or hammering — you are dropping, not attacking.
+
+**Wrist "cushion" on release:** After each chord attack, let the wrist bounce slightly upward on the release. This prevents forearm tension from accumulating across a practice session.
+
+---
+
+## 4. Chord Inversions: Same Notes, Different Bass
+
+A triad has three positions: root position (root on bottom), first inversion (third on bottom), second inversion (fifth on bottom).
+
+### C Major Through All Inversions
+
 ```
-Scale degree 0: MIDI notes [60 64 67]  # C E G
-Scale degree 1: MIDI notes [62 65 69]  # D F A
-Scale degree 2: MIDI notes [64 67 71]  # E G B
-Scale degree 3: MIDI notes [65 69 72]  # F A C
-Scale degree 4: MIDI notes [67 71 74]  # G B D
-Scale degree 5: MIDI notes [69 72 76]  # A C E
-Scale degree 6: MIDI notes [71 74 77]  # B D F
-```
+Root Position    1st Inversion    2nd Inversion
+   G (5)            C (8va)          E (8va)
+   E (3)            G (5)            C (5)
+   C (R)            E (3)            G (R)
 
-This algorithmic construction generalizes to any mode by substituting the appropriate semitone pattern. For natural minor (Aeolian mode), the pattern is [0, 2, 3, 5, 7, 8, 10].
-
-### Chord Quality Detection
-
-Determining chord quality requires analyzing the intervals between root, third, and fifth:
-
-```python
-def analyze_triad_quality(triad_midi):
-    """
-    Analyze the quality of a triad given as MIDI note numbers.
-    
-    Parameters:
-    - triad_midi: Array of three MIDI note numbers in root position
-    
-    Returns:
-    - String describing chord quality: 'major', 'minor', 'diminished', or 'augmented'
-    """
-    intervals = np.diff(triad_midi)
-    root_to_third = intervals[0]
-    third_to_fifth = intervals[1]
-    
-    if root_to_third == 4 and third_to_fifth == 3:
-        return 'major'
-    elif root_to_third == 3 and third_to_fifth == 4:
-        return 'minor'
-    elif root_to_third == 3 and third_to_fifth == 3:
-        return 'diminished'
-    elif root_to_third == 4 and third_to_fifth == 4:
-        return 'augmented'
-    else:
-        return 'unknown'
-
-# Analyze all diatonic triads in C major
-for degree in range(7):
-    triad = build_diatonic_triad(60, degree)
-    quality = analyze_triad_quality(triad)
-    print(f"Degree {degree}: {quality}")
-```
-
-Output:
-```
-Degree 0: major
-Degree 1: minor
-Degree 2: minor
-Degree 3: major
-Degree 4: major
-Degree 5: minor
-Degree 6: diminished
-```
-
-### Visualizing Harmonic Relationships with Mermaid
-
-The functional relationships among diatonic chords can be represented as a directed graph, where edges indicate common harmonic progressions:
-
-```mermaid
-graph LR
-    I["I (Tonic)"]
-    ii["ii (Supertonic)"]
-    iii["iii (Mediant)"]
-    IV["IV (Subdominant)"]
-    V["V (Dominant)"]
-    vi["vi (Submediant)"]
-    vii["vii° (Leading Tone)"]
-    
-    I -->|"Strong"| IV
-    I -->|"Strong"| V
-    I -->|"Weak"| vi
-    I -->|"Weak"| iii
-    
-    ii -->|"Strong"| V
-    ii -->|"Deceptive"| vi
-    
-    iii -->|"Weak"| vi
-    iii -->|"Weak"| IV
-    
-    IV -->|"Strong"| V
-    IV -->|"Plagal"| I
-    IV -->|"Weak"| ii
-    
-    V -->|"Authentic"| I
-    V -->|"Deceptive"| vi
-    
-    vi -->|"Weak"| ii
-    vi -->|"Weak"| IV
-    vi -->|"Weak"| V
-    
-    vii -->|"Strong"| I
-    vii -->|"Weak"| iii
-    
-    style I fill:#6EE7B7
-    style V fill:#38BDF8
-    style IV fill:#E9A568
+RH: 1–3–5         RH: 1–2–5        RH: 1–3–5
+LH: 5–3–1         LH: 5–3–1        LH: 5–2–1
 ```
 
-This graph encodes traditional voice-leading preferences. The strongest progressions—V → I (authentic cadence), IV → I (plagal cadence), and ii → V → I (predominant–dominant–tonic)—reflect the gravitational pull of the tonic and the tension-resolution mechanics of the dominant.
+**Why inversions matter physically:** Root position chords require jumping your hand position for every chord change. Inversions let your hand stay in one area of the keyboard and voice-lead smoothly by moving the minimum number of fingers.
 
-### The Circle of Fifths as a Harmonic Lattice
+### I – IV – V – I with Smooth Voice Leading (C Major, RH)
 
-The circle of fifths orders pitch classes by ascending perfect fifths. In equal temperament, twelve fifths return to the starting pitch class (modulo octave):
+This is the most important inversion exercise you can do. The goal is that no single finger moves more than a step or two between chords.
+
+```
+  I (root)    IV (2nd inv.)    V (1st inv.)    I (root)
+  G           C                B               G
+  E           F                G               E
+  C           C                G               C
+              (C held)         (G held)
+
+Fingers:
+  1–3–5       1–2–5            1–2–5           1–3–5
+```
+
+**What is happening:** The common tone C is held between I and IV (second inversion). Then C moves down to B and F stays as G shifts up — minimal motion. Then everything resolves home.
+
+This three-chord sequence (I – IV – V – I with these specific inversions) is the voice-leading skeleton of thousands of songs. Internalize it in every key.
+
+---
+
+## 5. Harmonic Function: Tonic, Subdominant, Dominant
+
+Every diatonic chord belongs to one of three functional families:
 
 ```mermaid
 graph TD
-    C["C"]
-    G["G"]
-    D["D"]
-    A["A"]
-    E["E"]
-    B["B"]
-    Fs["F♯/G♭"]
-    Db["D♭/C♯"]
-    Ab["A♭"]
-    Eb["E♭"]
-    Bb["B♭"]
-    F["F"]
-    
-    C --> G
-    G --> D
-    D --> A
-    A --> E
-    E --> B
-    B --> Fs
-    Fs --> Db
-    Db --> Ab
-    Ab --> Eb
-    Eb --> Bb
-    Bb --> F
-    F --> C
-    
-    style C fill:#6EE7B7
-    style G fill:#38BDF8
-    style F fill:#E9A568
+    subgraph sub_tonic ["Tonic Family (Stability)"]
+        I["I — C major"]
+        iii["iii — E minor"]
+        vi["vi — A minor"]
+    end
+
+    subgraph sub_pre ["Predominant Family (Motion away from home)"]
+        ii["ii — D minor"]
+        IV["IV — F major"]
+    end
+
+    subgraph sub_dom ["Dominant Family (Tension → Resolution)"]
+        V["V — G major"]
+        vii["vii° — B diminished"]
+    end
+
+    sub_tonic -->|"moves to"| sub_pre
+    sub_pre -->|"sets up"| sub_dom
+    sub_dom -->|"resolves to"| sub_tonic
+    sub_dom -->|"deceptive cadence"| vi
 ```
 
-Neighboring keys on the circle differ by a single accidental in their key signatures. Moving clockwise adds sharps; counterclockwise adds flats. This structure reflects the acoustic proximity of perfect fifths and governs modulation strategies in tonal music.
+**Tonic chords (I, iii, vi):** Feel like home or rest. I is the strongest tonic. vi (A minor) is a weaker tonic substitute — the same notes as C major with a different root, so it can fool the ear into hearing partial resolution. iii is rarely a goal; it functions more as a passing chord.
 
-### Seventh Chords and Extended Harmony
+**Predominant chords (ii, IV):** Pull you away from tonic and toward the dominant. IV has a warm, hymn-like quality (the "plagal" direction). ii is harmonically stronger because it sets up a full ii–V–I motion.
 
-Extending diatonic triads by adding the seventh scale degree above the root produces seventh chords. In C major:
+**Dominant chords (V, vii°):** Generate the highest tension. V contains the leading tone (B in C major) which pulls by half-step to the tonic (C). vii° is an incomplete V7 — it contains B, D, and F, three of the four notes in G7.
 
-| Degree | Chord | Pitches | Quality | Interval Structure |
-|--------|-------|---------|---------|-------------------|
-| I | Cmaj7 | C–E–G–B | Major seventh | M3 + m3 + M3 |
-| ii | Dm7 | D–F–A–C | Minor seventh | m3 + M3 + m3 |
-| iii | Em7 | E–G–B–D | Minor seventh | m3 + M3 + m3 |
-| IV | Fmaj7 | F–A–C–E | Major seventh | M3 + m3 + M3 |
-| V | G7 | G–B–D–F | Dominant seventh | M3 + m3 + m3 |
-| vi | Am7 | A–C–E–G | Minor seventh | m3 + M3 + m3 |
-| vii | Bm7♭5 | B–D–F–A | Half-diminished | m3 + m3 + M3 |
+---
 
-The dominant seventh chord (G7 in C major) contains both the tritone (B–F) and the major third (G–B), creating maximal tension that resolves compellingly to the tonic. Jazz and popular music extensively employ seventh chords, ninth chords, and further extensions (11ths, 13ths) to enrich harmonic color.
+## 6. Voice Leading Rules — The Four That Matter
 
-```python
-def build_diatonic_seventh(tonic_midi, scale_degree):
-    """
-    Construct a diatonic seventh chord in root position.
-    
-    Parameters:
-    - tonic_midi: MIDI note number of the tonic
-    - scale_degree: 0-indexed scale degree
-    
-    Returns:
-    - Array of four MIDI note numbers representing the seventh chord
-    """
-    degrees = np.array([scale_degree, (scale_degree + 2) % 7, 
-                        (scale_degree + 4) % 7, (scale_degree + 6) % 7])
-    
-    offsets = MAJOR_SCALE[degrees]
-    
-    # Adjust octave for wrapped degrees
-    for i in range(1, 4):
-        if degrees[i] < scale_degree:
-            offsets[i] += 12
-    
-    return tonic_midi + offsets
+**Rule 1 — Hold common tones.** When two adjacent chords share a note, keep that note in the same voice (same hand position). C major → F major share C. Keep C in place, move E down to F, move G up to A.
 
-# Example: V7 chord in C major (scale degree 4)
-v7_chord = build_diatonic_seventh(60, 4)
-print(f"V7 chord: MIDI notes {v7_chord}")  # Output: [67 71 74 77] → G B D F
+**Rule 2 — Move by step when possible.** Leaping by fourth or fifth is jarring. If a voice can move by half-step or whole step to reach the next chord tone, do that.
+
+**Rule 3 — No parallel perfect fifths or octaves.** Two voices that move in the same direction by the same interval (both moving up a fifth, or both moving up an octave) collapse into one audible line instead of two. This eliminates textural depth.
+
+**Rule 4 — Resolve the tritone.** In G7 (G–B–D–F), the tritone is B–F. B (the leading tone) must resolve **up** to C. F (the fourth scale degree) must resolve **down** to E. Any voicing of G7 → C must honor this, or the progression sounds evasive.
+
+---
+
+## 7. Seventh Chords on the Keyboard
+
+Add the note a seventh above the root to any triad and you get a seventh chord. In C major:
+
+| Roman | Chord | Pitches | Quality | RH Fingering |
+|-------|-------|---------|---------|--------------|
+| Imaj7 | Cmaj7 | C E G B | Major 7th | 1–2–3–5 |
+| ii7 | Dm7 | D F A C | Minor 7th | 1–2–3–5 |
+| iii7 | Em7 | E G B D | Minor 7th | 1–2–3–5 |
+| IVmaj7 | Fmaj7 | F A C E | Major 7th | 1–2–3–5 |
+| V7 | G7 | G B D F | Dominant 7th | 1–2–3–5 (or 1–2–4–5) |
+| vi7 | Am7 | A C E G | Minor 7th | 1–2–3–5 |
+| viiø7 | Bm7♭5 | B D F A | Half-dim 7th | 1–2–3–5 |
+
+**Fingering note on V7 (G7):** G–B–D–F in root position is a wide spread. Use 1–2–3–5 if your hand spans an octave easily; use 1–2–4–5 if D and F feel cramped together on 3–5.
+
+### V7 → I Resolution — Hear the Tritone Snap
+
+```
+G7 (V7)      Cmaj (I)
+   F              E       ← F resolves DOWN by half-step
+   D              C       ← D resolves DOWN by step  
+   B              C       ← B resolves UP by half-step (leading tone)
+   G              C       ← G leaps down to C (or holds if doubled)
 ```
 
-## 3. High-Performance Optimization & Failure Modes
+Play G7 in root position with the full four-note voicing, then resolve to C major. Feel B pulling up and F pulling down — that is the acoustic engine of tonal music.
 
-### Voicing and Register for Clarity and Balance
+---
 
-Chord voicing—the vertical arrangement and spacing of pitches—profoundly affects timbre, balance, and perceived consonance. Close voicing places all chord tones within a single octave, producing a dense, focused sound. Open voicing distributes tones across multiple octaves, enhancing clarity and blending.
+## 8. Harmonic Progressions Map
 
-The Helmholtz resonance region (approximately 80–200 Hz on the piano) exhibits muddy acoustics due to the buildup of lower partials. Voicing chords with roots below C3 (MIDI 48, ~131 Hz) in close position often produces indistinct, booming textures. To mitigate:
+```mermaid
+graph LR
+    subgraph sub_t ["Tonic"]
+        I["I"]
+        vi["vi"]
+        iii["iii"]
+    end
 
-- **Wide spacing in the bass:** Keep the bass note isolated, placing the next voice at least an octave above.
-- **Drop voicings:** Take the second-highest voice of a close-position chord and drop it an octave. This opens the middle register while maintaining structural integrity.
-- **Quartal voicings:** Stack fourths rather than thirds, distributing energy more evenly across the spectrum and reducing harmonic congestion.
+    subgraph sub_pd ["Predominant"]
+        IV["IV"]
+        ii["ii"]
+    end
 
-```python
-def voice_chord_drop2(triad_midi):
-    """
-    Apply drop-2 voicing to a triad, lowering the second-highest voice by an octave.
-    
-    Parameters:
-    - triad_midi: Array of MIDI note numbers in close position
-    
-    Returns:
-    - Array of MIDI note numbers in drop-2 voicing
-    """
-    voicing = triad_midi.copy()
-    voicing[1] -= 12  # Drop the middle voice (third of the chord)
-    voicing.sort()
-    return voicing
+    subgraph sub_d ["Dominant"]
+        V["V / V7"]
+        vii["vii°"]
+    end
 
-# Example: Drop-2 voicing of C major triad
-c_major = np.array([60, 64, 67])
-drop2 = voice_chord_drop2(c_major)
-print(f"Close position: {c_major}")  # [60 64 67]
-print(f"Drop-2 voicing: {drop2}")    # [52 60 67] → E3 C4 G4
+    I -->|"to Predominant"| IV
+    I -->|"to Predominant"| ii
+    I -->|"weak"| iii
+    vi -->|"to Predominant"| ii
+    vi -->|"to Predominant"| IV
+    iii -->|"to Predominant"| IV
+    IV -->|"to Dominant"| V
+    IV -->|"to Dominant"| vii
+    ii -->|"to Dominant"| V
+    ii -->|"to Dominant"| vii
+    V -->|"authentic cadence"| I
+    V -->|"deceptive"| vi
+    vii -->|"strong resolution"| I
+    vii -->|"weak"| iii
+
+    style I fill:#6EE7B7,color:#000
+    style vi fill:#A7F3D0,color:#000
+    style iii fill:#D1FAE5,color:#000
+    style IV fill:#FDE68A,color:#000
+    style ii fill:#FCD34D,color:#000
+    style V fill:#93C5FD,color:#000
+    style vii fill:#BFDBFE,color:#000
 ```
 
-### Algorithmic Voice Leading: Minimal Motion
+---
 
-Automated voice leading seeks to minimize the total distance voices travel between chords, subject to constraints (no parallel fifths/octaves, proper doubling, range limits). This is a constrained optimization problem.
+## 9. Practice Drills — Metronome Targets
 
-```python
-from itertools import permutations
+Work through these in order. Do not advance to the next drill until the current one is effortless at the target tempo.
 
-def voice_lead(chord1, chord2, max_range=24):
-    """
-    Find the voicing of chord2 that minimizes total voice motion from chord1.
-    
-    Parameters:
-    - chord1: Current chord as MIDI note numbers
-    - chord2: Target chord as MIDI note numbers (root position)
-    - max_range: Maximum range in semitones for each voice
-    
-    Returns:
-    - Optimally voiced chord2 as MIDI note numbers
-    """
-    n_voices = len(chord1)
-    best_voicing = None
-    min_distance = float('inf')
-    
-    # Generate all octave transpositions of each voice in chord2
-    candidates = []
-    for note in chord2:
-        candidates.append([note + 12*i for i in range(-2, 3)])  # ±2 octaves
-    
-    # Try all combinations
-    from itertools import product
-    for voicing in product(*candidates):
-        if len(set(voicing)) != n_voices:
-            continue  # Skip voicings with duplicates
-        
-        # Try all permutations (voice assignments)
-        for perm in permutations(voicing):
-            distance = sum(abs(perm[i] - chord1[i]) for i in range(n_voices))
-            
-            # Check range constraint
-            if all(abs(perm[i] - chord1[i]) <= max_range for i in range(n_voices)):
-                if distance < min_distance:
-                    min_distance = distance
-                    best_voicing = np.array(perm)
-    
-    return best_voicing
+### Drill 1: Block Chord Diatonic Cycle (Root Position)
 
-# Example: Voice lead from C major to G major
-c_major_voiced = np.array([48, 60, 64])  # C3 C4 E4
-g_major_root = np.array([55, 59, 62])     # G B D (root position
+Play all seven diatonic chords up the scale in root position, both hands together, then back down. Legato touch, listen for even voicing balance.
+
+```
+C major scale chords:
+RH: C/E/G — D/F/A — E/G/B — F/A/C — G/B/D — A/C/E — B/D/F — back down
+
+LH mirrors one octave lower, same fingering (5–3–1 on each chord)
+
+Tempo: ♩= 60 BPM (quarter note per chord)
+Target: ♩= 80 BPM
+```
+
+**What to listen for:** Each chord should have even volume across all three notes. The top note (5th finger) often goes softer — consciously lean into it.
+
+### Drill 2: I – IV – V – I with Inversions (Voice-Led)
+
+This is the fundamental harmonic motion. All in RH, then add LH bass notes.
+
+```
+Key of C:
+I (root)   →  IV (2nd inv.)  →  V (1st inv.)  →  I (root)
+C/E/G      →  C/F/A          →  B/G/D          →  C/E/G
+
+LH plays bass notes: C — F — G — C (roots, single notes, one octave below)
+
+Tempo: ♩= 60 BPM (one chord per beat, 4/4 time — chord on beat 1 of each bar)
+Target: ♩= 100 BPM
+Advanced: ♩= 120 BPM, arpeggiate the RH chords (1-3-5-3 pattern per bar)
+```
+
+Transpose this to G major, D major, F major, and A minor before moving on.
+
+### Drill 3: ii – V – I (The Jazz Cadence)
+
+The most important three-chord sequence in jazz and pop harmony.
+
+```
+Key of C, with 7ths:
+ii7 (Dm7)   →   V7 (G7)   →   Imaj7 (Cmaj7)
+D/F/A/C     →   G/B/D/F   →   C/E/G/B
+
+Voice-led version (keep common tones, move others by step):
+LH: D        →   G          →   C
+RH: C/F/A    →   B/F/G      →   B/E/G   (note: F resolves to E, B held, A→G)
+
+Tempo: ♩= 60 BPM
+Target: ♩= 90 BPM
+Practice in all 12 keys going around the Circle of Fifths:
+C → F → B♭ → E♭ → A♭ → D♭ → G♭ → B → E → A → D → G
+```
+
+### Drill 4: Diatonic Chord Cadences
+
+Practice the four standard cadences in C major, then in three other keys of your choice:
+
+```
+1. Authentic (Perfect): V → I
+   G major (1st inv: B/G/D) → C major (root: C/E/G)
+   Strongest possible rest.
+
+2. Half Cadence: I → V  (or ii → V)
+   C/E/G → G/B/D
+   Ends on tension — like a question mark.
+
+3. Plagal: IV → I
+   F/A/C → C/E/G
+   "Amen" cadence. Warmer, less urgent than authentic.
+
+4. Deceptive: V → vi
+   G/B/D → A/C/E
+   The ear expects I, gets vi — surprise resolution.
+   
+Tempo for each: ♩= 60 BPM, hold each chord for 2 full beats.
+```
+
+### Drill 5: Broken Chord (Alberti Bass) + Melody
+
+The Alberti bass pattern (low–high–middle–high) in the LH while the RH holds melody notes is the fundamental Classical texture.
+
+```
+Key of C, 4/4 time, one chord per bar:
+LH pattern per bar: C2 – G2 – E2 – G2  (Alberti on C major)
+RH: Hold E4 for one bar, then G4, then G4, then C4
+
+Chords: I — V — IV — I
+
+LH fingering: 5 – 2 – 1 – 2 (thumb on middle note each time)
+RH fingering: Sustain single notes, finger 3 for E, finger 5 for G, finger 1 for C
+
+Tempo: ♩= 60 BPM
+Target: ♩= 100 BPM clean
+```
+
+---
+
+## 10. Circle of Fifths as a Practice Map
+
+```mermaid
+graph TD
+    subgraph sub_sharp ["Sharp Keys (clockwise)"]
+        C["C (0♯)"] --> G2["G (1♯)"] --> D2["D (2♯)"] --> A2["A (3♯)"] --> E2["E (4♯)"] --> B2["B (5♯)"] --> Fs2["F♯ (6♯)"]
+    end
+
+    subgraph sub_flat ["Flat Keys (counterclockwise)"]
+        C2["C (0♭)"] --> F2["F (1♭)"] --> Bb["B♭ (2♭)"] --> Eb["E♭ (3♭)"] --> Ab["A♭ (4♭)"] --> Db["D♭ (5♭)"] --> Gb["G♭ (6♭)"]
+    end
+
+    subgraph sub_rel ["Relative Minors"]
+        Am["Am"] --- C
+        Em["Em"] --- G2
+        Bm["Bm"] --- D2
+        Fsm["F♯m"] --- A2
+        Csm["C♯m"] --- E2
+        Gsm["G♯m"] --- B2
+        Dsm["D♯m"] --- Fs2
+    end
+```
+
+Use the circle as your transposition schedule. After mastering Drills 1–4 in C major, move to G major (one sharp, F♯), then D major (two sharps, F♯ and C♯), and so on. Each new key deepens pattern recognition and builds fingerboard independence — you stop thinking "C E G" and start thinking "root–third–fifth" anywhere on the keyboard.
+
+**Keys to prioritize in order:**
+1. C major (no accidentals — learn all patterns here first)
+2. G major / E minor
+3. F major / D minor
+4. D major / B minor
+5. B♭ major / G minor
+6. A major / F♯ minor
+
+---
+
+## 11. Common Mistakes and How to Fix Them
+
+**Mistake: Chords are uneven — the bottom note drowns out the top.**
+Fix: Practice the chord one note at a time (block just the top voice, then just the middle, then just the bass). Then put them together, consciously listening for the melody note (top) to project above the others. Use forearm weight directed slightly toward finger 5.
+
+**Mistake: The hand tenses up between chords.**
+Fix: After each chord, consciously release weight before the next attack. Add a physical "float" of the wrist between chords — even a tiny lift. This prevents accumulated forearm tension.
+
+**Mistake: The thumb (finger 1) sticks out horizontally and bangs notes.**
+Fix: Curl the thumb so it plays on its side-tip. Practice holding a loose fist, then open only the minimum needed for the chord shape.
+
+**Mistake: Voice leading sounds jumpy — large leaps everywhere.**
+Fix: Check whether you are using root position for every chord. Switch to inversions. The I–IV–V–I inversion drill (Drill 2) is the cure.
+
+**Mistake: The V7–I resolution sounds muddy in the low register.**
+Fix: Keep V7 voicings above C3 (middle C minus an octave). In the bass register, voice chords with wider spacing: bass note alone in LH, then the upper chord tones spread across the RH an octave higher.
+
+---
+
+## 12. Applying Diatonic Chords: Real Song Structures
+
+Here are three fundamental progression templates. Learn these in C major first, then transpose.
+
+### Template A: I – V – vi – IV (The Pop Axis)
+
+Used in literally thousands of pop and rock songs.
+
+```
+C major: C — G — Am — F
+Voicing (all 1st/2nd inversions for smooth voice leading):
+  C (root):  C/E/G   fingers 1–3–5
+  G (1st):   B/G/D   fingers 1–2–5  (B on top, 1st inversion)
+  Am (root): A/C/E   fingers 1–3–5
+  F (2nd):   C/F/A   fingers 1–2–5  (C in bass, 2nd inversion)
+
+LH: Plays roots C – G – A – F, one per bar, half notes or whole notes.
+
+Metronome: ♩= 70 BPM, 4/4, one chord per bar.
+```
+
+### Template B: i – VII – VI – VII (Natural Minor Loop)
+
+The classic rock and film music minor loop.
+
+```
+A minor: Am — G — F — G
+  Am (root): A/C/E   1–3–5
+  G (root):  G/B/D   1–2–5
+  F (root):  F/A/C   1–3–5
+  G (root):  G/B/D   1–2–5
+
+LH: A – G – F – G bass notes.
+Metronome: ♩= 72 BPM.
+```
+
+### Template C: ii – V – I (Jazz Cadence, Extended)
+
+```
+Dm7 — G7 — Cmaj7
+LH:   D  —  G  —   C
+RH: F/A/C — F/B/D — E/G/B   (rootless voicings, voice-led)
+
+Note: These are "A-form" rootless voicings for jazz:
+  Dm7:   the 3rd, 5th, 7th above the LH root  → F, A, C
+  G7:    the 3rd, 7th, 9th (or 7th, 3rd, 13th) → B, F, A  (tritone in RH)
+  Cmaj7: the 3rd, 5th, 7th → E, G, B
+
+Metronome: ♩= 80 BPM swing feel (eighth notes slightly uneven: long–short).
+```
+
+---
+
+## 13. Diatonic Chord Reference — Key of C Major (Full Summary)
+
+| Roman | Name | Pitches (R.P.) | Quality | Function | Resolves To |
+|-------|------|----------------|---------|----------|-------------|
+| I | Tonic | C E G | Major | Stability | — |
+| ii | Supertonic | D F A | Minor | Predominant | V |
+| iii | Mediant | E G B | Minor | Weak Tonic | vi or IV |
+| IV | Subdominant | F A C | Major | Predominant | V or I |
+| V | Dominant | G B D | Major | Dominant tension | I or vi |
+| V7 | Dom. 7th | G B D F | Dom. 7th | Strongest tension | I |
+| vi | Submediant | A C E | Minor | Tonic substitute | ii or IV |
+| vii° | Leading tone | B D F | Diminished | Dominant substitute | I |
+| Imaj7 | Tonic 7th | C E G B | Maj7 | Color tonic | — |
+| IVmaj7 | Subdominant 7th | F A C E | Maj7 | Rich predominant | V |
+
+---
+
+## Summary
+
+You now have the complete toolkit for diatonic harmony at the piano: the visual keyboard geometry for all seven chords in major and minor keys, the correct hand posture and forearm-weight mechanics that prevent injury, all four inversions with smooth voice leading, the functional family model (tonic / predominant / dominant), the four cadence types, and five progressive drills with metronome targets.
+
+The single most important thing you can do right now: sit at the keyboard and play Drill 2 (I–IV–V–I with inversions) in C major at ♩= 60 BPM until the voice leading feels completely automatic. Then transpose it to G major. That loop is the DNA of Western harmony, and muscle memory in it will unlock every progression that follows.
