@@ -941,34 +941,58 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
-                <h4 className="panel-box-heading">Workspace Transient Data</h4>
+                <h4 className="panel-box-heading">Workspace Transient Data & Progress</h4>
                 <div className="form-group compact">
-                  <label>Session & Cache Artifacts</label>
+                  <label>Session Artifacts & Study Progress</label>
                   <span className="field-hint">
-                    Clears temporary markdown chat sessions (.workspace_sessions) and cached export bundles.
-                    Safe to run at any time; never touches curriculum courses or your private memory.
+                    Clears temporary markdown chat sessions (.workspace_sessions), cached export bundles, or resets lesson completion checkmarks.
                   </span>
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    style={{ marginTop: '8px', width: 'fit-content' }}
-                    onClick={async () => {
-                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
-                        try {
-                          const res = await fetch('/api/clean', { method: 'POST' });
-                          if (res.ok) {
-                            const data = await res.json();
-                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      onClick={async () => {
+                        if (confirm('Clear all transient chat sessions and temporary exports?')) {
+                          try {
+                            const res = await fetch('/api/clean', { method: 'POST' });
+                            if (res.ok) {
+                              const data = await res.json();
+                              alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
+                            }
+                          } catch {
+                            alert('Cleanup failed.');
                           }
-                        } catch {
-                          alert('Cleanup failed.');
                         }
-                      }
-                    }}
-                  >
-                    <Trash2 size={12} />
-                    <span>Clear Transient Artifacts</span>
-                  </button>
+                      }}
+                    >
+                      <Trash2 size={12} />
+                      <span>Clear Transient Artifacts</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      onClick={async () => {
+                        if (confirm('Reset all lesson completion checkmarks across all courses?')) {
+                          try {
+                            const res = await fetch('/api/clean', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ sessions: false, exports: false, mastery: true })
+                            });
+                            if (res.ok) {
+                              alert('Lesson completion progress reset.');
+                              window.location.reload();
+                            }
+                          } catch {
+                            alert('Reset failed.');
+                          }
+                        }
+                      }}
+                    >
+                      <RefreshCw size={12} />
+                      <span>Reset Lesson Progress</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 

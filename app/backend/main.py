@@ -844,7 +844,8 @@ def api_clean(req: Dict[str, bool] = {}):
     """
     sessions = req.get("sessions", True)
     exports = req.get("exports", True)
-    count = perform_cleanup(clean_sessions=sessions, clean_exports=exports)
+    mastery = req.get("mastery", False)
+    count = perform_cleanup(clean_sessions=sessions, clean_exports=exports, clean_mastery=mastery)
     return {"success": True, "cleaned": count}
 
 LANGUAGE_MANDATES = {

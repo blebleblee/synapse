@@ -471,7 +471,8 @@ export const TopicTree: React.FC<TopicTreeProps> = ({
                                 const unitTitle = toTitleCase(singleUnit.display_name);
 
                                 const unitCompletedLessons = isSelected && completedLessons ? completedLessons : (singleUnit.completed_lessons || []);
-                                const completedCount = unitCompletedLessons.length;
+                                const validLessonIds = new Set((singleUnit.lessons || []).map((l: any) => l.id));
+                                const completedCount = unitCompletedLessons.filter((id: string) => validLessonIds.has(id)).length;
                                 const totalLessons = singleUnit.lessons ? singleUnit.lessons.length : 0;
                                 const isAllCompleted = totalLessons > 0 && completedCount >= totalLessons;
 

@@ -2,15 +2,15 @@ import shutil
 from pathlib import Path
 from typing import Dict, Any, List
 
-def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True) -> int:
+def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True, clean_mastery: bool = False) -> int:
     """
     Cleans transient runtime artifacts (chat sessions, export bundles, temp logs)
-    without touching authored curriculum files. Returns count of cleaned items.
+    and optionally resets lesson completion records without touching authored curriculum files.
     """
     WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
     topics_dir = WORKSPACE_ROOT / "topics"
     exports_dir = WORKSPACE_ROOT / "exports"
-    
+
     cleaned_count = 0
 
     if clean_sessions:
@@ -24,7 +24,18 @@ def perform_cleanup(clean_sessions: bool = True, clean_exports: bool = True) -> 
             if p.is_file():
                 p.unlink()
                 cleaned_count += 1
-                
+
+    if clean_mastery:
+        try:
+            from .database import get_connection
+            conn = get_connection()
+            conn.execute("UPDATE mastery SET completed_lessons='[]'")
+            conn.commit()
+            conn.close()
+            cleaned_count += 1
+        except Exception:
+            pass
+
     return cleaned_count
 
 def get_unit_lessons(unit_dir: Path) -> List[Dict[str, str]]:
