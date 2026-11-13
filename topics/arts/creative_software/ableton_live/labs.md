@@ -1,242 +1,153 @@
-# Operational Verification Labs: Ableton Live
+# Operational Verification Labs: Ableton Live Suite
 
-## Objective & Toolchain Setup
+## Objective & Studio Signal Chain Setup
 
-This laboratory aims to provide hands-on experience with the operational verification of Ableton Live, a widely used digital audio workstation (DAW). The lab will guide you through the process of analyzing Ableton Live's binary, profiling its performance, and diagnosing potential issues using a variety of tools. The target audience is software engineers and systems programmers familiar with low-level programming concepts and debugging techniques.
+This laboratory provides hands-on operational mastery over Ableton Live Suite, focusing on real-time audio engine architecture, non-linear clip launching, sample-accurate warping, multi-band rack design, and multi-output routing. You will verify signal integrity across 32-bit floating-point summing buses, calibrate low-latency hardware buffers, and execute studio-grade mixing and sound design workflows.
 
-### Required Toolchains
-
-To conduct the exercises in this lab, you will need the following toolchains:
-
-- **Compiler Toolchains:**
-  - **GCC/Clang:** For compiling and analyzing C/C++ code.
-  - **LLVM:** For advanced compiler optimizations and intermediate representation (IR) analysis.
-  - **GDB/LLDB:** For debugging and disassembly.
-  - **Valgrind/ASan:** For memory leak detection and data race analysis.
-
-- **Performance Profilers:**
-  - **perf:** For hardware performance counters and cache analysis.
-  - **cachegrind:** For cache miss analysis.
-  - **gprof:** For function-level profiling.
-
-- **Additional Tools:**
-  - **objdump:** For disassembly of binary files.
-  - **readelf:** For inspecting ELF binary files.
-  - **strace:** For tracing system calls and signals.
-  - **ltrace:** For tracing library calls.
-
-## Exercise 1: AST, IR & Disassembly Analysis
-
-In this exercise, we will analyze the Abstract Syntax Tree (AST), Intermediate Representation (IR), and disassembly of a simple C program that simulates a basic audio processing function. This will help us understand how Ableton Live's code is structured and optimized.
-
-### Step 1: Write a Simple C Program
-
-Create a file named `audio_process.c` with the following content:
-
-```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#define SAMPLE_RATE 44100
-#define BUFFER_SIZE 1024
-
-void process_audio(float *input, float *output, int num_samples) {
-    for (int i = 0; i < num_samples; i++) {
-        output[i] = input[i] * sin(2 * M_PI * 440 * i / SAMPLE_RATE);
-    }
-}
-
-int main() {
-    float *input = (float *)malloc(BUFFER_SIZE * sizeof(float));
-    float *output = (float *)malloc(BUFFER_SIZE * sizeof(float));
-
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-        input[i] = 1.0; // Simple test signal
-    }
-
-    process_audio(input, output, BUFFER_SIZE);
-
-    for (int i = 0; i < 10; i++) {
-        printf("Output sample %d: %f\n", i, output[i]);
-    }
-
-    free(input);
-    free(output);
-
-    return 0;
-}
+```
+Studio Signal Flow & DAW Engine Invariants:
+[Hardware Inputs] ──▶ [CoreAudio / ASIO Driver] ──▶ [Input Buffer (128 samples)]
+                                                              │
+[MIDI / MPE Input] ──▶ [Track Input Routing] ─────────▶ [Track Audio / Instrument Rack]
+                                                              │
+                                                        [Plugin DSP Chains]
+                                                              │
+[Master Output 1-2] ◀── [Master Limiter (-0.3 dBFS)] ◀── [32-Bit Float Summing Bus]
 ```
 
-### Step 2: Generate AST and IR
+### Studio Hardware & Audio Engine Calibration
 
-Compile the program with Clang to generate the AST and IR:
+Calibrate Live's audio engine preferences before conducting operations:
+1. **Sample Rate**: Set to `48,000 Hz` (Broadcast / Video Standard) or `44,100 Hz` (CD Red Book Standard).
+2. **Buffer Size**:
+   - Tracking / Live Instrument Performance: `128 samples` (roundtrip latency $\approx 5.8\text{ ms}$).
+   - Mixing / Mastering / Heavy DSP: `1024 samples` (prevents CPU thread buffer underruns).
+3. **Driver Error Compensation**: Run Live's built-in latency measurement loopback cable test and calibrate offset to $0.00\text{ ms}$.
 
-```sh
-clang -Xclang -ast-dump -fsyntax-only audio_process.c > ast_output.txt
-clang -S -emit-llvm audio_process.c -o ir_output.ll
+---
+
+## Exercise 1: Session View Non-Linear Clip Launching & Follow Actions
+
+In this exercise, you will construct a non-linear generative song arrangement in Session View using probability-based Follow Actions, scene quantization, and Legato clip transitions.
+
+### Step 1: Track Matrix Configuration
+
+Create three audio tracks and one MIDI track in Session View:
+- **Track 1**: `KICK_SUB` (Direct Audio)
+- **Track 2**: `PERC_LOOP` (Audio - Warped)
+- **Track 3**: `PAD_HARMONY` (Wavetable Instrument)
+- **Track 4**: `LEAD_MPE` (Drift Instrument with MPE Pressure)
+
+### Step 2: Configure Follow Actions for Generative Progression
+
+1. On `PERC_LOOP`, load four 2-bar audio variations (`Perc_A`, `Perc_B`, `Perc_C`, `Fill_D`).
+2. Open the **Clip View** for `Perc_A` and expand the **Follow Action** drawer.
+3. Configure probabilistic branching:
+   - **Action A**: `Next` with probability weight `7`.
+   - **Action B**: `Other` with probability weight `3`.
+   - **Time**: `2 Bars`, `0 Beats`, `0 16ths`.
+4. On `Fill_D`, configure Follow Action:
+   - **Action A**: `First` with weight `10` (returns to groove head).
+   - **Time**: `1 Bar`.
+
+### Step 3: Scene Launch Quantization & Verification
+
+Set Global Quantization to `1 Bar`. Trigger scene launches and observe the Launch Quantization status ring on clip headers. Verify that clip triggering occurs strictly on bar boundaries without phase misalignment or sample dropouts.
+
+---
+
+## Exercise 2: Audio Warping Topologies & Transient Phase Preservation
+
+Ableton Live employs five specialized time-stretching and pitch-shifting DSP algorithms. In this exercise, you will evaluate and select appropriate warp modes to preserve transient impact and eliminate granular artifacts.
+
+### Warp Algorithm Selection Matrix
+
+| Warp Algorithm | Granular Topology | Optimal Audio Material | Critical Parameter Settings |
+| :--- | :--- | :--- | :--- |
+| **Beats** | Slice & re-trigger per transient | Drums, percussion, rhythmic plucks | Transient Resolution: `1/16`, Loop Mode: `Off` / `Forward` |
+| **Tones** | Overlapping granular synthesis | Solo woodwinds, monophonic bass, vocals | Grain Size: `30-45 ms` (adjust to fundamental $f_0$) |
+| **Texture** | Polyrhythmic randomized grains | Ambient pads, noise washes, orchestral strings | Grain Size: `60-100 ms`, Flux: `35-50` |
+| **Re-Pitch** | Variable-speed resampling | DJ transitions, tape effects | Modulates pitch proportionally with tempo ($f \propto v$) |
+| **Complex Pro**| Formant-preserving spectral vocoder | Dense polyphonic full mixes, layered vocals | Formants: `100`, Envelope: `128` (clean speech articulation) |
+
+### Step-by-Step Multitrack Drum Warping
+
+1. Import a multitrack acoustic drum stem set (Kick In, Kick Out, Snare Top, Overhead Left, Overhead Right) recorded at 110 BPM into an arrangement at 124 BPM.
+2. Select all five drum tracks simultaneously and enable **Group Tracks**.
+3. In Clip View, enable **Warp** simultaneously across all stems. Set Warp Mode to **Beats**.
+4. Set Transient Loop Mode to **Off** (arrow pointing right into a line `->|`) to avoid false tail playback on transient markers.
+5. Invert the phase on `Kick Out` (using the Utility plugin with $\varnothing$ Phase Invert activated) and verify that low-frequency fundamental energy sum ($45-80\text{ Hz}$) does not cancel at the master bus.
+
+---
+
+## Exercise 3: Advanced Audio Effect Racks & Frequency-Split Processing
+
+In this exercise, you will engineer a custom 3-Band Frequency Crossover Audio Effect Rack to process bass fundamentals and stereo top-end independently.
+
+```
+3-Band Crossover Rack Signal Flow:
+                       ┌──▶ [Low Band: < 120 Hz Mono] ───────▶ [Saturator (Warm Tube)] ────┐
+[Incoming Audio In] ──┼──▶ [Mid Band: 120 Hz - 2.5 kHz] ────▶ [Dynamic EQ / Chorus] ─────┼──▶ [Sum Bus Out]
+                       └──▶ [High Band: > 2.5 kHz Stereo] ──▶ [Stereo Imager / Reverb] ────┘
 ```
 
-### Step 3: Disassemble the Binary
+### Step 1: Rack Chain Creation
 
-Compile the program to an executable and disassemble it:
+1. Drop an **Audio Effect Rack** onto an electric bass or synth bass track.
+2. Open the Chain List and create three discrete chains: `LOW`, `MID`, `HIGH`.
+3. Insert an **EQ Eight** on each chain configured as steep 24 dB/oct Linkwitz-Riley crossover filters:
+   - `LOW` Chain: Low-Pass Filter at `120 Hz`, $Q = 0.707$. Insert **Utility** and click **Bass Mono** (`< 120 Hz`).
+   - `MID` Chain: Band-Pass Filter (High-Pass at `120 Hz`, Low-Pass at `2,500 Hz`).
+   - `HIGH` Chain: High-Pass Filter at `2,500 Hz`, $Q = 0.707$.
 
-```sh
-clang -o audio_process audio_process.c
-objdump -d audio_process > disassembly_output.txt
+### Step 2: Dynamic Sidechain Compression Ducking
+
+1. On the `LOW` chain, insert an Ableton **Compressor**.
+2. Click the sidechain disclosure triangle, activate **Sidechain**, and route Audio From to `KICK_SUB` (Post-FX).
+3. Set sidechain filter: High-Pass at `100 Hz` to trigger compression solely on the kick drum attack transient.
+4. Set Compressor parameters:
+   - **Attack**: `0.8 ms` (fast clamp to clear transient headroom).
+   - **Release**: `45 ms` (recovers naturally before the next sub pulse).
+   - **Ratio**: `4:1`, **Threshold**: `-18 dBFS`.
+5. Verify gain reduction reaches $-4\text{ to } -6\text{ dB}$ on kick strikes, ensuring clear fundamental separation.
+
+---
+
+## Exercise 4: Drum Rack Multi-Output Routing & Max for Live Modulation
+
+In this exercise, you will route individual drum pad sounds out to dedicated mixer tracks for outboard processing and modulate sound parameters via Max for Live LFO.
+
+### Step 1: Discrete Aux Output Routing
+
+1. Insert a **Drum Rack** on an empty MIDI track. Load samples into pads C1 (Kick), D1 (Snare), and F#1 (Closed Hi-Hat).
+2. Create three dedicated Audio Tracks labeled `AUX_KICK`, `AUX_SNARE`, and `AUX_HH`.
+3. Set **Audio From** on each track to the Drum Rack track, and in the sub-menu select the discrete pad output:
+   - `AUX_KICK`: `Drum Rack -> Kick`
+   - `AUX_SNARE`: `Drum Rack -> Snare`
+   - `AUX_HH`: `Drum Rack -> Closed Hi-Hat`
+4. Set Monitor mode on the receiving tracks to **In**. Verify that soloing or applying insert effects on `AUX_SNARE` does not contaminate the kick or hi-hat channels.
+
+### Step 2: LFO Modulation Setup
+
+1. Insert a Max for Live **LFO** device on the MIDI track.
+2. Click **Map** and select the Hi-Hat sample's **Filter Cutoff** parameter inside the Drum Rack pad chain.
+3. Configure the LFO:
+   - **Waveform**: `Random / S&H`
+   - **Rate**: `1/16 Sync`
+   - **Depth**: `25%`
+   - **Offset**: `60%`
+4. Trigger 16th-note hi-hat patterns and observe natural acoustic-style timbral variation on each stroke.
+
+---
+
+## Studio Production Verification & Gain Staging Checklist
+
+Execute these verification checks before bouncing pre-master stems:
+
 ```
-
-### Step 4: Analyze the Outputs
-
-Review `ast_output.txt` to understand the structure of the C program. Examine `ir_output.ll` to see how the C code is translated into LLVM IR. Finally, review `disassembly_output.txt` to understand the machine code generated by the compiler.
-
-## Exercise 2: Cache Miss & Throughput Profiling
-
-In this exercise, we will benchmark the execution speed of the `process_audio` function, analyze memory allocations, and use hardware performance counters to identify cache misses and throughput bottlenecks.
-
-### Step 1: Benchmark Execution Speed
-
-Use `perf` to benchmark the execution speed of the `process_audio` function:
-
-```sh
-perf stat -e cycles,instructions ./audio_process
+[ ] Pre-Master Peak Headroom: Ensure Master Bus peaks at -6.0 dBFS with zero clipping indicators.
+[ ] Nominal Channel Gain Staging: RMS level on individual channels sits between -18 dBFS and -14 dBFS.
+[ ] Mono Compatibility Check: Insert Utility on Master, toggle Mono, verify zero phase cancellation in bass and snare body.
+[ ] Plugin Latency Compensation: Verify Options -> Delay Compensation is checked.
+[ ] Export Stems Invariants: Set File -> Export Audio/Video -> All Individual Tracks, 24-bit / 48 kHz, Dither: Triangular / None (if mastering separately).
 ```
-
-### Step 2: Analyze Memory Allocations
-
-Use `cachegrind` to analyze memory allocations and cache misses:
-
-```sh
-valgrind --tool=cachegrind ./audio_process
-```
-
-Review the `cachegrind.out.<pid>` file to understand cache usage and memory access patterns.
-
-### Step 3: Use Hardware Performance Counters
-
-Use `perf` to collect detailed hardware performance counters:
-
-```sh
-perf record -g ./audio_process
-perf report
-```
-
-Review the `perf.data` file to identify performance bottlenecks and cache misses.
-
-## Exercise 3: Data Race Stress Testing & Leak Sanitizer Diagnostics
-
-In this exercise, we will simulate concurrent thread access to the `process_audio` function, run thread sanitizers, and diagnose race conditions and memory leaks.
-
-### Step 1: Modify the Program for Concurrency
-
-Modify `audio_process.c` to include multithreading:
-
-```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <pthread.h>
-
-#define SAMPLE_RATE 44100
-#define BUFFER_SIZE 1024
-
-void *process_audio(void *arg) {
-    float *data = (float *)arg;
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-        data[i] = data[i] * sin(2 * M_PI * 440 * i / SAMPLE_RATE);
-    }
-    return NULL;
-}
-
-int main() {
-    float *input = (float *)malloc(BUFFER_SIZE * sizeof(float));
-    float *output = (float *)malloc(BUFFER_SIZE * sizeof(float));
-
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-        input[i] = 1.0; // Simple test signal
-    }
-
-    pthread_t thread1, thread2;
-    pthread_create(&thread1, NULL, process_audio, input);
-    pthread_create(&thread2, NULL, process_audio, output);
-
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
-
-    for (int i = 0; i < 10; i++) {
-        printf("Input sample %d: %f\n", i, input[i]);
-        printf("Output sample %d: %f\n", i, output[i]);
-    }
-
-    free(input);
-    free(output);
-
-    return 0;
-}
-```
-
-### Step 2: Run Thread Sanitizer
-
-Compile the program with Thread Sanitizer and run it:
-
-```sh
-clang -fsanitize=thread -o audio_process audio_process.c
-./audio_process
-```
-
-Review the output to identify any data races.
-
-### Step 3: Run Leak Sanitizer
-
-Compile the program with Leak Sanitizer and run it:
-
-```sh
-clang -fsanitize=leak -o audio_process audio_process.c
-./audio_process
-```
-
-Review the output to identify any memory leaks.
-
-## Developer Cheat Sheet & Toolchain Checklist
-
-### Essential Compiler Flags
-
-- **GCC/Clang:**
-  - `-g`: Generate debug information.
-  - `-O2`: Optimize for speed.
-  - `-O3`: Optimize for maximum speed.
-  - `-Wall`: Enable all compiler's warning messages.
-  - `-Wextra`: Enable extra warning messages.
-  - `-fsanitize=address`: Enable AddressSanitizer.
-  - `-fsanitize=thread`: Enable ThreadSanitizer.
-  - `-fsanitize=leak`: Enable LeakSanitizer.
-
-- **LLVM:**
-  - `-S`: Generate human-readable LLVM IR.
-  - `-emit-llvm`: Emit LLVM IR.
-  - `-Xclang -ast-dump`: Dump the AST.
-
-### Sanitizer Options
-
-- **AddressSanitizer:**
-  - `-fsanitize=address`: Enable AddressSanitizer.
-  - `-fsanitize-address-use-after-scope`: Detect use-after-scope errors.
-
-- **ThreadSanitizer:**
-  - `-fsanitize=thread`: Enable ThreadSanitizer.
-  - `-fsanitize=thread:halt_on_error=1`: Halt on the first detected error.
-
-- **LeakSanitizer:**
-  - `-fsanitize=leak`: Enable LeakSanitizer.
-  - `-fsanitize=leak:report_objects=1`: Report leaked objects.
-
-### Profiling Commands
-
-- **perf:**
-  - `perf stat -e cycles,instructions ./audio_process`: Benchmark execution speed.
-  - `perf record -g ./audio_process`: Collect detailed hardware performance counters.
-  - `perf report`: Review performance bottlenecks and cache misses.
-
-- **cachegrind:**
-  - `valgrind --tool=cachegrind ./audio_process`: Analyze memory allocations and cache misses.
-  - Review `cachegrind.out.<pid>` for cache usage and memory access patterns.
