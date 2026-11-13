@@ -222,3 +222,36 @@
 - **Blockchain Consensus Mechanisms** (`software/blockchain_consensus/`)
 - **Smart Contract Auditing and EVM** (`software/smart_contracts/`)
 - **Zero Knowledge Proofs zkSNARKs** (`software/zero_knowledge_proofs/`)
+
+### AI: Deep Learning Frameworks and Cloud MLOps
+- **PyTorch Deep Learning Internals and Autograd** (`ai/pytorch/`)
+- **TensorFlow Graph Execution and XLA Compiler** (`ai/tensorflow/`)
+- **Scikit-Learn Machine Learning Pipelines and Estimators** (`ai/scikit_learn/`)
+- **Google Cloud Vertex AI and MLOps Platform** (`ai/google_vertex_ai/`)
+- **AWS SageMaker Distributed Training and Model Endpoints** (`ai/aws_sagemaker/`)
+
+### Infrastructure: Cloud Native Networking and Service Meshes
+- **TCP IP Protocol Suite and Packet Mechanics** (`infrastructure/tcp_ip/`)
+- **Domain Name System Architecture and CoreDNS** (`infrastructure/dns/`)
+- **Linux Firewalls iptables nftables and eBPF Filters** (`infrastructure/firewalls/`)
+- **Container Network Interface CNI and IPAM Plugins** (`infrastructure/cni/`)
+- **Cilium eBPF Datapath and Cloud Native Networking** (`infrastructure/cilium/`)
+- **Layer 4 and Layer 7 Load Balancers HAProxy and Envoy** (`infrastructure/load_balancers/`)
+- **Istio Service Mesh Envoy Sidecars and mTLS Security** (`infrastructure/istio/`)
+
+### Infrastructure: Container Specifications and GitOps Delivery
+- **Open Container Initiative OCI Runtime and Image Specs** (`infrastructure/oci/`)
+- **Argo CD Declarative GitOps Continuous Delivery** (`infrastructure/argocd/`)
+- **Flux CD Automated GitOps Reconciliation Operator** (`infrastructure/flux/`)
+- **Terraform Infrastructure as Code and State Management** (`infrastructure/terraform/`)
+- **GitHub Actions CI CD Workflows and Pipeline Automation** (`infrastructure/github_actions/`)
+
+### Infrastructure: Managed Kubernetes Clouds and Enterprise Security
+- **Kubernetes Role Based Access Control RBAC and Security** (`infrastructure/rbac/`)
+- **AWS EKS Elastic Kubernetes Service and VPC CNI** (`infrastructure/aws_eks/`)
+- **Azure AKS Kubernetes Service and Virtual Nodes** (`infrastructure/azure_aks/`)
+- **Google GKE Kubernetes Engine Autopilot and Dual Stack** (`infrastructure/google_gke/`)
+- **Datadog Cloud Monitoring and Distributed APM Tracing** (`infrastructure/datadog/`)
+
+### Software: Node.js and Server-Side JavaScript Architecture
+- **Node.js Asynchronous Runtime Libuv and Event Loop** (`software/nodejs/`)
