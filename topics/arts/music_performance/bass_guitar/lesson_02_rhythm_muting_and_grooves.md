@@ -23,7 +23,7 @@ The bass guitar occupies a singular role in any ensemble: it simultaneously defi
 
 Standard four-string tuning is **E1–A1–D2–G2** (41 Hz, 55 Hz, 73 Hz, 98 Hz). These low frequencies have naturally long decay times—an open low E can ring for 5–8 seconds unpedaled. At 120 BPM, a sixteenth note lasts only 125 ms. That gap is your central technical challenge: **you must actively stop notes** as precisely as you start them. Muting is not an optional refinement—it is the foundation of rhythmic clarity.
 
-One paragraph of physics worth knowing: string pitch is determined by length, tension, and mass per unit length. Heavier strings (the E string at ~.105" gauge is roughly twice the mass of a guitar's low E) produce deep fundamentals but carry more inertia—they keep vibrating unless you stop them. This inertia is why bass muting demands more deliberate physical commitment than on guitar.
+One paragraph of physics worth knowing: string pitch is determined by length, tension, and mass per unit length ($f = \frac{1}{2L}\sqrt{\frac{T}{\mu}}$, where $L$ is length, $T$ is tension, $\mu$ is linear mass density). Heavier strings (the E string at ~.105" gauge is roughly twice the mass of a guitar's low E) produce deep fundamentals but carry more inertia—they keep vibrating unless you stop them. This inertia is why bass muting demands more deliberate physical commitment than on guitar.
 
 ### The Pocket: Kick Drum Relationship
 
@@ -120,6 +120,42 @@ Beats: 1   2   3   4
 
 Progressive lift: After mastering with full palm mute, gradually reduce contact pressure until you find the "just barely muted" zone. This earns you the reggae pocket.
 
+### 2.4 Three-Finger Technique (i-m-a)
+
+Adding the ring finger (a) to your alternation increases speed ceiling and reduces fatigue on fast passages. The mechanical principle: distributing the workload across three muscles instead of two.
+
+**Setup:**
+- Ring finger curves to match the arc of index and middle
+- All three fingers maintain equal string contact angle
+- Initial target: play any two-finger pattern with three fingers before attempting faster speeds
+
+**Progressive integration drill:**
+
+```
+Week 1: i-m-a triplets on single string (quarter-note pulse)
+E: |–––––––|–––––––|–––––––|–––––––|
+   i m a   i m a   i m a   i m a
+   Tempo: ♩= 60 BPM
+
+Week 2: String crossing with triplet grouping
+G: |–––i–m–a–|
+D: |–i–m–a–––|
+A: |–––––––––|
+E: |–––––––––|
+   Tempo: ♩= 70 BPM
+
+Week 3: Apply to scalar runs (natural minor scale)
+A: |–5–7–8–|–5–7–8–|–5–7–8–|
+   i m a   i m a   i m a
+   Tempo: ♩= 80 BPM
+
+Week 4: Integrate into actual bass lines
+   Use i-m-a for any passage requiring 12+ consecutive notes
+   at tempos above ♩= 140 BPM
+```
+
+**Common mistake:** Ring finger striking with less force than index/middle. Remedy: practice 5 minutes daily with ring finger only, matching the volume of your index finger.
+
 ---
 
 ## 3. Left-Hand Muting & Fretting Mechanics
@@ -151,6 +187,18 @@ Ring finger (3) acts as a support brace behind the pinky, never fretting indepen
 
 The neck narrows enough here that all four fingers cover four consecutive frets without strain. Standard guitar-style fingering applies: finger 1 = lowest fret, finger 4 = highest.
 
+```
+Example — A string, OFPF at 7th position:
+  Fret 7 (E)  → finger 1
+  Fret 8 (F)  → finger 2
+  Fret 9 (F#) → finger 3
+  Fret 10 (G) → finger 4
+```
+
+**Transition zone (frets 5–7):**
+
+This is a hybrid area. Use Simandl if your hand is small or the passage stays primarily in lower positions. Use OFPF if the passage extends above fret 7 or your hand is large enough to reach comfortably.
+
 ### 3.2 Thumb Placement on the Back of the Neck
 
 Thumb lives on the **back of the neck**, opposite the middle finger (finger 2), pointing roughly toward the headstock at a slight angle. Never hook the thumb over the top of the neck—this collapses your arch, kills your reach, and stresses the wrist.
@@ -168,11 +216,68 @@ Correct geometry:
 
 **Wrist position:** Keep the wrist reasonably straight—mild inward rotation is fine, but avoid bending the wrist sharply upward or downward. The forearm transmits force into the fingertips; a kinked wrist disrupts that chain and leads to repetitive strain injury.
 
+**Dynamic thumb adjustment:**
+
+- When playing on G string (highest): thumb may drop slightly lower on the back of the neck
+- When playing on E string (lowest): thumb may rise slightly higher
+- The thumb **moves with your hand position** but never leaves the back of the neck
+
 ### 3.3 Fretting Efficiency
 
-- **Finger placement:** Land your fingertip **1–2 mm behind the fret** (toward the nut), in the small zone where minimum pressure produces a clean note. Pressing in the middle of the fret space requires 2–3× more force for the same result.
-- **Minimum pressure:** Use only enough pressure to stop the buzz. Excess pressure causes sharp tuning, fatigue, and mutes overtones.
-- **Finger arch:** Keep fingers curved so each fingertip contacts the string independently. Flat fingers accidentally mute adjacent strings.
+**Finger placement:** Land your fingertip **1–2 mm behind the fret** (toward the nut), in the small zone where minimum pressure produces a clean note. Pressing in the middle of the fret space requires 2–3× more force for the same result.
+
+```
+Fret wire cross-section view:
+
+  [Nut] ←──── distance ────→ [Fret wire]
+                    ↑
+              Optimal zone
+           (1–2mm before fret)
+
+Pressing here = minimum force for clean note
+Pressing in middle = 2–3× more force required
+```
+
+**Minimum pressure principle:** Use only enough pressure to stop the buzz. Excess pressure causes sharp tuning (you're stretching the string tighter, raising pitch), fatigue, and mutes overtones. Test this: fret a note with heavy pressure, then gradually release until it buzzes. The pressure required is just above that buzz threshold.
+
+**Finger arch:** Keep fingers curved so each fingertip contacts the string independently. Flat fingers accidentally mute adjacent strings.
+
+```
+Correct (side view):    Incorrect (side view):
+    ╭─●                      ──●
+   │  │                        │
+   │  │  ← curved             │  ← flat, mutes neighbors
+   └──┘                       └──
+```
+
+### 3.4 Left-Hand Muting Techniques
+
+**Draping:** When not fretting a lower string, let your fretting fingers lightly drape across it to prevent sympathetic vibration.
+
+```
+Example: Fretting D string, fret 7 (A note)
+  E string: index finger (1) lightly touches to mute
+  A string: muted by floating thumb (right hand)
+  D string: finger 1 actively fretting at fret 7
+  G string: unused fingers 2-4 hover above without touching
+```
+
+**Release muting:** The instant you finish a note, reduce fretting pressure to zero **without lifting the finger off the string**. The finger stays in light contact, muting the string.
+
+```
+Drill: Quarter notes with full muting between each
+Tempo: ♩= 60 BPM
+
+E: |–5–––0–––5–––0–|
+   Fret 5 (A), beat 1: full pressure
+   Beat 2 (rest): release pressure, finger stays on string (mute)
+   Beat 3 (rest): finger still touching, zero pressure
+   Beat 4 (rest): prepare for next note
+   Bar 2, beat 1: re-apply pressure for fret 5
+
+The finger never leaves the string surface. This is the fastest,
+most reliable muting technique.
+```
 
 ---
 
@@ -210,23 +315,94 @@ D: |–––5–|  G (fifth)  ← fret 5
 G: |–––5–|  C (octave) ← fret 5
 ```
 
-**Shape 3 — Adding the minor/major 3rd:**
+**Shape 3 — Root on D string:**
 
 ```
-Minor box (movable, root on E string):
-E: |–R–––––––m3–|
-A: |–––––5–––––|
-D: |–––––R–––––|  (octave)
+D: |–––R–––––|
+G: |–––––5–––|
+   (octave moves to A string, 2 frets higher than D root)
 
-Major box (movable, root on E string):
-E: |–R–––––M3–––|
-A: |–––––5–––––|
-D: |–––5–R–––––|  (octave)
+Example: Root = F (fret 3, D string)
+D: |–3–––|  F (root)
+G: |–––5–|  C (fifth)  ← fret 5
+A: |–––5–|  F (octave) ← fret 5
 ```
 
-Memorize these three shapes. They cover 90% of bass playing across all genres. The remaining 10% is chromatic approach notes and style-specific runs built on this foundation.
+**Memorization drill:**
 
-### 4.2 Position Map: Notes on E and A Strings
+```
+Day 1–3: Shape 1 only (E string roots)
+  Call out random notes: "G" → find G on E string → play R-5-Oct
+  Tempo: ♩= 60, whole notes
+  
+Day 4–6: Shape 2 only (A string roots)
+  Same process, A string only
+  
+Day 7–9: Shape 3 only (D string roots)
+  Same process, D string only
+  
+Day 10+: Random shape selection
+  Call out: "D, A string" → play D root shape 2
+  Call out: "Bb, E string" → play Bb root shape 1
+```
+
+### 4.2 Major and Minor Box Patterns
+
+Add the third to complete the fundamental chord tone vocabulary.
+
+**Minor box (movable, root on E string):**
+
+```
+E: |–R–––––––m3–|  Root and minor 3rd (3 frets up)
+A: |–––––5–––––|  Fifth (same fret, 2 strings up)
+D: |–––––R–––––|  Octave (2 frets up from fifth)
+
+Example: A minor (root = A, fret 5 / E string)
+E: |–5–––––––8–|  A (root) and C (m3)
+A: |–––––7––––|   E (fifth)
+D: |–––––7––––|   A (octave)
+```
+
+**Major box (movable, root on E string):**
+
+```
+E: |–R–––––M3–––|  Root and major 3rd (4 frets up)
+A: |–––––5–––––|  Fifth
+D: |–––5–R–––––|  Octave
+
+Example: A major (root = A, fret 5 / E string)
+E: |–5–––––9–|  A (root) and C# (M3)
+A: |–––––7–|   E (fifth)
+D: |–––7–|     A (octave)
+```
+
+**Minor box (movable, root on A string):**
+
+```
+A: |–R–––––––m3–|  Root and minor 3rd
+D: |–––––5–––––|  Fifth
+G: |–––––R–––––|  Octave
+
+Example: D minor (root = D, fret 5 / A string)
+A: |–5–––––––8–|  D (root) and F (m3)
+D: |–––––7––––|   A (fifth)
+G: |–––––7––––|   D (octave)
+```
+
+**Major box (movable, root on A string):**
+
+```
+A: |–R–––––M3–––|  Root and major 3rd
+D: |–––––5–––––|  Fifth
+G: |–––5–R–––––|  Octave
+
+Example: D major (root = D, fret 5 / A string)
+A: |–5–––––9–|  D (root) and F# (M3)
+D: |–––––7–|   A (fifth)
+G: |–––7–|     D (octave)
+```
+
+### 4.3 Position Map: Notes on E and A Strings
 
 Knowing your root positions across E and A strings unlocks the entire neck.
 
@@ -248,9 +424,34 @@ Fret:  0    2    3    5    7    8    10   12
 Note:  G    A    Bb   C    D    Eb   F    G
 ```
 
-**Drill — Root finder:** Set a metronome to ♩= 60. Call out a random note name every 4 beats. Find it on both the E and A strings before the next 4 beats expire. Increase to 2 beats per note as you improve. This drill alone transforms fretboard navigation.
+**Chromatic fret formula (works on all strings):**
 
-### 4.3 The ii–V–I Bass Line Framework
+```
+Any natural note + 1 fret = sharp (#)
+Any natural note – 1 fret = flat (♭)
+
+Example: Find C# on A string
+  C natural = fret 3
+  C# = fret 4 (one fret higher)
+
+Example: Find Eb on G string
+  E natural = not on chart, but E is at fret 7 (D string)
+  G string E would be fret 7 as well
+  Eb = fret 6 (one fret lower)
+```
+
+**Drill — Root finder:**
+
+Set a metronome to ♩= 60. Call out a random note name every 4 beats. Find it on both the E and A strings before the next 4 beats expire. Increase to 2 beats per note as you improve. This drill alone transforms fretboard navigation.
+
+```
+Week 1: 4 beats per note, natural notes only (A B C D E F G)
+Week 2: 4 beats per note, add sharps/flats
+Week 3: 2 beats per note, all notes
+Week 4: 2 beats per note + state the fifth and octave fret numbers
+```
+
+### 4.4 The ii–V–I Bass Line Framework
 
 The most universal harmonic motion in Western music. Here it is in C major with practical fingering:
 
@@ -261,19 +462,82 @@ Tempo: ♩= 80 BPM
 Dm7 (root D, fret 5 / A string):
 A: |–5–5–7–8–|  D–D–E–F
 D: |–––––––––|
+Fingering: 1-1-2-4 (Simandl)
 
 G7 (root G, fret 10 / A string or fret 3 / E string):
 A: |–10–10–9–8–|  G–G–F#–F (chromatic approach)
+Fingering (at fret 10): 4-4-3-2 (OFPF)
    OR
-E: |–3–3–2–1–|
+E: |–3–3–2–1–|  G–G–F#–F
+Fingering: 4-4-2-1 (Simandl)
 
-Cmaj7 (root C, fret 8 / A string or fret 3 / A string):
-A: |–8–8–8–8–|  C sustained / rhythmic
+Cmaj7 (root C, fret 3 / A string):
+A: |–3–3–3–3–|  C sustained / rhythmic
+Fingering: 1-1-1-1
 
 Combined — 2-beat roots + chromatic approach:
-Bar 1 (Dm7): D on beat 1, chromatic up to E (fret 7) on beat 4
-Bar 2 (G7):  G on beat 1, chromatic down to F (fret 8) on beat 4
-Bar 3 (Cmaj7): C on beat 1, hold or add octave C
+Bar 1 (Dm7): D on beat 1, hold, E (fret 7) on beat 3, F (fret 8) beat 4
+Bar 2 (G7):  G on beat 1, hold, F# (fret 9) on beat 3, F (fret 8) beat 4
+Bar 3 (Cmaj7): C on beat 1, hold or add octave C on beat 3
+```
+
+**ii–V–I practice protocol:**
+
+```
+Week 1: Whole notes only (one note per chord, 4 beats)
+        Tempo: ♩= 60
+        
+Week 2: Add passing tones (root + one approach note per chord)
+        Tempo: ♩= 70
+        
+Week 3: Full 4-note pattern per chord (as shown above)
+        Tempo: ♩= 80
+        
+Week 4: Transpose to all 12 keys
+        Start in C, then F, then Bb, then Eb...
+        (descending circle of fifths)
+        Tempo: ♩= 90
+```
+
+### 4.5 Extended Box Shapes: 7th and 9th Intervals
+
+**Dominant 7th box (root on E string):**
+
+```
+E: |–R–––––M3–––|  Root and major 3rd
+A: |–––––5––m7–|  Fifth and minor 7th (♭7, two frets below octave)
+D: |–––––R–––––|  Octave
+
+Example: G7 (root = G, fret 3 / E string)
+E: |–3–––––7–|  G (root) and B (M3)
+A: |–––5–––8–|  D (fifth) and F (♭7)
+D: |–––5––––|   G (octave)
+```
+
+**Major 7th box (root on E string):**
+
+```
+E: |–R–––––M3–––|  Root and major 3rd
+A: |–––––5––M7–|  Fifth and major 7th (one fret below octave)
+D: |–––––R–––––|  Octave
+
+Example: Gmaj7 (root = G, fret 3 / E string)
+E: |–3–––––7–|  G (root) and B (M3)
+A: |–––5–––9–|  D (fifth) and F# (M7)
+D: |–––5––––|   G (octave)
+```
+
+**9th (major 9) box (root on A string):**
+
+```
+A: |–R–––––M3–––9–|  Root, major 3rd, and major 9th (2 frets above octave)
+D: |–––––5–––––––|  Fifth
+G: |–––––R–––––––|  Octave
+
+Example: Cmaj9 (root = C, fret 3 / A string)
+A: |–3–––––7–––5–|  C (root), E (M3), D (9th, next octave)
+D: |–––––5––––––|   G (fifth)
+G: |–––––5––––––|   C (octave)
 ```
 
 ---
@@ -294,6 +558,27 @@ At ♩= 120 BPM, understand the time grid you're working within:
 ```
 
 Your groove lives in the relationship between your note attacks and this grid. Sixteenth notes at 125 ms intervals approach the outer edge of rhythmic perception for most listeners (~80–100 ms). This is why perfectly quantized bass lines can feel robotic—the grid is so tight that microscopic variations stand out.
+
+**Subdivision fluency drill:**
+
+```
+Week 1: Count quarter notes aloud while playing
+        "1 2 3 4" — tap your foot on each count
+        Tempo: ♩= 60
+        
+Week 2: Count eighth notes aloud while playing quarters
+        "1 & 2 & 3 & 4 &" — tap foot on numbers only
+        Tempo: ♩= 70
+        
+Week 3: Play eighth notes, count sixteenths aloud
+        "1 e & a 2 e & a 3 e & a 4 e & a"
+        Tap foot on numbers only
+        Tempo: ♩= 80
+        
+Week 4: Play sixteenths, count aloud
+        Stop counting after 8 bars — keep the grid internalized
+        Tempo: ♩= 90
+```
 
 ### 5.2 Pocket Placement: Push, Center, Lay Back
 
@@ -321,6 +606,36 @@ Gospel:        varies — often push on anticipations, lay back on
 5. Intentionally lay back by 15 ms, record again.
 6. You now have proprioceptive awareness of these three feels. Practice each deliberately.
 
+**Genre-specific pocket training:**
+
+```
+Funk (James Brown style):
+  Bass line: E string, frets 0-3-5 (E-G-A)
+  Pattern: ♩= 100
+  E: |–0–.–3–5–|–0–.–3–5–|
+  Pocket: Slight push on all notes (5–10ms early)
+  Target feel: Urgent, driving
+
+Jazz (Ray Brown style):
+  Walking quarter notes, C blues
+  Tempo: ♩= 180 (walking quarters feel like half notes)
+  Pocket: Lay back 10–15ms on beats 2 and 4
+  Target feel: Relaxed, swinging weight
+
+Reggae (Aston Barrett style):
+  A: |–.–5–.–5–|–.–5–.–5–|  (D root, beats 2 and 4 only)
+  Tempo: ♩= 75
+  Pocket: Heavy lay back 20–30ms, especially beat 2
+  Target feel: Behind the drummer, almost lazy
+
+Metal (Steve Harris style):
+  Galloping sixteenths, E minor
+  E: |–0–0–0–0–0–0–0–0–|
+  Tempo: ♩= 180 (sixteenth notes)
+  Pocket: Precise center, quantized feel
+  Target feel: Machine-like accuracy
+```
+
 ### 5.3 Locking with the Kick Drum
 
 The bass note attack should **align with or slightly after** the kick drum's initial transient, not before. The kick drum's attack is percussive and brief; the bass note fills in the sustained low frequency underneath it.
@@ -339,6 +654,26 @@ Bar 1 target:
 Verification: Record your bass over the loop, then view both
 waveforms stacked in a DAW. Adjust until kick and bass transients
 are visually aligned.
+```
+
+**Advanced kick-bass synchronization:**
+
+```
+Stage 1: Kick and bass always together (unison)
+         E: |–0–.–0–.–|  on beats 1 and 3 only
+         
+Stage 2: Kick alone on beat 1, bass + kick on beat 3
+         Kick: | X . X . |
+         Bass: | . . 0 . |
+         
+Stage 3: Syncopated kicks — bass fills the gaps
+         Kick: | X . . X | . X . . |
+         Bass: | 0 . 3 . | 5 . 3 0 |
+         (where kick is absent, bass provides the anchor)
+         
+Stage 4: Dense 16th-note kick patterns
+         Bass plays on primary accents only (beats 1 and 3)
+         Even when kick is playing 16ths between
 ```
 
 ### 5.4 Ghost Notes: Rhythmic Punctuation
@@ -380,6 +715,87 @@ Week 2: ♩= 80, add floating thumb muting
 Week 3: ♩= 90, integrate into 2-chord vamp (D–G)
 ```
 
+**Dynamics control in ghost notes:**
+
+Ghost notes should be **50–60% the volume** of pitched notes, not silent. The goal is rhythmic texture, not complete disappearance.
+
+```
+DAW verification protocol:
+  Record 4 bars of ghost note pattern
+  Measure peak levels:
+    Pitched note (O): target –6 dB
+    Ghost note (x):   target –12 to –14 dB
+    
+If ghost notes are below –18 dB: increase right-hand attack force
+If ghost notes are above –10 dB: increase left-hand muting pressure
+```
+
+### 5.5 Swing Feel & Triplet-Based Grooves
+
+Swing feel alters the eighth-note grid from even (50/50 split) to uneven (typically 67/33 or 60/40).
+
+```
+Straight eighths (rock/funk):
+Beat: 1   &   2   &   3   &   4   &
+Time: |---|---|---|---|---|---|---|---|
+      250ms   250ms   250ms   250ms
+
+Swing eighths (jazz/blues):
+Beat: 1   &   2   &   3   &   4   &
+Time: |-----|---|-----|---|-----|---|-----|---|
+      333ms 167 333ms 167 333ms 167 333ms 167
+      (triplet grid: play on 1st and 3rd of each triplet)
+```
+
+**Swing practice drill:**
+
+```
+Week 1: Set metronome to triplet subdivision (♩= 60, triplets)
+        Count aloud: "1 trip let 2 trip let 3 trip let 4 trip let"
+        Play bass notes ONLY on "1" and "let"
+        (this is swing eighths)
+        
+Week 2: Same drill, ♩= 80
+        Stop counting aloud, internalize the triplet grid
+        
+Week 3: Switch between straight and swing every 4 bars
+        4 bars straight, 4 bars swing, repeat
+        Tempo: ♩= 90
+        
+Week 4: Apply to 12-bar blues progression in swing
+        Tempo: ♩= 100
+```
+
+**Shuffle bass line (classic blues):**
+
+```
+Key of E, 12-bar blues
+Tempo: ♩= 90, swing eighths
+
+Bar 1–4 (E7):
+E: |–0–.–0–0–|–0–.–0–0–|  (swing: long-short rhythm)
+A: |–––––––––|–––––––––|
+   Fret 0 on "1" and "let" of triplet
+
+Bar 5–6 (A7):
+A: |–0–.–0–0–|–0–.–0–0–|
+
+Bar 7–8 (E7):
+E: |–0–.–0–0–|–0–.–0–0–|
+
+Bar 9 (B7):
+A: |–2–.–2–2–|  (B on A string)
+
+Bar 10 (A7):
+A: |–0–.–0–0–|
+
+Bar 11 (E7):
+E: |–0–.–0–0–|
+
+Bar 12 (B7 turnaround):
+A: |–2–.–2–2–|
+```
+
 ---
 
 ## 6. Slap & Pop Technique
@@ -410,6 +826,41 @@ you are damping it, not hitting it.
 
 **Common mistake:** Striking with the pad/flesh of the thumb instead of the bone. The pad absorbs the impact. Find the bony knuckle on the side of your thumb — that is your striking surface.
 
+**Thumb strike point anatomy:**
+
+```
+Top view of right thumb:
+
+   ╭───────╮
+   │  PAD  │  ← Soft, absorbs impact (WRONG)
+   │       │
+   ╞═══════╡  ← First knuckle joint
+   │ BONE  │  ← Lateral edge, hard surface (CORRECT)
+   │ EDGE  │     This is your striking surface
+   ╘═══════╛
+
+The bony edge should contact the string at a 45° angle
+to the string plane, not flat-on.
+```
+
+**Thumb position calibration drill:**
+
+```
+Week 1: Thumb only, E string, open
+        Focus: Find the exact thumb angle and wrist rotation
+               that produces maximum "snap" with minimum effort
+        Tempo: ♩= 50 (quarter notes)
+        Duration: 5 minutes, once per day
+        
+Week 2: Same, move to fret 5 (A note)
+        Verify bounce is consistent at different fret positions
+        Tempo: ♩= 60
+        
+Week 3: Alternate open E and fret 5, same technique
+        E: |–0–––5–––0–––5–|
+        Tempo: ♩= 70
+```
+
 ### 6.2 Pop Mechanics: Hook and Snap
 
 Pop targets the G or D string (occasionally A). Index finger is standard; middle finger gives a slightly different tonal character.
@@ -425,6 +876,42 @@ Pop targets the G or D string (occasionally A). Index finger is standard; middle
 ```
 
 **Too close to neck** = weak, dull pop. **Too close to bridge** = thin, brittle pop. The sweet spot for pop position is typically over or just behind the neck pickup.
+
+**Pop displacement calibration:**
+
+```
+Test protocol:
+  String: G open
+  Position: Over neck pickup
+  
+  Pull 5mm perpendicular: Record the sound
+  Pull 10mm perpendicular: Record the sound
+  Pull 15mm perpendicular: Record the sound
+  Pull 20mm perpendicular: Record the sound (likely too much)
+  
+Listen back. The optimal displacement produces maximum "snap"
+without the string bottoming out or sounding choked.
+
+Most players land between 8–12mm displacement.
+```
+
+**Pop practice drill:**
+
+```
+Week 1: G string open, index pop only
+        Tempo: ♩= 60, quarter notes
+        Count: "pop 2 3 4 pop 2 3 4"
+        Focus: Consistent pull direction (straight up)
+        
+Week 2: G string, fret 5 (C note), middle finger pop
+        Same tempo and pattern
+        Compare tonal difference vs. index finger
+        
+Week 3: Alternate G open (index) and G fret 5 (middle)
+        G: |–0–––5–––0–––5–|
+            i   m   i   m
+        Tempo: ♩= 70
+```
 
 ### 6.3 Slap-Pop Coordination Patterns
 
@@ -468,11 +955,41 @@ D: |–––––––––––––––––––|
 A: |–––5–––––––5–––––––|  (thumb: &-of-1, beat 3)
 E: |–0–––0–––––––0–––––|  (thumb: beats 1, +of-1, beat 2)
 
-Beat: 1  e  +  a  2  e  +  a
-      T  .  T  .  T  .  P  .
-      .  .  .  .  T  .  T  .
+Beat: 1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
+      T  .  T  .  T  .  P  .  T  .  T  .  P  .  .  .
 
 Tempo: Start ♩= 65, work to ♩= 100
+```
+
+**Detailed breakdown of Level 3 pattern:**
+
+```
+Measure 1, beat 1:
+  "1"   = Thumb on E open (beat 1)
+  "e"   = rest
+  "+"   = Thumb on E open (& of 1)
+  "a"   = rest
+
+Measure 1, beat 2:
+  "2"   = Thumb on A string fret 5 (beat 2)
+  "e"   = rest
+  "+"   = Pop on G string fret 7 (& of 2)
+  "a"   = rest
+
+Measure 1, beat 3:
+  "3"   = Thumb on A string fret 5 (beat 3)
+  "e"   = rest
+  "+"   = Thumb on E open (& of 3)
+  "a"   = rest
+
+Measure 1, beat 4:
+  "4"   = rest
+  "e"   = rest
+  "+"   = Pop on G string fret 7 (& of 4)
+  "a"   = rest
+
+Practice this at ♩= 50 with all subdivisions counted aloud
+before attempting at tempo.
 ```
 
 **Level 4 — Double thumbing:**
@@ -486,6 +1003,33 @@ P  = pop
 
 |–T↓–T↑–P–T↓–|–T↑–P–T↓–T↑–|
  16th notes at ♩= 80 target
+
+Detailed beat 1 of pattern above:
+  "1"   = T↓ (downstroke on beat 1)
+  "e"   = T↑ (upstroke on "e")
+  "+"   = P  (pop on "&")
+  "a"   = T↓ (downstroke on "a")
+```
+
+**Double-thumb practice protocol:**
+
+```
+Week 1: Single string (E open), down-up-down-up
+        No pop yet, just alternating thumb direction
+        Tempo: ♩= 50, 16th notes
+        E: |–T↓–T↑–T↓–T↑–|–T↓–T↑–T↓–T↑–|
+        
+Week 2: Add ONE pop per bar (on beat 3)
+        E: |–T↓–T↑–T↓–T↑–|
+        G: |–––––––P–––––|
+        Tempo: ♩= 60
+        
+Week 3: Full double-thumb + pop pattern
+        (As shown in Level 4 above)
+        Tempo: ♩= 70
+        
+Week 4: Apply to groove context (add chord changes)
+        Tempo: ♩= 80
 ```
 
 ### 6.4 Slap-Pop Balance
@@ -494,6 +1038,58 @@ Thumb slap is naturally louder than a pop because the thumb is heavier and strik
 - **Reduce thumb force by ~25%** from your instinctive "full power"
 - **Increase pop displacement** (pull string slightly higher than feels natural)
 - **Measure with a DAW input meter**: target <3 dB difference between T and P peaks
+
+**Dynamic balance training:**
+
+```
+Record 8 bars of T-P alternation (Level 2 pattern)
+Import to DAW, measure peak levels:
+
+If Thumb peaks at –3 dB and Pop peaks at –12 dB:
+  → Gap is 9 dB (too much)
+  → Reduce thumb force
+  → Increase pop displacement
+  → Re-record and re-measure
+
+Target: Thumb –6 dB, Pop –8 dB (2 dB difference acceptable)
+        Thumb –4 dB, Pop –6 dB (2 dB difference acceptable)
+
+Some natural difference is fine. The goal is preventing
+the pop from disappearing in the mix.
+```
+
+### 6.5 Left-Hand Slap Technique
+
+Advanced technique: using the fretting hand to slap open strings against the fretboard for percussive punctuation.
+
+**Mechanics:**
+
+```
+1. RELEASE: Fully release fretting pressure on current note
+2. FLATTEN: Lay all four fingers flat across all strings
+3. SLAP:    Rapid downward motion, strings impact fretboard
+            (typically frets 3–7 area)
+4. LIFT:    Immediately lift fingers off strings to allow ring
+            (unless muting is desired)
+
+Result: Percussive "clack" with optional pitch content
+        depending on whether strings ring after impact
+```
+
+**Integration pattern (left-hand slap + right-hand slap/pop):**
+
+```
+E: |–T–––T–––T–––T–|  Right-hand thumb slaps
+G: |–––P–––P–––P–.–|  Right-hand pops
+LH:|–.–.–.–X–.–.–.–|  Left-hand slap on "a" of beat 2
+                      (X = left-hand slap)
+
+Beat: 1  e  +  a  2  e  +  a
+      T  .  P  .  T  .  P  X
+
+This is advanced. Master right-hand slap/pop for 6+ months
+before attempting left-hand integration.
+```
 
 ---
 
@@ -507,6 +1103,21 @@ Walking bass lines move primarily in quarter notes, covering the chord changes o
 2. **Use chord tones** (1, 3, 5, 7) on beats 1 and 3
 3. **Use passing tones and approach notes** on beats 2 and 4
 4. **Approach each new root by half-step or whole-step** from above or below
+
+**Chord tone hierarchy:**
+
+```
+Primary targets (beats 1 and 3):
+  Root (1) — strongest, most common
+  Fifth (5) — second strongest
+  Third (3) — defines major/minor quality
+  Seventh (7) — adds color, approach to next chord
+
+Passing tones (beats 2 and 4):
+  Chromatic approach (half-step to next target)
+  Scalar passing tones (diatonic scale degrees)
+  Double chromatic encirclement (up then down, or down then up)
+```
 
 ### 7.2 Chromatic Approach Note Rules
 
@@ -526,6 +1137,28 @@ Example — encirclement:
   Ab → F# → G   [above → below → target]
 ```
 
+**Approach note practice drill:**
+
+```
+Target: Root on beat 1 of bar 2 = C (A string, fret 3)
+
+Bar 1, beat 4 options:
+
+Option 1: Approach from below (half-step)
+  A: |–.–.–.–2–|–3–.–.–.–|
+     Beat 4 = B (fret 2), beat 1 = C (fret 3)
+
+Option 2: Approach from above (half-step)
+  A: |–.–.–.–4–|–3–.–.–.–|
+     Beat 4 = C# (fret 4), beat 1 = C (fret 3)
+
+Option 3: Encirclement (beat 3 = above, beat 4 = below)
+  A: |–.–.–4–2–|–3–.–.–.–|
+     Beat 3 = C# (fret 4), beat 4 = B (fret 2), beat 1 = C (fret 3)
+
+Practice all three options to every chord in a progression.
+```
+
 ### 7.3 Walking Bass Over a 12-Bar Blues (Key of G)
 
 ```
@@ -536,11 +1169,13 @@ Bar:  Chord:  Walking line (A string unless noted):
 2     G7      10–9–8–7       D–C#–C–B  (descending chromatic)
 3     G7      5–7–8–10       G–A–Bb–D  (chord tones)
 4     G7      10–9–8–7       (same as bar 2)
+
 5     C7      8–10–9–8       C–D–C#–C  (C on A string fret 3,
                               or use E string fret 8)
 6     C7      3–5–4–3        C–D–Db–C
 7     G7      5–7–8–9        back to G
 8     G7      10–8–7–5       turnaround descent
+
 9     D7      10–9–8–7       D–C#–C–B  (D on A string fret 5,
                               or E string fret 10)
 10    C7      8–7–5–3        C–B–A–G approach line
@@ -548,6 +1183,49 @@ Bar:  Chord:  Walking line (A string unless noted):
 12    D7      10–9–8–7       (turnaround, sets up bar 1 repeat)
 
 All quarter notes, swing feel — lay back slightly on beats 2 and 4.
+```
+
+**Detailed bar-by-bar analysis:**
+
+```
+Bar 1 (G7): G–A–Bb–B
+  Beat 1: G (root, fret 5 / A string)
+  Beat 2: A (2nd, fret 7)
+  Beat 3: Bb (♭3, fret 8, chromatic passing tone)
+  Beat 4: B (3rd, fret 9, approaches bar 2)
+
+Bar 2 (G7): D–C#–C–B
+  Beat 1: D (5th, fret 10 / A string)
+  Beat 2: C# (chromatic passing, fret 9)
+  Beat 3: C (♭7 of G7, fret 8)
+  Beat 4: B (3rd, fret 9, approaches bar 3)
+
+Continue this analysis for all 12 bars to understand
+the relationship between chord tones and passing tones.
+```
+
+**Walking bass practice protocol:**
+
+```
+Week 1: Play roots only (whole notes, one per bar)
+        Tempo: ♩= 60
+        Focus: Chord changes, harmonic awareness
+        
+Week 2: Roots + fifths (half notes)
+        Tempo: ♩= 70
+        Focus: Chord tone strength on beats 1 and 3
+        
+Week 3: Add chromatic approaches on beat 4
+        Tempo: ♩= 80
+        Focus: Smooth voice leading into next chord
+        
+Week 4: Full walking lines (as written above)
+        Tempo: ♩= 90
+        Focus: Swing feel, pocket placement
+        
+Month 2: Create your own walking lines
+        Use the four rules to generate new lines
+        over the same changes
 ```
 
 ### 7.4 Anticipation Notes
@@ -563,6 +1241,82 @@ Bar 1: G7 bass notes | "& of 4" = C (early!) | Bar 2: C held/restruck
 
 The C note is played 500 ms (at ♩= 60) early.
 Effect: Harmonic tension that "pulls" the listener into the next chord.
+```
+
+**Anticipation practice:**
+
+```
+ii–V–I in C: Dm7 – G7 – Cmaj7
+Tempo: ♩= 90
+
+Without anticipation (on the beat):
+Bar 1 (Dm7): D–F–A–B   (beat 4 = B, approaches G)
+Bar 2 (G7):  G–A–F–F#  (beat 1 = G on the beat)
+Bar 3 (Cmaj7): C–E–G–B (beat 1 = C on the beat)
+
+With anticipation (& of 4):
+Bar 1 (Dm7): D–F–A–B–G  (& of 4 = G, anticipates bar 2)
+             1 2 3 4 &
+Bar 2 (G7):  G–A–F–F#–C (& of 4 = C, anticipates bar 3)
+             1 2 3 4 &
+Bar 3 (Cmaj7): C–E–G–B–D (& of 4 = D, anticipates repeat)
+               1 2 3 4 &
+
+The anticipated note is the ROOT of the incoming chord.
+```
+
+**When to use anticipations:**
+
+```
+✓ Use when: Chord changes every bar or two bars
+✓ Use when: Medium-fast tempos (♩= 90–160)
+✓ Use when: Harmonic rhythm is clearly defined
+✓ Use when: The drummer/pianist also anticipates
+
+✗ Avoid when: Chord changes every 2 beats (too dense)
+✗ Avoid when: Very slow ballads (sounds rushed)
+✗ Avoid when: The drummer plays strictly on the beat
+```
+
+### 7.5 Scalar Runs & Arpeggiated Lines
+
+Beyond walking, scalar runs and arpeggios provide melodic interest.
+
+**Major scale run (G major, one octave):**
+
+```
+A: |–5–7–9–10–|–12–14–16–17–|
+   G A B C     D  E  F#  G
+   Fingering (OFPF at fret 7+): 1-3-4-1-2-4-1-2
+
+D: |–5–7–9–10–|–12–14–16–17–|
+   G A B C     D  E  F#  G
+   (same pattern, one string higher)
+```
+
+**Arpeggio — Gmaj7 (two octaves):**
+
+```
+A: |–5–––––9–––––12–|  G (root), B (3rd), D (5th)
+D: |–––––––––––––––17–|  G (octave)
+G: |–––––––––––––––––19–|  B (3rd, second octave)
+
+Full arpeggio ascending:
+  G (A5) → B (A9) → D (A12) → G (D17) → B (G19)
+  
+Practice ascending, then descending, with metronome
+at ♩= 60 (quarter notes per arpeggio note)
+```
+
+**Combining walking with scalar runs:**
+
+```
+Bars 1–2: Walking quarter notes (G7)
+Bar 3:    Scalar run (G major scale, eighth notes)
+Bar 4:    Return to walking (chromatic approach to C)
+
+This creates dynamic contrast — walking provides foundation,
+runs provide melodic interest.
 ```
 
 ---
@@ -605,6 +1359,12 @@ Exercise 2B: Root–5th groove pattern
   A: |–5–.–5–8–|  D . D G  (D major box)
   Beat: 1   2  3   4
   Tempo: ♩= 80 → 95 over the week
+
+Exercise 2C: Two-string pattern (E and A only)
+  E: |–0–3–5–3–|
+  A: |–5–3–0–3–|
+  Alternate bars, focus on smooth string transitions
+  Tempo: ♩= 70
 ```
 
 **Week 3 — Ghost Notes & Sixteenth-Note Feel**
@@ -620,6 +1380,14 @@ Exercise 3B: Sixteenth-note subdivision
   |–O–O–O–O–|–O–O–O–O–|
   16th notes at ♩= 80 (= 8th notes at ♩= 160)
   Count aloud: "1-e-and-a 2-e-and-a 3-e-and-a 4-e-and-a"
+
+Exercise 3C: Mixed subdivision (quarters, eighths, sixteenths)
+  Bar 1: Quarter notes
+  Bar 2: Eighth notes
+  Bar 3: Sixteenth notes
+  Bar 4: Back to quarters
+  Tempo: ♩= 75
+  Focus: Consistent pulse across all subdivisions
 ```
 
 **Week 4 — Chord Tone Navigation & ii–V–I**
@@ -636,6 +1404,12 @@ Exercise 4B: Same ii–V–I with chromatic approaches
   D7:  5–5–7–8   (approach Gmaj7 root from below)
   Gmaj7: 10–10–10–10
   Tempo: ♩= 75 → 90
+
+Exercise 4C: Transpose ii–V–I to all keys
+  Start in C, then F, Bb, Eb, Ab, Db, Gb (descending 5ths)
+  Then C, G, D, A, E, B, F# (ascending 5ths)
+  Tempo: ♩= 80
+  This maps the entire fretboard
 ```
 
 ### 8.2 Metronome Displacement Protocol
@@ -652,6 +1426,28 @@ Stage 5 (Month 2):  Click on the "&" of beat 2 only (most difficult)
 Each stage: 10 minutes/day on a single bass line pattern.
 If you lose the tempo, restart the stage — do not advance until
 you can play 2 minutes without tempo drift at each stage.
+```
+
+**Detailed Stage 5 explanation:**
+
+```
+Stage 5: Click on the "&" of beat 2
+
+Visual representation:
+Beat:  1   &   2   &   3   &   4   &
+Click: .   .   .   X   .   .   .   .
+Bass:  O   .   O   .   O   .   O   .
+
+The click lands between your note on beat 2 and beat 3.
+This is the ultimate test of internalized pulse.
+
+Pattern recommendation for Stage 5:
+  Use root-fifth pattern you learned in Week 2
+  A: |–5–.–5–.–|–5–.–5–.–|
+  Tempo: ♩= 80
+
+Verify: Record yourself and check that beat 2 and 3
+        are EXACTLY 500ms apart (at ♩= 120, adjust for your tempo)
 ```
 
 ### 8.3 Simandl Chromatic Crawl (Injury Prevention + Fingerboard Mapping)
@@ -677,19 +1473,140 @@ Time: 5 minutes at the start of every practice session
 Purpose: Builds finger independence, maps the neck, warms tendons safely
 ```
 
+**Extended chromatic crawl (Month 2+):**
+
+```
+Add position shifts within the pattern:
+
+E: |–1–2–4–|–(shift up 3 frets)–|–1–2–4–|
+Start fret 1, play 1-2-4, shift to fret 4, play 1-2-4
+Continue across all strings, then shift back down
+
+This trains both Simandl fingering AND position shifts
+simultaneously.
+```
+
 ### 8.4 Slap Endurance Builder
 
 ```
 Week 1: 30 seconds thumb-only slap on E string (open), rest 30 sec
         Repeat 4 sets. Tempo: ♩= 80
+        
 Week 2: 45 seconds T-P alternation. 4 sets. Tempo: ♩= 80
+        
 Week 3: 60 seconds full slap groove pattern. 4 sets. Tempo: ♩= 90
+        
 Week 4: 90 seconds. Add double-thumbing in second half. ♩= 90
+        
 Month 2: 2-minute uninterrupted slap groove. ♩= 100
 
 Rule: If your thumb contact becomes imprecise (hitting wrong strings,
       tone degrades), stop and rest. Endurance through degraded
       technique builds bad habits, not strength.
+```
+
+**Endurance progression rules:**
+
+```
+Only increase duration when:
+  ✓ Tone quality is consistent throughout current duration
+  ✓ No pain or sharp discomfort in thumb joint
+  ✓ Tempo is stable (no speeding up or slowing down)
+  ✓ T-P balance remains within 3 dB throughout
+
+If any of the above fails:
+  → Maintain current duration for another week
+  → Reduce tempo by 10 BPM and rebuild
+  → Add extra rest between sets (60 sec instead of 30 sec)
+```
+
+### 8.5 Ear Training for Bassists
+
+Pitch recognition and interval training specific to bass function.
+
+**Root recognition drill:**
+
+```
+Use any song with clear bass
+Listen to 4-bar phrase
+Identify the root note of each chord by ear
+Verify by playing along
+
+Week 1: Songs with slow harmonic rhythm (roots change every 2 bars)
+Week 2: Songs with moderate rhythm (roots change every bar)
+Week 3: Songs with fast changes (roots change every 2 beats)
+Week 4: Transcribe a full bass line by ear (8-bar section)
+```
+
+**Interval recognition (from root):**
+
+```
+Play a root note (e.g., C on A string, fret 3)
+Sing or hum the interval (e.g., major 3rd)
+Find that interval on the bass
+Verify: C (fret 3) → E (fret 7) = major 3rd ✓
+
+Intervals to master:
+  Minor 3rd (3 frets)
+  Major 3rd (4 frets)
+  Perfect 4th (5 frets)
+  Perfect 5th (7 frets, or 2 strings up same fret)
+  Octave (see box patterns in Section 4)
+
+Practice 10 minutes/day, all intervals from all roots.
+```
+
+**Groove transcription protocol:**
+
+```
+Month 2+ skill development:
+
+1. Select a bass line in your target genre
+   (funk, R&B, jazz, rock, etc.)
+   
+2. Listen 3–5 times without instrument
+   Focus: Rhythmic pattern, note lengths, ghost notes
+   
+3. Identify the key and root notes only
+   
+4. Add the rhythmic skeleton (when notes happen)
+   
+5. Fill in exact pitches
+   
+6. Verify by playing along with the recording
+   
+7. Notate (standard notation, tab, or both)
+
+Start with simple lines (Motown, early rock)
+Progress to complex lines (Jaco Pastorius, Marcus Miller)
+```
+
+### 8.6 The 12-Week Complete Practice Routine
+
+```
+Weeks 1–4: Foundation (follow 4-Week Foundation Builder above)
+
+Weeks 5–8: Genre expansion
+  Week 5: Focus on funk grooves + slap technique (Level 1–2)
+  Week 6: Focus on jazz walking + swing feel
+  Week 7: Focus on rock driving eighths + palm muting
+  Week 8: Focus on reggae one-drop + heavy lay-back pocket
+
+Weeks 9–12: Integration & musicality
+  Week 9:  Play along with 10 different backing tracks
+           (mixed genres, varied tempos)
+  Week 10: Transcribe 3 complete bass lines by ear
+  Week 11: Write 5 original bass lines over chord progressions
+  Week 12: Record yourself playing through all previous
+           drills at final tempo targets — document progress
+
+Daily practice structure (60 minutes):
+  00:00–05:00  Chromatic crawl warmup
+  05:00–10:00  Single-string muting + timing accuracy
+  10:00–25:00  Main technique focus (varies by week)
+  25:00–45:00  Musical context (backing tracks, songs)
+  45:00–55:00  Ear training or transcription
+  55:00–60:00  Cool down (slow root-fifth-octave patterns)
 ```
 
 ---
@@ -703,10 +1620,52 @@ Rule: If your thumb contact becomes imprecise (hitting wrong strings,
 **Root causes and fixes (check in this order):**
 
 1. **Finger placement:** Are you landing behind the fret (1–2 mm toward nut)? Landing in the middle of the fret space requires much more pressure to prevent buzz.
+   
+   ```
+   Quick test:
+   Fret any note
+   While maintaining pressure, slide your finger
+   toward the fret wire (toward bridge)
+   The buzz should disappear as you get closer to the fret
+   
+   If buzz persists even right behind the fret → proceed to #2
+   ```
+
 2. **Insufficient pressure:** Apply just enough to stop the buzz — no more.
-3. **Collapsed arch:** Flat fingers accidentally touch adjacent strings. Curl your fingers so only the fingertip contacts the string.
+   
+   ```
+   Calibration drill:
+   Fret a note with heavy pressure (buzz-free)
+   Gradually reduce pressure until buzz just appears
+   Increase pressure slightly above that threshold
+   That is your optimal pressure — memorize the feeling
+   ```
+
+3. **Collapsed arch:** Flat fingers accidentally touch adjacent strings.
+   
+   ```
+   Side-view check:
+   Ask someone to photograph your fretting hand from the side
+   Verify fingertips are curved, first knuckle is bent
+   If fingers are flat → practice curved finger position
+   at slow tempo until muscle memory develops
+   ```
+
 4. **Neck relief:** If buzz appears only on frets 1–5, the neck may have too little relief (backbow). A trained luthier adjustment — not a DIY fix.
+
 5. **High frets:** If buzz appears only at specific frets regardless of technique, the fret itself may be high. Luthier territory.
+
+6. **String height (action):** If buzz occurs across all frets, action may be too low. Luthier or tech can raise the bridge saddles.
+
+**Emergency on-stage buzz fix:**
+
+```
+If buzz suddenly appears mid-performance:
+  1. Increase fretting pressure slightly
+  2. Move plucking position toward neck pickup (softer attack)
+  3. Adjust amp EQ: reduce mids around 1–2 kHz (buzz frequency)
+  4. After the gig: check for loose hardware, inspect bridge/nut
+```
 
 ### 9.2 Inconsistent Note Duration (Sloppy Muting)
 
@@ -720,17 +1679,95 @@ Rule: If your thumb contact becomes imprecise (hitting wrong strings,
 4. If notes vary: practice "counting the note" — internally say "one" for the duration of the note, "stop" on the mute. This externalizes the timing of the mute action.
 5. Progress to eighth notes only after quarter notes are consistent.
 
+**DAW verification procedure:**
+
+```
+Import your recording into any DAW
+Zoom in to see individual note transients
+
+Measure each note:
+  Note 1: 480ms duration (target: 500ms ± 20ms)
+  Note 2: 520ms duration ✓
+  Note 3: 380ms duration ✗ (too short)
+  Note 4: 650ms duration ✗ (too long)
+
+For short notes: Left-hand mute is happening too early
+                → Delay the release by counting internally
+
+For long notes: Right-hand or left-hand mute is too late
+                → Actively mute on the exact next beat
+```
+
+**Advanced muting coordination drill:**
+
+```
+Exercise: Different durations on each beat
+
+Bar 1:
+  Beat 1: Whole note (4 beats duration)
+  Beat 2–4: Let ring
+  
+Bar 2:
+  Beat 1: Half note (2 beats)
+  Beat 2: (silence)
+  Beat 3: Half note (2 beats)
+  Beat 4: (silence)
+  
+Bar 3:
+  Beat 1–4: Quarter notes (1 beat each)
+  
+Bar 4:
+  Beat 1–4: Eighth notes (0.5 beat each)
+
+Tempo: ♩= 60
+This trains independent control of note duration.
+```
+
 ### 9.3 Tempo Drift
 
 **Symptom:** Playing slows down during technically difficult passages, speeds up during simpler ones.
 
 **Diagnostic:** Record yourself playing a 2-minute bass line alone. Import to any DAW and lay a grid over it. Drift will be visible where your transients shift from the grid lines.
 
-**Fix:**
+**Fix protocol:**
 
-1. Practice the difficult passage in isolation at 60% target tempo until it matches the easy passages in accuracy.
-2. Use gap-click training (see Section 5.2 drill) — the internalized pulse must be strong enough to survive technical demands.
-3. Practice with a drum loop, not just a metronome. A drum loop has a consistent rhythmic "pull" that reveals drift more immediately than a click.
+1. **Isolate the drift zone:**
+   
+   ```
+   If bars 5–8 consistently slow down:
+     Practice ONLY bars 5–8 at 60% of target tempo
+     Use metronome on all 4 beats
+     Master at 60%, then 70%, then 80%, then full tempo
+   ```
+
+2. **Gap-click training** (see Section 8.2 drill) — the internalized pulse must be strong enough to survive technical demands.
+
+3. **Practice with a drum loop, not just a metronome.** A drum loop has a consistent rhythmic "pull" that reveals drift more immediately than a click.
+
+4. **Subdivision counting during difficult passages:**
+   
+   ```
+   If 16th notes cause drift:
+     Count "1-e-and-a" aloud while playing
+     The vocalization anchors your internal clock
+     Do this until the passage is stable
+   ```
+
+**Preventive practice structure:**
+
+```
+For any new bass line:
+  Day 1: Tempo 50% of target, metronome on all beats
+  Day 2: Tempo 60%, metronome on 2 and 4 only
+  Day 3: Tempo 70%, metronome on beat 1 only
+  Day 4: Tempo 80%, metronome on beat 1 of every 2 bars
+  Day 5: Tempo 90%, no metronome (record and verify)
+  Day 6: Full tempo, no metronome (record and verify)
+  Day 7: Full tempo with drum loop
+
+Only advance if the previous day showed <5 BPM drift
+when measured in DAW.
+```
 
 ### 9.4 Slap-Pop Tonal Imbalance
 
@@ -742,6 +1779,48 @@ Rule: If your thumb contact becomes imprecise (hitting wrong strings,
 - Reduce thumb force (consciously play the slap at ~70% of instinctive power).
 - Increase pop string displacement slightly.
 - Use a mild compressor (4:1 ratio, medium attack ~10 ms, release ~100 ms) during practice to hear tonal differences that dynamics obscure.
+
+**Detailed balance calibration:**
+
+```
+Step 1: Record 8 bars of T-P alternation (no effects)
+Step 2: Import to DAW, locate the loudest T and loudest P
+Step 3: Measure peak levels:
+  
+  Example result:
+    Thumb peak: –2 dB
+    Pop peak:   –14 dB
+    Difference: 12 dB (unacceptable, pop is buried)
+
+Step 4: Adjustments
+  If Thumb is too loud:
+    → Reduce wrist rotation angle (40° instead of 60°)
+    → Strike with less velocity
+    → Move thumb contact point closer to neck (softer zone)
+  
+  If Pop is too quiet:
+    → Increase string displacement (12mm instead of 8mm)
+    → Pull more perpendicular (straight up, not angled)
+    → Verify you're using the fingertip, not the pad
+
+Step 5: Re-record and re-measure
+  Target: Thumb –6 dB, Pop –8 dB (2 dB gap acceptable)
+```
+
+**Compression settings for practice:**
+
+```
+Use during practice only (remove for performance):
+  Ratio: 4:1
+  Threshold: Set so both T and P trigger compression
+  Attack: 10 ms (fast, catches transient)
+  Release: 100 ms (allows note to breathe)
+  Makeup gain: Adjust so output level is comfortable
+
+Effect: Compression "squashes" the loud thumb down,
+        making the pop more audible in the mix.
+        This reveals balance issues you might otherwise miss.
+```
 
 ### 9.5 Forearm / Wrist Pain
 
@@ -771,17 +1850,288 @@ Shoulder/jaw:  Periodically scan for tension. Tight shoulders
                kinetic chain into your hands.
 ```
 
-If pain persists after ergonomic correction, see a sports medicine physician or occupational therapist before resuming intensive practice.
+**Sitting vs. standing considerations:**
+
+```
+Sitting:
+  ✓ Bass rests on right thigh (right-handed players)
+  ✓ Right foot on footstool or floor, knee at 90°
+  ✓ Neck angled upward 30–45°
+  ✓ Both hands in neutral position without reaching
+  
+  Common mistake: Letting the bass slide down between legs
+                  This forces the right hand into extreme
+                  upward wrist bend
+
+Standing:
+  ✓ Strap adjusted so bass position matches sitting position
+  ✓ Strap should be short enough that you're not reaching down
+  ✓ Wide strap distributes weight (reduces shoulder fatigue)
+  
+  Common mistake: "Guitar player low" strap position
+                  This looks cool but destroys wrist ergonomics
+```
+
+**Stretching routine (do before and after practice):**
+
+```
+1. Wrist flexion/extension (30 seconds each)
+   Make a fist, bend wrist down (flexion), hold 15 sec
+   Open hand, bend wrist up (extension), hold 15 sec
+
+2. Forearm rotation (30 seconds)
+   Arm extended, palm up → palm down, slow rotations
+
+3. Finger independence (60 seconds)
+   On a table, lift each finger independently
+   Keep others flat on the surface
+
+4. Thumb opposition (30 seconds)
+   Touch thumb to each fingertip in sequence
+   Repeat 10 times
+
+5. Neck and shoulder rolls (60 seconds)
+   Slow, gentle circles in both directions
+
+Total time: 3.5 minutes
+Do this before every practice session and after every hour
+of playing.
+```
+
+**When to see a medical professional:**
+
+```
+Seek immediate evaluation if you experience:
+  ✗ Sharp, shooting pain that persists after stopping
+  ✗ Numbness or tingling that doesn't resolve in 10 minutes
+  ✗ Weakness (difficulty gripping or fretting)
+  ✗ Pain that wakes you up at night
+  ✗ Swelling or visible deformity
+
+These may indicate:
+  - Tendonitis (inflammation of tendons)
+  - Carpal tunnel syndrome (nerve compression)
+  - Repetitive strain injury (RSI)
+  - Other serious conditions requiring professional treatment
+
+Do NOT "push through" serious pain. Early intervention
+prevents permanent damage.
+```
+
+**Return-to-play protocol after injury:**
+
+```
+Week 1: 10 minutes/day, 50% tempo, easy material only
+Week 2: 15 minutes/day, 60% tempo
+Week 3: 20 minutes/day, 70% tempo
+Week 4: 30 minutes/day, 80% tempo
+Week 5: 45 minutes/day, 90% tempo
+Week 6: 60 minutes/day, full tempo
+
+Only advance if:
+  ✓ Zero pain during practice
+  ✓ Zero pain after practice (next day)
+  ✓ Full range of motion
+  ✓ No swelling or warmth in the joint
+
+If pain returns: Drop back 2 weeks in the protocol
+                 and consult a medical professional
+```
 
 ### 9.6 Right-Hand Finger Imbalance (Index Dominates)
 
 **Symptom:** Notes played by the index finger are noticeably louder or harder-sounding than middle finger notes — the groove sounds uneven at the 16th-note level.
 
 **Fix:**
-1. Practice exclusively with the middle finger (m) for 5 minutes/session for two weeks.
-2. Practice exclusively with the ring finger (a) if using three-finger technique.
-3. Reintegrate alternation, paying attention to tonal matching.
-4. Record at close quarters (DI signal preferred) and zoom into waveforms to compare attack peaks finger-by-finger.
+
+1. **Practice exclusively with the middle finger (m) for 5 minutes/session for two weeks.**
+   
+   ```
+   Exercise: Middle finger only, all passages
+   E: |–0–0–0–0–|–0–0–0–0–|
+      m m m m   m m m m
+   Tempo: ♩= 60, eighth notes
+   
+   This forces the weaker finger to develop independent strength.
+   ```
+
+2. **Practice exclusively with the ring finger (a) if using three-finger technique.**
+
+3. **Reintegrate alternation, paying attention to tonal matching.**
+   
+   ```
+   Re-integration drill:
+   Week 1 post-isolation: i-m alternation at ♩= 50
+                          Focus: Volume matching
+   Week 2: i-m alternation at ♩= 70
+           Focus: Tonal consistency (brightness/darkness)
+   Week 3: i-m-a (if using 3-finger) at ♩= 60
+   Week 4: Apply to actual bass lines at tempo
+   ```
+
+4. **Record at close quarters (DI signal preferred) and zoom into waveforms to compare attack peaks finger-by-finger.**
+   
+   ```
+   DAW analysis:
+   Measure every note in a 16-bar recorded passage
+   Calculate:
+     Average index peak:  –7 dB
+     Average middle peak: –11 dB
+     Difference: 4 dB (needs correction)
+   
+   Target: <2 dB difference between fingers
+   ```
+
+**Biomechanical root cause (often overlooked):**
+
+```
+Index finger is naturally stronger (more flexor muscle mass)
+AND has a more favorable angle of attack on the string.
+
+Middle finger approaches at a slightly steeper angle,
+which can reduce power transfer.
+
+Solution: Adjust hand position slightly so middle finger
+          approaches string at the same angle as index.
+          This may mean rotating your wrist outward 5–10°.
+```
+
+### 9.7 Intonation Issues (Notes Sound Out of Tune)
+
+**Symptom:** Fretted notes sound sharp or flat even when the open strings are in tune.
+
+**Causes and fixes:**
+
+1. **Excess fretting pressure (most common):**
+   
+   ```
+   Physics: Pressing too hard stretches the string,
+            increasing tension → raising pitch
+   
+   Test: Fret any note, play it
+         Gradually reduce pressure until it buzzes
+         Increase pressure just above buzz threshold
+         That is the correct pressure
+   
+   If the note now sounds in tune → you were pressing too hard
+   ```
+
+2. **Finger placement too far from fret:**
+   
+   ```
+   Optimal zone: 1–2mm behind the fret wire (toward nut)
+   Too far from fret: Requires excess pressure → sharp pitch
+   
+   Visual check: Look at your finger placement
+                 Is it in the middle of the fret space? → Too far
+                 Move closer to the fret wire
+   ```
+
+3. **Neck angle / bass setup issues:**
+   
+   ```
+   If intonation is good at low frets but bad at high frets:
+     → Bridge saddle intonation adjustment needed (luthier)
+   
+   If intonation is bad everywhere:
+     → Neck relief may be incorrect (luthier)
+     → Nut height may be wrong (luthier)
+   
+   Do NOT attempt to adjust truss rod or bridge intonation
+   unless you have proper training. Incorrect adjustments
+   can permanently damage the instrument.
+   ```
+
+4. **String age:**
+   
+   ```
+   Old strings lose tonal clarity and intonation accuracy.
+   Replace strings every 3–6 months (more often if:
+     - You play 2+ hours daily
+     - You have acidic sweat
+     - You play outdoors/humid environments)
+   ```
+
+**Intonation verification procedure:**
+
+```
+Use an electronic tuner (clip-on or pedal):
+
+1. Tune open strings accurately
+2. Play 12th fret (octave) on each string
+   → Should read exact same note as open string
+   → If 12th fret is sharp or flat > 5 cents → setup issue
+3. Play 7th fret (perfect 5th)
+   → Should read exact 5th interval
+4. Play 5th fret (perfect 4th)
+   → Should read exact 4th interval
+
+If all three checks pass on all strings → your technique
+or ear is the variable, not the instrument.
+```
+
+### 9.8 Lack of Tonal Variation (Everything Sounds the Same)
+
+**Symptom:** Bass lines sound monotonous, even when notes and rhythms are correct.
+
+**Causes and fixes:**
+
+1. **Static plucking position:**
+   
+   ```
+   Fix: Practice the same 4-bar pattern in three positions:
+     Position A: Over neck pickup (warm, round)
+     Position B: Between pickups (balanced)
+     Position C: Over bridge pickup (bright, cutting)
+   
+   Hear the difference. Use position changes to match
+   the emotional arc of the song.
+   ```
+
+2. **No dynamic variation:**
+   
+   ```
+   Fix: Practice with dynamic markings:
+     p  (piano) = soft, 40% plucking force
+     mf (mezzo-forte) = medium, 70% force
+     f  (forte) = strong, 100% force
+   
+   Apply to actual music:
+     Verse: p–mf (lay back, support the vocal)
+     Chorus: f (drive, increase intensity)
+     Bridge: mf (pull back, create space)
+   ```
+
+3. **Uniform note lengths:**
+   
+   ```
+   Fix: Mix staccato (short, detached) and legato (long, smooth)
+   
+   Example:
+   Bar 1: All quarter notes, staccato (0.3 beat duration each)
+   Bar 2: All quarter notes, legato (0.9 beat duration each)
+   Bar 3: Mix — beats 1+2 staccato, beats 3+4 legato
+   
+   This creates rhythmic texture beyond just pitch and timing.
+   ```
+
+4. **No use of bass tone controls:**
+   
+   ```
+   Active bass (battery-powered preamp):
+     Bass boost: +3 to +6 dB → thicker, warmer
+     Treble boost: +3 to +6 dB → brighter, more attack
+     Both flat (noon position): Natural tone
+   
+   Passive bass (no preamp):
+     Tone knob full up (10): Brightest
+     Tone knob rolled off (5): Darker, warmer
+     Tone knob at 0: Very dark, "thumpy"
+   
+   Drill: Play the same groove with tone at 10, 5, and 0
+          Hear the tonal palette available to you
+          Use tone changes to match song dynamics
+   ```
 
 ---
 
@@ -791,63 +2141,81 @@ If pain persists after ergonomic correction, see a sports medicine physician or 
 graph TD
     subgraph sub_entry ["Problem Identification"]
         A["Technique issue detected during practice"]
-        B{"What category\nis the problem?"}
+        B{"What category<br/>is the problem?"}
         A --> B
     end
 
     subgraph sub_timing ["Timing & Groove Issues"]
-        C{"Specific\ntiming problem?"}
-        C1["Tempo drift\n(speeds up / slows down)"]
-        C2["Subdivision errors\n(16ths falling off-grid)"]
-        C3["Pocket feel missing\n(no groove lock)"]
+        C{"Specific<br/>timing problem?"}
+        C1["Tempo drift<br/>(speeds up / slows down)"]
+        C2["Subdivision errors<br/>(16ths falling off-grid)"]
+        C3["Pocket feel missing<br/>(no groove lock)"]
 
         C -->|"Drifting tempo"| C1
         C -->|"Subdivision"| C2
         C -->|"Groove"| C3
 
-        C1 --> C1a["Gap-click training\nRecord + DAW analysis\nIsolate hard passages at 60% tempo"]
-        C2 --> C2a["Count aloud subdivisions\nMetronome on 2+4 only\nSlow-tempo mastery first"]
-        C3 --> C3a["Practice with drum loops\nAlign to kick transient\nRecord + waveform comparison"]
+        C1 --> C1a["Gap-click training (Section 8.2)<br/>Record + DAW analysis<br/>Isolate hard passages at 60% tempo"]
+        C2 --> C2a["Count aloud subdivisions<br/>Metronome on 2+4 only<br/>Slow-tempo mastery first"]
+        C3 --> C3a["Practice with drum loops<br/>Align to kick transient<br/>Record + waveform comparison"]
     end
 
     subgraph sub_tone ["Tone & Articulation Issues"]
-        D{"Specific\ntone problem?"}
+        D{"Specific<br/>tone problem?"}
         D1["Fret buzz"]
-        D2["Muting inconsistency\n(uneven note lengths)"]
+        D2["Muting inconsistency<br/>(uneven note lengths)"]
         D3["Slap/pop imbalance"]
-        D4["Right-hand\nfinger imbalance"]
+        D4["Right-hand<br/>finger imbalance"]
+        D5["Intonation problems<br/>(notes sound out of tune)"]
 
         D -->|"Buzz"| D1
         D -->|"Note length"| D2
         D -->|"Slap/pop"| D3
         D -->|"Finger balance"| D4
+        D -->|"Intonation"| D5
 
-        D1 --> D1a["Check finger placement\n(1–2mm behind fret)\nCheck neck relief\nConsult luthier if persistent"]
-        D2 --> D2a["Slow tempo muting drill\n♩= 50, equal on/off\nRecord + waveform check"]
-        D3 --> D3a["DAW level comparison\nReduce thumb force 25%\nIncrease pop displacement\nCompressor 4:1 during practice"]
-        D4 --> D4a["5 min/day m-finger only\nRecord + compare attack peaks\nReintegrate with attention"]
+        D1 --> D1a["Check finger placement<br/>(1–2mm behind fret)<br/>Check pressure (minimum to stop buzz)<br/>Check arch (curved fingers)<br/>Consult luthier if persistent"]
+        D2 --> D2a["Slow tempo muting drill<br/>♩= 50, equal on/off<br/>Record + waveform check<br/>Count note duration internally"]
+        D3 --> D3a["DAW level comparison<br/>Reduce thumb force 25%<br/>Increase pop displacement<br/>Compressor 4:1 during practice"]
+        D4 --> D4a["5 min/day m-finger only<br/>Record + compare attack peaks<br/>Reintegrate with attention<br/>Adjust hand angle if needed"]
+        D5 --> D5a["Check fretting pressure (too hard → sharp)<br/>Check finger placement (too far → sharp)<br/>Electronic tuner verification at frets 5, 7, 12<br/>If consistent across all: luthier setup check"]
     end
 
     subgraph sub_physical ["Physical / Ergonomic Issues"]
-        E{"Pain or\nfatigue?"}
+        E{"Pain or<br/>fatigue?"}
         E1["Sharp / shooting pain"]
-        E2["Fatigue and\ntechnique degradation"]
-        E3["Wrist / forearm\ndiscomfort"]
+        E2["Fatigue and<br/>technique degradation"]
+        E3["Wrist / forearm<br/>discomfort"]
 
         E -->|"Sharp pain"| E1
         E -->|"Fatigue only"| E2
         E -->|"Wrist discomfort"| E3
 
-        E1 --> E1a["STOP IMMEDIATELY\nRest minimum 48 hours\nSee sports medicine physician"]
-        E2 --> E2a["Reduce session length\nAdd 30-sec rests every 10 min\nGraded exposure: +2 min/week"]
-        E3 --> E3a["Ergonomic assessment\nCheck strap height + bass angle\nVerify wrist alignment\nSoft tissue stretching"]
+        E1 --> E1a["STOP IMMEDIATELY<br/>Rest minimum 48 hours<br/>Ice and elevate if swollen<br/>See sports medicine physician"]
+        E2 --> E2a["Reduce session length<br/>Add 30-sec rests every 10 min<br/>Graded exposure: +2 min/week<br/>Pre/post-practice stretching"]
+        E3 --> E3a["Ergonomic assessment (Section 9.5)<br/>Check strap height + bass angle<br/>Verify wrist alignment<br/>Stretching routine (3.5 min pre/post)<br/>If persists: medical consult"]
+    end
+
+    subgraph sub_musical ["Musical / Creative Issues"]
+        F{"Musicality<br/>problem?"}
+        F1["Lines sound boring<br/>(no tonal variation)"]
+        F2["Can't lock with drummer"]
+        F3["Lost on fretboard<br/>(don't know where notes are)"]
+
+        F -->|"Boring tone"| F1
+        F -->|"Can't lock"| F2
+        F -->|"Lost on neck"| F3
+
+        F1 --> F1a["Practice plucking position changes<br/>Add dynamic variation (p, mf, f)<br/>Mix staccato and legato<br/>Use tone controls actively"]
+        F2 --> F2a["Kick drum alignment drill (Section 5.3)<br/>Record with drums + waveform check<br/>Practice pocket placement (push/center/lay back)<br/>Metronome displacement training"]
+        F3 --> F3a["Root-Fifth-Octave drill (Section 4.1)<br/>Root finder exercise (Section 4.3)<br/>Chromatic crawl (Section 8.3)<br/>Transpose ii–V–I to all keys"]
     end
 
     subgraph sub_resolve ["Resolution Path"]
-        R1["Implement fix protocol\nfor 2 weeks minimum"]
+        R1["Implement fix protocol<br/>for 2 weeks minimum"]
         R2{"Resolved?"}
-        R3["Advance difficulty\nIncrement tempo or complexity"]
-        R4["Video-record technique\nSeek qualified instructor\nIf pain: medical consult"]
+        R3["Advance difficulty<br/>Increment tempo or complexity<br/>Apply to musical context"]
+        R4["Video-record technique<br/>Seek qualified instructor<br/>If pain: medical consult<br/>If setup: luthier visit"]
 
         R1 --> R2
         R2 -->|"Yes"| R3
@@ -857,6 +2225,7 @@ graph TD
     B -->|"Timing"| C
     B -->|"Tone"| D
     B -->|"Physical"| E
+    B -->|"Musical"| F
 
     C1a --> R1
     C2a --> R1
@@ -865,8 +2234,12 @@ graph TD
     D2a --> R1
     D3a --> R1
     D4a --> R1
+    D5a --> R1
     E2a --> R1
     E3a --> R1
+    F1a --> R1
+    F2a --> R1
+    F3a --> R1
 ```
 
 ---
@@ -874,31 +2247,107 @@ graph TD
 ## Quick Reference Card
 
 ```
-SIMANDL ZONES:
-  Frets 1–5:   Use 1-2-4  (index, middle, pinky)
-  Frets 7+:    Use 1-2-3-4 (OFPF)
+═══════════════════════════════════════════════════════════════
+                  BASS GUITAR QUICK REFERENCE
+═══════════════════════════════════════════════════════════════
 
-THUMB POSITION: Back of neck, opposite middle finger, angled toward headstock
+FINGERING ZONES:
+  Frets 1–5:   Simandl 1-2-4  (index, middle, pinky)
+  Frets 7+:    OFPF 1-2-3-4   (one finger per fret)
+  Frets 5–7:   Hybrid (use context)
 
-FINGER PLACEMENT: 1–2mm behind target fret (toward nut)
+HAND POSITIONS:
+  Thumb: Back of neck, behind middle finger, angled to headstock
+  Wrist: Straight, minimal bend up/down
+  Fingers: Curved arch, land 1–2mm behind fret
+  Plucking: Rest stroke default, 45° string angle
 
-FLOATING THUMB: Rests on the string directly above the one you're playing
+MUTING:
+  Floating thumb: Rests on string below current string
+  Left-hand drape: Unused fingers lightly touch lower strings
+  Palm mute: Heel of hand 1–3cm from bridge saddles
 
-PALM MUTE ZONE: 1–3 cm from bridge saddles for the classic thud
+SLAP & POP:
+  Slap: Bony thumb edge, wrist rotation 40–60°, BOUNCE off
+  Pop: Hook under string, pull perpendicular, 8–12mm displacement
+  Contact point: Neck/body joint (20th–22nd fret area)
 
-SLAP CONTACT: Bony outer edge of thumb, at neck/body joint, BOUNCE off
+GROOVE POCKETS:
+  Funk: slight push (5–10ms early)
+  Jazz: lay back (10–15ms late)
+  Rock: center (on the beat)
+  Reggae: heavy lay back (20–30ms late)
 
-POP POSITION:  Hook under string over neck pickup, pull PERPENDICULAR to body
+ROOT-FIFTH-OCTAVE (from E string root):
+  Root:   E string, fret N
+  Fifth:  A string, fret N+2
+  Octave: D string, fret N+2
 
-POCKET TARGETS:
-  Funk: slight push     Jazz: slight lay back
-  Rock: center          Reggae: heavy lay back
+ROOT-FIFTH-OCTAVE (from A string root):
+  Root:   A string, fret N
+  Fifth:  D string, fret N+2
+  Octave: G string, fret N+2
 
-PRACTICE ORDER:
-  1. Chromatic crawl warmup (5 min, Simandl)
-  2. Single-string muting drill (5 min)
-  3. Main technique focus (20 min)
-  4. Musical context — play with drums/backing (15 min)
-  5. Cool down — slow root-fifth-octave patterns (5 min)
+APPROACH NOTES:
+  From below: Target – 1 fret (half-step)
+  From above: Target + 1 fret (half-step)
+  Encircle: Above → below → target
 
-WEEKLY TEMPO INCREMENT: +2–5 BPM per session, only after clean execution
+WALKING BASS RULES:
+  1. Root on beat 1 of new chord
+  2. Chord tones (1, 3, 5, 7) on beats 1 and 3
+  3. Passing tones on beats 2 and 4
+  4. Approach next root by half or whole step
+
+PRACTICE ORDER (60-minute session):
+  00–05 min: Chromatic crawl warmup (Simandl + OFPF)
+  05–10 min: Single-string muting drill
+  10–25 min: Main technique focus (varies by goal)
+  25–45 min: Musical context (backing tracks, songs)
+  45–55 min: Ear training or transcription
+  55–60 min: Cool down (slow root-fifth-octave patterns)
+
+TEMPO PROGRESSION:
+  +2–5 BPM per session (only after clean execution)
+  Do NOT advance with errors
+
+ERGONOMIC ALERTS:
+  Sharp pain → STOP IMMEDIATELY → Rest 48+ hours → Doctor
+  Strap too low → Wrist strain
+  Bass angle flat → Wrist deviation
+  Pre/post stretch → 3.5 minutes (Section 9.5)
+
+DYNAMIC BALANCE:
+  Thumb slap vs. pop: <3 dB difference (use DAW to verify)
+  Index vs. middle finger: <2 dB difference
+  Ghost notes: 50–60% volume of pitched notes (–6 to –8 dB quieter)
+
+METRONOME DISPLACEMENT (groove training):
+  Stage 1: Click on beats 1, 2, 3, 4
+  Stage 2: Click on beats 2 and 4 only
+  Stage 3: Click on beat 1 only
+  Stage 4: Click on beat 1 of every other bar
+  Stage 5: Click on "&" of beat 2 only (advanced)
+
+KEY DRILLS:
+  • Chromatic crawl: Daily warmup, 5 min
+  • Root finder: Random note → find on E and A strings
+  • Gap-click training: Internalize pulse without constant click
+  • ii–V–I in all keys: Harmonic navigation mastery
+  • Ghost note integration: Rhythmic texture building
+  • Slap endurance: 30 sec → 2 min over 8 weeks
+
+RED FLAGS (seek medical/luthier help):
+  ✗ Pain persists after 48-hour rest
+  ✗ Numbness/tingling doesn't resolve in 10 min
+  ✗ Fret buzz on all strings after technique correction
+  ✗ Intonation problems at 12th fret after fresh strings
+
+WEEKLY TEMPO TARGETS (4-Week Foundation):
+  Week 1: ♩= 60 BPM baseline
+  Week 2: ♩= 70–80 BPM
+  Week 3: ♩= 85–95 BPM
+  Week 4: ♩= 100–110 BPM
+  (Adjust based on individual progress)
+
+═══════════════════════════════════════════════════════════════
