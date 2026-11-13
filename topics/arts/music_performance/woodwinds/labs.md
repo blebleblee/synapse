@@ -1,1752 +1,898 @@
-# Operational Verification Labs: Woodwind Aeroacoustics and Performance Systems
+# Woodwind Mastery: Performance Technique, Sound Production & Instrument Systems
 
-## Objective & Laboratory Configuration
+## Overview
 
-This laboratory provides systematic operational verification of woodwind instrument systems through acoustical measurement, aerodynamic characterization, and psychoacoustic analysis. The curriculum integrates physical measurement techniques with computational modeling to establish quantitative relationships between player control parameters, aeroacoustic phenomena, and timbral outcomes. Students will develop empirical methodologies for assessing instrument response across the operational envelope, correlating subjective performance characteristics with objective physical measurements.
+This masterclass covers the woodwind family from the ground up — embouchure mechanics, breath support, fingering systems, articulation, and tone development. The curriculum is organized by playing priority: what you feel and do first, grounded in just enough acoustic understanding to explain *why* the technique works. Labs build from single sustained tones to full-range technical exercises.
 
-The woodwind family operates through coupled fluid-structure interactions: an airstream interacts with either a reed (single: clarinet, saxophone; double: oboe, bassoon) or an edge tone mechanism (flute family) to generate periodic pressure oscillations. These acoustic drivers couple with resonant air columns exhibiting frequency-dependent impedance characteristics determined by bore geometry and tone hole configurations. Understanding this system requires integrating aerodynamic fluid mechanics, structural vibration analysis, and acoustic wave propagation theory.
-
-### Required Instrumentation, Software, and Laboratory Equipment
-
-#### Physical Measurement Systems
-
-- **Woodwind Instruments:** Professional-grade instruments representing each major family: Böhm-system flute (C foot), Boehm-system clarinet (Bb, cylindrical bore), Alto saxophone (Eb, conical bore), conservatory-system oboe (C, conical bore with narrow reed), Heckel-system bassoon (C, conical bore with wide reed)
-- **Acoustic Measurement Equipment:**
-  - Calibrated measurement microphone (flat frequency response 20 Hz–20 kHz, <1% THD): Earthworks M30 or equivalent
-  - Professional audio interface with 24-bit/96 kHz minimum specification: RME Fireface UCX II or Focusrite Clarett 8PreX
-  - Acoustic measurement software: REW (Room EQ Wizard), ARTA (Audio Response and Transmission Analysis)
-  - SPL meter calibrated to IEC 61672-1 Class 1 standard
-- **Aerodynamic Measurement:**
-  - Differential pressure transducer (0–2 kPa range, <0.5% accuracy): Omega PX409 series
-  - Hot-wire anemometer or mass airflow sensor for breath flow quantification
-  - Oral cavity pressure measurement system (medical-grade transducer)
-- **Mechanical Characterization:**
-  - Reed vibration measurement: High-speed camera (>1000 fps) or laser Doppler vibrometer
-  - Force measurement: Digital force gauge for keywork and pad sealing verification
-  - Dimensional metrology: Digital calipers (0.01 mm resolution) for reed and mouthpiece geometry
-
-#### Computational Analysis Environment
-
-- **Digital Audio Workstation (DAW):** Reaper (professional license, extensible with ReaScript/Python), Ableton Live Suite (Max for Live integration), or Logic Pro X
-- **Spectral Analysis Software:** 
-  - PRAAT (phonetic sciences platform, formant extraction, spectral analysis)
-  - Sonic Visualiser with Vamp plugin architecture
-  - Custom Python analysis pipeline (librosa, scipy.signal, numpy/matplotlib)
-- **Physical Modeling Simulators:**
-  - Modartt Pianoteq (physical modeling engine adaptable for wind instruments)
-  - IRCAM AudioSculpt (spectral domain analysis and resynthesis)
-  - Open-source computational acoustic toolkits: Python Acoustics, PyTTa
-- **Finite Element / Computational Fluid Dynamics (advanced):**
-  - COMSOL Multiphysics (acoustics and CFD modules)
-  - OpenFOAM (open-source CFD, fluid-structure interaction)
-
-#### Calibration Standards and Reference Materials
-
-- **Reference Tones:** Precision audio oscillator or software tone generator (THD <0.001%)
-- **Acoustic Calibrator:** 94 dB / 114 dB dual-level calibrator (1 kHz reference tone)
-- **Reed Quality Standards:** Standardized synthetic reeds (Légère, Forestone) for eliminating cane variability in controlled experiments
-- **Environmental Monitoring:** Temperature (±0.1°C), relative humidity (±1%), barometric pressure sensors for compensating acoustic measurements
-
-## Exercise 1: Aeroacoustic Fundamentals and Control Parameter Mapping
-
-### Exercise 1a: Excitation Mechanisms and Impedance-Controlled Oscillation
-
-**Theoretical Foundation:**
-
-Woodwind sound generation relies on self-sustained oscillations arising from flow instabilities coupled to acoustic resonators. For reed instruments, the Bernoulli effect creates a negative pressure region as air accelerates through the constriction between reed and mouthpiece, closing the reed against the lay. This forms a relaxation oscillator: pressure builds in the oral cavity until it overcomes reed stiffness, allowing flow, which then reduces pressure through the Bernoulli effect, causing the reed to snap shut. The oscillation frequency is not determined by reed resonance but by the acoustic impedance of the air column, which selectively amplifies frequencies corresponding to standing wave modes.
-
-The acoustic impedance Z(ω) for a cylindrical tube closed at one end (clarinet approximation) exhibits peaks at odd harmonics:
-
-```
-f_n = (2n - 1) * c / (4L)    where n = 1, 2, 3, ...
-c = speed of sound ≈ 343 m/s at 20°C
-L = effective acoustic length including end corrections
-```
-
-For conical bores (saxophone, oboe, bassoon), the impedance exhibits peaks at all harmonics similar to a stopped cylindrical pipe with effective length L/2:
-
-```
-f_n = n * c / (2L)    where n = 1, 2, 3, ...
-```
-
-The flute operates via edge tone mechanism: a planar jet from the embouchure hole impinges on the labium (sharp edge), creating alternating vortices that modulate flow into and out of the tube. This aerodynamic oscillation couples with acoustic modes through jet deflection feedback.
-
-**Experimental Procedure:**
-
-1. **Embouchure Formation and Characterization**
-
-   Begin with a professional single-reed setup (Bb clarinet, Vandoren B45 mouthpiece, strength 3 reed). Position the reed on the table with 1–2 mm of mouthpiece tip visible beyond the reed tip. The facing curve should allow the reed to vibrate freely while maintaining sufficient damping to prevent squeaks.
-
-   Establish oral cavity pressure measurement: Insert a thin catheter (medical-grade silicone tubing, 2 mm ID) through the corner of the embouchure, connected to the differential pressure transducer. Zero the transducer at atmospheric pressure. Form the embouchure with lower lip rolled over the bottom teeth, covering approximately 1/3 of the reed surface. Upper teeth rest directly on the mouthpiece top. Jaw position: slightly recessed to create approximately 5–10° angle of attack between reed and mouthpiece.
-
-   Measure baseline parameters while playing a stable middle register note (written G/sounding F, concert pitch 349.23 Hz):
-   - Oral cavity pressure: typical range 1–3 kPa for piano dynamic
-   - Reed opening area: estimated from high-speed video or acoustic flow modeling
-   - Attack transient characteristics: measure time from breath onset to stable oscillation
-
-2. **Mapping Embouchure Parameters to Spectral Characteristics**
-
-   Systematically vary embouchure parameters while maintaining constant fingering (written G):
-
-   **Parameter Space:**
-   
-   | Parameter | Range | Measurement |
-   |-----------|-------|-------------|
-   | Lip pressure (lower lip force) | Light (1 N) → Heavy (5 N) | Force gauge calibration, then tactile reproduction |
-   | Jaw position (vertical aperture) | Recessed (closed) → Forward (open) | ±3 mm displacement measured with video analysis |
-   | Oral cavity volume | Small (tongue forward) → Large (tongue retracted) | Indirect measurement via impedance change |
-   | Embouchure seal tightness | Loose (air leakage) → Tight | Measure air leakage with pressure decay test |
-
-   For each parameter combination (minimum 5 levels per parameter, full factorial design yields 625 test conditions—select critical subset using Latin hypercube sampling), record:
-   
-   - 5-second steady-state tone at mezzo-forte dynamic
-   - Position calibrated measurement microphone at 50 cm on-axis from bell
-   - Simultaneously record oral pressure and acoustic output
-   - Environmental compensation: record temperature, humidity, barometric pressure
-
-3. **Spectral Analysis Protocol**
-
-   Process recordings using the following Python analysis pipeline:
-
-   ```python
-   import numpy as np
-   import librosa
-   import scipy.signal as signal
-   import matplotlib.pyplot as plt
-   from scipy.interpolate import interp1d
-   
-   def analyze_woodwind_spectrum(audio_file, sr=96000):
-       """
-       Comprehensive spectral analysis for woodwind tones.
-       
-       Returns:
-           dict: Spectral features including fundamental, harmonics, 
-                 spectral centroid, inharmonicity, formant structure
-       """
-       # Load audio with high sample rate
-       y, sr = librosa.load(audio_file, sr=sr)
-       
-       # Extract steady-state portion (middle 3 seconds, excluding attack/release)
-       steady_start = int(1.0 * sr)
-       steady_end = int(4.0 * sr)
-       y_steady = y[steady_start:steady_end]
-       
-       # Fundamental frequency estimation using YIN algorithm
-       f0 = librosa.yin(y_steady, fmin=80, fmax=800, sr=sr)
-       f0_median = np.median(f0[f0 > 0])  # Exclude unvoiced frames
-       f0_std = np.std(f0[f0 > 0])
-       
-       # FFT-based spectral analysis
-       n_fft = 8192
-       hop_length = n_fft // 4
-       
-       # Compute STFT
-       D = librosa.stft(y_steady, n_fft=n_fft, hop_length=hop_length)
-       S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
-       
-       # Average spectrum across time
-       S_avg = np.mean(np.abs(D), axis=1)
-       freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
-       
-       # Harmonic analysis: extract peak amplitudes at expected harmonics
-       harmonics = []
-       harmonic_freqs = []
-       n_harmonics = 10
-       
-       for h in range(1, n_harmonics + 1):
-           target_freq = f0_median * h
-           # Find peak within ±5% of expected harmonic frequency
-           freq_range = target_freq * 0.05
-           idx_range = np.where((freqs >= target_freq - freq_range) & 
-                                (freqs <= target_freq + freq_range))[0]
-           
-           if len(idx_range) > 0:
-               peak_idx = idx_range[np.argmax(S_avg[idx_range])]
-               harmonics.append(S_avg[peak_idx])
-               harmonic_freqs.append(freqs[peak_idx])
-           else:
-               harmonics.append(0)
-               harmonic_freqs.append(target_freq)
-       
-       # Compute inharmonicity coefficient
-       # Measure deviation of partials from ideal harmonic series
-       inharmonicity = np.std([harmonic_freqs[i] / ((i+1) * f0_median) 
-                               for i in range(len(harmonic_freqs))]) if len(harmonic_freqs) > 0 else 0
-       
-       # Spectral centroid (brightness)
-       spectral_centroid = np.sum(freqs * S_avg) / np.sum(S_avg)
-       
-       # Spectral rolloff (frequency below which 85% of energy is contained)
-       cumulative_energy = np.cumsum(S_avg**2)
-       total_energy = cumulative_energy[-1]
-       rolloff_idx = np.where(cumulative_energy >= 0.85 * total_energy)[0][0]
-       spectral_rolloff = freqs[rolloff_idx]
-       
-       # Harmonic-to-noise ratio (HNR)
-       # Compare energy in harmonic peaks vs. total energy
-       harmonic_energy = np.sum([S_avg[int(freq / (sr/n_fft))]**2 
-                                  for freq in harmonic_freqs if freq < sr/2])
-       total_energy_linear = np.sum(S_avg**2)
-       hnr = 10 * np.log10(harmonic_energy / (total_energy_linear - harmonic_energy + 1e-10))
-       
-       return {
-           'f0_median': f0_median,
-           'f0_std': f0_std,
-           'harmonics': harmonics,
-           'harmonic_freqs': harmonic_freqs,
-           'inharmonicity': inharmonicity,
-           'spectral_centroid': spectral_centroid,
-           'spectral_rolloff': spectral_rolloff,
-           'hnr': hnr,
-           'spectrum': S_avg,
-           'frequencies': freqs
-       }
-   
-   def plot_spectral_comparison(results_dict, parameter_name):
-       """
-       Visualize how spectral characteristics change with parameter variation.
-       
-       Args:
-           results_dict: {parameter_value: analysis_result}
-           parameter_name: string describing the varied parameter
-       """
-       fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-       
-       # Plot 1: Fundamental frequency stability
-       param_values = sorted(results_dict.keys())
-       f0_values = [results_dict[p]['f0_median'] for p in param_values]
-       f0_stds = [results_dict[p]['f0_std'] for p in param_values]
-       
-       axes[0, 0].errorbar(param_values, f0_values, yerr=f0_stds, 
-                           marker='o', capsize=5)
-       axes[0, 0].set_xlabel(parameter_name)
-       axes[0, 0].set_ylabel('Fundamental Frequency (Hz)')
-       axes[0, 0].set_title('Pitch Stability vs. ' + parameter_name)
-       axes[0, 0].grid(True, alpha=0.3)
-       
-       # Plot 2: Spectral centroid (brightness)
-       centroids = [results_dict[p]['spectral_centroid'] for p in param_values]
-       axes[0, 1].plot(param_values, centroids, marker='s', linewidth=2)
-       axes[0, 1].set_xlabel(parameter_name)
-       axes[0, 1].set_ylabel('Spectral Centroid (Hz)')
-       axes[0, 1].set_title('Timbral Brightness vs. ' + parameter_name)
-       axes[0, 1].grid(True, alpha=0.3)
-       
-       # Plot 3: Harmonic spectrum envelope
-       for p in param_values:
-           harmonic_levels_db = 20 * np.log10(
-               np.array(results_dict[p]['harmonics'][:8]) / 
-               results_dict[p]['harmonics'][0] + 1e-10
-           )
-           axes[1, 0].plot(range(1, 9), harmonic_levels_db, 
-                          marker='o', label=f'{parameter_name}={p}')
-       
-       axes[1, 0].set_xlabel('Harmonic Number')
-       axes[1, 0].set_ylabel('Relative Amplitude (dB)')
-       axes[1, 0].set_title('Harmonic Structure')
-       axes[1, 0].legend(fontsize=8)
-       axes[1, 0].grid(True, alpha=0.3)
-       
-       # Plot 4: Harmonic-to-noise ratio
-       hnr_values = [results_dict[p]['hnr'] for p in param_values]
-       axes[1, 1].plot(param_values, hnr_values, marker='^', 
-                      linewidth=2, color='darkred')
-       axes[1, 1].set_xlabel(parameter_name)
-       axes[1, 1].set_ylabel('HNR (dB)')
-       axes[1, 1].set_title('Tone Purity vs. ' + parameter_name)
-       axes[1, 1].grid(True, alpha=0.3)
-       
-       plt.tight_layout()
-       plt.savefig(f'spectral_analysis_{parameter_name}.png', dpi=300)
-       plt.show()
-   ```
-
-4. **Acoustic Impedance Visualization**
-
-   The relationship between bore geometry and acoustic response can be visualized using a Mermaid diagram:
+**Instruments covered:** Flute (Böhm system, C), Bb Clarinet (cylindrical bore), Alto Saxophone (Eb, conical), Oboe (conservatory system), Bassoon (Heckel system).
 
 ```mermaid
-graph TB
-    A["Player Control Interface<br/>(Embouchure + Breath)"] -->|"Pressure & Flow"| B["Excitation Mechanism"]
-    B -->|"Reed: Flow-controlled valve"| C["Single Reed<br/>(Clarinet, Sax)"]
-    B -->|"Double Reed: Pressure-controlled valve"| D["Double Reed<br/>(Oboe, Bassoon)"]
-    B -->|"Edge Tone: Jet instability"| E["Flute Embouchure"]
-    
-    C --> F["Acoustic Resonator<br/>(Air Column)"]
-    D --> F
-    E --> F
-    
-    F --> G["Bore Geometry<br/>Determines Impedance"]
-    G -->|"Cylindrical"| H["Odd Harmonics<br/>(Clarinet)"]
-    G -->|"Conical"| I["All Harmonics<br/>(Sax, Oboe, Bassoon)"]
-    G -->|"Parabolic"| J["Modified Spectrum<br/>(Flute)"]
-    
-    H --> K["Radiated Sound<br/>(Bell + Tone Holes)"]
-    I --> K
-    J --> K
-    
-    K --> L["Acoustic Field<br/>(Directivity Pattern)"]
-    
-    F -.->|"Feedback"| B
-    
-    style A fill:#e1f5ff
-    style B fill:#fff3e1
-    style F fill:#f0e1ff
-    style K fill:#e1ffe1
+graph LR
+    subgraph sub_excitation ["Excitation Type"]
+        A["Edge Tone<br/>Flute"]
+        B["Single Reed<br/>Clarinet · Saxophone"]
+        C["Double Reed<br/>Oboe · Bassoon"]
+    end
+
+    subgraph sub_bore ["Bore Profile"]
+        D["Parabolic/Cylindrical<br/>(Flute)"]
+        E["Cylindrical<br/>(Clarinet)"]
+        F["Conical<br/>(Sax · Oboe · Bassoon)"]
+    end
+
+    subgraph sub_register ["Register Behavior"]
+        G["Overblows Octave<br/>(open-pipe)"]
+        H["Overblows Twelfth<br/>(closed-pipe)"]
+        I["Overblows Octave<br/>(conical)"]
+    end
+
+    A --> D --> G
+    B --> E --> H
+    B --> F --> I
+    C --> F --> I
 ```
 
-5. **Data Collection and Statistical Analysis**
+---
 
-   For each embouchure configuration, collect minimum 3 repetitions to assess measurement repeatability. Calculate:
-   
-   - Coefficient of variation (CV) for fundamental frequency: CV = (σ / μ) × 100%
-   - Effect size (Cohen's d) for spectral centroid changes between conditions
-   - Correlation coefficients between oral pressure and spectral parameters
-   
-   Expected results: Increased lip pressure typically raises spectral centroid (brighter tone) and improves pitch stability (lower f0_std). Excessive pressure degrades tone quality (reduced HNR) due to reed damping.
+## Part 1: Breath Support — The Foundation of Everything
 
-### Exercise 1b: Fingering Systems and Acoustic Length Modulation
+Before touching a fingering chart, every woodwind player must internalize diaphragmatic breath support. The instrument is just a resonator; *you* are the engine.
 
-**Theoretical Foundation:**
+### 1.1 Diaphragmatic Breathing Mechanics
 
-Woodwind pitch control operates by modulating the effective acoustic length of the resonator through opening tone holes or extending tubing sections. A simplified model treats each open tone hole as creating a pressure node (velocity antinode), causing the acoustic wave to radiate from that point rather than continuing to the bell. The effective length L_eff is approximately the distance from reed/embouchure to the first open tone hole, corrected for end effects.
+The diaphragm is a dome-shaped muscle beneath your lungs. When it contracts (flattens), it creates negative pressure that draws air in. When it releases, the lungs deflate passively — but for playing, you actively control the release with your abdominal wall.
 
-The end correction δ for an open tone hole depends on hole geometry:
+**The column model:** Think of your airstream as a column of water in a hose. High pressure at the source (compressed abdomen), small aperture at the end (embouchure), fast laminar flow. Turbulence is your enemy.
 
-```
-δ ≈ 0.6 * r    for an isolated hole
-δ ≈ 0.85 * r   for holes with nearby closed holes (lattice correction)
+**Drill 1 — Breath Control Without the Instrument (5 minutes daily)**
 
-where r = hole radius
-```
+1. Place one hand on your sternum, one on your navel.
+2. Inhale for 4 counts: only the navel hand should move outward. If your sternum rises, reset.
+3. Exhale on a sustained "shhh" for 8 counts. Feel your abdominal wall gently compress inward.
+4. Add resistance: exhale on a thin, fast "ss" for 16 counts. This is the pressure and speed needed for a fortissimo high note.
 
-For a cylindrical bore with radius R and tone hole radius r_h at distance L from the closed end:
+**Metronome targets:**
+- Week 1: 4-count inhale / 8-count exhale at ♩ = 60
+- Week 2: 4-count inhale / 12-count exhale
+- Week 3: 2-count inhale / 16-count exhale
 
-```
-L_eff = L + δ_hole + δ_bell
+### 1.2 Breath Pressure vs. Breath Volume — Know the Difference
 
-f = c / (4 * L_eff)    for clarinet (odd harmonics)
-f = c / (2 * L_eff)    for conical instruments (all harmonics)
-```
+| Register | Flute | Clarinet | Saxophone | Oboe | Bassoon |
+|---|---|---|---|---|---|
+| **Low** | Low pressure, high volume | Low-medium pressure | Low pressure, full volume | High pressure, narrow aperture | Medium pressure |
+| **Middle** | Medium pressure | Medium pressure | Medium pressure | Medium-high pressure | Medium pressure |
+| **High** | High pressure, reduced volume, faster air | High pressure, faster air | High pressure, faster air | Very high pressure | High pressure |
 
-Tone hole cutoff frequency f_c determines efficiency of radiation:
+**Key rule:** Going higher in register requires *faster, more compressed* air — not more volume. This is the single most common mistake beginners make (over-blowing low notes, under-supporting high notes).
 
-```
-f_c = c / (2π) * sqrt(S_h / (t_eff * V_hole))
+---
 
-where:
-S_h = tone hole area
-t_eff = effective thickness (wall + chimney + end correction)
-V_hole = volume between tone hole and next closed hole
-```
+## Part 2: Embouchure Mechanics by Instrument
 
-Below f_c, the hole behaves as a high-impedance shunt (poor radiator); above f_c, it acts as an effective open end.
+### 2.1 Flute Embouchure
 
-**Experimental Procedure:**
+The flute produces sound via an **edge tone**: you direct a focused airstream across the embouchure hole, splitting it on the far edge. Half the air goes into the tube; half escapes. The ratio you direct inward determines pitch and dynamics.
 
-1. **Dimensional Characterization of Fingering System**
+**Setup checklist:**
+1. Roll the headjoint so the embouchure hole center aligns with the keys of the body joint.
+2. Rest the edge of the embouchure plate on your lower lip, *not* the chin. The hole center sits at or just below the lip line.
+3. Form a relaxed "puh" with your lips. The aperture (embouchure hole in your lips) is an oval, roughly 10–12 mm wide × 4–5 mm tall for middle register.
+4. Direct the air *downward* at approximately 25–35° below horizontal for low register; flatten toward horizontal as you ascend.
+5. Upper lip: relaxed, not pulled back. No smiling — a spread embouchure kills the tone.
 
-   Document the physical dimensions of the instrument's bore and tone hole configuration:
-   
-   Using digital calipers (0.01 mm resolution):
-   - Measure bore diameter at 10 cm intervals from mouthpiece to bell
-   - Record tone hole diameters and locations (distance from mouthpiece)
-   - Measure chimney heights for raised tone holes
-   - Document pad sealing surfaces and key mechanisms
-   
-   Construct a bore profile visualization:
+**Common fault — Chin tension:** If your tone is thin and airy, your aperture is too large. If your tone is tight and pinched, your chin muscle is tense. The chin should be flat, like a flattened ball — the "apple chin" position.
 
-   ```python
-   import numpy as np
-   import matplotlib.pyplot as plt
-   from scipy.interpolate import UnivariateSpline
-   
-   def plot_bore_profile(distances_cm, diameters_mm, instrument_name):
-       """
-       Visualize bore geometry and tone hole positions.
-       
-       Args:
-           distances_cm: array of measurement positions from mouthpiece
-           diameters_mm: bore diameter at each position
-           instrument_name: string identifier
-       """
-       fig, ax = plt.subplots(figsize=(14, 6))
-       
-       # Interpolate bore profile
-       spline = UnivariateSpline(distances_cm, diameters_mm, s=0.5)
-       x_fine = np.linspace(0, max(distances_cm), 500)
-       y_fine = spline(x_fine)
-       
-       # Plot bore profile (top and bottom)
-       ax.fill_between(x_fine, -y_fine/2, y_fine/2, alpha=0.3, color='lightblue')
-       ax.plot(x_fine, y_fine/2, 'b-', linewidth=2, label='Bore Profile')
-       ax.plot(x_fine, -y_fine/2, 'b-', linewidth=2)
-       
-       # Add tone hole markers
-       tone_hole_positions = [10.2, 15.7, 21.3, 26.8, 32.4, 37.9, 43.5, 49.0]
-       tone_hole_diameters = [11.5, 11.8, 12.0, 12.2, 12.5, 12.8, 13.0, 13.5]
-       
-       for pos, diam in zip(tone_hole_positions, tone_hole_diameters):
-           bore_diam_at_hole = spline(pos)
-           ax.plot([pos, pos], [bore_diam_at_hole/2, bore_diam_at_hole/2 + 5], 
-                  'r-', linewidth=3)
-           ax.plot(pos, bore_diam_at_hole/2 + 5, 'ro', markersize=diam*0.8)
-       
-       ax.set_xlabel('Distance from Mouthpiece (cm)', fontsize=12)
-       ax.set_ylabel('Bore Diameter (mm)', fontsize=12)
-       ax.set_title(f'Bore Profile: {instrument_name}', fontsize=14, fontweight='bold')
-       ax.grid(True, alpha=0.3)
-       ax.legend()
-       ax.set_aspect('equal')
-       
-       plt.tight_layout()
-       plt.savefig(f'bore_profile_{instrument_name}.png', dpi=300)
-       plt.show()
-   
-   # Example: Bb Clarinet measurements
-   clarinet_distances = np.array([0, 10, 20, 30, 40, 50, 60])
-   clarinet_diameters = np.array([15.0, 15.0, 15.0, 15.2, 24.0, 35.0, 52.0])
-   plot_bore_profile(clarinet_distances, clarinet_diameters, 'Bb Clarinet')
-   ```
+**Drill 2 — Tone without the headjoint**
 
-2. **Systematic Fingering Validation**
+Hold just the headjoint. Cover the open end with your palm. Produce a steady, resonant tone on the note B4 (open end sealed). Sustain 10 seconds. This isolates embouchure formation from fingering entirely.
 
-   Test all standard fingerings across the instrument's range:
-   
-   **Protocol:**
-   - Play each written note in chromatic sequence from lowest to highest
-   - Hold each note for 5 seconds at mezzo-forte dynamic with constant embouchure
-   - Record with calibrated microphone at 50 cm on-axis
-   - Use digital tuner to verify pitch accuracy: record cents deviation from equal temperament
-   
-   **Data Structure:**
+Target: Clear, centered tone with no breathiness within 2 weeks of daily 10-minute sessions.
 
-   | Written Note | Concert Pitch (Hz) | Measured f0 (Hz) | Deviation (cents) | Open Holes | Closed Holes | Register Key |
-   |--------------|-------------------|------------------|-------------------|------------|--------------|--------------|
-   | E3 (chalumeau) | 155.56 | 155.72 | +1.8 | 0-7 | All | Off |
-   | F3 | 174.61 | 174.58 | -0.3 | 6-7 | 0-5 | Off |
-   | F#3 | 185.00 | 185.11 | +1.0 | 5-7 | 0-4 | Off |
-   | ... | ... | ... | ... | ... | ... | ... |
-   
-   Calculate:
-   - Mean absolute deviation across all fingerings
-   - Standard deviation of pitch accuracy (should be <10 cents for professional instruments)
-   - Identify problematic fingerings requiring embouchure compensation
+### 2.2 Clarinet Embouchure
 
-3. **Cross-Fingering and Alternate Fingering Analysis**
+The clarinet uses a **single reed** (cane or synthetic) clamped against the mouthpiece by the ligature. The reed vibrates against the mouthpiece table, acting as a pressure-controlled valve.
 
-   Woodwind instruments employ cross-fingerings (closing lower holes while leaving upper holes open) to access chromatic notes not available in the diatonic fingering sequence. These create complex impedance conditions that modify pitch and timbre.
-   
-   **Procedure:**
-   
-   Select a single written pitch that has multiple fingering options (e.g., Bb4 on clarinet has 3+ fingerings). Record using:
-   - Standard fingering
-   - 1st alternate fingering
-   - 2nd alternate fingering
-   - Trill fingering (if applicable)
-   
-   For each fingering, measure:
-   - Pitch accuracy (cents deviation)
-   - Spectral centroid (timbral brightness)
-   - Attack transient duration (time from breath onset to 90% of steady amplitude)
-   - Dynamic range (softest and loudest sustainable tone)
-   
-   **Expected Observations:**
-   
-   Standard fingerings typically offer best intonation and timbral balance. Alternate fingerings may exhibit:
-   - Sharp or flat tendency (±10–30 cents)
-   - Altered harmonic balance (fork fingerings often emphasize odd harmonics)
-   - Reduced dynamic range
-   - Slower attack transients
-   
-   These compromises are accepted for technical advantages (trill speed, awkward interval facilitation).
+**Setup — lower lip over teeth:**
+1. Roll your lower lip *over* your bottom teeth so the lip cushions the reed. About 1/3 of the red part of your lower lip is in contact with the reed.
+2. Upper teeth rest *directly on top of the mouthpiece* — no rolling, no biting down. This is your anchor point.
+3. Lip seal: corners of your mouth grip the mouthpiece sides gently. No air escapes.
+4. Chin: flat and firm, pulled slightly downward. This keeps the reed channel open.
+5. Jaw position: slightly dropped — imagine you have a small cork between your back molars.
 
-4. **Acoustic Length Calculation and Validation**
+**Mouthpiece angle:** Approximately 35–45° down from horizontal. Beginners often take too little mouthpiece (only 5–8 mm). You need 10–14 mm of mouthpiece inside the mouth to get enough reed vibrating length.
 
-   Use measured pitch data to back-calculate effective acoustic length and compare with physical measurements:
+**Common fault — The Bite:** Squeezing the reed with the lower lip against the upper teeth. Symptoms: sharp intonation on middle register, thin tone, fatigue after 10 minutes. Solution: drop the jaw, relax the lower lip contact.
 
-   ```python
-   import numpy as np
-   import pandas as pd
-   
-   def calculate_effective_length(f_measured, register='fundamental', bore_type='cylindrical'):
-       """
-       Calculate effective acoustic length from measured frequency.
-       
-       Args:
-           f_measured: measured fundamental frequency (Hz)
-           register: 'fundamental', 'second', or 'third' register
-           bore_type: 'cylindrical' (clarinet) or 'conical' (others)
-       
-       Returns:
-           float: effective acoustic length in meters
-       """
-       c = 343  # speed of sound in m/s at 20°C
-       
-       if bore_type == 'cylindrical':
-           if register == 'fundamental':
-               L_eff = c / (4 * f_measured)
-           elif register == 'second':  # twelfth (3rd harmonic)
-               L_eff = 3 * c / (4 * f_measured)
-           elif register == 'third':  # 5th harmonic
-               L_eff = 5 * c / (4 * f_measured)
-       else:  # conical
-           if register == 'fundamental':
-               L_eff = c / (2 * f_measured)
-           elif register == 'second':  # octave (2nd harmonic)
-               L_eff = 2 * c / (2 * f_measured)
-           elif register == 'third':  # 3rd harmonic
-               L_eff = 3 * c / (2 * f_measured)
-       
-       return L_eff
-   
-   def analyze_fingering_system(fingering_data_csv):
-       """
-       Comprehensive analysis of fingering system accuracy and consistency.
-       
-       Args:
-           fingering_data_csv: path to CSV with columns:
-               note, concert_pitch_hz, measured_hz, physical_length_cm
-       
-       Returns:
-           DataFrame with analysis results
-       """
-       df = pd.read_csv(fingering_data_csv)
-       
-       # Calculate effective acoustic length from measured pitch
-       df['L_eff_m'] = df.apply(
-           lambda row: calculate_effective_length(
-               row['measured_hz'], 
-               bore_type='cylindrical'  # adjust based on instrument
-           ),
-           axis=1
-       )
-       
-       # Convert physical length to meters and calculate end correction
-       df['L_physical_m'] = df['physical_length_cm'] / 100
-       df['end_correction_cm'] = (df['L_eff_m'] - df['L_physical_m']) * 100
-       
-       # Calculate pitch deviation in cents
-       df['cents_deviation'] = 1200 * np.log2(
-           df['measured_hz'] / df['concert_pitch_hz']
-       )
-       
-       # Statistical summary
-       print("Fingering System Analysis Summary:")
-       print(f"Mean absolute pitch error: {df['cents_deviation'].abs().mean():.2f} cents")
-       print(f"Pitch error std dev: {df['cents_deviation'].std():.2f} cents")
-       print(f"Mean end correction: {df['end_correction_cm'].mean():.2f} cm")
-       print(f"End correction range: {df['end_correction_cm'].min():.2f} to {df['end_correction_cm'].max():.2f} cm")
-       
-       # Identify outliers (>15 cents deviation)
-       outliers = df[df['cents_deviation'].abs() > 15]
-       if len(outliers) > 0:
-           print(f"\nProblematic fingerings (>15 cents deviation):")
-           print(outliers[['note', 'cents_deviation']])
-       
-       return df
-   ```
+**Drill 3 — Mouthpiece only long tones**
 
-5. **Register Key and Overblowing Mechanism**
+Play the mouthpiece alone (no barrel). You should produce a concert A (written B) around 440 Hz. Too sharp = too much jaw pressure. Too flat = not enough lip firmness or insufficient mouthpiece in the mouth.
 
-   Woodwind instruments access upper registers by opening a register key (speaker key, octave key) that creates a pressure node at a strategic location, favoring excitation of higher harmonics.
-   
-   **Clarinet register key (speaker key):**
-   - Opens small hole at approximately 1/3 of tube length from mouthpiece
-   - Creates pressure node favoring 3rd harmonic (clarinet overblows at twelfth: 3:1 frequency ratio)
-   - Suppresses fundamental by disrupting standing wave pattern
-   
-   **Saxophone/oboe octave key:**
-   - Opens hole at 1/2 tube length (or one of multiple keys at different positions)
-   - Creates pressure node favoring 2nd harmonic (octave: 2:1 frequency ratio)
-   
-   **Procedure:**
-   
-   Select a fundamental register note (e.g., written G/concert F on Bb clarinet, 349.23 Hz). 
-   
-   Play and record:
-   - Fundamental register (no register key): expect strong f0 at 349 Hz
-   - Clarion register (register key depressed, same fingering): expect fundamental at 1047 Hz (3× original)
-   
-   Analyze spectral content:
-   - Verify frequency ratio: should be very close to 3.000 for clarinet
-   - Examine suppression of lower harmonic: fundamental register tone should have minimal 1047 Hz component
-   - Compare timbral characteristics: clarion register typically has stronger higher harmonics due to bore cutoff effects
-   
-   Repeat for multiple fingerings across the range to verify consistent register key operation.
+Sustain for 8 counts, rest 4 counts. Repeat 10×. Target: pitch within ±25 cents of 440 Hz with consistent tone. Practice daily before assembling the instrument.
 
-## Exercise 2: Aerodynamic Control Parameters and Psychoacoustic Correlates
+### 2.3 Saxophone Embouchure
 
-### Exercise 2a: Dynamic Range and Breath Pressure Mapping
+Saxophone embouchure is closely related to clarinet but with important differences: conical bore, larger reed, and a wider mouthpiece angle.
 
-**Theoretical Foundation:**
+**Setup:**
+1. Lower lip curves *over* bottom teeth — same as clarinet, but with a slightly *firmer* lip contact given the larger reed surface.
+2. Upper teeth on mouthpiece. Because saxophone mouthpieces have higher baffle chambers, you typically take slightly *less* mouthpiece depth (10–12 mm for alto).
+3. The mouthpiece angle is *more downward* than clarinet: 50–65° from horizontal.
+4. Corner seal: firm "ooh" shape — not spread, not pursed like a kiss.
 
-Acoustic power output P_acoustic scales approximately with the square of driving pressure P_mouth for reed instruments:
+**Alto vs. tenor/baritone:** Larger instruments require more mouthpiece and a wider aperture. For tenor, lip contact increases proportionally.
+
+**Key difference from clarinet:** The saxophone is a conical bore and overblows at the octave (not the twelfth). This means your embouchure adjustment moving between registers is *smaller* — just a slight compression and faster air. Many clarinet players who double on sax over-tighten the embouchure going to high notes.
+
+### 2.4 Oboe Embouchure
+
+The oboe uses a **double reed** — two pieces of cane bound together with a wire and thread staple. The two blades vibrate against each other, creating an extremely efficient pressure-controlled oscillator.
+
+**Double reed characteristics:**
+- Reed opening at rest: 1.0–1.5 mm (much smaller than clarinet)
+- Very high playing pressure required: 5–15 kPa (vs. 1–5 kPa clarinet)
+- The reed is entirely inside the mouth; lips contact the reed blades, not a mouthpiece
+
+**Setup:**
+1. Take the reed to approximately the second wire binding — usually 10–12 mm inside the mouth.
+2. Lips: form a relaxed "oh" shape. Both lips roll *over* the teeth, surrounding the reed blades with a soft cushion.
+3. The lip contact point is at the first wire binding — not on the blades themselves.
+4. Embouchure firmness: the corners hold the reed in a consistent oval shape. If the lips collapse inward, the reed clamps shut. If they spread, the reed opens too wide and pitch drops.
+5. Jaw: slightly dropped, relaxed. This is *critical* — a clenched jaw ruins intonation on oboe.
+
+**The crow:** Before playing, hold the reed alone and blow through it without embouchure. You should hear an unfocused, raspy buzz on a low C or B. Now add gentle lip pressure — the pitch should focus up to a bright Bb–C (sounding pitched around C5–D5 on the reed alone). This is your "crow" check. If the reed crows too flat, it may need adjustment; too sharp, consider wetting it longer.
+
+### 2.5 Bassoon Embouchure
+
+The bassoon uses a wide double reed on a metal bocal (crook). The reed is significantly larger than oboe, requiring different lip coverage.
+
+**Setup:**
+1. The reed goes into the mouth to roughly the first wire — approximately 15–18 mm.
+2. Both lips roll over teeth similarly to oboe, but the contact is *wider* given the larger reed.
+3. The upper lip does more sealing work on bassoon; it folds more pronouncedly over the top blade.
+4. Chin: flat and firm, same as clarinet. Avoid chin bunching.
+5. Bocal angle enters the mouth at roughly 30–40° from horizontal.
+
+**Low register bassoon:** Requires relaxed, open embouchure with *more* reed in the mouth and slightly relaxed lip tension. Many beginners clamp too hard, flattening the low Bb–D range. Think "open throat, hissing like a snake."
+
+---
+
+## Part 3: Fingering Systems — Fretboard-Style Reference
+
+### 3.1 Böhm Clarinet Fingering System — Chalumeau Register
+
+The Böhm clarinet has 17 keys and 6 main tone holes. We use the following notation:
 
 ```
-P_acoustic ∝ P_mouth²
-
-Sound Pressure Level (SPL):
-SPL = 20 * log₁₀(P_rms / P_ref)    where P_ref = 20 μPa
-
-Dynamic range (DR):
-DR = SPL_max - SPL_min    (in dB)
+Left Hand (L):         Right Hand (R):
+1 = Index              1 = Index
+2 = Middle             2 = Middle
+3 = Ring               3 = Ring
+4 = Pinky              4 = Pinky
+T = Left Thumb         Register key = Left Thumb back
 ```
 
-Professional woodwind instruments typically exhibit dynamic ranges of 40–50 dB (pp to ff). The lower threshold is limited by oscillation startup conditions (minimum pressure to overcome reed damping and establish self-sustained oscillation). The upper threshold is constrained by nonlinear effects (reed closure, flow separation, embouchure strain).
+**Standard tone hole notation:** ● = covered, ○ = open, × = register key
 
-The relationship between oral pressure and dynamic level is not linear perceptually. The decibel scale is logarithmic, matching human loudness perception (Fletcher-Munson curves). A 10 dB increase corresponds to approximately doubling perceived loudness.
-
-**Experimental Procedure:**
-
-1. **Breath Pressure Measurement System Calibration**
-
-   Configure the differential pressure transducer:
-   - Reference port: ambient atmospheric pressure
-   - Measurement port: oral cavity via catheter (medical-grade silicone, 2 mm ID, 10 cm length)
-   - Zero offset calibration: with catheter open to atmosphere, adjust to read 0 Pa
-   - Span calibration: apply known pressure via calibration device (±1 kPa range)
-   
-   Establish measurement protocol:
-   - Catheter insertion through corner of mouth, minimal obstruction of embouchure
-   - Transducer mounted on stable surface, analog output connected to audio interface auxiliary input
-   - Synchronize pressure recording with acoustic recording (common time base)
-
-2. **Systematic Dynamic Level Mapping**
-
-   Select a standard test note (written G / concert F on Bb clarinet, 349.23 Hz).
-   
-   **Procedure for each dynamic level:**
-   
-   - Establish embouchure and steady breath support
-   - Target specific dynamic marking: ppp, pp, p, mp, mf, f, ff, fff
-   - Record 5-second sustained tone
-   - Simultaneously capture:
-     - Acoustic signal (calibrated microphone at 1 m on-axis)
-     - Oral cavity pressure (transducer analog output)
-     - Reference tone (1 kHz, 94 dB SPL from calibrator for absolute level verification)
-   
-   Measure for each recording:
-   - Mean oral pressure (Pa or kPa)
-   - RMS sound pressure level at 1 m distance (dBA and dBC weighted)
-   - Crest factor (peak/RMS ratio, indicates waveform clipping)
-   - Spectral centroid and harmonic distribution
-   
-   **Analysis:**
-
-   ```python
-   import numpy as np
-   import matplotlib.pyplot as plt
-   from scipy import signal
-   import soundfile as sf
-   
-   def calculate_spl(audio, sr, reference_spl=94.0, calibration_tone_rms=None):
-       """
-       Calculate absolute SPL from calibrated recording.
-       
-       Args:
-           audio: audio signal array
-           sr: sample rate
-           reference_spl: SPL of calibration tone (dB)
-           calibration_tone_rms: RMS amplitude of calibration tone in recording
-       
-       Returns:
-           float: SPL in dB re 20 μPa
-       """
-       # Calculate RMS of audio signal
-       audio_rms = np.sqrt(np.mean(audio**2))
-       
-       if calibration_tone_rms is not None:
-           # Calculate relative level to calibration tone
-           level_re_cal = 20 * np.log10(audio_rms / calibration_tone_rms)
-           absolute_spl = reference_spl + level_re_cal
-       else:
-           # Assume full-scale digital corresponds to known SPL
-           # (requires prior calibration of recording chain)
-           absolute_spl = reference_spl + 20 * np.log10(audio_rms)
-       
-       return absolute_spl
-   
-   def analyze_dynamic_range(recordings_dict, pressure_dict):
-       """
-       Correlate breath pressure with acoustic output level.
-       
-       Args:
-           recordings_dict: {dynamic_marking: audio_array}
-           pressure_dict: {dynamic_marking: pressure_array_Pa}
-       
-       Returns:
-           tuple: (pressure_values, spl_values, correlation_coefficient)
-       """
-       dynamics_order = ['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff']
-       
-       pressures = []
-       spls = []
-       
-       for dyn in dynamics_order:
-           if dyn in recordings_dict and dyn in pressure_dict:
-               audio = recordings_dict[dyn]
-               pressure = pressure_dict[dyn]
-               
-               # Calculate mean pressure (steady-state portion)
-               p_mean = np.mean(pressure[int(len(pressure)*0.3):int(len(pressure)*0.7)])
-               pressures.append(p_mean)
-               
-               # Calculate SPL (simplified, assumes pre-calibration)
-               audio_steady = audio[int(len(audio)*0.3):int(len(audio)*0.7)]
-               spl = 94 + 20 * np.log10(np.sqrt(np.mean(audio_steady**2)) / 0.1)  # example calibration
-               spls.append(spl)
-       
-       # Fit power law relationship: SPL = a + b * log(P)
-       pressures = np.array(pressures)
-       spls = np.array(spls)
-       
-       log_p = np.log10(pressures + 1e-6)  # avoid log(0)
-       coeffs = np.polyfit(log_p, spls, 1)
-       
-       # Calculate correlation
-       correlation = np.corrcoef(log_p, spls)[0, 1]
-       
-       # Visualization
-       fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-       
-       # Plot 1: SPL vs. Pressure (log scale)
-       axes[0].scatter(pressures, spls, s=100, alpha=0.7, color='darkblue')
-       axes[0].set_xscale('log')
-       axes[0].set_xlabel('Oral Cavity Pressure (Pa)', fontsize=12)
-       axes[0].set_ylabel('SPL at 1 m (dB)', fontsize=12)
-       axes[0].set_title('Dynamic Range: Pressure vs. Acoustic Output', fontsize=13, fontweight='bold')
-       axes[0].grid(True, alpha=0.3, which='both')
-       
-       # Add fit line
-       p_fit = np.logspace(np.log10(min(pressures)), np.log10(max(pressures)), 100)
-       spl_fit = coeffs[0] * np.log10(p_fit) + coeffs[1]
-       axes[0].plot(p_fit, spl_fit, 'r--', linewidth=2, 
-                   label=f'Fit: SPL = {coeffs[0]:.1f}·log(P) + {coeffs[1]:.1f}')
-       axes[0].legend()
-       
-       # Plot 2: Dynamic level labels
-       for i, dyn in enumerate(dynamics_order[:len(pressures)]):
-           axes[1].barh(i, spls[i], color='steelblue', alpha=0.7)
-           axes[1].text(spls[i] + 1, i, f'{spls[i]:.1f} dB', va='center', fontsize=10)
-       
-       axes[1].set_yticks(range(len(dynamics_order[:len(pressures)])))
-       axes[1].set_yticklabels(dynamics_order[:len(pressures)])
-       axes[1].set_xlabel('SPL (dB)', fontsize=12)
-       axes[1].set_title('Dynamic Range by Marking', fontsize=13, fontweight='bold')
-       axes[1].grid(True, alpha=0.3, axis='x')
-       
-       plt.tight_layout()
-       plt.savefig('dynamic_range_analysis.png', dpi=300)
-       plt.show()
-       
-       print(f"Dynamic Range: {max(spls) - min(spls):.1f} dB")
-       print(f"Pressure Range: {min(pressures):.0f} to {max(pressures):.0f} Pa")
-       print(f"Correlation (log P vs SPL): r = {correlation:.3f}")
-       
-       return pressures, spls, correlation
-   ```
-
-3. **Spectral Evolution Across Dynamic Range**
-
-   As dynamic level increases, spectral characteristics change due to nonlinear effects:
-   
-   - **Low dynamics (pp–p):** Fundamental dominant, fewer upper harmonics, often described as "pure" or "warm" tone
-   - **Mid dynamics (mp–f):** Balanced harmonic spectrum, optimal timbre for most musical contexts
-   - **High dynamics (ff–fff):** Enhanced upper harmonics due to reed nonlinearity and flow turbulence, described as "bright" or "intense"
-   
-   Quantify this relationship:
-
-   ```python
-   def analyze_spectral_evolution_by_dynamic(recordings_dict, sr=96000):
-       """
-       Track how harmonic content changes with dynamic level.
-       """
-       dynamics_order = ['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff']
-       
-       results = {
-           'dynamic': [],
-           'h1_h2_ratio_db': [],
-           'spectral_centroid_hz': [],
-           'even_odd_ratio_db': []
-       }
-       
-       for dyn in dynamics_order:
-           if dyn not in recordings_dict:
-               continue
-           
-           audio = recordings_dict[dyn]
-           audio_steady = audio[int(len(audio)*0.3):int(len(audio)*0.7)]
-           
-           # FFT analysis
-           n_fft = 8192
-           spectrum = np.abs(np.fft.rfft(audio_steady, n=n_fft))
-           freqs = np.fft.rfftfreq(n_fft, 1/sr)
-           
-           # Estimate fundamental
-           f0 = 349.23  # known test frequency
-           bin_f0 = int(f0 * n_fft / sr)
-           
-           # Extract harmonic amplitudes
-           h1 = spectrum[bin_f0]
-           h2 = spectrum[bin_f0 * 2]
-           h3 = spectrum[bin_f0 * 3]
-           h4 = spectrum[bin_f0 * 4]
-           
-           # Calculate metrics
-           h1_h2_ratio = 20 * np.log10(h1 / (h2 + 1e-10))
-           
-           # Even vs. odd harmonics (clarinet characteristic)
-           odd_harmonics = h1 + h3  # + h5, h7, etc.
-           even_harmonics = h2 + h4  # + h6, h8, etc.
-           even_odd_ratio = 20 * np.log10(even_harmonics / (odd_harmonics + 1e-10))
-           
-           # Spectral centroid
-           centroid = np.sum(freqs[:len(spectrum)] * spectrum) / (np.sum(spectrum) + 1e-10)
-           
-           results['dynamic'].append(dyn)
-           results['h1_h2_ratio_db'].append(h1_h2_ratio)
-           results['spectral_centroid_hz'].append(centroid)
-           results['even_odd_ratio_db'].append(even_odd_ratio)
-       
-       # Visualization
-       fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-       
-       x_pos = range(len(results['dynamic']))
-       
-       axes[0].plot(x_pos, results['h1_h2_ratio_db'], marker='o', linewidth=2, markersize=8)
-       axes[0].set_xticks(x_pos)
-       axes[0].set_xticklabels(results['dynamic'])
-       axes[0].set_ylabel('H1/H2 Ratio (dB)', fontsize=11)
-       axes[0].set_title('Fundamental Dominance', fontsize=12, fontweight='bold')
-       axes[0].grid(True, alpha=0.3)
-       
-       axes[1].plot(x_pos, results['spectral_centroid_hz'], marker='s', 
-                   linewidth=2, markersize=8, color='darkgreen')
-       axes[1].set_xticks(x_pos)
-       axes[1].set_xticklabels(results['dynamic'])
-       axes[1].set_ylabel('Spectral Centroid (Hz)', fontsize=11)
-       axes[1].set_title('Timbral Brightness', fontsize=12, fontweight='bold')
-       axes[1].grid(True, alpha=0.3)
-       
-       axes[2].plot(x_pos, results['even_odd_ratio_db'], marker='^', 
-                   linewidth=2, markersize=8, color='darkred')
-       axes[2].set_xticks(x_pos)
-       axes[2].set_xticklabels(results['dynamic'])
-       axes[2].set_ylabel('Even/Odd Harmonics (dB)', fontsize=11)
-       axes[2].set_title('Spectral Balance', fontsize=12, fontweight='bold')
-       axes[2].grid(True, alpha=0.3)
-       
-       plt.tight_layout()
-       plt.savefig('spectral_evolution_dynamics.png', dpi=300)
-       plt.show()
-       
-       return results
-   ```
-
-### Exercise 2b: Articulation Transients and Attack Characteristics
-
-**Theoretical Foundation:**
-
-Articulation refers to the manner of note initiation and termination. In woodwinds, the tongue acts as a valve controlling airflow to the reed or embouchure, creating attack transients that are critical for rhythmic definition and musical expression.
-
-Attack transient characteristics:
-- **Attack time (T_attack):** Duration from note onset to 90% of steady-state amplitude
-- **Rise slope:** Rate of amplitude increase (dB/ms)
-- **Spectral flux:** Rate of spectral change during attack
-- **Centroid trajectory:** Evolution of spectral centroid from attack through steady state
-
-Different articulation types produce distinct transient signatures:
-- **Legato (slurred):** No tongue interruption, smooth amplitude and spectral transitions
-- **Tenuto (sustained tongue):** Tongue releases reed gently, medium attack time (~50–100 ms)
-- **Staccato (detached):** Tongue releases abruptly and quickly returns, short attack time (~20–50 ms), distinct release transient
-- **Marcato (accented):** Strong tongue release with increased breath pressure, very fast attack (~10–30 ms), often with pressure "spike" preceding steady tone
-- **Double/Triple Tonguing:** Alternating tongue positions (tu-ku or tu-ku-tu), enables rapid articulation beyond single-tongue speed limit
-
-**Experimental Procedure:**
-
-1. **Transient Capture and Characterization**
-
-   Configure high-resolution recording:
-   - Sample rate: 96 kHz minimum (48 kHz Nyquist allows capturing up to 24 kHz components in attack transients)
-   - Bit depth: 24-bit (maintains dynamic range for capturing both quiet attacks and loud steady tones)
-   - Buffer size: Minimal latency for synchronization with visual cues
-   
-   Record the following articulation sequence on a test note (written G / concert F):
-   
-   ```
-   Pattern: G (whole note) with each articulation type:
-   1. Legato slur from previous note
-   2. Tenuto (standard attack)
-   3. Staccato (short)
-   4. Marcato (accented)
-   5. Sforzando (loud accent then diminuendo)
-   ```
-   
-   Repeat sequence 5 times to assess consistency.
-
-2. **Attack Transient Extraction and Analysis**
-
-   ```python
-   import numpy as np
-   import matplotlib.pyplot as plt
-   from scipy import signal
-   import librosa
-   
-   def extract_attack_transient(audio, sr, threshold_db=-40):
-       """
-       Isolate and characterize attack transient.
-       
-       Args:
-           audio: full audio signal containing note attack
-           sr: sample rate
-           threshold_db: detection threshold relative to peak
-       
-       Returns:
-           dict: attack characteristics
-       """
-       # Convert to dB scale
-       envelope = np.abs(signal.hilbert(audio))
-       envelope_db = 20 * np.log10(envelope / np.max(envelope) + 1e-10)
-       
-       # Detect attack onset (first point above threshold)
-       onset_idx = np.where(envelope_db > threshold_db)[0][0]
-       
-       # Find 90% of steady-state amplitude
-       steady_state_amp = np.median(envelope[int(len(envelope)*0.5):int(len(envelope)*0.9)])
-       target_amp = 0.9 * steady_state_amp
-       
-       # Find when amplitude first exceeds 90% of steady state
-       attack_end_idx = onset_idx + np.where(envelope[onset_idx:] > target_amp)[0][0]
-       
-       # Calculate attack time
-       attack_time_ms = (attack_end_idx - onset_idx) / sr * 1000
-       
-       # Calculate rise slope
-       attack_db_range = 20 * np.log10(target_amp / (envelope[onset_idx] + 1e-10))
-       rise_slope_db_per_ms = attack_db_range / attack_time_ms
-       
-       # Extract attack segment for spectral analysis
-       attack_segment = audio[onset_idx:attack_end_idx]
-       
-       # STFT of attack transient
-       f, t, Zxx = signal.stft(attack_segment, fs=sr, nperseg=512, noverlap=256)
-       
-       # Calculate spectral centroid trajectory during attack
-       magnitude = np.abs(Zxx)
-       centroid_trajectory = np.sum(f[:, np.newaxis] * magnitude, axis=0) / (np.sum(magnitude, axis=0) + 1e-10)
-       
-       # Spectral flux (rate of spectral change)
-       spectral_flux = np.sqrt(np.sum(np.diff(magnitude, axis=1)**2, axis=0))
-       
-       return {
-           'attack_time_ms': attack_time_ms,
-           'rise_slope_db_ms': rise_slope_db_per_ms,
-           'onset_idx': onset_idx,
-           'attack_end_idx': attack_end_idx,
-           'envelope': envelope[onset_idx:attack_end_idx],
-           'centroid_trajectory': centroid_trajectory,
-           'spectral_flux': spectral_flux,
-           'stft_freqs': f,
-           'stft_times': t,
-           'stft_magnitude': magnitude
-       }
-   
-   def compare_articulations(recordings_dict, sr=96000):
-       """
-       Compare attack characteristics across articulation types.
-       """
-       articulation_types = ['legato', 'tenuto', 'staccato', 'marcato', 'sforzando']
-       
-       results = {}
-       
-       for artic in articulation_types:
-           if artic in recordings_dict:
-               audio = recordings_dict[artic]
-               results[artic] = extract_attack_transient(audio, sr)
-       
-       # Visualization
-       fig = plt.figure(figsize=(16, 10))
-       gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
-       
-       # Plot 1: Attack envelopes comparison
-       ax1 = fig.add_subplot(gs[0, :])
-       for artic in articulation_types:
-           if artic in results:
-               envelope = results[artic]['envelope']
-               time_ms = np.arange(len(envelope)) / sr * 1000
-               ax1.plot(time_ms, 20 * np.log10(envelope / np.max(envelope) + 1e-10), 
-                       label=artic.capitalize(), linewidth=2)
-       
-       ax1.set_xlabel('Time (ms)', fontsize=11)
-       ax1.set_ylabel('Amplitude (dB re peak)', fontsize=11)
-       ax1.set_title('Attack Envelope Comparison', fontsize=13, fontweight='bold')
-       ax1.legend(fontsize=10)
-       ax1.grid(True, alpha=0.3)
-       ax1.set_xlim(0, 200)
-       
-       # Plot 2: Attack time comparison
-       ax2 = fig.add_subplot(gs[1, 0])
-       attack_times = [results[artic]['attack_time_ms'] for artic in articulation_types if artic in results]
-       labels = [artic.capitalize() for artic in articulation_types if artic in results]
-       ax2.barh(labels, attack_times, color='steelblue', alpha=0.7)
-       ax2.set_xlabel('Attack Time (ms)', fontsize=11)
-       ax2.set_title('Attack Duration', fontsize=12, fontweight='bold')
-       ax2.grid(True, alpha=0.3, axis='x')
-       
-       # Plot 3: Rise slope comparison
-       ax3 = fig.add_subplot(gs[1, 1])
-       rise_slopes = [results[artic]['rise_slope_db_ms'] for artic in articulation_types if artic in results]
-       ax3.barh(labels, rise_slopes, color='darkgreen', alpha=0.7)
-       ax3.set_xlabel('Rise Slope (dB/ms)', fontsize=11)
-       ax3.set_title('Attack Intensity', fontsize=12, fontweight='bold')
-       ax3.grid(True, alpha=0.3, axis='x')
-       
-       # Plot 4: Spectral centroid trajectory (example: marcato)
-       if 'marcato' in results:
-           ax4 = fig.add_subplot(gs[2, 0])
-           centroid = results['marcato']['centroid_trajectory']
-           time_ms = np.arange(len(centroid)) / sr * 1000 * (512/4)  # adjust for STFT hop
-           ax4.plot(time_ms, centroid, linewidth=2, color='darkred')
-           ax4.set_xlabel('Time (ms)', fontsize=11)
-           ax4.set_ylabel('Spectral Centroid (Hz)', fontsize=11)
-           ax4.set_title('Spectral Evolution: Marcato Attack', fontsize=12, fontweight='bold')
-           ax4.grid(True, alpha=0.3)
-       
-       # Plot 5: Spectrogram (example: staccato)
-       if 'staccato' in results:
-           ax5 = fig.add_subplot(gs[2, 1])
-           stft_mag = results['staccato']['stft_magnitude']
-           stft_freqs = results['staccato']['stft_freqs']
-           stft_times = results['staccato']['stft_times']
-           
-           stft_db = 20 * np.log10(stft_mag / np.max(stft_mag) + 1e-10)
-           im = ax5.pcolormesh(stft_times * 1000, stft_freqs, stft_db, 
-                              shading='gouraud', cmap='magma', vmin=-60, vmax=0)
-           ax5.set_xlabel('Time (ms)', fontsize=11)
-           ax5.set_ylabel('Frequency (Hz)', fontsize=11)
-           ax5.set_title('Attack Spectrogram: Staccato', fontsize=12, fontweight='bold')
-           ax5.set_ylim(0, 5000)
-           plt.colorbar(im, ax=ax5, label='Magnitude (dB)')
-       
-       plt.savefig('articulation_analysis.png', dpi=300)
-       plt.show()
-       
-       return results
-   ```
-
-3. **Rapid Articulation and Tonguing Technique**
-
-   Single-tonguing speed is physiologically limited to approximately 8–10 notes per second for most players. Double and triple tonguing techniques overcome this limit by alternating tongue positions.
-   
-   **Procedure:**
-   
-   Perform and record the following exercise on a single note (written G):
-   
-   ```
-   Single tongue: T T T T T T T T (repeat 16 times)
-   Tempo: Start at ♩=60, increase by 20 BPM increments to failure point
-   
-   Double tongue: TK TK TK TK (repeat 16 times) 
-   Tempo: Start at ♩=60, increase by 20 BPM increments
-   
-   Triple tongue: TKT TKT TKT (repeat 12 times)
-   Tempo: Start at ♩=60, increase by 20 BPM increments
-   ```
-   
-   For each recording:
-   - Extract individual note attacks using onset detection
-   - Measure inter-onset interval (IOI) distribution
-   - Calculate coefficient of variation: CV = σ(IOI) / μ(IOI)
-   - Identify maximum tempo where CV < 15% (consistent articulation threshold)
-   
-   Expected results:
-   - Single tongue maximum: ~180–240 BPM (3–4 Hz articulation rate)
-   - Double tongue maximum: ~240–360 BPM (4–6 Hz effective rate)
-   - Triple tongue: Similar to double tongue, useful for rhythmic patterns divisible by 3
-
-## Exercise 3: Operational Envelope Testing and Failure Mode Analysis
-
-### Exercise 3a: Component Integrity and Systematic Fault Injection
-
-**Theoretical Foundation:**
-
-Woodwind instrument performance depends on precision mechanical systems and consumable components. Systematic testing of degraded components reveals:
-- Sensitivity to reed characteristics (stiffness, density, geometry)
-- Effects of pad leakage on intonation and response
-- Mouthpiece geometry effects on timbre and playability
-- Environmental sensitivity (temperature, humidity effects on wood and reed)
-
-Reed strength classification (e.g., Vandoren 2.5, 3.0, 3.5) relates to flexural stiffness:
+**Chalumeau Register (Low E3–C5, written):**
 
 ```
-EI = Young's modulus × Second moment of area
-
-For a rectangular reed of width w and thickness t:
-I = w * t³ / 12
-
-Resonant frequency of cantilevered beam:
-f_reed ≈ (1.875² / 2π) * sqrt(EI / (ρ A L⁴))
-
-where:
-ρ = density
-A = cross-sectional area
-L = vibrating length
+Note    L.T  L1  L2  L3  L4   R1  R2  R3  R4  Notes
+E3      ●    ●   ●   ●   ●    ●   ●   ●   ●   All holes covered
+F3      ●    ●   ●   ●   ●    ●   ●   ●   ○   RH pinky up
+F#3     ●    ●   ●   ●   ●    ●   ●   ○   ○   
+G3      ●    ●   ●   ●   ○    ●   ●   ●   ○   LH pinky side key
+G#3     ●    ●   ●   ●   ●    ○   ●   ●   ●   G# key (LH or RH)
+A3      ●    ●   ●   ●   ●    ○   ●   ●   ○   
+Bb3     ●    ●   ●   ●   ●    ○   ○   ●   ○   (1st position)
+B3      ●    ●   ●   ●   ○    ○   ●   ●   ○   
+C4      ●    ●   ●   ○   ○    ○   ●   ●   ○   
+C#4     ●    ●   ○   ●   ○    ○   ●   ●   ○   
+D4      ●    ●   ○   ○   ○    ○   ○   ○   ○   
+Eb4     ●    ●   ○   ○   ○    ○   ○   ●   ○   (Eb/D# key)
+E4      ●    ○   ○   ○   ○    ○   ○   ○   ○   
+F4      ○    ●   ●   ●   ○    ○   ●   ●   ○   
+F#4     ○    ○   ●   ●   ○    ●   ●   ●   ○   
+G4      ○    ○   ○   ●   ○    ●   ●   ●   ○   
+Ab4     ○    ○   ○   ○   ○    ○   ●   ●   ●   
+A4      ○    ○   ○   ○   ○    ○   ○   ●   ○   
+Bb4     ○    ○   ○   ○   ○    ○   ●   ○   ●   (Bis Bb — most used)
+B4      ○    ○   ○   ○   ○    ●   ○   ○   ○   
+C5      ○    ○   ○   ○   ○    ○   ○   ○   ○   All holes open
 ```
 
-Higher strength reeds have greater thickness t, increasing stiffness but requiring more pressure to oscillate. The interaction between reed resonance and air column resonance determines playability and tone color.
-
-**Experimental Procedure:**
-
-1. **Reed Characterization and Strength Testing**
-
-   Obtain reeds spanning the strength range: 2.0, 2.5, 3.0, 3.5, 4.0 (or synthetic equivalents).
-   
-   For each reed, measure:
-   - **Physical dimensions:** Thickness at tip (0.08–0.12 mm), heart (1.5–2.5 mm), and heel (3–4 mm) using micrometer
-   - **Mass:** Digital balance (0.001 g resolution)
-   - **Flexural stiffness:** Custom fixture or commercial reed testing device measuring deflection under known force
-   
-   **Static mechanical test:**
-   
-   Mount reed on mouthpiece and apply known forces at tip using calibrated force gauge:
-   
-   ```
-   Force applied: 0.5 N, 1.0 N, 1.5 N, 2.0 N
-   Measure deflection: Use laser displacement sensor or dial indicator
-   Calculate stiffness: k = F / δ (N/mm)
-   ```
-   
-   **Dynamic playing test:**
-   
-   Install each reed and play standardized test sequence:
-   - Lowest note (chalumeau E): measure attack response, dynamic range
-   - Middle register G: measure pitch stability, tone quality
-   - Altissimo (third register, beyond written C6): measure ease of production, stability
-   
-   Record metrics:
-   - Minimum pressure required for stable oscillation (P_threshold)
-   - Dynamic range (dB)
-   - Pitch accuracy across range (cents deviation)
-   - Subjective response rating (1–10 scale: sluggish to responsive)
-
-2. **Acoustic Analysis of Reed Strength Effects**
-
-   ```python
-   def analyze_reed_strength_effects(recordings_by_strength, sr=96000):
-       """
-       Compare spectral and temporal characteristics across reed strengths.
-       
-       Args:
-           recordings_by_strength: {strength: {'low': audio, 'mid': audio, 'high': audio}}
-       """
-       strengths = sorted(recordings_by_strength.keys())
-       registers = ['low', 'mid', 'high']
-       
-       results = {strength: {reg: {} for reg in registers} for strength in strengths}
-       
-       for strength in strengths:
-           for register in registers:
-               if register in recordings_by_strength[strength]:
-                   audio = recordings_by_strength[strength][register]
-                   
-                   # Extract steady-state segment
-                   audio_steady = audio[int(len(audio)*0.3):int(len(audio)*0.7)]
-                   
-                   # Fundamental frequency
-                   f0 = librosa.yin(audio_steady, fmin=80, fmax=1500, sr=sr)
-                   results[strength][register]['f0_mean'] = np.median(f0[f0 > 0])
-                   results[strength][register]['f0_std'] = np.std(f0[f0 > 0])
-                   
-                   # Spectral centroid
-                   centroid = librosa.feature.spectral_centroid(y=audio_steady, sr=sr)[0]
-                   results[strength][register]['centroid_mean'] = np.mean(centroid)
-                   
-                   # HNR estimate
-                   spectrum = np.abs(np.fft.rfft(audio_steady))
-                   f0_bin = int(results[strength][register]['f0_mean'] * len(spectrum) * 2 / sr)
-                   harmonic_energy = sum([spectrum[f0_bin * h]**2 for h in range(1, 8) if f0_bin * h < len(spectrum)])
-                   total_energy = np.sum(spectrum**2)
-                   results[strength][register]['hnr'] = 10 * np.log10(harmonic_energy / (total_energy - harmonic_energy + 1e-10))
-       
-       # Visualization
-       fig, axes = plt.subplots(2, 3, figsize=(16, 10))
-       
-       for reg_idx, register in enumerate(registers):
-           # Pitch stability
-           f0_stds = [results[s][register]['f0_std'] for s in strengths if 'f0_std' in results[s][register]]
-           axes[0, reg_idx].bar(range(len(f0_stds)), f0_stds, color='steelblue', alpha=0.7)
-           axes[0, reg_idx].set_xticks(range(len(strengths)))
-           axes[0, reg_idx].set_xticklabels([f'{s}' for s in strengths])
-           axes[0, reg_idx].set_ylabel('F0 Std Dev (Hz)', fontsize=10)
-           axes[0, reg_idx].set_title(f'{register.capitalize()} Register: Pitch Stability', fontsize=11, fontweight='bold')
-           axes[0, reg_idx].grid(True, alpha=0.3, axis='y')
-           
-           # Tone quality (HNR)
-           hnr_vals = [results[s][register]['hnr'] for s in strengths if 'hnr' in results[s][register]]
-           axes[1, reg_idx].bar(range(len(hnr_vals)), hnr_vals, color='darkgreen', alpha=0.7)
-           axes[1, reg_idx].set_xticks(range(len(strengths)))
-           axes[1, reg_idx].set_xticklabels([f'{s}' for s in strengths])
-           axes[1, reg_idx].set_xlabel('Reed Strength', fontsize=10)
-           axes[1, reg_idx].set_ylabel('HNR (dB)', fontsize=10)
-           axes[1, reg_idx].set_title(f'{register.capitalize()} Register: Tone Purity', fontsize=11, fontweight='bold')
-           axes[1, reg_idx].grid(True, alpha=0.3, axis='y')
-       
-       plt.tight_layout()
-       plt.savefig('reed_strength_analysis.png', dpi=300)
-       plt.show()
-       
-       return results
-   ```
-
-3. **Mouthpiece Facing Curve and Chamber Volume Effects**
-
-   Mouthpiece design parameters critically affect playability:
-   - **Facing length:** Distance from tip to where reed contacts table (16–22 mm typical)
-   - **Tip opening:** Gap between reed tip and mouthpiece tip (0.9–1.4 mm for clarinet)
-   - **Chamber volume and shape:** Internal volume affects timbre and resistance
-   
-   **Procedure:**
-   
-   If multiple mouthpieces are available (different facings and chambers), perform comparative testing:
-   
-   | Mouthpiece | Facing Length | Tip Opening | Chamber | Subjective Character |
-   |------------|---------------|-------------|---------|---------------------|
-   | Vandoren B45 | 21.00 mm | 1.19 mm | Small | Focused, dark tone |
-   | Vandoren M30 | 19.70 mm | 1.14 mm | Medium | Versatile, balanced |
-   | Vandoren 5RV Lyre | 20.50 mm | 1.12 mm | Medium | Centered pitch, flexible |
-   
-   Record standardized test sequence with each mouthpiece (same reed strength):
-   - Full range chromatic scale
-   - Dynamic range test (ppp to fff)
-   - Articulation test (legato, staccato, marcato)
-   
-   Measure:
-   - Intonation consistency across range
-   - Dynamic range capability
-   - Attack transient characteristics
-   - Spectral balance (centroid, harmonic distribution)
-
-4. **Pad Leakage Simulation**
-
-   Tone hole pads seal against the instrument body to isolate acoustic sections. Leakage degrades performance:
-   - Sharp pitch tendency (leak shortens effective acoustic length)
-   - Reduced dynamic range (acoustic energy escapes through leak)
-   - Unstable oscillation (altered impedance affects reed coupling)
-   
-   **Controlled leak introduction:**
-   
-   - Select a key in the middle register (e.g., left hand index finger key)
-   - Insert thin shim material (0.05 mm feeler gauge) under one edge of pad to create controlled leak
-   - Progressive testing: 0.05 mm, 0.10 mm, 0.15 mm leak gaps
-   
-   For each leak condition, record:
-   - Notes using that key (and all keys below)
-   - Measure pitch deviation, dynamic range, attack response
-   
-   **Expected observations:**
-   
-   - Leak size below ~0.02 mm: Minimal effect (within manufacturing tolerances)
-   - 0.05–0.10 mm: Noticeable pitch sharpness (+10–30 cents), reduced dynamic range
-   - >0.15 mm: Severe degradation, notes may not speak or squeak
-
-### Exercise 3b: Environmental Stress Testing and Performance Envelope Mapping
-
-**Theoretical Foundation:**
-
-Woodwind acoustics exhibit temperature and humidity sensitivity through multiple mechanisms:
-
-**Speed of sound temperature dependence:**
+**Clarion Register (D5–C6, written):** Add register key (left thumb back key) to the chalumeau fingering. The clarinet overblows at the **twelfth** (interval of 12 half steps = octave + perfect fifth) because of its cylindrical bore and closed-end behavior.
 
 ```
-c(T) = 331.3 + 0.606 * T    (m/s, T in °C)
-
-Frequency scaling:
-f(T) ∝ c(T)
-
-ΔF/F ≈ Δc/c ≈ 0.001 * ΔT    (fractional change per °C)
+D5  = Register key + D4 fingering
+E5  = Register key + E4 fingering
+F5  = Register key + F4 fingering
+(etc., all the same as chalumeau fingering + register key)
 ```
 
-For a note at 440 Hz:
-- +10°C → +4.4 Hz (+18 cents)
-- -10°C → -4.4 Hz (-18 cents)
+**Critical note:** Moving from B4 (chalumeau) to C5 opens *all* holes — this is the most acoustically open note on the instrument and tends to be flat. Embouchure must compensate with slightly firmer lip contact and faster air.
 
-**Humidity effects:**
-- Reed stiffness: Cane reeds absorb moisture, reducing stiffness and lowering pitch
-- Pad sealing: Excessive humidity causes pads to swell, potentially improving sealing but slowing key action
-- Condensation: Water accumulation in tone holes and bore creates turbulence and pitch instability
+### 3.2 Alto Saxophone Fingering — Full Range Reference
 
-**Procedure:**
+Saxophone notation: T = thumb octave key, 1-2-3 = index-middle-ring (each hand), ★ = palm keys, side keys designated by finger.
 
-1. **Temperature Sensitivity Mapping**
+**Low Bb2 to G4 (written, one octave chart):**
 
-   Establish controlled temperature conditions:
-   - Cold: 10–15°C (cold rehearsal space, outdoor performance)
-   - Room temperature: 20–22°C (standard conditions)
-   - Warm: 28–32°C (warm hall, extended playing warms instrument)
-   
-   **Measurement protocol:**
-   
-   Allow instrument to stabilize at test temperature for minimum 20 minutes. Use non-contact infrared thermometer to verify bore temperature.
-   
-   Record chromatic scale from lowest to highest note. Use digital tuner to measure pitch deviation from equal temperament at A440 reference.
-   
-   ```python
-   def analyze_temperature_effects(recordings_by_temp, target_pitches_hz, sr=96000):
-       """
-       Quantify pitch drift with temperature change.
-       
-       Args:
-           recordings_by_temp: {temperature_C: audio_chromatic_scale}
-           target_pitches_hz: array of expected frequencies
-       """
-       temps = sorted(recordings_by_temp.keys())
-       
-       results = {temp: [] for temp in temps}
-       
-       for temp in temps:
-           audio = recordings_by_temp[temp]
-           
-           # Segment audio into individual notes (assume 2-second notes)
-           note_duration = 2.0
-           n_notes = int(len(audio) / (note_duration * sr))
-           
-           for i in range(n_notes):
-               start_idx = int((i + 0.3) * note_duration * sr)  # Skip attack
-               end_idx = int((i + 0.8) * note_duration * sr)
-               note_segment = audio[start_idx:end_idx]
-               
-               # Estimate F0
-               f0 = librosa.yin(note_segment, fmin=80, fmax=1500, sr=sr)
-               f0_median = np.median(f0[f0 > 0])
-               
-               # Calculate cents deviation
-               if i < len(target_pitches_hz):
-                   cents_dev = 1200 * np.log2(f0_median / target_pitches_hz[i])
-                   results[temp].append(cents_dev)
-       
-       # Visualization
-       fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-       
-       # Plot 1: Pitch deviation by note and temperature
-       for temp in temps:
-           axes[0].plot(results[temp], marker='o', label=f'{temp}°C', alpha=0.7)
-       
-       axes[0].axhline(y=0, color='black', linestyle='--', linewidth=1)
-       axes[0].set_xlabel('Note Number (Chromatic Scale)', fontsize=11)
-       axes[0].set_ylabel('Pitch Deviation (cents)', fontsize=11)
-       axes[0].set_title('Temperature Effect on Intonation', fontsize=13, fontweight='bold')
-       axes[0].legend()
-       axes[0].grid(True, alpha=0.3)
-       
-       # Plot 2: Mean deviation vs. temperature
-       mean_devs = [np.mean(results[temp]) for temp in temps]
-       axes[1].plot(temps, mean_devs, marker='s', linewidth=2, markersize=10, color='darkred')
-       axes[1].set_xlabel('Temperature (°C)', fontsize=11)
-       axes[1].set_ylabel('Mean Pitch Deviation (cents)', fontsize=11)
-       axes[1].set_title('Overall Pitch Shift with Temperature', fontsize=13, fontweight='bold')
-       axes[1].grid(True, alpha=0.3)
-       
-       # Linear fit
-       coeffs = np.polyfit(temps, mean_devs, 1)
-       temp_fit = np.linspace(min(temps), max(temps), 100)
-       dev_fit = coeffs[0] * temp_fit + coeffs[1]
-       axes[1].plot(temp_fit, dev_fit, 'b--', linewidth=1.5, 
-                   label=f'Slope: {coeffs[0]:.2f} cents/°C')
-       axes[1].legend()
-       
-       plt.tight_layout()
-       plt.savefig('temperature_sensitivity.png', dpi=300)
-       plt.show()
-       
-       print(f"Pitch sensitivity: {coeffs[0]:.2f} cents per °C")
-       print(f"Expected from theory: ~1.7 cents per °C")
-       
-       return results
-   ```
+```
+Note     Oct  L1  L2  L3   R1  R2  R3  Notes
+Bb2      ○    ●   ●   ●    ●   ●   ●   + front Bb key (LH side)
+B2       ○    ●   ●   ●    ●   ●   ●   + LH pinky key
+C3       ○    ●   ●   ●    ●   ●   ●   
+C#3      ○    ●   ●   ●    ●   ●   ○   + G#/C# key
+D3       ○    ●   ●   ●    ●   ●   ○   
+Eb3      ○    ●   ●   ●    ●   ○   ●   
+E3       ○    ●   ●   ●    ○   ○   ○   
+F3       ○    ●   ●   ○    ○   ○   ○   
+F#3      ○    ●   ○   ●    ○   ○   ○   
+G3       ○    ○   ○   ○    ○   ○   ○   All holes open
+Ab3/G#3  ○    ○   ○   ○    ○   ○   ○   + G# key (LH pinky)
+A3       ○    ●   ○   ○    ○   ○   ○   (octave vent for A, automatic)
+Bb3      ○    ●   ●   ●    ●   ●   ●   + Bis Bb or side Bb
+B3       ○    ●   ●   ●    ●   ●   ○   
+C4       ○    ●   ●   ●    ●   ○   ○   
+...
+```
 
-2. **Extended Performance Endurance Testing**
+**Upper register (Octave key depressed = ●):** Depress thumb octave key; fingering patterns remain identical to low register. The saxophone overblows at the octave — your embouchure adjustment is minimal (slightly firmer corners, fractionally faster air).
 
-   Long performance sessions create physiological and mechanical stress:
-   - Embouchure fatigue: Reduced precision, pitch instability
-   - Reed saturation: Moisture absorption changes reed response
-   - Condensation buildup: Water in tone holes affects acoustics
-   
-   **Procedure:**
-   
-   Perform continuous playing for 30 minutes:
-   - Alternate between melodic passages (moderate dynamics) and technical exercises (varying articulation)
-   - Record standardized test sequence every 5 minutes:
-     - Middle register G (written), 10-second sustained tone
-     - Chromatic scale, one octave
-     - Rapid articulation exercise
-   
-   Measure temporal evolution of:
-   - Pitch stability (F0 standard deviation)
-   - Tone quality (HNR)
-   - Attack response time
-   - Embouchure pressure (if instrumented)
-   
-   Expected observations:
-   - First 10 minutes: "Warm-up" phase, improving stability
-   - 10–20 minutes: Optimal performance
-   - Beyond 20 minutes: Gradual degradation (embouchure fatigue, reed saturation)
+**High register palm keys (D5–F#5 written):** Use left palm to depress 1–3 palm keys. D5 = 1 palm key; E5 = 2 palm keys; F5 = 3 palm keys; F#5 = 3 palm keys + side F key.
 
-3. **Extreme Range Testing: Altissimo Register**
+### 3.3 Flute Fingering — Key Register Transitions
 
-   The altissimo register (above written C6 for clarinet) requires advanced technique:
-   - Increased oral pressure
-   - Precise voicing (oral cavity shaping)
-   - Specialized fingerings combining register key with partial venting
-   
-   **Procedure:**
-   
-   Attempt to produce and sustain notes in the altissimo range:
-   - Written C#6 (concert Bb5, 932 Hz)
-   - Written D6 (concert C6, 1047 Hz)
-   - Written Eb6, E6, F6, etc., to maximum achievable pitch
-   
-   For each successfully produced note:
-   - Measure fundamental frequency and verify harmonic structure
-   - Record oral cavity pressure
-   - Assess stability: Can the note be sustained for 5 seconds?
-   - Measure dynamic range: Can the note be played softly?
-   
-   Document "failure modes":
-   - Pitch instability (wavering)
-   - Squeak (sudden jump to unintended pitch)
-   - Inability to initiate oscillation
-   - Uncontrolled dynamic (only loud production possible)
+```
+Note     T    1    2    3    4    5    6    Foot  Notes
+C4       ●    ●    ●    ●    ●    ●    ●    ●     (B foot clarifies low C)
+D4       ○    ●    ●    ●    ●    ●    ●    ●
+E4       ○    ●    ●    ●    ●    ●    ○    ○
+F4       ○    ●    ●    ●    ●    ○    ○    ○
+F#4      ○    ●    ●    ●    ○    ○    ○    ○
+G4       ○    ●    ●    ○    ○    ○    ○    ○
+Ab4      ○    ●    ●    ○    ●    ○    ○    ○     (trill key variant)
+A4       ○    ●    ○    ○    ○    ○    ○    ○
+Bb4      ○    ●    ●    ●    ●    ●    ●    ●     (using Bb lever — most common)
+B4       ○    ●    ○    ○    ○    ○    ○    ●     (B foot)
+```
 
-4. **Multi-Register Intonation Mapping**
+**Register transition — the break from second to third octave:** Unlike clarinet, flute register transitions are achieved purely by embouchure and air speed. No register key exists. To move from B4 to C5:
+- Increase air speed (compress your abdomen more firmly)
+- Flatten the embouchure plate angle slightly toward the lips
+- Narrow the aperture slightly
 
-   Create comprehensive intonation map across all registers:
+A common error is "rolling in" too much to reach the third octave — this darkens and flattens the pitch. Roll *out* slightly to brighten and center.
 
-   ```python
-   def create_intonation_map(instrument_name, fingering_data_csv):
-       """
-       Generate visual intonation map showing pitch deviations across range.
-       
-       Args:
-           instrument_name: string identifier
-           fingering_data_csv: CSV with columns: note, register, measured_hz, target_hz
-       """
-       import pandas as pd
-       
-       df = pd.read_csv(fingering_data_csv)
-       
-       # Calculate cents deviation
-       df['cents'] = 1200 * np.log2(df['measured_hz'] / df['target_hz'])
-       
-       # Group by register
-       registers = df['register'].unique()
-       
-       fig, ax = plt.subplots(figsize=(16, 6))
-       
-       colors = {'chalumeau': 'blue', 'clarion': 'green', 'altissimo': 'red'}
-       
-       for register in registers:
-           reg_data = df[df['register'] == register]
-           ax.scatter(reg_data.index, reg_data['cents'], 
-                     label=register.capitalize(), 
-                     color=colors.get(register, 'gray'),
-                     s=100, alpha=0.7, edgecolors='black', linewidth=0.5)
-       
-       # Add reference lines
-       ax.axhline(y=0, color='black', linestyle='-', linewidth=1.5, label='Perfect Tune')
-       ax.axhline(y=10, color='orange', linestyle='--', linewidth=1, alpha=0.5)
-       ax.axhline(y=-10, color='orange', linestyle='--', linewidth=1, alpha=0.5)
-       ax.fill_between(range(len(df)), -10, 10, color='green', alpha=0.1, label='Acceptable Range (±10¢)')
-       
-       ax.set_xlabel('Note (Chromatic Sequence)', fontsize=12)
-       ax.set_ylabel('Pitch Deviation (cents)', fontsize=12)
-       ax.set_title(f'Intonation Map: {instrument_name}', fontsize=14, fontweight='bold')
-       ax.set_ylim(-50, 50)
-       ax.legend(fontsize=10, loc='upper left')
-       ax.grid(True, alpha=0.3, axis='y')
-       
-       # Annotate problem notes (>20 cents deviation)
-       problem_notes = df[df['cents'].abs() > 20]
-       for idx, row in problem_notes.iterrows():
-           ax.annotate(row['note'], 
-                      xy=(idx, row['cents']),
-                      xytext=(idx, row['cents'] + 5),
-                      fontsize=8, color='red',
-                      ha='center')
-       
-       plt.tight_layout()
-       plt.savefig(f'intonation_map_{instrument_name}.png', dpi=300)
-       plt.show()
-       
-       # Statistical summary
-       print(f"\nIntonation Statistics for {instrument_name}:")
-       print(f"Mean absolute deviation: {df['cents'].abs().mean():.2f} cents")
-       print(f"Std deviation: {df['cents'].std():.2f} cents")
-       print(f"Range: {df['cents'].min():.2f} to {df['cents'].max():.2f} cents")
-       print(f"Notes within ±10 cents: {len(df[df['cents'].abs() <= 10])}/{len(df)} ({100*len(df[df['cents'].abs() <= 10])/len(df):.1f}%)")
-       print(f"Problem notes (>20 cents): {len(problem_notes)}")
-       
-       return df
-   ```
+---
 
-## Practical Reference: Measurement Protocols and Verification Standards
+## Part 4: Tone Production Drills — Progressive Exercises
 
-### Essential Formulas and Relationships
+### 4.1 Long Tone Practice — The Daily Foundation
 
-| Physical Quantity | Formula | Units | Typical Range |
-|-------------------|---------|-------|---------------|
-| **Acoustic** |
-| Fundamental frequency (cylindrical bore) | f = c / (4L_eff) | Hz | 150–1500 Hz |
-| Fundamental frequency (conical bore) | f = c / (2L_eff) | Hz | 150–1500 Hz |
-| Speed of sound (air) | c = 331.3 + 0.606T | m/s | 340–345 m/s (15–25°C) |
-| Wavelength | λ = c / f | m | 0.2–2.3 m |
-| Sound pressure level | SPL = 20 log₁₀(P_rms / P_ref) | dB | 60–110 dB |
-| **Aerodynamic** |
-| Oral cavity pressure | P_mouth | Pa or kPa | 1000–5000 Pa (1–5 kPa) |
-| Mass flow rate | ṁ = ρ A v | kg/s | 0.001–0.01 kg/s |
-| Bernoulli pressure | ΔP = ½ρv² | Pa | Function of flow velocity |
-| **Mechanical** |
-| Reed stiffness | k = F / δ | N/m | 100–500 N/m |
-| Flexural rigidity | EI = E w t³ / 12 | N·m² | Function of reed geometry |
-| Resonant frequency (reed) | f_r ≈ 1.875² / (2π) √(EI / ρAL⁴) | Hz | 2000–4000 Hz (clarinet) |
-| **Acoustic Impedance** |
-| Characteristic impedance | Z_0 = ρc / S | Pa·s/m³ | Function of bore area |
-| End correction (open hole) | δ ≈ 0.6r | m | 3–8 mm (typical holes) |
+Long tones are the most high-ROI practice you can do. No shortcuts.
 
-### Measurement Uncertainty and Calibration Standards
+**Drill 4 — Single-Note Long Tones with Dynamic Shape**
 
-All measurements must be accompanied by uncertainty estimates. Propagate uncertainties through derived quantities using standard methods.
+Play a single note in the middle register of your instrument (written G4 on clarinet/sax, A4 on flute, A3 on oboe).
 
-**Frequency measurement:**
-- Accuracy: ±0.1% with digital tuner or spectral analysis
-- Resolution: 0.1 Hz minimum for fundamental identification
-- Uncertainty in cents: ±1.7 cents (corresponds to ±0.1% frequency)
+```
+Shape: ppp ──crescendo──> fff ──diminuendo──> ppp
+Duration: 20 seconds total
+Metronome: Counts in quarter notes at ♩ = 60
+Beats 1-5: Gradually crescendo from barely audible
+Beats 5-15: Continue growing
+Beats 15-20: Diminuendo back to ppp without stopping tone
+```
 
-**Sound pressure level:**
-- Calibration: Use 94 dB or 114 dB calibrator before each measurement session
-- Accuracy: ±1 dB with Class 1 microphone and calibration
-- Environmental correction: Compensate for atmospheric pressure and temperature
+**What to listen for:**
+- Does the pitch stay *exactly* centered throughout the dynamic shape? Most players go sharp as they crescendo and flat as they diminuendo. Focus on the following compensation:
+  - Crescendo: slightly drop the jaw / relax embouchure to keep pitch from rising
+  - Diminuendo: slightly firm the embouchure to keep pitch from falling
+- Is the tone quality consistent? A crescendo that gets "squeezed" and bright at the top, then "cloudy" at pp, indicates uneven breath support.
 
-**Pressure measurement:**
-- Zero offset: <0.5% of full scale
-- Linearity: <1% across measurement range
-- Frequency response: DC to >1 kHz for capturing transients
+**Weekly progression:**
 
-### Verification Checklist
+| Week | Note | Dynamic Shape | Duration |
+|---|---|---|---|
+| 1 | G4 (cl) / A4 (fl) | mp → f → mp | 12 sec |
+| 2 | G4 & D4 | p → ff → p | 16 sec |
+| 3 | Chromatic scale, one note per breath | pp → mf → pp | 16 sec |
+| 4 | Major scale, octave | pp → ff → pp | 20 sec |
+| 5+ | Full range, every semitone | ppp → fff → ppp | 20 sec |
 
-Before concluding laboratory work, verify:
+### 4.2 Interval Tuning Drill — Training Intonation with Drones
 
-- [ ] All spectral measurements show clear fundamental and harmonics (HNR > 20 dB for sustained tones)
-- [ ] Pitch accuracy measurements fall within ±15 cents for standard fingerings (professional standard: ±10 cents)
-- [ ] Dynamic range spans minimum 40 dB (pianissimo to fortissimo)
-- [ ] Attack transients show consistent characteristics across repetitions (CV < 20%)
-- [ ] Temperature compensation: Pitch shift of ~1.7 cents/°C verified
-- [ ] Reed strength effects documented: Stiffness inversely correlates with low-register response
-- [ ] Pad leakage threshold identified: <0.02 mm acceptable, >0.05 mm problematic
-- [ ] Environmental data recorded: Temperature ±0.5°C, relative humidity ±5%, barometric pressure ±1 hPa
-- [ ] Calibration traces documented: Microphone, pressure transducer, tuner reference
+This drill develops the most critical skill in ensemble playing: hearing and adjusting your pitch relative to a reference.
 
-### System-Level Performance Model
+**Setup:** Use a drone app (GarageBand, PitchDrone, or a synthesizer) set to your instrument's tonic (Bb concert for clarinet players = written C; F concert for flute = written F).
 
-The complete woodwind system can be represented as a feedback control system:
+**Drill 5 — Major Scale over Drone**
+
+1. Set drone to concert Bb (for clarinet players: drone sounds Bb, you finger middle C = concert Bb).
+2. Play the entire Bb major scale (written C major on Bb clarinet), one note at a time, holding each note for 4 beats at ♩ = 60.
+3. Listen for beating between your tone and the drone on scale degrees 1, 4, 5, and 8 (tonic, subdominant, dominant, upper tonic). These should be *beatless*.
+4. Scale degrees 3, 6, and 7 will beat slightly — this is normal for equal temperament vs. just intonation. Learn to recognize and control the beat rate.
+
+**What "beating" tells you:**
+- Fast beats (more than 4 per second): significantly out of tune
+- Slow beats (1–2 per second): slightly out of tune — adjust embouchure
+- No beats: in tune
+- As a beat slows and disappears: you are approaching unison. Lock onto that position and remember the embouchure/air feeling.
+
+**Tempo progression:** ♩ = 60 → 80 → practice at 80 until automatic, then remove the drone and test.
+
+### 4.3 Vibrato — Flute, Oboe, and Saxophone
+
+Vibrato is a *periodic modulation* of pitch (and to a lesser extent, amplitude) produced differently on each instrument.
+
+**Flute vibrato:** Generated by diaphragm pulses, *not* jaw movement. Practice by:
+1. Sustain a steady A4.
+2. Add "ha-ha-ha-ha" pulses with your diaphragm at ♩ = 60 (4 pulses per beat).
+3. Gradually speed up to 60 bpm × 6 pulses, then × 8.
+4. Smooth the pulses into a continuous undulation.
+
+Target vibrato rate for orchestral playing: 5–6 oscillations per second (Hz) at moderate tempo.
+
+**Oboe vibrato:** Lip-based ("throat vibrato" is an error on oboe — it destabilizes the high-pressure system). Slight rhythmic firmness-and-release of lip contact. Practice extremely slowly — this is subtle on oboe.
+
+**Saxophone vibrato:** Jaw vibrato is standard (unlike flute). Jaw drops and rises slightly, modulating reed opening. Practice "ya-ya-ya-ya" jaw motion without the instrument first, then apply to sustained tones. Aim for a relaxed, wide-wave vibrato similar to a string player for ballad playing; narrow it to nearly straight for classical playing.
+
+**Clarinet and bassoon:** Vibrato is used sparingly or not at all in classical playing; standard in jazz clarinet. When used, diaphragm-based is preferred.
+
+---
+
+## Part 5: Articulation — The Language of the Tongue
+
+Articulation is how you shape individual notes and define musical character. The tongue is the gatekeeper between the breath column and the vibrating source.
+
+### 5.1 Single Tongue — Foundation Mechanics by Instrument
+
+The tongue tip touches a *specific point* on each instrument. Getting this wrong is the most common root cause of slow articulation and poor tone attacks.
+
+| Instrument | Tongue Contact Point | Syllable | Feel |
+|---|---|---|---|
+| Flute | Lower lip or just inside lower teeth — the air stream, not the embouchure hole | "Tuh" or "Duh" | Lightest touch; the tongue interrupts the airstream, not the reed |
+| Clarinet | Tip of tongue to the tip of the reed — the very end of the bottom blade | "Tuh" or "Du" | Feel the reed on the tongue tip; don't stab, dab |
+| Saxophone | Tip of reed (same as clarinet principle, larger reed surface) | "Tuh" or "Du" | Firmer than clarinet due to larger reed |
+| Oboe | Reed tip (both blades); tongue approaches from below | "Tuh" or "Du" | Very light — excessive force clamps the reed |
+| Bassoon | Reed tip, tongue from below | "Tuh" or "Du" | Relaxed; the large reed is sensitive |
+
+**What the tongue does *not* do:** Stop the airflow. The breath column keeps moving — the tongue only momentarily interrupts the reed/airstream. Many students stop breathing between tongued notes, which kills tone and speed.
+
+### 5.2 Articulation Drill Progression — All Woodwinds
+
+**Drill 6 — Single Tongue on One Pitch**
+
+Choose a comfortable middle register note (written G4 clarinet/sax, A4 flute, A3 oboe).
+
+```
+Exercise A — Even 8th notes:
+♩ = 60: G G G G G G G G (8 notes, single tongue each)
+♩ = 72: same
+♩ = 84: same
+♩ = 100: same
+♩ = 116: same
+Maximum clean tempo: typically 120–132 BPM for beginners
+
+Exercise B — Staccato (notes very short, silence between):
+♩ = 60: short G, rest, short G, rest... (staccato 8ths)
+Focus: each note sounds identical — same attack, same length, same tone
+
+Exercise C — Accented notes:
+♩ = 72: > G G G G (accent every 4th note, then every 2nd)
+Focus: accent = more breath, same tongue speed
+```
+
+### 5.3 Double and Triple Tonguing
+
+When single-tongue speed plateaus (~132–144 BPM 16th notes), double tonguing unlocks faster passages.
+
+**Double tongue syllables:** T-K-T-K or D-G-D-G
+
+The "K/G" is produced by the back of the tongue hitting the soft palate (velum). Important: the K stroke must be *equal* to the T stroke in force and tone quality — this requires dedicated practice.
+
+**Triple tongue:** T-K-T / T-K-T or T-T-K / T-T-K (for triplet-based figures)
+
+**Drill 7 — Double Tongue Builder**
+
+```
+Step 1: T only — 4 notes at ♩ = 80 (establish single tongue tone quality reference)
+Step 2: K only — 4 notes at ♩ = 80 (K strokes sound as clear as T)
+Step 3: TK pairs — 2 notes at ♩ = 60 (slow, deliberate, listen for evenness)
+Step 4: TKTK on one pitch — ♩ = 80, 100, 120, 144
+Step 5: TKTK on scale — once pitch-change is clean, raise tempo
+
+Red flag: If T sounds clear and K sounds "muddy," your K is too far back.
+Fix: Move K tongue contact point forward; "K" should feel almost like it's in the middle of your mouth.
+```
+
+**Expected progression:**
+- Week 1-2: TK even at ♩ = 80 (16th notes)
+- Week 3-4: ♩ = 100
+- Month 2: ♩ = 120+ with scale passages
+
+### 5.4 Legato — Connecting Notes Without the Tongue
+
+Legato means the tongue does *not* re-attack between notes. The only interruption is the fingering change itself.
+
+**The legato problem on woodwinds:** When fingers move between notes, there is a brief period where both the old and new holes/pads are partially open — creating a glitch pitch. The solution is *simultaneous* finger movement: all fingers must land at exactly the same moment. Early or late fingers create "grace notes" you didn't intend.
+
+**Drill 8 — Slow Legato Scale for Finger Coordination**
+
+```
+♩ = 40: Play G major scale, 2 beats per note, NO tongue
+Focus entirely on simultaneous finger placement
+Increase by 4 BPM every two passes
+Target: ♩ = 72 with zero pitch glitches between notes
+Then use tongued reference: play same scale tongued, compare pitch glitch presence
+```
+
+---
+
+## Part 6: Register Traversal — The Break
+
+Every woodwind has a "break" — the register transition where the instrument physically shifts its mode of vibration. This is where beginners struggle most.
+
+### 6.1 The Clarinet Break (E4/F4 → F4/G4 written)
+
+The clarinet break separates the chalumeau register (up to written G#4/Ab4) from the clarion register. Crossing it requires:
+1. Coordinated addition of the register key (left thumb, back of instrument)
+2. Slight increase in air speed and minimal embouchure firmness increase
+3. Precise finger placement — the break fails when fingers are poorly synchronized
+
+**The notorious A4–Bb4 clarion voice leading:** After mastering the break in scale passages, the hardest interval is any note in chalumeau jumping to the same note + register key in clarion.
+
+**Drill 9 — The Clarinet Break Ladder (♩ = 60 → 100)**
+
+```
+Level 1: Long tone crossing — G4 (chalumeau) → G5 (clarion), slurred, 4 beats each
+Level 2: G4 ↔ G5, alternating each beat
+Level 3: Scale crossing — play E4-F4-F#4-G4|G4-A4-B4-C5 slurred (bar line = register key added)
+Level 4: Thirds across the break — G4-B4, A4-C5, Bb4-D5, etc.
+Level 5: Full scale over the break at ♩ = 92 without any glitches
+```
+
+**What goes wrong:** The tongue fires an extra note during the register key transition. Cure: exaggerate the finger coordination in slow practice. The register key must arrive *before or simultaneously* with the new note fingering, never after.
+
+### 6.2 The Flute Second-to-Third Octave Transition
+
+Flute has no register key. The third octave (C6+) is entirely achieved by embouchure and air speed.
+
+**Transition mechanics:**
+- Increase abdominal compression → faster airstream
+- Narrow the lip aperture very slightly (corners firm up)
+- Bring the lower jaw forward 1–2 mm — this angles the air direction slightly upward, favoring the higher resonance mode
+- Do NOT roll the flute in toward the lips (a common overcompensation)
+
+**Drill 10 — Flute Octave Slurs**
+
+```
+♩ = 60: 
+D4 (open) → slur → D5 → slur → D6
+Hold each note 4 beats. Focus on jaw position change, not embouchure squeezing.
+Common fault: D6 sounds → goes flat → player rolls in → goes even flatter.
+Correction: Keep the same roll-out position and increase air speed instead.
+```
+
+---
+
+## Part 7: Intonation Tendencies by Instrument — Problem Notes and Solutions
+
+Every woodwind has notes that are inherently sharp or flat due to bore geometry, tone hole placement, and acoustic physics. Knowing these in advance means you can compensate automatically rather than hunting during performance.
+
+### 7.1 Clarinet Intonation Map
+
+```
+SHARP by nature (need to open/relax embouchure):
+- Written G#4 / Ab4: Use alternate fingering (register key + standard G) when possible
+- Written Bb5 (clarion): Very sharp on most instruments; drop jaw 1–2 mm
+- Throat tones (G4–Bb4 written): Naturally bright/sharp; use voicing (say "oh" internally)
+
+FLAT by nature (need to firm up / add jaw pressure):
+- Written C5 / D5 (chalumeau top): Very flat — firm embouchure, faster air
+- Written high E6, F6 (altissimo): Often flat; support with high-velocity air
+- Low E3, F3 (clarinet bottom): Can be flat on cold instruments; warm up for 5 min first
+```
+
+**Voicing trick for throat tones:** Think the vowel "oh" or "oo" internally while playing the throat tones (G4, Ab4, A4, Bb4). This shapes the oral cavity, raising the resonance frequency slightly to center the pitch.
+
+### 7.2 Flute Intonation Map
+
+```
+SHARP by nature:
+- Middle Bb4: Most flutes sharp; use thumb Bb key (lever), not Bis key, to lower pitch
+- High D6, E6: Sharp; relax aperture slightly, keep air speed high
+
+FLAT by nature:
+- Low C4, C#4, D4: Very flat (all woodwinds tend flat in low register when cold)
+  Fix: Push headjoint in slightly for cold performance conditions
+- C6 (all-fingers-up note): Often flat; firm embouchure, forward jaw
+- Low Bb (B-foot): Rolls flat quickly; full breath support, do not "blow through" this note
+```
+
+**Flute headjoint tuning:** Pulling the headjoint out lowers pitch (lengthens the tube). Pushing in raises pitch. Standard starting position: gap of approximately 12–14 mm from the embouchure hole center to the headjoint end. Adjust by ear against a drone reference at playing temperature.
+
+### 7.3 Saxophone Intonation Map
+
+```
+SHARP by nature:
+- Palm key notes (D5, E5, F5): Sharp on virtually all saxophones; drop jaw, relax corners
+- High G#5 / A5: Sharp; use long-side C key alternate for A5
+
+FLAT by nature:
+- Low Bb2, B2: Very flat (long tube, cold); support with full breath
+- Mid Eb3: Flat on many instruments; use side Eb key alternate
+- Mid C#3: Flat; firm embouchure, check neck cork fit
+```
+
+---
+
+## Part 8: Reed Care, Mouthpiece Selection, and Instrument Maintenance
+
+Sound production quality starts before you pick up the instrument. A bad reed or leaking pad wastes practice time.
+
+### 8.1 Reed Selection and Break-In Protocol
+
+**Synthetic reeds (Légère, Forestone, D'Addario Venn):** Ready to play out of the box. Consistent from reed to reed. Excellent for practice, gigging in variable humidity. Synthetic reeds run approximately half a strength higher than labeled cane — a Légère 3.0 often plays like a cane 2.5.
+
+**Cane reeds (Vandoren, Rico, Alexander):** Require break-in and rotation.
+
+**New cane reed break-in protocol:**
+1. Wet the reed by holding it in your mouth (saliva) for 30 seconds.
+2. Play for no more than 5 minutes the first day.
+3. Rest 24 hours.
+4. Play 10 minutes second day.
+5. Rest again.
+6. By day 5–7: fully broken in, optimal performance.
+
+Rotate between 3–5 reeds in a cycle. Never play the same reed two days in a row for the first two weeks.
+
+**Reed selection test:**
+1. Wet the reed, assemble the instrument.
+2. Play a low middle-register note (written G clarinet) at mp. If it starts immediately without excessive pressure: good candidate.
+3. Play the full range. If notes crack easily or refuse above the break: reed is too soft.
+4. If you have to push very hard or the low notes won't speak: reed is too hard.
+5. Optimal: comfortable in low register, the high register requires slight effort but speaks cleanly.
+
+**Reed strength guide by instrument:**
+
+| Instrument | Beginner | Intermediate | Advanced |
+|---|---|---|---|
+| Clarinet | 2.0–2.5 | 2.5–3.0 | 3.0–3.5 |
+| Alto Sax | 2.0–2.5 | 2.5–3.0 | 3.0–3.5 |
+| Tenor Sax | 2.0–2.5 | 2.5–3.0 | 3.0–3.5 |
+| Soprano Sax | 2.0–2.5 | 2.5–3.0 | 3.0–3.5 |
+
+Oboe and bassoon reeds are typically hand-made or purchased from specialized makers; "strength" is replaced by "opening" and "scrape" characteristics.
+
+### 8.2 Mouthpiece Selection Guide — Clarinet and Saxophone
+
+| Parameter | What It Affects | Smaller | Larger |
+|---|---|---|---|
+| Tip opening (mm) | Resistance, flexibility | More resistant, easier to control | More flexible, harder to control |
+| Facing length | Vibrating reed length | Less vibration, brighter | More vibration, darker |
+| Chamber volume | Tone color | Brighter, more projection | Darker, warmer |
+| Baffle height | Brightness, edge | Darker | Brighter, more "edge" |
+
+**Clarinet starting recommendations:**
+- Classical: Vandoren B45 or 5RV Lyre (medium tip opening 1.14–1.19 mm, small-medium chamber)
+- Jazz/klezmer: Vandoren M13 or Zinner mouthpieces (larger tip opening 1.25–1.35 mm)
+
+**Alto sax starting recommendations:**
+- Classical: Vandoren Optimum AL3 or Selmer C* (medium opening ~1.6–1.7 mm)
+- Jazz: Meyer 5M or Otto Link 6* (medium-large opening 1.8–2.0 mm)
+
+**The ligature:** The ligature clamps the reed to the mouthpiece. Leather and fabric ligatures (BG, Rovner) allow the reed to vibrate more freely, producing a warmer, more flexible tone. Metal ligatures (Vandoren Optimum, Bonade) provide more resistance and presence. For beginners, any correctly-fitted ligature works fine. The reed vibrates; the ligature just holds it in place — don't overthink it until you've developed a consistent embouchure.
+
+### 8.3 Pad Leakage Diagnosis — The Feeler Gauge Method
+
+A leaking pad causes sharp intonation, weak tone, or notes that refuse to speak.
+
+**Diagnosis:**
+1. Remove the reed and blow firmly into the instrument with all keys closed.
+2. If air escapes: a pad is leaking.
+3. Insert a cigarette paper (or feeler gauge strip) under each pad systematically.
+4. Close the pad. Pull the paper slowly. If it slides out freely with no resistance: the pad is not sealing.
+5. Normal: you should feel consistent drag across the full pad circumference.
+
+**Common leak sources:**
+- Lower joint on clarinet: low E, F, F# keys
+- Saxophone octave key mechanism
+- Any keywork that hasn't been played for extended periods (pads dry-seal to the tone holes)
+
+**Emergency fix:** A small amount of Valentino pad cement on the edge of a leaking pad can restore seal temporarily. Proper repair requires a technician.
+
+**Preventive maintenance schedule:**
+
+| Frequency | Task |
+|---|---|
+| After every session | Swab out bore with silk swab, oil the reed, store reed in flat case |
+| Weekly | Check for loose screws, test pad sealing with feeler paper |
+| 6 months | Professional pad check, cork grease application to tenon corks |
+| Yearly | Full service: regulation, pad replacement if needed, mechanism adjustment |
+
+---
+
+## Part 9: Acoustic Fundamentals — Why These Techniques Work
+
+This section provides just enough physics to explain the techniques above. We cover it *after* the technique so the physics serves the playing, not the reverse.
+
+### 9.1 Why the Clarinet Overblows at the Twelfth
+
+The clarinet is essentially a **closed cylindrical pipe** (closed at the mouthpiece end, open at the bell). Closed-pipe resonators only support *odd-numbered harmonics*: the fundamental (n=1), then 3rd harmonic (n=3, the twelfth), then 5th, 7th, etc. This is why:
+- The clarion register is a twelfth above chalumeau (not an octave)
+- The clarinet has a characteristic "hollow" timbre in the low register (even harmonics are suppressed)
+- The chalumeau register has a distinctively dark, woody quality absent from the flute or sax
+
+Conical bores (sax, oboe, bassoon) support all harmonics including even ones, so they overblow at the octave and have a fuller, brighter harmonic spectrum.
+
+### 9.2 The Excitation Mechanisms — What the Reed and Edge Tone Do
+
+All woodwind excitation is a **self-sustained feedback oscillation**:
+
+1. The player applies sub-tone pressure (breath) to the input.
+2. The reed (or air jet) allows a pulse of air into the bore.
+3. That pulse travels down the bore, reflects at the open end (or first open tone hole), and returns as a rarefaction wave.
+4. The returning rarefaction *assists* in opening the reed again.
+5. This synchronizes the reed vibration to the bore's resonance frequency — not the reed's own natural frequency.
+
+This is why changing fingering changes pitch: you're changing which resonance mode the bore favors, and the reed locks onto that frequency.
 
 ```mermaid
-graph TB
-    subgraph sub_player__controller ["Player (Controller)"]
-        A["Neural Control<br/>(Motor Commands)"]
-        B["Auditory Feedback<br/>(Pitch, Timbre Perception)"]
-        C["Tactile Feedback<br/>(Embouchure, Finger Forces)"]
+graph TD
+    subgraph sub_feedback ["Self-Sustained Oscillation Loop"]
+        A["Breath Pressure<br/>(Sub-tone DC input)"]
+        B["Reed Opens<br/>(Pressure pulse enters bore)"]
+        C["Pulse Travels Down Bore<br/>(~340 m/s)"]
+        D["Reflection at Open End<br/>(Rarefaction returns)"]
+        E["Rarefaction Assists Reed Opening<br/>(Positive feedback)"]
     end
-    
-    subgraph sub_instrument__plant ["Instrument (Plant)"]
-        D["Aerodynamic Driver<br/>(Breath → Reed Oscillation)"]
-        E["Acoustic Resonator<br/>(Bore + Tone Holes)"]
-        F["Radiation<br/>(Bell + Open Holes)"]
+
+    A --> B --> C --> D --> E --> B
+
+    subgraph sub_control ["Player Control Parameters"]
+        F["Embouchure Firmness<br/>(Modulates reed stiffness)"]
+        G["Breath Pressure & Speed<br/>(Drives oscillation amplitude)"]
+        H["Vocal Tract Voicing<br/>(Oral cavity resonance)"]
+        I["Fingering<br/>(Selects bore resonance frequency)"]
     end
-    
-    subgraph sub_environment ["Environment"]
-        G["Acoustic Field<br/>(Room Response)"]
-        H["Temperature & Humidity"]
-    end
-    
-    A --> D
-    D -->|"Pressure Oscillation"| E
-    E -->|"Standing Wave"| F
-    F --> G
-    
-    G -->|"Sound Perception"| B
-    D -->|"Reed Vibration"| C
-    
-    B --> A
-    C --> A
-    
-    H -.->|"Acoustic Properties"| E
-    H -.->|"Reed Stiffness"| D
-    
-    style A fill:#e1f5ff
-    style D fill:#fff3e1
-    style E fill:#f0e1ff
-    style F fill:#e1ffe1
-    style G fill:#ffe1e1
+
+    F -.-> B
+    G -.-> A
+    H -.-> E
+    I -.-> D
 ```
 
-The player acts as a closed-loop controller, continuously adjusting control parameters (embouchure tension, breath pressure, tongue position, finger coordination) based on auditory and tactile feedback to achieve desired musical output. Understanding this system requires both component-level characterization (reed mechanics, bore acoustics) and system-level integration (feedback stability, transient response).
+### 9.3 Bore Geometry and Its Effect on Tone
 
-### Advanced Analysis: Computational Modeling
+| Bore Type | Instrument | Harmonic Content | Timbre Character |
+|---|---|---|---|
+| Cylindrical | Clarinet | Odd harmonics dominate | Dark, hollow, woody |
+| Conical | Sax, Oboe, Bassoon | Full harmonic series | Bright, complex, rich |
+| Parabolic/Cylindrical hybrid | Flute | Full harmonics, modified by open ends | Clear, flute-like, projecting |
 
-For students proceeding to computational analysis, consider implementing physical models:
+The key insight for players: a **cylindrical bore instrument needs more embouchure adjustment** crossing registers because it's jumping between odd harmonics (1st → 3rd harmonic = twelfth). A **conical bore instrument** jumps from 1st to 2nd harmonic (octave), requiring a smaller adjustment.
 
-**Simplified clarinet model (time-domain simulation):**
+### 9.4 Temperature and Intonation — The Practical Rule
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+The speed of sound increases approximately 0.6 m/s per °C. For playing purposes:
 
-def simulate_clarinet_simplified(duration=0.5, sr=48000, pressure_pa=3000, reed_stiffness=200):
-    """
-    Time-domain simulation of clarinet using simplified lumped-element model.
-    
-    Based on McIntyre-Schumacher-Woodhouse model.
-    
-    Args:
-        duration: simulation time (seconds)
-        sr: sample rate (Hz)
-        pressure_pa: mouth pressure (Pa)
-        reed_stiffness: reed stiffness parameter (N/m)
-    
-    Returns:
-        tuple: (time_array, pressure_waveform, flow_waveform)
-    """
-    dt = 1.0 / sr
-    n_samples = int(duration * sr)
-    
-    # Physical parameters
-    c = 343  # speed of sound (m/s)
-    L = 0.60  # effective length (m) for written G
-    rho = 1.2  # air density (kg/m³)
-    S = np.pi * (0.0075)**2  # bore cross-section (m²)
-    
-    # Delay line for waveguide (represents bore)
-    delay_samples = int(2 * L / c * sr)  # round-trip delay
-    delay_line = np.zeros(delay_samples)
-    
-    # Reed model parameters
-    reed_mass = 0.0001  # kg (effective mass)
-    reed_damping = 10  # damping coefficient
-    reed_opening_rest = 0.0005  # m (rest opening)
-    
-    # State variables
-    reed_displacement = 0
-    reed_velocity = 0
-    
-    # Output arrays
-    pressure_out = np.zeros(n_samples)
-    flow_out = np.zeros(n_samples)
-    
-    for i in range(n_samples):
-        # Get reflected pressure from bore
-        p_bore = delay_line[0]
-        
-        # Reed dynamics (simple spring-mass-damper)
-        # Pressure difference across reed
-        delta_p = pressure_pa - p_bore
-        
-        # Bernoulli effect: pressure drop proportional to flow²
-        # Flow through reed opening
-        reed_opening = reed_opening_rest - reed_displacement
-        reed_opening = max(reed_opening, 0)  # Can't be negative
-        
-        # Simplified flow calculation
-        if delta_p > 0 and reed_opening > 0:
-            flow = reed_opening * np.sqrt(2 * delta_p / rho)
-        else:
-            flow = 0
-        
-        # Pressure in mouthpiece (simplified)
-        p_mouth = pressure_pa - flow * 100  # Flow resistance
-        
-        # Reed equation of motion
-        reed_acceleration = (delta_p - reed_stiffness * reed_displacement - 
-                           reed_damping * reed_velocity) / reed_mass
-        
-        # Update reed state (Euler integration)
-        reed_velocity += reed_acceleration * dt
-        reed_displacement += reed_velocity * dt
-        
-        # Update delay line (simple waveguide)
-        delay_line[1:] = delay_line[:-1]
-        delay_line[-1] = p_mouth
-        
-        # Store outputs
-        pressure_out[i] = p_mouth
-        flow_out[i] = flow
-    
-    time = np.arange(n_samples) / sr
-    
-    return time, pressure_out, flow_out
+**Rule of thumb:** Every 6°C drop in temperature drops your pitch approximately 10 cents (1/10 of a semitone). Every 6°C rise raises it 10 cents.
 
-# Run simulation
-time, pressure, flow = simulate_clarinet_simplified(duration=0.1, pressure_pa=3000)
+**Practical implications:**
+- Playing in a cold church (10°C vs. 20°C warmer practice room): you will be ~17 cents flat. Push headjoint/mouthpiece in before playing.
+- After 10–15 minutes of playing, your instrument warms up significantly — retune.
+- Oboe and bassoon reeds also change stiffness with humidity, adding another variable. Break reeds in gradually.
 
-# Visualize
-fig, axes = plt.subplots(3, 1, figsize=(12, 8))
+---
 
-axes[0].plot(time * 1000, pressure)
-axes[0].set_ylabel('Pressure (Pa)', fontsize=11)
-axes[0].set_title('Clarinet Simulation: Mouthpiece Pressure', fontsize=12, fontweight='bold')
-axes[0].grid(True, alpha=0.3)
+## Part 10: Scales, Arpeggios, and Technical Development
 
-axes[1].plot(time * 1000, flow * 1000)  # Convert to L/s
-axes[1].set_ylabel('Flow (L/s)', fontsize=11)
-axes[1].set_title('Airflow Through Reed', fontsize=12, fontweight='bold')
-axes[1].grid(True, alpha=0.3)
+### 10.1 Daily Technical Routine — Bb Clarinet Scale System
 
-# Spectrum
-spectrum = np.abs(np.fft.rfft(pressure))
-freqs = np.fft.rfftfreq(len(pressure), 1/48000)
-axes[2].plot(freqs[:2000], 20*np.log10(spectrum[:2000] / np.max(spectrum)))
-axes[2].set_xlabel('Frequency (Hz)', fontsize=11)
-axes[2].set_ylabel('Magnitude (dB)', fontsize=11)
-axes[2].set_title('Spectrum', fontsize=12, fontweight='bold')
-axes[2].grid(True, alpha=0.3)
+Adapt these fingering patterns and targets to any woodwind — the interval logic is the same.
 
-plt.tight_layout()
-plt.savefig('clarinet_simulation.png', dpi=300)
-plt.show()
+**Foundation Scale Drill (all 12 major scales, one octave):**
+
+```
+Target tempos:
+♩ = 60:  q q q q (quarter notes)   — Week 1-2
+♩ = 80:  eighth notes              — Week 3-4
+♩ = 100: eighth notes              — Month 2
+♩ = 120: 16th notes (triplet feel) — Month 3-4
+♩ = 144: 16th notes               — Months 5-6
 ```
 
-This simplified model captures the essence of reed-air column coupling: reed motion modulates flow, which injects pressure oscillations into the bore, which reflect back to influence reed motion, establishing self-sustained oscillation at the air column resonance frequency.
+**Scale order by difficulty (clarinet, Böhm system):**
 
-Professional-grade models extend this framework with:
-- Nonlinear reed contact dynamics (collision with mouthpiece table)
-- Frequency-dependent bore losses and dispersion
-- Tone hole lattice modeling (scattering matrix formulation)
-- Radiation impedance at bell and open holes
-- Visco-thermal boundary layer losses
+1. G major (1 sharp): only uses white keys + F# key
+2. F major (1 flat): adds Bb fingering
+3. D major (2 sharps): builds on G, adds C#
+4. Bb major (2 flats): cross-break practice, Bb fingerings
+5. A major (3 sharps): G# key work
+6. Eb major (3 flats): multiple Eb fingerings
+7. E major (4 sharps): Good cross-register workout
+8. Ab major (4 flats): Difficult, three flat keys coordinated
+9. B major (5 sharps): Full chromatic workout
+10. Db major (5 flats): Enharmonic of C#
+11. F# major (6 sharps): Uses both register key and cross-fingerings
+12. Gb major (6 flats): Enharmonic of F#
 
-### Reporting Standards and Data Presentation
+### 10.2 Arpeggio Patterns — Major, Minor, Dominant 7th
 
-All laboratory findings must be documented according to scientific standards:
+Arpeggios expose finger synchronization problems more than scales because the intervals are wider.
 
-**Required elements:**
-1. **Objective:** Clear statement of investigation goals
-2. **Methods:** Detailed description of instrumentation, calibration, and procedures enabling replication
-3. **Results:** Quantitative data with uncertainties, presented in tables and figures
-4. **Analysis:** Statistical treatment, uncertainty propagation, comparison with theoretical predictions
-5. **Discussion:** Interpretation of results, identification of systematic errors, limitations
-6. **Conclusions:** Summary of key findings and their implications
+**G major arpeggio (Bb clarinet, written):**
+```
+G4 – B4 – D5 – G5 – D5 – B4 – G4
+Fingering: standard G, then cross break to B clarion, D clarion, G clarion
+```
 
-**Figure standards:**
-- High resolution (300 dpi minimum for publication)
-- Clear axis labels with units
-- Legends identifying all data series
-- Error bars or uncertainty regions where applicable
-- Captions providing complete standalone context
+**Common break problem on the G major arpeggio:** G4 (chalumeau, all-fingers-up) to B4 (clarion) requires the register key to appear simultaneously with the removal of left hand fingers. Isolate this single interval and practice it at ♩ = 40 until perfect.
 
-**Data archival:**
-- Raw measurement data stored in open formats (CSV, WAV)
-- Metadata documenting experimental conditions
-- Analysis scripts version-controlled (Git repository)
-- Calibration certificates and instrument specifications attached
+### 10.3 Chromatic Scale — Full Range
 
-This comprehensive laboratory curriculum provides rigorous, measurement-based understanding of woodwind instrument acoustics, aerodynamics, and performance characteristics. Students completing these exercises will possess both theoretical knowledge and empirical skills necessary for advanced work in musical acoustics, instrument design, or professional performance.
+The chromatic scale tests all 12 pitch classes in sequence and is the best tool for even finger movement and consistent tone across the instrument.
+
+**Clarinet chromatic scale fingering decisions:**
+
+```
+Bb4: Use Bis Bb key (index finger side key, right next to the first tone hole)
+     — faster than side key Bb in rapid passages
+     — but side key Bb is flatter, better for sustained notes
+
+F#4: Use side Bb key / F# spatula — cleaner in descending passages
+
+G#4/Ab4: Left pinky G# key — the main one
+          Alternate: Right hand spatula key — for passages leading to Bb
+```
+
+**Practice format:**
+
+```
+♩ = 60, two beats per note → ♩ = 80, one beat per note → ♩ = 100, 16th notes
+Full range: low E3 to written C6 (or higher)
+```
+
+---
+
+## Part 11: Practical Performance Considerations
+
+### 11.1 Warm-Up Sequence — 15 Minutes Before Any Performance
+
+```
+Minutes 0-3:   Long tones, middle register only (mf, no vibrato)
+               Focus: embouchure settles, reed warms and saturates
+Minutes 3-6:   Scales, one octave, slow (♩ = 60)
+               Focus: finger coordination, intonation against room acoustics
+Minutes 6-9:   Dynamic long tones (pp → ff → pp)
+               Focus: full dynamic range available, test reed at extremes
+Minutes 9-12:  Articulation — single tongue, light staccato (♩ = 80 8ths)
+               Focus: tongue tip placement, consistency
+Minutes 12-15: Passage work from repertoire — difficult spots only, slow
+               Focus: build confidence in specific problem bars
+```
+
+### 11.2 Reed Emergency Protocols — Live Performance
+
+**Scenario 1 — Reed cracks mid-performance:**
+Have 2–3 pre-soaked backup reeds in your case. A reed soaked for 30 seconds and placed correctly can be functional within seconds.
+
+**Scenario 2 — Reed too hard (sluggish, won't speak easily):**
+Briefly press the flat side (table side) of the reed against your lower lip and rub lightly with a saliva-moistened thumb. This slightly increases moisture content and temporarily softens the reed.
+
+**Scenario 3 — Reed too soft (easy to squeak, lacks projection):**
+Let the reed dry slightly (5–10 minutes without playing). A marginally drier reed has more stiffness and projects better.
+
+**Scenario 4 — Condensation bubbling in keys:**
+Slide cigarette paper under the affected pad, close the key, and release. The paper absorbs the water. Repeat 2–3 times. For flute, this happens most often in the G key area.
+
+### 11.3 Ear Training Integration — Matching Pitch in Ensembles
+
+The most important performance skill has nothing to do with technique: it's listening.
+
+**The two-voice rule:** At all times in ensemble playing, identify the instrument or section *most harmonically important* to your note. If you're playing a fifth above a cello, listen to the cello constantly, not to yourself.
+
+**Active intonation listening positions:**
+- Unison with another instrument: match beat patterns, then eliminate them
+- Octave: should be beatless and resonant when in tune
+- Perfect 5th: should lock into a stable acoustic resonance (the 3rd partial of the lower note)
+- Major 3rd: needs to be played 14 cents *lower* than equal temperament for pure just intonation in a held chord
+
+**Practical exercise for ensemble intonation:**
+
+Tune A440 from the oboist (standard orchestral procedure). Then:
+1. Hold concert A, compare to drone
+2. Build a Bb major chord from bottom: bassoon/bass clarinet Bb, then add F, then add D on top
+3. Each upper voice adjusts until the chord sounds resonant and "locked in" — you will feel the acoustic resonance physically
+
+---
+
+## Appendix A: Quick-Reference Fingering Charts
+
+### Clarinet Chromatic Fingering — Problem Note Solutions
+
+| Written Note | Standard Fingering | Alternate / Situation |
+|---|---|---|
+| Bb4 | Bis key (index side) | Side Bb key: flatter, better in slow passages |
+| Bb4 | Side Bb | Easier for passages ending on Bb |
+| F#4 | Standard (R1 side) | 1½ fingering (L1 half-hole) for smooth transitions |
+| G#4 | LH pinky | RH spatula G#: when ascending from low register |
+| Eb4 | Standard | Side Eb: when descending from above |
+| A5 (clarion) | Standard | 1st alt: easier above the clarion break |
+
+### Saxophone Altissimo Entry Fingerings (Alto, written)
+
+```
+D5 (palm): L1 (palm 1)
+E5:        L1 + palm 2
+F5:        L1 + palm 2 + palm 3
+F#5:       L1 + palm 2 + palm 3 + side F
+G5:        L1 + palm 2 + palm 3 + side F + R1
+```
+
+For notes above G5 (altissimo proper, written G#5+), voicing becomes the primary control mechanism. Research Joe Allard and Sigurd Rascher overtone approaches once the core technique is solid.
+
+---
+
+## Appendix B: Acoustic System Signal Flow
+
+```mermaid
+graph TD
+    subgraph sub_player ["Player Control Layer"]
+        P1["Diaphragm / Abdominal Wall<br/>(Breath Pressure Source)"]
+        P2["Embouchure Muscles<br/>(Aperture & Reed Control)"]
+        P3["Oral Cavity Voicing<br/>(Resonance Shaping)"]
+        P4["Fingers<br/>(Bore Length & Hole Control)"]
+        P5["Tongue<br/>(Articulation Valve)"]
+    end
+
+    subgraph sub_instrument ["Instrument Acoustic System"]
+        I1["Reed / Edge Tone<br/>(Nonlinear Oscillation Source)"]
+        I2["Mouthpiece / Bocal Chamber<br/>(Near-field resonance)"]
+        I3["Bore<br/>(Standing Wave Resonator)"]
+        I4["Tone Holes<br/>(Effective Length Control)"]
+        I5["Bell<br/>(Radiation Impedance)"]
+    end
+
+    subgraph sub_output ["Output & Feedback"]
+        O1["Radiated Sound Field"]
+        O2["Auditory Feedback<br/>(Ears → Brain)"]
+        O3["Tactile Feedback<br/>(Embouchure & Fingers)"]
+    end
+
+    P1 -->|"Steady pressure"| I1
+    P2 -->|"Reed stiffness & aperture"| I1
+    P3 -->|"Vocal tract impedance"| I2
+    P5 -->|"Interrupts airflow"| I1
+    I1 --> I2 --> I3
+    P4 -->|"Opens / closes holes"| I4
+    I4 -->|"Modulates effective length"| I3
+    I3 --> I5 --> O1
+    O1 -->|"Room reflection"| O2
+    I1 -->|"Reed contact"| O3
+    O2 -->|"Pitch / timbre correction"| P2
+    O2 -->|"Intonation adjustment"| P1
+    O3 -->|"Resistance feel"| P2
+```
+
+---
+
+## Appendix C: Practice Log Template
+
+Track these metrics weekly:
+
+| Metric | Week 1 | Week 2 | Week 4 | Week 8 |
+|---|---|---|---|---|
+| Long tone max duration (sec) | | | | |
+| Scale tempo — 8th notes (BPM) | | | | |
+| Chromatic scale — 16th notes (BPM) | | | | |
+| Single tongue max clean tempo | | | | |
+| Double tongue clean tempo | | | | |
+| Break crossing — no glitches (Y/N) | | | | |
+| Dynamic range (pp to ff consistent) | | | | |
+| Intonation drone test (worst note, cents) | | | | |
+
+Review this log every two weeks. If a metric hasn't improved in four weeks, that's your practice priority for the next cycle. Consistent daily practice of 30–45 minutes outperforms sporadic 2-hour sessions every time.
