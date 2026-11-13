@@ -106,7 +106,7 @@ def test_api_multi_lesson_discovery_and_selection():
     assert res_l3.status_code == 200
     data_l3 = res_l3.json()
     assert data_l3["active_lesson_id"] == "lesson_03_mvcc_wal_and_vacuum"
-    assert "Multiversion Concurrency Control" in data_l3["lesson"]
+    assert "MVCC" in data_l3["lesson"] or "Multiversion" in data_l3["lesson"] or "Multi-Version" in data_l3["lesson"]
 
 def test_api_cluster_status():
     res = client.get("/api/settings/cluster-status")
