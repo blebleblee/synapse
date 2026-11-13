@@ -1,95 +1,200 @@
-# Lesson 2: Feature Importance and Sensitivity Analysis
+```markdown
+# Lesson 2: Feature Importance and Sensitivity Analysis in AI Safety
 
-## 1. First-Principles Intuition & Invariants
+## 1. First-Principles Foundations
 
-In the realm of artificial intelligence and machine learning, understanding the mechanisms by which models make predictions is paramount. This understanding not only aids in the development of more robust and reliable systems but also ensures that these systems align with human values and ethical standards. At the heart of this endeavor lies the concept of feature importance and sensitivity analysis, which provide insights into the influence of individual input features on model predictions.
+### Why Interpretability Is a Safety Property
 
-Feature importance and sensitivity analysis are critical for several reasons. Firstly, they help in identifying the most influential features, which can guide feature selection and engineering efforts, thereby improving model performance and reducing computational overhead. Secondly, they offer a means to interpret model predictions, making it easier to explain the decision-making process to stakeholders and ensuring transparency. Lastly, these analyses can highlight potential biases and vulnerabilities in the model, enabling proactive mitigation strategies.
+Feature importance and sensitivity analysis are not merely diagnostic conveniences—they are foundational safety properties. A model that produces correct outputs for inscrutable reasons is not safer than one that produces wrong outputs; it is dangerous in a different and often harder-to-detect way. When a system cannot be audited, biases cannot be found, failure modes cannot be predicted, and trust cannot be justified.
 
-From a theoretical standpoint, feature importance can be understood through the lens of information theory and statistical dependence. Information theory provides a framework for quantifying the amount of information that one random variable (the feature) contains about another (the prediction). Mutual information, a key concept in this framework, measures the reduction in uncertainty about the prediction when the feature is known. Mathematically, mutual information \( I(X;Y) \) between two random variables \( X \) and \( Y \) is defined as:
+The core thesis is this: **a model is aligned only insofar as we can verify what it is responding to**. If a fraud-detection model is secretly using postal code as a proxy for race, permutation importance will expose it. If an autonomous vehicle's steering network is responding to irrelevant sensor artifacts, Sobol indices will localize them. The analytical tools in this lesson are, in a very direct sense, alignment verification tools.
 
-\[
-I(X;Y) = \sum_{x \in X} \sum_{y \in Y} p(x, y) \log \frac{p(x, y)}{p(x)p(y)}
-\]
+### Information-Theoretic Grounding
 
-This equation captures the joint probability distribution \( p(x, y) \) of the feature and prediction, as well as their marginal distributions \( p(x) \) and \( p(y) \). High mutual information indicates a strong relationship between the feature and the prediction, suggesting that the feature is important.
+Feature importance can be formalized through mutual information. For a feature $X_i$ and model output $Y$, the mutual information is:
 
-Sensitivity analysis, on the other hand, focuses on how small changes in input features affect model predictions. This is particularly useful for understanding the robustness of the model and identifying features that can lead to significant changes in predictions. Sensitivity analysis can be performed using various techniques, such as local sensitivity analysis, which examines the impact of small perturbations around a specific input point, and global sensitivity analysis, which considers the entire input space.
+$$
+I(X_i; Y) = \sum_{x \in \mathcal{X}} \sum_{y \in \mathcal{Y}} p(x, y) \log \frac{p(x, y)}{p(x)\,p(y)}
+$$
 
-The invariants in feature importance and sensitivity analysis lie in their ability to provide consistent and reliable insights across different models and datasets. These methods should be robust to variations in data distribution and model architecture, ensuring that the identified features and sensitivities are meaningful and actionable.
+For continuous variables this becomes:
 
-## 2. Core Architecture & Mechanics
+$$
+I(X_i; Y) = \int_{\mathcal{X}} \int_{\mathcal{Y}} p(x, y) \log \frac{p(x, y)}{p(x)\,p(y)}\, dy\, dx
+$$
 
-To delve deeper into the mechanics of feature importance and sensitivity analysis, we will explore two popular methods: permutation feature importance and Sobol sensitivity analysis.
+$I(X_i; Y) = 0$ if and only if $X_i$ and $Y$ are statistically independent. This establishes a principled lower bound: a feature with zero mutual information contributes nothing to prediction and can be safely dropped. Crucially, mutual information is **invariant under invertible transformations** of either variable, which makes it more reliable than correlation-based measures that assume linearity.
 
-### Permutation Feature Importance
+The conditional mutual information $I(X_i; Y \mid X_{\setminus i})$ quantifies the *unique* contribution of $X_i$ after accounting for all other features—the quantity permutation importance approximates empirically without requiring density estimation.
 
-Permutation feature importance is a model-agnostic technique that assesses the importance of a feature by measuring the decrease in model performance when the values of that feature are randomly shuffled. The intuition behind this method is that if a feature is important, shuffling its values should degrade the model's performance significantly.
+### Variance Decomposition: The ANOVA Functional Decomposition
 
-The process of computing permutation feature importance involves the following steps:
+The theoretical backbone of Sobol analysis is the **Hoeffding-Sobol (ANOVA) decomposition**. For a square-integrable function $f : [0,1]^d \to \mathbb{R}$ of independent uniform inputs $X = (X_1, \ldots, X_d)$:
 
-1. **Train the Model:** Start by training a predictive model on the dataset.
-2. **Evaluate Baseline Performance:** Measure the performance of the model on a validation set using a suitable metric (e.g., accuracy, mean squared error).
-3. **Shuffle Feature Values:** For each feature, shuffle its values in the validation set while keeping the values of other features unchanged.
-4. **Evaluate Performance with Shuffled Feature:** Measure the performance of the model on the validation set with the shuffled feature.
-5. **Compute Importance Score:** The importance score for a feature is the decrease in performance when the feature is shuffled. This score is averaged over multiple shuffling iterations to ensure stability.
+$$
+f(X) = f_0 + \sum_i f_i(X_i) + \sum_{i < j} f_{ij}(X_i, X_j) + \cdots + f_{1,2,\ldots,d}(X_1, \ldots, X_d)
+$$
 
-Permutation feature importance is straightforward to implement and can be applied to any predictive model, regardless of its architecture. However, it can be computationally expensive, especially for large datasets and models with many features.
+where $f_0 = \mathbb{E}[f(X)]$, and each term integrates to zero over any of its arguments. This decomposition is **unique** under the constraint that all constituent functions are orthogonal with respect to the uniform measure. Squaring and integrating yields the variance decomposition:
 
-### Sobol Sensitivity Analysis
+$$
+\mathrm{Var}(Y) = \sum_i V_i + \sum_{i<j} V_{ij} + \cdots + V_{1,\ldots,d}
+$$
 
-Sobol sensitivity analysis is a global sensitivity analysis method that quantifies the contribution of each input feature to the variance of the model output. This method is based on the decomposition of the variance of the output into contributions from individual features and their interactions.
+where $V_i = \mathrm{Var}(\mathbb{E}[Y \mid X_i])$ and $V_{ij} = \mathrm{Var}(\mathbb{E}[Y \mid X_i, X_j]) - V_i - V_j$. This is not an approximation—it is exact for independent inputs.
 
-The Sobol sensitivity indices are defined as follows:
+The independence assumption is critical. When features are correlated, the decomposition is no longer unique and Sobol indices can assign importance to features that are not causally relevant. This is a known, non-trivial failure mode discussed in Section 4.
 
-- **First-Order Index (\( S_i \)):** Measures the main effect of the \( i \)-th feature on the output variance.
-- **Total Index (\( S_{Ti} \)):** Measures the total effect of the \( i \)-th feature, including its interactions with other features.
+---
 
-The Sobol indices are computed using the following equations:
+## 2. Core Methods: Architecture and Mechanics
 
-\[
-S_i = \frac{V_i}{V_Y}
-\]
+### 2.1 Permutation Feature Importance (PFI)
 
-\[
-S_{Ti} = 1 - \frac{V_{Y|X_i}}{V_Y}
-\]
+PFI was introduced by Breiman (2001) in the context of Random Forests and later generalized by Fisher, Rudin, and Dominici (2019) as model-agnostic "Model Reliance." The mechanism is conceptually clean: a feature is important if the model *relies* on it, and we detect reliance by breaking the feature's signal.
 
-where \( V_i \) is the variance of the output with respect to the \( i \)-th feature, \( V_Y \) is the total variance of the output, and \( V_{Y|X_i} \) is the variance of the output with the \( i \)-th feature fixed.
+**Algorithm:**
 
-Sobol sensitivity analysis is particularly useful for models with complex interactions between features, as it provides insights into both main effects and interaction effects. However, it requires a large number of model evaluations to estimate the sensitivity indices accurately, which can be computationally intensive.
-
-To illustrate the mechanics of Sobol sensitivity analysis, consider a simple example using a Mermaid diagram:
-
-```mermaid
-graph TD
-    A[Model] --> B[Output Variance]
-    B --> C[First-Order Indices]
-    B --> D[Total Indices]
-    C --> E[Feature 1]
-    C --> F[Feature 2]
-    D --> G[Feature 1]
-    D --> H[Feature 2]
+```
+Given: trained model f, validation set D = {(x^(n), y^(n))}, metric L
+Baseline: s_0 = L(f, D)
+For each feature j in {1, ..., d}:
+    For k in {1, ..., K}:
+        D_k^j = D with column j randomly permuted
+        s_k^j = L(f, D_k^j)
+    Importance(j) = mean_k(s_k^j - s_0)   # positive = performance drop
 ```
 
-In this diagram, the model's output variance is decomposed into first-order and total indices for each feature. The first-order indices represent the main effects of the features, while the total indices account for both main effects and interactions.
+The permutation breaks the joint distribution $p(X_j, Y)$ while preserving the marginal $p(X_j)$, so the model still receives plausible values for feature $j$—just values that carry no information about $y$. The resulting drop in $L$ measures how much the model was relying on that signal.
 
-## 3. High-Performance Optimization & Failure Modes
+**Architectural consequences:**
 
-When implementing feature importance and sensitivity analysis, several considerations must be taken into account to ensure high performance and reliability.
+- PFI measures reliance on marginal information. It does *not* detect features that are important only in combination with others (interaction effects). A feature that is useless alone but essential in concert with another will show low PFI.
+- PFI on the training set measures memorization; PFI on a held-out validation set measures generalization. Use the validation set.
+- For correlated features, PFI produces misleading results: shuffling $X_j$ creates out-of-distribution (OOD) samples that expose the model to inputs it was never trained on, inflating apparent importance for correlated partners.
 
-### Concurrency and Resource Scaling
+**Production-grade Python implementation with confidence intervals:**
 
-For large datasets and complex models, the computation of feature importance and sensitivity indices can be resource-intensive. To optimize performance, concurrency and parallelization techniques can be employed. For example, permutation feature importance can be parallelized by shuffling and evaluating multiple features simultaneously across different threads or processes. Similarly, Sobol sensitivity analysis can benefit from parallel evaluations of the model for different input samples.
+```python
+import numpy as np
+from sklearn.base import is_classifier
+from sklearn.metrics import check_scoring
+from typing import Callable, Optional
+import pandas as pd
+from dataclasses import dataclass, field
 
-Resource scaling is another critical aspect of high-performance optimization. Cloud-based computing resources can be leveraged to distribute the computational load across multiple machines, thereby reducing the time required for analysis. Additionally, efficient data structures and algorithms can be used to minimize memory usage and improve cache performance.
 
-### Boundary Edge Cases and Failure Mitigations
+@dataclass
+class PFIResult:
+    feature_names: list[str]
+    importances_mean: np.ndarray
+    importances_std: np.ndarray
+    importances_raw: np.ndarray  # shape: (n_features, n_repeats)
 
-Feature importance and sensitivity analysis are not immune to boundary edge cases and potential failures. For instance, permutation feature importance may produce unreliable results if the validation set is too small or if the model is overfitting. To mitigate these issues, it is essential to ensure that the validation set is representative of the entire dataset and that the model is properly regularized.
+    def as_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "feature": self.feature_names,
+                "importance_mean": self.importances_mean,
+                "importance_std": self.importances_std,
+            }
+        ).sort_values("importance_mean", ascending=False).reset_index(drop=True)
 
-Sobol sensitivity analysis can also encounter challenges, particularly when dealing with high-dimensional input spaces. In such cases, the number of model evaluations required to estimate the sensitivity indices can become prohibitively large. To address this, dimensionality reduction techniques can be applied to reduce the input space before performing sensitivity analysis.
 
-Another potential failure mode arises when the model's predictions are highly sensitive to noise or outliers in the input data. In such cases, feature importance and sensitivity analysis may identify features that are not truly important but rather correlate with noise. To mitigate this, robust statistical techniques can be employed to filter out noise and outliers before performing the analysis.
+def permutation_feature_importance(
+    model,
+    X: np.ndarray,
+    y: np.ndarray,
+    scoring: str | Callable = "neg_mean_squared_error",
+    n_repeats: int = 30,
+    random_state: Optional[int] = 42,
+    feature_names: Optional[list[str]] = None,
+    n_jobs: int = 1,
+) -> PFIResult:
+    """
+    Model-agnostic permutation feature importance with confidence intervals.
 
-In conclusion, feature importance and sensitivity analysis are powerful tools for understanding the mechanisms by which machine learning models make predictions. By providing insights into the influence of individual input features, these methods enable the development of more robust, interpretable, and aligned AI systems. Through a combination of theoretical grounding, practical implementation, and optimization techniques, these methods can be effectively applied to a wide range of models and datasets.
+    Parameters
+    ----------
+    model      : Fitted estimator with a predict (or predict_proba) method.
+    X          : Validation features, shape (n_samples, n_features).
+    y          : Validation targets, shape (n_samples,).
+    scoring    : sklearn-compatible scorer name or callable.
+    n_repeats  : Number of shuffles per feature; 30 is typically sufficient.
+    random_state : Seed for reproducibility.
+    feature_names : Optional list of feature names for labeling.
+    n_jobs     : Parallel workers (-1 = all cores). Requires joblib.
+
+    Returns
+    -------
+    PFIResult dataclass with per-feature importance distributions.
+    """
+    rng = np.random.default_rng(random_state)
+    scorer = check_scoring(model, scoring=scoring)
+
+    n_features = X.shape[1]
+    if feature_names is None:
+        feature_names = [f"feature_{i}" for i in range(n_features)]
+
+    baseline_score = scorer(model, X, y)
+
+    def _permute_one_feature(j: int) -> np.ndarray:
+        scores = np.empty(n_repeats)
+        X_permuted = X.copy()
+        for k in range(n_repeats):
+            X_permuted[:, j] = rng.permutation(X[:, j])
+            scores[k] = scorer(model, X_permuted, y)
+        return baseline_score - scores  # positive = importance
+
+    if n_jobs != 1:
+        from joblib import Parallel, delayed
+        raw = np.array(
+            Parallel(n_jobs=n_jobs)(
+                delayed(_permute_one_feature)(j) for j in range(n_features)
+            )
+        )
+    else:
+        raw = np.array([_permute_one_feature(j) for j in range(n_features)])
+
+    return PFIResult(
+        feature_names=feature_names,
+        importances_mean=raw.mean(axis=1),
+        importances_std=raw.std(axis=1),
+        importances_raw=raw,
+    )
+
+
+# --- Usage example ---
+if __name__ == "__main__":
+    from sklearn.datasets import make_regression
+    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.model_selection import train_test_split
+
+    X, y = make_regression(n_samples=2000, n_features=15, n_informative=5,
+                            noise=0.1, random_state=0)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2,
+                                                       random_state=0)
+
+    model = GradientBoostingRegressor(n_estimators=200, random_state=0)
+    model.fit(X_train, y_train)
+
+    result = permutation_feature_importance(
+        model, X_val, y_val,
+        scoring="neg_mean_squared_error",
+        n_repeats=30,
+        n_jobs=-1,
+    )
+    print(result.as_dataframe().head(10))
+```
+
+### 2.2 Sobol Sensitivity Indices
+
+Sobol indices are the gold standard for **global** sensitivity analysis. They answer the question: across the full input distribution, how much of the output variance is attributable to each input or interaction?
+
+**First-order index:**
+
+$$
+S_i = \frac{V_i}{\mathrm{Var}(Y)} = \frac{\mathrm{Var}\bigl(\mathbb{E}[Y \mid X_i]\bigr)}{\mathrm{Var}(Y)}
+$$
+
+$S_i$ captures the main effect of $X_i$ alone—the variance reduction achievable by learning $X_i$ perfectly
