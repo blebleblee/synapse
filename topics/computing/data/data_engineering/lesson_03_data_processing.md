@@ -121,7 +121,7 @@ Key optimization passes include:
 
 ```mermaid
 flowchart LR
-    subgraph "Catalyst Optimization Pipeline"
+    subgraph sub_catalyst_optimization_pipeline ["Catalyst Optimization Pipeline"]
         A["Parsed\nLogical Plan"] --> B["Analysis\n(Resolver)"]
         B --> C["Logical Optimization\n(Rule-Based)"]
         C --> D["Physical Planning\n(Strategy Application)"]
@@ -558,14 +558,14 @@ Spark's batch-centric model (DAG of stages, results materialized at stage bounda
 
 ```mermaid
 flowchart LR
-    subgraph "Apache Spark (Micro-Batch / Batch)"
+    subgraph sub_apache_spark__micro_batch___batc ["Apache Spark (Micro-Batch / Batch)"]
         direction TB
         S1["Source\n(read partitions)"] --> S2["Stage 1\n(map, filter)"]
         S2 -->|"Shuffle\n(barrier)"| S3["Stage 2\n(aggregation)"]
         S3 -->|"Shuffle\n(barrier)"| S4["Stage 3\n(join, write)"]
     end
 
-    subgraph "Apache Flink (Pipelined Streaming)"
+    subgraph sub_apache_flink__pipelined_streamin ["Apache Flink (Pipelined Streaming)"]
         direction TB
         F1["Source\n(continuous)"] --> F2["Operator 1\n(map, filter)"]
         F2 --> F3["Operator 2\n(stateful aggregation\nwith managed state)"]

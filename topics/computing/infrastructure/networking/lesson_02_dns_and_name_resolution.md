@@ -394,7 +394,7 @@ flowchart LR
     end
 
     subgraph DoH["DNS over HTTPS"]
-        C3[Client] -->|"HTTPS port 443\nPOST /dns-query"| R3[DoH Resolver\n(e.g. 1.1.1.1/dns-query)]
+        C3[Client] -->|"HTTPS port 443\nPOST /dns-query"| R3["DoH Resolver\n(e.g. 1.1.1.1/dns-query)"]
     end
 ```
 

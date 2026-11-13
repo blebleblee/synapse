@@ -22,23 +22,23 @@ Kafka's security model has four independent but complementary layers. Each layer
 
 ```mermaid
 graph TD
-    subgraph "Client Side"
+    subgraph sub_client_side ["Client Side"]
         P["Producer / Consumer"]
     end
 
-    subgraph "Transport Layer"
+    subgraph sub_transport_layer ["Transport Layer"]
         TLS["TLS 1.2 / 1.3\n(Encryption + Server Auth)"]
     end
 
-    subgraph "Broker Authentication"
+    subgraph sub_broker_authentication ["Broker Authentication"]
         SASL["SASL Mechanism\n(PLAIN / SCRAM-SHA-256 / SCRAM-SHA-512 / GSSAPI / OAUTHBEARER)"]
     end
 
-    subgraph "Authorization Layer"
+    subgraph sub_authorization_layer ["Authorization Layer"]
         ACL["AclAuthorizer / Ranger\n(Topic, Group, Cluster, TransactionalId)"]
     end
 
-    subgraph "Audit Layer"
+    subgraph sub_audit_layer ["Audit Layer"]
         AUDIT["Audit Log\n(Authorizer plugin or Confluent Audit)"]
     end
 
@@ -254,17 +254,17 @@ Kafka exposes metrics through **JMX** (Java Management Extensions). Every meanin
 
 ```mermaid
 graph LR
-    subgraph "Kafka Broker JVM"
+    subgraph sub_kafka_broker_jvm ["Kafka Broker JVM"]
         JMX["JMX MBeans\n(kafka.server:*, kafka.network:*, kafka.log:*)"]
     end
 
-    subgraph "Metric Exporters"
+    subgraph sub_metric_exporters ["Metric Exporters"]
         JMX -->|"Prometheus JMX Exporter\n(javaagent)"| PROM["Prometheus\nScrape Endpoint :7071"]
         JMX -->|"JMX Jolokia\n(REST bridge)"| JOLOKIA["Jolokia HTTP API"]
         JMX -->|"Kafka Metrics Reporter\n(plugin)"| KAFKA_REPORTER["Datadog / Dynatrace\nAgent"]
     end
 
-    subgraph "Storage & Visualization"
+    subgraph sub_storage___visualization ["Storage & Visualization"]
         PROM --> TSDB["Prometheus TSDB"]
         JOLOKIA --> GRAFANA["Grafana Dashboard"]
         TSDB --> GRAFANA
@@ -575,12 +575,12 @@ Kafka does not implement STONITH (Shoot The Other Node In The Head), which means
 
 ```mermaid
 graph TD
-    subgraph "Partition A (connected to ZooKeeper/KRaft quorum)"
+    subgraph sub_partition_a__connected_to_zookee ["Partition A (connected to ZooKeeper/KRaft quorum)"]
         B1["Broker 1 (Leader)"]
         B2["Broker 2 (Follower)"]
     end
 
-    subgraph "Partition B (isolated)"
+    subgraph sub_partition_b__isolated ["Partition B (isolated)"]
         B3["Broker 3 (Follower, removed from ISR after 30s)"]
     end
 
@@ -813,20 +813,20 @@ listener.name.controller.ssl.client.auth=required
 
 ```mermaid
 graph TD
-    subgraph "Security Plane"
+    subgraph sub_security_plane ["Security Plane"]
         AUTH_N["Authentication\n(SASL/SCRAM, GSSAPI, OAUTHBEARER)"]
         AUTH_Z["Authorization\n(AclAuthorizer / Ranger)"]
         ENC["Encryption\n(TLS 1.3, AES-256-GCM)"]
         INTEG["Data Integrity\n(CRC32C per batch)"]
     end
 
-    subgraph "Data Plane"
+    subgraph sub_data_plane ["Data Plane"]
         PROD["Producers"] -->|"SASL_SSL"| BROKER["Kafka Brokers\n(Leader)"]
         BROKER -->|"SSL (internal)"| FOLLOWER["Kafka Brokers\n(Followers)"]
         BROKER -->|"SASL_SSL"| CONS["Consumers"]
     end
 
-    subgraph "Observability Plane"
+    subgraph sub_observability_plane ["Observability Plane"]
         BROKER -->|"JMX"| JMX_EXP["Prometheus\nJMX Exporter"]
         JMX_EXP --> PROM["Prometheus"]
         PROM --> GRAF["Grafana"]
@@ -834,7 +834,7 @@ graph TD
         AM -->|"PagerDuty / Slack"| OPS["Operations Team"]
     end
 
-    subgraph "Control Plane (KRaft)"
+    subgraph sub_control_plane__kraft ["Control Plane (KRaft)"]
         CTRL["KRaft Controller Quorum\n(3 or 5 nodes)"]
         BROKER <-->|"Metadata RPC"| CTRL
     end

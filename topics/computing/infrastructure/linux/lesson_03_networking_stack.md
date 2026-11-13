@@ -1,4 +1,3 @@
-```markdown
 # Lesson 3: The Linux Networking Stack
 
 ## 1. First-Principles Invariants
@@ -149,7 +148,7 @@ Netfilter provides five hook points in the IPv4 (and separately IPv6) packet pat
 
 ```mermaid
 flowchart LR
-    subgraph "IPv4 Netfilter Hook Points"
+    subgraph sub_ipv4_netfilter_hook_points ["IPv4 Netfilter Hook Points"]
         A["NF_INET_PRE_ROUTING\n(ingress, before routing)"]
         B["NF_INET_LOCAL_IN\n(destined for local socket)"]
         C["NF_INET_FORWARD\n(being forwarded)"]
@@ -522,19 +521,19 @@ Network namespaces (introduced in Linux 2.6.24, generalized in 2.6.29) provide c
 
 ```mermaid
 flowchart TD
-    subgraph "Host Network Namespace"
+    subgraph sub_host_network_namespace ["Host Network Namespace"]
         BR["Linux Bridge / OVS\nbr0"]
         VETH_HOST_A["veth0a\n(host side)"]
         VETH_HOST_B["veth0b\n(host side)"]
         PHY["eth0\nPhysical NIC"]
     end
 
-    subgraph "Container Namespace A"
+    subgraph sub_container_namespace_a ["Container Namespace A"]
         VETH_A["eth0\n(container side)\n172.17.0.2/16"]
         TCP_A["TCP/IP Stack A"]
     end
 
-    subgraph "Container Namespace B"
+    subgraph sub_container_namespace_b ["Container Namespace B"]
         VETH_B["eth0\n(container side)\n172.17.0.3/16"]
         TCP_B["TCP/IP Stack B"]
     end

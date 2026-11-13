@@ -47,7 +47,7 @@ The Linux kernel exposes multiple probe attachment points, each with different s
 
 ```mermaid
 graph TD
-    subgraph "Probe Attachment Points"
+    subgraph sub_probe_attachment_points ["Probe Attachment Points"]
         KP["kprobes / kretprobes\n(arbitrary kernel addresses)"]
         UP["uprobes / uretprobes\n(arbitrary user-space addresses)"]
         TP["Tracepoints\n(TRACE_EVENT macros)"]
@@ -58,14 +58,14 @@ graph TD
         FENTRY["fentry / fexit\n(BTF-based, low-overhead kprobe replacement)"]
     end
 
-    subgraph "eBPF Runtime"
+    subgraph sub_ebpf_runtime ["eBPF Runtime"]
         VERIFY["Verifier\n(safety + termination proof)"]
         JIT["JIT Compiler\n(x86-64 / ARM64 / s390x)"]
         MAPS["BPF Maps\n(shared kernel/user state)"]
         HELPER["Helper Functions\n(bpf_get_current_pid_tgid,\nbpf_probe_read_kernel, etc.)"]
     end
 
-    subgraph "Data Egress"
+    subgraph sub_data_egress ["Data Egress"]
         RB["Ring Buffer\n(BPF_MAP_TYPE_RINGBUF)"]
         PM["Perf Buffer\n(BPF_MAP_TYPE_PERF_EVENT_ARRAY)"]
         POLL["User-space\nConsumer\n(poll / epoll)"]
@@ -516,7 +516,7 @@ The choice of probe type has first-order performance implications:
 
 ```mermaid
 graph LR
-    subgraph "Overhead (low to high)"
+    subgraph sub_overhead__low_to_high ["Overhead (low to high)"]
         A["XDP / TC\n(packet path,\npre-allocation)"]
         B["fentry / fexit\n(BPF trampoline,\nno int3)"]
         C["Tracepoints\n(static, stable\nABI)"]
@@ -582,20 +582,20 @@ pid_t pid = BPF_CORE_READ(task, pid);
 
 ```mermaid
 graph TB
-    subgraph "High-Level Tools (observability)"
+    subgraph sub_high_level_tools__observability ["High-Level Tools (observability)"]
         BCC["BCC / bcc-tools\n(Python DSL,\nruntime compilation)"]
         BPF2["bpftrace\n(awk-like one-liner\nlanguage)"]
         PERF2["perf + eBPF\n(kernel built-in)"]
     end
 
-    subgraph "Frameworks (production deployment)"
+    subgraph sub_frameworks__production_deploymen ["Frameworks (production deployment)"]
         LIBBPF["libbpf\n(C, CO-RE,\nreference implementation)"]
         CILIUM["cilium/ebpf\n(Go, CO-RE)"]
         ARGO["aya\n(Rust, CO-RE)"]
         REXBPF["rex-bpf / redbpf\n(Rust, older)"]
     end
 
-    subgraph "Infrastructure Products"
+    subgraph sub_infrastructure_products ["Infrastructure Products"]
         CIL["Cilium\n(K8s CNI +\npolicy engine)"]
         CATL["Falco\n(runtime security)"]
         PIX["Pixie\n(auto-telemetry)"]

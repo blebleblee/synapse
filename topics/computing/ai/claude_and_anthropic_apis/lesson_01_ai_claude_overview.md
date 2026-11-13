@@ -86,7 +86,7 @@ The Messages API uses a **turns-based conversation format**. Each request carrie
 
 ```mermaid
 graph LR
-    subgraph "Context Window (N tokens)"
+    subgraph sub_context_window__n_tokens ["Context Window (N tokens)"]
         SP["System Prompt\n(optional, pre-pended)"]
         H1["Human Turn 1"]
         A1["Assistant Turn 1"]
@@ -411,7 +411,7 @@ Understanding the internals clarifies why certain API behaviors are hard constra
 
 ```mermaid
 graph TD
-    subgraph "Single Transformer Decoder Block"
+    subgraph sub_single_transformer_decoder_block ["Single Transformer Decoder Block"]
         INPUT["Input Embedding\n(token + positional)"]
         LN1["LayerNorm 1"]
         MHA["Multi-Head Self-Attention\n(causal mask applied)"]

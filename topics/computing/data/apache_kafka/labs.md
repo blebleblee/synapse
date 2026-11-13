@@ -97,7 +97,7 @@ The `.index` file is a sparse index mapping offsets to physical byte positions i
 
 ```mermaid
 graph TB
-    subgraph "Kafka Partition Storage"
+    subgraph sub_kafka_partition_storage ["Kafka Partition Storage"]
         A["Partition 0"] --> B["Segment 00000000000000000000.log"]
         A --> C["Segment 00000000000001000000.log"]
         B --> D["00000000000000000000.index"]
@@ -106,7 +106,7 @@ graph TB
         C --> G["00000000000001000000.timeindex"]
     end
     
-    subgraph "Segment Internal Structure"
+    subgraph sub_segment_internal_structure ["Segment Internal Structure"]
         B --> H["Batch 1: Offsets 0-99"]
         B --> I["Batch 2: Offsets 100-199"]
         H --> J["CRC + Headers + Compressed Records"]
@@ -667,11 +667,11 @@ graph LR
     A["Uncompacted Log"] --> B["Log Cleaner Thread"]
     B --> C["Compacted Log"]
     
-    subgraph "Before Compaction"
+    subgraph sub_before_compaction ["Before Compaction"]
         A1["key1:v1, key2:v1, key1:v2, key2:v2, key1:null"]
     end
     
-    subgraph "After Compaction"
+    subgraph sub_after_compaction ["After Compaction"]
         C1["key2:v2, key1:null (tombstone)"]
     end
     

@@ -54,12 +54,12 @@ The architecture of modern IaC systems rests on a feedback loop between three pr
 
 ```mermaid
 graph TD
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         SPEC["Declarative Spec\n(Git Commit)"]
         ENGINE["Orchestration Engine\n(Reconciler)"]
         STATE["State Backend\n(S3 / etcd / TF Cloud)"]
     end
-    subgraph "Data Plane"
+    subgraph sub_data_plane ["Data Plane"]
         PROVIDER["Cloud Provider / API Server"]
         INFRA["Running Resources"]
     end
@@ -1059,7 +1059,7 @@ IaC systems introduce attack surfaces that did not exist in manual operations. T
 
 ```mermaid
 graph LR
-    subgraph "Threat Surface"
+    subgraph sub_threat_surface ["Threat Surface"]
         A["Developer\nWorkstation\n(credential theft)"]
         B["Git Repository\n(branch injection\ncommit forgery)"]
         C["CI/CD Pipeline\n(runner compromise\nenv injection)"]
@@ -1785,26 +1785,26 @@ Assembling the patterns from previous sections, a production-grade IaC security 
 
 ```mermaid
 graph TD
-    subgraph "Layer 1: Developer Workstation"
+    subgraph sub_layer_1__developer_workstation ["Layer 1: Developer Workstation"]
         L1A["pre-commit hooks:\ncheckov, tflint,\nsecret scanning"]
     end
-    subgraph "Layer 2: Pull Request"
+    subgraph sub_layer_2__pull_request ["Layer 2: Pull Request"]
         L2A["automated CI:\nterraform plan,\ncheckov, infracost"]
         L2B["peer review:\ncodeowners, signed commits"]
     end
-    subgraph "Layer 3: Merge Gate"
+    subgraph sub_layer_3__merge_gate ["Layer 3: Merge Gate"]
         L3A["policy enforcement:\nSentinel / OPA conftest\nplan-time checks"]
         L3B["OIDC credential\nfederation (no stored secrets)"]
     end
-    subgraph "Layer 4: Admission Control"
+    subgraph sub_layer_4__admission_control ["Layer 4: Admission Control"]
         L4A["OPA Gatekeeper\nvalidating webhook"]
         L4B["Kubernetes PSA\n(Pod Security Admission)"]
     end
-    subgraph "Layer 5: Runtime"
+    subgraph sub_layer_5__runtime ["Layer 5: Runtime"]
         L5A["Gatekeeper audit\nAWS Config rules\nAzure Policy"]
         L5B["Drift detection\nscheduled jobs"]
     end
-    subgraph "Layer 6: State & Secrets"
+    subgraph sub_layer_6__state___secrets ["Layer 6: State & Secrets"]
         L6A["Remote state:\nKMS-encrypted S3\nDynamoDB locking"]
         L6B["External Secrets Operator\nHashiCorp Vault\nno plaintext in Git"]
     end

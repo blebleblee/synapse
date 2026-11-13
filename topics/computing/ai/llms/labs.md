@@ -602,17 +602,17 @@ if __name__ == "__main__":
 
 ```mermaid
 graph LR
-    subgraph "TTFT Drivers (Prefill Phase)"
+    subgraph sub_ttft_drivers__prefill_phase ["TTFT Drivers (Prefill Phase)"]
         P1["Prompt Length\n(dominant factor)"]
         P2["Model Layers L"]
         P3["Batch Size\n(≥1 saturates prefill)"]
     end
-    subgraph "TBT Drivers (Decode Phase)"
+    subgraph sub_tbt_drivers__decode_phase ["TBT Drivers (Decode Phase)"]
         D1["Memory Bandwidth\n(VRAM ↔ compute units)"]
         D2["KV Cache Size\n(grows with seq length)"]
         D3["Sampling Overhead\n(top-k sort: O(V log k))"]
     end
-    subgraph "Throughput Drivers"
+    subgraph sub_throughput_drivers ["Throughput Drivers"]
         T1["Batch Size\n(amortizes model load)"]
         T2["Continuous Batching\n(vLLM PagedAttention)"]
         T3["Speculative Decoding\n(draft model + verifier)"]

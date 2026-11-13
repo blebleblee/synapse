@@ -22,7 +22,7 @@ These three invariants define the **contract** between the Kubernetes control pl
 
 ```mermaid
 graph TD
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         API["kube-apiserver"]
         ETCD["etcd\n(source of truth)"]
         CM["kube-controller-manager\nEndpointSlice Controller"]
@@ -30,7 +30,7 @@ graph TD
         CM -->|"watches Services/Pods"| API
     end
 
-    subgraph "Node Data Plane (each node)"
+    subgraph sub_node_data_plane__each_node ["Node Data Plane (each node)"]
         KP["kube-proxy\n(iptables / IPVS / eBPF)"]
         CNI["CNI Plugin\n(Calico / Cilium / Flannel)"]
         KT["Kernel: netfilter\niptables / IPVS / eBPF maps"]
@@ -200,7 +200,7 @@ This separation of concerns maps cleanly to real org boundaries and eliminates t
 
 ```mermaid
 graph LR
-    subgraph "Gateway API Role Separation"
+    subgraph sub_gateway_api_role_separation ["Gateway API Role Separation"]
         OPS["Cluster Operator\nGatewayClass: nginx"]
         INFRA["Infra Team\nGateway: prod-gw\nlistener: 443/HTTPS"]
         APP["App Team\nHTTPRoute: /api/v1 → svc-a\nHTTPRoute: /api/v2 → svc-b"]
@@ -576,13 +576,13 @@ The architectural cost is real: each service mesh proxy adds **~5–10ms of late
 
 ```mermaid
 graph LR
-    subgraph "Sidecar Mesh (Istio)"
+    subgraph sub_sidecar_mesh__istio ["Sidecar Mesh (Istio)"]
         PA["Pod A\napp container"] -->|"iptables\nredirect"| EA["Envoy sidecar A"]
         EA -->|"mTLS"| EB["Envoy sidecar B"]
         EB -->|"iptables\nredirect"| PB["Pod B\napp container"]
     end
 
-    subgraph "Sidecar-less Mesh (Cilium)"
+    subgraph sub_sidecar_less_mesh__cilium ["Sidecar-less Mesh (Cilium)"]
         PA2["Pod A\napp container"] -->|"BPF tc hook\nL7 intercept"| EN["Per-node\nEnvoy (shared)"]
         EN -->|"BPF routing"| PB2["Pod B\napp container"]
     end

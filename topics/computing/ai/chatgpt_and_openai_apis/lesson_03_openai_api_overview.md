@@ -165,7 +165,7 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    subgraph "Continuous Batching - Iteration T=5"
+    subgraph sub_continuous_batching___iteration ["Continuous Batching - Iteration T=5"]
         R1["Request A: token 42/128 (decode)"]
         R2["Request B: token 7/50 (decode)"]
         R3["Request C: prompt prefill (new)"]
@@ -536,13 +536,13 @@ The current recommended embedding model is `text-embedding-3-large` (3072 dimens
 
 ```mermaid
 graph LR
-    subgraph "Indexing Pipeline (Offline)"
+    subgraph sub_indexing_pipeline__offline ["Indexing Pipeline (Offline)"]
         DOCS["Raw Documents"] --> CHUNK["Chunker\n(512-token chunks\nwith overlap)"]
         CHUNK --> EMBED_API["POST /v1/embeddings\ntext-embedding-3-large"]
         EMBED_API --> VECDB["Vector Database\n(pgvector / Pinecone / Weaviate)"]
     end
 
-    subgraph "Query Pipeline (Online)"
+    subgraph sub_query_pipeline__online ["Query Pipeline (Online)"]
         USER["User Query"] --> Q_EMBED["POST /v1/embeddings\n(query vector)"]
         Q_EMBED --> ANN["ANN Search\n(cosine similarity, top-k)"]
         VECDB --> ANN
@@ -1083,13 +1083,13 @@ Understanding the API in isolation is insufficient; production systems combine m
 
 ```mermaid
 graph TD
-    subgraph "Pattern 1: Simple Chain"
+    subgraph sub_pattern_1__simple_chain ["Pattern 1: Simple Chain"]
         P1_IN["User Input"] --> P1_A["Prompt A: Extract intent"]
         P1_A --> P1_B["Prompt B: Generate response"]
         P1_B --> P1_OUT["Final Output"]
     end
 
-    subgraph "Pattern 2: Map-Reduce"
+    subgraph sub_pattern_2__map_reduce ["Pattern 2: Map-Reduce"]
         P2_IN["Large Document"] --> P2_SPLIT["Chunker"]
         P2_SPLIT --> P2_M1["Summarize chunk 1"]
         P2_SPLIT --> P2_M2["Summarize chunk 2"]
@@ -1100,7 +1100,7 @@ graph TD
         P2_RED --> P2_OUT["Final Summary"]
     end
 
-    subgraph "Pattern 3: Agent Loop"
+    subgraph sub_pattern_3__agent_loop ["Pattern 3: Agent Loop"]
         P3_IN["Goal"] --> P3_PLAN["Plan next action"]
         P3_PLAN --> P3_EXEC{Tool needed?}
         P3_EXEC -- Yes --> P3_TOOL["Execute tool\n(search, code, API)"]

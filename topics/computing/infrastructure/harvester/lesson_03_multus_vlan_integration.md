@@ -121,16 +121,16 @@ If the pod interface is expected to see untagged frames (standard for most conta
 
 ```mermaid
 graph TD
-    subgraph "Host Network Namespace"
+    subgraph sub_host_network_namespace ["Host Network Namespace"]
         Eth0[Physical NIC eth0]
         Br0[Linux Bridge br0]
         VethHost[Veth Host Side]
         
-        Eth0 -->|Trunk/Access| Br0
+        Eth0 -->|"Trunk/Access"| Br0
         VethHost -->|"Port: VLAN 100"| Br0
     end
     
-    subgraph "Pod Network Namespace"
+    subgraph sub_pod_network_namespace ["Pod Network Namespace"]
         Eth1[net1 Interface]
         App[Container Process]
         
@@ -174,7 +174,7 @@ ethtool -K eth0 rxvlan on txvlan on
 ```mermaid
 flowchart TD
     A[Pod Stuck in ContainerCreating] --> B{Check Kubelet Logs}
-    B -->|CNI Error| C[Inspect Multus Daemon Logs]
+    B -->|"CNI Error"| C[Inspect Multus Daemon Logs]
     C --> D{Is NAD Present?}
     D -- No --> E[Create NAD]
     D -- Yes --> F[Verify Multus Daemon Cache]
@@ -194,4 +194,3 @@ nsenter -t $PID -n ip addr
 
 # 3. Check bridge VLAN configuration on host
 bridge vlan show
-```

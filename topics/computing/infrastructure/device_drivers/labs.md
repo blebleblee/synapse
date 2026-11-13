@@ -1111,9 +1111,9 @@ ip link show $IFACE
 ```mermaid
 graph TD
     A["Identify Performance Issue"] --> B{"Symptom?"}
-    B -->|Low Throughput| C["Check TSO/GSO enabled<br/>Measure CPU cycles<br/>Profile with perf"]
-    B -->|High Latency| D["Check interrupt coalescing<br/>Examine qdisc backlog<br/>Measure RTT with ping"]
-    B -->|Packet Drops| E["Check ring sizes<br/>Monitor softirq CPU<br/>Inspect error counters"]
+    B -->|"Low Throughput"| C["Check TSO/GSO enabled<br/>Measure CPU cycles<br/>Profile with perf"]
+    B -->|"High Latency"| D["Check interrupt coalescing<br/>Examine qdisc backlog<br/>Measure RTT with ping"]
+    B -->|"Packet Drops"| E["Check ring sizes<br/>Monitor softirq CPU<br/>Inspect error counters"]
     C --> F["Apply Tuning"]
     D --> F
     E --> F

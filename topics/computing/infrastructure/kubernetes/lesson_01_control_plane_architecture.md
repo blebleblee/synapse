@@ -32,7 +32,7 @@ The control plane comprises four primary components: the API server (`kube-apise
 
 ```mermaid
 graph TD
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         ETCD["etcd Cluster\n(Raft Consensus)"]
         API["kube-apiserver\n(REST + Watch + Admission)"]
         SCH["kube-scheduler\n(Filter + Score + Bind)"]
@@ -40,7 +40,7 @@ graph TD
         CC["cloud-controller-manager\n(optional: LB, routes, volumes)"]
     end
 
-    subgraph "Worker Node"
+    subgraph sub_worker_node ["Worker Node"]
         KL["kubelet"]
         KP["kube-proxy"]
         CR["Container Runtime\n(containerd / CRI-O)"]
@@ -199,7 +199,7 @@ Etcd provides persistent, strongly consistent storage for all cluster state. Bui
 
 ```mermaid
 graph LR
-    subgraph "etcd Cluster (3 members)"
+    subgraph sub_etcd_cluster__3_members ["etcd Cluster (3 members)"]
         L["Leader\n(handles all writes)"]
         F1["Follower 1"]
         F2["Follower 2"]

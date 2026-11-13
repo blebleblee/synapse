@@ -40,20 +40,20 @@ The node participates in the cluster as a symmetric peer: every node runs the hy
 
 ```mermaid
 graph TB
-    subgraph "Physical Hardware"
+    subgraph sub_physical_hardware ["Physical Hardware"]
         H_CPU["CPU (x86-64)"]
         H_MEM["DRAM"]
         H_NVME["NVMe / SSD"]
         H_NIC["25/100 GbE NIC / DPU"]
     end
 
-    subgraph "Hypervisor Layer"
+    subgraph sub_hypervisor_layer ["Hypervisor Layer"]
         HV["Hypervisor (ESXi / AHV / Hyper-V / KVM)"]
         HV_SCHED["CPU Scheduler"]
         HV_MMU["Memory Manager (EPT/NPT)"]
     end
 
-    subgraph "Software-Defined Storage Layer"
+    subgraph sub_software_defined_storage_layer ["Software-Defined Storage Layer"]
         SDS_LOG["NVMe Write Log (WAL)"]
         SDS_CACHE["Read Cache (DRAM / NVMe)"]
         SDS_EC["Erasure Coding / RF Engine"]
@@ -61,20 +61,20 @@ graph TB
         SDS_DIST["Distributed Metadata Service"]
     end
 
-    subgraph "Software-Defined Networking Layer"
+    subgraph sub_software_defined_networking_laye ["Software-Defined Networking Layer"]
         SDN_OVS["Open vSwitch / VDS"]
         SDN_ENCAP["Overlay Encapsulation (VXLAN/Geneve)"]
         SDN_FW["Distributed Stateful Firewall (micro-seg)"]
         SDN_LB["Distributed Load Balancer"]
     end
 
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         CP_ORCH["Orchestrator (Prism Central / vCenter / SCVMM)"]
         CP_POLICY["Policy Engine"]
         CP_SCHED["Workload Scheduler (DRS / ADS)"]
     end
 
-    subgraph "VM Workloads"
+    subgraph sub_vm_workloads ["VM Workloads"]
         VM1["VM 1"]
         VM2["VM 2"]
         VMN["VM N"]
@@ -168,14 +168,14 @@ HCI networking collapses the traditional physical network hierarchy (access, dis
 
 ```mermaid
 graph LR
-    subgraph "Node A"
+    subgraph sub_node_a ["Node A"]
         VTEP_A["VTEP (VXLAN Tunnel Endpoint)"]
         OVS_A["Open vSwitch"]
         VM_A1["VM A1 (MAC: aa:bb:cc:01)"]
         VM_A2["VM A2 (MAC: aa:bb:cc:02)"]
     end
 
-    subgraph "Physical Underlay"
+    subgraph sub_physical_underlay ["Physical Underlay"]
         SW1["ToR Switch 1"]
         SW2["ToR Switch 2"]
         SPINE["Spine Switch"]
@@ -183,7 +183,7 @@ graph LR
         SW2 --- SPINE
     end
 
-    subgraph "Node B"
+    subgraph sub_node_b ["Node B"]
         VTEP_B["VTEP (VXLAN Tunnel Endpoint)"]
         OVS_B["Open vSwitch"]
         VM_B1["VM B1 (MAC: aa:bb:cc:03)"]
@@ -340,16 +340,16 @@ The *rebuild storm* is a critical failure mode: if a second node fails during th
 
 ```mermaid
 graph TB
-    subgraph "Availability Zone / Rack-Aware FD"
-        subgraph "Rack A (FD-1)"
+    subgraph sub_availability_zone___rack_aware_f ["Availability Zone / Rack-Aware FD"]
+        subgraph sub_rack_a__fd_1 ["Rack A (FD-1)"]
             N1["Node 1\n(holds replica A of blocks 1,2,3)"]
             N2["Node 2\n(holds replica A of blocks 4,5,6)"]
         end
-        subgraph "Rack B (FD-2)"
+        subgraph sub_rack_b__fd_2 ["Rack B (FD-2)"]
             N3["Node 3\n(holds replica B of blocks 1,2,3)"]
             N4["Node 4\n(holds replica B of blocks 4,5,6)"]
         end
-        subgraph "Rack C (FD-3, witness/parity)"
+        subgraph sub_rack_c__fd_3__witness_parity ["Rack C (FD-3, witness/parity)"]
             N5["Node 5\n(witness or parity shard)"]
         end
     end
@@ -934,20 +934,20 @@ The convergence of HCI and Kubernetes is the defining infrastructure trend of th
 
 ```mermaid
 graph TB
-    subgraph "Kubernetes Control Plane"
+    subgraph sub_kubernetes_control_plane ["Kubernetes Control Plane"]
         API["kube-apiserver"]
         SCHED["kube-scheduler"]
         CM["kube-controller-manager"]
     end
 
-    subgraph "Worker Node"
+    subgraph sub_worker_node ["Worker Node"]
         KUBELET["kubelet"]
         CSI_NODE["CSI Node Plugin\n(e.g., nutanix-csi-node)"]
         POD["Pod"]
         PV_MOUNT["/var/data (PV mount)"]
     end
 
-    subgraph "HCI Storage Layer"
+    subgraph sub_hci_storage_layer ["HCI Storage Layer"]
         CSI_CTRL["CSI Controller Plugin\n(e.g., nutanix-csi-controller)"]
         HCI_API["HCI Storage API\n(Prism / vSAN API)"]
         VOLUME["vDisk / iSCSI LUN\n(HCI-managed volume)"]

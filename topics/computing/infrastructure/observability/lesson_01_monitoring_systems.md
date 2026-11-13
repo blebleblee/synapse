@@ -29,26 +29,26 @@ The critical insight is that a single trace span can emit a log entry, and both 
 
 ```mermaid
 graph TB
-    subgraph "Application Process"
+    subgraph sub_application_process ["Application Process"]
         A[Instrumented Code] -->|emits| S1[Span: db.query]
         S1 -->|logs| L1["log: {trace_id, span_id, query, latency_ms}"]
         S1 -->|increments| M1["metric: db_query_duration_seconds_bucket{le='0.1'}"]
-        S1 -->|emits event| E1["span event: cache_miss"]
+        S1 -->|"emits event"| E1["span event: cache_miss"]
     end
-    subgraph "Collection"
-        L1 -->|OTLP/gRPC| C[OpenTelemetry Collector]
-        M1 -->|OTLP/gRPC| C
-        S1 -->|OTLP/gRPC| C
+    subgraph sub_collection ["Collection"]
+        L1 -->|"OTLP/gRPC"| C[OpenTelemetry Collector]
+        M1 -->|"OTLP/gRPC"| C
+        S1 -->|"OTLP/gRPC"| C
     end
-    subgraph "Backends"
-        C -->|metrics| P[(Prometheus / VictoriaMetrics)]
-        C -->|logs| E[(Loki / Elasticsearch)]
-        C -->|traces| T[(Tempo / Jaeger)]
+    subgraph sub_backends ["Backends"]
+        C -->|metrics| P["(Prometheus / VictoriaMetrics)"]
+        C -->|logs| E["(Loki / Elasticsearch)"]
+        C -->|traces| T["(Tempo / Jaeger)"]
     end
     P -->|datasource| G[Grafana Dashboard]
     E -->|datasource| G
     T -->|datasource| G
-    G -->|correlate via trace_id| Debug[Root Cause Analysis]
+    G -->|"correlate via trace_id"| Debug[Root Cause Analysis]
 ```
 
 ### 1.4 Cardinality: The Central Invariant
@@ -69,8 +69,8 @@ Sampling is the mechanism by which observability systems trade signal completene
 ```mermaid
 flowchart TD
     R[Incoming Request] --> H{Head Sampling}
-    H -->|sampled: yes| T1[Full trace recorded]
-    H -->|sampled: no| D1[Discard immediately]
+    H -->|"sampled: yes"| T1[Full trace recorded]
+    H -->|"sampled: no"| D1[Discard immediately]
     D1 --> RISK["Risk: miss unexpected errors"]
 
     R2[Incoming Request] --> TB[Tail Sampling Buffer]
@@ -440,37 +440,37 @@ The collector's pipeline model has three stages:
 
 ```mermaid
 flowchart LR
-    subgraph "Instrumented Services"
-        S1[Service A<br/>OTel SDK]
-        S2[Service B<br/>OTel SDK]
-        S3[Service C<br/>OTel SDK]
+    subgraph sub_instrumented_services ["Instrumented Services"]
+        S1["Service A<br/>OTel SDK"]
+        S2["Service B<br/>OTel SDK"]
+        S3["Service C<br/>OTel SDK"]
     end
 
     S1 -->|"OTLP/gRPC :4317"| CR
     S2 -->|"OTLP/gRPC :4317"| CR
     S3 -->|"OTLP/HTTP :4318"| CR
 
-    subgraph "OpenTelemetry Collector"
+    subgraph sub_opentelemetry_collector ["OpenTelemetry Collector"]
         CR[Receiver: OTLP] --> CP1[Processor: memory_limiter]
-        CP1 --> CP2[Processor: batch<br/>batch_size=8192<br/>timeout=5s]
-        CP2 --> CP3[Processor: tailsampling<br/>keep errors + slow traces]
+        CP1 --> CP2["Processor: batch<br/>batch_size=8192<br/>timeout=5s"]
+        CP2 --> CP3["Processor: tailsampling<br/>keep errors + slow traces"]
 
         CP3 --> CE1[Exporter: Tempo]
-        CP3 --> CE2[Exporter: Prometheus<br/>remote_write]
+        CP3 --> CE2["Exporter: Prometheus<br/>remote_write"]
 
-        CR2[Receiver: OTLP/metrics] --> CP4[Processor: filter<br/>drop high-cardinality]
+        CR2["Receiver: OTLP/metrics"] --> CP4["Processor: filter<br/>drop high-cardinality"]
         CP4 --> CP5[Processor: batch]
         CP5 --> CE3[Exporter: VictoriaMetrics]
 
-        CR3[Receiver: OTLP/logs] --> CP6[Processor: attributes<br/>add cloud.region]
+        CR3["Receiver: OTLP/logs"] --> CP6["Processor: attributes<br/>add cloud.region"]
         CP6 --> CP7[Processor: batch]
         CP7 --> CE4[Exporter: Loki]
     end
 
-    CE1 --> T[(Tempo: traces)]
-    CE2 --> P[(Prometheus: metrics)]
-    CE3 --> V[(VictoriaMetrics: metrics)]
-    CE4 --> L[(Loki: logs)]
+    CE1 --> T["(Tempo: traces)"]
+    CE2 --> P["(Prometheus: metrics)"]
+    CE3 --> V["(VictoriaMetrics: metrics)"]
+    CE4 --> L["(Loki: logs)"]
 
     T --> G[Grafana]
     P --> G
@@ -805,7 +805,7 @@ The meta-failure: the monitoring system itself is unobservable. If Prometheus is
 
 ```mermaid
 graph TB
-    subgraph "Meta-Monitoring: Watching the Watchers"
+    subgraph sub_meta_monitoring__watching_the_wa ["Meta-Monitoring: Watching the Watchers"]
         P1[Prometheus Primary] -->|"scrapes"| T1[App Targets]
         P2[Prometheus Replica] -->|"scrapes"| T1
 
@@ -883,19 +883,19 @@ The following diagram shows a production-grade observability architecture for a 
 
 ```mermaid
 graph TB
-    subgraph "Kubernetes Cluster"
-        subgraph "Application Pods"
-            APP1[Checkout Service<br/>OTel SDK: Go]
-            APP2[Payment Service<br/>OTel SDK: Java]
-            APP3[Inventory Service<br/>OTel SDK: Python]
+    subgraph sub_kubernetes_cluster ["Kubernetes Cluster"]
+        subgraph sub_application_pods ["Application Pods"]
+            APP1["Checkout Service<br/>OTel SDK: Go"]
+            APP2["Payment Service<br/>OTel SDK: Java"]
+            APP3["Inventory Service<br/>OTel SDK: Python"]
         end
 
-        subgraph "DaemonSet: OTel Collector (Agent mode)"
-            DAEMON[OTel Collector Agent<br/>Receives OTLP on :4317<br/>Forwards to gateway]
+        subgraph sub_daemonset__otel_collector__agent ["DaemonSet: OTel Collector (Agent mode)"]
+            DAEMON["OTel Collector Agent<br/>Receives OTLP on :4317<br/>Forwards to gateway"]
         end
 
-        subgraph "Deployment: OTel Collector (Gateway mode)"
-            GATEWAY[OTel Collector Gateway<br/>Tail sampling, batching<br/>Fan-out to backends]
+        subgraph sub_deployment__otel_collector__gate ["Deployment: OTel Collector (Gateway mode)"]
+            GATEWAY["OTel Collector Gateway<br/>Tail sampling, batching<br/>Fan-out to backends"]
         end
 
         APP1 -->|"OTLP gRPC :4317"| DAEMON
@@ -904,11 +904,11 @@ graph TB
         DAEMON -->|"OTLP gRPC"| GATEWAY
     end
 
-    subgraph "Observability Backends (separate namespace/cluster)"
-        PROM[Prometheus<br/>+ Thanos Sidecar]
-        TEMPO[Tempo<br/>Distributed trace storage]
-        LOKI[Loki<br/>Log aggregation]
-        ES[Elasticsearch<br/>Full-text log search]
+    subgraph sub_observability_backends__separate ["Observability Backends (separate namespace/cluster)"]
+        PROM["Prometheus<br/>+ Thanos Sidecar"]
+        TEMPO["Tempo<br/>Distributed trace storage"]
+        LOKI["Loki<br/>Log aggregation"]
+        ES["Elasticsearch<br/>Full-text log search"]
     end
 
     GATEWAY -->|"Prometheus remote write"| PROM
@@ -916,10 +916,10 @@ graph TB
     GATEWAY -->|"OTLP HTTP"| LOKI
     GATEWAY -->|"Bulk API"| ES
 
-    subgraph "Query & Visualization Layer"
-        THANOS_Q[Thanos Query<br/>Global query federation]
-        GRAFANA[Grafana<br/>Unified dashboards]
-        ALERTMGR[Alertmanager<br/>Alert routing]
+    subgraph sub_query___visualization_layer ["Query & Visualization Layer"]
+        THANOS_Q["Thanos Query<br/>Global query federation"]
+        GRAFANA["Grafana<br/>Unified dashboards"]
+        ALERTMGR["Alertmanager<br/>Alert routing"]
     end
 
     PROM --> THANOS_Q
@@ -928,8 +928,8 @@ graph TB
     LOKI --> GRAFANA
     ES --> GRAFANA
     PROM --> ALERTMGR
-    ALERTMGR --> PD[PagerDuty / Opsgenie]
-    GRAFANA --> USERS[Engineers & SREs]
+    ALERTMGR --> PD["PagerDuty / Opsgenie"]
+    GRAFANA --> USERS["Engineers & SREs"]
 ```
 
 ### Agent vs. Gateway Collector Topology

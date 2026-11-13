@@ -8,22 +8,22 @@ A file descriptor is not a pointer, not a memory address, and not the file itsel
 
 ```mermaid
 graph TD
-    subgraph "Process A (parent)"
+    subgraph sub_process_a__parent ["Process A (parent)"]
         A_FDT["File Descriptor Table\n fd0 → entry#0\n fd1 → entry#1\n fd2 → entry#2\n fd3 → entry#3"]
     end
 
-    subgraph "Process B (child after fork)"
+    subgraph sub_process_b__child_after_fork ["Process B (child after fork)"]
         B_FDT["File Descriptor Table\n fd0 → entry#0\n fd1 → entry#1\n fd2 → entry#2\n fd3 → entry#3"]
     end
 
-    subgraph "Kernel: Open File Table"
+    subgraph sub_kernel__open_file_table ["Kernel: Open File Table"]
         OFT0["entry#0\n offset=0\n flags=O_RDONLY\n ref=2"]
         OFT1["entry#1\n offset=42\n flags=O_WRONLY\n ref=2"]
         OFT2["entry#2\n offset=0\n flags=O_WRONLY\n ref=2"]
         OFT3["entry#3\n offset=1024\n flags=O_RDWR\n ref=2"]
     end
 
-    subgraph "VFS Inode Table"
+    subgraph sub_vfs_inode_table ["VFS Inode Table"]
         IN0["inode: /dev/pts/0\n (terminal)"]
         IN1["inode: /dev/pts/0\n (terminal)"]
         IN2["inode: /dev/pts/0\n (terminal)"]

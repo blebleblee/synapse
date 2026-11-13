@@ -221,7 +221,7 @@ A process is the kernel's unit of resource ownership and isolation. Within a pro
 
 ```mermaid
 graph TB
-    subgraph "Process Address Space"
+    subgraph sub_process_address_space ["Process Address Space"]
         Code["Code Segment<br/>(executable instructions)"]
         Data["Data Segment<br/>(initialized globals)"]
         BSS["BSS Segment<br/>(uninitialized globals)"]
@@ -230,7 +230,7 @@ graph TB
         VDSO["VDSO<br/>(kernel-provided code)"]
     end
     
-    subgraph "Kernel Data Structures"
+    subgraph sub_kernel_data_structures ["Kernel Data Structures"]
         TaskStruct["task_struct<br/>(process descriptor)"]
         MMStruct["mm_struct<br/>(memory descriptor)"]
         FilesStruct["files_struct<br/>(file descriptor table)"]
@@ -252,15 +252,15 @@ The kernel is organized into subsystems that manage distinct resource classes. T
 
 ```mermaid
 graph TD
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         Process["User Process"]
     end
     
-    subgraph "System Call Interface"
+    subgraph sub_system_call_interface ["System Call Interface"]
         Syscall["System Call Entry<br/>(syscall instruction)"]
     end
     
-    subgraph "Kernel Core Subsystems"
+    subgraph sub_kernel_core_subsystems ["Kernel Core Subsystems"]
         ProcMgmt["Process Management<br/>(fork, exec, exit, wait)"]
         Scheduler["Scheduler<br/>(CFS, real-time)"]
         MM["Memory Management<br/>(page allocation, paging, swapping)"]
@@ -269,13 +269,13 @@ graph TD
         IPC["IPC<br/>(signals, pipes, shared memory)"]
     end
     
-    subgraph "Low-Level Subsystems"
+    subgraph sub_low_level_subsystems ["Low-Level Subsystems"]
         BlockIO["Block I/O Layer<br/>(disk request scheduling)"]
         FS["File Systems<br/>(ext4, XFS, Btrfs)"]
         Device["Device Drivers<br/>(character, block, network)"]
     end
     
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         CPU["CPU<br/>(ring 0/3 enforcement)"]
         MMU["MMU<br/>(page table walks)"]
         Disk["Storage Devices"]

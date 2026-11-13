@@ -1,4 +1,3 @@
-```markdown
 # Operating System Theory & Kernel Subsystems: Operational Verification Lab
 
 ## Preface: Architectural Context
@@ -56,12 +55,12 @@ zcat /proc/config.gz 2>/dev/null | grep -E "CONFIG_PERF_EVENTS|CONFIG_FTRACE|CON
 
 ```mermaid
 graph TD
-    subgraph "Userspace Process (Ring 3)"
+    subgraph sub_userspace_process__ring_3 ["Userspace Process (Ring 3)"]
         A["User Virtual Address Space\n(0x0000 – 0x0000_7FFF_FFFF_FFFF)"]
         B["malloc / mmap / brk"]
     end
 
-    subgraph "Kernel Virtual Space (Ring 0)"
+    subgraph sub_kernel_virtual_space__ring_0 ["Kernel Virtual Space (Ring 0)"]
         C["VMA List\nmm_struct → vm_area_struct"]
         D["Page Table Walker\nPGD → P4D → PUD → PMD → PTE"]
         E["Physical Page Allocator\nBuddy System + SLAB/SLUB"]
@@ -70,7 +69,7 @@ graph TD
         H["OOM Killer\noom_score / oom_badness()"]
     end
 
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         I["MMU + TLB"]
         J["DRAM Physical Frames"]
         K["Block Device / NVMe"]
@@ -151,7 +150,7 @@ The canonical x86-64 Linux process address space layout (kernel 5.x, non-PIE vs.
 
 ```mermaid
 graph TD
-    subgraph "x86-64 Virtual Address Space (128 TiB user half)"
+    subgraph sub_x86_64_virtual_address_space__12 ["x86-64 Virtual Address Space (128 TiB user half)"]
         S1["0xFFFF_FFFF_FFFF_FFFF\n────── Kernel Space (not mapped) ──────"]
         S2["0x0000_7FFF_FFFF_FFFF\n────── Stack (grows ↓) ──────\nvDSO, vsyscall page"]
         S3["────── Memory-Mapped Region (mmap base) ──────\nShared libs (.so), anonymous mmap,\nfile-backed mappings"]

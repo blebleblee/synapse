@@ -106,25 +106,25 @@ Cgroup hierarchy example (v2):
 
 ```mermaid
 graph TB
-    subgraph "Host Kernel"
+    subgraph sub_host_kernel ["Host Kernel"]
         A[Task Scheduler] -->|schedules| B[Process 1]
         A -->|schedules| C[Process 2]
-        B -->|isolated by| D[PID Namespace 1]
-        C -->|isolated by| E[PID Namespace 2]
-        B -->|limited by| F[Cgroup 1<br/>cpu.max=50%<br/>memory.max=1G]
-        C -->|limited by| G[Cgroup 2<br/>cpu.max=100%<br/>memory.max=2G]
+        B -->|"isolated by"| D[PID Namespace 1]
+        C -->|"isolated by"| E[PID Namespace 2]
+        B -->|"limited by"| F["Cgroup 1<br/>cpu.max=50%<br/>memory.max=1G"]
+        C -->|"limited by"| G["Cgroup 2<br/>cpu.max=100%<br/>memory.max=2G"]
         D -->|provides| H[Isolated PID space]
         E -->|provides| I[Isolated PID space]
-        F -->|enforces| J[CPU & Memory Limits]
-        G -->|enforces| K[CPU & Memory Limits]
+        F -->|enforces| J["CPU & Memory Limits"]
+        G -->|enforces| K["CPU & Memory Limits"]
     end
     
-    subgraph "Container 1"
+    subgraph sub_container_1 ["Container 1"]
         H
         J
     end
     
-    subgraph "Container 2"
+    subgraph sub_container_2 ["Container 2"]
         I
         K
     end
@@ -150,26 +150,26 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "Physical Hardware"
-        A[CPU with VT-x/AMD-V] --> B[Memory]
-        A --> C[I/O Devices]
+    subgraph sub_physical_hardware ["Physical Hardware"]
+        A["CPU with VT-x/AMD-V"] --> B[Memory]
+        A --> C["I/O Devices"]
     end
     
-    subgraph "Host Kernel"
+    subgraph sub_host_kernel ["Host Kernel"]
         D[KVM Module] -->|uses| A
         D -->|allocates| B
-        E[Vhost-net] -->|kernel-space virtio| C
+        E[Vhost-net] -->|"kernel-space virtio"| C
     end
     
-    subgraph "User Space"
-        F[QEMU Process] -->|ioctl /dev/kvm| D
-        F -->|emulates devices| G[Virtio Backend]
+    subgraph sub_user_space ["User Space"]
+        F[QEMU Process] -->|"ioctl /dev/kvm"| D
+        F -->|"emulates devices"| G[Virtio Backend]
         G -.->|alternatively| E
     end
     
-    subgraph "Guest VM"
-        H[Guest Kernel] -->|VMCALL/VMEXIT| D
-        H -->|virtio drivers| G
+    subgraph sub_guest_vm ["Guest VM"]
+        H[Guest Kernel] -->|"VMCALL/VMEXIT"| D
+        H -->|"virtio drivers"| G
         I[Guest Process 1]
         J[Guest Process 2]
         H --> I
@@ -344,14 +344,14 @@ int main() {
 ```mermaid
 graph TB
     A[Runqueue per CPU] --> B{Scheduling Classes<br/>priority order}
-    B -->|1. Highest| C[Stop Tasks]
-    B -->|2.| D[Deadline Tasks<br/>EDF Algorithm]
-    B -->|3.| E[Real-Time Tasks<br/>SCHED_FIFO/RR]
-    B -->|4.| F[CFS Normal Tasks<br/>Red-Black Tree]
-    B -->|5. Lowest| G[Idle Task]
+    B -->|"1. Highest"| C[Stop Tasks]
+    B -->|2.| D["Deadline Tasks<br/>EDF Algorithm"]
+    B -->|3.| E["Real-Time Tasks<br/>SCHED_FIFO/RR"]
+    B -->|4.| F["CFS Normal Tasks<br/>Red-Black Tree"]
+    B -->|"5. Lowest"| G[Idle Task]
     
-    F --> H[Task Group 1<br/>e.g., user.slice]
-    F --> I[Task Group 2<br/>e.g., docker cgroup]
+    F --> H["Task Group 1<br/>e.g., user.slice"]
+    F --> I["Task Group 2<br/>e.g., docker cgroup"]
     
     H --> J[Tasks sorted by vruntime]
     I --> K[Tasks sorted by vruntime]
@@ -359,8 +359,8 @@ graph TB
     L[Timer Interrupt] -->|triggers| M[schedule]
     M --> A
     
-    N[Explicit yield<br/>sched_yield] --> M
-    O[Blocking I/O<br/>sleep] --> M
+    N["Explicit yield<br/>sched_yield"] --> M
+    O["Blocking I/O<br/>sleep"] --> M
 ```
 
 ## 3. High-Performance Optimization, Profiling, and Failure Modes

@@ -62,7 +62,7 @@ Before dissecting internals, it is essential to understand that "the kernel" is 
 
 ```mermaid
 graph TD
-    subgraph "Monolithic (Linux)"
+    subgraph sub_monolithic__linux ["Monolithic (Linux)"]
         UL["User Space\n(libc, apps)"]
         KL["Kernel Space (ring 0)\nScheduler · MM · VFS · Drivers · Net"]
         HWL["Hardware"]
@@ -70,7 +70,7 @@ graph TD
         KL -->|"direct calls"| HWL
     end
 
-    subgraph "Microkernel (seL4)"
+    subgraph sub_microkernel__sel4 ["Microkernel (seL4)"]
         UM["User Space\nFS Server · Driver · Net Server · App"]
         MK["Microkernel (ring 0)\nIPC · Address Spaces · Interrupts"]
         HWM["Hardware"]
@@ -167,7 +167,7 @@ CFS stores all runnable tasks in a **per-CPU red-black tree** (`struct rb_root_c
 
 ```mermaid
 graph TD
-    subgraph "CFS Run Queue (per CPU)"
+    subgraph sub_cfs_run_queue__per_cpu ["CFS Run Queue (per CPU)"]
         RBT["Red-Black Tree\n(keyed by vruntime)"]
         MIN["min_vruntime\n(leftmost node — next to run)"]
         RBT --> MIN
@@ -639,7 +639,7 @@ The practical implication for systems engineers is straightforward: **monolithic
 
 ```mermaid
 graph TD
-    subgraph "Kernel Performance vs Safety Trade-off Space"
+    subgraph sub_kernel_performance_vs_safety_tra ["Kernel Performance vs Safety Trade-off Space"]
         direction LR
         L["Linux\n(Monolithic)\nHigh throughput\nLow isolation"]
         W["Windows NT\n(Hybrid)\nBalanced"]

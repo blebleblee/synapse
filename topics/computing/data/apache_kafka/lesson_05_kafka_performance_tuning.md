@@ -134,7 +134,7 @@ Historically, Kafka depended on Apache ZooKeeper for controller election, broker
 
 ```mermaid
 graph TD
-    subgraph "KRaft Mode"
+    subgraph sub_kraft_mode ["KRaft Mode"]
         KRC1["Controller 1 (Raft Leader)"]
         KRC2["Controller 2 (Raft Voter)"]
         KRC3["Controller 3 (Raft Voter)"]
@@ -148,7 +148,7 @@ graph TD
         KRC1 <-->|"Raft Consensus"| KRC3
     end
 
-    subgraph "Legacy ZooKeeper Mode"
+    subgraph sub_legacy_zookeeper_mode ["Legacy ZooKeeper Mode"]
         ZK["ZooKeeper Ensemble"]
         CB[Controller Broker]
         ZB1[Broker 1]
@@ -165,7 +165,7 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "Broker Disk Layout"
+    subgraph sub_broker_disk_layout ["Broker Disk Layout"]
         direction TB
         SEG0["Segment 0\n(.log + .index + .timeindex)"]
         SEG1["Segment 1\n(.log + .index + .timeindex)"]
@@ -174,7 +174,7 @@ graph LR
         SEG1 -->|"immutable"| ACTIVE
     end
 
-    subgraph "Active Segment Detail"
+    subgraph sub_active_segment_detail ["Active Segment Detail"]
         direction TB
         RB0["RecordBatch @ offset 0\n(compressed, CRC32C)"]
         RB1["RecordBatch @ offset 47\n(compressed, CRC32C)"]
@@ -182,7 +182,7 @@ graph LR
         RB0 --> RB1 --> RB2
     end
 
-    subgraph "Sparse Offset Index"
+    subgraph sub_sparse_offset_index ["Sparse Offset Index"]
         I0["offset=0 → pos=0"]
         I1["offset=47 → pos=4096"]
         I2["offset=91 → pos=8192"]
@@ -411,7 +411,7 @@ Broker-side performance is dominated by I/O configuration, network thread pools,
 
 ```mermaid
 graph TD
-    subgraph "Log Compaction Process"
+    subgraph sub_log_compaction_process ["Log Compaction Process"]
         direction LR
         L0["Log Head\n(offset 0–99)\nAll keys present"]
         L1["Log Tail\n(offset 100–199)\nSome keys duplicated"]
@@ -538,7 +538,7 @@ flowchart TD
     START([Producer send]) --> ACCUM{RecordAccumulator\nbuffer available?}
     ACCUM -->|Yes| BATCH[Append to ProducerBatch]
     ACCUM -->|No| BLOCK[Block up to max.block.ms]
-    BLOCK -->|Buffer freed| BATCH
+    BLOCK -->|"Buffer freed"| BATCH
     BLOCK -->|Timeout| THROW[Throw TimeoutException]
     BATCH --> LINGER{linger.ms elapsed\nor batch.size reached?}
     LINGER -->|Yes| SENDER[Sender Thread\ndrain batch]
@@ -548,9 +548,9 @@ flowchart TD
     INFLIGHT -->|Yes| QUEUE[Queue in-flight batch]
     INFLIGHT -->|No| NET[Send over network]
     NET --> ACK{Broker ack\nreceived?}
-    ACK -->|NONE error| RETRY[Retry with backoff]
+    ACK -->|"NONE error"| RETRY[Retry with backoff]
     ACK -->|Success| CB[Invoke delivery callback]
-    RETRY -->|retries exhausted| FAIL[Fail delivery callback]
+    RETRY -->|"retries exhausted"| FAIL[Fail delivery callback]
 ```
 
 ### Transactions and Exactly-Once Semantics (EOS)
@@ -622,22 +622,22 @@ flowchart TD
     START([Performance problem observed]) --> Q1{Is producer\nthroughput low?}
 
     Q1 -->|Yes| P1{Is latency\nconstraint tight?}
-    P1 -->|No, batch aggressively| P2["Increase linger.ms to 10–50ms\nIncrease batch.size to 1–4 MiB\nEnable zstd compression"]
-    P1 -->|Yes, latency sensitive| P3["Reduce linger.ms to 0–1ms\nAccept lower throughput\nEnsure acks=1 if durability allows"]
+    P1 -->|"No, batch aggressively"| P2["Increase linger.ms to 10–50ms\nIncrease batch.size to 1–4 MiB\nEnable zstd compression"]
+    P1 -->|"Yes, latency sensitive"| P3["Reduce linger.ms to 0–1ms\nAccept lower throughput\nEnsure acks=1 if durability allows"]
     P2 --> P4{Still bottlenecked?}
     P4 -->|Yes| P5["Add partitions\nAdd producer instances\nCheck broker I/O saturation"]
 
     Q1 -->|No| Q2{Is consumer\nlag growing?}
     Q2 -->|Yes| C1{Is consumer\nCPU-bound?}
     C1 -->|Yes| C2["Optimize processing logic\nIncrease consumer instances\n(requires more partitions)"]
-    C1 -->|No, I/O-bound| C3["Increase fetch.min.bytes\nIncrease max.partition.fetch.bytes\nCheck network bandwidth"]
+    C1 -->|"No, I/O-bound"| C3["Increase fetch.min.bytes\nIncrease max.partition.fetch.bytes\nCheck network bandwidth"]
     C2 --> C4{Partition count\n< consumer count?}
     C4 -->|Yes| C5["Increase partition count\n(requires topic recreation\nor kafka-reassign-partitions)"]
 
     Q2 -->|No| Q3{Are there\nunder-replicated\npartitions?}
     Q3 -->|Yes| R1{Is a broker\ndown?}
     R1 -->|Yes| R2["Restart broker\nCheck disk health\nVerify network connectivity"]
-    R1 -->|No, replica lagging| R3["Check replica.lag.time.max.ms\nIncrease num.replica.fetchers\nCheck broker I/O for the follower"]
+    R1 -->|"No, replica lagging"| R3["Check replica.lag.time.max.ms\nIncrease num.replica.fetchers\nCheck broker I/O for the follower"]
 
     Q3 -->|No| Q4{Is p99 latency\nhigh?}
     Q4 -->|Yes| L1["Check GC pause times on brokers\nCheck OS page cache hit rate\nCheck network round-trip time\nVerify no log flush policy forcing fsync"]

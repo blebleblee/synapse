@@ -99,7 +99,7 @@ The pause container (image `registry.k8s.io/pause`) is the architectural linchpi
 
 ```mermaid
 flowchart TB
-    subgraph "Kubelet"
+    subgraph sub_kubelet ["Kubelet"]
         A["Pod spec received"] --> B["CRI gRPC: RunPodSandbox"]
     end
     B --> C["Container Runtime (containerd)"]
@@ -474,18 +474,18 @@ Kubernetes provides multiple layers of failure detection and recovery, each oper
 
 ```mermaid
 flowchart TD
-    subgraph "Container Level"
+    subgraph sub_container_level ["Container Level"]
         A["Liveness probe fails"] --> B["kubelet restarts container"]
         B --> C["Back-off delay increases\n(10s, 20s, 40s, ... capped at 5m)"]
     end
-    subgraph "Pod Level"
+    subgraph sub_pod_level ["Pod Level"]
         D["Pod eviction (disk pressure, etc.)"] --> E["Pod rescheduled to healthy node"]
     end
-    subgraph "Node Level"
+    subgraph sub_node_level ["Node Level"]
         F["Node becomes NotReady"] --> G["Node controller marks pods for deletion\nafter grace period (default 5m)"]
         G --> H["Scheduler places pods on available nodes"]
     end
-    subgraph "Control Plane Level"
+    subgraph sub_control_plane_level ["Control Plane Level"]
         I["etcd quorum loss"] --> J["API server becomes read-only"]
         J --> K["No new resources can be created\nExisting pods continue running"]
     end

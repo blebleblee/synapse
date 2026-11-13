@@ -39,22 +39,22 @@ A production logging pipeline consists of four logical tiers: generation, collec
 
 ```mermaid
 graph LR
-    subgraph "Tier 1: Generation"
+    subgraph sub_tier_1__generation ["Tier 1: Generation"]
         A1["App Instance 1\n(structured logger)"]
         A2["App Instance 2\n(structured logger)"]
         A3["App Instance N\n(structured logger)"]
     end
 
-    subgraph "Tier 2: Collection"
+    subgraph sub_tier_2__collection ["Tier 2: Collection"]
         B1["Fluent Bit\n(sidecar)"]
         B2["Fluent Bit\n(daemonset)"]
     end
 
-    subgraph "Tier 3: Buffer/Transport"
+    subgraph sub_tier_3__buffer_transport ["Tier 3: Buffer/Transport"]
         C1["Kafka\n(partitioned, replicated)"]
     end
 
-    subgraph "Tier 4: Storage & Query"
+    subgraph sub_tier_4__storage___query ["Tier 4: Storage & Query"]
         D1["Elasticsearch\n(inverted index)"]
         D2["Loki\n(label index + compression)"]
         D3["S3 / Object Storage\n(cold archive)"]
@@ -291,7 +291,7 @@ Kafka is the dominant choice for log transport in large-scale environments. It p
 
 ```mermaid
 graph TD
-    subgraph "Kafka Log Transport Topology"
+    subgraph sub_kafka_log_transport_topology ["Kafka Log Transport Topology"]
         P1["Fluent Bit Pod 1"] -->|"produce"| K1["Partition 0\nLeader: Broker 1\nISR: 1,2,3"]
         P2["Fluent Bit Pod 2"] -->|"produce"| K2["Partition 1\nLeader: Broker 2\nISR: 2,3,1"]
         P3["Fluent Bit Pod 3"] -->|"produce"| K3["Partition 2\nLeader: Broker 3\nISR: 3,1,2"]
@@ -322,7 +322,7 @@ For log workloads, Elasticsearch uses time-based index patterns (e.g., `logs-pro
 
 ```mermaid
 graph LR
-    subgraph "Index Lifecycle Management"
+    subgraph sub_index_lifecycle_management ["Index Lifecycle Management"]
         H["Hot Node\n(SSD, high CPU)\nIndex: logs-2024.01.15\nRefresh: 1s\nReplicas: 1"] -->|"age: 1d\nILM action\nforce_merge"| W["Warm Node\n(SSD, lower CPU)\nIndex: logs-2024.01.14\nRefresh: -1\nReplicas: 0"]
         W -->|"age: 7d\nILM action\nshrink + freeze"| C["Cold Node\n(HDD, low CPU)\nIndex: logs-2024.01.08\nSearch: slow\nReplicas: 0"]
         C -->|"age: 30d\nILM action\ndelete"| D["Deleted"]
@@ -398,7 +398,7 @@ The most impactful performance optimization at the generation tier is asynchrono
 
 ```mermaid
 graph LR
-    subgraph "Async Logging Ring Buffer"
+    subgraph sub_async_logging_ring_buffer ["Async Logging Ring Buffer"]
         T1["App Thread 1"] -->|"tryPublish\n(lock-free CAS)" |> R["Ring Buffer\n[slot0][slot1][slot2]...[slotN-1]\nfixed-size, pre-allocated"]
         T2["App Thread 2"] -->|"tryPublish\n(lock-free CAS)" |> R
         T3["App Thread N"] -->|"tryPublish\n(lock-free CAS)" |> R

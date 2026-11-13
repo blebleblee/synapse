@@ -44,7 +44,7 @@ The `BPF_MAP_TYPE_HASH` implementation uses a pre-allocated array of hash bucket
 
 ```mermaid
 graph TB
-    subgraph "Hash Map Structure"
+    subgraph sub_hash_map_structure ["Hash Map Structure"]
         HM["htab (struct bpf_htab)"]
         HM --> BKT["buckets (array of struct bucket)"]
         HM --> ELEM_POOL["elem preallocation pool"]
@@ -65,7 +65,7 @@ graph TB
         E2 --> H2["hash_value"]
     end
     
-    subgraph "Lookup Flow"
+    subgraph sub_lookup_flow ["Lookup Flow"]
         L1["1. hash = jhash(key)"]
         L2["2. bucket_idx = hash & (n_buckets - 1)"]
         L3["3. spin_lock(&bucket->lock)"]

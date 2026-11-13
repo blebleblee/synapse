@@ -1,275 +1,403 @@
-```markdown
-# Lesson 1: Distributed Systems Architecture
+# Lesson 01 Distributed Systems Architecture
 
-## 1. First-Principles Intuition & Invariants
+## Preface
 
-A single machine is bounded by the speed of light across its bus, the capacity of its RAM, and the rotational latency of its disks. When the working set of a problem exceeds these physical limits — or when the cost of downtime is unacceptable — you must partition the problem across multiple cooperating machines. That act of partitioning is the genesis of every challenge in distributed systems: the moment data lives on more than one machine, those machines can disagree, and the moment they can disagree, you need a formal model for what "correct" means.
+This lesson is the foundation on which every subsequent big data topic rests. Before you can reason about Spark shuffles, Kafka replication, or Flink checkpoints, you need a precise mental model of what a distributed system actually is, what guarantees it can and cannot provide, and how those constraints shape every architectural decision you will ever make at scale.
 
-### The Fundamental Tension: Partial Failure
-
-A single-node system either works or it does not. A distributed system introduces a third state: **partial failure**, where some nodes are working, some are dead, and some are alive but cannot communicate with the others. Peter Deutsch's eight fallacies of distributed computing (documented at Sun Microsystems in 1994, later expanded by James Gosling) enumerate the assumptions that break in this environment: the network is not reliable, latency is not zero, bandwidth is not infinite, the network is not secure, topology does not change, there is not one administrator, transport cost is not zero, and the network is not homogeneous. Every architecture decision in distributed systems is ultimately a response to one or more of these broken assumptions.
-
-### The CAP Theorem: Precision over Folklore
-
-Eric Brewer conjectured the CAP theorem at PODC 2000; Seth Gilbert and Nancy Lynch provided the formal proof in their 2002 ACM SIGACT paper. The theorem proves that in an asynchronous network model where message loss is possible, **no distributed data store can simultaneously guarantee all three of**:
-
-- **Consistency (C)**: Every read receives the most recent write or an error (linearizability in the formal sense).
-- **Availability (A)**: Every request to a non-failed node receives a non-error response.
-- **Partition Tolerance (P)**: The system continues operating when an arbitrary number of messages between nodes are dropped.
-
-The common misreading is that you "choose two of three." In reality, **partition tolerance is not optional** — network partitions occur in any real deployment, so the actual choice is between CP (sacrifice availability during a partition) and AP (sacrifice linearizability during a partition). Systems like ZooKeeper and etcd choose CP; systems like Cassandra and DynamoDB choose AP with tunable consistency.
-
-Brewer himself acknowledged in a 2012 IEEE Computer article that CAP is often over-applied. The more nuanced framework is **PACELC** (Daniel Abadi, 2012): even when there is no partition, there is a latency–consistency trade-off. PACELC asks: in the case of Partition (P), choose Availability (A) or Consistency (C); Else (E, no partition), choose Latency (L) or Consistency (C). This gives a richer two-axis characterization of system behavior.
-
-### Consistency Models as a Partial Order
-
-Consistency models form a strict hierarchy. Understanding where your system sits determines what application-level invariants you must enforce yourself:
-
-```
-Linearizability (Strict Serializability)
-    └── Sequential Consistency
-            └── Causal Consistency
-                    └── PRAM / Monotonic Reads + Writes
-                            └── Eventual Consistency
-```
-
-**Linearizability** (Herlihy & Wing, 1990) is the gold standard: operations appear to execute atomically at some point between their invocation and their response, and that point is consistent with real time. This requires coordination on every operation and is expensive to achieve at scale.
-
-**Causal consistency** (Lamport's happens-before relation, 1978) requires that causally related operations be seen in order by all nodes, while concurrent operations may be seen in any order. Lamport clocks provide a logical clock sufficient to track causality in the absence of physical clock synchronization; vector clocks (Fidge/Mattern, 1988) generalize this to track the causal history of each node independently, enabling detection of concurrent writes and meaningful conflict resolution.
-
-**Eventual consistency** (Vogels, 2009) guarantees only that, absent new writes, all replicas converge to the same value. The gap between "absent new writes" and real workloads is bridged by **Conflict-free Replicated Data Types (CRDTs)**, which define merge functions that are commutative, associative, and idempotent, ensuring convergence regardless of the order in which updates are received.
+We build that model from first principles, moving from the mathematics of distributed consensus through the physics of network communication to the engineering of fault-tolerant pipelines. Every claim is grounded in either a formal theorem or a runnable implementation.
 
 ---
 
-## 2. Core Architecture & Mechanics
+## Table of Contents
 
-### Consensus: The Engine of Replication
+1. [What Is a Distributed System?](#1-what-is-a-distributed-system)
+2. [The Fundamental Impossibility Results](#2-the-fundamental-impossibility-results)
+3. [Time, Clocks, and Ordering](#3-time-clocks-and-ordering)
+4. [Failure Models and Fault Tolerance](#4-failure-models-and-fault-tolerance)
+5. [Consistency Models](#5-consistency-models)
+6. [The CAP Theorem in Depth](#6-the-cap-theorem-in-depth)
+7. [PACELC: Beyond CAP](#7-pacelc-beyond-cap)
+8. [Replication Strategies](#8-replication-strategies)
+9. [Partitioning and Sharding](#9-partitioning-and-sharding)
+10. [Consensus Algorithms: Raft](#10-consensus-algorithms-raft)
+11. [Distributed Coordination Patterns](#11-distributed-coordination-patterns)
+12. [Big Data Architecture Patterns](#12-big-data-architecture-patterns)
+13. [The Lambda Architecture](#13-the-lambda-architecture)
+14. [The Kappa Architecture](#14-the-kappa-architecture)
+15. [Complete Working Implementation: A Distributed Log](#15-complete-working-implementation-a-distributed-log)
+16. [Observability and Debugging](#16-observability-and-debugging)
+17. [Production Checklist](#17-production-checklist)
+18. [Exercises](#18-exercises)
 
-Consensus is the problem of getting a set of processes to agree on a single value, even when some processes fail. The **FLP impossibility result** (Fischer, Lynch, Paterson, 1985) proves that in a purely asynchronous system where even one process may crash, deterministic consensus is impossible. Real systems escape FLP by introducing timing assumptions (Paxos, Raft use timeouts) or randomness (Ben-Or's algorithm).
+---
 
-#### Raft Consensus
+## 1. What Is a Distributed System?
 
-Raft (Ongaro & Ousterhout, USENIX ATC 2014) decomposes consensus into three sub-problems: leader election, log replication, and safety. Its design constraint is understandability, achieved by decomposing state into only three roles: **Leader**, **Follower**, and **Candidate**.
+### 1.1 Formal Definition
 
-**Leader Election**: Each server starts as a Follower. If a Follower receives no `AppendEntries` heartbeat within an election timeout (typically 150–300 ms, randomized to break symmetry), it converts to Candidate, increments its current term, votes for itself, and broadcasts `RequestVote` RPCs. A Candidate becomes Leader if it receives votes from a strict majority ⌊N/2⌋ + 1 of servers. A server grants a vote only if the candidate's log is at least as up-to-date as its own (defined by comparing the last log entry's term, then index), and it has not voted for a different candidate in this term.
+A **distributed system** is a collection of autonomous computational entities — nodes — that communicate exclusively by passing messages over a network, with no shared memory, and that present a coherent service to external observers.
 
-**Log Replication**: The Leader accepts client commands, appends them to its log as new entries with the current term, and broadcasts `AppendEntries` RPCs to all Followers in parallel. An entry is **committed** once the Leader has replicated it to a majority. The Leader then applies the entry to its state machine, returns the result to the client, and piggybacks the commit index on subsequent `AppendEntries` so Followers learn of the commit.
+More formally, let:
 
-**Safety Invariant**: Raft guarantees the **Log Matching Property**: if two entries in different logs have the same index and term, all preceding entries are identical. The `AppendEntries` RPC includes a consistency check (the term and index of the entry immediately preceding the new entries), and Followers reject the RPC if this does not match, forcing the Leader to send earlier entries until a consistent prefix is found.
+- **N** = {n₁, n₂, …, nₖ} be the finite set of nodes
+- **C** ⊆ N × N be the set of directed communication channels
+- **M** be the (possibly infinite) message alphabet
+- **S_i** be the local state space of node nᵢ
+- **A_i** be the set of local actions node nᵢ can take (compute, send, receive)
 
-The quorum size for N nodes:
+A distributed system is a tuple **(N, C, M, {S_i}, {A_i})** together with an execution model that defines how nodes interleave their actions.
+
+The critical invariant is **no shared state**: the only way node nᵢ can influence node nⱼ is by sending a message along some channel (nᵢ, nⱼ) ∈ C, possibly transitively through intermediate nodes.
+
+### 1.2 Why Distribute?
+
+Three orthogonal motivations drive distribution, and they impose different architectural pressures:
+
+| Motivation | Driver | Key Metric | Example |
+|---|---|---|---|
+| Scalability | Dataset exceeds single-machine capacity | Throughput, storage | HDFS, BigQuery |
+| Availability | Service must survive hardware failure | Uptime, MTTR | ZooKeeper, etcd |
+| Latency | Geographic proximity to users | p99 latency | CDNs, regional databases |
+| Collaboration | Multiple independent owners | Interoperability | Federated learning |
+
+A system designed primarily for scalability (e.g., a batch processing pipeline) makes very different trade-offs from one designed for availability (e.g., a coordination service). Conflating these motivations is the source of most architectural mistakes.
+
+### 1.3 The Execution Model
+
+Two classical execution models bound the design space:
+
+**Synchronous model**: There exists a known upper bound Δ on message delay and a known bound δ on relative clock drift. Every step completes within a known number of rounds. This model is easy to reason about but physically unrealisable across a wide-area network.
+
+**Asynchronous model**: No bounds on message delay or clock drift are assumed. Messages may be arbitrarily delayed but not lost (reliable channels). This is the foundation of the FLP impossibility result below.
+
+Real systems operate in the **partially synchronous model** (Dwork, Lynch, Stockmeyer 1988): the system behaves asynchronously during fault periods but eventually enters a synchronous phase of duration at least GST (Global Stabilisation Time). This model is what Raft, Paxos, and Zab are actually designed for.
 
 ```
-Q = ⌊N/2⌋ + 1
+Timeline of partial synchrony:
+
+t=0          t=GST          t=∞
+|------------|--------------|----→
+  Asynchronous  Synchronous
+  (no bounds)   (bounds hold)
 ```
 
-This tolerates ⌊N/2⌋ simultaneous failures. With N=3 (Q=2), the system tolerates 1 failure. With N=5 (Q=3), it tolerates 2 failures. Adding nodes beyond 7 provides diminishing fault-tolerance returns while increasing write latency linearly due to the extra round-trip to a larger quorum.
+---
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant L as Leader (Node 1)
-    participant F1 as Follower (Node 2)
-    participant F2 as Follower (Node 3)
+## 2. The Fundamental Impossibility Results
 
-    C->>L: Write(key="x", val=42)
-    Note over L: Append entry (term=3, idx=7) to local log
+These are not engineering limitations you can overcome with better hardware. They are mathematical facts.
 
-    par Replicate in parallel
-        L->>F1: AppendEntries(term=3, prevLogIdx=6, entry=[x=42])
-        L->>F2: AppendEntries(term=3, prevLogIdx=6, entry=[x=42])
-    end
+### 2.1 The FLP Impossibility Theorem
 
-    F1-->>L: AppendEntries_Success(term=3)
-    Note over L: Quorum reached (Leader + F1 = 2/3)
-    L->>L: Commit entry, apply to state machine
+**Theorem (Fischer, Lynch, Paterson 1985)**: In a fully asynchronous message-passing system where processes can fail by crashing, there is no deterministic algorithm that solves distributed consensus, even if at most one process fails.
 
-    F2-->>L: AppendEntries_Success(term=3)
-    Note over L: commitIndex=7 piggybacked on next heartbeat
+**Proof sketch**: Assume algorithm A solves consensus. Consider a bivalent initial configuration C₀ (one reachable from which both 0 and 1 can be decided, whose existence is proven by a reachability argument). There must exist some event e from C₀ that leads to another bivalent configuration, because if every event led to a univalent configuration, A would be trivially correct on all asynchronous schedules. By repeating this construction, we build an infinite admissible execution with no decision — a contradiction.
 
-    L-->>C: Write_OK
-```
+**Practical implication**: The FLP result does *not* say consensus is impossible. It says you must relax at least one of:
+1. **Determinism** — use randomised algorithms (Ben-Or 1983)
+2. **Full asynchrony** — assume partial synchrony (Paxos, Raft)
+3. **Failure model** — only handle benign failures with extra assumptions
 
-#### Paxos and Multi-Paxos
+### 2.2 The CAP Theorem
 
-Paxos (Lamport, 1989/1998) is the foundational algorithm from which Raft derives. Single-decree Paxos agrees on a single value in two phases: Prepare/Promise and Accept/Accepted. Multi-Paxos extends this by electing a distinguished proposer (leader) who can skip the Prepare phase for subsequent slots, reducing the common case to a single round trip. Raft is essentially a re-engineering of Multi-Paxos with clearly defined leader election, log structure, and membership change protocols. Production systems using Paxos variants include Google Chubby, Google Spanner, and Apache Zookeeper (which uses ZAB, a variant closely related to Paxos).
+**Theorem (Brewer 2000, formalised Gilbert & Lynch 2002)**: A distributed data store cannot simultaneously provide all three of:
 
-### Replication Topologies
+- **C**onsistency: Every read receives the most recent write or an error
+- **A**vailability: Every request receives a (non-error) response
+- **P**artition tolerance: The system continues operating despite arbitrary message loss between nodes
 
-The choice of replication topology directly determines the latency, throughput, and durability trade-offs of a distributed system.
+**Proof sketch (Gilbert & Lynch)**: Consider two nodes n₁, n₂ with a network partition between them. Node n₁ receives write W. If the system is available, n₁ must respond to writes and n₂ must respond to reads without communicating. If n₂ returns stale data, C is violated. If n₂ returns an error, A is violated.
 
-```mermaid
-graph TD
-    subgraph "Single-Leader (Raft/Paxos)"
-        CL1[Client] -->|All Writes| LD[Leader]
-        LD -->|Sync Replication| R1[Replica A]
-        LD -->|Sync Replication| R2[Replica B]
-        CL1 -->|Reads| LD
-    end
+**The correct reading**: Since network partitions are a physical reality you cannot prevent, the real trade-off is between C and A *during* a partition. This is a narrow special case. The more practically useful framing is PACELC (Section 7).
 
-    subgraph "Multi-Leader (CRDTs / Conflict Resolution)"
-        CL2[Client A] -->|Write| L1[Leader DC-West]
-        CL3[Client B] -->|Write| L2[Leader DC-East]
-        L1 <-->|Async Cross-DC Replication| L2
-    end
+### 2.3 The Two Generals Problem
 
-    subgraph "Leaderless (Dynamo-style)"
-        CL4[Client] -->|Write W-of-N| N1[Node 1]
-        CL4 -->|Write W-of-N| N2[Node 2]
-        CL4 -->|Write W-of-N| N3[Node 3]
-        CL4 -->|Read R-of-N| N1
-        CL4 -->|Read R-of-N| N2
-        CL4 -->|Read R-of-N| N3
-    end
-```
+Two generals on opposite sides of a valley must coordinate an attack. They can only communicate by messenger crossing the valley (which may be captured). They need consensus on a time to attack simultaneously.
 
-In **leaderless replication** (Dynamo, Cassandra, Riak), quorum reads and writes are configured via parameters W (write quorum) and R (read quorum) over N replicas. When R + W > N, at least one node participates in both read and write, guaranteeing that a read returns the most recent write — but only probabilistically so, since the overlapping node might not have the latest version if a write is in flight. **Read repair** and **anti-entropy** background processes converge diverged replicas.
+**Theorem**: No protocol guarantees agreement in the presence of message loss.
 
-### Partitioning Strategies
+**Proof by induction**: Any protocol has a finite last message. If that last message is lost, the generals are in the same epistemic state as if it was never sent — no agreement is possible. Removing the last message reduces the protocol to a shorter one, which by induction also cannot guarantee agreement.
 
-Partitioning (sharding) distributes data across nodes to enable horizontal scaling. The partitioning scheme determines hotspot likelihood, rebalancing complexity, and query routing.
+This result underlies why TCP's connection teardown uses TIME_WAIT rather than a clean 4-way handshake guarantee — perfect agreement is physically impossible.
 
-**Range partitioning** assigns contiguous key ranges to shards (e.g., HBase regions). Range scans are efficient, but monotonically increasing keys (e.g., timestamps) cause write hotspots on the last shard.
+---
 
-**Hash partitioning** applies a deterministic hash to the key and assigns the result modulo the number of shards. This distributes writes uniformly but destroys key ordering, making range scans expensive.
+## 3. Time, Clocks, and Ordering
 
-**Consistent hashing** (Karger et al., 1997) places both keys and nodes on a virtual ring. Each key is owned by the first node clockwise from its hash position. When a node is added or removed, only K/N keys are remapped (K total keys, N nodes), minimizing rebalancing. Virtual nodes (vnodes), used in Cassandra and DynamoDB, assign each physical node multiple positions on the ring to improve load distribution and handle heterogeneous hardware.
+### 3.1 Why Physical Clocks Fail
 
-```mermaid
-graph TD
-    subgraph "Consistent Hash Ring"
-        K1(("Key A\nhash=12")) -->|clockwise| N1["Node 1\nrange 0-25"]
-        K2(("Key B\nhash=40")) -->|clockwise| N2["Node 2\nrange 26-50"]
-        K3(("Key C\nhash=70")) -->|clockwise| N3["Node 3\nrange 51-75"]
-        K4(("Key D\nhash=90")) -->|clockwise| N4["Node 4\nrange 76-99"]
-        N4 -->|wraps around| N1
-    end
-```
+Physical clocks drift. Network Time Protocol (NTP) synchronises clocks to within ~100ms on a local network, ~1-10ms with dedicated servers, and ~1ms with PTP (Precision Time Protocol). But:
 
-### Multi-Version Concurrency Control (MVCC)
+- Clock drift between synchronisations can be milliseconds to seconds
+- Leap seconds cause clocks to jump or repeat
+- VM clock skew during live migration can be tens of seconds
+- A system relying on wall-clock ordering for event causality will silently produce wrong answers
 
-MVCC enables concurrent readers to see a consistent snapshot of the database without blocking writers, and writers to proceed without blocking readers. Each row (or key-value pair) stores multiple versions tagged with a transaction ID or timestamp. Readers see the most recent version whose commit timestamp is less than or equal to the reader's snapshot timestamp.
+Google's Spanner uses TrueTime — atomic clocks plus GPS receivers — with bounded uncertainty ε ≈ 7ms. For every other system, we use logical clocks.
 
-The core invariant of MVCC is that a transaction T at snapshot timestamp `ts_read` can only see writes committed at `ts_commit ≤ ts_read`. Writes create new versions; they do not overwrite existing ones. Garbage collection (vacuum in PostgreSQL, compaction in RocksDB) reclaims old versions no longer visible to any active snapshot.
+### 3.2 Lamport Clocks
 
-In PostgreSQL, every row has hidden system columns `xmin` (the transaction ID that inserted it) and `xmax` (the transaction ID that deleted or updated it, or zero if live). A tuple is visible to transaction `xid` if `xmin` is committed and `xmin ≤ xid`, and either `xmax` is zero or `xmax` is not committed or `xmax > xid`.
+**Definition (Lamport 1978)**: The *happens-before* relation → is the smallest relation satisfying:
 
-In distributed databases like Google Spanner, MVCC is combined with **TrueTime** — a globally synchronized clock with bounded uncertainty — to assign commit timestamps. Spanner waits out the clock uncertainty interval before committing, guaranteeing that the commit timestamp is in the past relative to any future transaction, achieving external consistency (a form of linearizability) across globally distributed shards.
+1. If a and b are events in the same process and a occurs before b, then a → b
+2. If a is the sending of a message and b is the receipt of that message, then a → b
+3. Transitivity: if a → b and b → c, then a → c
 
-The following example shows how RocksDB (used as the storage engine for TiKV, CockroachDB, and others) stores MVCC versions using a composite key encoding:
+**Lamport Clock Algorithm**:
+
+Each process maintains a counter `C`. For each event:
+- Local event: `C := C + 1`
+- Send message: `C := C + 1`, attach `C` to message
+- Receive message with timestamp `T`: `C := max(C, T) + 1`
+
+**Guarantee**: if a → b, then C(a) < C(b). The converse does not hold — concurrent events may have any clock ordering.
 
 ```python
-# RocksDB MVCC key encoding (simplified from TiKV's implementation)
-# Key format: <user_key> | <timestamp_descending>
-# Timestamps are stored in descending order so that the latest version
-# is always the first key returned by a forward scan.
-
-import struct
-import rocksdb  # pip install python-rocksdb
-
-MAX_TS = (1 << 64) - 1  # u64::MAX
-
-def encode_key(user_key: bytes, ts: int) -> bytes:
-    """Encode a user key with a descending timestamp for MVCC."""
-    # Encode timestamp in big-endian, then XOR with MAX to invert ordering
-    ts_encoded = struct.pack(">Q", MAX_TS - ts)
-    return user_key + b"\x00" + ts_encoded
-
-def decode_key(encoded: bytes) -> tuple[bytes, int]:
-    """Decode an MVCC-encoded key back to (user_key, timestamp)."""
-    sep = encoded.rfind(b"\x00")
-    user_key = encoded[:sep]
-    ts_inv = struct.unpack(">Q", encoded[sep + 1:])[0]
-    ts = MAX_TS - ts_inv
-    return user_key, ts
-
-def mvcc_get(db: rocksdb.DB, user_key: bytes, read_ts: int) -> bytes | None:
-    """
-    Retrieve the value of user_key as of read_ts.
-    Scans forward from the encoded key; the first version whose timestamp
-    is <= read_ts is the correct snapshot version.
-    """
-    seek_key = encode_key(user_key, read_ts)
-    it = db.iteritems()
-    it.seek(seek_key)
-    for raw_key, value in it:
-        decoded_key, version_ts = decode_key(raw_key)
-        if decoded_key != user_key:
-            break  # moved past all versions of this key
-        if version_ts <= read_ts:
-            return value  # first visible version
-    return None  # key does not exist at this snapshot
-
-def mvcc_put(db: rocksdb.DB, user_key: bytes, value: bytes, commit_ts: int):
-    """Write a new version of user_key at commit_ts."""
-    encoded = encode_key(user_key, commit_ts)
-    db.put(encoded, value)
-```
-
-### Lamport Clocks and Vector Clocks
-
-Physical clocks drift and cannot be perfectly synchronized across machines (NTP provides only millisecond-level accuracy under good conditions; GPS-disciplined clocks reach nanoseconds but are expensive). Logical clocks provide a causal ordering without requiring clock synchronization.
-
-**Lamport timestamps**: Each process maintains a counter. Before a local event, increment the counter. When sending a message, include the counter. On receiving a message, set the counter to `max(local, received) + 1`. This guarantees: if event A causally precedes event B, then `L(A) < L(B)`. The converse is not true — a higher Lamport timestamp does not imply causality.
-
-**Vector clocks**: Each process `i` maintains a vector `V` of N counters, one per process. Increment `V[i]` on a local event or send. On receiving a message with vector `V'`, set `V[j] = max(V[j], V'[j])` for all j, then increment `V[i]`. Two events are concurrent if neither `V(A) ≤ V(B)` nor `V(B) ≤ V(A)` component-wise. Amazon DynamoDB originally used vector clocks for conflict detection (described in the 2007 Dynamo paper), though later versions shifted to last-write-wins with server-side timestamps due to operational complexity.
-
-```python
+# lamport_clock.py — complete implementation
+import threading
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Any, Optional
+
 
 @dataclass
-class VectorClock:
-    node_id: str
-    clock: Dict[str, int] = field(default_factory=dict)
+class LamportClock:
+    """
+    Thread-safe Lamport logical clock.
+    
+    Invariant: if event a happens-before event b,
+    then clock(a) < clock(b).
+    """
+    _time: int = field(default=0, init=False)
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False)
 
-    def tick(self) -> "VectorClock":
-        """Increment own component before a local event or send."""
-        self.clock[self.node_id] = self.clock.get(self.node_id, 0) + 1
-        return self
+    def tick(self) -> int:
+        """Increment clock for a local event. Returns new timestamp."""
+        with self._lock:
+            self._time += 1
+            return self._time
 
-    def merge(self, other: "VectorClock") -> "VectorClock":
-        """Merge on receive: take component-wise maximum, then tick."""
-        for node, ts in other.clock.items():
-            self.clock[node] = max(self.clock.get(node, 0), ts)
-        self.tick()
-        return self
+    def send(self) -> int:
+        """Prepare timestamp for outgoing message."""
+        return self.tick()
 
-    def happened_before(self, other: "VectorClock") -> bool:
-        """Return True if self causally precedes other."""
-        return (
-            all(self.clock.get(n, 0) <= other.clock.get(n, 0)
-                for n in set(self.clock) | set(other.clock))
-            and self.clock != other.clock
-        )
+    def receive(self, msg_timestamp: int) -> int:
+        """
+        Update clock on message receipt.
+        C := max(C, T_msg) + 1
+        """
+        with self._lock:
+            self._time = max(self._time, msg_timestamp) + 1
+            return self._time
 
-    def concurrent(self, other: "VectorClock") -> bool:
-        return (
-            not self.happened_before(other)
-            and not other.happened_before(self)
-        )
+    @property
+    def time(self) -> int:
+        with self._lock:
+            return self._time
+
+
+@dataclass
+class Message:
+    sender: str
+    payload: Any
+    timestamp: int
+
+
+class Process:
+    """
+    Simulated distributed process with a Lamport clock.
+    """
+
+    def __init__(self, name: str):
+        self.name = name
+        self.clock = LamportClock()
+        self.log: list[tuple[int, str]] = []
+        self._inbox: list[Message] = []
+        self._lock = threading.Lock()
+
+    def local_event(self, description: str) -> int:
+        t = self.clock.tick()
+        self.log.append((t, f"[LOCAL] {description}"))
+        return t
+
+    def send_message(self, payload: Any) -> Message:
+        t = self.clock.send()
+        msg = Message(sender=self.name, payload=payload, timestamp=t)
+        self.log.append((t, f"[SEND ] payload={payload}"))
+        return msg
+
+    def receive_message(self, msg: Message) -> None:
+        t = self.clock.receive(msg.timestamp)
+        self.log.append((t, f"[RECV ] from={msg.sender} payload={msg.payload} msg_ts={msg.timestamp}"))
+
+    def print_log(self) -> None:
+        print(f"\nProcess {self.name}:")
+        for ts, event in sorted(self.log):
+            print(f"  t={ts:3d}  {event}")
+
+
+def simulate_lamport_clocks():
+    """
+    Simulate the classic 3-process example from Lamport 1978.
+    
+    Timeline:
+        P1: e1 ──send(m1)──────────────────── e4
+        P2:          ────recv(m1)── e2 ──send(m2)──
+        P3:                              ────recv(m2)── e3
+    """
+    p1 = Process("P1")
+    p2 = Process("P2")
+    p3 = Process("P3")
+
+    # P1: local event, then send
+    p1.local_event("start computation")
+    m1 = p1.send_message("data chunk A")
+
+    # P2: receives, does work, sends
+    p2.receive_message(m1)
+    p2.local_event("process chunk A")
+    m2 = p2.send_message("result B")
+
+    # P3: receives
+    p3.receive_message(m2)
+    p3.local_event("store result B")
+
+    # P1 continues independently
+    p1.local_event("start computation 2")
+
+    p1.print_log()
+    p2.print_log()
+    p3.print_log()
+
+    # Verify happens-before: clock(send m1) < clock(recv m1)
+    send_ts = m1.timestamp
+    recv_ts = dict(p2.log)[next(ts for ts, e in p2.log if "recv" in e.lower())]
+    print(f"\nVerification: send(m1) ts={send_ts} < recv(m1) ts={recv_ts}: {send_ts < recv_ts}")
+
+
+if __name__ == "__main__":
+    simulate_lamport_clocks()
 ```
 
----
+### 3.3 Vector Clocks
 
-## 3. High-Performance Optimization & Failure Modes
+Lamport clocks detect causality in one direction. **Vector clocks** (Fidge 1988, Mattern 1988) capture it completely.
 
-### Write Path Optimization: LSM-Trees vs. B-Trees
+Each process i maintains a vector V of length n (one entry per process). Rules:
 
-The two dominant storage structures in distributed databases reflect different optimization targets.
+- **Local event**: `V[i] += 1`
+- **Send**: `V[i] += 1`, attach entire `V` to message
+- **Receive** message with vector `W`: `V[j] = max(V[j], W[j])` for all j, then `V[i] += 1`
 
-**B-Trees** (Bayer & McCreight, 1972) maintain sorted data in fixed-size pages (typically 4–16 KB). An update is an in-place write to a page. Random writes to spinning disks are expensive because the disk head must seek; on SSDs, random writes cause write amplification through the flash translation layer. B-Trees are optimal for read-heavy workloads with large individual records.
+**Causality detection**:
+- `V_a < V_b` (a → b) iff `V_a[i] ≤ V_b[i]` for all i, with at least one strict inequality
+- `V_a || V_b` (concurrent) iff neither `V_a < V_b` nor `V_b < V_a`
 
-**Log-Structured Merge-Trees (LSM-Trees)** (O'Neil et al., 1996) convert random writes into sequential writes by buffering mutations in a memory-resident structure (MemTable in RocksDB/LevelDB) and flushing it to immutable sorted files (SSTables) on disk. Background **compaction** merges SSTables, reclaims space from deleted/updated records, and maintains the invariant that files are sorted and non-overlapping within a level. LSM-Trees dominate write-heavy workloads (Cassandra, RocksDB, HBase, InfluxDB).
+```python
+# vector_clock.py — complete implementation
+from __future__ import annotations
+import threading
+from copy import deepcopy
+from dataclasses import dataclass, field
+from typing import NamedTuple
 
-Write amplification in LSM-Trees is the ratio of bytes written to disk versus bytes of user data written. In level-based compaction (LevelDB/RocksDB default), write amplification is O(L × R) where L is the number of levels and R is the size ratio between levels. With R=10 and L=6, write amplification can reach 30–50×, which matters for SSD endurance. **FIFO compaction** and **TWCS** (Time-Window Compaction Strategy in Cassandra) reduce write amplification for time-series workloads by exploiting TTL patterns.
 
-```mermaid
-graph TD
-    subgraph "LSM-Tree Write Path"
-        W[Client Write] --> WAL[Write-Ahead Log\nsequential append]
-        WAL --> MT[MemTable\nin-memory sorted skip list]
-        MT -->|flush when full ~64MB| L0[Level-0 SSTables\nsorted, possibly overlapping]
-        L0 -->|compaction| L1[Level-1 SSTables\n≤10MB total, non-overlapping]
-        L1 -->|compaction| L2[Level-2 SSTables\n≤100MB total]
-        L2 -->|compaction| L
+class VectorTimestamp(NamedTuple):
+    """Immutable snapshot of a vector clock."""
+    vector: tuple[int, ...]
+    process_id: int
+
+    def happens_before(self, other: VectorTimestamp) -> bool:
+        """Returns True if self → other (self happens before other)."""
+        v1, v2 = self.vector, other.vector
+        if len(v1) != len(v2):
+            raise ValueError("Vector clocks of different sizes are incomparable")
+        # all components ≤ and at least one strictly <
+        return (all(v1[i] <= v2[i] for i in range(len(v1))) and
+                any(v1[i] < v2[i] for i in range(len(v1))))
+
+    def concurrent_with(self, other: VectorTimestamp) -> bool:
+        """Returns True if self || other (events are concurrent)."""
+        return (not self.happens_before(other) and
+                not other.happens_before(self))
+
+    def __str__(self) -> str:
+        return f"[{', '.join(str(v) for v in self.vector)}]"
+
+
+class VectorClock:
+    """
+    Thread-safe vector clock for a single process.
+    
+    Args:
+        process_id: This process's index in the vector (0-based)
+        num_processes: Total number of processes in the system
+    """
+
+    def __init__(self, process_id: int, num_processes: int):
+        if process_id < 0 or process_id >= num_processes:
+            raise ValueError(f"process_id {process_id} out of range [0, {num_processes})")
+        self.process_id = process_id
+        self.num_processes = num_processes
+        self._vector: list[int] = [0] * num_processes
+        self._lock = threading.Lock()
+
+    def tick(self) -> VectorTimestamp:
+        """Increment own component for a local event."""
+        with self._lock:
+            self._vector[self.process_id] += 1
+            return VectorTimestamp(tuple(self._vector), self.process_id)
+
+    def send(self) -> VectorTimestamp:
+        """Prepare timestamp for outgoing message."""
+        return self.tick()
+
+    def receive(self, remote_vector: tuple[int, ...]) -> VectorTimestamp:
+        """
+        Merge remote vector and increment own component.
+        V[j] = max(V[j], W[j]) for all j, then V[i] += 1
+        """
+        with self._lock:
+            if len(remote_vector) != self.num_processes:
+                raise ValueError("Remote vector has wrong length")
+            for j in range(self.num_processes):
+                self._vector[j] = max(self._vector[j], remote_vector[j])
+            self._vector[self.process_id] += 1
+            return VectorTimestamp(tuple(self._vector), self.process_id)
+
+    def snapshot(self) -> VectorTimestamp:
+        with self._lock:
+            return VectorTimestamp(tuple(self._vector), self.process_id)
+
+
+@dataclass
+class VectorMessage:
+    sender_id: int
+    payload: object
+    vector: tuple[int, ...]
+
+
+def demonstrate_vector_clocks():
+    """
+    Demonstrate causality detection with vector clocks.
+    
+    Three processes, four messages, showing concurrent events.
+    """
+    n = 3
+    clocks = [VectorClock(i, n) for i in range(n)]
+    events: dict[str, VectorTimestamp] = {}
+
+    # P0: event a
+    events["a"] = clocks[0].tick()
+    print(f"a (P0 local):      {events['a']}")
+
+    # P0 sends to P1
+    send_ts = clocks[0].send()
+    msg_0_to_1 = VectorMessage(0, "hello", send_ts.vector)
+    events["send_0_1"] = send_ts
+    print(f"send(P0→P1):       {events['send_0_1']}")
+
+    # P1 receives
+    events["recv_0_1"] = clocks[1].receive(msg_0_to_1.vector)
+    print(f"recv(P0→P1 at P1): {events['recv_0_1']}")
+
+    # P2: independent event

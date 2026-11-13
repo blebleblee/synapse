@@ -47,7 +47,7 @@ This is a crucial invariant: running a container with a User namespace does not 
 
 ```mermaid
 graph LR
-    subgraph "Attack Vectors"
+    subgraph sub_attack_vectors ["Attack Vectors"]
         V1["Image Layer<br/>Vulnerable libraries,<br/>backdoors, rootkits"]
         V2["Runtime Layer<br/>runc/containerd bugs<br/>(CVE-2019-5736)"]
         V3["Kernel Layer<br/>Namespace/cgroup bugs<br/>(CVE-2022-0847)"]
@@ -55,7 +55,7 @@ graph LR
         V5["Supply Chain<br/>Compromised CI/CD,<br/>dependency confusion"]
     end
 
-    subgraph "Defense Controls"
+    subgraph sub_defense_controls ["Defense Controls"]
         D1["Image Scanning,<br/>Signing, SBOM"]
         D2["Runtime Updates,<br/>Rootless Containers"]
         D3["Kernel Patching,<br/>Kata Containers"]
@@ -895,18 +895,18 @@ Modern container platforms integrate threat detection with automated response th
 
 ```mermaid
 flowchart LR
-    subgraph "Detection"
+    subgraph sub_detection ["Detection"]
         F["Falco / Tetragon<br/>(eBPF)"]
         S["Syscall Stream"]
         S --> F
     end
 
-    subgraph "Routing"
+    subgraph sub_routing ["Routing"]
         W["Falcosidekick<br/>(webhook multiplexer)"]
         F -->|"JSON alert"| W
     end
 
-    subgraph "Response Automation"
+    subgraph sub_response_automation ["Response Automation"]
         R["Response Controller<br/>(Go service)"]
         W --> R
         R -->|"delete pod"| K["Kubernetes API"]
@@ -914,7 +914,7 @@ flowchart LR
         R -->|"write forensics"| FS["Object Storage<br/>(S3/GCS)"]
     end
 
-    subgraph "Notification"
+    subgraph sub_notification ["Notification"]
         W -->|"async"| SL["Slack / PagerDuty"]
         W -->|"async"| SI["SIEM<br/>(Splunk/ELK)"]
     end
@@ -1118,12 +1118,12 @@ Scanning occurs at multiple pipeline stages:
 
 ```mermaid
 flowchart LR
-    subgraph "Development"
+    subgraph sub_development ["Development"]
         D1["Developer Workstation<br/>(trivy fs .)"]
         D2["Pre-commit Hook<br/>(secret scanning)"]
     end
 
-    subgraph "CI Pipeline"
+    subgraph sub_ci_pipeline ["CI Pipeline"]
         C1["Build Stage<br/>(docker build)"]
         C2["Scan Stage<br/>(trivy image)"]
         C3["Attest Stage<br/>(cosign attest)"]
@@ -1134,14 +1134,14 @@ flowchart LR
         C3 --> C4
     end
 
-    subgraph "Registry"
+    subgraph sub_registry ["Registry"]
         R1["Harbor / ECR / GAR<br/>with signing verification"]
         R2["Continuous Rescan<br/>(new CVEs on existing images)"]
         C4 --> R1
         R1 --> R2
     end
 
-    subgraph "Admission"
+    subgraph sub_admission ["Admission"]
         A1["Kubernetes Admission Webhook<br/>(Kyverno / Cosign verify)"]
         A2["Reject unsigned or<br/>policy-failing images"]
         R1 -->|"deploy"| A1
@@ -1342,7 +1342,7 @@ Zero-trust security rejects the perimeter security model. No entity (user, servi
 
 ```mermaid
 graph TD
-    subgraph "Zero-Trust Control Layers"
+    subgraph sub_zero_trust_control_layers ["Zero-Trust Control Layers"]
         L1["Identity: SPIFFE/SPIRE SVIDs<br/>mTLS between all services<br/>(Istio / Cilium Mesh)"]
         L2["Authorization: RBAC + OPA<br/>Per-request policy enforcement<br/>(Kubernetes RBAC + Istio AuthorizationPolicy)"]
         L3["Network: Default-deny NetworkPolicy<br/>Encrypted at L4 (mTLS) and L7<br/>(Cilium eBPF + Envoy)"]

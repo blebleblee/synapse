@@ -1,4 +1,3 @@
-```markdown
 # Operational Verification Labs: Core
 
 ## Conceptual Foundation

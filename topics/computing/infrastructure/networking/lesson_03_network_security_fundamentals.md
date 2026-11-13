@@ -472,7 +472,7 @@ HTTP/2 multiplexes multiple streams over a single TLS/TCP connection, but TCP's 
 
 ```mermaid
 graph LR
-    subgraph "HTTP/2 over TLS/TCP"
+    subgraph sub_http_2_over_tls_tcp ["HTTP/2 over TLS/TCP"]
         A1["Stream 1 (blocked)"] --> TCP1["TCP\n(HoL blocked on lost packet)"]
         A2["Stream 2 (blocked)"] --> TCP1
         A3["Stream 3 (blocked)"] --> TCP1
@@ -480,7 +480,7 @@ graph LR
         TLS1 --> IP1["IP"]
     end
 
-    subgraph "HTTP/3 over QUIC"
+    subgraph sub_http_3_over_quic ["HTTP/3 over QUIC"]
         B1["Stream 1"] --> QUIC1["QUIC Stream 1\n(independent)"]
         B2["Stream 2"] --> QUIC2["QUIC Stream 2\n(independent)"]
         B3["Stream 3"] --> QUIC3["QUIC Stream 3\n(independent)"]
@@ -1133,21 +1133,21 @@ Every implementation decision in a secure communication system should trace back
 
 ```mermaid
 graph LR
-    subgraph "Security Invariants"
+    subgraph sub_security_invariants ["Security Invariants"]
         C["Confidentiality"]
         I["Integrity"]
         A["Authentication"]
         NR["Non-Repudiation"]
     end
 
-    subgraph "Cryptographic Primitives"
+    subgraph sub_cryptographic_primitives ["Cryptographic Primitives"]
         AEAD["AES-256-GCM\nChaCha20-Poly1305\n(AEAD)"]
         ECDH["X25519 ECDH\n(key exchange)"]
         SIG["ECDSA P-256\nEd25519\n(signatures)"]
         HKDF2["HKDF-SHA256\n(key derivation)"]
     end
 
-    subgraph "Protocol Mechanisms"
+    subgraph sub_protocol_mechanisms ["Protocol Mechanisms"]
         TLS13["TLS 1.3\nHandshake"]
         CT2["Certificate\nTransparency"]
         RPKI2["RPKI / ROV\n(BGP security)"]

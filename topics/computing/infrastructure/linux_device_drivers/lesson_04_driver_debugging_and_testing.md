@@ -1,4 +1,3 @@
-```markdown
 # Lesson 4: Driver Debugging and Testing
 
 ## First-Principles Architecture: What You Are Actually Debugging
@@ -47,21 +46,21 @@ The sysfs-visible device tree reflects a true ownership hierarchy rooted at the 
 
 ```mermaid
 graph TD
-    subgraph "Kernel Object Hierarchy"
+    subgraph sub_kernel_object_hierarchy ["Kernel Object Hierarchy"]
         K["struct kobject (kobj)"]
         K --> B["struct bus_type\n(pci_bus_type, usb_bus_type)"]
         K --> D["struct device\n(parent, bus, driver_data)"]
         K --> DR["struct device_driver\n(name, bus, probe, remove)"]
     end
 
-    subgraph "PCI Example"
+    subgraph sub_pci_example ["PCI Example"]
         B --> PB["pci_bus_type"]
         DR --> PD["struct pci_driver\n(id_table, probe, remove)"]
         D --> PDE["struct pci_dev\n(vendor, device, irq, resource[])"]
         PD -->|"match via id_table"| PDE
     end
 
-    subgraph "sysfs Projection"
+    subgraph sub_sysfs_projection ["sysfs Projection"]
         PDE --> SYS["/sys/bus/pci/devices/0000:00:1f.2/"]
         PD --> SYSDR["/sys/bus/pci/drivers/ahci/"]
     end

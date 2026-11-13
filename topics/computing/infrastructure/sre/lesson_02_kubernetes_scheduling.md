@@ -166,7 +166,7 @@ The scheduler maintains three internal queues:
 
 ```mermaid
 graph LR
-    subgraph "Scheduling Queue"
+    subgraph sub_scheduling_queue ["Scheduling Queue"]
         A["activeQ<br/>(min-heap by priority)"] --> B["Scheduling cycle"]
         B -->|"Scheduling fails"| C["backoffQ<br/>(exponential backoff)"]
         B -->|"Unschedulable: no node can fit"| D["unschedulableQ"]

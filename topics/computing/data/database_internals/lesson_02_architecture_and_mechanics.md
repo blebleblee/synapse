@@ -65,12 +65,12 @@ MySQL runs as a single `mysqld` process. Each client connection is serviced by a
 ```mermaid
 graph TD
     MD["mysqld Process<br/>(single OS process)"]
-    subgraph "Server Layer Threads"
+    subgraph sub_server_layer_threads ["Server Layer Threads"]
         TH1["Connection Thread 1"]
         TH2["Connection Thread 2"]
         THN["Connection Thread N"]
     end
-    subgraph "InnoDB Internal Threads"
+    subgraph sub_innodb_internal_threads ["InnoDB Internal Threads"]
         MT["Master Thread<br/>(checkpoint, purge, flush)"]
         PT["Purge Thread(s)<br/>(remove deleted records)"]
         PC["Page Cleaner Thread(s)<br/>(flush dirty pages)"]
@@ -227,7 +227,7 @@ The replacement algorithm determines which page to evict when the buffer pool is
 
 ```mermaid
 graph LR
-    subgraph "PostgreSQL CLOCK Algorithm"
+    subgraph sub_postgresql_clock_algorithm ["PostgreSQL CLOCK Algorithm"]
         direction TB
         N1["Buffer 0<br/>usage_count=3"]
         N2["Buffer 1<br/>usage_count=0 ← victim"]
@@ -486,7 +486,7 @@ The original content referred to "B-trees," but production databases almost univ
 
 ```mermaid
 graph TD
-    subgraph "B+ Tree Structure"
+    subgraph sub_b__tree_structure ["B+ Tree Structure"]
         ROOT["Root Node<br/>[10 | 20 | 30]"]
         I1["Internal Node<br/>[10 | 20]"]
         I2["Internal Node<br/>[20 | 30]"]
@@ -624,7 +624,7 @@ A slotted page has four regions growing towards each other:
 
 ```mermaid
 graph LR
-    subgraph "Slotted Page Layout (8KB)"
+    subgraph sub_slotted_page_layout__8kb ["Slotted Page Layout (8KB)"]
         direction LR
         H["Page Header<br/>(40-60 bytes)"]
         S["Slot Array<br/>grows →"]
@@ -771,7 +771,7 @@ Log-Structured Merge trees (LSM trees) are the primary alternative to B+ trees f
 
 ```mermaid
 graph TD
-    subgraph "LSM Tree Architecture"
+    subgraph sub_lsm_tree_architecture ["LSM Tree Architecture"]
         W["Write / Update / Delete"] --> MEM["MemTable<br/>(in-memory sorted structure,<br/>e.g., skip list or red-black tree)"]
         MEM -->|"size threshold reached<br/>flush (sequential write)"| SST0["SSTable L0<br/>(immutable, on disk)"]
         SST0 -->|"compaction"| SST1["SSTables L1<br/>(sorted runs, non-overlapping)"]
@@ -779,7 +779,7 @@ graph TD
         SST2 -->|"compaction"| SSTN["SSTables LN<br/>(largest, oldest data)"]
     end
 
-    subgraph "Read Path"
+    subgraph sub_read_path ["Read Path"]
         R["Read / Scan"] --> MEM
         R --> BF0["Bloom Filter L0"] --> SST0
         R --> BF1["Bloom Filter L1"] --> SST1
@@ -863,7 +863,7 @@ typedef struct {
 
 ```mermaid
 graph TD
-    subgraph "WAL Protocol: Write Before Data"
+    subgraph sub_wal_protocol__write_before_data ["WAL Protocol: Write Before Data"]
         T1["Txn 100: UPDATE page P<br/>set byte at offset 40 to 0xFF"]
         R1["WAL Record<br/>LSN=500, txn=100,<br/>type=UPDATE, page=P,<br/>redo=0xFF, undo=0x00"]
         WB["WAL Buffer<br/>(in-memory, sequential)"]

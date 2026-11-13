@@ -34,13 +34,13 @@ Mathematically, we can model the information loss from a system state **s** to o
 
 ```mermaid
 graph TB
-    subgraph "System State Space"
+    subgraph sub_system_state_space ["System State Space"]
         S1["State s₁<br/>(CPU=80%, Latency=50ms)"]
         S2["State s₂<br/>(CPU=80%, Latency=500ms)"]
         S3["State s₃<br/>(CPU=20%, Latency=50ms)"]
     end
     
-    subgraph "Telemetry Projection φ"
+    subgraph sub_telemetry_projection ["Telemetry Projection φ"]
         T1["Telemetry t₁<br/>(cpu.util=0.8, p99.latency=50)"]
         T2["Telemetry t₂<br/>(cpu.util=0.8, p99.latency=500)"]
         T3["Telemetry t₃<br/>(cpu.util=0.2, p99.latency=50)"]
@@ -184,7 +184,7 @@ Metrics exhibit temporal locality and are amenable to aggressive compression. Pr
 
 ```mermaid
 graph LR
-    subgraph "Prometheus TSDB"
+    subgraph sub_prometheus_tsdb ["Prometheus TSDB"]
         A["In-Memory Head<br/>(2h, mutable)"] --> B["Write-Ahead Log<br/>(durability)"]
         A --> C["Compaction"]
         C --> D["Block 1<br/>(2h, immutable)"]
@@ -1097,24 +1097,24 @@ func (cb *CircuitBreaker) Call(fn func() error) error {
 
 ```mermaid
 graph TB
-    subgraph "Application Layer"
+    subgraph sub_application_layer ["Application Layer"]
         A1["Service A<br/>(Auto Instrumentation)"]
         A2["Service B<br/>(Manual Instrumentation)"]
         A3["Service C<br/>(eBPF Instrumentation)"]
     end
     
-    subgraph "Collection Layer"
+    subgraph sub_collection_layer ["Collection Layer"]
         C1["OpenTelemetry Collector<br/>(Stateless)"]
         C2["Tail-Based Sampling Collector<br/>(Stateful)"]
     end
     
-    subgraph "Aggregation Layer"
+    subgraph sub_aggregation_layer ["Aggregation Layer"]
         M1[("Prometheus<br/>(Metrics TSDB)")]
         L1[("Elasticsearch<br/>(Log Storage)")]
         T1[("Jaeger/Cassandra<br/>(Trace Storage)")]
     end
     
-    subgraph "Analysis Layer"
+    subgraph sub_analysis_layer ["Analysis Layer"]
         D1["Grafana<br/>(Dashboards)"]
         D2["Alertmanager<br/>(Alerting)"]
         D3["ML Pipeline<br/>(Anomaly Detection)"]

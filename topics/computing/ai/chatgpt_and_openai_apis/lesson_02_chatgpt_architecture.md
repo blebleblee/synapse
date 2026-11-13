@@ -101,7 +101,7 @@ This reduces per-step complexity from $O(n)$ to $O(1)$ (for the new token) plus 
 
 ```mermaid
 graph LR
-    subgraph "Step t: Generate token t"
+    subgraph sub_step_t__generate_token_t ["Step t: Generate token t"]
         Q_t["Query Q_t<br/>(1 token)"] --> ATTN["Attention<br/>Computation"]
         KV_cache["KV Cache<br/>(tokens 1..t-1)"] --> ATTN
         ATTN --> OUT["Output for<br/>position t"]
@@ -109,7 +109,7 @@ graph LR
         V_t["Value V_t"] --> KV_cache2
     end
 
-    subgraph "Step t+1: Generate token t+1"
+    subgraph sub_step_t_1__generate_token_t_1 ["Step t+1: Generate token t+1"]
         Q_t1["Query Q_{t+1}"] --> ATTN2["Attention<br/>Computation"]
         KV_cache3["KV Cache<br/>(tokens 1..t)"] --> ATTN2
         ATTN2 --> OUT2["Output for<br/>position t+1"]
@@ -186,18 +186,18 @@ The model's architecture is only part of the story. ChatGPT's conversational beh
 
 ```mermaid
 graph TD
-    subgraph "Stage 1: Pre-training"
+    subgraph sub_stage_1__pre_training ["Stage 1: Pre-training"]
         PT["Internet-scale text corpus"] --> PTM["Next-token prediction<br/>loss = cross-entropy"]
         PTM --> BASE["Base model<br/>(competent but not<br/>instruction-tuned)"]
     end
 
-    subgraph "Stage 2: Supervised Fine-Tuning (SFT)"
+    subgraph sub_stage_2__supervised_fine_tuning ["Stage 2: Supervised Fine-Tuning (SFT)"]
         BASE --> SFT_IN["Human-authored<br/>demonstrations<br/>(prompt → ideal response)"]
         SFT_IN --> SFT_TRAIN["Fine-tune on<br/>demonstration data"]
         SFT_TRAIN --> SFT_MODEL["SFT model<br/>(follows instructions)"]
     end
 
-    subgraph "Stage 3: RLHF"
+    subgraph sub_stage_3__rlhf ["Stage 3: RLHF"]
         SFT_MODEL --> RM_DATA["Human rankings<br/>of model outputs"]
         RM_DATA --> RM["Train Reward Model<br/>(predicts human preference)"
         RM --> PPO["PPO optimization<br/>maximize reward subject<br/>to KL penalty vs SFT"]
@@ -601,13 +601,13 @@ On the model server side, **continuous batching** (also called in-flight batchin
 
 ```mermaid
 graph TD
-    subgraph "Static Batching"
+    subgraph sub_static_batching ["Static Batching"]
         direction LR
         SA["Req A (100 tokens)"] --> SB["Batch<br/>forward pass"]
         SB --> SC["Wait for all<br/>to finish"]
     end
 
-    subgraph "Continuous Batching"
+    subgraph sub_continuous_batching ["Continuous Batching"]
         direction LR
         CA["Req A (100 tokens)"] --> CB["Step 1: generate<br/>tokens for A, B, C"]
         CB --> CC["Req A finishes at step 50"]

@@ -521,8 +521,8 @@ graph TD
 
     subgraph TensorParallel["Tensor Parallelism (Megatron-LM)"]
         TP_X["Input X"]
-        TP1["GPU 0\nW[:, 0:d/2]"]
-        TP2["GPU 1\nW[:, d/2:d]"]
+        TP1["GPU 0\nW[":, 0:d/2"]"]
+        TP2["GPU 1\nW[":, d/2:d"]"]
         TP_ALLGATHER["AllGather"]
         TP_X --> TP1 & TP2
         TP1 & TP2 --> TP_ALLGATHER

@@ -1364,4 +1364,3 @@ Exact-match cache hit: eliminates t_prefill + t_decode
 Prefix cache hit:      eliminates t_prefill for the shared prefix portion
 Semantic cache hit:    eliminates t_prefill + t_decode (same as exact-match)
 Speculative decoding:  reduces t_decode by ~(1 − 1/acceptance_rate)/γ
-```

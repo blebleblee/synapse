@@ -752,4 +752,3 @@ flowchart TD
     K -->|"No"| M["Fail to reject H₀\nReport: power, MDE,\nCI includes δ=0"]
     L --> N["Pre-register &\nreplicate"]
     M --> N
-```

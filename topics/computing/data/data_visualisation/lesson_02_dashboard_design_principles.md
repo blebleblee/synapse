@@ -52,30 +52,30 @@ The canonical dashboard architecture consists of five layers:
 
 ```mermaid
 graph TB
-    subgraph "Data Layer"
-        A["OLTP Sources<br/>(Postgres, MySQL)"] -->|CDC/ETL| B["Data Warehouse<br/>(Snowflake, BigQuery, Redshift)"]
+    subgraph sub_data_layer ["Data Layer"]
+        A["OLTP Sources<br/>(Postgres, MySQL)"] -->|"CDC/ETL"| B["Data Warehouse<br/>(Snowflake, BigQuery, Redshift)"]
         B -->|Aggregation| C["OLAP Cube/Materialized Views"]
     end
     
-    subgraph "Query Layer"
+    subgraph sub_query_layer ["Query Layer"]
         C -->|SQL| D["Query Engine<br/>(Presto, Spark SQL)"]
-        D -->|Result Set| E["Cache Layer<br/>(Redis, Memcached)"]
+        D -->|"Result Set"| E["Cache Layer<br/>(Redis, Memcached)"]
     end
     
-    subgraph "Application Layer"
+    subgraph sub_application_layer ["Application Layer"]
         E --> F["API Server<br/>(REST/GraphQL)"]
         F -->|JSON| G["Dashboard Backend"]
     end
     
-    subgraph "Presentation Layer"
-        G -->|State Management| H["Frontend Framework<br/>(React, Vue, Svelte)"]
+    subgraph sub_presentation_layer ["Presentation Layer"]
+        G -->|"State Management"| H["Frontend Framework<br/>(React, Vue, Svelte)"]
         H -->|Render| I["Visualization Library<br/>(D3.js, Plotly, Canvas)"]
         I --> J["Browser Compositor"]
     end
     
-    subgraph "Interaction Loop"
-        J -->|User Event| K["Event Handler"]
-        K -->|Filter/Query| F
+    subgraph sub_interaction_loop ["Interaction Loop"]
+        J -->|"User Event"| K["Event Handler"]
+        K -->|"Filter/Query"| F
     end
     
     style A fill:#e1f5ff

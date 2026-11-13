@@ -140,14 +140,14 @@ The logical plan is an expression tree where leaves are base relations (tables, 
 
 ```mermaid
 graph TD
-    subgraph "Before Pushdown"
+    subgraph sub_before_pushdown ["Before Pushdown"]
     J1["⋈ (orders.cust_id = customers.id)"]
     J1 --> S1["σ (status = 'shipped')"]
     J1 --> R1["customers"]
     S1 --> O1["orders"]
     end
 
-    subgraph "After Predicate Pushdown"
+    subgraph sub_after_predicate_pushdown ["After Predicate Pushdown"]
     J2["⋈ (orders.cust_id = customers.id)"]
     J2 --> S2["σ (status = 'shipped')"]
     J2 --> R2["customers"]
@@ -202,7 +202,7 @@ where B is available buffer pages. Merge join is optimal when both inputs are al
 
 ```mermaid
 graph LR
-    subgraph "Join Algorithm Decision Tree"
+    subgraph sub_join_algorithm_decision_tree ["Join Algorithm Decision Tree"]
     A["Join required"] --> B{"Inner has index\non join key?"}
     B -- "Yes + outer is small" --> C["Nested Loop Join\nO(|outer| × log|inner|)"]
     B -- "No" --> D{"Memory available\n> min(|R|,|S|)?"}
@@ -238,13 +238,13 @@ The difference in CPU efficiency is not marginal: vectorized execution achieves 
 
 ```mermaid
 graph TD
-    subgraph "Volcano Model (Row at a Time)"
+    subgraph sub_volcano_model__row_at_a_time ["Volcano Model (Row at a Time)"]
     V1["Root: next() → 1 tuple"] --> V2["Join: next() → 1 tuple"]
     V2 --> V3["Scan: next() → 1 tuple"]
     V2 --> V4["Filter: next() → 1 tuple"]
     end
 
-    subgraph "Vectorized Model (Batch at a Time)"
+    subgraph sub_vectorized_model__batch_at_a_tim ["Vectorized Model (Batch at a Time)"]
     B1["Root: next() → 8192 rows"] --> B2["Join: next() → 8192 rows"]
     B2 --> B3["ColScan: next() → 8192 int32 values\n[contiguous memory]"]
     B2 --> B4["Filter: next() → 8192 bitmask\n[SIMD-accelerated]"]
@@ -389,7 +389,7 @@ EXPLAIN SELECT * FROM orders WHERE status = 'shipped' AND created_at > '2024-01-
 
 ```mermaid
 graph TD
-    subgraph "Partitioning Taxonomy"
+    subgraph sub_partitioning_taxonomy ["Partitioning Taxonomy"]
     P["Partitioned Table"] --> R["Range Partitioning\n(e.g., created_at by month)\nGood for time-series, archival"]
     P --> L["List Partitioning\n(e.g., region IN ('US', 'EU'))\nGood for categorical sharding"]
     P --> H["Hash Partitioning\n(e.g., customer_id % N)\nGood for even distribution,\npoor for range queries"]
@@ -473,7 +473,7 @@ Modern OLAP systems achieve high throughput by parallelizing individual queries 
 
 ```mermaid
 graph TD
-    subgraph "Parallel Aggregation Plan"
+    subgraph sub_parallel_aggregation_plan ["Parallel Aggregation Plan"]
     A["Gather Merge\n(1 thread)\nFinal merge of partial aggregates"] --> B1
     A --> B2
     A --> B3
@@ -1050,7 +1050,7 @@ ORDER BY n_mod_since_analyze DESC;
 
 ```mermaid
 graph TD
-    subgraph "Optimizer Correctness Contract"
+    subgraph sub_optimizer_correctness_contract ["Optimizer Correctness Contract"]
     C1["Semantic Preservation\n(Relational Algebra Equivalence)"]
     C2["Completeness\n(No valid result row is omitted)"]
     C3["Soundness\n(No invalid row is included)"]
@@ -1060,14 +1060,14 @@ graph TD
     C3 --- C4
     end
 
-    subgraph "Optimizer Performance Goals"
+    subgraph sub_optimizer_performance_goals ["Optimizer Performance Goals"]
     P1["Minimize I/O\n(Partition pruning, covering indexes)"]
     P2["Minimize CPU\n(JIT, vectorization, predicate pushdown)"]
     P3["Minimize Memory\n(Join algorithm selection, work_mem)"]
     P4["Maximize Parallelism\n(Parallel scan, parallel hash, exchange ops)"]
     end
 
-    subgraph "Failure Modes"
+    subgraph sub_failure_modes ["Failure Modes"]
     F1["Cardinality error cascade\n→ Wrong join algorithm"]
     F2["Stale statistics\n→ Plan instability"]
     F3["Data skew\n→ Parallelism breakdown"]

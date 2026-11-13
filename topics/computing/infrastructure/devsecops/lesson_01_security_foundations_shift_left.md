@@ -1,768 +1,2641 @@
-# Lesson 1: Security Foundations, Threat Modeling, and Shift-Left Principles
+# Lesson 01 Security Foundations Shift Left
 
-## 1. First-Principles Intuition & Invariants
+## Preface
 
-Security in distributed systems emerges from a fundamental asymmetry: attackers need find only one vulnerability, while defenders must protect every surface. This imbalance is not merely strategic—it is rooted in computational universality. Any sufficiently expressive system (Turing-complete or otherwise) can be repurposed, subverted, or exploited by an adversary with enough time and capability. Shannon's maxim captures this precisely: the adversary knows the system. Security cannot depend on obscurity of mechanism; it must depend on the secrecy of keys and the correctness of access controls enforced at every boundary.
+Security in software systems is not a feature you add after the fact. It is a property that must be woven into every layer of a system from the moment a requirement is conceived. This lesson establishes the theoretical and practical foundations of DevSecOps — the discipline of integrating security controls into the continuous delivery pipeline — through the lens of *shift-left*, a principle that moves security verification as early as possible in the development lifecycle.
 
-This realization demands abandoning the illusion of perfect closure. No system is immune. The practical goal is a probabilistic risk model: quantify exposure, reduce attack surface, construct concentric defensive rings, and ensure that the cost and complexity of exploitation exceeds the attacker's resources or expected return.
+By the end of this lesson you will understand the mathematical models that underpin threat reasoning, the architectural invariants that hold across all secure systems, and the concrete toolchain implementations that enforce those invariants automatically.
 
-### 1.1 The CIA Triad: A Formal Reading
+---
 
-The classical CIA triad—Confidentiality, Integrity, Availability—provides the foundational grammar of security objectives. Mechanical interpretations of this triad produce checklists. Architectural interpretations produce systems.
+## Table of Contents
 
-**Confidentiality** transcends encryption. At its core, confidentiality is an *information flow* property: secret data must not flow to unauthorized observers, regardless of the channel. This encompasses transitive information flow—a database query result derived from sensitive rows can leak sensitive information even if the rows themselves are protected. The Bell-LaPadula model formalizes this as "no read up, no write down" across security labels, and while that lattice model is rarely deployed directly, its intuitions underpin modern mandatory access control (MAC) systems like SELinux and AppArmor. Confidentiality must hold across time (key material must not persist in logs), across privilege boundaries (a web worker should not read a payment service's secrets), and across administrative domains (multi-tenant isolation must prevent cross-tenant data access).
+1. [The Cost Model of Late Security](#1-the-cost-model-of-late-security)
+2. [First Principles: The CIA Triad and Beyond](#2-first-principles-the-cia-triad-and-beyond)
+3. [Threat Modeling from First Principles](#3-threat-modeling-from-first-principles)
+4. [The Shift-Left Continuum](#4-the-shift-left-continuum)
+5. [Static Analysis and SAST](#5-static-analysis-and-sast)
+6. [Dependency and SCA Scanning](#6-dependency-and-sca-scanning)
+7. [Secret Detection and Prevention](#7-secret-detection-and-prevention)
+8. [Policy as Code](#8-policy-as-code)
+9. [Container and Infrastructure Security](#9-container-and-infrastructure-security)
+10. [The Secure Pipeline: End-to-End Implementation](#10-the-secure-pipeline-end-to-end-implementation)
+11. [Measuring Security Posture](#11-measuring-security-posture)
+12. [Exercises and Further Reading](#12-exercises-and-further-reading)
 
-**Integrity** extends beyond checksums to encompass the stronger property that data remains unmodified by unauthorized principals *and* that cryptographic commitments remain verifiable under active adversaries. The Biba Integrity Model formalizes this as the dual of Bell-LaPadula: "no write up, no read down." In practice, integrity failures are often more damaging than confidentiality failures. An attacker who can modify a software artifact, a configuration file, or a database record may achieve arbitrary code execution or privilege escalation, turning an integrity violation into a full compromise. Integrity guarantees require both authenticity (data came from the claimed source) and freshness (data has not been replayed from a previous state), typically provided together by authenticated encryption with associated data (AEAD) schemes and monotonic sequence counters or timestamps.
+---
 
-**Availability** guarantees that legitimate principals can access resources within defined time bounds even under resource exhaustion, link saturation, or coordinated denial. Availability is frequently the most difficult objective to reason about formally because it involves real-time and liveness properties that are categorically harder to verify than safety properties. A system that is simply slow may be functionally unavailable even without complete outage. Availability threats include volumetric denial-of-service attacks, algorithmic complexity attacks (hash-flooding, ReDoS), resource exhaustion through malformed inputs, and dependency failures that propagate through the call graph.
+## 1. The Cost Model of Late Security
 
-These three objectives operate in fundamental tension, and the tension is not merely theoretical:
+### 1.1 The IBM / NIST Exponential Relationship
 
-- Perfect confidentiality achieved through complete network isolation sacrifices availability for every legitimate remote user.
-- Maximum availability through permissive access controls compromises both confidentiality and integrity.
-- Strong integrity guarantees through append-only audit logs and immutable storage create operational challenges for availability during failure recovery.
+The empirical observation that drives shift-left is economic. The cost to remediate a defect scales exponentially with the phase in which it is discovered. Let the lifecycle phases be an ordered set:
 
-Security architecture demands explicit tradeoff analysis within your domain's specific threat model. There is no universal correct balance; there is only the balance appropriate for your assets, your adversaries, and your operational context.
-
-```mermaid
-graph TD
-    subgraph "CIA Triad Tensions"
-        C["Confidentiality<br/>(restrict access)"]
-        I["Integrity<br/>(prevent tampering)"]
-        A["Availability<br/>(ensure access)"]
-    end
-
-    C -- "Isolation reduces<br/>access surface" --> A
-    A -- "Broad access<br/>weakens controls" --> C
-    I -- "Immutability complicates<br/>recovery" --> A
-    A -- "Fast-path bypasses<br/>weaken checks" --> I
-    C -- "Encryption provides<br/>tamper evidence" --> I
-    I -- "Verification overhead<br/>adds latency" --> C
-
-    style C fill:#1a3a5c,color:#fff
-    style I fill:#1a5c3a,color:#fff
-    style A fill:#5c3a1a,color:#fff
+```
+P = { requirements, design, implementation, testing, staging, production }
 ```
 
-### 1.2 Adversary Models and Threat Classification
+Define a remediation cost function `C(p)` for phase `p ∈ P`. Empirical studies across NASA, IBM, and NIST consistently show:
 
-A threat model formally specifies adversary capabilities. Without a concrete adversary model, security analysis produces untargeted controls that defend against nothing in particular and consume resources that could address real risks.
+```
+C(pₙ) ≈ C(p₀) · 10^n
+```
 
-Information security classifies adversaries along several axes:
+Where `p₀` is the requirements phase and `pₙ` is the nth subsequent phase. A defect that costs $80 to fix at the requirements phase costs approximately $7,600 to fix in production.
 
-**By network position:**
-- *Passive network adversary*: Observes packets in transit without modification. Defeated by encryption alone (TLS, WireGuard). This is the weakest meaningful adversary.
-- *Active network adversary* (Dolev-Yao model): Can intercept, modify, inject, replay, and drop packets on any network link. Defeated by authenticated encryption with replay protection (nonces, sequence numbers). TLS 1.3 and WireGuard assume this adversary model.
-- *On-path adversary* (formerly "man-in-the-middle"): Controls a router or ISP link on the path between two endpoints. Certificate pinning, HSTS preloading, and DNSSEC/DoH partially address this.
+This is not merely about monetary cost. It captures:
 
-**By system access:**
-- *Remote code execution adversary*: Can execute arbitrary code in a sandboxed context (browser tab, container, restricted process). Defeated by privilege separation, namespaces, seccomp filtering, and capability dropping.
-- *Local privilege escalation adversary*: Has unprivileged code execution on the target machine and seeks to reach root or kernel. Defeated by kernel hardening (SMEP, SMAP, KASLR, kernel lockdown), mandatory access control, and timely patching.
-- *Privileged adversary*: Possesses root or kernel access. Defeating this adversary requires hardware roots of trust (TPM, secure enclave), remote attestation, and audit trails to external immutable sinks.
+- **Engineer hours**: context reconstruction, root-cause analysis, regression scope
+- **Blast radius**: a production vulnerability may already have been exploited
+- **Reputation**: public CVEs, breach disclosures, regulatory fines (GDPR Article 83: up to 4% of global annual turnover)
 
-**By trust relationship:**
-- *Supply-chain adversary*: Injects malicious code into upstream dependencies, build tools, or CI/CD infrastructure. SolarWinds (2020), XZ Utils backdoor (2024), and the event-stream npm compromise are canonical examples. Defeated by dependency pinning with cryptographic hashes, reproducible builds, Software Bill of Materials (SBOM) generation with attestation, and binary artifact signing (Sigstore/cosign).
-- *Insider adversary*: Abuses legitimate credentials and system access. Defeated by least privilege, privileged access workstations (PAWs), just-in-time access, session recording, and anomaly detection on access patterns.
+### 1.2 Formal Definition of a Security Defect
 
-Each threat model demands different defensive strategies. A system designed exclusively to defeat a passive network adversary—encrypted at the transport layer but with no supply-chain controls—may prove entirely inadequate against a compromised dependency delivering a reverse shell with the first legitimate install. Security cost scales with the breadth of threats you must defend against, which is why threat modeling must precede control selection rather than follow it.
+A security defect is a triple `(A, V, I)` where:
 
-### 1.3 The Shift-Left Imperative: Economics and Architecture
+- `A` is an **asset** with associated value `v(A) ∈ ℝ⁺`
+- `V` is a **vulnerability** — a exploitable flaw in the system's behavior
+- `I` is an **impact** function `I: (A, V) → ℝ⁺` mapping asset-vulnerability pairs to expected loss
 
-Shift-left is not a philosophy of risk aversion—it is a discipline grounded in the economics of defect remediation. The IBM Systems Science Institute's data on defect cost multiplication (reproduced by NIST and refined by numerous studies) demonstrates that the cost of fixing a security vulnerability grows roughly one to two orders of magnitude for each lifecycle phase it traverses:
+The **risk** of a defect is:
 
-| Discovery Phase | Relative Cost | Remediation Window |
+```
+R(A, V) = P(exploit | V) · I(A, V)
+```
+
+Where `P(exploit | V)` is the probability of exploitation given the vulnerability exists. Shift-left is a strategy to minimize `∑ R(Aᵢ, Vᵢ)` by reducing `P(exploit | V)` through early elimination of `V`, before it can reach a reachable attack surface.
+
+### 1.3 The Attack Surface Integral
+
+The total attack surface of a system at time `t` can be modeled as:
+
+```
+S(t) = ∫₀ᵗ [ dE(τ)/dτ - dR(τ)/dτ ] dτ
+```
+
+Where:
+- `dE(τ)/dτ` is the rate of exposure growth (new features, new endpoints, new dependencies)
+- `dR(τ)/dτ` is the rate of remediation
+
+DevSecOps seeks to maintain `dR(τ)/dτ ≥ dE(τ)/dτ` at all times, keeping the integral bounded. Without automated security gates in the pipeline, `dR` asymptotically approaches zero as the team scales (human review bandwidth is fixed), while `dE` grows linearly with engineer count. This is the fundamental mathematical argument for automation.
+
+---
+
+## 2. First Principles: The CIA Triad and Beyond
+
+### 2.1 Confidentiality, Integrity, Availability
+
+Every security control maps to at least one of three invariants:
+
+**Confidentiality**: For all subjects `s` and objects `o`, if subject `s` is not authorized to read object `o`, then `s` cannot obtain the value of `o`.
+
+Formally, using Bell-LaPadula notation:
+```
+∀s ∈ S, ∀o ∈ O: ¬authorized(s, read, o) → ¬can_obtain(s, value(o))
+```
+
+**Integrity**: The value of an object `o` can only be modified by authorized transformations.
+```
+∀s ∈ S, ∀o ∈ O: value(o, t₂) ≠ value(o, t₁) → ∃s: authorized(s, write, o) ∧ acted(s, t₁, t₂)
+```
+
+**Availability**: Authorized subjects can access authorized objects within acceptable latency bounds.
+```
+∀s ∈ S, ∀o ∈ O, ∀t ∈ T: authorized(s, read, o) → response_time(s, o, t) ≤ SLA
+```
+
+### 2.2 Extended Properties: STRIDE Mapping
+
+The STRIDE threat model (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) maps to CIA extensions:
+
+| STRIDE Threat | Violated Property | Countermeasure Category |
 |---|---|---|
-| Design / Architecture | 1× | Hours; change a diagram |
-| Code Review / Static Analysis | 10× | Hours; change a few lines |
-| Integration Testing | 100× | Days; change, test, re-integrate |
-| Staging / QA | 500× | Days to weeks; regression risk |
-| Production (post-incident) | 1,000×+ | Weeks; incident response, forensics, potential data breach notification |
+| Spoofing | Authentication | Identity verification, MFA, certificate pinning |
+| Tampering | Integrity | HMAC, digital signatures, WAF |
+| Repudiation | Non-repudiation | Audit logs, signed tokens, HSM-backed signing |
+| Information Disclosure | Confidentiality | Encryption at rest/transit, RBAC, data masking |
+| Denial of Service | Availability | Rate limiting, circuit breakers, autoscaling |
+| Elevation of Privilege | Authorization | Principle of least privilege, capability systems |
 
-These multipliers are not merely financial. A vulnerability discovered in code review costs one developer an hour. The same vulnerability discovered during a production incident involves incident commanders, security engineers, legal counsel, communications teams, potentially regulatory notification, and customer trust damage that does not appear on any line item.
+### 2.3 The Principle of Least Privilege (PoLP)
 
-Shift-left embeds security analysis, threat modeling, and automated detection into development's earliest phases:
+Formally, for every subject `s` with capability set `Caps(s)`, PoLP states:
 
-```mermaid
-flowchart LR
-    subgraph "Traditional (Shift-Right)"
-        T1[Code] --> T2[Build] --> T3[Test] --> T4[Deploy] --> T5[🔒 Security Gate]
-        style T5 fill:#8B0000,color:#fff
-    end
-
-    subgraph "Shift-Left DevSecOps"
-        S0[🔒 Threat Model] --> S1[Code + SAST]
-        S1 --> S2[Build + SCA + Secrets Scan]
-        S2 --> S3[Test + DAST + IaC Scan]
-        S3 --> S4[Deploy + Policy Enforcement]
-        S4 --> S5[Prod + Runtime Detection]
-        style S0 fill:#003366,color:#fff
-        style S1 fill:#004d00,color:#fff
-        style S2 fill:#004d00,color:#fff
-        style S3 --> S4
-    end
+```
+Caps(s) = min{ C ⊆ AllCaps : task(s) can be completed using C }
 ```
 
-The critical architectural insight is that shift-left requires security controls to be *machine-readable and automatable*. A security review that lives only in a human reviewer's memory cannot be enforced in a CI pipeline. Threat model artifacts must exist as version-controlled documents that evolve with the system. Policy must be expressed in code (Open Policy Agent, Cedar, Sentinel) so it can be tested and enforced programmatically. This is what distinguishes DevSecOps from "DevOps with a security person in the room."
+This is a minimization over capability sets. Any capability granted beyond this minimum is a potential privilege escalation vector. In practice, PoLP manifests as:
 
-### 1.4 Defense-in-Depth: The Multiplicative Security Model
+- Service accounts with scoped IAM roles (not `AdministratorAccess`)
+- Container processes running as non-root UIDs
+- Database users with table-level, not database-level, grants
+- API tokens scoped to specific operations
 
-Defense-in-depth recognizes that no single security control achieves perfection. Every control has failure modes: cryptographic keys can be compromised, authentication systems bypassed, firewalls misconfigured, logging pipelines disabled. Defense-in-depth architectures assume individual controls *will* fail and design overlapping, independent layers such that compromising the system requires compromising multiple layers simultaneously.
+### 2.4 Defense in Depth
 
-The mathematics are compelling. If we model each independent control layer as having probability *p* of being bypassed by a given attack:
+Defense in depth is the architectural invariant that no single control failure should lead to full system compromise. It can be modeled as a layered probability product:
 
-- Single layer, *p* = 0.1: Attack success probability = 10%
-- Two independent layers: *p²* = 1%  
-- Three independent layers: *p³* = 0.1%
-- Four independent layers: *p⁴* = 0.01%
-
-The word "independent" is load-bearing. Defense-in-depth fails when controls share failure modes. Two firewall rules enforced by the same process provide no depth—a process compromise bypasses both. TLS termination and application-layer authorization implemented in the same service provide no depth against a vulnerability in that service. True independence requires different codebases, different trust roots, different administrative boundaries, and different failure modes.
-
-A concrete defense-in-depth stack for a web application illustrates layered independence:
-
-```mermaid
-graph TB
-    Internet["Internet (untrusted)"]
-
-    subgraph "Layer 1: Network Perimeter"
-        WAF["WAF + DDoS Mitigation<br/>(Cloudflare, AWS Shield)"]
-        FW["Stateful Firewall<br/>(Security Groups, NACLs)"]
-    end
-
-    subgraph "Layer 2: Workload Isolation"
-        LB["Load Balancer<br/>(TLS termination)"]
-        NS["Kubernetes NetworkPolicy<br/>(East-West traffic control)"]
-    end
-
-    subgraph "Layer 3: Application Controls"
-        AUTH["Authentication + AuthZ<br/>(OAuth2 / OIDC / RBAC)"]
-        INPUT["Input Validation + Schema Enforcement"]
-        RL["Rate Limiting + Quotas"]
-    end
-
-    subgraph "Layer 4: Data Controls"
-        DAL["ORM / Parameterized Queries<br/>(SQLi prevention)"]
-        ENC["Encryption at Rest<br/>(AES-256-GCM, KMS-managed keys)"]
-        MASK["Data Masking + Field-Level Encryption"]
-    end
-
-    subgraph "Layer 5: Detection & Response"
-        LOG["Immutable Audit Logs<br/>(shipped to external SIEM)"]
-        IDS["Runtime Anomaly Detection<br/>(Falco, GuardDuty)"]
-        ALERT["Alerting + Incident Response Runbooks"]
-    end
-
-    Internet --> WAF --> FW --> LB --> NS --> AUTH --> INPUT --> RL --> DAL --> ENC --> MASK
-    DAL --> LOG
-    AUTH --> LOG
-    LOG --> IDS --> ALERT
-
-    style Internet fill:#8B0000,color:#fff
+```
+P(full_compromise) = ∏ᵢ P(bypass_layer_i)
 ```
 
-Each layer operates on different assumptions, is administered by different teams, and fails independently. An attacker who bypasses the WAF still faces network policies, then application authentication, then parameterized queries, then encrypted storage, and their lateral movement is detected by runtime anomaly detection before they can exfiltrate data.
+If each of `n` independent layers has a bypass probability of `p`, then:
 
-### 1.5 Least Privilege: Mathematical Bounds on Blast Radius
-
-Least privilege operationalizes defense-in-depth for access control. Every principal—user, service, process, or system—receives the minimum permissions necessary to perform its function and no more.
-
-The formal guarantee is a bound on blast radius: if a principal is compromised, the damage is bounded by the capabilities in its permission set. A microservice with read-only access to a single database table cannot exfiltrate data from other tables, cannot modify records, and cannot pivot to other services it has no credentials for. A worker process running without ambient network access cannot establish command-and-control channels to external infrastructure. This transforms a potential full breach into a constrained, contained compromise.
-
-Least privilege is frequently abandoned in practice because it imposes operational friction. This is not a cultural failure—it is a systems design failure. When the least-privilege path requires filing a ticket, waiting for approval, debugging opaque permission errors, and finding workarounds, engineers will choose the path of least resistance: broad permissions. The solution is to make least privilege the path of least resistance through tooling:
-
-- **Just-in-Time (JIT) access**: Tools like HashiCorp Boundary, AWS IAM Identity Center, and Teleport provision short-lived, narrowly-scoped credentials on demand, with the request-to-credential latency measured in seconds rather than days.
-- **Dynamic secrets**: HashiCorp Vault and AWS Secrets Manager with rotation generate database credentials with a TTL of hours or minutes. A leaked credential is self-expiring.
-- **Capability-based security in containers**: Docker's `--cap-drop=ALL --cap-add=NET_BIND_SERVICE` pattern and Kubernetes' `securityContext.capabilities` drop all Linux capabilities by default and add only those required. This is preferable to `privileged: true`, which re-grants the full capability set.
-- **IAM policy generation from access logs**: Tools like AWS IAM Access Analyzer, Cloudsplaining, and `kubectl-who-can` analyze actual access patterns and generate minimally-scoped policies automatically.
-
-The following example demonstrates a production-grade AWS IAM policy applying least privilege for a service that must only read objects from a specific S3 prefix and publish to a specific SNS topic. Note the use of explicit deny conditions to prevent privilege escalation and constrain the scope further than the allow statements alone:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowS3ReadFromSpecificPrefix",
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectAttributes"
-      ],
-      "Resource": "arn:aws:s3:::my-bucket/invoices/*",
-      "Condition": {
-        "StringEquals": {
-          "s3:ExistingObjectTag/classification": "internal"
-        }
-      }
-    },
-    {
-      "Sid": "AllowSNSPublishToSpecificTopic",
-      "Effect": "Allow",
-      "Action": "sns:Publish",
-      "Resource": "arn:aws:sns:us-east-1:123456789012:invoice-events"
-    },
-    {
-      "Sid": "DenyS3DeleteUnderAllConditions",
-      "Effect": "Deny",
-      "Action": [
-        "s3:DeleteObject",
-        "s3:DeleteObjectVersion"
-      ],
-      "Resource": "arn:aws:s3:::my-bucket/*"
-    },
-    {
-      "Sid": "DenyPrivilegeEscalation",
-      "Effect": "Deny",
-      "Action": [
-        "iam:CreatePolicyVersion",
-        "iam:SetDefaultPolicyVersion",
-        "iam:AttachUserPolicy",
-        "iam:AttachRolePolicy",
-        "iam:PutUserPolicy",
-        "iam:PutRolePolicy",
-        "sts:AssumeRole"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
+```
+P(full_compromise) = pⁿ
 ```
 
-The explicit deny on privilege escalation APIs is essential. Without it, a service with `iam:AttachRolePolicy` can grant itself `AdministratorAccess`, defeating least privilege entirely.
+For `p = 0.1` and `n = 4`: `P(full_compromise) = 0.0001` — a 10,000x improvement over a single layer. This independence assumption requires that layers use different technologies, different codebases, and different trust boundaries, which is why a WAF, an application-level input validation, a parameterized query layer, and a database firewall together are more effective than four WAF rules alone.
 
-### 1.6 Security Boundaries and Trust Domains
+---
 
-Security boundaries define trust perimeters—lines separating assets you own and control from entities with different trust levels. These boundaries exist at every layer of the system stack, and each boundary requires its own controls.
+## 3. Threat Modeling from First Principles
 
-```mermaid
-graph TD
-    subgraph "Trust Domain 0: Internet (Untrusted)"
-        EXT["External Clients, APIs, Webhooks"]
-    end
+### 3.1 The STRIDE-per-Element Method
 
-    subgraph "Trust Domain 1: DMZ / Edge"
-        CDN["CDN / Load Balancer"]
-        WAF2["WAF / API Gateway"]
-    end
+Threat modeling is systematic enumeration of potential security defects at the design phase. It operates on a Data Flow Diagram (DFD) and applies STRIDE to each element.
 
-    subgraph "Trust Domain 2: Application Tier"
-        SVC_A["Service A<br/>(User-facing)"]
-        SVC_B["Service B<br/>(Internal)"]
-    end
+A DFD element set `E` consists of:
+- **External entities** (users, external systems)
+- **Processes** (code that transforms data)
+- **Data stores** (databases, files, caches)
+- **Data flows** (communication channels between elements)
 
-    subgraph "Trust Domain 3: Data Tier"
-        DB["Database<br/>(Encrypted at rest)"]
-        CACHE["Cache<br/>(Encryption optional)"]
-        SECRETS["Secrets Store<br/>(Vault / KMS)"]
-    end
+For each element `e ∈ E` and each STRIDE category `t`, we ask: "Is this element vulnerable to `t`?"
 
-    subgraph "Trust Domain 4: Management Plane"
-        CI["CI/CD Pipeline"]
-        ADMIN["Admin Bastion<br/>(MFA required)"]
-        MON["Monitoring / SIEM"]
-    end
-
-    EXT -->|"TLS 1.3 only"| CDN
-    CDN -->|"mTLS or JWT validation"| WAF2
-    WAF2 -->|"Filtered, authenticated"| SVC_A
-    SVC_A -->|"Service-to-service mTLS<br/>(SPIFFE/SPIRE)"| SVC_B
-    SVC_B -->|"Parameterized queries,<br/>connection pooling"| DB
-    SVC_A -->|"Token-scoped read"| SECRETS
-    SVC_B -->|"Token-scoped read"| SECRETS
-    CI -->|"Short-lived deploy credential"| SVC_A
-    ADMIN -->|"JIT privilege,<br/>session recording"| DB
-
-    style "Trust Domain 0: Internet (Untrusted)" fill:#4a0000
-    style "Trust Domain 4: Management Plane" fill:#1a1a4a
-```
-
-The boundaries are not merely conceptual—each requires concrete enforcement mechanisms:
-
-- **Network boundary**: Enforced by firewalls, security groups, Kubernetes NetworkPolicy, and service mesh policies. These are the coarsest controls and the first to be misconfigured.
-- **API boundary**: Enforced by API gateways performing authentication, authorization, schema validation, and rate limiting before traffic reaches application code. This boundary separates untrusted external input from internal processing.
-- **Process boundary**: Enforced by operating system process isolation, seccomp profiles, and Linux capabilities. A container is a process boundary, not a security boundary, without additional hardening—it shares the host kernel.
-- **Privilege boundary**: Enforced by kernel access control mechanisms (DAC, MAC, capabilities). Transitions across this boundary (setuid, kernel syscalls) represent high-risk code paths requiring scrutiny.
-- **Cryptographic boundary**: Enforced by encryption algorithms and key management. Data crossing this boundary is unreadable to adversaries without key material, even those with physical access to storage media.
-- **Administrative boundary**: Enforced by identity and access management, requiring separate credentials and authentication flows for management-plane operations distinct from data-plane credentials.
-
-A critical architectural principle: **trust boundaries must be enforced by the receiver, not asserted by the sender.** A service cannot declare itself trusted; trust must be verified at the boundary through cryptographic credentials (mTLS client certificates, signed JWTs, SPIFFE SVIDs) or hardware attestation. This principle prevents trust escalation attacks where a compromised service asserts elevated privileges to downstream systems.
-
-### 1.7 Attack Surface Analysis: Systematic Enumeration
-
-Attack surface analysis systematically enumerates all entry points through which adversaries could interact with your system. The surface includes obvious vectors—network endpoints, authentication flows, API interfaces—and critically important non-obvious ones:
-
-**Input ingestion surfaces (high risk):**
-- File upload handlers: attackers supply crafted files exploiting parser vulnerabilities (zip bombs, XML entity expansion, JPEG with embedded shellcode for image processors, crafted PDFs for document renderers)
-- Webhook receivers: externally-driven server-side request forgery (SSRF) if the receiver fetches from attacker-controlled URLs
-- Log ingestion pipelines: log injection attacks that corrupt SIEM queries or exploit log4shell-style remote code execution in log processors
-- Configuration file parsers: YAML deserialization attacks (`!!python/object/apply:subprocess.call`), TOML injection
-
-**Implicit surfaces (frequently overlooked):**
-- Health check endpoints (`/healthz`, `/readyz`): may expose internal service topology or be used to trigger expensive operations
-- Metrics exporters (`/metrics`): Prometheus exposition format endpoints often expose internal state, build versions, and configuration values
-- Debug endpoints (`/debug/pprof`, `/debug/vars`): Go's default HTTP debug mux exposes goroutine dumps, heap profiles, and runtime variables; must be disabled in production or access-restricted
-- Admin dashboards: Kubernetes Dashboard, Grafana, Jaeger UI exposed without authentication are routinely exploited
-- Dependency management metadata: `package-lock.json`, `go.sum`, `Cargo.lock` reveal exact dependency versions that may have known CVEs
-
-**Automated attack surface mapping** using tools like OWASP Amass, `nuclei`, or `ffuf` for HTTP surface enumeration should be part of the CI/CD pipeline or run on a scheduled cadence against staging environments. The output feeds into the threat model as the attack surface evolves.
-
-### 1.8 Fail-Secure: Designing for Adversarial Failure Modes
-
-The principle of fail-secure dictates that when systems encounter unexpected conditions or errors, they must default to the most secure state rather than the most permissive. This principle has non-obvious implications that expose frequent design errors.
-
-**Permission checks under failure**: A permissions check that encounters a database timeout must deny access, not grant it. The fail-open alternative—treating "I don't know" as "yes"—creates a denial-of-service-to-authentication-escalation chain: an attacker who can knock out the authorization service gains access to everything it was protecting.
-
-**Authentication fallback paths**: An authentication system that cannot reach its backing store (LDAP, OAuth IdP, database) must reject all authentications. It must not fall back to a local bypass account, to cached credentials without freshness validation, or to unauthenticated mode. Each fallback creates an exploitable path.
-
-**Cryptographic agility and default algorithms**: A TLS stack that falls back from TLS 1.3 to TLS 1.0 when the client requests it (to "maximize compatibility") creates a downgrade attack surface. Fail-secure here means advertising only the minimum acceptable TLS version and cipher suites, rejecting clients that cannot meet the bar rather than degrading to an insecure channel.
-
-**Parser error handling**: A firewall rule parser that encounters malformed configuration must block all traffic until the configuration is valid, not silently ignore the malformed rule and apply the rest. The malformed rule may be the most important one. A network ACL that cannot parse a DENY rule must not forward traffic, as the DENY was likely placed there for a reason.
-
-The following Go snippet illustrates fail-secure permission checking with explicit handling of error states:
-
-```go
-// CheckPermission enforces a fail-secure pattern:
-// any error—timeout, unavailability, unexpected response—
-// is treated as a denial rather than an approval.
-func CheckPermission(ctx context.Context, store AuthzStore, principal, resource, action string) (bool, error) {
-    // Enforce a hard timeout to prevent slow-loris attacks on the authz path
-    ctx, cancel := context.WithTimeout(ctx, 500*time.Millisecond)
-    defer cancel()
-
-    allowed, err := store.IsAllowed(ctx, principal, resource, action)
-    if err != nil {
-        // Log the specific error for observability, but do not expose
-        // internal error details to the caller (information leakage).
-        slog.ErrorContext(ctx, "authz check failed; denying by default",
-            "principal", principal,
-            "resource", resource,
-            "action", action,
-            "error", err,
-        )
-        // Return false (deny), not the error, so callers cannot
-        // distinguish "denied" from "error" and cannot probe for
-        // availability-based bypass.
-        return false, nil
-    }
-
-    if !allowed {
-        // Emit a structured audit event for every denial.
-        emitAuditEvent(ctx, AuditDenial{
-            Principal: principal,
-            Resource:  resource,
-            Action:    action,
-            Timestamp: time.Now().UTC(),
-        })
-    }
-
-    return allowed, nil
-}
-```
-
-The design decision to return `(false, nil)` on error rather than `(false, err)` is deliberate. If callers branch on `err != nil` to bypass the permission check ("we got an error, let the user through so they don't have a bad experience"), the error handling becomes a bypass vector. Fail-secure requires that the error path and the denial path are indistinguishable to the caller.
-
-### 1.9 Security Invariants: From Assertions to Formal Properties
-
-Security invariants are properties that must hold true across all system states, regardless of the sequence of operations that led to those states. Invariants are the security engineer's equivalent of loop invariants in formal program verification—they define what must remain true before and after every state transition.
-
-Expressing security requirements as invariants has concrete operational benefits:
-
-1. **Automated enforcement**: Invariants expressed as assertions can be checked at runtime, in property-based tests, and through static analysis. If an invariant is violated, the violation is detected immediately.
-2. **Regression prevention**: An invariant checked in CI means that a code change which inadvertently breaks a security property is caught before it reaches production.
-3. **Threat model validation**: Invariants make implicit security assumptions explicit and machine-verifiable.
-
-Examples of concrete, testable security invariants:
-
-| Invariant | Verification Mechanism |
-|---|---|
-| No user can read another tenant's data | Property-based test: for all (user, resource) pairs where `user.tenant_id ≠ resource.tenant_id`, access is denied |
-| All external data transmission is encrypted | Static analysis + network policy assertion: no HTTP (non-TLS) egress permitted |
-| Every privileged operation appears in the audit log | Differential testing: compare operations against audit log entries in an integration test harness |
-| No service can escalate its own IAM permissions | AWS Config rule + OPA policy: IAM policies are immutable from within the workload |
-| Secrets never appear in environment variables in production | OPA/Gatekeeper policy: `env` fields in pod specs must not contain known secret patterns |
-| Container images run as non-root | Kubernetes admission controller: `runAsNonRoot: true` enforced by policy |
-
-The following Python example uses Hypothesis (a property-based testing library) to verify the multi-tenancy isolation invariant against a simplified access control function:
-
-```python
-from hypothesis import given, strategies as st, assume
-import pytest
-
-# Domain types
-class User:
-    def __init__(self, user_id: str, tenant_id: str, roles: list[str]):
-        self.user_id = user_id
-        self.tenant_id = tenant_id
-        self.roles = roles
-
-class Resource:
-    def __init__(self, resource_id: str, tenant_id: str, owner_id: str):
-        self.resource_id = resource_id
-        self.tenant_id = tenant_id
-        self.owner_id = owner_id
-
-def can_access(user: User, resource: Resource, action: str) -> bool:
-    """
-    Access control function under test.
-    Invariant: cross-tenant access must ALWAYS be denied,
-    regardless of roles, action, or any other attribute.
-    """
-    # Cross-tenant isolation is an absolute boundary.
-    # Checked first, before any role evaluation, to prevent
-    # role-based bypass of tenant isolation.
-    if user.tenant_id != resource.tenant_id:
-        return False
-
-    # Same-tenant logic: owners can do anything, admins can read/write,
-    # viewers can only read.
-    if user.user_id == resource.owner_id:
-        return True
-    if "admin" in user.roles and action in ("read", "write", "delete"):
-        return True
-    if "viewer" in user.roles and action == "read":
-        return True
-
-    return False
-
-
-# Property-based test for the cross-tenant isolation invariant.
-# Hypothesis will generate hundreds of (user, resource, action) combinations,
-# including edge cases a human tester would not think to construct.
-@given(
-    user_tenant=st.text(min_size=1, max_size=20),
-    resource_tenant=st.text(min_size=1, max_size=20),
-    user_id=st.text(min_size=1, max_size=36),
-    resource_id=st.text(min_size=1, max_size=36),
-    roles=st.lists(st.sampled_from(["admin", "viewer", "owner", "superuser"]), max_size=5),
-    action=st.sampled_from(["read", "write", "delete", "admin", "impersonate"]),
-)
-def test_cross_tenant_isolation_invariant(
-    user_tenant, resource_tenant, user_id, resource_id, roles, action
-):
-    """
-    INVARIANT: For all users and resources where tenant IDs differ,
-    access MUST be denied regardless of any other attribute.
-    This invariant must hold for all possible inputs.
-    """
-    # Precondition: tenants must differ for this invariant to apply.
-    assume(user_tenant != resource_tenant)
-
-    user = User(user_id=user_id, tenant_id=user_tenant, roles=roles)
-    resource = Resource(resource_id=resource_id, tenant_id=resource_tenant, owner_id=user_id)
-
-    # Even if the user is the resource's "owner" in some sense,
-    # cross-tenant access must be denied.
-    result = can_access(user, resource, action)
-
-    assert result is False, (
-        f"Cross-tenant isolation violated: user {user_id} in tenant "
-        f"'{user_tenant}' accessed resource '{resource_id}' in tenant "
-        f"'{resource_tenant}' via action '{action}' with roles {roles}"
-    )
-```
-
-Property-based testing is significantly more powerful than example-based testing for security invariants because adversaries do not restrict themselves to the cases a developer explicitly thought to test. Hypothesis explores the full input space and finds the counterexample that breaks your invariant—before an attacker does.
-
-### 1.10 Threat Modeling Methodology: STRIDE in Practice
-
-Threat modeling operationalizes the adversary model into a structured analysis of system components and their failure modes. The STRIDE taxonomy (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege), developed at Microsoft, provides a systematic lens for identifying threats against each element of a data flow diagram.
-
-```mermaid
-flowchart LR
-    subgraph "STRIDE Threat → Mitigating Control"
-        S["Spoofing Identity<br/>→ Authentication<br/>(MFA, mTLS, SPIFFE)"]
-        T2["Tampering<br/>→ Integrity Controls<br/>(HMAC, digital signatures,<br/>AEAD encryption)"]
-        R["Repudiation<br/>→ Non-repudiation<br/>(Immutable audit logs,<br/>signed audit trails)"]
-        I["Information Disclosure<br/>→ Confidentiality<br/>(Encryption, ACLs,<br/>data masking)"]
-        D["Denial of Service<br/>→ Availability Controls<br/>(Rate limiting, circuit breakers,<br/>resource quotas)"]
-        E["Elevation of Privilege<br/>→ Authorization<br/>(RBAC/ABAC, least privilege,<br/>privilege separation)"]
-    end
-
-    style S fill:#1a3a5c,color:#fff
-    style T2 fill:#1a5c3a,color:#fff
-    style R fill:#5c3a1a,color:#fff
-    style I fill:#4a1a4a,color:#fff
-    style D fill:#5c1a1a,color:#fff
-    style E fill:#1a4a4a,color:#fff
-```
-
-**Applying STRIDE to a data flow element** requires mapping each element type (external entity, process, data store, data flow) to the threats most relevant to it:
-
-| Element Type | Relevant STRIDE Threats | Priority |
-|---|---|---|
-| External entity (browser, API client) | Spoofing, Repudiation | High |
-| Process (microservice, function) | Tampering, DoS, EoP | High |
-| Data store (database, cache, object store) | Tampering, Information Disclosure, DoS | Critical |
-| Data flow (network connection, queue message) | Tampering, Information Disclosure, DoS | High |
-
-A concrete STRIDE analysis of an order processing API endpoint (`POST /orders`) might produce:
-
-- **Spoofing**: An attacker submits a request with a forged JWT claiming to be a different user. *Mitigation*: Validate JWT signature against the IdP's JWKS endpoint; never accept unsigned or HS256-signed tokens (symmetric signature is a shared secret; RS256/ES256 with asymmetric keys enables stateless verification).
-- **Tampering**: An attacker intercepts the request and modifies the order total to $0.01 before it reaches the payment service. *Mitigation*: Recalculate the order total server-side from canonical product data; never trust client-supplied price fields. Apply HMAC to inter-service messages.
-- **Repudiation**: A user disputes an order claiming they never placed it. *Mitigation*: Emit a signed, timestamped audit log entry at the moment of order creation, including the JWT claims, source IP, and request body hash.
-- **Information Disclosure**: An error response leaks internal stack traces, database schema names, or query text. *Mitigation*: Return generic error codes to clients; log detailed errors to a separate, access-controlled sink.
-- **Denial of Service**: An attacker submits thousands of large-payload POST requests, exhausting processing capacity. *Mitigation*: Request body size limits, per-user rate limiting with token bucket or sliding window algorithm, circuit breakers on downstream dependencies.
-- **Elevation of Privilege**: A regular user crafts a request setting `admin: true` in the JSON body, exploiting mass assignment in an ORM. *Mitigation*: Use explicit DTO/schema classes with allowlists rather than automatic property binding; validate role assignments server-side from the token's claims, not from the request body.
-
-### 1.11 Supply Chain Security: The Emerging Critical Surface
-
-The supply chain represents the most rapidly evolving and underdefended attack surface in modern software systems. The XZ Utils backdoor (CVE-2024-3094), where a nation-state actor spent two years establishing trust in an open-source project before inserting a systemd-triggered SSH authentication bypass, demonstrates that the supply chain threat is not theoretical.
+### 3.2 Data Flow Diagram for a Typical Microservice
 
 ```mermaid
 flowchart TD
-    subgraph "Software Supply Chain Attack Surface"
-        DEV["Developer Workstation<br/>(Malware, credential theft)"]
-        SRC["Source Repository<br/>(Malicious commits, branch protection bypass)"]
-        DEP["Open Source Dependencies<br/>(Typosquatting, compromised maintainer,<br/>malicious update)"]
-        CI["CI/CD Pipeline<br/>(Compromised runner, secrets exfiltration,<br/>pipeline injection)"]
-        REG["Artifact Registry<br/>(Tampered images, stale vulnerable layers)"]
-        DEPLOY["Deployment Target<br/>(Compromised infrastructure credentials)"]
+    subgraph sub_external ["External Zone"]
+        USER["👤 End User\n(Browser / Mobile)"]
+        ATTACKER["🔴 Threat Actor"]
     end
 
-    DEV --> SRC
-    DEP --> SRC
-    SRC --> CI
-    CI --> REG
-    REG --> DEPLOY
-
-    subgraph "SLSA Controls"
-        PROV["Build Provenance<br/>(SLSA Level 3+)"]
-        SIGN["Artifact Signing<br/>(Sigstore/cosign)"]
-        SBOM2["SBOM + VEX<br/>(CycloneDX / SPDX)"]
-        REPRO["Reproducible Builds"]
+    subgraph sub_edge ["Edge Layer"]
+        WAF["Web Application Firewall"]
+        APIGW["API Gateway\n(Auth, Rate Limit, TLS Termination)"]
     end
 
-    CI --> PROV
-    REG --> SIGN
-    DEP --> SBOM2
-    CI --> REPRO
+    subgraph sub_app ["Application Zone"]
+        AUTH["Auth Service\n(JWT / OAuth2)"]
+        SVC_A["Order Service"]
+        SVC_B["Payment Service"]
+        SVC_C["Notification Service"]
+    end
 
-    style DEV fill:#4a0000,color:#fff
-    style CI fill:#4a0000,color:#fff
-    style DEP fill:#4a0000,color:#fff
+    subgraph sub_data ["Data Zone"]
+        DB_A[("Orders DB\n(PostgreSQL)")]
+        DB_B[("Payment Vault\n(Encrypted)")]
+        CACHE[("Redis Cache")]
+        MQ["Message Queue\n(Kafka)"]
+    end
+
+    subgraph sub_ops ["Operations Zone"]
+        SECRETS["Secrets Manager\n(Vault / AWS SM)"]
+        LOGS["Centralized Logging\n(ELK / Splunk)"]
+        METRICS["Metrics & Alerting\n(Prometheus / Grafana)"]
+    end
+
+    USER -->|"HTTPS"| WAF
+    ATTACKER -.->|"Attack vectors"| WAF
+    WAF --> APIGW
+    APIGW -->|"Bearer token"| AUTH
+    AUTH -->|"Validated claims"| SVC_A
+    SVC_A -->|"Charge request"| SVC_B
+    SVC_B -->|"Notify"| MQ
+    MQ -->|"Consume"| SVC_C
+    SVC_A <-->|"SQL over TLS"| DB_A
+    SVC_B <-->|"Encrypted channel"| DB_B
+    SVC_A <-->|"Cache lookup"| CACHE
+    SVC_A & SVC_B & SVC_C -->|"Structured logs"| LOGS
+    SECRETS -->|"Dynamic credentials"| SVC_A & SVC_B & SVC_C
+    LOGS --> METRICS
 ```
 
-**Supply Chain Levels for Software Artifacts (SLSA)** provides a framework for incrementally improving supply chain integrity guarantees across four levels:
+### 3.3 STRIDE Worksheet for the Order Service
 
-- **SLSA Level 1**: Build process is scripted/automated, producing basic provenance metadata.
-- **SLSA Level 2**: Build runs on a hosted build service generating signed provenance.
-- **SLSA Level 3**: The build platform is hardened; provenance includes the specific build instructions and input sources used; builds are isolated.
-- **SLSA Level 4** (aspirational): Two-party review for all changes; hermetic, reproducible builds with bitwise-identical outputs across independent rebuild attempts.
+| Element | Spoofing | Tampering | Repudiation | Info Disclosure | DoS | EoP |
+|---|---|---|---|---|---|---|
+| API Gateway | Fake client certs | Modify headers | No request log | Leaked tokens in logs | Flood attacks | JWT algorithm confusion |
+| Order Service process | Impersonate payment svc | SQL injection | No audit trail | Stack traces in errors | Unbounded pagination | SSRF to metadata API |
+| Orders DB | Credential theft | Direct DB write | No query log | Dump all rows | Connection exhaustion | SA account abuse |
+| Kafka topic | Produce as wrong service | Message injection | No producer ID | Unencrypted messages | Topic flood | Consume unauthorized topics |
 
-The following Dockerfile demonstrates supply chain hardening practices for a production container image, applying SLSA-aligned controls:
+### 3.4 Threat Prioritization: DREAD Scoring
 
-```dockerfile
-# syntax=docker/dockerfile:1.6
+Each threat is scored using DREAD:
 
-# =============================================================================
-# Stage 1: Dependency verification
-# Pin the exact digest of the base image, not just a tag.
-# Tags are mutable; digests are content-addressed and immutable.
-# =============================================================================
-FROM golang:1.22.3@sha256:b1e05e2c918f52c59d39ce7d5844f73b2f4511f7734add8bb98c9ecdd4443365 AS builder
-
-WORKDIR /app
-
-# Copy dependency manifests first to leverage build cache.
-# If go.mod/go.sum are unchanged, the dependency fetch layer is not rebuilt.
-COPY go.mod go.sum ./
-
-# Verify the module download graph against the checksum database (sum.golang.org).
-# This prevents substitution attacks against the module proxy.
-RUN go mod verify && \
-    go mod download
-
-COPY . .
-
-# Build with hardening flags:
-#   -trimpath: remove local path information from the binary (information disclosure)
-#   -ldflags="-w -s": strip debug symbols (reduces binary size, removes debug info)
-#   CGO_ENABLED=0: produce a statically-linked binary (no dynamic linker attack surface)
-#   GOFLAGS=-mod=readonly: prevent go from modifying go.sum at build time
-RUN CGO_ENABLED=0 GOFLAGS=-mod=readonly go build \
-    -trimpath \
-    -ldflags="-w -s -X main.version=$(git describe --tags --always)" \
-    -o /bin/app \
-    ./cmd/app
-
-# =============================================================================
-# Stage 2: SBOM generation
-# Generate a CycloneDX SBOM from the verified module graph.
-# =============================================================================
-FROM golang:1.22.3@sha256:b1e05e2c918f52c59d39ce7d5844f73b2f4511f7734add8bb98c9ecdd4443365 AS sbom-generator
-
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.6.0 && \
-    cyclonedx-gomod app -json -output /sbom.json
-
-# =============================================================================
-# Stage 3: Minimal production image
-# Use a distroless base to minimize attack surface.
-# distroless contains no shell, no package manager, no debug utilities.
-# An attacker who achieves code execution cannot easily pivot.
-# =============================================================================
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:c0f429e16a13a3f2c96fbe08b76ce1346622f7c419b8c9c4cd6c4e7f86ba3e73
-
-# Copy only the binary and the SBOM; nothing else.
-COPY --from=builder /bin/app /app
-COPY --from=sbom-generator /sbom.json /sbom.json
-
-# Document the port for tooling; does not publish the port.
-EXPOSE 8080
-
-# Run as nonroot (uid 65532 in distroless:nonroot).
-# This is enforced by the base image selection; we don't need USER here.
-ENTRYPOINT ["/app"]
+```
+DREAD_score = (Damage + Reproducibility + Exploitability + Affected_users + Discoverability) / 5
 ```
 
-Supply chain security also requires verifying that the artifacts you deploy are the artifacts your CI/CD pipeline produced—a property called *deployment integrity*. This is enforced by signing container images with `cosign` and verifying signatures at admission control time:
+Each dimension is scored 0–10. A threat with score ≥ 7 is high severity and must be mitigated before the feature ships. Scores 4–6 are medium (backlog item within the sprint). Scores < 4 are accepted risk (documented).
 
-```bash
-# Sign the image after CI builds it, using a keyless workflow
-# (Sigstore's ephemeral key tied to the CI job's OIDC identity).
-cosign sign \
-  --yes \
-  --oidc-issuer https://token.actions.githubusercontent.com \
-  "gcr.io/my-project/my-app@${IMAGE_DIGEST}"
+---
 
-# In the Kubernetes admission controller (Kyverno or Sigstore Policy Controller),
-# verify that all images in a namespace are signed by the expected CI workflow.
-# This policy denies pods with unsigned or improperly signed images at admission time.
-```
+## 4. The Shift-Left Continuum
 
-```yaml
-# Kyverno ClusterPolicy: enforce image signing verification
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: verify-image-signatures
-spec:
-  validationFailureAction: Enforce
-  background: false
-  rules:
-    - name: check-image-signature
-      match:
-        any:
-          - resources:
-              kinds: ["Pod"]
-              namespaces: ["production"]
-      verifyImages:
-        - imageReferences:
-            - "gcr.io/my-project/*"
-          attestors:
-            - count: 1
-              entries:
-                - keyless:
-                    subject: "https://github.com/my-org/my-repo/.github/workflows/build.yml@refs/heads/main"
-                    issuer: "https://token.actions.githubusercontent.com"
-                    rekor:
-                      url: "https://rekor.sigstore.dev"
-```
+### 4.1 Phases and Security Gates
 
-### 1.12 Integrating Threat Modeling into the Development Lifecycle
-
-Threat modeling is most valuable when it is a living document that evolves with the system architecture, not a one-time exercise conducted at project inception and filed away. The practical integration pattern is *threat modeling as code*:
-
-1. **Architecture Decision Records (ADRs) with security annotations**: Each architectural change that introduces a new trust boundary, data flow, or component should include a threat model analysis section. The ADR documents what threats were considered, which were mitigated, and which were accepted as residual risk.
-
-2. **Data flow diagrams as version-controlled artifacts**: Threat model diagrams should live in the repository alongside the code they describe, authored in a text format (Mermaid, draw.io XML, or the OWASP Threat Dragon JSON format) so they can be diffed and reviewed in pull requests.
-
-3. **Security user stories in the backlog**: Translate threat model findings into concrete backlog items with acceptance criteria. "Implement rate limiting on the `/orders` endpoint to mitigate STRIDE:DoS threat TM-004" is actionable; "improve API security" is not.
-
-4. **Automated threat model validation**: Tools like `threagile` (an open-source threat modeling engine that processes YAML architecture models and produces risk assessments) can run in CI to flag when the architecture model indicates unmitigated high-severity threats.
-
-The following `threagile` YAML snippet illustrates encoding a threat model as a machine-readable artifact that can be version-controlled and validated in CI:
-
-```yaml
-# threagile.yaml — machine-readable threat model for order processing service
-threagile_version: "1.0.0"
-
-title: "Order Processing Service Threat Model"
-date: "2024-01-15"
-author:
-  name: "Platform Security Team"
-
-technical_assets:
-  order-api:
-    id: order-api
-    type: process
-    usage: business
-    technologies:
-      - go-webservice
-    communication_links:
-      to-database:
-        target: order-db
-        protocol: jdbc
-        authentication: credentials
-        authorization: technical-user
-        encryption: transport
-      to-payment-service:
-        target: payment-svc
-        protocol: https
-        authentication: token
-        authorization: technical-user
-        encryption: transport
-
-  order-db:
-    id: order-db
-    type: datastore
-    usage: business
-    technologies:
-      - postgresql
-    data_assets_stored:
-      - order-records
-      - customer-pii
-
-data_assets:
-  order-records:
-    id: order-records
-    usage: business
-    quantity: many
-    confidentiality: confidential
-    integrity: critical
-    availability: critical
-
-  customer-pii:
-    id: customer-pii
-    usage: business
-    quantity: many
-    confidentiality: strictly-confidential
-    integrity: critical
-    availability: important
-```
-
-Running `threagile analyze` against this model produces a risk report identifying unmitigated threats based on the data sensitivity, communication protocols, and authentication mechanisms described—turning threat modeling from a manual workshop exercise into an automated, continuous process.
-
-### Summary
-
-The first principles of security—CIA properties and their tensions, formal adversary models, the economics of shift-left, the mathematics of defense-in-depth, the blast-radius bounding of least privilege, and the enforcement of security invariants—form a coherent framework for reasoning about system security at an architectural level. These are not independent best practices to be applied from a checklist; they compose into a unified discipline.
-
-The following lessons build on this foundation to implement specific shift-left controls: static analysis pipelines (SAST), dependency vulnerability management (SCA), secrets detection, infrastructure-as-code security scanning (IaC analysis), and runtime security monitoring. Each of those controls derives its purpose and configuration from the threat model and invariants established here.
+The shift-left continuum places security controls at every phase boundary, creating a series of mandatory gates that code must pass before advancing.
 
 ```mermaid
 flowchart LR
-    subgraph "Foundation (This Lesson)"
-        TM["Threat Model<br/>(STRIDE + adversary model)"]
-        INV["Security Invariants<br/>(Testable properties)"]
-        BOUND["Trust Boundaries<br/>(Defense-in-depth)"]
+    subgraph sub_ide ["Phase 0: IDE"]
+        P0A["Linter / SAST plugin\n(e.g., Semgrep LSP)"]
+        P0B["Secret detection\n(e.g., GitLeaks pre-commit)"]
     end
 
-    subgraph "Shift-Left Controls (Subsequent Lessons)"
-        SAST["SAST<br/>(Semgrep, CodeQL)"]
-        SCA["SCA<br/>(Dependabot, OWASP DC)"]
-        SECRETS["Secrets Scanning<br/>(Trufflehog, Gitleaks)"]
-        IAC["IaC Scanning<br/>(Checkov, tfsec)"]
-        DAST["DAST<br/>(OWASP ZAP, Nuclei)"]
-        RUNTIME["Runtime Detection<br/>(Falco, GuardDuty)"]
+    subgraph sub_pr ["Phase 1: Pull Request"]
+        P1A["SAST scan\n(CodeQL / Semgrep)"]
+        P1B["SCA scan\n(Dependabot / Snyk)"]
+        P1C["Secret scan\n(TruffleHog)"]
+        P1D["IaC scan\n(Checkov / tfsec)"]
+        P1E["License compliance\n(FOSSA)"]
     end
 
-    TM --> SAST
-    TM --> DAST
-    INV --> SCA
-    INV --> SECRETS
-    BOUND --> IAC
-    BOUND --> RUNTIME
+    subgraph sub_ci ["Phase 2: CI Build"]
+        P2A["Container image scan\n(Trivy / Grype)"]
+        P2B["SBOM generation\n(Syft)"]
+        P2C["Policy gate\n(OPA / Conftest)"]
+        P2D["Unit + security tests"]
+    end
 
-    style "Foundation (This Lesson)" fill:#1a1a3a,color:#fff
-    style "Shift-Left Controls (Subsequent Lessons)" fill:#1a3a1a,color:#fff
+    subgraph sub_staging ["Phase 3: Staging"]
+        P3A["DAST scan\n(OWASP ZAP)"]
+        P3B["Fuzzing\n(AFL++ / libFuzzer)"]
+        P3C["Penetration test\n(automated)"]
+    end
+
+    subgraph sub_prod ["Phase 4: Production"]
+        P4A["Runtime protection\n(RASP / eBPF)"]
+        P4B["WAF rules"]
+        P4C["SIEM alerting"]
+        P4D["Vulnerability disclosure"]
+    end
+
+    sub_ide -->|"Commit"| sub_pr
+    sub_pr -->|"Merge"| sub_ci
+    sub_ci -->|"Deploy"| sub_staging
+    sub_staging -->|"Release"| sub_prod
 ```
+
+### 4.2 Security Gate Contract
+
+Each gate has a formal contract:
+
+```
+Gate(phase) = {
+    input:    artifact(phase - 1),
+    checks:   [check₁, check₂, ..., checkₙ],
+    policy:   threshold(severity, count),
+    output:   PASS | FAIL,
+    artifact: signed_attestation(artifact, checks, policy, timestamp)
+}
+```
+
+A gate `PASS` produces a signed attestation that the downstream phase can verify. This creates a verifiable chain of custody — the production deployment can cryptographically verify that every upstream gate passed, using tools like Sigstore/Cosign.
+
+### 4.3 The Security-as-Code Mindset
+
+Security-as-Code means every security control is:
+1. **Version-controlled**: The policy that rejects CVSS ≥ 7 vulnerabilities lives in a Git repository
+2. **Testable**: The policy has unit tests verifying it blocks known-bad inputs
+3. **Reviewable**: Changes to security policy go through the same PR process as application code
+4. **Auditable**: The history of security policy changes is in the Git log
+
+---
+
+## 5. Static Analysis and SAST
+
+### 5.1 Theory: Abstract Interpretation
+
+Static Application Security Testing (SAST) is grounded in abstract interpretation — a theory of sound approximation of program semantics. Rather than executing code, SAST tools compute an over-approximation of all possible program states.
+
+For a program `P` with concrete semantics `⟦P⟧: State → State`, SAST operates on an abstract domain `D#` with:
+
+- An abstraction function `α: State → D#`
+- A concretization function `γ: D# → ℙ(State)`
+
+Soundness requires: `∀s ∈ State: s ∈ γ(α(s))`
+
+The consequence is that SAST may produce **false positives** (flagging safe code) but should not produce **false negatives** (missing unsafe code) when configured correctly. This is the foundational tradeoff.
+
+### 5.2 Taint Analysis
+
+The most practically important SAST technique is taint analysis. It tracks the flow of untrusted data (sources) through program transformations to sensitive operations (sinks).
+
+**Source**: Any input from an external entity (HTTP parameters, environment variables, file reads, database query results from user-controlled tables)
+
+**Sink**: Any operation that is dangerous when fed untrusted data (SQL query construction, shell execution, HTML rendering, deserialization, cryptographic key usage)
+
+**Sanitizer**: Any transformation that removes the tainted property (parameterized query binding, HTML escaping, integer parsing, regex validation)
+
+A taint path is a chain `source → transform₁ → transform₂ → ... → sink` where no sanitizer appears. SAST tools enumerate all such paths.
+
+### 5.3 Semgrep Rule Implementation
+
+Semgrep is the dominant open-source SAST tool. Its rules use pattern matching over ASTs rather than regex, making them language-aware and precise.
+
+The following is a complete, working Semgrep ruleset for detecting common vulnerabilities in a Python web application:
+
+```yaml
+# semgrep-rules/python-security.yaml
+# Comprehensive Python security rules for shift-left pipeline integration.
+# Compatible with Semgrep OSS >= 1.0.0
+---
+rules:
+  # ─────────────────────────────────────────────────────────────
+  # SQL Injection via string formatting
+  # ─────────────────────────────────────────────────────────────
+  - id: python-sql-injection-format
+    patterns:
+      - pattern: |
+          $CURSOR.execute($QUERY % ...)
+      - pattern-not: |
+          $CURSOR.execute($QUERY, ...)
+    message: >
+      SQL query built with string formatting. User-controlled data flowing
+      into the query string creates a SQL injection vulnerability.
+      Use parameterized queries: cursor.execute(query, (param,))
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-89"
+      owasp: "A03:2021 - Injection"
+      confidence: HIGH
+    fix: |
+      $CURSOR.execute($QUERY, (...))
+
+  - id: python-sql-injection-fstring
+    pattern: |
+      $CURSOR.execute(f"...")
+    message: >
+      SQL query built with f-string. Never interpolate variables directly
+      into SQL strings. Use parameterized queries instead.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-89"
+      owasp: "A03:2021 - Injection"
+      confidence: HIGH
+
+  - id: python-sql-injection-concat
+    pattern: |
+      $CURSOR.execute($A + $B)
+    message: >
+      SQL query built with string concatenation. This is a SQL injection
+      vulnerability if any part of the query derives from user input.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-89"
+      owasp: "A03:2021 - Injection"
+      confidence: MEDIUM
+
+  # ─────────────────────────────────────────────────────────────
+  # Command Injection
+  # ─────────────────────────────────────────────────────────────
+  - id: python-subprocess-shell-true
+    patterns:
+      - pattern: subprocess.run(..., shell=True, ...)
+      - pattern-not: subprocess.run([...], shell=True, ...)
+    message: >
+      subprocess.run() called with shell=True and a string command.
+      This passes the command to the shell and enables injection attacks.
+      Pass a list of arguments instead, or set shell=False.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-78"
+      owasp: "A03:2021 - Injection"
+      confidence: HIGH
+
+  - id: python-os-system
+    pattern: os.system(...)
+    message: >
+      os.system() invokes a shell and is vulnerable to command injection.
+      Use subprocess.run() with a list of arguments and shell=False.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-78"
+      confidence: HIGH
+
+  # ─────────────────────────────────────────────────────────────
+  # Hardcoded Secrets
+  # ─────────────────────────────────────────────────────────────
+  - id: python-hardcoded-password-assign
+    patterns:
+      - pattern: $VAR = "$VALUE"
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i)(password|passwd|pwd|secret|api_key|apikey|token|auth_token|access_token)
+      - metavariable-regex:
+          metavariable: $VALUE
+          regex: .{8,}
+    message: >
+      Hardcoded credential in variable '$VAR'. Store secrets in environment
+      variables or a secrets manager (Vault, AWS Secrets Manager).
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-798"
+      owasp: "A07:2021 - Identification and Authentication Failures"
+      confidence: HIGH
+
+  # ─────────────────────────────────────────────────────────────
+  # Deserialization
+  # ─────────────────────────────────────────────────────────────
+  - id: python-pickle-loads
+    patterns:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
+    message: >
+      Deserialization of untrusted data via pickle. Pickle can execute
+      arbitrary code during deserialization. Use JSON or a schema-validated
+      format for data exchange with untrusted sources.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-502"
+      owasp: "A08:2021 - Software and Data Integrity Failures"
+      confidence: HIGH
+
+  # ─────────────────────────────────────────────────────────────
+  # Cryptographic Weaknesses
+  # ─────────────────────────────────────────────────────────────
+  - id: python-weak-hash-md5
+    patterns:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.new("md5", ...)
+    message: >
+      MD5 is cryptographically broken. Do not use MD5 for security-sensitive
+      purposes (passwords, integrity verification, digital signatures).
+      Use SHA-256 or higher for general hashing; use bcrypt/argon2 for passwords.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-327"
+      owasp: "A02:2021 - Cryptographic Failures"
+      confidence: HIGH
+
+  - id: python-weak-hash-sha1
+    patterns:
+      - pattern: hashlib.sha1(...)
+      - pattern: hashlib.new("sha1", ...)
+    message: >
+      SHA-1 is deprecated for security use. Use SHA-256 or SHA-3.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-327"
+      confidence: HIGH
+
+  - id: python-random-not-cryptographic
+    patterns:
+      - pattern: random.random()
+      - pattern: random.randint(...)
+      - pattern: random.choice(...)
+    message: >
+      Standard random module is not cryptographically secure. For security
+      tokens, session IDs, or any security-sensitive randomness, use
+      secrets.token_hex() or secrets.token_bytes().
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-338"
+      confidence: MEDIUM
+
+  # ─────────────────────────────────────────────────────────────
+  # Path Traversal
+  # ─────────────────────────────────────────────────────────────
+  - id: python-path-traversal-open
+    patterns:
+      - pattern: open($PATH, ...)
+      - pattern-not: open("...", ...)
+    message: >
+      open() called with a potentially user-controlled path. Validate
+      and canonicalize the path using os.path.realpath() and verify it
+      falls within the expected base directory before opening.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-22"
+      owasp: "A01:2021 - Broken Access Control"
+      confidence: LOW
+
+  # ─────────────────────────────────────────────────────────────
+  # SSRF via requests
+  # ─────────────────────────────────────────────────────────────
+  - id: python-ssrf-requests
+    patterns:
+      - pattern: requests.get($URL, ...)
+      - pattern-not: requests.get("https://...", ...)
+      - pattern-not: requests.get("http://...", ...)
+    message: >
+      requests.get() called with a potentially user-controlled URL.
+      This can lead to Server-Side Request Forgery (SSRF). Validate
+      the URL against an allowlist of permitted hosts before making
+      the request.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-918"
+      owasp: "A10:2021 - Server-Side Request Forgery"
+      confidence: MEDIUM
+
+  # ─────────────────────────────────────────────────────────────
+  # Flask-specific: Debug mode in production
+  # ─────────────────────────────────────────────────────────────
+  - id: python-flask-debug-true
+    pattern: app.run(..., debug=True, ...)
+    message: >
+      Flask debug mode must never be enabled in production. It exposes
+      an interactive debugger that allows arbitrary code execution.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-94"
+      confidence: HIGH
+
+  - id: python-flask-secret-key-weak
+    patterns:
+      - pattern: app.secret_key = "$VALUE"
+      - metavariable-regex:
+          metavariable: $VALUE
+          regex: ^(secret|password|test|dev|change.?me|todo|xxx|placeholder).*
+    message: >
+      Flask secret key appears to be a placeholder or weak value.
+      Use a cryptographically random key: secrets.token_hex(32)
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-798"
+      confidence: HIGH
+```
+
+### 5.4 Running Semgrep in CI
+
+```bash
+#!/usr/bin/env bash
+# scripts/sast-scan.sh
+# Runs SAST scan and enforces policy thresholds.
+# Exit code 0 = gate passes. Non-zero = gate fails.
+
+set -euo pipefail
+
+RULES_DIR="${SEMGREP_RULES_DIR:-./security/semgrep-rules}"
+OUTPUT_FILE="$(mktemp /tmp/semgrep-output.XXXXXX.json)"
+SEVERITY_THRESHOLD="${SAST_FAIL_SEVERITY:-ERROR}"
+
+echo "==> Running SAST scan with Semgrep"
+echo "    Rules:     ${RULES_DIR}"
+echo "    Threshold: ${SEVERITY_THRESHOLD}"
+
+# Run semgrep; capture output even on non-zero exit (findings present)
+semgrep scan \
+  --config "${RULES_DIR}" \
+  --config "p/owasp-top-ten" \
+  --config "p/secrets" \
+  --json \
+  --output "${OUTPUT_FILE}" \
+  --severity "${SEVERITY_THRESHOLD}" \
+  --no-rewrite-rule-ids \
+  --metrics=off \
+  . || true
+
+# Parse results
+TOTAL_FINDINGS=$(jq '.results | length' "${OUTPUT_FILE}")
+ERROR_FINDINGS=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' "${OUTPUT_FILE}")
+WARNING_FINDINGS=$(jq '[.results[] | select(.extra.severity == "WARNING")] | length' "${OUTPUT_FILE}")
+
+echo ""
+echo "==> SAST Scan Results"
+echo "    Total findings:   ${TOTAL_FINDINGS}"
+echo "    ERROR severity:   ${ERROR_FINDINGS}"
+echo "    WARNING severity: ${WARNING_FINDINGS}"
+
+# Print findings table
+if [ "${TOTAL_FINDINGS}" -gt 0 ]; then
+  echo ""
+  echo "==> Finding Details"
+  jq -r '.results[] | "[\(.extra.severity)] \(.check_id)\n  File: \(.path):\(.start.line)\n  Message: \(.extra.message)\n"' \
+    "${OUTPUT_FILE}"
+fi
+
+# Enforce gate: fail on any ERROR-severity finding
+if [ "${ERROR_FINDINGS}" -gt 0 ]; then
+  echo ""
+  echo "✗ SAST gate FAILED: ${ERROR_FINDINGS} ERROR-severity finding(s) detected."
+  echo "  Resolve all ERROR findings before merging."
+  rm -f "${OUTPUT_FILE}"
+  exit 1
+fi
+
+echo ""
+echo "✓ SAST gate PASSED"
+rm -f "${OUTPUT_FILE}"
+exit 0
+```
+
+---
+
+## 6. Dependency and SCA Scanning
+
+### 6.1 The Dependency Supply Chain Attack Model
+
+Modern applications are composed of far more third-party code than first-party code. A typical Node.js application may have 2–5 direct dependencies but 500–1500 transitive dependencies. The dependency graph `G = (V, E)` where:
+
+- `V = { direct_deps } ∪ { transitive_deps }`
+- `E = { (a, b) : a depends on b }`
+
+Has the property that a vulnerability in any `v ∈ V` potentially compromises the application, not just the direct dependencies. The XZ Utils backdoor (CVE-2024-3094), the Log4Shell vulnerability (CVE-2021-44228), and the event-stream attack all exploited this transitive dependency model.
+
+### 6.2 CVSS Scoring Mathematics
+
+The Common Vulnerability Scoring System (CVSS v3.1) computes a base score using:
+
+```
+ISCBase = 1 - [(1 - ImpactConf) × (1 - ImpactInteg) × (1 - ImpactAvail)]
+
+If Scope = Unchanged:
+  Impact = 6.42 × ISCBase
+
+If Scope = Changed:
+  Impact = 7.52 × [ISCBase - 0.029] - 3.25 × [ISCBase - 0.02]^15
+
+Exploitability = 8.22 × AttackVector × AttackComplexity × PrivilegesRequired × UserInteraction
+
+If Impact ≤ 0:
+  BaseScore = 0.0
+Else If Scope = Unchanged:
+  BaseScore = Roundup(Min[(Impact + Exploitability), 10])
+Else:
+  BaseScore = Roundup(Min[1.08 × (Impact + Exploitability), 10])
+```
+
+This score is used to triage which CVEs require immediate remediation (CVSS ≥ 9.0 = Critical) versus scheduled remediation.
+
+### 6.3 Trivy Configuration for SCA
+
+```yaml
+# security/trivy.yaml
+# Trivy scanner configuration for SCA and container image scanning.
+# Used in both pre-commit (filesystem mode) and CI (image mode).
+
+scan:
+  # Scan both OS packages and language-specific dependencies
+  scanners:
+    - vuln
+    - secret
+    - misconfig
+    - license
+
+vulnerability:
+  # Only fail the build on CRITICAL and HIGH findings that have fixes available
+  ignore-unfixed: false
+  severity:
+    - CRITICAL
+    - HIGH
+
+secret:
+  config: ./security/trivy-secret.yaml
+
+misconfig:
+  # Include Kubernetes, Dockerfile, Terraform misconfigurations
+  include-non-failures: false
+
+license:
+  # Reject licenses incompatible with commercial distribution
+  forbidden:
+    - GPL-2.0
+    - GPL-3.0
+    - AGPL-3.0
+    - LGPL-2.0
+    - LGPL-2.1
+    - LGPL-3.0
+    - CC-BY-SA-4.0
+
+cache:
+  dir: /tmp/.trivy-cache
+  policy: pulls
+
+# Generate SBOM in SPDX format alongside scan
+format: table
+output: ""
+
+# Exit code behavior
+exit-code: 1  # Non-zero exit when findings at or above severity threshold
+```
+
+### 6.4 Custom Trivy Secret Rules
+
+```yaml
+# security/trivy-secret.yaml
+# Custom secret detection rules supplementing Trivy's built-in patterns.
+
+enable-builtin-rules: true
+
+rules:
+  - id: custom-internal-api-key
+    category: "Internal API Key"
+    title: "Internal service API key"
+    severity: CRITICAL
+    regex: "(?i)(x-internal-api-key|internal_api_key)['\"]?\\s*[:=]\\s*['\"]?([a-zA-Z0-9_\\-]{32,})"
+    secret-group: 2
+
+  - id: custom-jwt-secret
+    category: "JWT Secret"
+    title: "JWT signing secret"
+    severity: CRITICAL
+    regex: "(?i)(jwt_secret|jwt_signing_key|jwt_private_key)['\"]?\\s*[:=]\\s*['\"]?([a-zA-Z0-9+/=_\\-]{20,})"
+    secret-group: 2
+
+  - id: custom-database-url-with-creds
+    category: "Database Credential"
+    title: "Database connection string with embedded credentials"
+    severity: CRITICAL
+    regex: "(postgres|postgresql|mysql|mssql|mongodb)(\\+[a-z]+)?://[a-zA-Z0-9_\\-]+:[^@\\s]{8,}@"
+    secret-group: 0
+
+  - id: custom-pem-private-key
+    category: "Private Key"
+    title: "PEM-encoded private key"
+    severity: CRITICAL
+    regex: "-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"
+    secret-group: 0
+```
+
+### 6.5 Python Dependency Audit Script
+
+```python
+#!/usr/bin/env python3
+"""
+scripts/audit_dependencies.py
+
+Audits Python dependencies against the OSV (Open Source Vulnerabilities)
+database. Produces a structured report and enforces severity thresholds.
+
+Usage:
+    python3 audit_dependencies.py --requirements requirements.txt \
+        --fail-on CRITICAL HIGH
+
+Requires: pip install requests packaging
+"""
+
+import argparse
+import json
+import sys
+import textwrap
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+import requests
+from packaging.requirements import Requirement
+from packaging.version import Version
+
+
+OSV_API_BASE = "https://api.osv.dev/v1"
+SEVERITY_ORDER = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+
+
+@dataclass
+class Vulnerability:
+    id: str
+    summary: str
+    severity: str
+    cvss_score: float
+    aliases: list[str] = field(default_factory=list)
+    fixed_versions: list[str] = field(default_factory=list)
+
+
+@dataclass
+class DependencyAuditResult:
+    package: str
+    version: str
+    vulnerabilities: list[Vulnerability] = field(default_factory=list)
+
+    @property
+    def max_severity(self) -> Optional[str]:
+        if not self.vulnerabilities:
+            return None
+        return max(
+            self.vulnerabilities,
+            key=lambda v: SEVERITY_ORDER.index(v.severity)
+        ).severity
+
+
+def parse_requirements(requirements_path: Path) -> list[tuple[str, str]]:
+    """Parse a requirements.txt file into (package, version) pairs."""
+    packages = []
+    with open(requirements_path) as f:
+        for line in f:
+            line = line.strip()
+            # Skip comments, blank lines, and options
+            if not line or line.startswith("#") or line.startswith("-"):
+                continue
+            try:
+                req = Requirement(line)
+                # Extract exact pinned version
+                for spec in req.specifier:
+                    if spec.operator == "==":
+                        packages.append((req.name, spec.version))
+                        break
+            except Exception:
+                # Skip unparseable lines (VCS URLs, etc.)
+                continue
+    return packages
+
+
+def query_osv(package: str, version: str, ecosystem: str = "PyPI") -> list[dict]:
+    """Query the OSV database for vulnerabilities affecting a specific package version."""
+    payload = {
+        "version": version,
+        "package": {
+            "name": package,
+            "ecosystem": ecosystem,
+        },
+    }
+    try:
+        response = requests.post(
+            f"{OSV_API_BASE}/query",
+            json=payload,
+            timeout=10,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data.get("vulns", [])
+    except requests.RequestException as e:
+        print(f"  Warning: OSV query failed for {package}=={version}: {e}", file=sys.stderr)
+        return []
+
+
+def extract_severity(vuln: dict) -> tuple[str, float]:
+    """Extract the highest severity rating from an OSV vulnerability record."""
+    severity_str = "LOW"
+    cvss_score = 0.0
+
+    # Check CVSS scores in severity array
+    for sev in vuln.get("severity", []):
+        if sev.get("type") == "CVSS_V3":
+            # CVSS v3 vector string — parse base score from AV components
+            # For simplicity, use the score from database_specific if available
+            pass
+
+    # Check database_specific for NVD CVSS
+    db_specific = vuln.get("database_specific", {})
+    nvd_severity = db_specific.get("severity", "").upper()
+    if nvd_severity in SEVERITY_ORDER:
+        severity_str = nvd_severity
+
+    # Try to extract numeric CVSS
+    for affected in vuln.get("affected", []):
+        db = affected.get("database_specific", {})
+        if "cvss" in db:
+            try:
+                cvss_score = float(db["cvss"])
+                # Map numeric CVSS to severity if not already set
+                if cvss_score >= 9.0:
+                    severity_str = "CRITICAL"
+                elif cvss_score >= 7.0:
+                    severity_str = "HIGH"
+                elif cvss_score >= 4.0:
+                    severity_str = "MEDIUM"
+                else:
+                    severity_str = "LOW"
+            except (ValueError, TypeError):
+                pass
+
+    return severity_str, cvss_score
+
+
+def extract_fixed_versions(vuln: dict, package: str) -> list[str]:
+    """Extract the versions that fix this vulnerability."""
+    fixed = []
+    for affected in vuln.get("affected", []):
+        pkg = affected.get("package", {})
+        if pkg.get("name", "").lower() != package.lower():
+            continue
+        for version_range in affected.get("ranges", []):
+            for event in version_range.get("events", []):
+                if "fixed" in event:
+                    fixed.append(event["fixed"])
+    return fixed
+
+
+def audit_dependencies(
+    requirements_path: Path,
+    ecosystem: str = "PyPI",
+) -> list[DependencyAuditResult]:
+    """Audit all dependencies in a requirements file against OSV."""
+    packages = parse_requirements(requirements_path)
+    results = []
+
+    print(f"Auditing {len(packages)} packages against OSV database...")
+
+    for package, version in packages:
+        raw_vulns = query_osv(package, version, ecosystem)
+        vulns = []
+
+        for raw in raw_vulns:
+            severity, cvss_score = extract_severity(raw)
+            fixed_versions = extract_fixed_versions(raw, package)
+            vulns.append(Vulnerability(
+                id=raw.get("id", "UNKNOWN"),
+                summary=raw.get("summary", "No summary available"),
+                severity=severity,
+                cvss_score=cvss_score,
+                aliases=raw.get("aliases", []),
+                fixed_versions=fixed_versions,
+            ))
+
+        results.append(DependencyAuditResult(
+            package=package,
+            version=version,
+            vulnerabilities=vulns,
+        ))
+
+    return results
+
+
+def print_report(results: list[DependencyAuditResult]) -> None:
+    """Print a human-readable audit report."""
+    vulnerable = [r for r in results if r.vulnerabilities]
+    clean = [r for r in results if not r.vulnerabilities]
+
+    print("\n" + "=" * 70)
+    print("DEPENDENCY VULNERABILITY AUDIT REPORT")
+    print("=" * 70)
+    print(f"Total packages scanned: {len(results)}")
+    print(f"Packages with vulnerabilities: {len(vulnerable)}")
+    print(f"Clean packages: {len(clean)}")
+
+    if vulnerable:
+        print("\n" + "-" * 70)
+        print("VULNERABLE PACKAGES")
+        print("-" * 70)
+        for result in sorted(vulnerable, key=lambda r: SEVERITY_ORDER.index(r.max_severity or "LOW"), reverse=True):
+            print(f"\n📦 {result.package} == {result.version}")
+            print(f"   Severity: {result.max_severity}")
+            for vuln in sorted(result.vulnerabilities, key=lambda v: SEVERITY_ORDER.index(v.severity), reverse=True):
+                aliases = ", ".join(vuln.aliases) if vuln.aliases else "none"
+                fixed = ", ".join(vuln.fixed_versions) if vuln.fixed_versions else "no fix available"
+                print(f"   [{vuln.severity}] {vuln.id} (aliases: {aliases})")
+                print(f"           CVSS: {vuln.cvss_score:.1f}")
+                print(f"           {textwrap.shorten(vuln.summary, width=60)}")
+                print(f"           Fixed in: {fixed}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Audit Python dependencies for known vulnerabilities via OSV"
+    )
+    parser.add_argument(
+        "--requirements",
+        type=Path,
+        default=Path("requirements.txt"),
+        help="Path to requirements.txt (default: requirements.txt)",
+    )
+    parser.add_argument(
+        "--fail-on",
+        nargs="+",
+        choices=SEVERITY_ORDER,
+        default=["CRITICAL", "HIGH"],
+        help="Severity levels that cause a non-zero exit (default: CRITICAL HIGH)",
+    )
+    parser.add_argument(
+        "--output-json",
+        type=Path,
+        help="Write results to a JSON file",
+    )
+    args = parser.parse_args()
+
+    if not args.requirements.exists():
+        print(f"Error: requirements file not found: {args.requirements}", file=sys.stderr)
+        return 2
+
+    results = audit_dependencies(args.requirements)
+    print_report(results)
+
+    # Optionally write JSON report
+    if args.output_json:
+        report = {
+            "total": len(results),
+            "vulnerable": [
+                {
+                    "package": r.package,
+                    "version": r.version,
+                    "max_severity": r.max_severity,
+                    "vulnerabilities": [
+                        {
+                            "id": v.id,
+                            "severity": v.severity,
+                            "cvss": v.cvss_score,
+                            "summary": v.summary,
+                            "aliases": v.aliases,
+                            "fixed_versions": v.fixed_versions,
+                        }
+                        for v in r.vulnerabilities
+                    ],
+                }
+                for r in results
+                if r.vulnerabilities
+            ],
+        }
+        with open(args.output_json, "w") as f:
+            json.dump(report, f, indent=2)
+        print(f"\nJSON report written to: {args.output_json}")
+
+    # Enforce policy
+    fail_severities = set(args.fail_on)
+    failing = [
+        r for r in results
+        if r.max_severity in fail_severities
+    ]
+
+    if failing:
+        print(f"\n✗ Audit FAILED: {len(failing)} package(s) with {args.fail_on} severity vulnerabilities.")
+        return 1
+
+    print("\n✓ Audit PASSED: No blocking vulnerabilities found.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+---
+
+## 7. Secret Detection and Prevention
+
+### 7.1 Why Secrets Leak
+
+Secrets appear in source code for predictable reasons:
+
+1. **Developer convenience**: pasting a token to test quickly, intending to remove it
+2. **Misconfigured environments**: `.env` files committed alongside `.env.example`
+3. **Debug logging**: printing request objects that contain authorization headers
+4. **Configuration drift**: infrastructure configs that hardcode credentials for "legacy" reasons
+5. **History contamination**: a secret removed in commit N is still visible in `git log`
+
+The fix requires both detection (catching secrets before they land) and rotation (invalidating any secret that did land).
+
+### 7.2 Pre-Commit Hook with GitLeaks
+
+```toml
+# security/gitleaks.toml
+# GitLeaks configuration for pre-commit secret detection.
+# GitLeaks >= 8.0.0
+
+title = "Gitleaks - Project Secret Detection Configuration"
+
+[extend]
+# Extend the default ruleset
+useDefault = true
+
+[[rules]]
+id = "internal-service-token"
+description = "Internal microservice authentication token"
+regex = '''(?i)x[-_]service[-_]token['":\s=]+([a-zA-Z0-9+/=_\-]{32,})'''
+secretGroup = 1
+keywords = ["x-service-token", "x_service_token"]
+severity = "critical"
+tags = ["internal", "auth"]
+
+[[rules]]
+id = "database-connection-string"
+description = "Database connection string with embedded credentials"
+regex = '''(?:postgres|mysql|mongodb|redis)(?:\+\w+)?:\/\/[^:]+:[^@\s]{8,}@'''
+keywords = ["postgres://", "mysql://", "mongodb://", "redis://"]
+severity = "critical"
+tags = ["database", "credential"]
+
+[[rules]]
+id = "jwt-signing-secret"
+description = "JWT signing secret in configuration"
+regex = '''(?i)jwt[_\-]?(secret|signing[_\-]?key|private[_\-]?key)['":\s=]+['"]([a-zA-Z0-9+/=_\-]{16,})['"]'''
+secretGroup = 2
+keywords = ["jwt_secret", "jwt_signing_key", "jwt-secret"]
+severity = "critical"
+tags = ["jwt", "auth"]
+
+[[rules]]
+id = "pem-private-key-block"
+description = "PEM private key block"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----'''
+severity = "critical"
+tags = ["private-key", "crypto"]
+
+[[rules]]
+id = "env-file-secret"
+description = "Secret value in .env file"
+regex = '''(?i)^(PASSWORD|SECRET|API_KEY|ACCESS_TOKEN|AUTH_TOKEN|PRIVATE_KEY|CLIENT_SECRET)=(?!["']?\$\{)(?!["']?<)(.{8,})'''
+secretGroup = 2
+filePatterns = ["^\.env(\.\w+)?$"]
+severity = "high"
+tags = ["env", "config"]
+
+[allowlist]
+description = "Global allowlist for false positives"
+regexes = [
+  # Placeholder values
+  '''(?i)(placeholder|changeme|your[-_]?.*here|example|todo|fixme|replace.?me)''',
+  # Template variables
+  '''\$\{[^}]+\}''',
+  '''\{\{[^}]+\}\}''',
+  # Test/mock values
+  '''(?i)(test|mock|fake|dummy)[-_]?(secret|key|token|password)''',
+]
+paths = [
+  # Test fixtures and example files
+  "test/",
+  "tests/",
+  "spec/",
+  "__tests__/",
+  "*.test.*",
+  "*.spec.*",
+  "*.example",
+  ".env.example",
+  ".env.sample",
+  "CHANGELOG.md",
+  "docs/",
+]
+commits = [
+  # Add known false-positive commit SHAs here if needed
+]
+stopwords = [
+  "password_hash",
+  "hashed_password",
+  "password_digest",
+]
+```
+
+### 7.3 Pre-Commit Framework Configuration
+
+```yaml
+# .pre-commit-config.yaml
+# Pre-commit hooks configuration.
+# Install: pip install pre-commit && pre-commit install
+# Run all: pre-commit run --all-files
+
+repos:
+  # ─────────────────────────────────────────────────────────────
+  # Secret detection (runs first to fail fast on credential leaks)
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        args:
+          - "--config=security/gitleaks.toml"
+          - "--verbose"
+
+  # ─────────────────────────────────────────────────────────────
+  # General file hygiene
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ["--unsafe"]
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: ["--branch=main", "--branch=master", "--branch=production"]
+
+  # ─────────────────────────────────────────────────────────────
+  # Python linting and formatting
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.5
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  # ─────────────────────────────────────────────────────────────
+  # SAST via Semgrep (lightweight subset at pre-commit stage)
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/semgrep/semgrep
+    rev: v1.68.0
+    hooks:
+      - id: semgrep
+        args:
+          - "--config=security/semgrep-rules/python-security.yaml"
+          - "--error"
+          - "--quiet"
+        types: [python]
+
+  # ─────────────────────────────────────────────────────────────
+  # Dockerfile linting
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args:
+          - "--config=security/hadolint.yaml"
+
+  # ─────────────────────────────────────────────────────────────
+  # Terraform / IaC linting
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.90.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_tflint
+        args:
+          - "--args=--config=__GIT_WORKING_DIR__/security/tflint.hcl"
+
+  # ─────────────────────────────────────────────────────────────
+  # Commit message format enforcement
+  # ─────────────────────────────────────────────────────────────
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args:
+          - "feat"
+          - "fix"
+          - "docs"
+          - "style"
+          - "refactor"
+          - "perf"
+          - "test"
+          - "build"
+          - "ci"
+          - "chore"
+          - "security"
+          - "revert"
+```
+
+---
+
+## 8. Policy as Code
+
+### 8.1 Open Policy Agent (OPA) Architecture
+
+Policy as Code externalizes authorization and compliance decisions into a versioned, testable policy engine. OPA uses the Rego policy language and operates as a decision point that any service can query.
+
+The evaluation model is:
+
+```
+input (JSON) + data (JSON) + policy (Rego) → decision (JSON)
+```
+
+This allows the same policy engine to serve:
+- API authorization ("Can user X perform action Y on resource Z?")
+- CI/CD gate decisions ("Does this container image meet our security policy?")
+- Kubernetes admission control ("Does this Pod spec comply with our security standards?")
+- Infrastructure compliance ("Does this Terraform plan violate any controls?")
+
+### 8.2 OPA Policy for Container Image Security
+
+```rego
+# security/opa/container_image_policy.rego
+# OPA policy for validating container images before deployment.
+# Evaluated by CI pipeline and Kubernetes admission webhook.
+
+package container.security
+
+import future.keywords.in
+import future.keywords.every
+
+# ─────────────────────────────────────────────────────────────
+# Default deny: images must explicitly satisfy all rules
+# ─────────────────────────────────────────────────────────────
+default allow := false
+
+# Allow only when all security checks pass
+allow {
+    count(deny_reasons) == 0
+}
+
+# ─────────────────────────────────────────────────────────────
+# Collect all denial reasons (for structured error reporting)
+# ─────────────────────────────────────────────────────────────
+deny_reasons[reason] {
+    reason := critical_vulnerabilities_present
+}
+
+deny_reasons[reason] {
+    reason := runs_as_root
+}
+
+deny_reasons[reason] {
+    reason := uses_latest_tag
+}
+
+deny_reasons[reason] {
+    reason := missing_sbom
+}
+
+deny_reasons[reason] {
+    reason := forbidden_base_image
+}
+
+deny_reasons[reason] {
+    reason := missing_required_labels[_]
+}
+
+deny_reasons[reason] {
+    reason := writable_root_filesystem
+}
+
+deny_reasons[reason] {
+    reason := excessive_capabilities[_]
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: No CRITICAL or HIGH CVEs with available fixes
+# ─────────────────────────────────────────────────────────────
+critical_vulnerabilities_present := reason {
+    critical_vulns := [v |
+        v := input.scan_results.vulnerabilities[_]
+        v.severity in {"CRITICAL", "HIGH"}
+        v.fix_available == true
+    ]
+    count(critical_vulns) > 0
+    reason := sprintf(
+        "Image has %d CRITICAL/HIGH fixable vulnerabilities. Run `trivy image --severity CRITICAL,HIGH %s` for details.",
+        [count(critical_vulns), input.image.name]
+    )
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: Container must not run as root (UID 0)
+# ─────────────────────────────────────────────────────────────
+runs_as_root := reason {
+    input.image.config.User == ""
+    reason := "Container image has no USER directive. Set a non-root user: USER 65534"
+}
+
+runs_as_root := reason {
+    user := input.image.config.User
+    user != ""
+    # Match UID 0 or "root" username
+    regex.match(`^(0|root)(:.*)?$`, user)
+    reason := sprintf("Container image runs as root user '%s'. Use a non-root UID >= 1000.", [user])
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: Image must not use :latest tag
+# ─────────────────────────────────────────────────────────────
+uses_latest_tag := reason {
+    image_ref := input.image.reference
+    endswith(image_ref, ":latest")
+    reason := sprintf(
+        "Image '%s' uses ':latest' tag. Pin to a specific digest or semantic version tag.",
+        [image_ref]
+    )
+}
+
+uses_latest_tag := reason {
+    image_ref := input.image.reference
+    not contains(image_ref, ":")
+    reason := sprintf(
+        "Image '%s' has no tag specified (defaults to :latest). Pin to a specific version.",
+        [image_ref]
+    )
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: SBOM must be present and signed
+# ─────────────────────────────────────────────────────────────
+missing_sbom := reason {
+    not input.attestations.sbom
+    reason := "No SBOM attestation found for image. Generate with: syft <image> -o spdx-json | cosign attest ..."
+}
+
+missing_sbom := reason {
+    input.attestations.sbom
+    not input.attestations.sbom.verified
+    reason := "SBOM attestation present but signature verification failed. Check Cosign signing key."
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: Base image must be from approved registry
+# ─────────────────────────────────────────────────────────────
+approved_base_registries := {
+    "gcr.io/distroless",
+    "cgr.dev/chainguard",
+    "registry.access.redhat.com/ubi",
+    "docker.io/library/alpine",
+    "our-internal-registry.example.com",
+}
+
+forbidden_base_image := reason {
+    base := input.image.base_image
+    not any_approved_base(base)
+    reason := sprintf(
+        "Base image '%s' is not from an approved registry. Use distroless, Chainguard, or UBI.",
+        [base]
+    )
+}
+
+any_approved_base(base) {
+    approved := approved_base_registries[_]
+    startswith(base, approved)
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: Required OCI labels must be present
+# ─────────────────────────────────────────────────────────────
+required_labels := {
+    "org.opencontainers.image.source",
+    "org.opencontainers.image.revision",
+    "org.opencontainers.image.created",
+    "org.opencontainers.image.version",
+}
+
+missing_required_labels[reason] {
+    label := required_labels[_]
+    not input.image.config.Labels[label]
+    reason := sprintf("Required OCI label '%s' is missing from image.", [label])
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: Root filesystem should be read-only
+# ─────────────────────────────────────────────────────────────
+writable_root_filesystem := reason {
+    # Check Kubernetes security context if present
+    input.kubernetes_spec
+    not input.kubernetes_spec.securityContext.readOnlyRootFilesystem
+    reason := "Kubernetes pod spec does not set readOnlyRootFilesystem: true"
+}
+
+# ─────────────────────────────────────────────────────────────
+# Rule: No excessive Linux capabilities
+# ─────────────────────────────────────────────────────────────
+dangerous_capabilities := {
+    "SYS_ADMIN", "NET_ADMIN", "SYS_PTRACE",
+    "SYS_MODULE", "DAC_OVERRIDE", "SETUID",
+    "SETGID", "NET_RAW", "SYS_RAWIO",
+}
+
+excessive_capabilities[reason] {
+    cap := input.kubernetes_spec.securityContext.capabilities.add[_]
+    cap in dangerous_capabilities
+    reason := sprintf("Dangerous Linux capability '%s' added to container. Avoid unless strictly necessary.", [cap])
+}
+
+# ─────────────────────────────────────────────────────────────
+# Summary report for structured output
+# ─────────────────────────────────────────────────────────────
+report := {
+    "allow": allow,
+    "image": input.image.reference,
+    "denial_reasons": deny_reasons,
+    "checks_passed": count(deny_reasons) == 0,
+    "severity": severity_summary,
+}
+
+severity_summary := "PASS" { count(deny_reasons) == 0 }
+severity_summary := "FAIL" { count(deny_reasons) > 0 }
+```
+
+### 8.3 OPA Unit Tests
+
+```rego
+# security/opa/container_image_policy_test.rego
+# Unit tests for the container image security policy.
+# Run with: opa test security/opa/ -v
+
+package container.security
+
+# ─────────────────────────────────────────────────────────────
+# Test: Clean image should be allowed
+# ─────────────────────────────────────────────────────────────
+test_clean_image_passes if {
+    allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:1.2.3",
+            "name": "api:1.2.3",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "65534",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "abc123",
+                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
+                    "org.opencontainers.image.version": "1.2.3",
+                },
+            },
+        },
+        "scan_results": {"vulnerabilities": []},
+        "attestations": {
+            "sbom": {"verified": true},
+        },
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+
+# ─────────────────────────────────────────────────────────────
+# Test: Latest tag should be denied
+# ─────────────────────────────────────────────────────────────
+test_latest_tag_denied if {
+    not allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:latest",
+            "name": "api:latest",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "65534",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "abc123",
+                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
+                    "org.opencontainers.image.version": "1.2.3",
+                },
+            },
+        },
+        "scan_results": {"vulnerabilities": []},
+        "attestations": {"sbom": {"verified": true}},
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+
+# ─────────────────────────────────────────────────────────────
+# Test: Root user should be denied
+# ─────────────────────────────────────────────────────────────
+test_root_user_denied if {
+    not allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:1.0.0",
+            "name": "api:1.0.0",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "root",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "abc123",
+                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
+                    "org.opencontainers.image.version": "1.0.0",
+                },
+            },
+        },
+        "scan_results": {"vulnerabilities": []},
+        "attestations": {"sbom": {"verified": true}},
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+
+# ─────────────────────────────────────────────────────────────
+# Test: Critical vulnerability should be denied when fix available
+# ─────────────────────────────────────────────────────────────
+test_critical_vuln_denied if {
+    not allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:1.0.0",
+            "name": "api:1.0.0",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "65534",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "abc123",
+                    "org.opencontainers.image.created": "2024-01-01T00:00:00Z",
+                    "org.opencontainers.image.version": "1.0.0",
+                },
+            },
+        },
+        "scan_results": {
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2021-44228",
+                    "severity": "CRITICAL",
+                    "fix_available": true,
+                    "package": "log4j-core",
+                },
+            ],
+        },
+        "attestations": {"sbom": {"verified": true}},
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+
+# ─────────────────────────────────────────────────────────────
+# Test: Unfixable vulnerability should not block deployment
+# (fix is not available; teams cannot act on it immediately)
+# ─────────────────────────────────────────────────────────────
+test_unfixable_critical_does_not_block if {
+    allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:2.0.0",
+            "name": "api:2.0.0",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "65534",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "def456",
+                    "org.opencontainers.image.created": "2024-01-02T00:00:00Z",
+                    "org.opencontainers.image.version": "2.0.0",
+                },
+            },
+        },
+        "scan_results": {
+            "vulnerabilities": [
+                {
+                    "id": "CVE-2024-99999",
+                    "severity": "CRITICAL",
+                    "fix_available": false,
+                    "package": "some-lib",
+                },
+            ],
+        },
+        "attestations": {"sbom": {"verified": true}},
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+
+# ─────────────────────────────────────────────────────────────
+# Test: Missing SBOM should be denied
+# ─────────────────────────────────────────────────────────────
+test_missing_sbom_denied if {
+    not allow with input as {
+        "image": {
+            "reference": "our-internal-registry.example.com/api:3.0.0",
+            "name": "api:3.0.0",
+            "base_image": "gcr.io/distroless/static:nonroot",
+            "config": {
+                "User": "65534",
+                "Labels": {
+                    "org.opencontainers.image.source": "https://github.com/example/api",
+                    "org.opencontainers.image.revision": "ghi789",
+                    "org.opencontainers.image.created": "2024-01-03T00:00:00Z",
+                    "org.opencontainers.image.version": "3.0.0",
+                },
+            },
+        },
+        "scan_results": {"vulnerabilities": []},
+        "attestations": {},
+        "kubernetes_spec": {
+            "securityContext": {
+                "readOnlyRootFilesystem": true,
+                "capabilities": {"add": []},
+            },
+        },
+    }
+}
+```
+
+### 8.4 Kubernetes Admission Policy with Kyverno
+
+```yaml
+# security/kyverno/restrict-pod-security.yaml
+# Kyverno ClusterPolicy enforcing pod security standards at admission time.
+# Applies to all namespaces except kube-system.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-pod-security
+  annotations:
+    policies.kyverno.io/title: Restrict Pod Security
+    policies.kyverno.io/category: Pod Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >
+      Enforces security best practices for all Pods:
+      non-root execution, read-only root filesystem, dropped capabilities,
+      no privilege escalation, and approved image registries.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    # ─────────────────────────────────────────────────────────────
+    # Rule 1: Containers must not run as root
+    # ─────────────────────────────────────────────────────────────
+    - name: restrict-root-user
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+                      - kube-public
+      validate:
+        message: >
+          Containers must not run as root (UID 0).
+          Set securityContext.runAsNonRoot: true or securityContext.runAsUser >= 1000.
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.runAsUser || `0` }}"
+                    operator: Equals
+                    value: 0
+                  - key: "{{ element.securityContext.runAsNonRoot || `false` }}"
+                    operator: Equals
+                    value: false
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 2: Root filesystem must be read-only
+    # ─────────────────────────────────────────────────────────────
+    - name: require-readonly-rootfs
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      validate:
+        message: >
+          Containers must set securityContext.readOnlyRootFilesystem: true.
+          Use emptyDir volumes for writable paths.
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.readOnlyRootFilesystem || `false` }}"
+                    operator: NotEquals
+                    value: true
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 3: Privilege escalation must be disabled
+    # ─────────────────────────────────────────────────────────────
+    - name: restrict-privilege-escalation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      validate:
+        message: >
+          Containers must set securityContext.allowPrivilegeEscalation: false.
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.allowPrivilegeEscalation || `true` }}"
+                    operator: Equals
+                    value: true
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 4: Drop ALL capabilities, add back only specific ones
+    # ─────────────────────────────────────────────────────────────
+    - name: restrict-capabilities
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      validate:
+        message: >
+          Containers must drop ALL capabilities.
+          Add back only specific required capabilities with justification.
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.capabilities.drop || `[]` }}"
+                    operator: AnyNotIn
+                    value:
+                      - ALL
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 5: Images must come from approved registries
+    # ─────────────────────────────────────────────────────────────
+    - name: restrict-image-registries
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      validate:
+        message: >
+          Images must be pulled from approved registries:
+          our-internal-registry.example.com, gcr.io/distroless, cgr.dev/chainguard
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                all:
+                  - key: "{{ element.image }}"
+                    operator: AnyNotIn
+                    value:
+                      - "our-internal-registry.example.com/*"
+                      - "gcr.io/distroless/*"
+                      - "cgr.dev/chainguard/*"
+                      - "registry.access.redhat.com/ubi*"
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 6: Disallow hostNetwork, hostPID, hostIPC
+    # ─────────────────────────────────────────────────────────────
+    - name: restrict-host-namespaces
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      validate:
+        message: >
+          Pods must not share host namespaces (hostNetwork, hostPID, hostIPC).
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.object.spec.hostNetwork || `false` }}"
+                operator: Equals
+                value: true
+              - key: "{{ request.object.spec.hostPID || `false` }}"
+                operator: Equals
+                value: true
+              - key: "{{ request.object.spec.hostIPC || `false` }}"
+                operator: Equals
+                value: true
+
+    # ─────────────────────────────────────────────────────────────
+    # Rule 7: Mutate — add seccomp profile if missing
+    # ─────────────────────────────────────────────────────────────
+    - name: add-default-seccomp
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: kubernetes.io/metadata.name
+                    operator: NotIn
+                    values:
+                      - kube-system
+      mutate:
+        patchStrategicMerge:
+          spec:
+            securityContext:
+              +(seccompProfile):
+                type: RuntimeDefault
+```
+
+---
+
+## 9. Container and Infrastructure Security
+
+### 9.1 Secure Dockerfile Design
+
+A secure Dockerfile follows several invariants:
+
+1. **Multi-stage build**: the build environment never reaches production
+2. **Minimal base image**: fewer installed packages = fewer CVEs
+3. **Non-root user**: no UID 0 at runtime
+4. **No secrets in layers**: image layers are immutable and inspectable
+5. **Pinned base image digest**: reproducible builds, immune to tag mutation attacks
+6. **Read-only root filesystem friendly**: writable paths explicitly declared
+
+```dockerfile
+# Dockerfile
+# Multi-stage secure build for a Python FastAPI application.
+# Base: distroless/python3 — no shell, no package manager, minimal attack surface.
+
+# ─────────────────────────────────────────────────────────────
+# Stage 1: Dependency resolution
+# Uses full Python image to compile native extensions
+# ─────────────────────────────────────────────────────────────
+FROM python:3.12.3-slim-bookworm@sha256:a12f14f3cb89b53e4b8949e44f4e04ab575cfb88c35dab9b9d6b6a97e43c81e4 \
+    AS dependency-builder
+
+# Set build-time environment
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /build
+
+# Copy only dependency manifests first (leverages layer caching)
+COPY requirements.txt requirements-hash.txt ./
+
+# Verify requirements file integrity before installing
+RUN sha256sum -c requirements-hash.txt || \
+    (echo "ERROR: requirements.txt integrity check failed" && exit 1)
+
+# Install dependencies into an isolated prefix
+RUN pip install \
+    --no-cache-dir \
+    --prefix=/install \
+    --requirement requirements.txt
+
+# ─────────────────────────────────────────────────────────────
+# Stage 2: Security scanning (optional — for local builds)
+# In CI, Trivy runs externally; this stage enables local scan
+# ─────────────────────────────────────────────────────────────
+FROM aquasec/trivy:0.51.1@sha256:3ebf78e920b3e6e9b97f99ce70c6d3e8be726c17fa34d7ee7a16be8a79a3e643 \
+    AS security-scanner
+
+COPY --from=dependency-builder /install /install
+# Scan installed packages; fail on CRITICAL findings
+RUN trivy filesystem --exit-code 1 --severity CRITICAL --no-progress /install \
+    || (echo "WARN: Trivy not available in local build; CI will scan" && exit 0)
+
+# ─────────────────────────────────────────────────────────────
+# Stage 3: Final runtime image
+# Distroless: no shell, no curl, no package manager
+# ─────────────────────────────────────────────────────────────
+FROM gcr.io/distroless/python3-debian12:nonroot@sha256:2d7ac4949dca6b52fd3c2f6ee8cedb52e9b56e4bf18ce97869cbf50ce04c1bc6 \
+    AS runtime
+
+# OCI image annotations (required by container policy)
+LABEL org.opencontainers.image.source="https://github.com/example/api" \
+      org.opencontainers.image.description="Example FastAPI service" \
+      org.opencontainers.image.licenses="MIT"
+# Note: revision, created, and version labels are injected by CI
+# docker build --label org.opencontainers.image.revision=$(git rev-parse HEAD) ...
+
+# Copy installed dependencies from builder stage
+COPY --from=dependency-builder /install/lib/python3.12/site-packages \
+     /usr/local/lib/python3.12/site-packages
+
+# Copy application source (non-secret files only)
+COPY --chown=65534:65534 src/ /app/src/
+COPY --chown=65534:65534 pyproject.toml /app/
+
+# Distroless nonroot image uses UID 65534 by default
+# This is set in the base image; we document it explicitly
+USER 65534
+
+WORKDIR /app
+
+# Expose only the application port
+EXPOSE 8080
+
+# Use exec form to avoid shell interpretation
+ENTRYPOINT ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+```
+
+### 9.2 Terraform Security with Checkov
+
+```hcl
+# infrastructure/aws/s3_secure_bucket.tf
+# Terraform module for a security-compliant S3 bucket.
+# All Checkov checks CKV_AWS_18, CKV_AWS_19, CKV_AWS_52,
+# CKV_AWS_53, CKV_AWS_54, CKV_AWS_55, CKV_AWS_56 pass.
+
+terraform {
+  required_version = ">= 1.7.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.40.0"
+    }
+  }
+}
+
+variable "bucket_name" {
+  type        = string
+  description = "Name of the S3 bucket"
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$", var.bucket_name))
+    error_message = "Bucket name must be 3-63 chars, lowercase alphanumeric and hyphens only."
+  }
+}
+
+variable "kms_key_arn" {
+  type        = string
+  description = "ARN of the KMS key for server-side encryption"
+}
+
+variable "log_bucket_id" {
+  type        = string
+  description = "ID of the S3 bucket for access logs"
+}
+
+variable "environment" {
+  type        = string
+  description = "Deployment environment (prod, staging, dev)"
+  validation {
+    condition     = contains(["prod", "staging", "dev"], var.environment)
+    error_message = "Environment must be prod, staging, or dev."
+  }
+}
+
+# Primary secure bucket
+resource "aws_s3_bucket" "secure" {
+  bucket        = var.bucket_name
+  force_destroy = var.environment != "prod"
+
+  tags = {
+    Environment  = var.environment
+    ManagedBy    = "terraform"
+    SecurityTier = "high"
+  }
+}
+
+# CKV_AWS_19: Ensure S3 bucket has server-side encryption enabled
+resource "aws_s3_bucket_server_side_encryption_configuration" "secure" {
+  bucket = aws_s3_bucket.secure.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_arn
+    }
+    # Prevents uploading objects without encryption
+    bucket_key_enabled = true
+  }
+}
+
+# CKV_AWS_52: Ensure S3 bucket has MFA delete enabled
+# CKV_AWS_53: Ensure S3 bucket has versioning enabled
+resource "aws_s3_bucket_versioning" "secure" {
+  bucket = aws_s3_bucket.secure.id
+
+  versioning_configuration {
+    status     = "Enabled"
+    mfa_delete = var.environment == "prod" ? "Enabled" : "Disabled"
+  }
+}
+
+# CKV_AWS_18: Ensure S3 bucket access logging is enabled
+resource "aws_s3_bucket_logging" "secure" {
+  bucket        = aws_s3_bucket.secure.id
+  target_bucket = var.log_bucket_id
+  target_prefix = "s3-access-logs/${var.bucket_name}/"
+}
+
+# CKV_AWS_54: Ensure S3 bucket policy does not allow wildcard actions
+# CKV_AWS_55: Block public ACLs
+resource "aws_s3_bucket_public_access_block" "secure" {
+  bucket = aws_s3_bucket.secure.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# CKV_AWS_56: Ensure S3 bucket is configured to use object ownership controls
+resource "aws_s3_bucket_ownership_controls" "secure" {
+  bucket = aws_s3_bucket.secure.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+# Lifecycle policy for automatic object expiration and transition
+resource "aws_s3_bucket_lifecycle_configuration" "secure" {
+  bucket = aws_s3_bucket.secure.id
+
+  rule {
+    id     = "transition-and-expire"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 90
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+# Bucket policy: enforce TLS-only access and deny non-KMS uploads
+data "aws_iam_policy_document" "secure_bucket_policy" {
+  # Deny any request not using TLS
+  statement {
+    sid    = "DenyNonTLS"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.secure.arn,
+      "${aws_s3_bucket.secure.arn}/*",
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  # Deny object uploads that do not use the specified KMS key
+  statement {
+    sid    = "DenyNonKMSUploads"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.secure.arn}/*"]
+
+    condition {
+      test     = "StringNotEqualsIfExists"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [var.kms_key_arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "secure" {
+  bucket = aws_s3_bucket.secure.id
+  policy = data.aws_iam_policy_document.secure_bucket_policy.json
+
+  # Ensure public access block is in place before applying bucket policy
+  depends_on = [aws_s3_bucket_public_access_block.secure]
+}
+
+output "bucket_id" {
+  value       = aws_s3_bucket.secure.id
+  description = "ID of the secure S3 bucket"
+}
+
+output "bucket_arn" {
+  value       = aws_s3_bucket.secure.arn
+  description = "ARN of the secure S3 bucket"
+}
+```
+
+---
+
+## 10. The Secure Pipeline: End-to-End Implementation
+
+### 10.1 GitHub Actions Workflow
+
+This is a complete, production-ready CI/CD pipeline implementing all shift-left security controls discussed in this lesson.
+
+```mermaid
+flowchart TD
+    subgraph sub_trigger ["Trigger"]
+        T1["PR opened / pushed"]
+        T2["Merge to main"]
+    end
+
+    subgraph sub_quality ["Quality Gate"]
+        Q1["Lint + Format"]
+        Q2["Unit Tests"]
+        Q3["Code Coverage ≥ 80%"]
+    end
+
+    subgraph sub_security ["Security Gate"]
+        S1["SAST (Semgrep + CodeQL)"]
+        S2["Secret Scan (TruffleHog)"]
+        S3["SCA (Trivy filesystem)"]
+        S4["License Check"]
+    end
+
+    subgraph sub_build ["Build & Attest"]
+        B1["Docker build\n(multi-stage)"]
+        B2["SBOM generation (Syft)"]
+        B3["Image sign (Cosign)"]
+        B4["SBOM attest (Cosign)"]
+    end
+
+    subgraph sub_imgsec ["Image Security Gate"]
+        I1["Container scan (Trivy image)"]
+        I2["OPA policy evaluation"]
+        I3["DAST (ZAP baseline)"]
+    end
+
+    subgraph sub_deploy ["Deploy"]
+        D1["Push to registry"]
+        D2["Deploy to staging"]
+        D3["Smoke tests"]
+        D4["Deploy to production"]
+    end
+
+    T1 --> Q1 --> Q2 --> Q3
+    Q3 --> S1 & S2 & S3 & S4
+    S1 & S2 & S3 & S4 -->|"All gates pass"| B1
+    B1 --> B2 --> B3 --> B4
+    B4 --> I1 --> I2 --> I3
+    I3 -->|"PR"| D1
+    T2 --> D1 --> D2 --> D3 --> D4
+```
+
+```yaml
+# .github/workflows/secure-pipeline.yml
+# Complete DevSecOps CI/CD pipeline with all shift-left security gates.
+# Requires the following secrets in GitHub repository settings:
+#   - COSIGN_PRIVATE_KEY: Cosign private key for image signing
+#   - COSIGN_PASSWORD: Password for the Cosign private key
+#   - REGISTRY_USERNAME: Container registry username
+#   - REGISTRY_PASSWORD: Container registry password
+#   - SNYK_TOKEN: Snyk API token (optional — Trivy is primary)
+
+name: Secure CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [main, master]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      skip_dast:
+        description: "Skip DAST scan (for hotfix deployments)"
+        required: false
+        default: "false"
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PYTHON_VERSION: "3.12"
+  OPA_VERSION: "0.63.0"
+  COSIGN_VERSION: "2.2.4"
+  SYFT_VERSION: "1.3.0"
+  TRIVY_VERSION: "0.51.1"
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  id-token: write  # Required for Cosign keyless signing (OIDC)
+  pull-requests: write
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 1: Code Quality Gate
+  # ─────────────────────────────────────────────────────────────
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate diff analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Lint with Ruff
+        run: |
+          ruff check . --output-format=github
+          ruff format --check .
+
+      - name: Type check with mypy
+        run: mypy src/ --ignore-missing-imports --strict
+
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/unit \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=80 \
+            --junitxml=test-results.xml \
+            -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results.xml
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 2: SAST Gate (runs in parallel with quality gate)
+  # ─────────────────────────────────────────────────────────────
+  sast-gate:
+    name: SAST Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep SAST
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >
+            security/semgrep-rules/python-security.yaml
+            p/owasp-top-ten
+            p/python
+          generateSarif: "1"
+          publishResults: false
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: codeql
+          upload: true
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 3: Secret Detection Gate
+  # ─────────────────────────────────────────────────────────────
+  secret-detection:
+    name: Secret Detection
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog (full history scan on PR)
+        uses: trufflesecurity/trufflehog@v3.78.0
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: >
+            --only-verified
+            --fail
+            --json
+            --no-update
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: security/gitleaks.toml
+          GITLEAKS_ENABLE_COMMENTS: true
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 4: SCA and License Gate
+  # ─────────────────────────────────────────────────────────────
+  sca-gate:
+    name: SCA and License Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-sca.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: false
+          vuln-type: library
+          scanners: vuln,secret,license
+
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-sca.sarif
+          category: trivy-sca
+
+      - name: Run OSV dependency audit
+        run: |
+          pip install requests packaging
+          python scripts/audit_dependencies.py \
+            --requirements requirements.txt \
+            --fail-on CRITICAL HIGH \
+            --output-json reports/sca-audit.json
+
+      - name: Upload SCA report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sca-report
+          path: reports/sca-audit.json
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 5: IaC Security Gate
+  # ─────────────────────────────────────────────────────────────
+  iac-gate:
+    name: IaC Security Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infrastructure/
+          framework: terraform,dockerfile,kubernetes
+          output_format: sarif
+          output_file_path: checkov.sarif
+          soft_fail: false
+          check: >
+            CKV_AWS_18,CKV_AWS_19,CKV_AWS_52,CKV_AWS_53,
+            CKV_AWS_54,CKV_AWS_55,CKV_AWS_56,
+            CKV_DOCKER_2,CKV_DOCKER_3,CKV_DOCKER_7,
+            CKV_K8S_8,CKV_K8S_9,CKV_K8S_10,CKV_K8S_28,
+            CKV_K8S_30,CKV_K8S_32,CKV_K8S_36,CKV_K8S_37
+
+      - name: Upload Checkov SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: checkov.sarif
+          category: checkov
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 6: Build, Scan, Sign, Attest
+  # Requires all security gates to pass
+  # ─────────────────────────────────────────────────────────────
+  build-and-attest:
+    name: Build, Scan, Sign, and Attest
+    runs-on: ubuntu-24.04
+    needs:
+      - quality-gate
+      - sast-gate
+      - secret-detection
+      - sca-gate
+      - iac-gate
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-ref: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: image=moby/buildkit:latest
+
+      - name: Log in to container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+          # Build args: inject version metadata (never secrets)
+          build-args: |
+            BUILD_VERSION=${{ github.ref_name }}
+            BUILD_COMMIT=${{ github.sha }}
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
+
+      - name: Scan container image
+        id: trivy-image
+        run: |
+          trivy image \
+            --format sarif \
+            --output trivy-image.sarif \
+            --severity CRITICAL,HIGH \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --scanners vuln \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+
+      - name: Upload Trivy image scan SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-image.sarif
+          category: trivy-image
+
+      - name: Install Syft for SBOM generation

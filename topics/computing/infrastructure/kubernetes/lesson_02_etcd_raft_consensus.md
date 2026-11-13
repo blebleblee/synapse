@@ -187,11 +187,11 @@ An unrestricted log grows without bound. When the log exceeds a configurable thr
 
 ```mermaid
 flowchart LR
-    subgraph Log Before Compaction
+    subgraph sub_log_before_compaction ["Log Before Compaction"]
         direction LR
         E1["idx:1\nterm:1"] --> E2["idx:2\nterm:1"] --> E3["idx:3\nterm:2"] --> E4["idx:4\nterm:2"] --> E5["idx:5\nterm:3"]
     end
-    subgraph Log After Compaction at idx=3
+    subgraph sub_log_after_compaction_at_idx_3 ["Log After Compaction at idx=3"]
         direction LR
         S["Snapshot\n(idx:3, term:2)\nKV state"] --> E4b["idx:4\nterm:2"] --> E5b["idx:5\nterm:3"]
     end
@@ -290,14 +290,14 @@ Consider a five-member etcd cluster {A, B, C, D, E} with A as the current leader
 
 ```mermaid
 flowchart LR
-    subgraph Majority Partition
+    subgraph sub_majority_partition ["Majority Partition"]
         A["A (Leader, term T)"]
         B["B (Follower)"]
         C["C (Follower)"]
-        A <-->|heartbeat + replication| B
-        A <-->|heartbeat + replication| C
+        A <-->|"heartbeat + replication"| B
+        A <-->|"heartbeat + replication"| C
     end
-    subgraph Minority Partition
+    subgraph sub_minority_partition ["Minority Partition"]
         D["D (Follower)"]
         E["E (Follower)"]
     end

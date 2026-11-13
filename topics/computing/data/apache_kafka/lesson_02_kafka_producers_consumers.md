@@ -1,4 +1,3 @@
-```markdown
 # Lesson 2: Producers and Consumers
 
 ## 1. First-Principles Intuition & Invariants

@@ -36,7 +36,7 @@ Kubernetes is not a monolithic system — it is a distributed state machine that
 
 ```mermaid
 graph TD
-    subgraph "Control Plane (HA)"
+    subgraph sub_control_plane__ha ["Control Plane (HA)"]
         A["kube-apiserver\n(mTLS on 6443)"]
         B["etcd cluster\n(mTLS on 2379/2380)"]
         C["kube-controller-manager\n(loopback only)"]
@@ -44,14 +44,14 @@ graph TD
         E["cloud-controller-manager"]
     end
 
-    subgraph "Worker Node"
+    subgraph sub_worker_node ["Worker Node"]
         F["kubelet\n(mTLS on 10250)"]
         G["kube-proxy"]
         H["container runtime\n(containerd/CRI-O)"]
         I["Pod\nworkload"]
     end
 
-    subgraph "Admission Chain"
+    subgraph sub_admission_chain ["Admission Chain"]
         J["AuthN\nwebhook/OIDC"]
         K["AuthZ\nRBAC/Node/ABAC"]
         L["MutatingAdmission\nWebhook"]
@@ -109,14 +109,14 @@ Kubernetes RBAC is an additive DAG of subjects, verbs, and resources. It has no 
 
 ```mermaid
 graph LR
-    subgraph "RBAC Primitives"
+    subgraph sub_rbac_primitives ["RBAC Primitives"]
         R["Role\n(namespace-scoped)"]
         CR["ClusterRole\n(cluster-scoped)"]
         RB["RoleBinding\n(namespace-scoped)"]
         CRB["ClusterRoleBinding\n(cluster-scoped)"]
     end
 
-    subgraph "Subjects"
+    subgraph sub_subjects ["Subjects"]
         U["User\n(X.509 CN)"]
         G["Group\n(X.509 O)"]
         SA["ServiceAccount"]
@@ -181,20 +181,20 @@ Pod security is enforced by composing Linux kernel primitives. Each `securityCon
 
 ```mermaid
 graph TD
-    subgraph "PodSpec securityContext"
+    subgraph sub_podspec_securitycontext ["PodSpec securityContext"]
         P1["runAsNonRoot: true\nrunAsUser: 1000"]
         P2["seccompProfile:\ntype: RuntimeDefault"]
         P3["sysctls\n(namespaced only)"]
     end
 
-    subgraph "ContainerSpec securityContext"
+    subgraph sub_containerspec_securitycontext ["ContainerSpec securityContext"]
         C1["allowPrivilegeEscalation: false\n→ PR_SET_NO_NEW_PRIVS"]
         C2["readOnlyRootFilesystem: true\n→ MS_RDONLY mount"]
         C3["capabilities:\n  drop: [ALL]\n  add: [NET_BIND_SERVICE]"]
         C4["privileged: false\n→ no CAP_SYS_ADMIN, no /dev"]
     end
 
-    subgraph "Kernel Enforcement"
+    subgraph sub_kernel_enforcement ["Kernel Enforcement"]
         K1["Linux Namespaces\n(pid, net, mnt, uts, ipc)"]
         K2["cgroups v2\n(cpu, memory, pids limits)"]
         K3["seccomp BPF filter\n(syscall allowlist)"]
@@ -305,14 +305,14 @@ Kubernetes `NetworkPolicy` resources are enforced by the CNI plugin (Cilium, Cal
 
 ```mermaid
 graph LR
-    subgraph "namespace: payments"
+    subgraph sub_namespace__payments ["namespace: payments"]
         P1["payments-api"]
         P2["payments-db"]
     end
-    subgraph "namespace: frontend"
+    subgraph sub_namespace__frontend ["namespace: frontend"]
         F1["web-app"]
     end
-    subgraph "namespace: monitoring"
+    subgraph sub_namespace__monitoring ["namespace: monitoring"]
         M1["prometheus"]
     end
 
@@ -540,10 +540,10 @@ containerLogMaxFiles: 5
 
 ```mermaid
 graph TD
-    subgraph "kubelet"
+    subgraph sub_kubelet ["kubelet"]
         A["CRI gRPC\n(Unix socket)"]
     end
-    subgraph "containerd"
+    subgraph sub_containerd ["containerd"]
         B["containerd daemon"]
         C["containerd-shim-runc-v2"]
         D["runc (OCI)\ndefault runtime"]
@@ -601,17 +601,17 @@ Container image supply chain attacks (SolarWinds, XZ Utils) are the fastest-grow
 
 ```mermaid
 graph LR
-    subgraph "Build Pipeline"
+    subgraph sub_build_pipeline ["Build Pipeline"]
         S["Source Code\n(git commit)"]
         B["CI Build\n(hermetic, signed)"]
         I["OCI Image\n+ SBOM (CycloneDX/SPDX)"]
         SIG["Cosign Signature\n(Sigstore keyless)"]
     end
-    subgraph "Registry"
+    subgraph sub_registry ["Registry"]
         R["Container Registry\n(Harbor / ECR / GCR)"]
         SCAN["Trivy / Grype\nvuln scan"]
     end
-    subgraph "Cluster Admission"
+    subgraph sub_cluster_admission ["Cluster Admission"]
         P["Policy Engine\n(Kyverno / Gatekeeper)"]
         K["ImagePolicyWebhook\nor Kyverno ClusterPolicy"]
     end
@@ -756,19 +756,19 @@ Kubernetes Secrets are base64-encoded, not encrypted, in etcd unless `Encryption
 
 ```mermaid
 graph TD
-    subgraph "Tier 1 — Native Kubernetes Secrets"
+    subgraph sub_tier_1___native_kubernetes_secre ["Tier 1 — Native Kubernetes Secrets"]
         T1["Secrets in etcd\n+ EncryptionConfiguration\n(AES-GCM or KMS)"]
         T1N["Adequate for: TLS certs,\nnon-sensitive config"]
     end
-    subgraph "Tier 2 — External Secrets Operator"
+    subgraph sub_tier_2___external_secrets_operat ["Tier 2 — External Secrets Operator"]
         T2["ExternalSecret CR\n→ pulls from Vault/AWS SSM/GCP SM"]
         T2N["Secret lives in external store;\nK8s Secret is a ephemeral copy"]
     end
-    subgraph "Tier 3 — CSI Secret Store"
+    subgraph sub_tier_3___csi_secret_store ["Tier 3 — CSI Secret Store"]
         T3["secrets-store-csi-driver\n→ mounts as tmpfs volume\nnever touches K8s Secret API"]
         T3N["No K8s Secret object created;\nworkload reads from /mnt/secrets"]
     end
-    subgraph "Tier 4 — Workload Identity"
+    subgraph sub_tier_4___workload_identity ["Tier 4 — Workload Identity"]
         T4["IRSA / GKE WI / Azure WIF\n→ OIDC token exchange\nno secrets stored at all"]
         T4N["Best: zero static credentials;\nlimited to cloud-provider APIs"]
     end
@@ -840,16 +840,16 @@ Security controls are only as effective as the ability to detect their bypass. S
 
 ```mermaid
 graph LR
-    subgraph "Runtime Detection"
+    subgraph sub_runtime_detection ["Runtime Detection"]
         F["Falco\n(eBPF/kernel module)\nsyscall audit"]
         E["eBPF\n(Tetragon/Cilium)\nnetwork + process"]
     end
-    subgraph "Audit Aggregation"
+    subgraph sub_audit_aggregation ["Audit Aggregation"]
         A["kube-apiserver\naudit log"]
         V["Vector / Fluentbit\nlog shipper"]
         S["SIEM\n(OpenSearch / Splunk)"]
     end
-    subgraph "Alert & Response"
+    subgraph sub_alert___response ["Alert & Response"]
         AM["Alertmanager"]
         PD["PagerDuty / OpsGenie"]
         R["Automated Response\n(isolate pod, revoke SA)"]

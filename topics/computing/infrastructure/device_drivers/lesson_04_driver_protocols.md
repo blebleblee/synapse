@@ -350,22 +350,22 @@ Production drivers rarely transfer a single physically-contiguous buffer. The ke
 
 ```mermaid
 graph LR
-    subgraph "CPU Virtual Memory"
+    subgraph sub_cpu_virtual_memory ["CPU Virtual Memory"]
         V1["virt page A"]
         V2["virt page B"]
         V3["virt page C"]
     end
-    subgraph "Physical Memory (non-contiguous)"
+    subgraph sub_physical_memory__non_contiguous ["Physical Memory (non-contiguous)"]
         P1["phys 0x1000"]
         P2["phys 0x9000"]
         P3["phys 0x4000"]
     end
-    subgraph "IOMMU / DMA Remapping"
+    subgraph sub_iommu___dma_remapping ["IOMMU / DMA Remapping"]
         I["IOVA 0x0000 → P1
 IOVA 0x1000 → P2
 IOVA 0x2000 → P3"]
     end
-    subgraph "Device DMA Engine"
+    subgraph sub_device_dma_engine ["Device DMA Engine"]
         D["SG Descriptor Ring
 [IOVA 0x0000, len 4096]
 [IOVA 0x1000, len 4096]
@@ -457,12 +457,12 @@ The tradeoff is deterministic: coalescing increases throughput at the cost of la
 
 ```mermaid
 graph LR
-    subgraph "No Coalescing"
+    subgraph sub_no_coalescing ["No Coalescing"]
         A1["I/O 1 ✓"] -->|"IRQ"| B1["CPU"]
         A2["I/O 2 ✓"] -->|"IRQ"| B1
         A3["I/O 3 ✓"] -->|"IRQ"| B1
     end
-    subgraph "Coalescing (count=3)"
+    subgraph sub_coalescing__count_3 ["Coalescing (count=3)"]
         C1["I/O 1 ✓"] --> D1["HW Timer/Counter"]
         C2["I/O 2 ✓"] --> D1
         C3["I/O 3 ✓"] -->|"threshold met: 1 IRQ"| E1["CPU"]
@@ -617,17 +617,17 @@ Kernel driver development has a high iteration cost: a bug causes a kernel panic
 
 ```mermaid
 graph TD
-    subgraph "Guest Kernel"
+    subgraph sub_guest_kernel ["Guest Kernel"]
         GD["virtio-net driver"]
         VR["vring (shared memory)"]
         GD -->|"add descriptor"| VR
     end
-    subgraph "Host Kernel"
+    subgraph sub_host_kernel ["Host Kernel"]
         VH["vhost-net kthread"]
         VR -->|"kick via eventfd"| VH
         VH -->|"send/recv"| NIC["Physical NIC (TAP/macvtap)"]
     end
-    subgraph "Host Userspace"
+    subgraph sub_host_userspace ["Host Userspace"]
         QE["QEMU (control path only)"]
     end
     GD -->|"ioctl / irqfd"| QE

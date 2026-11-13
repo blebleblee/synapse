@@ -231,16 +231,16 @@ Understanding the layers you will observe:
 graph TD
     A["SQL Query"] -->|Parser| B["Query Planner"]
     B -->|Optimizer| C["Execution Engine"]
-    C -->|Lock Manager| D["Concurrency Control"]
-    C -->|Buffer Pool| E["Storage Engine"]
-    E -->|Page Cache| F["Filesystem (ext4/XFS)"]
-    F -->|Block Layer| G["I/O Scheduler"]
-    G -->|Device Driver| H["Disk/SSD"]
+    C -->|"Lock Manager"| D["Concurrency Control"]
+    C -->|"Buffer Pool"| E["Storage Engine"]
+    E -->|"Page Cache"| F["Filesystem (ext4/XFS)"]
+    F -->|"Block Layer"| G["I/O Scheduler"]
+    G -->|"Device Driver"| H["Disk/SSD"]
     
-    E -->|WAL Writer| I["Write-Ahead Log"]
+    E -->|"WAL Writer"| I["Write-Ahead Log"]
     I -->|fsync| F
     
-    D -->|MVCC/2PL| J["Transaction Manager"]
+    D -->|"MVCC/2PL"| J["Transaction Manager"]
     J -->|Checkpoint| E
     
     style E fill:#f9f,stroke:#333,stroke-width:2px

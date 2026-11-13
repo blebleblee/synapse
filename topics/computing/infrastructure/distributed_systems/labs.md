@@ -110,21 +110,21 @@ Worker nodes run:
 
 ```mermaid
 graph TB
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         API["kube-apiserver"]
         ETCD[("etcd cluster<br/>(Raft consensus)")]
         SCHED["kube-scheduler"]
         CM["controller-manager"]
     end
     
-    subgraph "Worker Node 1"
+    subgraph sub_worker_node_1 ["Worker Node 1"]
         KUBELET1["kubelet"]
         PROXY1["kube-proxy"]
         RT1["containerd"]
         POD1["Pods"]
     end
     
-    subgraph "Worker Node 2"
+    subgraph sub_worker_node_2 ["Worker Node 2"]
         KUBELET2["kubelet"]
         PROXY2["kube-proxy"]
         RT2["containerd"]
@@ -922,4 +922,3 @@ kind delete cluster --name distributed-systems
 
 # Remove downloaded tools (optional)
 sudo rm /usr/local/bin/{kubectl,etcdctl,crictl,helm,kind}
-```

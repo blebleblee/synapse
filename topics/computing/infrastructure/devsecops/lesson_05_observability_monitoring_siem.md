@@ -1,4 +1,3 @@
-```markdown
 # Lesson 5: Observability, Security Monitoring, Logging, and SIEM Integration
 
 ## 1. First-Principles Intuition and Invariants
@@ -53,7 +52,7 @@ Mitigation strategies fall into three categories. First, cardinality reduction t
 
 ```mermaid
 graph TD
-    subgraph "Label Cardinality Explosion"
+    subgraph sub_label_cardinality_explosion ["Label Cardinality Explosion"]
         M["metric: http_request_duration_seconds"]
         M --> L1["method: 8 values"]
         M --> L2["path: 200 values"]
@@ -64,7 +63,7 @@ graph TD
         L1 & L2 & L3 & L4 & L5 & L6 --> COMB["Theoretical Max:\n8×200×7×500×50×4\n= ~1.1B series"]
     end
 
-    subgraph "Mitigation Strategies"
+    subgraph sub_mitigation_strategies ["Mitigation Strategies"]
         COMB -->|"Label Normalization"| N1["Replace user_id\nwith user_tier cohort"]
         COMB -->|"Probabilistic Structures"| N2["HyperLogLog for\napproximate distinct count"]
         COMB -->|"Adaptive Sampling"| N3["Sample 0.1% normal\n100% error traces"]
@@ -141,14 +140,14 @@ The OpenTelemetry architecture consists of four distinct layers:
 
 ```mermaid
 graph TD
-    subgraph "Application Process"
+    subgraph sub_application_process ["Application Process"]
         APP["Application Code"] -->|"OTel API calls"| SDK["OTel SDK\n(TracerProvider, MeterProvider,\nLoggerProvider)"]
         SDK -->|"BatchSpanProcessor"| EXP1["OTLP Exporter\n(gRPC :4317)"]
         SDK -->|"PeriodicMetricReader\n(15s interval)"| EXP2["OTLP Exporter\n(gRPC :4317)"]
         SDK -->|"BatchLogRecordProcessor"| EXP3["OTLP Exporter\n(gRPC :4317)"]
     end
 
-    subgraph "OTel Collector (sidecar or daemonset)"
+    subgraph sub_otel_collector__sidecar_or_daemo ["OTel Collector (sidecar or daemonset)"]
         RCV["OTLP Receiver\n(gRPC :4317)"] --> PROC["Processors\n(batch, memory_limiter,\nresource, attributes,\nk8sattributes)"]
         PROC --> EXP_T["Exporter:\nTempo / Jaeger"]
         PROC --> EXP_M["Exporter:\nPrometheus Remote Write\n(Mimir / Thanos)"]
@@ -864,7 +863,7 @@ A Security Information and Event Management system performs two core functions: 
 
 ```mermaid
 graph TD
-    subgraph "Data Sources"
+    subgraph sub_data_sources ["Data Sources"]
         K8S["Kubernetes\nPod Logs\n(FluentBit / Vector)"]
         CLOUD["Cloud Audit Logs\n(CloudTrail / GCP Audit\n/ Azure Monitor)"]
         NET["Network Telemetry\n(VPC Flow Logs\nDNS Query Logs)"]
@@ -874,24 +873,24 @@ graph TD
         VULN["Vulnerability Scan\n(Trivy / Grype\nSnyk SCA results)"]
     end
 
-    subgraph "Ingestion Layer"
+    subgraph sub_ingestion_layer ["Ingestion Layer"]
         KAFKA["Apache Kafka\n(Partitioned by source type)\n(7-day retention)"]
         K8S & CLOUD & NET & KERN & ENDPT & AUTH & VULN --> KAFKA
     end
 
-    subgraph "Processing Layer"
+    subgraph sub_processing_layer ["Processing Layer"]
         VECTOR["Vector / Flink\n(PII Redaction\nEnrichment\nNormalization to\nECS / OCSF schema)"]
         KAFKA --> VECTOR
     end
 
-    subgraph "Storage Layer"
+    subgraph sub_storage_layer ["Storage Layer"]
         DATALAKE["Data Lake\n(S3 / GCS Parquet)\n(WORM: 7 years)"]
         HOT["Hot Search Index\n(OpenSearch / Splunk)\n(90 days)"]
         VECTOR --> DATALAKE
         VECTOR --> HOT
     end
 
-    subgraph "Detection & Response"
+    subgraph sub_detection___response ["Detection & Response"]
         CORR["Correlation Engine\n(Detection Rules\nML Anomaly Models\nThreat Intel Matching)"]
         CASE["Case Management\n(SOAR: PagerDuty\n/ JIRA / TheHive)"]
         RESP["Automated Response\n(Lambda / Cloud Functions\nBlock IP / Revoke Token\n/ Isolate Workload)"]
@@ -1570,7 +1569,7 @@ Falco (CNCF-graduated) uses eBPF (or the legacy kernel module) to intercept sysc
 
 ```mermaid
 graph TD
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         SYSCALL["System Call Interface\n(execve, open, connect, read, write,\nsetuid, ptrace, etc.)"]
         KPROBE["kprobe / tracepoint\nAttach Points"]
         LSM["Linux Security Module\n(LSM) Hooks"]
@@ -1586,7 +1585,7 @@ graph TD
         EBPF_PROG --> MAPS
     end
 
-    subgraph "Userspace Agent (e.g., Falco / Tetragon)"
+    subgraph sub_userspace_agent__e_g___falco___t ["Userspace Agent (e.g., Falco / Tetragon)"]
         CONSUMER["Ring Buffer Consumer\n(Go / C++ event loop)"]
         RULES["Policy Engine\n(Falco rules / CEL / Rego)"]
         OUTPUT["Event Output\n(gRPC / JSON / Kafka)"]
@@ -1748,20 +1747,20 @@ This creates a virtuous cycle: investment in observability depth—more granular
 
 ```mermaid
 graph LR
-    subgraph "Reliability Engineering"
+    subgraph sub_reliability_engineering ["Reliability Engineering"]
         SLO["SLO Burn Rate\nAlerting"]
         TRACE["Distributed Traces\n(P99 Latency)"]
         DASH["Grafana Dashboards\n(Service Health)"]
     end
 
-    subgraph "Shared Telemetry Infrastructure"
+    subgraph sub_shared_telemetry_infrastructure ["Shared Telemetry Infrastructure"]
         OTEL["OpenTelemetry\nCollector"]
         TSDB["Prometheus / Mimir\n(Metrics TSDB)"]
         LOGAGG["Loki / OpenSearch\n(Log Aggregator)"]
         TRACESTORE["Tempo / Jaeger\n(Trace Backend)"]
     end
 
-    subgraph "Security Operations"
+    subgraph sub_security_operations ["Security Operations"]
         SIEM_RULE["Sigma / YARA-L\nDetection Rules"]
         ANOMALY["ML Anomaly\nDetection (UEBA)"]
         INCIDENT["Incident Response\n(SOAR Playbook)"]

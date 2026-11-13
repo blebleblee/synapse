@@ -22,7 +22,7 @@ Understanding what actually happens when you send a multimodal request is prereq
 
 ```mermaid
 graph TD
-    subgraph "Client Side"
+    subgraph sub_client_side ["Client Side"]
         A["Application Code"] --> B["SDK / REST Client"]
         B --> C{"Media Source"}
         C -->|"Inline (base64)"| D["Request Payload Assembly"]
@@ -30,7 +30,7 @@ graph TD
         C -->|"Google Cloud Storage URI"| D
     end
 
-    subgraph "Gemini API Infrastructure"
+    subgraph sub_gemini_api_infrastructure ["Gemini API Infrastructure"]
         D -->|"HTTPS / gRPC"| E["API Gateway & Auth"]
         E --> F["Request Router"]
         F --> G["Media Tokenizer"]
@@ -44,7 +44,7 @@ graph TD
         J -->|"stream=True"| L["Streaming Chunk Emitter"]
     end
 
-    subgraph "Response Path"
+    subgraph sub_response_path ["Response Path"]
         K --> M["Client receives complete JSON"]
         L --> N["Client receives token-by-token SSE stream"]
     end
@@ -727,18 +727,18 @@ Choosing the right Gemini model variant is itself an optimization decision with 
 
 ```mermaid
 graph TD
-    subgraph "Gemini 1.5 Family"
+    subgraph sub_gemini_1_5_family ["Gemini 1.5 Family"]
         P["Gemini 1.5 Pro\n• 1M token context\n• Best accuracy\n• ~3-8s TTFT\n• $3.50-7.00/1M input tokens"]
         F["Gemini 1.5 Flash\n• 1M token context\n• Speed-accuracy balance\n• ~1-3s TTFT\n• $0.075-0.15/1M input tokens"]
         F8["Gemini 1.5 Flash-8B\n• 1M token context\n• Highest throughput\n• <1s TTFT\n• $0.0375/1M input tokens"]
     end
 
-    subgraph "Gemini 2.0 Family"
+    subgraph sub_gemini_2_0_family ["Gemini 2.0 Family"]
         G2F["Gemini 2.0 Flash\n• 1M token context\n• Improved speed+quality\n• Native tool use\n• $0.10/1M input tokens"]
         G2FT["Gemini 2.0 Flash-Thinking\n• Extended reasoning\n• Best for complex tasks\n• Higher latency"]
     end
 
-    subgraph "Selection Logic"
+    subgraph sub_selection_logic ["Selection Logic"]
         Q1{"Latency\ncritical?"}
         Q2{"Cost\ncritical?"}
         Q3{"Accuracy\ncritical?"}
@@ -872,25 +872,25 @@ The optimizations described in this lesson form a hierarchy. Apply them in order
 
 ```mermaid
 graph LR
-    subgraph "Layer 1: Media"
+    subgraph sub_layer_1__media ["Layer 1: Media"]
         A1["Downsample images\nto task-appropriate resolution"]
         A2["Use File API\nfor all media >100KB"]
         A3["Sample video\nat minimum viable FPS"]
     end
 
-    subgraph "Layer 2: Context"
+    subgraph sub_layer_2__context ["Layer 2: Context"]
         B1["Count tokens\nbefore every request"]
         B2["Cache large stable\nprefixes (>32K tokens)"]
         B3["Use GCS URIs\nfor files >2GB"]
     end
 
-    subgraph "Layer 3: Model"
+    subgraph sub_layer_3__model ["Layer 3: Model"]
         C1["Use Flash/Flash-8B\nfor dev & batch work"]
         C2["Use structured output\nfor parseable results"]
         C3["Set temperature=0\nfor deterministic extraction"]
     end
 
-    subgraph "Layer 4: Infrastructure"
+    subgraph sub_layer_4__infrastructure ["Layer 4: Infrastructure"]
         D1["Async worker pool\nwith token-bucket limiter"]
         D2["Exponential backoff\nwith jitter on 429/503"]
         D3["Isolate per-item errors\nin batch pipelines"]

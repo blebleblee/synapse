@@ -197,17 +197,17 @@ Ansible's architecture consists of several interconnected subsystems that collec
 
 ```mermaid
 graph TB
-    A[CLI Entry Point<br/>ansible-playbook] -->|Parse Arguments| B[Configuration Loader]
-    B -->|Load ansible.cfg| C[Inventory Manager]
-    C -->|Parse Inventory| D[Variable Manager]
-    D -->|Merge Variables| E[Playbook Parser]
-    E -->|Parse YAML| F[Task Queue Manager]
-    F -->|Schedule Tasks| G[Connection Plugin Layer]
-    G -->|Establish SSH| H[Executor Framework]
-    H -->|Transfer & Execute| I[Module Subsystem]
-    I -->|Return JSON| J[Callback Plugins]
-    J -->|Format Output| K[Results Aggregator]
-    K -->|Write Logs| L[Exit Handler]
+    A["CLI Entry Point<br/>ansible-playbook"] -->|"Parse Arguments"| B[Configuration Loader]
+    B -->|"Load ansible.cfg"| C[Inventory Manager]
+    C -->|"Parse Inventory"| D[Variable Manager]
+    D -->|"Merge Variables"| E[Playbook Parser]
+    E -->|"Parse YAML"| F[Task Queue Manager]
+    F -->|"Schedule Tasks"| G[Connection Plugin Layer]
+    G -->|"Establish SSH"| H[Executor Framework]
+    H -->|"Transfer & Execute"| I[Module Subsystem]
+    I -->|"Return JSON"| J[Callback Plugins]
+    J -->|"Format Output"| K[Results Aggregator]
+    K -->|"Write Logs"| L[Exit Handler]
     
     style A fill:#e1f5ff
     style I fill:#ffe1e1

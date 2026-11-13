@@ -68,7 +68,7 @@ int main(void) {
 
 ```mermaid
 graph TD
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         AS["API Server\n(kube-apiserver)"]
         ETCD["etcd Cluster\n(3 or 5 members)"]
         CM["Controller Manager\n(kube-controller-manager)"]
@@ -80,7 +80,7 @@ graph TD
         CCM -->|"cloud resource reconciliation"| AS
     end
 
-    subgraph "Node 1"
+    subgraph sub_node_1 ["Node 1"]
         KL1["kubelet"]
         KP1["kube-proxy"]
         CR1["Container Runtime\n(containerd / CRI-O)"]
@@ -89,7 +89,7 @@ graph TD
         KL1 -->|"calls on pod net setup"| CNI1
     end
 
-    subgraph "Node 2"
+    subgraph sub_node_2 ["Node 2"]
         KL2["kubelet"]
         KP2["kube-proxy"]
         CR2["Container Runtime"]
@@ -523,27 +523,27 @@ etcdctl alarm disarm ...
 
 ```mermaid
 graph LR
-    subgraph "Pod A (Node 1)"
+    subgraph sub_pod_a__node_1 ["Pod A (Node 1)"]
         APP_A["App Container\nveth0: 192.168.1.10"]
     end
 
-    subgraph "Node 1 Kernel"
+    subgraph sub_node_1_kernel ["Node 1 Kernel"]
         VETH_A["veth pair\n(host end: cali1234)"]
         BRIDGE_A["Linux Bridge\nor eBPF hook"]
         ETH0_A["eth0: 10.0.1.1"]
     end
 
-    subgraph "Underlay Network"
+    subgraph sub_underlay_network ["Underlay Network"]
         ROUTER["Physical Router\nor VXLAN Overlay"]
     end
 
-    subgraph "Node 2 Kernel"
+    subgraph sub_node_2_kernel ["Node 2 Kernel"]
         ETH0_B["eth0: 10.0.2.1"]
         BRIDGE_B["Linux Bridge\nor eBPF hook"]
         VETH_B["veth pair\n(host end: cali5678)"]
     end
 
-    subgraph "Pod B (Node 2)"
+    subgraph sub_pod_b__node_2 ["Pod B (Node 2)"]
         APP_B["App Container\nveth0: 192.168.2.20"]
     end
 
@@ -573,7 +573,7 @@ CNI plugins divide into two architectural families:
 
 ```mermaid
 graph TD
-    subgraph "Data Sources"
+    subgraph sub_data_sources ["Data Sources"]
         CGROUP["cgroups v2\n(node-level)"]
         CADVISOR["cAdvisor\n(embedded in kubelet)"]
         APISERVER_M["kube-apiserver\n/metrics"]
@@ -582,7 +582,7 @@ graph TD
         SCHED_M["scheduler\n/metrics"]
     end
 
-    subgraph "Collection"
+    subgraph sub_collection ["Collection"]
         PROM["Prometheus\n(scrape every 15–30s)"]
         CADVISOR --> PROM
         APISERVER_M --> PROM
@@ -592,14 +592,14 @@ graph TD
         CGROUP --> CADVISOR
     end
 
-    subgraph "Storage & Query"
+    subgraph sub_storage___query ["Storage & Query"]
         TSDB["Prometheus TSDB\n(local 15-day retention)"]
         THANOS["Thanos / Cortex\n(long-term S3-backed)"]
         PROM --> TSDB
         TSDB -->|"remote_write"| THANOS
     end
 
-    subgraph "Visualization & Alerting"
+    subgraph sub_visualization___alerting ["Visualization & Alerting"]
         GRAFANA["Grafana"]
         AM["Alertmanager"]
         TSDB --> GRAFANA

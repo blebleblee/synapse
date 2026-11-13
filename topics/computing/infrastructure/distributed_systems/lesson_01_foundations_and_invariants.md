@@ -24,7 +24,7 @@ Understanding distributed systems requires a precise model of the execution laye
 
 ```mermaid
 graph TD
-    subgraph "Node A"
+    subgraph sub_node_a ["Node A"]
         A1["Application (User Space)"]
         A2["Syscall Interface (glibc / musl)"]
         A3["Kernel: VFS / Socket Layer"]
@@ -33,11 +33,11 @@ graph TD
         A6["Hardware: NIC / DMA Engine"]
     end
 
-    subgraph "Network Fabric"
+    subgraph sub_network_fabric ["Network Fabric"]
         N1["Switch / Router"]
     end
 
-    subgraph "Node B"
+    subgraph sub_node_b ["Node B"]
         B6["Hardware: NIC / DMA Engine"]
         B5["NIC Driver (kernel module)"]
         B4["TCP/IP Stack (net subsystem)"]
@@ -275,27 +275,27 @@ The following diagram depicts the layered architecture of a production distribut
 
 ```mermaid
 graph TD
-    subgraph "Client Tier"
+    subgraph sub_client_tier ["Client Tier"]
         CL["Client Application"]
     end
 
-    subgraph "Gateway / Proxy Tier"
+    subgraph sub_gateway___proxy_tier ["Gateway / Proxy Tier"]
         LB["Load Balancer\n(L4/L7)"]
         SD["Service Discovery\n(Consul / etcd)"]
     end
 
-    subgraph "Application Tier"
+    subgraph sub_application_tier ["Application Tier"]
         SVC1["Service Instance 1\n(stateless)"]
         SVC2["Service Instance 2\n(stateless)"]
         SVC3["Service Instance 3\n(stateless)"]
     end
 
-    subgraph "Coordination Tier"
+    subgraph sub_coordination_tier ["Coordination Tier"]
         RAFT["Consensus Group\n(Raft / Multi-Paxos)"]
         LOCK["Distributed Lock\nService"]
     end
 
-    subgraph "Storage Tier"
+    subgraph sub_storage_tier ["Storage Tier"]
         WAL["Write-Ahead Log\n(per shard)"]
         LSM["LSM-Tree Storage\nEngine"]
         REP1["Replica 1"]

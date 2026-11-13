@@ -1,4 +1,3 @@
-```markdown
 # Lesson 4: Scripting Patterns, Parameter Expansion, Builtins
 
 ## 1. First-Principles Intuition & Invariants

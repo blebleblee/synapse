@@ -52,16 +52,16 @@ BACKOFF_FACTOR=0.5
 
 ```mermaid
 graph TB
-    A[External API] -->|HTTP GET| B[Retry Wrapper]
-    B -->|JSON Response| C[Schema Validator]
-    C -->|Valid Data| D[ETL Pipeline]
-    C -->|Invalid Data| E[Error Handler]
+    A[External API] -->|"HTTP GET"| B[Retry Wrapper]
+    B -->|"JSON Response"| C[Schema Validator]
+    C -->|"Valid Data"| D[ETL Pipeline]
+    C -->|"Invalid Data"| E[Error Handler]
     D -->|Transform| F[Price Categorizer]
     F -->|Enrich| G[CSV Serializer]
     G -->|Write| H[Filesystem]
     H -->|Load| I[Tableau Desktop]
-    I -->|Interactive Viz| J[Dashboard]
-    E -->|Log + Metrics| K[Monitoring]
+    I -->|"Interactive Viz"| J[Dashboard]
+    E -->|"Log + Metrics"| K[Monitoring]
     
     style D fill:#e1f5ff
     style I fill:#ffe1e1

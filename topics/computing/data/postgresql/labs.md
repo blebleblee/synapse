@@ -248,19 +248,19 @@ The shared buffer pool (`shared_buffers`) is PostgreSQL's primary in-memory cach
 
 ```mermaid
 graph TB
-    subgraph "Shared Buffer Pool"
+    subgraph sub_shared_buffer_pool ["Shared Buffer Pool"]
         B1["Buffer 1<br/>Block 0 of accounts<br/>usagecount=5<br/>dirty=false"]
         B2["Buffer 2<br/>Block 1 of accounts_pkey<br/>usagecount=3<br/>dirty=true"]
         B3["Buffer 3<br/>Block 0 of pg_class<br/>usagecount=1<br/>dirty=false"]
         B4["Buffer 4<br/>Free<br/>usagecount=0"]
     end
     
-    subgraph "Background Processes"
+    subgraph sub_background_processes ["Background Processes"]
         BGW["bgwriter<br/>Writes dirty buffers<br/>to disk"]
         CP["checkpointer<br/>Coordinates full sync<br/>of dirty pages"]
     end
     
-    subgraph "Disk"
+    subgraph sub_disk ["Disk"]
         D1["accounts heap file<br/>/var/lib/postgresql/data/<br/>base/5/16384"]
         D2["accounts_pkey index file<br/>/var/lib/postgresql/data/<br/>base/5/16385"]
     end

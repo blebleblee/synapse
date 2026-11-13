@@ -326,20 +326,20 @@ A dirty page (one with modifications not yet written to disk) cannot be evicted 
 
 ```mermaid
 graph TD
-    subgraph "Buffer Pool (Shared Memory)"
+    subgraph sub_buffer_pool__shared_memory ["Buffer Pool (Shared Memory)"]
         F1["Frame 1\nPage: orders.3\nLSN: 10042\nDirty: Yes\nPin Count: 0"]
         F2["Frame 2\nPage: customers.1\nLSN: 10038\nDirty: No\nPin Count: 2"]
         F3["Frame 3\nPage: order_items.7\nLSN: 10051\nDirty: Yes\nPin Count: 1"]
         FN["Frame N\n..."]
     end
 
-    subgraph "WAL Buffer (in-memory ring)"
+    subgraph sub_wal_buffer__in_memory_ring ["WAL Buffer (in-memory ring)"]
         W1["LSN 10038"]
         W2["LSN 10042"]
         W3["LSN 10051"]
     end
 
-    subgraph "Durable Storage"
+    subgraph sub_durable_storage ["Durable Storage"]
         D1["WAL Segment Files\n(fsynced at commit)"]
         D2["Data Files\n(written by bgwriter / checkpoint)"]
     end
@@ -467,49 +467,49 @@ The following diagram refines the high-level DBMS architecture to show the actua
 
 ```mermaid
 graph TD
-    subgraph "Client Tier"
+    subgraph sub_client_tier ["Client Tier"]
         APP["Application"]
         POOL["Connection Pooler\n(PgBouncer / ProxySQL)"]
     end
 
-    subgraph "DBMS Process"
-        subgraph "Frontend"
+    subgraph sub_dbms_process ["DBMS Process"]
+        subgraph sub_frontend ["Frontend"]
             PROTO["Wire Protocol Handler\n(pgwire / MySQL protocol)"]
             PARSER["SQL Parser\n(Lex + Yacc → AST)"]
             REWRITER["Query Rewriter\n(View expansion, RLS, rules)"]
         end
 
-        subgraph "Optimizer"
+        subgraph sub_optimizer ["Optimizer"]
             STATS["Catalog & Statistics\n(pg_statistic, pg_class)"]
             PLANNER["Cost-Based Optimizer\n(DP / Genetic algorithm)"]
         end
 
-        subgraph "Executor"
+        subgraph sub_executor ["Executor"]
             EXEC["Execution Engine\n(Volcano iterator / Vectorized)"]
             EXPREVAL["Expression Evaluator\n(JIT compiled or interpreted)"]
         end
 
-        subgraph "Transaction Layer"
+        subgraph sub_transaction_layer ["Transaction Layer"]
             TM["Transaction Manager\n(begin, commit, abort, savepoint)"]
             CCM["Concurrency Control\n(2PL or MVCC snapshot)"]
             LM["Lock Manager\n(lock table, deadlock detection)"]
         end
 
-        subgraph "Storage Layer"
+        subgraph sub_storage_layer ["Storage Layer"]
             BM["Buffer Manager\n(buffer pool, clock sweep)"]
             WAL["WAL Manager\n(log writer, fsync, LSN)"]
             HEAP["Heap / Access Methods\n(sequential scan, index scan)"]
             IDX["Index Managers\n(B-tree, Hash, GiST, GIN, BRIN)"]
         end
 
-        subgraph "Recovery"
+        subgraph sub_recovery ["Recovery"]
             CKPT["Checkpointer\n(periodic, on-demand)"]
             BGWRITER["Background Writer\n(proactive dirty page flush)"]
             RECOVERY["Recovery Manager\n(ARIES: analysis/redo/undo)"]
         end
     end
 
-    subgraph "Durable Storage"
+    subgraph sub_durable_storage ["Durable Storage"]
         DATAFILES["Data Files\n(heap pages, index pages)"]
         WALFILES["WAL Segment Files\n(sequential, pre-allocated)"]
         SYSCTL["System Catalog\n(pg_class, pg_attribute, ...)"]

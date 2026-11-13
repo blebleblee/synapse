@@ -181,7 +181,7 @@ A single physical router interface connects to a trunk port and uses subinterfac
 
 ```mermaid
 graph LR
-    subgraph "Layer 2 Switch"
+    subgraph sub_layer_2_switch ["Layer 2 Switch"]
         V10["VLAN 10<br/>192.168.10.0/24"]
         V20["VLAN 20<br/>192.168.20.0/24"]
         Trunk["Trunk Port<br/>Gi0/1"]
@@ -191,7 +191,7 @@ graph LR
     V20 -.->|"Tagged VLAN 20"| Trunk
     Trunk -->|"802.1Q"| RouterIf["Router Gi0/0"]
     
-    subgraph "Router"
+    subgraph sub_router ["Router"]
         RouterIf --> Sub10["Gi0/0.10<br/>192.168.10.1"]
         RouterIf --> Sub20["Gi0/0.20<br/>192.168.20.1"]
         Sub10 --> RoutingTable["IP Routing Table"]

@@ -619,16 +619,16 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "Global Revision Timeline"
+    subgraph sub_global_revision_timeline ["Global Revision Timeline"]
         R1["Rev 1"] --> R2["Rev 2"] --> R3["Rev 3"] --> R4["Rev 4"] --> R5["Rev 5"]
     end
 
-    subgraph "Key: /registry/pods/default/nginx"
+    subgraph sub_key___registry_pods_default_ngin ["Key: /registry/pods/default/nginx"]
         K1["CreateRev=1\nModRev=1\nVersion=1\nValue=v1"] -->|"PUT at Rev 3"| K2["CreateRev=1\nModRev=3\nVersion=2\nValue=v2"]
         K2 -->|"DELETE at Rev 5"| K3["Tombstone\nModRev=5"]
     end
 
-    subgraph "Key: /registry/services/default/svc"
+    subgraph sub_key___registry_services_default ["Key: /registry/services/default/svc"]
         S1["CreateRev=2\nModRev=2\nVersion=1\nValue=s1"] -->|"PUT at Rev 4"| S2["CreateRev=2\nModRev=4\nVersion=2\nValue=s2"]
     end
 

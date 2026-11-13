@@ -577,14 +577,14 @@ This combination achieves maximum I/O throughput (sequential WAL writes rather t
 
 ```mermaid
 graph LR
-    subgraph "Transaction Commit Path"
+    subgraph sub_transaction_commit_path ["Transaction Commit Path"]
         TX["Transaction\nExecutor"]
         WB["WAL Buffer\n(wal_buffers)"]
         WS["WAL Segment File\n(pg_wal/000000010000000000000001)"]
         CB["Commit Record\n(XLOG_XACT_COMMIT)"]
     end
 
-    subgraph "Buffer Pool Eviction Path (async)"
+    subgraph sub_buffer_pool_eviction_path__async ["Buffer Pool Eviction Path (async)"]
         SP2["Shared Buffers\n(dirty page)"]
         HF["Heap File\n(base/OID/relfilenode)"]
         BGW["Bgwriter /\nCheckpointer"]

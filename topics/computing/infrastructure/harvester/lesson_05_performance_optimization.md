@@ -32,20 +32,20 @@ The actual I/O path in Longhorn traverses multiple abstraction layers, each addi
 
 ```mermaid
 graph LR
-    subgraph "Consumer Node"
+    subgraph sub_consumer_node ["Consumer Node"]
         A["Application\n(Pod)"]
         B["Linux Block Device\n(/dev/longhorn/volname)"]
         C["NBD or iSCSI\nKernel Driver"]
     end
-    subgraph "Engine Node (same or remote)"
+    subgraph sub_engine_node__same_or_remote ["Engine Node (same or remote)"]
         D["longhorn-engine\nprocess (tgt-iscsid/nvmf)"]
         E["In-Memory\nWrite Cache"]
     end
-    subgraph "Replica Node 1"
+    subgraph sub_replica_node_1 ["Replica Node 1"]
         F["longhorn-replica\nprocess"]
         G["sparse file or\nblock device (disk.img)"]
     end
-    subgraph "Replica Node 2"
+    subgraph sub_replica_node_2 ["Replica Node 2"]
         H["longhorn-replica\nprocess"]
         I["sparse file or\nblock device (disk.img)"]
     end
@@ -79,24 +79,24 @@ Longhorn consists of four distinct runtime subsystems. Understanding each in dep
 
 ```mermaid
 graph TD
-    subgraph "Kubernetes Control Plane"
+    subgraph sub_kubernetes_control_plane ["Kubernetes Control Plane"]
         K8sAPI["kube-apiserver"]
     end
 
-    subgraph "Longhorn System Namespace"
+    subgraph sub_longhorn_system_namespace ["Longhorn System Namespace"]
         LM["Longhorn Manager\n(DaemonSet)\nlonghorn-manager"]
         LUI["Longhorn UI\n(Deployment)"]
         LD["Longhorn Driver\n(CSI Controller + Node Plugin)"]
     end
 
-    subgraph "Volume Data Plane – per volume"
+    subgraph sub_volume_data_plane___per_volume ["Volume Data Plane – per volume"]
         ENG["Engine Process\nlonghorn-engine binary\n(1 per volume)"]
         R1["Replica Process\nlonghorn-replica binary\n(node-1)"]
         R2["Replica Process\nlonghorn-replica binary\n(node-2)"]
         R3["Replica Process\nlonghorn-replica binary\n(node-3)"]
     end
 
-    subgraph "Persistent State"
+    subgraph sub_persistent_state ["Persistent State"]
         CRDs["Kubernetes CRDs\n(Volume, Engine, Replica,\nNode, BackingImage, …)"]
     end
 

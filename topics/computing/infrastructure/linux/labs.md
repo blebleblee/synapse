@@ -153,18 +153,18 @@ The kernel exposes its internal state through a layered set of virtual filesyste
 
 ```mermaid
 flowchart LR
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         MM["Memory Manager\n(mm_struct, page tables)"]
         SCHED["Scheduler\n(task_struct, cfs_rq)"]
         NET["Network Stack\n(sock, sk_buff, net_device)"]
         VFS["VFS Layer\n(inode, dentry, file)"]
     end
-    subgraph "Virtual Filesystems"
+    subgraph sub_virtual_filesystems ["Virtual Filesystems"]
         PROC["/proc\n(procfs)"]
         SYS["/sys\n(sysfs)"]
         DEBUGFS["/sys/kernel/debug\n(debugfs)"]
     end
-    subgraph "Userspace Tools"
+    subgraph sub_userspace_tools ["Userspace Tools"]
         CAT["cat / grep"]
         SS["ss / ip"]
         PERF["perf"]
@@ -444,7 +444,7 @@ Saturation occurs when a resource demand exceeds its capacity, causing queuing. 
 
 ```mermaid
 flowchart TD
-    subgraph "USE Method"
+    subgraph sub_use_method ["USE Method"]
         R["Resource\n(CPU, Memory, Disk, Network)"]
         U["Utilization\n(% busy time)"]
         S["Saturation\n(queue depth / wait time)"]
@@ -1157,7 +1157,7 @@ print(f'Random sum: {s}')
 
 ```mermaid
 flowchart TD
-    subgraph "/proc filesystem (procfs)"
+    subgraph sub_proc_filesystem__procfs ["/proc filesystem (procfs)"]
         PM["/proc/meminfo\nkernel: mm/page_alloc.c"]
         PS["/proc/stat\nkernel: kernel/stat.c"]
         PV["/proc/vmstat\nkernel: mm/vmstat.c"]
@@ -1167,14 +1167,14 @@ flowchart TD
         PSL["/proc/slabinfo\nkernel: mm/slab_common.c"]
     end
 
-    subgraph "/sys filesystem (sysfs)"
+    subgraph sub_sys_filesystem__sysfs ["/sys filesystem (sysfs)"]
         SB["/sys/block/<dev>/queue/\nI/O scheduler, queue depth"]
         SC["/sys/fs/cgroup/\ncgroup v2 controllers"]
         SK["/sys/kernel/mm/\nTHP, NUMA policies"]
         SD["/sys/devices/system/cpu/\nCPU topology, freq scaling"]
     end
 
-    subgraph "Tools"
+    subgraph sub_tools ["Tools"]
         T1["vmstat / sar\nreads /proc/stat, /proc/vmstat"]
         T2["iostat\nreads /proc/diskstats"]
         T3["ss\nnetlink SOCK_DIAG"]

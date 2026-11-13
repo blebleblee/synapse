@@ -282,10 +282,10 @@ No lock is taken on the row during this visibility evaluation. The reader traver
 
 ```mermaid
 graph LR
-    subgraph "Page 7, Offset 3 — Original Row (id=42)"
+    subgraph sub_page_7__offset_3___original_row ["Page 7, Offset 3 — Original Row (id=42)"]
         T1["Tuple version 1\nt_xmin=1001 (committed)\nt_xmax=1005 (committed)\nt_ctid → (7,4)"]
     end
-    subgraph "Page 7, Offset 4 — Updated Row (id=42)"
+    subgraph sub_page_7__offset_4___updated_row ["Page 7, Offset 4 — Updated Row (id=42)"]
         T2["Tuple version 2\nt_xmin=1005 (committed)\nt_xmax=0 (live)\nt_ctid → (7,4) (self)"]
     end
     T1 -->|"HOT chain: t_ctid"| T2

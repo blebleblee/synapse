@@ -774,7 +774,7 @@ if __name__ == "__main__":
 
 ```mermaid
 flowchart TD
-    subgraph "Your Application"
+    subgraph sub_your_application ["Your Application"]
         Q["Prompt Queue\n(N items)"]
         S["asyncio.Semaphore\n(max_concurrent=5)"]
         W1["Worker Coroutine 1"]
@@ -785,7 +785,7 @@ flowchart TD
         R["Results Collector"]
     end
 
-    subgraph "Anthropic API"
+    subgraph sub_anthropic_api ["Anthropic API"]
         RL["Rate Limiter\nRPM / TPM"]
         I["Inference\ncluster"]
     end
@@ -933,31 +933,31 @@ A complete production deployment of an Anthropic-powered service requires more t
 
 ```mermaid
 flowchart TD
-    subgraph "Client Layer"
+    subgraph sub_client_layer ["Client Layer"]
         UI["Web / Mobile Client"]
     end
 
-    subgraph "API Gateway Layer"
+    subgraph sub_api_gateway_layer ["API Gateway Layer"]
         GW["API Gateway\n(rate limiting, auth)"]
     end
 
-    subgraph "Application Layer"
+    subgraph sub_application_layer ["Application Layer"]
         SVC["LLM Service\n(Python / Go)"]
         CACHE["Prompt Cache\n(Redis)"]
         QUEUE["Job Queue\n(Redis Streams / SQS)"]
     end
 
-    subgraph "Observability"
+    subgraph sub_observability ["Observability"]
         LOG["Structured Logs\n(JSON → Loki/CloudWatch)"]
         TRACE["Distributed Traces\n(OpenTelemetry → Jaeger)"]
         METRIC["Metrics\n(Prometheus + Grafana)"]
     end
 
-    subgraph "Anthropic"
+    subgraph sub_anthropic ["Anthropic"]
         API["POST /v1/messages\n(claude-sonnet / opus)"]
     end
 
-    subgraph "Data Layer"
+    subgraph sub_data_layer ["Data Layer"]
         DB["Conversation Store\n(PostgreSQL)"]
         VEC["Vector DB\n(pgvector / Pinecone)"]
     end

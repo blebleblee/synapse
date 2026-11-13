@@ -66,12 +66,12 @@ The framework handles everything else: input splitting, task scheduling, data sh
 
 ```mermaid
 graph LR
-    subgraph "Map Phase"
+    subgraph sub_map_phase ["Map Phase"]
         S1["Input Split 1<br/>(HDFS Block)"] --> M1["Map Task 1<br/>(node-local)"]
         S2["Input Split 2<br/>(HDFS Block)"] --> M2["Map Task 2<br/>(node-local)"]
         S3["Input Split 3<br/>(HDFS Block)"] --> M3["Map Task 3<br/>(rack-local)"]
     end
-    subgraph "Shuffle & Sort"
+    subgraph sub_shuffle___sort ["Shuffle & Sort"]
         M1 -->|"partition + sort<br/>by key"| P1["Partition 0<br/>Partition 1"]
         M2 -->|"partition + sort<br/>by key"| P2["Partition 0<br/>Partition 1"]
         M3 -->|"partition + sort<br/>by key"| P3["Partition 0<br/>Partition 1"]
@@ -205,18 +205,18 @@ Narrow transformations can be pipelined within a single stage (no network I/O). 
 
 ```mermaid
 graph TD
-    subgraph "Stage 0 (narrow)"
+    subgraph sub_stage_0__narrow ["Stage 0 (narrow)"]
         A["Read HDFS"] --> B["filter: lines containing 'error'"]
         B --> C["map: extract (word, 1)"]
     end
-    subgraph "Shuffle Boundary"
+    subgraph sub_shuffle_boundary ["Shuffle Boundary"]
         C -->|"hash(key) % numPartitions<br/>network transfer"| S["Shuffle write<br/>→ shuffle read"]
     end
-    subgraph "Stage 1 (wide)"
+    subgraph sub_stage_1__wide ["Stage 1 (wide)"]
         S --> D["reduceByKey: sum counts"]
         D --> E["sortBy: count desc"]
     end
-    subgraph "Stage 2 (wide)"
+    subgraph sub_stage_2__wide ["Stage 2 (wide)"]
         E -->|"repartition for sort"| F["collect to driver"]
     end
     F --> G["Result"]
@@ -351,19 +351,19 @@ Column-family stores (Apache Cassandra, HBase) are optimized for write-heavy wor
 
 ```mermaid
 graph TD
-    subgraph "Write Path"
+    subgraph sub_write_path ["Write Path"]
         W["Write Request"] --> WAL["Write-Ahead Log<br/>(disk, append-only)"]
         W --> MT["MemTable<br/>(in-memory, sorted)"]
     end
-    subgraph "Flush (when MemTable is full)"
+    subgraph sub_flush__when_memtable_is_full ["Flush (when MemTable is full)"]
         MT --> SST1["SSTable 1<br/>(disk, immutable)"]
     end
-    subgraph "Compaction (background)"
+    subgraph sub_compaction__background ["Compaction (background)"]
         SST1 --> C["Compaction<br/>(merge sorted runs,<br/>discard tombstones)"]
         SST2["SSTable 2<br/>(disk, immutable)"] --> C
         C --> SST3["SSTable 3<br/>(merged, larger)"]
     end
-    subgraph "Read Path"
+    subgraph sub_read_path ["Read Path"]
         R["Read Request"] --> MT2["MemTable<br/>(check newest)"]
         MT2 -->|"not found"| BF["Bloom Filter<br/>(per SSTable)"]
         BF -->|"maybe present"| SST1R["SSTable 1"]
@@ -526,7 +526,7 @@ The most useful diagnostic pattern is correlating Spark UI task durations with r
 
 ```mermaid
 graph TD
-    subgraph "Observability Stack"
+    subgraph sub_observability_stack ["Observability Stack"]
         APP["Application Metrics<br/>(OpenTelemetry SDK)"] --> EXP["OTel Collector"]
         SPARK["Spark Metrics<br/>(Dropwizard/Metrics)"] --> EXP
         YARN["YARN Metrics"] --> EXP
@@ -535,7 +535,7 @@ graph TD
         PROM --> GRAF["Grafana<br/>(dashboards)"]
         PROM --> ALERT["Alertmanager<br/>(threshold alerts)"]
     end
-    subgraph "Diagnostic Flow"
+    subgraph sub_diagnostic_flow ["Diagnostic Flow"]
         SLOW["Slow Task Detected<br/>(Spark UI)"] --> Q1{"Disk I/O wait<br/>on node?"}
         Q1 -->|"Yes"| DISK["Failing disk →<br/>decommission node"]
         Q1 -->|"No"| Q2{"Network saturation<br/>on node?"}

@@ -78,7 +78,7 @@ Before a query can run, data must be physically organized on disk. The choice of
 
 ```mermaid
 graph TD
-    subgraph "B-Tree Index (PostgreSQL)"
+    subgraph sub_b_tree_index__postgresql ["B-Tree Index (PostgreSQL)"]
         R["Root Page"] --> B1["Branch Page"]
         R --> B2["Branch Page"]
         B1 --> L1["Leaf Page\n(key → heap TID)"]
@@ -89,7 +89,7 @@ graph TD
         L2 <-->|"doubly linked"| L3
         L3 <-->|"doubly linked"| L4
     end
-    subgraph "Heap File"
+    subgraph sub_heap_file ["Heap File"]
         P1["Page 0"] 
         P2["Page 1"]
         P3["Page ..."]
@@ -246,15 +246,15 @@ Optimal when: both inputs are already sorted (e.g., both have B-tree indexes on 
 
 ```mermaid
 flowchart LR
-    subgraph "Nested Loop\n(small outer + indexed inner)"
+    subgraph sub_nested_loop_n_small_outer___inde ["Nested Loop\n(small outer + indexed inner)"]
         NL_O["Outer: 100 rows"] -->|"per row"| NL_I["Index lookup\nInner: O(log N)"]
     end
-    subgraph "Hash Join\n(large tables, no index)"
+    subgraph sub_hash_join_n_large_tables__no_ind ["Hash Join\n(large tables, no index)"]
         HJ_B["Build: smaller table\n→ in-memory hash table"] 
         HJ_P["Probe: larger table\n→ hash lookup O(1)"]
         HJ_B --> HJ_P
     end
-    subgraph "Merge Join\n(pre-sorted inputs)"
+    subgraph sub_merge_join_n_pre_sorted_inputs ["Merge Join\n(pre-sorted inputs)"]
         MJ_A["Sorted Input A"] -->|"two-pointer merge"| MJ_OUT["Output"]
         MJ_B["Sorted Input B"] -->|"two-pointer merge"| MJ_OUT
     end
@@ -638,14 +638,14 @@ Two fundamentally different query profiles drive different physical architecture
 
 ```mermaid
 graph LR
-    subgraph "OLTP Pattern"
+    subgraph sub_oltp_pattern ["OLTP Pattern"]
         C["Application\n(many short queries)"] --> PG["PostgreSQL / MySQL\nRow-Store Heap Files\nB-Tree Indexes"]
         PG --> RR["Read Replica\n(streaming replication)"]
         C --> PGB["PgBouncer\n(connection pool)"]
         PGB --> PG
     end
 
-    subgraph "OLAP Pattern"
+    subgraph sub_olap_pattern ["OLAP Pattern"]
         BI["BI Tool / Analyst\n(few, large queries)"] --> DW["Snowflake / BigQuery\nRedshift / DuckDB\nColumnar + Compressed"]
         DW --> W1["Worker Node 1\n(partial scan)"]
         DW --> W2["Worker Node 2\n(partial scan)"]

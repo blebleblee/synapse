@@ -70,18 +70,18 @@ The canonical SDN architecture consists of three layers:
 
 ```mermaid
 graph TB
-    subgraph "Application Layer"
+    subgraph sub_application_layer ["Application Layer"]
         A1["Network Applications<br/>(Traffic Engineering, Security Policy)"]
         A2["Orchestration Platform<br/>(OpenStack Neutron, Kubernetes CNI)"]
     end
     
-    subgraph "Control Layer"
+    subgraph sub_control_layer ["Control Layer"]
         C1["SDN Controller<br/>(ODL, ONOS, OVN)"]
         C2["Network Hypervisor<br/>(Logical Network Abstraction)"]
         C3["Flow Compiler<br/>(Logical → Physical Translation)"]
     end
     
-    subgraph "Infrastructure Layer"
+    subgraph sub_infrastructure_layer ["Infrastructure Layer"]
         D1["Virtual Switch<br/>(Open vSwitch)"]
         D2["Physical Switch<br/>(OpenFlow-enabled)"]
         D3["SmartNIC<br/>(Hardware Offload)"]
@@ -118,19 +118,19 @@ Open vSwitch (OVS) is the de facto standard for virtual switching in SDN environ
 
 ```mermaid
 graph TB
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         A["ovs-vswitchd<br/>(Control Daemon)"]
         B["ovsdb-server<br/>(Configuration Database)"]
         C["Controller Connection<br/>(OpenFlow Channel)"]
     end
     
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         D["Kernel Datapath Module<br/>(Fast Path)"]
         E["Flow Cache<br/>(Exact Match)"]
         F["Megaflow Cache<br/>(Wildcard Match)"]
     end
     
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         G["NIC RX/TX Queues"]
         H["DPDK Poll-Mode Drivers"]
     end
@@ -207,17 +207,17 @@ NFV transforms network appliances into software, enabling dynamic service compos
 
 ```mermaid
 graph LR
-    subgraph "Tenant Traffic Flow"
+    subgraph sub_tenant_traffic_flow ["Tenant Traffic Flow"]
         T1["VM/Container<br/>Traffic Source"]
     end
     
-    subgraph "Service Chain (VNI 6001)"
+    subgraph sub_service_chain__vni_6001 ["Service Chain (VNI 6001)"]
         S1["VNF: Firewall<br/>(iptables/nftables)"]
         S2["VNF: IDS<br/>(Suricata)"]
         S3["VNF: Load Balancer<br/>(HAProxy)"]
     end
     
-    subgraph "Destination"
+    subgraph sub_destination ["Destination"]
         T2["Application Tier"]
     end
     
@@ -272,17 +272,17 @@ A centralized controller creates a scaling bottleneck and single point of failur
 
 ```mermaid
 graph TB
-    subgraph "Controller Cluster (Raft/Paxos Consensus)"
+    subgraph sub_controller_cluster__raft_paxos_c ["Controller Cluster (Raft/Paxos Consensus)"]
         C1["Controller Instance 1<br/>(Leader)"]
         C2["Controller Instance 2<br/>(Follower)"]
         C3["Controller Instance 3<br/>(Follower)"]
     end
     
-    subgraph "Distributed State Store"
+    subgraph sub_distributed_state_store ["Distributed State Store"]
         DB[("Network State Database<br/>(etcd, Cassandra)")]
     end
     
-    subgraph "Switch Fabric"
+    subgraph sub_switch_fabric ["Switch Fabric"]
         S1["Switch Group 1<br/>(1000 flows)"]
         S2["Switch Group 2<br/>(1000 flows)"]
         S3["Switch Group 3<br/>(1000 flows)"]
@@ -393,18 +393,18 @@ DPDK achieves 20-40x throughput improvement by:
 
 ```mermaid
 graph TB
-    subgraph "CPU (Host)"
+    subgraph sub_cpu__host ["CPU (Host)"]
         A["Application VMs"]
         B["Control Plane<br/>(ovs-vswitchd)"]
     end
     
-    subgraph "SmartNIC (Mellanox ConnectX, Netronome Agilio)"
+    subgraph sub_smartnic__mellanox_connectx__net ["SmartNIC (Mellanox ConnectX, Netronome Agilio)"]
         C["OVS Datapath<br/>(Offloaded)"]
         D["Flow Table<br/>(Hardware TCAM)"]
         E["Encap/Decap Engine<br/>(VXLAN in ASIC)"]
     end
     
-    subgraph "Wire"
+    subgraph sub_wire ["Wire"]
         F["Physical Network"]
     end
     
@@ -478,16 +478,16 @@ Flow count becomes T + (F per tenant), approximately T + F for uniform tenant tr
 
 ```mermaid
 graph TB
-    subgraph "Controller Cluster"
+    subgraph sub_controller_cluster ["Controller Cluster"]
         C1["Controller 1<br/>(Thinks it's primary)"]
         C2["Controller 2<br/>(Thinks it's primary)"]
     end
     
-    subgraph "Network Partition"
+    subgraph sub_network_partition ["Network Partition"]
         P["X"]
     end
     
-    subgraph "Switches"
+    subgraph sub_switches ["Switches"]
         S1["Switch Group A<br/>(Connected to C1)"]
         S2["Switch Group B<br/>(Connected to C2)"]
     end
@@ -716,11 +716,11 @@ flow_entry = {
 
 ```mermaid
 graph TB
-    subgraph "Tier 1: Hardware Flow Table (16K entries)"
+    subgraph sub_tier_1__hardware_flow_table__16k ["Tier 1: Hardware Flow Table (16K entries)"]
         T1["Elephant Flows<br/>(long-lived, high bandwidth)"]
     end
     
-    subgraph "Tier 2: Software Flow Cache (1M entries)"
+    subgraph sub_tier_2__software_flow_cache__1m ["Tier 2: Software Flow Cache (1M entries)"]
         T2["Mice Flows<br/>(short-lived, low bandwidth)"]
     end
     

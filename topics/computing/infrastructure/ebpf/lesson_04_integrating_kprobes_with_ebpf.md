@@ -50,7 +50,7 @@ graph TB
     E --> F["Kprobe Registration"]
     F --> G["Kprobe Handler"]
     
-    H["Kernel Function<br/>Execution"] -->|int3 trap| G
+    H["Kernel Function<br/>Execution"] -->|"int3 trap"| G
     G --> I["Save CPU State"]
     I --> J["Execute BPF<br/>Pre-handler"]
     J --> K["Single-Step<br/>Original Instruction"]

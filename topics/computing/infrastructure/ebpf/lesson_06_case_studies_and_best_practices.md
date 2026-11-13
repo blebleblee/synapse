@@ -112,14 +112,14 @@ The kernel implementation lives in `kernel/bpf/hashtab.c`. The structure is an o
 
 ```mermaid
 graph TD
-    subgraph "struct bpf_htab (kernel heap)"
+    subgraph sub_struct_bpf_htab__kernel_heap ["struct bpf_htab (kernel heap)"]
         direction TB
         META["htab metadata\n(n_buckets, key_size,\nvalue_size, max_entries)"]
         BUCKETS["buckets[n_buckets]\neach: { hlist_head, spinlock }"]
         POOL["pre-alloc pool\n(htab_elem × max_entries)\nif !BPF_F_NO_PREALLOC"]
     end
 
-    subgraph "Bucket Detail"
+    subgraph sub_bucket_detail ["Bucket Detail"]
         direction LR
         BHEAD["bucket.head (hlist_head)"]
         E0["htab_elem\n{ hlist_node, hash, key[], value[] }"]
@@ -151,7 +151,7 @@ Array maps (`kernel/bpf/arraymap.c`) are the simplest and fastest map type. The 
 
 ```mermaid
 graph LR
-    subgraph "BPF_MAP_TYPE_ARRAY — Contiguous vmalloc Region"
+    subgraph sub_bpf_map_type_array___contiguous ["BPF_MAP_TYPE_ARRAY — Contiguous vmalloc Region"]
         direction LR
         E0["[0]\nvalue_size bytes"]
         E1["[1]\nvalue_size bytes"]
@@ -184,19 +184,19 @@ Per-CPU maps allocate `num_possible_cpus()` independent value slots per key. Dur
 
 ```mermaid
 graph TD
-    subgraph "BPF_MAP_TYPE_PERCPU_ARRAY"
+    subgraph sub_bpf_map_type_percpu_array ["BPF_MAP_TYPE_PERCPU_ARRAY"]
         direction TB
         KEY2["key = 7"]
-        subgraph "CPU 0 (NUMA node 0)"
+        subgraph sub_cpu_0__numa_node_0 ["CPU 0 (NUMA node 0)"]
             V0["value[7] @ cpu0_base + 7×stride"]
         end
-        subgraph "CPU 1 (NUMA node 0)"
+        subgraph sub_cpu_1__numa_node_0 ["CPU 1 (NUMA node 0)"]
             V1["value[7] @ cpu1_base + 7×stride"]
         end
-        subgraph "CPU 2 (NUMA node 1)"
+        subgraph sub_cpu_2__numa_node_1 ["CPU 2 (NUMA node 1)"]
             V2["value[7] @ cpu2_base + 7×stride"]
         end
-        subgraph "CPU 3 (NUMA node 1)"
+        subgraph sub_cpu_3__numa_node_1 ["CPU 3 (NUMA node 1)"]
             V3["value[7] @ cpu3_base + 7×stride"]
         end
         KEY2 --> V0
@@ -205,7 +205,7 @@ graph TD
         KEY2 --> V3
     end
 
-    USERSPACE["User-space:\nbpf_map_lookup_elem(fd, &key, values_array)\nreturns values_array[num_possible_cpus()]"]
+    USERSPACE["User-space:\nbpf_map_lookup_elem(fd, &key, values_array)\nreturns values_array["num_possible_cpus()"]"]
     V0 --> USERSPACE
     V1 --> USERSPACE
     V2 --> USERSPACE
@@ -773,7 +773,7 @@ int main(void) {
 
 ```mermaid
 graph TD
-    subgraph "eBPF Map Invariants"
+    subgraph sub_ebpf_map_invariants ["eBPF Map Invariants"]
         I1["Bounded: max_entries fixed at creation"]
         I2["Verifier-audited: all accesses statically checked"]
         I3["ABI-stable: syscall interface stable across kernel versions"]
@@ -781,7 +781,7 @@ graph TD
         I5["Type-dispatch: bpf_map_ops vtable per map_type"]
     end
 
-    subgraph "Concurrency Guarantees by Type"
+    subgraph sub_concurrency_guarantees_by_type ["Concurrency Guarantees by Type"]
         C1["ARRAY: word-atomic (≤8B); no guarantee beyond"]
         C2["HASH: bucket-spinlock; per-bucket serialization"]
         C3["PERCPU_*: CPU-local; no cross-CPU sync at access time"]
@@ -789,7 +789,7 @@ graph TD
         C5["RINGBUF: single-producer per-CPU, SPMC ring"]
     end
 
-    subgraph "Performance Hierarchy (lookup latency)"
+    subgraph sub_performance_hierarchy__lookup_la ["Performance Hierarchy (lookup latency)"]
         P1["PERCPU_ARRAY: ~2ns (bounds check + offset)"]
         P2["ARRAY: ~3ns (bounds check + offset + possible RFO)"]
         P3["PERCPU_HASH: ~15ns (hash + hlist walk, no lock)"]

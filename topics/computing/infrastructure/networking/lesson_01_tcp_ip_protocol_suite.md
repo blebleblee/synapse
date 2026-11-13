@@ -37,7 +37,7 @@ IPv6 uses 128-bit addresses, yielding 2¹²⁸ ≈ 3.4 × 10³⁸ addresses. Thi
 
 ```mermaid
 graph TD
-    subgraph Host A
+    subgraph sub_host_a ["Host A"]
         A1["Application Layer\n(HTTP, DNS, SMTP, gRPC)"]
         T1["Transport Layer\n(TCP, UDP, QUIC, SCTP)"]
         N1["Network Layer\n(IPv4 / IPv6, ICMP, IPsec)"]
@@ -45,7 +45,7 @@ graph TD
         P1["Physical Medium\n(Copper, Fiber, Radio)"]
     end
 
-    subgraph Router R1
+    subgraph sub_router_r1 ["Router R1"]
         NR1["Network Layer\n(IP Forwarding, BGP/OSPF)"]
         LR1a["Link Layer (ingress)"]
         LR1b["Link Layer (egress)"]
@@ -53,7 +53,7 @@ graph TD
         PR1b["Physical (egress)"]
     end
 
-    subgraph Host B
+    subgraph sub_host_b ["Host B"]
         A2["Application Layer"]
         T2["Transport Layer"]
         N2["Network Layer"]
@@ -836,9 +836,9 @@ Each layer wraps the payload from the layer above in its own header (and sometim
 
 ```mermaid
 graph LR
-    subgraph "Ethernet Frame (1518 bytes max)"
-        subgraph "IPv4 Packet (1500 bytes max)"
-            subgraph "TCP Segment"
+    subgraph sub_ethernet_frame__1518_bytes_max ["Ethernet Frame (1518 bytes max)"]
+        subgraph sub_ipv4_packet__1500_bytes_max ["IPv4 Packet (1500 bytes max)"]
+            subgraph sub_tcp_segment ["TCP Segment"]
                 direction LR
                 APP["HTTP Data\n(payload)"]
             end

@@ -73,13 +73,13 @@ Tableau's internal data processing has two distinct modes:
 
 ```mermaid
 flowchart TD
-    subgraph "Tableau Desktop / Server"
+    subgraph sub_tableau_desktop___server ["Tableau Desktop / Server"]
         A["VizQL Engine\n(Shelf → SQL Transpiler)"]
         B["Marks Card\n(Visual Channel Bindings)"]
         C["Rendering Engine\n(SVG / Canvas output)"]
     end
 
-    subgraph "Data Layer"
+    subgraph sub_data_layer ["Data Layer"]
         D["Live Connection\n(JDBC/ODBC → Source DB)"]
         E["Hyper Extract\n(Columnar in-memory store)"]
     end

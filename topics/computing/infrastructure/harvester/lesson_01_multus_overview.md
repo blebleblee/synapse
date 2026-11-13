@@ -39,7 +39,7 @@ Multus is deployed as a DaemonSet on every node. Its binary is copied to `/opt/c
 
 ```mermaid
 graph TD
-    subgraph "Node"
+    subgraph sub_node ["Node"]
         K["kubelet"] -->|"CNI ADD /DEL /CHECK"| M["Multus CNI Binary\n/opt/cni/bin/multus"]
         M -->|"reads"| NAD["NetworkAttachmentDefinition\n(CRD via Kubernetes API)"]
         M -->|"reads"| CONF["/etc/cni/net.d/\nmultus.conf"]
@@ -50,7 +50,7 @@ graph TD
         P2 -->|"writes net1"| NS
         P3 -->|"writes net2"| NS
     end
-    subgraph "Kubernetes Control Plane"
+    subgraph sub_kubernetes_control_plane ["Kubernetes Control Plane"]
         API["kube-apiserver"]
         ETCD["etcd"]
         API --> ETCD
@@ -328,7 +328,7 @@ The integration requires three cooperating components:
 
 ```mermaid
 graph LR
-    subgraph "Physical NIC (PF)"
+    subgraph sub_physical_nic__pf ["Physical NIC (PF)"]
         PF["ixgbe/mlx5\nPhysical Function\nens1f0"]
         VF0["VF 0\nPCI 0000:01:10.0"]
         VF1["VF 1\nPCI 0000:01:10.2"]
@@ -338,13 +338,13 @@ graph LR
         PF --> VF2
     end
 
-    subgraph "Kubernetes Node"
+    subgraph sub_kubernetes_node ["Kubernetes Node"]
         DP["SR-IOV Device Plugin\nadvertises intel.com/sriov_net_a"]
         VF0 -->|"allocated to Pod A"| DP
         VF1 -->|"allocated to Pod B"| DP
     end
 
-    subgraph "Pod A Network Namespace"
+    subgraph sub_pod_a_network_namespace ["Pod A Network Namespace"]
         ETH0["eth0\n(Calico VXLAN)"]
         NET1["net1\n(VF 0 — DPDK/kernel)"]
     end
@@ -388,16 +388,16 @@ flowchart TD
     START([kubelet: CNI ADD]) --> PARSE[Parse Multus config\nfrom stdin]
     PARSE --> FETCHPOD{Fetch pod from K8S API}
     FETCHPOD -->|"API error"| APIFAIL[/"Return error\nPod stays in ContainerCreating"/]
-    FETCHPOD -->|"success"| FETCHNAD[Fetch & resolve NADs]
+    FETCHPOD -->|"success"| FETCHNAD["Fetch & resolve NADs"]
     FETCHNAD --> VALIDATE{Validate interface\nname uniqueness}
     VALIDATE -->|"collision detected"| VALFAIL[/"Return error\nno plugins invoked"/]
-    VALIDATE -->|"valid"| PRIMARY[Invoke primary CNI\nifname=eth0]
+    VALIDATE -->|"valid"| PRIMARY["Invoke primary CNI\nifname=eth0"]
     PRIMARY -->|"failure"| PRIMFAIL[/"Return error\nno state written"/]
     PRIMARY -->|"success"| SECONDLOOP["For each secondary NAD\n(ordered)"]
-    SECONDLOOP --> SECINVOKE[Invoke secondary CNI\nifname=netN or override]
+    SECONDLOOP --> SECINVOKE["Invoke secondary CNI\nifname=netN or override"]
     SECINVOKE -->|"success"| MORENAD{More NADs?}
     MORENAD -->|"yes"| SECONDLOOP
-    MORENAD -->|"no"| WRITESTA[Write state file\n/var/lib/cni/multus/<cid>]
+    MORENAD -->|"no"| WRITESTA["Write state file\n/var/lib/cni/multus/<cid>"]
     SECINVOKE -->|"failure + optional"| LOGWARN[Log warning\ncontinue]
     LOGWARN --> MORENAD
     SECINVOKE -->|"failure + required"| ROLLBACK[Rollback: DEL all\npreviously added interfaces]

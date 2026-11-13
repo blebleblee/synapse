@@ -90,23 +90,23 @@ The system processes a multimodal request through these stages:
 
 ```mermaid
 graph TD
-    subgraph "Client"
+    subgraph sub_client ["Client"]
         CL["API Client"]
     end
 
-    subgraph "API Gateway"
+    subgraph sub_api_gateway ["API Gateway"]
         REQ["POST /v1beta/models/{model}:generateContent"]
         VAL["Request Validation<br/>Schema + MIME + Size + Safety Pre-Screen"]
         CL -->|"HTTP Request"| REQ
         REQ --> VAL
     end
 
-    subgraph "Media Resolution"
+    subgraph sub_media_resolution ["Media Resolution"]
         RES["Resolve fileData URIs<br/>Decode inlineData base64"]
         VAL -->|"valid request"| RES
     end
 
-    subgraph "Modality Encoders"
+    subgraph sub_modality_encoders ["Modality Encoders"]
         ENC_T["Text Encoder<br/>Tokenizer → Token IDs"]
         ENC_I["Image Encoder<br/>Decode → Resize → Patchify → Project"]
         ENC_A["Audio Encoder<br/>Waveform → Mel-Spect → Patchify → Project"]
@@ -118,7 +118,7 @@ graph TD
     RES --> ENC_A
     RES --> ENC_V
 
-    subgraph "Token Assembly"
+    subgraph sub_token_assembly ["Token Assembly"]
         ASM["Concatenate Token Sequences<br/>in Part Order<br/>+ Positional Embeddings"]
         ENC_T --> ASM
         ENC_I --> ASM
@@ -126,14 +126,14 @@ graph TD
         ENC_V --> ASM
     end
 
-    subgraph "Model Inference"
+    subgraph sub_model_inference ["Model Inference"]
         TX["Transformer Layers<br/>Self-Attention + Cross-Modal Attention"]
         DEC["Autoregressive Decoder"]
         ASM --> TX
         TX --> DEC
     end
 
-    subgraph "Post-Processing"
+    subgraph sub_post_processing ["Post-Processing"]
         SAF["Safety Classification<br/>Harassment / Hate / Explicit / Dangerous"]
         DET["Detokenize / Format Output"]
         DEC --> SAF
@@ -459,7 +459,7 @@ The production pattern is a **work queue with backpressure**:
 
 ```mermaid
 graph TD
-    subgraph "Ingress Layer"
+    subgraph sub_ingress_layer ["Ingress Layer"]
         CL["API Clients"]
         GW["API Gateway<br/>Rate Limiting + Auth"]
         QUEUE["Message Queue<br/>(Pub/Sub, SQS, Kafka)"]
@@ -468,7 +468,7 @@ graph TD
         GW -->|"202 Accepted + job_id"| CL
     end
 
-    subgraph "Worker Pool"
+    subgraph sub_worker_pool ["Worker Pool"]
         W1["Worker 1<br/>GPU Node A"]
         W2["Worker 2<br/>GPU Node B"]
         WN["Worker N<br/>GPU Node N"]
@@ -477,14 +477,14 @@ graph TD
         QUEUE --> WN
     end
 
-    subgraph "State Store"
+    subgraph sub_state_store ["State Store"]
         STATE["Result Store<br/>(Redis / Firestore)"]
         W1 -->|"Write result"| STATE
         W2 -->|"Write result"| STATE
         WN -->|"Write result"| STATE
     end
 
-    subgraph "Egress Layer"
+    subgraph sub_egress_layer ["Egress Layer"]
         POLL["Polling Endpoint<br/>GET /jobs/{job_id}"]
         WEBHOOK["Webhook Dispatcher<br/>POST client_url"
         STATE --> POLL
@@ -936,37 +936,37 @@ A production-grade multimodal API service combines all the patterns discussed:
 
 ```mermaid
 graph TD
-    subgraph "Edge Layer"
+    subgraph sub_edge_layer ["Edge Layer"]
         CDN["CDN / Reverse Proxy<br/>TLS termination, DDoS protection"]
         AUTH["Auth Service<br/>API key validation, quota check"]
         RL["Rate Limiter<br/>Token bucket per API key"]
     end
 
-    subgraph "Ingress"
+    subgraph sub_ingress ["Ingress"]
         SYNC["Synchronous Handler<br/>generateContent"]
         STREAM["Streaming Handler<br/>streamGenerateContent<br/>(SSE)"]
         ASYNC["Batch Handler<br/>batch:submit → job_id"]
         TC["Token Counter<br/>countTokens (no inference)"]
     end
 
-    subgraph "Processing"
+    subgraph sub_processing ["Processing"]
         QUEUE["Job Queue<br/>(Pub/Sub)"]
         POOL["Worker Pool<br/>Dynamic batching, GPU nodes"]
         CACHE["Multi-layer Cache<br/>Embedding cache + Response cache"]
     end
 
-    subgraph "Model Backends"
+    subgraph sub_model_backends ["Model Backends"]
         MB1["Model Server A<br/>Gemini 1.5 Pro"]
         MB2["Model Server B<br/>Gemini 2.0 Flash"]
         MBN["Model Server N<br/>Specialized / Fine-tuned"]
     end
 
-    subgraph "Storage"
+    subgraph sub_storage ["Storage"]
         FILES["File API<br/>Object storage for uploaded media"]
         STATE["Session State<br/>Conversation history, job results"]
     end
 
-    subgraph "Safety"
+    subgraph sub_safety ["Safety"]
         SAF["Safety Classifiers<br/>Pre-screen input, post-screen output"]
     end
 

@@ -42,11 +42,11 @@ The Kubernetes storage subsystem operates through three distinct control planes,
 
 ```mermaid
 graph TB
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         User["User"] -->|"1. kubectl apply"| PVC["PersistentVolumeClaim<br/>requests: 10Gi<br/>storageClass: fast-ssd"]
     end
     
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         PVC -->|"2. Watch event"| PVController["PersistentVolume<br/>Controller"]
         PVController -->|"3a. Static: Match existing PV"| PV["PersistentVolume<br/>(pre-provisioned)"]
         PVController -->|"3b. Dynamic: No match found"| Provisioner["StorageClass<br/>Provisioner"]
@@ -60,7 +60,7 @@ graph TB
         PVController -->|"8. Update PVC status"| BoundPVC["PVC Status: Bound<br/>volumeName: pv-xyz"]
     end
     
-    subgraph "Node"
+    subgraph sub_node ["Node"]
         Kubelet["Kubelet"] -->|"9. Mount volume"| Volume["Mounted Volume<br/>/var/lib/kubelet/pods/.../volumes"]
         BoundPVC -->|"Pod scheduled"| Kubelet
     end

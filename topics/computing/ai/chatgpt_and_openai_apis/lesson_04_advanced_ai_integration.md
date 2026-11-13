@@ -215,7 +215,7 @@ Tool calling is the mechanism by which a model can emit a structured JSON payloa
 
 ```mermaid
 flowchart TD
-    A["User: 'What is the weather in Paris?'"] --> B[Chat Completions API\ntools= weather_tool ]
+    A["User: 'What is the weather in Paris?'"] --> B["Chat Completions API\ntools= weather_tool "]
     B --> C{Model decides\nto call a tool?}
     C -- No --> D[Return direct text response]
     C -- Yes --> E["finish_reason = 'tool_calls'\nmodel emits: tool_calls JSON"]
@@ -354,13 +354,13 @@ Every optimization decision in an OpenAI API integration ultimately reduces to t
 
 ```mermaid
 graph TD
-    subgraph "Latency Components"
+    subgraph sub_latency_components ["Latency Components"]
         A["Network RTT\n~10–80ms"] --> E[Total Response Latency]
         B["Time to First Token (TTFT)\n~200ms–2s"] --> E
         C["Tokens-per-second generation\n~40–100 tok/s for GPT-4o"] --> E
         D["SDK + deserialization overhead\n~5–20ms"] --> E
     end
-    subgraph "Cost Components"
+    subgraph sub_cost_components ["Cost Components"]
         F["Prompt tokens\n(every message, every turn)"] --> I[Total API Cost]
         G["Completion tokens\n(generated output)"] --> I
         H["Embedding tokens\n(separate model pricing)"] --> I
@@ -469,12 +469,12 @@ The correct architectural response to rate limits is a **token-aware request que
 
 ```mermaid
 flowchart LR
-    subgraph Application Layer
+    subgraph sub_application_layer ["Application Layer"]
         A[Service A]
         B[Service B]
         C[Service C]
     end
-    subgraph Rate-Limit Queue
+    subgraph sub_rate_limit_queue ["Rate-Limit Queue"]
         D[Request Queue\nwith token estimation]
         E[Token Bucket\nTPM governor]
         F[RPM governor]
@@ -595,18 +595,18 @@ RAG decouples the model's parametric knowledge (what it learned during training)
 
 ```mermaid
 flowchart TD
-    subgraph Indexing Pipeline - offline
+    subgraph sub_indexing_pipeline___offline ["Indexing Pipeline - offline"]
         A[Source Documents\nPDF, DB, HTML] --> B[Chunking\ne.g., 512 token windows\nwith 64 token overlap]
         B --> C[Embedding Model\ntext-embedding-3-small]
         C --> D[Vector Store\nPgVector, Pinecone, Weaviate, etc.]
     end
 
-    subgraph Query Pipeline - online per request
+    subgraph sub_query_pipeline___online_per_requ ["Query Pipeline - online per request"]
         E[User Query] --> F[Embed Query\nsame model as indexing]
         F --> G[ANN Search\nTop-k by cosine similarity]
         D --> G
-        G --> H[Retrieved Chunks\nk=3 to 10 typically]
-        H --> I[Prompt Assembly\nsystem + context chunks + query]
+        G --> H["Retrieved Chunks\nk=3 to 10 typically"]
+        H --> I["Prompt Assembly\nsystem + context chunks + query"]
         I --> J[Chat Completions API]
         J --> K[Grounded Response\nwith source citations]
     end
@@ -627,13 +627,13 @@ A production OpenAI integration requires telemetry at three levels:
 
 ```mermaid
 graph TD
-    subgraph "Request Level"
+    subgraph sub_request_level ["Request Level"]
         A["model, latency_ms,\nprompt_tokens, completion_tokens,\nfinish_reason, request_id"]
     end
-    subgraph "Session Level"
+    subgraph sub_session_level ["Session Level"]
         B["session_id, turn_count,\ntotal_tokens, total_cost_usd,\ntool_calls_made"]
     end
-    subgraph "System Level"
+    subgraph sub_system_level ["System Level"]
         C["p50/p95/p99 latency,\nerror rate by type,\nTPM utilization %,\nmodel version distribution"]
     end
     A --> B --> C

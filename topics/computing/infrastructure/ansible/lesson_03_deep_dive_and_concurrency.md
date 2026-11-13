@@ -1,4 +1,3 @@
-```markdown
 # Lesson 3: Advanced Internal Mechanics, Concurrency & Recovery
 
 Ansible is often characterized as a simple, agentless configuration management tool, yet beneath its declarative YAML syntax lies a sophisticated distributed state reconciliation engine. To the principal infrastructure architect or kernel specialist, Ansible is not merely a script runner—it is a **level-triggered control plane** that orchestrates remote execution through SSH, manages concurrency via bounded fork pools, and relies on the POSIX semantics of the target operating system to guarantee atomicity.
@@ -15,7 +14,7 @@ The following diagram captures the high-level architecture across a single playb
 
 ```mermaid
 graph TD
-    subgraph "Control Node (Orchestrator)"
+    subgraph sub_control_node__orchestrator ["Control Node (Orchestrator)"]
         A["ansible-playbook process\n(Python, forks=N)"] --> B["StrategyModule\n(linear / free / debug)"]
         B --> C["TaskQueueManager\n(bounded fork pool)"]
         C --> D1["Worker Process 1\n(fork)"]
@@ -23,13 +22,13 @@ graph TD
         C --> D3["Worker Process N\n(fork)"]
     end
 
-    subgraph "SSH Transport Layer"
+    subgraph sub_ssh_transport_layer ["SSH Transport Layer"]
         D1 --> E1["ControlMaster Socket\n(/tmp/ansible-ssh-host1)"]
         D2 --> E2["ControlMaster Socket\n(/tmp/ansible-ssh-host2)"]
         D3 --> E3["ControlMaster Socket\n(/tmp/ansible-ssh-host3)"]
     end
 
-    subgraph "Managed Node (Target)"
+    subgraph sub_managed_node__target ["Managed Node (Target)"]
         E1 --> F1["Python Interpreter\n(/usr/bin/python3)"]
         F1 --> G1["Module Execution\n(ephemeral .py file)"]
         G1 --> H1["Kernel Syscalls\n(rename, chmod, stat...)"]

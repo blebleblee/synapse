@@ -1,4 +1,3 @@
-```markdown
 # Lesson 6: Security and Compliance in Hyperconverged Infrastructure
 
 ## 1. First-Principles Intuition & Invariants
@@ -35,31 +34,31 @@ The diagram below shows the full HCI security boundary, including the hardware t
 
 ```mermaid
 graph TD
-    subgraph "Hardware Trust Anchor"
+    subgraph sub_hardware_trust_anchor ["Hardware Trust Anchor"]
         TPM["TPM 2.0 / AMD SEV-SNP"]
         UEFI["UEFI Secure Boot ROM"]
         CPU["CPU Microcode\n(Intel VT-x / AMD-V)"]
     end
 
-    subgraph "Hypervisor Layer (Ring 0 / VMX Root)"
+    subgraph sub_hypervisor_layer__ring_0___vmx_r ["Hypervisor Layer (Ring 0 / VMX Root)"]
         HV["Type-1 Hypervisor\n(ESXi / AHV / KVM)"]
         VMX["VMX Non-Root\nGuest Execution"]
         IOMMU["IOMMU / VT-d\n(DMA Isolation)"]
     end
 
-    subgraph "Storage Security Plane"
+    subgraph sub_storage_security_plane ["Storage Security Plane"]
         DSE["Distributed Storage Engine\n(vSAN / AOS / Ceph)"]
         ATREST["AES-256-XTS\nEncryption at Rest"]
         KMIP["KMIP Key Server\n(External KMS)"]
     end
 
-    subgraph "Network Security Plane"
+    subgraph sub_network_security_plane ["Network Security Plane"]
         DVS["Distributed Virtual Switch\n(VDS / OVS)"]
         NSX["Micro-segmentation\n(NSX-T / AHV OVN)"]
         TLS["mTLS East-West\nEncryption"]
     end
 
-    subgraph "Management & Audit Plane"
+    subgraph sub_management___audit_plane ["Management & Audit Plane"]
         MGMT["Cluster Management\n(vCenter / Prism / ACM)"]
         RBAC["RBAC / ABAC\nPolicy Engine"]
         SIEM["SIEM / Syslog\nAudit Stream"]
@@ -588,7 +587,7 @@ The security implication: during a rebuild, decrypted shard data transits the ne
 
 ```mermaid
 flowchart LR
-    subgraph "EC 4+2 Configuration"
+    subgraph sub_ec_4_2_configuration ["EC 4+2 Configuration"]
         D1["Data Shard 1\nNode A"]
         D2["Data Shard 2\nNode B"]
         D3["Data Shard 3\nNode C"]
@@ -597,7 +596,7 @@ flowchart LR
         P2["Parity Shard 2\nNode F"]
     end
 
-    subgraph "Node F Fails"
+    subgraph sub_node_f_fails ["Node F Fails"]
         FAIL["Node F\nFAILED"]
         REBUILD["Rebuild Engine\nreads D1–D4 + P1\nrecomputes P2"]
         NEWNODE["New Node G\nreceives P2 replica"]

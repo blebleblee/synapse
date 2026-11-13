@@ -23,11 +23,11 @@ The most significant architectural divergence is how the configuration reaches t
 
 ```mermaid
 graph TD
-    subgraph "Push Model (Ansible)"
+    subgraph sub_push_model__ansible ["Push Model (Ansible)"]
         A1[Control Node] -->|"SSH Connection"| B1[Managed Node 1]
         A1 -->|"SSH Connection"| B2[Managed Node 2]
     end
-    subgraph "Pull Model (Puppet/Chef)"
+    subgraph sub_pull_model__puppet_chef ["Pull Model (Puppet/Chef)"]
         C1[Config Server] -->|"Catalog/Policy"| D1[Agent Daemon 1]
         D1 -->|"Fetch Cycle (30m)"| C1
         C1 -->|"Catalog/Policy"| D2[Agent Daemon 2]

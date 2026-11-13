@@ -131,15 +131,15 @@ RBAC is the production-standard authorization mode. It is enabled by passing `--
 
 ```mermaid
 graph TD
-    subgraph "Namespace Scope"
+    subgraph sub_namespace_scope ["Namespace Scope"]
         Role["Role\n(namespace: payments)"]
         RoleBinding["RoleBinding\n(namespace: payments)"]
     end
-    subgraph "Cluster Scope"
+    subgraph sub_cluster_scope ["Cluster Scope"]
         ClusterRole["ClusterRole\n(cluster-wide or reusable)"]
         ClusterRoleBinding["ClusterRoleBinding"]
     end
-    subgraph "Subjects"
+    subgraph sub_subjects ["Subjects"]
         User["User\n'alice'"]
         Group["Group\n'dev-team'"]
         SA["ServiceAccount\n'payments-svc'"]

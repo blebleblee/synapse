@@ -1121,19 +1121,19 @@ GitOps extends the pipeline model into deployment: rather than the CI pipeline p
 
 ```mermaid
 graph LR
-    subgraph "CI Pipeline"
+    subgraph sub_ci_pipeline ["CI Pipeline"]
         A["Source Repo\n(app code)"] -->|"Build + Sign"| B["Artifact Registry\n(signed image)"]
         A -->|"Update image tag + digest"| C["Config Repo\n(Kubernetes manifests)"]
     end
 
-    subgraph "CD Controller (Argo CD)"
+    subgraph sub_cd_controller__argo_cd ["CD Controller (Argo CD)"]
         C -->|"Watch for changes"| D["Argo CD Controller"]
         D -->|"Verify image signature\n(admission webhook)"| E["Kubernetes Cluster"]
         E -->|"Report actual state"| D
         D -->|"Reconcile drift"| E
     end
 
-    subgraph "Audit & Governance"
+    subgraph sub_audit___governance ["Audit & Governance"]
         C -->|"All changes are git commits"| F["Audit Log\n(immutable git history)"]
         E -->|"Runtime events"| G["SIEM / SOAR"]
     end

@@ -44,19 +44,19 @@ Production ML monitoring requires three distinct observability planes that mirro
 
 ```mermaid
 graph TD
-    subgraph "Data Plane"
+    subgraph sub_data_plane ["Data Plane"]
         A["Upstream Data Sources\n(DBs, Streams, APIs)"]
         B["Feature Store\n(Online + Offline)"]
         C["Data Validation\n(Great Expectations / TFDV)"]
     end
 
-    subgraph "Model Plane"
+    subgraph sub_model_plane ["Model Plane"]
         D["Serving Layer\n(REST / gRPC / Batch)"]
         E["Shadow / Canary\nDeployment"]
         F["Prediction Logger"]
     end
 
-    subgraph "Observability Plane"
+    subgraph sub_observability_plane ["Observability Plane"]
         G["Feature Drift Monitor\n(PSI, KS-test, MMD)"]
         H["Prediction Drift Monitor\n(output distribution)"]
         I["Business KPI Monitor\n(revenue, CTR, churn)"]
@@ -65,7 +65,7 @@ graph TD
         L["Retraining Trigger"]
     end
 
-    subgraph "Feedback Loop"
+    subgraph sub_feedback_loop ["Feedback Loop"]
         M["Data Labeling Pipeline"]
         N["Retraining Orchestrator\n(Kubeflow / Metaflow / SageMaker)"]
         O["Model Registry\n(MLflow / W&B)"]
@@ -529,7 +529,7 @@ The three primary deployment patterns form a risk/speed tradeoff:
 
 ```mermaid
 graph TD
-    subgraph "Shadow Deployment"
+    subgraph sub_shadow_deployment ["Shadow Deployment"]
         SD_PROD["Production Model\n(serves users)"]
         SD_SHADOW["Candidate Model\n(shadow, no user impact)"]
         SD_TRAFFIC["Incoming Request"]
@@ -542,7 +542,7 @@ graph TD
         SD_LOG --> SD_COMPARE
     end
 
-    subgraph "Canary Deployment"
+    subgraph sub_canary_deployment ["Canary Deployment"]
         CD_TRAFFIC["Incoming Request"]
         CD_PROD["Production Model\n(90–99% traffic)"]
         CD_CANARY["Canary Model\n(1–10% traffic)"]
@@ -555,7 +555,7 @@ graph TD
         CD_METRICS --> CD_GATE
     end
 
-    subgraph "Blue/Green Deployment"
+    subgraph sub_blue_green_deployment ["Blue/Green Deployment"]
         BG_LB["Load Balancer"]
         BG_BLUE["Blue Environment\n(current production)"]
         BG_GREEN["Green Environment\n(new model, full stack)"]
@@ -811,25 +811,25 @@ The monitoring and maintenance system only achieves its purpose when it forms a 
 
 ```mermaid
 flowchart LR
-    subgraph "Observe"
+    subgraph sub_observe ["Observe"]
         FEAT_DRIFT["Feature Drift\nMonitor"]
         SCORE_DRIFT["Prediction Score\nMonitor"]
         PERF["Performance\nTracker (w/ labels)"]
         BIZ["Business KPI\nMonitor"]
     end
 
-    subgraph "Orient"
+    subgraph sub_orient ["Orient"]
         ALERT_ENGINE["Alert Engine\n(severity classification)"]
         ROOT_CAUSE["Root Cause\nClassifier\n(data? model? pipeline?)"]
     end
 
-    subgraph "Decide"
+    subgraph sub_decide ["Decide"]
         RETRAIN_GATE["Retraining Decision\n(drift type × severity)"]
         SCHEMA_FIX["Data Pipeline\nFix Required"]
         MANUAL["Escalate to\nML Engineer"]
     end
 
-    subgraph "Act"
+    subgraph sub_act ["Act"]
         RETRAIN["Retraining\nPipeline"]
         DEPLOY["Deployment\nPipeline"]
         MONITOR_NEW["Monitor New Model\nVersion"]

@@ -359,20 +359,20 @@ flowchart TD
 
 ```mermaid
 graph TB
-    subgraph "Kubernetes Control Plane"
+    subgraph sub_kubernetes_control_plane ["Kubernetes Control Plane"]
         KAPI["kube-apiserver\n(RBAC Admission Controller)"]
         ETCD["etcd\n(encrypted at rest\nwith KMS provider)"]
         KAPI <-->|"mTLS"| ETCD
     end
 
-    subgraph "longhorn-system Namespace"
+    subgraph sub_longhorn_system_namespace ["longhorn-system Namespace"]
         LM["Longhorn Manager\n(ServiceAccount: longhorn-service-account)"]
         LUI["Longhorn UI\n(read-only access)"]
         LM <-->|"RBAC-gated\nREST/Watch"| KAPI
         LUI <-->|"RBAC-gated\nREST"| KAPI
     end
 
-    subgraph "Worker Node A"
+    subgraph sub_worker_node_a ["Worker Node A"]
         ENG["Longhorn Engine\n(CSI NodeStage Pod)"]
         R1["Replica 1\n(LUKS-encrypted\nbacking file)"]
         DMCRYPT1["dm-crypt\n(AES-256-XTS)"]
@@ -383,7 +383,7 @@ graph TB
         DMCRYPT1 <-->|"Encrypted bytes"| DISK1["/dev/sda1\n(Host Disk)"]
     end
 
-    subgraph "Worker Node B"
+    subgraph sub_worker_node_b ["Worker Node B"]
         R2["Replica 2\n(LUKS-encrypted\nbacking file)"]
         DMCRYPT2["dm-crypt\n(AES-256-XTS)"]
         ENG <-->|"gRPC + mTLS\nTCP:10000"| R2
@@ -391,7 +391,7 @@ graph TB
         DMCRYPT2 <-->|"Encrypted bytes"| DISK2["/dev/sda1\n(Host Disk)"]
     end
 
-    subgraph "Worker Node C"
+    subgraph sub_worker_node_c ["Worker Node C"]
         R3["Replica 3\n(LUKS-encrypted\nbacking file)"]
         DMCRYPT3["dm-crypt\n(AES-256-XTS)"]
         ENG <-->|"gRPC + mTLS\nTCP:10000"| R3

@@ -36,12 +36,12 @@ flowchart LR
     D --> E["Monitoring"]
     E -->|"Retraining Trigger"| A
 
-    subgraph "CI/CD Boundary"
+    subgraph sub_ci_cd_boundary ["CI/CD Boundary"]
         B
         C
     end
 
-    subgraph "Runtime Boundary"
+    subgraph sub_runtime_boundary ["Runtime Boundary"]
         D
         E
     end
@@ -212,13 +212,13 @@ The MLflow tracking architecture records every run as an immutable record in a b
 
 ```mermaid
 flowchart TB
-    subgraph "Training Process"
+    subgraph sub_training_process ["Training Process"]
         T["Trainer.train"] --> ML["mlflow.log_params"]
         T --> MM["mlflow.log_metrics"]
         T --> MA["mlflow.log_model"]
     end
 
-    subgraph "MLflow Server"
+    subgraph sub_mlflow_server ["MLflow Server"]
         BS["Backend Store
         (SQLite/PostgreSQL)"]
         AS["Artifact Store
@@ -707,10 +707,10 @@ Deployment follows one of three patterns depending on latency and throughput req
 
 ```mermaid
 flowchart TB
-    subgraph "Deployment Patterns"
+    subgraph sub_deployment_patterns ["Deployment Patterns"]
         direction LR
 
-        subgraph "Batch Inference"
+        subgraph sub_batch_inference ["Batch Inference"]
             B1["Scheduler
             (Airflow/Cron)"]
             B2["Read from
@@ -721,7 +721,7 @@ flowchart TB
             B1 --> B2 --> B3 --> B4
         end
 
-        subgraph "Real-time API"
+        subgraph sub_real_time_api ["Real-time API"]
             R1["HTTP Request"]
             R2["Tokenize"]
             R3["Model.forward"]
@@ -729,7 +729,7 @@ flowchart TB
             R1 --> R2 --> R3 --> R4
         end
 
-        subgraph "Streaming"
+        subgraph sub_streaming ["Streaming"]
             S1["Kafka/Kinesis
             Consumer"]
             S2["Window Aggregation"]
@@ -1065,12 +1065,12 @@ The monitoring system must be decoupled from the serving system. The serving end
 
 ```mermaid
 flowchart TB
-    subgraph "Serving System"
+    subgraph sub_serving_system ["Serving System"]
         SE["Serving Endpoint"] --> PS["Prediction Store
         (DB/Queue)"]
     end
 
-    subgraph "Monitoring System (Decoupled)"
+    subgraph sub_monitoring_system__decoupled ["Monitoring System (Decoupled)"]
         PS --> MW["Rolling Window
         Aggregator"]
         MW --> PSI["PSI Calculator"]
@@ -1087,7 +1087,7 @@ flowchart TB
         Trigger"]
     end
 
-    subgraph "Feedback Loop"
+    subgraph sub_feedback_loop ["Feedback Loop"]
         GT["Ground Truth Labels"] --> CM["Confusion Matrix
         (Delayed)"]
         CM --> SE
@@ -1345,7 +1345,7 @@ if __name__ == "__main__":
 
 ```mermaid
 flowchart TB
-    subgraph "Experiment Phase"
+    subgraph sub_experiment_phase ["Experiment Phase"]
         DV["Data Validation"] --> TR["Training
         (Trainer + MLflow)"]
         TR --> HPO["Hyperparameter
@@ -1354,7 +1354,7 @@ flowchart TB
         Promotion Gate"]
     end
 
-    subgraph "Registry Phase"
+    subgraph sub_registry_phase ["Registry Phase"]
         EV --> MR["MLflow Model
         Registry"]
         MR --> ST["Staging"]
@@ -1362,14 +1362,14 @@ flowchart TB
         PR -->|"Supersede"| AR["Archived"]
     end
 
-    subgraph "Serving Phase"
+    subgraph sub_serving_phase ["Serving Phase"]
         PR --> API["FastAPI
         Endpoint"]
         API --> LOG["Prediction
         Logs"]
     end
 
-    subgraph "Monitoring Phase"
+    subgraph sub_monitoring_phase ["Monitoring Phase"]
         LOG --> MON["Drift Detector
         (PSI + KS)"]
         MON -->|"Drift"| AL["Alert +

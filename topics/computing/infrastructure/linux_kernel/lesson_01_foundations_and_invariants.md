@@ -166,46 +166,46 @@ The major subsystems and their responsibilities:
 
 ```mermaid
 graph TD
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         APP["Application (glibc, syscall ABI)"]
     end
 
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         SC["Syscall Dispatch\n(entry_SYSCALL_64 / do_syscall_64)"]
 
-        subgraph "Core Kernel"
+        subgraph sub_core_kernel ["Core Kernel"]
             SCHED["Process Scheduler\n(CFS / RT / Deadline)"]
             MM["Memory Manager\n(mmap, brk, page fault)"]
             SIGNALS["Signal Delivery"]
         end
 
-        subgraph "Virtual File System"
+        subgraph sub_virtual_file_system ["Virtual File System"]
             VFS["VFS Layer\n(inode, dentry, file ops)"]
             EXT4["ext4"]
             BTRFS["btrfs"]
             TMPFS["tmpfs"]
         end
 
-        subgraph "Networking"
+        subgraph sub_networking ["Networking"]
             SOCK["Socket Layer\n(SOCK_STREAM / DGRAM)"]
             TCP["TCP/IP Stack"]
             NETFILTER["Netfilter / eBPF XDP"]
         end
 
-        subgraph "Block & Storage"
+        subgraph sub_block___storage ["Block & Storage"]
             BIO["Block I/O Layer\n(bio, request queue)"]
             NVME["NVMe Driver"]
             SCSI["SCSI / SATA"]
         end
 
-        subgraph "Hardware Abstraction"
+        subgraph sub_hardware_abstraction ["Hardware Abstraction"]
             IRQ["Interrupt Controller\n(APIC / GIC)"]
             DMA["DMA Engine"]
             MMU_HW["MMU / TLB Management\n(CR3 / TTBR0_EL1)"]
         end
     end
 
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         CPU["CPU Cores"]
         RAM["Physical RAM"]
         DISK["NVMe / SATA SSD"]

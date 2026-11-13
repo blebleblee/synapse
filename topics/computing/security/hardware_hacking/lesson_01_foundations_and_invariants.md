@@ -253,13 +253,13 @@ The minimal UART connection requires only TX, RX, and GND, with TX of one device
 
 ```mermaid
 graph LR
-    subgraph "Device A"
+    subgraph sub_device_a ["Device A"]
         A_TX[TX Pin]
         A_RX[RX Pin]
         A_GND[GND]
     end
     
-    subgraph "Device B"
+    subgraph sub_device_b ["Device B"]
         B_TX[TX Pin]
         B_RX[RX Pin]
         B_GND[GND]
@@ -278,7 +278,7 @@ Within an embedded system, UART peripherals connect to the CPU via on-chip inter
 
 ```mermaid
 graph TD
-    subgraph "System-on-Chip (SoC)"
+    subgraph sub_system_on_chip__soc ["System-on-Chip (SoC)"]
         CPU["CPU Core<br/>(ARM Cortex, RISC-V)"]
         BUS["Interconnect Bus<br/>(AXI, AHB, APB)"]
         UART_CTRL["UART Controller<br/>(Peripheral)"]
@@ -317,21 +317,21 @@ In hardware reconnaissance scenarios, the attacker's objective is to intercept a
 
 ```mermaid
 graph TD
-    subgraph "Target Embedded System"
+    subgraph sub_target_embedded_system ["Target Embedded System"]
         TARGET_CPU["Target CPU<br/>(Running Firmware)"]
         TARGET_UART["UART Interface"]
         
         TARGET_CPU <-->|"Control/Data"| TARGET_UART
     end
     
-    subgraph "Host Controller"
+    subgraph sub_host_controller ["Host Controller"]
         HOST["Host Computer<br/>(Engineer/Attacker)"]
         HOST_UART["USB-to-UART Adapter"]
         
         HOST <-->|"USB"| HOST_UART
     end
     
-    subgraph "Analysis Equipment"
+    subgraph sub_analysis_equipment ["Analysis Equipment"]
         ANALYZER["Logic Analyzer<br/>(Saleae, DSLogic)"]
         PROBE_TX["High-Z Probe on TX"]
         PROBE_RX["High-Z Probe on RX"]
@@ -366,7 +366,7 @@ Standard UART is point-to-point. For multi-device networks, RS-485 extends UART 
 
 ```mermaid
 graph LR
-    subgraph "RS-485 Bus Topology"
+    subgraph sub_rs_485_bus_topology ["RS-485 Bus Topology"]
         MASTER["Master Device<br/>(TX/RX)"]
         SLAVE1["Slave 1<br/>(TX/RX)"]
         SLAVE2["Slave 2<br/>(TX/RX)"]

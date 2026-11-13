@@ -196,7 +196,7 @@ graph TD
     B -->|Yes| C["vDSO reads vvar page:<br/>TSC + scale + offset"]
     C --> D["Compute time in user space<br/>No ring transition"]
     D --> E["Return to application"]
-    B -->|No / fallback| F["SYSCALL trap to kernel"]
+    B -->|"No / fallback"| F["SYSCALL trap to kernel"]
     F --> G["Kernel reads hardware clock<br/>with full privileges"]
     G --> H["SYSRET back to user space"]
     H --> E
@@ -359,12 +359,12 @@ int main(void) {
 
 ```mermaid
 graph LR
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         A["Application"] --> SQ["Submission Queue (SQ)<br/>shared memory"]
         CQ["Completion Queue (CQ)<br/>shared memory"] --> A
     end
 
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         KP["io_uring kernel poller<br/>(SQPOLL kernel thread)"]
         SQ --> KP
         KP --> KS["Process I/O<br/>(read, write, etc.)"]

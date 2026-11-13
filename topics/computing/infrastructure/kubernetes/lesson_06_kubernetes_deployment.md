@@ -20,13 +20,13 @@ A Deployment does *not* directly manage Pods. It manages ReplicaSets. Each rollo
 
 ```mermaid
 graph TD
-    subgraph "Control Plane"
+    subgraph sub_control_plane ["Control Plane"]
         A[("etcd\n(desired state store)")] -->|"watch events"| B["Deployment Controller\n(kube-controller-manager)"]
         A -->|"watch events"| C["ReplicaSet Controller\n(kube-controller-manager)"]
         A -->|"watch events"| D["Scheduler\n(kube-scheduler)"]
     end
 
-    subgraph "Desired State Objects (etcd)"
+    subgraph sub_desired_state_objects__etcd ["Desired State Objects (etcd)"]
         E["Deployment\n(spec.template, replicas)"]
         F["ReplicaSet v1 (old)\n(replicas: 0)"]
         G["ReplicaSet v2 (new)\n(replicas: 3)"]
@@ -35,7 +35,7 @@ graph TD
         H3["Pod C"]
     end
 
-    subgraph "Worker Nodes"
+    subgraph sub_worker_nodes ["Worker Nodes"]
         I["kubelet (Node 1)"] --> J["Container Runtime\n(containerd/CRI-O)"]
         K["kubelet (Node 2)"] --> L["Container Runtime"]
         M["kubelet (Node 3)"] --> N["Container Runtime"]
@@ -355,12 +355,12 @@ HPA is implemented as a separate control loop running in `kube-controller-manage
 
 ```mermaid
 graph LR
-    subgraph "Metrics Pipeline"
+    subgraph sub_metrics_pipeline ["Metrics Pipeline"]
         A["cAdvisor\n(kubelet)"] -->|"raw container stats"| B["metrics-server"]
         C["Prometheus\n(scrapes cAdvisor)"] --> D["Prometheus Adapter"]
     end
 
-    subgraph "HPA Control Loop"
+    subgraph sub_hpa_control_loop ["HPA Control Loop"]
         E["HPA Controller"] -->|"GET /apis/metrics.k8s.io/v1beta1/\npods?labelSelector=app=web-server"| B
         E -->|"GET /apis/custom.metrics.k8s.io/v1beta1/\n...requests_per_second"| D
         E -->|"scale subresource"| F["Deployment\n(spec.replicas)"]
@@ -462,7 +462,7 @@ The Cluster Autoscaler (CA) operates at a different layer than HPA. HPA adjusts 
 
 ```mermaid
 graph TD
-    subgraph "Scale-Out Path"
+    subgraph sub_scale_out_path ["Scale-Out Path"]
         A["Pod enters Pending state\n(scheduler: Unschedulable)"] --> B["CA detects Pending Pod"]
         B --> C{"Can any node group\naccommodate the Pod?"}
         C -->|"Yes"| D["Call cloud API:\nscale node group N+1"]
@@ -471,7 +471,7 @@ graph TD
         C -->|"No"| G["Pod remains Pending\n(CA logs: no suitable node group)"]
     end
 
-    subgraph "Scale-In Path"
+    subgraph sub_scale_in_path ["Scale-In Path"]
         H["CA evaluates node\nutilization periodically (10s)"] --> I{"Node underutilized?\n< 50% requests for 10min"}
         I -->|"Yes"| J{"All Pods evictable?\nCheck PDB, local storage,\nsafe-to-evict annotation"}
         J -->|"Yes"| K["Cordon node\nEvict all Pods\nCall cloud API: terminate node"]
@@ -635,4 +635,3 @@ For a Deployment to achieve true zero-downtime updates, the following conditions
 spec:
   minReadySeconds: 30
   progressDeadlineSeconds: 600
-```

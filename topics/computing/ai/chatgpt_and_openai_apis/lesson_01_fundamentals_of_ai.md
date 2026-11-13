@@ -1,4 +1,3 @@
-```markdown
 # Lesson 1: Fundamentals of AI
 
 ## 1. First-Principles Intuition & Invariants

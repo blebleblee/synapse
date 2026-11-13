@@ -14,7 +14,7 @@ The network driver stack adds a fourth abstraction: the `struct net_device` and 
 
 ```mermaid
 graph TD
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         VFS["VFS Layer\n(sys_read / sys_write)"]
         NETSTACK["Network Stack\n(TCP/IP, Netfilter)"]
         BLOCKIO["Block I/O Layer\n(bio, request_queue)"]
@@ -158,7 +158,7 @@ This confirms the driver binding. The `Kernel driver in use` line reflects the s
 
 ```mermaid
 graph LR
-    subgraph "Tools Used"
+    subgraph sub_tools_used ["Tools Used"]
         A["ip / ethtool\n(static config + counters)"]
         B["perf\n(CPU PMU + tracepoints)"]
         C["bpftrace / bpftool\n(eBPF dynamic tracing)"]
@@ -167,7 +167,7 @@ graph LR
         F["/proc /sys / debugfs\n(kernel state export)"]
     end
 
-    subgraph "Driver Subsystems Observed"
+    subgraph sub_driver_subsystems_observed ["Driver Subsystems Observed"]
         G["TX/RX Ring Buffers"]
         H["Interrupt Coalescing"]
         I["NAPI Poll"]
@@ -1029,7 +1029,7 @@ Before considering a driver operationally verified:
 
 ```mermaid
 graph TD
-    subgraph "Verification Layers"
+    subgraph sub_verification_layers ["Verification Layers"]
         L1["Layer 1: Static State\nlspci, ethtool -i, /sys"]
         L2["Layer 2: Runtime Counters\nethtool -S, /proc/net/dev"]
         L3["Layer 3: Dynamic Tracing\nbpftrace, perf tracepoints"]
@@ -1040,7 +1040,7 @@ graph TD
 
     L1 --> L2 --> L3 --> L4 --> L5 --> L6
 
-    subgraph "Evidence Produced"
+    subgraph sub_evidence_produced ["Evidence Produced"]
         E1["Driver version + firmware match"]
         E2["Zero error counters at idle"]
         E3["NAPI efficiency under load"]

@@ -203,25 +203,25 @@ The OCI Runtime Specification defines a standard interface for container runtime
 
 ```mermaid
 graph TB
-    subgraph "Container Orchestration"
+    subgraph sub_container_orchestration ["Container Orchestration"]
         A[Docker CLI] -->|gRPC| B[dockerd]
         B -->|gRPC| C[containerd]
     end
     
-    subgraph "OCI Runtime Layer"
-        C -->|API calls| D[containerd-shim]
-        D -->|fork/exec| E[runc]
+    subgraph sub_oci_runtime_layer ["OCI Runtime Layer"]
+        C -->|"API calls"| D[containerd-shim]
+        D -->|"fork/exec"| E[runc]
     end
     
-    subgraph "Kernel Isolation"
-        E -->|clone CLONE_NEWPID| F[PID Namespace]
-        E -->|clone CLONE_NEWNET| G[Network Namespace]
-        E -->|clone CLONE_NEWNS| H[Mount Namespace]
+    subgraph sub_kernel_isolation ["Kernel Isolation"]
+        E -->|"clone CLONE_NEWPID"| F[PID Namespace]
+        E -->|"clone CLONE_NEWNET"| G[Network Namespace]
+        E -->|"clone CLONE_NEWNS"| H[Mount Namespace]
         E -->|cgroup_attach| I[cgroups]
         E -->|pivot_root| J[Root FS]
     end
     
-    subgraph "Container Process"
+    subgraph sub_container_process ["Container Process"]
         F --> K[PID 1: init]
         G --> K
         H --> K
@@ -256,17 +256,17 @@ iptables -t nat -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
 
 ```mermaid
 graph LR
-    subgraph "Host A"
+    subgraph sub_host_a ["Host A"]
         A1[Container A] -->|veth| A2[vxlan0]
-        A2 -->|UDP 4789| A3[eth0: 10.0.1.5]
+        A2 -->|"UDP 4789"| A3[eth0: 10.0.1.5]
     end
     
-    subgraph "IP Network"
+    subgraph sub_ip_network ["IP Network"]
         A3 -.->|VXLAN Tunnel| B3[eth0: 10.0.1.6]
     end
     
-    subgraph "Host B"
-        B3 -->|UDP 4789| B2[vxlan0]
+    subgraph sub_host_b ["Host B"]
+        B3 -->|"UDP 4789"| B2[vxlan0]
         B2 -->|veth| B1[Container B]
     end
     
@@ -711,32 +711,32 @@ docker run -v /var/log/myapp:/app/logs myimage
 
 ```mermaid
 graph TB
-    subgraph "User Space"
-        A[Docker CLI] -->|REST API| B[Docker Daemon dockerd]
-        B -->|gRPC containerd API| C[containerd]
-        C -->|Task API| D[containerd-shim]
+    subgraph sub_user_space ["User Space"]
+        A[Docker CLI] -->|"REST API"| B[Docker Daemon dockerd]
+        B -->|"gRPC containerd API"| C[containerd]
+        C -->|"Task API"| D[containerd-shim]
         D -->|exec| E[runc]
     end
     
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         E -->|clone| F[Namespace Creation]
-        F --> F1[PID NS<br/>init=PID 1]
-        F --> F2[NET NS<br/>veth pair]
-        F --> F3[MNT NS<br/>pivot_root]
-        F --> F4[USER NS<br/>UID map]
+        F --> F1["PID NS<br/>init=PID 1"]
+        F --> F2["NET NS<br/>veth pair"]
+        F --> F3["MNT NS<br/>pivot_root"]
+        F --> F4["USER NS<br/>UID map"]
         
         E -->|cgroup_attach| G[cgroup Controllers]
-        G --> G1[memory<br/>limit enforcement]
-        G --> G2[cpu<br/>CFS quota]
-        G --> G3[blkio<br/>I/O throttle]
+        G --> G1["memory<br/>limit enforcement"]
+        G --> G2["cpu<br/>CFS quota"]
+        G --> G3["blkio<br/>I/O throttle"]
         
         E -->|mount| H[OverlayFS]
-        H --> H1[lowerdir<br/>base layers]
-        H --> H2[upperdir<br/>container writes]
-        H --> H3[merged<br/>union view]
+        H --> H1["lowerdir<br/>base layers"]
+        H --> H2["upperdir<br/>container writes"]
+        H --> H3["merged<br/>union view"]
     end
     
-    subgraph "Container Process"
+    subgraph sub_container_process ["Container Process"]
         F1 --> I[Application PID 1]
         F2 --> I
         F3 --> I
@@ -748,14 +748,14 @@ graph TB
         I --> J[Child Processes]
     end
     
-    subgraph "Storage"
-        H1 -.->|content-addressable| K[Image Registry<br/>SHA-256 layers]
+    subgraph sub_storage ["Storage"]
+        H1 -.->|content-addressable| K["Image Registry<br/>SHA-256 layers"]
         H2 -->|ephemeral| L[Container Disk]
     end
     
-    subgraph "Networking"
+    subgraph sub_networking ["Networking"]
         F2 -->|veth| M[docker0 Bridge]
-        M -->|iptables NAT| N[Host eth0]
+        M -->|"iptables NAT"| N[Host eth0]
         N -->|external| O[Internet]
     end
     

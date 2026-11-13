@@ -34,14 +34,14 @@ AWS Lambda's architecture is publicly documented through the Firecracker open-so
 
 ```mermaid
 graph TB
-    subgraph "Lambda Control Plane"
+    subgraph sub_lambda_control_plane ["Lambda Control Plane"]
         FE["Frontend Load Balancer"]
         WM["Worker Manager"]
         CS["Counting Service\n(concurrency enforcement)"]
         PS["Placement Service"]
     end
 
-    subgraph "Lambda Worker Host (EC2 bare metal)"
+    subgraph sub_lambda_worker_host__ec2_bare_met ["Lambda Worker Host (EC2 bare metal)"]
         direction TB
         MVM1["Firecracker MicroVM\n(Execution Environment A)"]
         MVM2["Firecracker MicroVM\n(Execution Environment B)"]
@@ -49,7 +49,7 @@ graph TB
         SS["Slot Manager / Sandbox Manager"]
     end
 
-    subgraph "MicroVM Internal"
+    subgraph sub_microvm_internal ["MicroVM Internal"]
         direction TB
         AG["Lambda Agent (Go)"]
         RT["Language Runtime\n(Node/Python/JVM/etc.)"]
@@ -223,20 +223,20 @@ The host runtime (`azure-functions-host`, written in C#) uses an **out-of-proces
 
 ```mermaid
 graph LR
-    subgraph "Azure Functions Host Process"
+    subgraph sub_azure_functions_host_process ["Azure Functions Host Process"]
         TM["Trigger Manager\n(HTTP / Timer / ServiceBus / etc.)"]
         BM["Binding Manager"]
         HOST_GRPC["gRPC Server"]
     end
 
-    subgraph "Out-of-Process Worker (Python/Node/Java/etc.)"
+    subgraph sub_out_of_process_worker__python_no ["Out-of-Process Worker (Python/Node/Java/etc.)"]
         WORKER_GRPC["gRPC Client"]
         DISPATCH["Function Dispatcher"]
         FN1["Function A"]
         FN2["Function B"]
     end
 
-    subgraph "Durable Functions Extension"
+    subgraph sub_durable_functions_extension ["Durable Functions Extension"]
         ORCH["Orchestrator Function\n(deterministic replay)"]
         ACT["Activity Functions\n(actual side effects)"]
         HIST[("History Table\n(Azure Storage / Netherite)"]

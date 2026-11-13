@@ -43,12 +43,12 @@ When a driver registers with a bus, the bus core iterates over all known devices
 
 ```mermaid
 graph TD
-    subgraph "User Space"
+    subgraph sub_user_space ["User Space"]
         US_APP["Application"]
         US_APP -->|"open/read/write/ioctl"| VFS["VFS Layer"]
     end
 
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         VFS -->|"file_operations"| DRV["Device Driver"]
         DRV -->|"readl/writel"| MMIO["MMIO Registers"]
         DRV -->|"request_irq"| IRQ["Interrupt Controller (APIC/GIC)"]
@@ -60,7 +60,7 @@ graph TD
         DEV -->|"sysfs"| SYSFS["/sys/devices/..."]
     end
 
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         MMIO -->|"bus cycle"| DEV_HW["Peripheral Device"]
         IRQ -->|"IRQ line"| DEV_HW
         DMA -->|"bus master"| DEV_HW
@@ -621,18 +621,18 @@ This is the foundation of:
 
 ```mermaid
 graph TD
-    subgraph "User Space (ring 3)"
+    subgraph sub_user_space__ring_3 ["User Space (ring 3)"]
         APP["Application / DPDK / SPDK"]
         VFIO_FD["VFIO file descriptor"]
     end
 
-    subgraph "Kernel Space (ring 0)"
+    subgraph sub_kernel_space__ring_0 ["Kernel Space (ring 0)"]
         VFIO["VFIO Framework"]
         IOMMU["IOMMU (VT-d / SMMU)"]
         IRQFD["irqfd / eventfd"]
     end
 
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         PCIE["PCIe Device"]
     end
 

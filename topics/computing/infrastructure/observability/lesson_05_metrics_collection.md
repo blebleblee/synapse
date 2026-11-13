@@ -55,14 +55,14 @@ Two fundamental collection models exist, and each embeds different assumptions a
 
 ```mermaid
 flowchart LR
-    subgraph Pull Model
+    subgraph sub_pull_model ["Pull Model"]
         direction TB
         P_Server["Prometheus Server\n(scraper)"] -->|"HTTP GET /metrics\nevery ∆t"| T1["Target: Pod A"]
         P_Server -->|"HTTP GET /metrics\nevery ∆t"| T2["Target: Pod B"]
         P_Server -->|"HTTP GET /metrics\nevery ∆t"| T3["Target: Pod C"]
     end
 
-    subgraph Push Model
+    subgraph sub_push_model ["Push Model"]
         direction TB
         A1["Agent: Host X"] -->|"POST metrics\nOTLP/gRPC"| OC["OpenTelemetry\nCollector"]
         A2["Agent: Host Y"] -->|"POST metrics\nOTLP/gRPC"| OC
@@ -75,24 +75,24 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    subgraph Instrumentation Layer
+    subgraph sub_instrumentation_layer ["Instrumentation Layer"]
         APP["Application Code\n(SDK: Prometheus client,\nOTel SDK, StatsD)"]
         KERN["Kernel Subsystems\n(/proc/stat, /proc/net/dev,\neBPF programs)"]
         RT["Container Runtime\n(cAdvisor / containerd\nmetrics API)"]
         HW["Hardware PMCs\n(perf_events, MSRs)"]
     end
 
-    subgraph Collection Layer
+    subgraph sub_collection_layer ["Collection Layer"]
         NODE["Node Exporter /\nOTel Collector Agent"]
     end
 
-    subgraph Aggregation & Storage Layer
+    subgraph sub_aggregation___storage_layer ["Aggregation & Storage Layer"]
         RW["Remote Write\nReceiver"]
         TSDB["Time-Series Database\n(Prometheus / Thanos /\nVictoriaMetrics / Mimir)"]
         CACHE["Query Cache\n(Thanos Query Frontend)"]
     end
 
-    subgraph Consumption Layer
+    subgraph sub_consumption_layer ["Consumption Layer"]
         GRAF["Grafana\n(PromQL / MetricsQL)"]
         ALERT["Alertmanager /\nPagerDuty"]
         SLO["SLO Engine\n(Sloth / pyrra)"]
@@ -739,7 +739,7 @@ Note that the loop over all higher buckets in `observe` is O(n) in bucket count.
 
 ```mermaid
 flowchart TD
-    subgraph Data Loss Failure Modes
+    subgraph sub_data_loss_failure_modes ["Data Loss Failure Modes"]
         F1["Scrape Timeout\n(target slow to render /metrics)"]
         F2["TSDB Backpressure\n(remote write queue full)"]
         F3["Agent OOM\n(cardinality explosion)"]
@@ -815,7 +815,7 @@ flowchart LR
         SDK_API["OTel Metrics API\n(Counter, Histogram,\nUpDownCounter, Gauge,\nObservableCounter...)"]
     end
 
-    subgraph OTel SDK
+    subgraph sub_otel_sdk ["OTel SDK"]
         direction TB
         VIEW["View Configuration\n(rename, re-bucket,\nfilter attributes)"]
         ACCUM["Accumulator\n(maintains running state\nper instrument)"]

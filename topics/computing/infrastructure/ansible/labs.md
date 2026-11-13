@@ -444,7 +444,7 @@ The relationship between fork count and wall-clock time is not linear. Diminishi
 
 ```mermaid
 flowchart LR
-    subgraph "Control Node Saturation Analysis"
+    subgraph sub_control_node_saturation_analysis ["Control Node Saturation Analysis"]
         A["ansible-playbook<br/>process"] -->|"forks=N"| B["SSH connection pool"]
         B -->|"fork=1"| C1["SSH Conn 1"]
         B -->|"fork=2"| C2["SSH Conn 2"]
@@ -454,7 +454,7 @@ flowchart LR
         CN --> MN["Managed Host N"]
     end
 
-    subgraph "Bottleneck Zones"
+    subgraph sub_bottleneck_zones ["Bottleneck Zones"]
         Z1["Zone 1: Forks < Hosts<br/>SSH setup dominates<br/>Low CPU usage"]
         Z2["Zone 2: Forks ~ Hosts<br/>Optimal parallelism<br/>CPU and I/O balanced"]
         Z3["Zone 3: Forks >> Hosts<br/>Control node CPU bound<br/>Memory pressure<br/>No speedup"]

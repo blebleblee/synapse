@@ -1,4 +1,3 @@
-```markdown
 # Lesson 3: Operating System Theory
 
 ## 1. First-Principles Intuition & Invariants

@@ -1,4 +1,3 @@
-```markdown
 # Lesson 2: Core Architecture & Memory/Execution Models
 
 ## 1. Process, Threading & Execution Lifecycles

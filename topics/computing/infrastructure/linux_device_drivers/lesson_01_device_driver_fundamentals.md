@@ -245,16 +245,16 @@ The registration path follows a strict sequence, and each step has a matching te
 
 ```mermaid
 graph TD
-    A["alloc_chrdev_region()"] -->|allocates major/minor| B["kzalloc driver struct"]
-    B -->|allocates buffer| C["cdev_init()"]
-    C -->|links cdev to file_operations| D["cdev_add()"]
-    D -->|makes device visible to kernel| E["device_create()"]
-    E -->|creates /dev node via udev| F["Device usable by user space"]
+    A["alloc_chrdev_region()"] -->|"allocates major/minor"| B["kzalloc driver struct"]
+    B -->|"allocates buffer"| C["cdev_init()"]
+    C -->|"links cdev to file_operations"| D["cdev_add()"]
+    D -->|"makes device visible to kernel"| E["device_create()"]
+    E -->|"creates /dev node via udev"| F["Device usable by user space"]
 
-    F -->|user calls close + rmmod| G["device_destroy()"]
-    G -->|removes /dev node| H["cdev_del()"]
-    H -->|removes from kernel cdev map| I["kfree buffers"]
-    I -->|releases memory| J["unregister_chrdev_region()"]
+    F -->|"user calls close + rmmod"| G["device_destroy()"]
+    G -->|"removes /dev node"| H["cdev_del()"]
+    H -->|"removes from kernel cdev map"| I["kfree buffers"]
+    I -->|"releases memory"| J["unregister_chrdev_region()"]
 ```
 
 ### I/O Memory Access
@@ -383,18 +383,18 @@ The kernel maintains a unified device model centered on three core structures:
 
 ```mermaid
 graph TB
-    subgraph "Linux Device Model"
+    subgraph sub_linux_device_model ["Linux Device Model"]
         BUS["struct bus_type"]
         DRV["struct device_driver"]
         DEV["struct device"]
 
-        BUS -->|match(): binds device to driver| DEV
-        BUS -->|match(): binds device to driver| DRV
-        DRV -->|probe()/remove()| DEV
-        DEV -->|parent/child hierarchy| DEV2["child device"]
+        BUS -->|"match(): binds device to driver"| DEV
+        BUS -->|"match(): binds device to driver"| DRV
+        DRV -->|"probe()/remove()"| DEV
+        DEV -->|"parent/child hierarchy"| DEV2["child device"]
     end
 
-    subgraph "Bus-specific wrappers"
+    subgraph sub_bus_specific_wrappers ["Bus-specific wrappers"]
         PLAT["struct platform_driver"]
         PLATDEV["struct platform_device"]
         PCI["struct pci_driver"]

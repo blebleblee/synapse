@@ -45,14 +45,14 @@ For binary classification, every prediction falls into one of four cells. This i
 
 ```mermaid
 graph TD
-    subgraph "Confusion Matrix Structure"
+    subgraph sub_confusion_matrix_structure ["Confusion Matrix Structure"]
         A["Actual Positive"] --> C["True Positive (TP)<br/>Correctly identified positive"]
         A --> D["False Negative (FN)<br/>Missed positive — Type II Error"]
         B["Actual Negative"] --> E["False Positive (FP)<br/>False alarm — Type I Error"]
         B --> F["True Negative (TN)<br/>Correctly identified negative"]
     end
 
-    subgraph "Model Decision"
+    subgraph sub_model_decision ["Model Decision"]
         G["Predicted Positive"] --> C
         G --> E
         H["Predicted Negative"] --> D
@@ -62,7 +62,7 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "Full Evaluation Pipeline"
+    subgraph sub_full_evaluation_pipeline ["Full Evaluation Pipeline"]
         A["Raw Dataset"] -->|"stratified split"| B["Train / Val / Test"]
         B --> C["Feature Engineering"]
         C --> D["Model Training"]
@@ -139,7 +139,7 @@ The **AUC-ROC** (Area Under the ROC Curve) has a direct probabilistic interpreta
 
 ```mermaid
 graph LR
-    subgraph "ROC Space"
+    subgraph sub_roc_space ["ROC Space"]
         A["(0,0)\nAll Negative"] --> B["(1,1)\nAll Positive"]
         C["Random Classifier\nAUC=0.5\nDiagonal Line"]
         D["Perfect Classifier\nAUC=1.0\nTop-Left Corner"]

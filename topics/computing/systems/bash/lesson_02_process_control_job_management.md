@@ -191,18 +191,18 @@ When the shell creates a pipeline `cmd1 | cmd2 | cmd3`, it forks three children 
 
 ```mermaid
 graph LR
-    subgraph "Session SID=1024"
-        subgraph "Shell Process Group PGID=1024"
+    subgraph sub_session_sid_1024 ["Session SID=1024"]
+        subgraph sub_shell_process_group_pgid_1024 ["Shell Process Group PGID=1024"]
             SH["bash PID=1024"]
         end
-        subgraph "Foreground Pipeline PGID=1025"
+        subgraph sub_foreground_pipeline_pgid_1025 ["Foreground Pipeline PGID=1025"]
             P1["cat PID=1025"]
             P2["grep PID=1026"]
             P3["wc PID=1027"]
             P1 -->|"pipe[0]"| P2
             P2 -->|"pipe[0]"| P3
         end
-        subgraph "Background Job PGID=1028"
+        subgraph sub_background_job_pgid_1028 ["Background Job PGID=1028"]
             BG["find PID=1028"]
         end
     end
@@ -1088,7 +1088,7 @@ Coprocesses are valuable when you need to maintain state in a child process acro
 
 ```mermaid
 graph TB
-    subgraph "Kernel Space"
+    subgraph sub_kernel_space ["Kernel Space"]
         SCHED["Scheduler<br/>(CFS / O(1))"]
         PT["Process Table<br/>(task_struct array)"]
         SIG["Signal Subsystem<br/>(sigpending, sigmask)"]
@@ -1097,7 +1097,7 @@ graph TB
         MM["Memory Manager<br/>(page tables, COW)"]
     end
 
-    subgraph "Shell Process (PID 1024)"
+    subgraph sub_shell_process__pid_1024 ["Shell Process (PID 1024)"]
         MAIN["Main Loop<br/>(read/eval/print)"]
         PARSER["Command Parser<br/>(tokenize, expand, quote)"]
         JT["Job Table<br/>(jobs, PIDs, PGIDs)"]
@@ -1105,7 +1105,7 @@ graph TB
         FDT["File Descriptor Table<br/>(0=stdin, 1=stdout, 2=stderr, ...)"]
     end
 
-    subgraph "Child Processes"
+    subgraph sub_child_processes ["Child Processes"]
         FG["Foreground Job<br/>(PGID = child PGID)<br/>tcsetpgrp() active"]
         BG1["Background Job 1<br/>(PGID = own PGID)"]
         BG2["Background Job 2<br/>(PGID = own PGID)"]
@@ -1213,4 +1213,3 @@ strace -f -e trace=process,signal bash script.sh
 set -x          # Trace commands as they execute
 set -euo pipefail  # Exit on error, undefined var, pipe failure
 bash -n script.sh  # Parse-only check (no execution)
-```

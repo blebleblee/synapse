@@ -1,4 +1,3 @@
-```markdown
 # Lesson 4: Network Monitoring and Troubleshooting
 
 ## 1. First-Principles Intuition & Invariants

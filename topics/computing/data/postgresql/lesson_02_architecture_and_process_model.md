@@ -70,7 +70,7 @@ graph TD
     end
 
     subgraph Pooler["PgBouncer (transaction-mode pooling)"]
-        PB[Connection Pool<br/>pool_size = 20–100]
+        PB["Connection Pool<br/>pool_size = 20–100"]
     end
 
     subgraph PG["PostgreSQL Cluster"]
@@ -107,10 +107,10 @@ graph TD
         CS["CLOG / SLRU Caches\n(commit status bitmaps)"]
     end
 
-    B1[Backend 1] -->|mmap MAP_SHARED| SHM
-    B2[Backend 2] -->|mmap MAP_SHARED| SHM
-    CP[Checkpointer] -->|mmap MAP_SHARED| SHM
-    BW[bgwriter] -->|mmap MAP_SHARED| SHM
+    B1[Backend 1] -->|"mmap MAP_SHARED"| SHM
+    B2[Backend 2] -->|"mmap MAP_SHARED"| SHM
+    CP[Checkpointer] -->|"mmap MAP_SHARED"| SHM
+    BW[bgwriter] -->|"mmap MAP_SHARED"| SHM
 ```
 
 ### 2.1 Anatomy of a Buffer Descriptor
@@ -162,15 +162,15 @@ When a backend needs a specific page, it executes the following sequence inside 
 ```mermaid
 flowchart TD
     A([Backend: needs page X]) --> B{Hash lookup\nin buffer map}
-    B -->|Hit: buf_id found| C[Atomic increment refcount\n'pin the buffer']
+    B -->|"Hit: buf_id found"| C[Atomic increment refcount\n'pin the buffer']
     B -->|Miss| D[StrategyGetBuffer:\nfind free or evict slot]
     D --> E{Victim page\ndirty?}
-    E -->|Yes| F[FlushBuffer: write\ndirty page to disk\nvia pread/pwrite]
+    E -->|Yes| F["FlushBuffer: write\ndirty page to disk\nvia pread/pwrite"]
     E -->|No| G[Assign tag to slot]
     F --> G
     G --> H[pread syscall:\nKernel Page Cache\n→ shared_buffers slot]
     H --> C
-    C --> I[Acquire content LWLock\nshared=read / exclusive=write]
+    C --> I["Acquire content LWLock\nshared=read / exclusive=write"]
     I --> J([Access tuple data])
     J --> K[Release content LWLock]
     K --> L[Atomic decrement refcount\n'unpin the buffer']
@@ -229,7 +229,7 @@ The Postmaster spawns a set of **auxiliary processes** at cluster startup. These
 ```mermaid
 graph TD
     subgraph PM["Postmaster (supervisor)"]
-        PM_NODE[Postmaster\npid=1 of cluster]
+        PM_NODE["Postmaster\npid=1 of cluster"]
     end
 
     subgraph AUX["Auxiliary Processes (always running)"]
@@ -237,29 +237,29 @@ graph TD
         BW[Background Writer]
         WW[WAL Writer]
         AL[Autovacuum Launcher]
-        SC[Stats Collector\n(pg14-: separate process)\n(pg15+: shared memory)]
-        LG[Logger\n(if logging_collector=on)]
-        AR[Archiver\n(if archive_mode=on)]
+        SC["Stats Collector\n(pg14-: separate process)\n(pg15+: shared memory)"]
+        LG["Logger\n(if logging_collector=on)"]
+        AR["Archiver\n(if archive_mode=on)"]
     end
 
     subgraph DYNAMIC["Dynamic Processes (on demand)"]
-        SU[Startup Process\n(crash recovery / streaming apply)]
-        AW[Autovacuum Workers\n(1 per active table needing vacuum)]
-        WR[Walsender\n(1 per streaming replica)]
-        WV[Walreceiver\n(on standby)]
-        BGW[Custom Background Workers\n(pg_cron, logical replication apply)]
+        SU["Startup Process\n(crash recovery / streaming apply)"]
+        AW["Autovacuum Workers\n(1 per active table needing vacuum)"]
+        WR["Walsender\n(1 per streaming replica)"]
+        WV["Walreceiver\n(on standby)"]
+        BGW["Custom Background Workers\n(pg_cron, logical replication apply)"]
     end
 
-    PM_NODE -->|spawns & monitors| CP
-    PM_NODE -->|spawns & monitors| BW
-    PM_NODE -->|spawns & monitors| WW
-    PM_NODE -->|spawns & monitors| AL
-    PM_NODE -->|spawns & monitors| SC
-    PM_NODE -->|spawns & monitors| LG
-    PM_NODE -->|spawns & monitors| AR
-    PM_NODE -->|spawns on demand| SU
-    AL -->|spawns up to autovacuum_max_workers| AW
-    PM_NODE -->|spawns per replica| WR
+    PM_NODE -->|"spawns & monitors"| CP
+    PM_NODE -->|"spawns & monitors"| BW
+    PM_NODE -->|"spawns & monitors"| WW
+    PM_NODE -->|"spawns & monitors"| AL
+    PM_NODE -->|"spawns & monitors"| SC
+    PM_NODE -->|"spawns & monitors"| LG
+    PM_NODE -->|"spawns & monitors"| AR
+    PM_NODE -->|"spawns on demand"| SU
+    AL -->|"spawns up to autovacuum_max_workers"| AW
+    PM_NODE -->|"spawns per replica"| WR
 ```
 
 ### 4.1 The Checkpointer Process
@@ -364,14 +364,14 @@ graph TD
             BP[Buffer Pool\nshared_buffers]
             WB2[WAL Buffers]
             LT[Lock Tables]
-            PA[ProcArray / XID tracking]
-            ST[Stats shared memory\npg15+]
+            PA["ProcArray / XID tracking"]
+            ST["Stats shared memory\npg15+"]
         end
 
         subgraph AuxProc["Auxiliary Processes"]
-            CP2[Checkpointer\nfsync + checkpoint WAL record]
+            CP2["Checkpointer\nfsync + checkpoint WAL record"]
             BGW2[Background Writer\nproactive dirty-page flush]
-            WW2[WAL Writer\ngroup commit + fdatasync]
+            WW2["WAL Writer\ngroup commit + fdatasync"]
             AVL[Autovacuum Launcher]
         end
 
@@ -382,14 +382,14 @@ graph TD
             WS[Walsender\n→ replica]
         end
 
-        PM -->|fork + monitor| CP2
-        PM -->|fork + monitor| BGW2
-        PM -->|fork + monitor| WW2
-        PM -->|fork + monitor| AVL
-        PM -->|fork per connection| BE1
-        PM -->|fork per connection| BE2
-        AVL -->|fork per table| AV1
-        PM -->|fork per replica| WS
+        PM -->|"fork + monitor"| CP2
+        PM -->|"fork + monitor"| BGW2
+        PM -->|"fork + monitor"| WW2
+        PM -->|"fork + monitor"| AVL
+        PM -->|"fork per connection"| BE1
+        PM -->|"fork per connection"| BE2
+        AVL -->|"fork per table"| AV1
+        PM -->|"fork per replica"| WS
 
         BE1 <-->|mmap| SHM
         BE2 <-->|mmap| SHM
@@ -400,8 +400,8 @@ graph TD
         WS <-->|mmap| SHM
     end
 
-    Cluster <-->|syscalls: pread/pwrite/fsync| OS
-    OS <-->|block I/O| Storage[(NVMe / SAN / S3\nHeap + WAL + Indexes)]
+    Cluster <-->|"syscalls: pread/pwrite/fsync"| OS
+    OS <-->|"block I/O"| Storage["(NVMe / SAN / S3\nHeap + WAL + Indexes)"]
 ```
 
 ---

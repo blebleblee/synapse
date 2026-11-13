@@ -17,7 +17,7 @@ A write operation follows this path: the proposed mutation enters the Raft log, 
 
 ```mermaid
 graph LR
-    subgraph "etcd MVCC Write Path"
+    subgraph sub_etcd_mvcc_write_path ["etcd MVCC Write Path"]
         A["Client Write Request"] --> B["Raft Proposal"]
         B --> C["Replicate to Quorum"]
         C --> D["Commit & Assign Revision N"]
@@ -30,7 +30,7 @@ graph LR
 
 ```mermaid
 graph LR
-    subgraph "etcd MVCC Read Path"
+    subgraph sub_etcd_mvcc_read_path ["etcd MVCC Read Path"]
         H["Client Read (rev=N)"] --> I["Lookup Key Index"]
         I --> J["Find Generation Entry at rev N"]
         J --> K["Return Value Snapshot"]
@@ -152,7 +152,7 @@ The queue is built on a singly linked list with atomic head and tail pointers. T
 
 ```mermaid
 graph TD
-    subgraph "Michael-Scott Queue: Enqueue"
+    subgraph sub_michael_scott_queue__enqueue ["Michael-Scott Queue: Enqueue"]
         E1["Allocate node N with value V, N.next = NULL"] --> E2["Read tail pointer T"]
         E2 --> E3["Read T.next (S)"]
         E3 --> E4{"Is T.next == NULL?"}
@@ -168,7 +168,7 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph "Michael-Scott Queue: Dequeue"
+    subgraph sub_michael_scott_queue__dequeue ["Michael-Scott Queue: Dequeue"]
         D1["Read head pointer H, tail pointer T"] --> D2["Read H.next (S)"]
         D2 --> D3{"Is S == NULL?"}
         D3 -->|"Yes: queue empty"| D4["Return EMPTY"]
@@ -372,7 +372,7 @@ Three approaches mitigate this:
 
 ```mermaid
 graph TD
-    subgraph "ABA Problem Timeline"
+    subgraph sub_aba_problem_timeline ["ABA Problem Timeline"]
         T1["Thread 1: reads head = A, next = B"] --> T1p["Thread 1 preempted"]
         T1p --> T1r["Thread 1 resumes, CAS head A->B"]
         T2["Thread 2: dequeue A, head = B"] --> T3["Thread 2: dequeue B, head = C"]
@@ -385,7 +385,7 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph "Tagged Pointer Mitigation"
+    subgraph sub_tagged_pointer_mitigation ["Tagged Pointer Mitigation"]
         S1["Thread 1: reads head = {ptr=A, tag=5}"] --> S1p["Thread 1 preempted"]
         S1p --> S1r["Thread 1 resumes, CAS head {A,5} -> B"]
         S2["Thread 2: dequeue, tag increments to 6"] --> S3["Thread 2: dequeue, tag increments to 7"]
@@ -406,7 +406,7 @@ In a declarative model, the desired state is persisted in a source of truth (etc
 
 ```mermaid
 graph TD
-    subgraph "Reconciliation Loop"
+    subgraph sub_reconciliation_loop ["Reconciliation Loop"]
         R1["Observe: read current state from API server (via informer cache)"] --> R2["Diff: compare current state to desired state in spec"]
         R2 --> R3{"Current == Desired?"}
         R3 -->|"Yes"| R4["No-op. Wait for next event or resync tick."]
@@ -431,7 +431,7 @@ Each controller runs one or more informers. An informer maintains an in-process 
 
 ```mermaid
 graph TD
-    subgraph "Informer Architecture"
+    subgraph sub_informer_architecture ["Informer Architecture"]
         I1["Controller"] --> I2["Informer (shared)"]
         I2 --> I3["Local Store (in-memory cache)"]
         I2 --> I4["Lister (read-only interface to store)"]
@@ -439,7 +439,7 @@ graph TD
         I5 -->| "ADDED/MODIFIED/DELETED events" | I3
         I6["Initial LIST (full snapshot)"] --> I3
     end
-    subgraph "Event Distribution"
+    subgraph sub_event_distribution ["Event Distribution"]
         I3 --> I7["Event Handlers (registered by controller)"]
         I7 --> I8["Workqueue (rate-limited, deduplicating)"]
         I8 --> I9["Reconcile worker goroutines"]
@@ -713,7 +713,7 @@ The Pod lifecycle is not an arbitrary set of labels but a formal state machine e
 
 ```mermaid
 graph TD
-    subgraph "Pod Lifecycle State Machine"
+    subgraph sub_pod_lifecycle_state_machine ["Pod Lifecycle State Machine"]
         P["Pod Created<br/>(API server accepts, writes to etcd)"] --> PENDING["Pending<br/>(Awaiting scheduling or container startup)"]
         PENDING -->| "Scheduler assigns node" | PENDING
         PENDING -->| "Kubelet starts containers<br/>via CRI" | RUNNING["Running<br/>(All containers started)"]
@@ -754,7 +754,7 @@ The recovery model of a declarative control plane is a direct consequence of thr
 
 ```mermaid
 graph TD
-    subgraph "Crash Recovery Sequence"
+    subgraph sub_crash_recovery_sequence ["Crash Recovery Sequence"]
         C1["Controller running"] --> C2["Controller process crashes"]
         C2 --> C3["Process manager restarts controller<br/>(e.g., kubelet restarts pod)"]
         C3 --> C4["Controller initializes: creates new informers"]

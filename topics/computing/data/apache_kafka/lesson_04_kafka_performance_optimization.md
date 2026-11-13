@@ -42,7 +42,7 @@ The active segment is the one currently being written. All other segments are im
 
 ```mermaid
 graph TD
-    subgraph "Partition Directory: topic-0"
+    subgraph sub_partition_directory__topic_0 ["Partition Directory: topic-0"]
         S1["Segment 0\n00000000000000000000.log\n00000000000000000000.index\n00000000000000000000.timeindex"]
         S2["Segment 1\n00000000000000012345.log\n00000000000000012345.index\n00000000000000012345.timeindex"]
         S3["Active Segment\n00000000000000089012.log\n00000000000000089012.index\n00000000000000089012.timeindex"]
@@ -549,13 +549,13 @@ In KRaft mode, metadata is stored in a Kafka topic (`__cluster_metadata`) manage
 
 ```mermaid
 graph TD
-    subgraph "KRaft Controller Quorum (3 nodes)"
+    subgraph sub_kraft_controller_quorum__3_nodes ["KRaft Controller Quorum (3 nodes)"]
         AC["Active Controller\n(Raft Leader)"]
         SC1["Standby Controller\n(Raft Follower)"]
         SC2["Standby Controller\n(Raft Follower)"]
     end
 
-    subgraph "Broker Nodes"
+    subgraph sub_broker_nodes ["Broker Nodes"]
         B1["Broker 1"]
         B2["Broker 2"]
         B3["Broker 3"]
@@ -664,7 +664,7 @@ Compaction is performed by background threads (`log.cleaner.threads`, default: 1
 
 ```mermaid
 graph LR
-    subgraph "Before Compaction"
+    subgraph sub_before_compaction ["Before Compaction"]
         B1["K=A, V=1, off=0"]
         B2["K=B, V=2, off=1"]
         B3["K=A, V=3, off=2"]
@@ -674,7 +674,7 @@ graph LR
         B1 --> B2 --> B3 --> B4 --> B5 --> B6
     end
 
-    subgraph "After Compaction"
+    subgraph sub_after_compaction ["After Compaction"]
         A1["K=A, V=6, off=5"]
         A2["K=B, V=5, off=4"]
         A3["K=C, V=4, off=3"]

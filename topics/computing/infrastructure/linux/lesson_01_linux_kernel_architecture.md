@@ -10,10 +10,10 @@ Linux employs a monolithic kernel design where core subsystems—process schedul
 
 ```mermaid
 graph TB
-    subgraph "User Space (Ring 3)"
+    subgraph sub_user_space__ring_3 ["User Space (Ring 3)"]
         A[Application Processes]
     end
-    subgraph "Kernel Space (Ring 0)"
+    subgraph sub_kernel_space__ring_0 ["Kernel Space (Ring 0)"]
         B[System Call Interface]
         C[Process Scheduler]
         D[Memory Manager]
@@ -21,7 +21,7 @@ graph TB
         F[Network Stack]
         G[Device Drivers]
     end
-    subgraph "Hardware"
+    subgraph sub_hardware ["Hardware"]
         H[CPU]
         I[Memory]
         J[Devices]
@@ -366,12 +366,12 @@ Linux divides physical memory into nodes (NUMA), zones, and pages:
 ```mermaid
 graph TB
     A[Physical Memory]
-    B[Node 0<br/>NUMA Node]
-    C[Node 1<br/>NUMA Node]
-    D[Zone DMA<br/>0-16MB]
-    E[Zone DMA32<br/>16MB-4GB]
-    F[Zone Normal<br/>4GB+]
-    G[Buddy Allocator<br/>Page Blocks]
+    B["Node 0<br/>NUMA Node"]
+    C["Node 1<br/>NUMA Node"]
+    D["Zone DMA<br/>0-16MB"]
+    E["Zone DMA32<br/>16MB-4GB"]
+    F["Zone Normal<br/>4GB+"]
+    G["Buddy Allocator<br/>Page Blocks"]
     
     A --> B
     A --> C
@@ -529,7 +529,7 @@ VFS abstracts filesystem implementations behind a uniform interface:
 ```mermaid
 graph TB
     A[User Application]
-    B[System Calls:<br/>open, read, write, close]
+    B["System Calls:<br/>open, read, write, close"]
     C[VFS Layer]
     D[ext4]
     E[XFS]
@@ -679,7 +679,7 @@ graph TB
     B[VFS]
     C[Page Cache]
     D[Block Layer]
-    E[I/O Scheduler]
+    E["I/O Scheduler"]
     F[Device Driver]
     G[Block Device]
     

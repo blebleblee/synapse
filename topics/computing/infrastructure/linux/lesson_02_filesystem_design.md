@@ -1171,24 +1171,24 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "AG 0"
-        A0[Free Space BNO B+tree]
-        B0[Free Space CNT B+tree]
-        C0[Inode B+tree]
+    subgraph sub_ag_0 ["AG 0"]
+        A0["Free Space BNO B+tree"]
+        B0["Free Space CNT B+tree"]
+        C0["Inode B+tree"]
         D0[Data Blocks]
     end
     
-    subgraph "AG 1"
-        A1[Free Space BNO B+tree]
-        B1[Free Space CNT B+tree]
-        C1[Inode B+tree]
+    subgraph sub_ag_1 ["AG 1"]
+        A1["Free Space BNO B+tree"]
+        B1["Free Space CNT B+tree"]
+        C1["Inode B+tree"]
         D1[Data Blocks]
     end
     
-    subgraph "AG 2"
-        A2[Free Space BNO B+tree]
-        B2[Free Space CNT B+tree]
-        C2[Inode B+tree]
+    subgraph sub_ag_2 ["AG 2"]
+        A2["Free Space BNO B+tree"]
+        B2["Free Space CNT B+tree"]
+        C2["Inode B+tree"]
         D2[Data Blocks]
     end
     

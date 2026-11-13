@@ -66,31 +66,31 @@ A production tracing system comprises five logical components. Understanding eac
 
 ```mermaid
 graph LR
-    subgraph "Application Process"
+    subgraph sub_application_process ["Application Process"]
         IN["Instrumentation\n(manual + auto)"]
         SP["Span Processor\n(BatchSpanProcessor)"]
         BUF["In-Memory Buffer\n(ring buffer)"]
         IN --> SP --> BUF
     end
 
-    subgraph "Export Pipeline"
+    subgraph sub_export_pipeline ["Export Pipeline"]
         EXP["Exporter\n(OTLP/gRPC)"]
         BUF --> EXP
     end
 
-    subgraph "Collection Tier"
+    subgraph sub_collection_tier ["Collection Tier"]
         COL["OpenTelemetry Collector\n(receiver → processor → exporter)"]
         EXP -->|"OTLP gRPC\nor HTTP/protobuf"| COL
     end
 
-    subgraph "Storage & Query"
+    subgraph sub_storage___query ["Storage & Query"]
         JAE["Jaeger / Tempo\n(trace storage)"]
         IDX["Index\n(Elasticsearch / Cassandra)"]
         COL --> JAE
         JAE --> IDX
     end
 
-    subgraph "Visualization"
+    subgraph sub_visualization ["Visualization"]
         UI["Jaeger UI / Grafana"]
         IDX --> UI
     end
@@ -659,13 +659,13 @@ The OpenTelemetry Collector's `tailsampling` processor implements tail-based sam
 
 ```mermaid
 graph TD
-    subgraph "Head-Based Sampling"
+    subgraph sub_head_based_sampling ["Head-Based Sampling"]
         A1["Root Span Created"] --> B1{"Sample?\n(coin flip at root)"}
         B1 -->|"Yes (flags=01)"| C1["All downstream spans\nfollow parent decision"]
         B1 -->|"No (flags=00)"| D1["All downstream spans\ndropped at source"]
     end
 
-    subgraph "Tail-Based Sampling"
+    subgraph sub_tail_based_sampling ["Tail-Based Sampling"]
         A2["All spans buffered\nin collector"] --> B2["Trace assembled\nat timeout"]
         B2 --> C2{"Policy evaluation:\nhas error?\nlatency > p99?\ntarget service?"}
         C2 -->|"Keep"| D2["Export to storage"]
@@ -717,7 +717,7 @@ The OpenTelemetry SDK exposes `dropped_spans` as an internal metric via `SpanExp
 
 ```mermaid
 graph TD
-    subgraph "Failure Taxonomy"
+    subgraph sub_failure_taxonomy ["Failure Taxonomy"]
         F1["Context not propagated\n(broken trace graph)"]
         F2["Queue overflow\n(span drop)"]
         F3["Collector unreachable\n(export failure)"]
@@ -725,7 +725,7 @@ graph TD
         F5["Sampling misconfiguration\n(trace fragmentation)"]
     end
 
-    subgraph "Root Causes"
+    subgraph sub_root_causes ["Root Causes"]
         R1["Missing header injection\n(async queues, jobs)"]
         R2["Span production rate\nexceeds export throughput"]
         R3["Network partition or\ncollector crash"]
@@ -733,7 +733,7 @@ graph TD
         R5["ParentBased sampler\nnot used downstream"]
     end
 
-    subgraph "Mitigations"
+    subgraph sub_mitigations ["Mitigations"]
         M1["Use framework auto-instrumentation;\nintegration test context propagation"]
         M2["Increase queue size; tune\nbatch size; use adaptive sampling"]
         M3["Collector HA deployment;\nretry with exponential backoff;\nlocal buffering in collector agent"]
@@ -937,30 +937,30 @@ Tracing does not operate in isolation. Its full value is realized in an **observ
 
 ```mermaid
 graph TD
-    subgraph "Instrumented Services"
+    subgraph sub_instrumented_services ["Instrumented Services"]
         SVC1["Service A\n(traces + metrics + logs)"]
         SVC2["Service B\n(traces + metrics + logs)"]
         SVC3["Service C\n(traces + metrics + logs)"]
     end
 
-    subgraph "Collection Layer (OTel Collector DaemonSet)"
+    subgraph sub_collection_layer__otel_collector ["Collection Layer (OTel Collector DaemonSet)"]
         RCV["OTLP Receiver"]
         PROC["Processors:\nmemory_limiter\nk8sattributes\nbatch\ntail_sampling"]
         RCV --> PROC
     end
 
-    subgraph "Storage Backends"
+    subgraph sub_storage_backends ["Storage Backends"]
         TEMPO["Grafana Tempo\n(trace storage, S3-backed)"]
         PROM["Prometheus / Mimir\n(metric storage)"]
         LOKI["Loki\n(log storage)"]
     end
 
-    subgraph "Correlation Layer"
+    subgraph sub_correlation_layer ["Correlation Layer"]
         EXMP["Exemplars\n(trace_id in metric samples)"]
         LOGCTX["Trace context in logs\n(trace_id, span_id in log fields)"]
     end
 
-    subgraph "Visualization (Grafana)"
+    subgraph sub_visualization__grafana ["Visualization (Grafana)"]
         DASH["Service dashboards\n(latency, error rate, throughput)"]
         TRACE["Trace explorer\n(waterfall view, service graph)"]
         LOG["Log explorer\n(correlated with trace)"]

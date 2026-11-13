@@ -395,7 +395,7 @@ The cacher also maintains a **`Indexer` store** (a map from key to current objec
 
 ```mermaid
 graph TD
-    subgraph "API Server Process"
+    subgraph sub_api_server_process ["API Server Process"]
         A["etcd gRPC watch goroutine"] -->|"raw WatchEvent"| B["Cacher dispatch loop"]
         B --> C["watchCache ring buffer\n(ordered by revision)"]
         B --> D["Indexer store\n(current state snapshot)"]
@@ -406,7 +406,7 @@ graph TD
         E2 --> F2["HTTP chunked response\n(client 2)"]
         EN --> FN["HTTP chunked response\n(client N)"]
     end
-    subgraph "New Watch Initialization"
+    subgraph sub_new_watch_initialization ["New Watch Initialization"]
         G["Incoming watch request\n(resourceVersion=X)"] --> H{"X >= oldestRevision?"}
         H -->|"Yes"| I["Backfill from ring buffer\n(revisions X+1..current)"]
         H -->|"No"| J["Fall back to etcd range\n+ paginated historical events"]

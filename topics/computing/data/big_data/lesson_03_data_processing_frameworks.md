@@ -1,4 +1,3 @@
-```markdown
 # Lesson 3: Data Processing Frameworks
 
 ## 1. First-Principles Intuition & Invariants
@@ -45,19 +44,19 @@ graph TD
     F -->|"Shuffle\nWrite"| G["sortByKey\n[Wide Dep]"]
     G --> H["Action: collect()"]
 
-    subgraph "Stage 1 — Executed in parallel per partition"
+    subgraph sub_stage_1___executed_in_parallel_p ["Stage 1 — Executed in parallel per partition"]
         A
         B
         C
         D
     end
 
-    subgraph "Stage 2 — Blocked on Stage 1 shuffle"
+    subgraph sub_stage_2___blocked_on_stage_1_shu ["Stage 2 — Blocked on Stage 1 shuffle"]
         E
         F
     end
 
-    subgraph "Stage 3 — Blocked on Stage 2 shuffle"
+    subgraph sub_stage_3___blocked_on_stage_2_shu ["Stage 3 — Blocked on Stage 2 shuffle"]
         G
         H
     end
@@ -216,7 +215,7 @@ graph TD
     TM2["TaskManager 2\n(slots: SRC-1, MAP-1, WIN-2,3)"] -.- MAP
     TM3["TaskManager 3\n(slots: AGG-0,1, SINK-0)"] -.- AGG
 
-    subgraph "Checkpoint Barrier Flow"
+    subgraph sub_checkpoint_barrier_flow ["Checkpoint Barrier Flow"]
         CB["Barrier injected\nat Source"] -->|"flows with data"| CB2["Barrier arrives\nat Window Operator"]
         CB2 -->|"all channels\ndelivered"| CB3["Operator snapshots\nstate to StateBackend"]
     end

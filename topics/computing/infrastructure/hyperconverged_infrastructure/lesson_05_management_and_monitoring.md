@@ -220,17 +220,17 @@ Monitoring agents run as privileged daemons on each node, collecting metrics via
 
 ```mermaid
 graph TB
-    subgraph "Node 1"
+    subgraph sub_node_1 ["Node 1"]
         A1["Monitoring Agent"] -->|"Push (60s)" | B1["Local Buffer"]
         A1 -->|"Scrape /metrics"| C1["Prometheus Exporter"]
     end
     
-    subgraph "Node 2"
+    subgraph sub_node_2 ["Node 2"]
         A2["Monitoring Agent"] -->|"Push (60s)" | B2["Local Buffer"]
         A2 -->|"Scrape /metrics"| C2["Prometheus Exporter"]
     end
     
-    subgraph "Node N"
+    subgraph sub_node_n ["Node N"]
         AN["Monitoring Agent"] -->|"Push (60s)" | BN["Local Buffer"]
         AN -->|"Scrape /metrics"| CN["Prometheus Exporter"]
     end
@@ -545,7 +545,7 @@ if __name__ == '__main__':
 
 ```mermaid
 graph TB
-    subgraph "Control Plane Cluster (Raft Consensus)"
+    subgraph sub_control_plane_cluster__raft_cons ["Control Plane Cluster (Raft Consensus)"]
         CP1["Controller 1<br/>(Leader)"]
         CP2["Controller 2<br/>(Follower)"]
         CP3["Controller 3<br/>(Follower)"]
@@ -559,7 +559,7 @@ graph TB
         CP3 --> KV
     end
     
-    subgraph "Compute Nodes"
+    subgraph sub_compute_nodes ["Compute Nodes"]
         N1["Node 1<br/>(Hypervisor + Storage)"]
         N2["Node 2<br/>(Hypervisor + Storage)"]
         N3["Node 3<br/>(Hypervisor + Storage)"]
@@ -574,7 +574,7 @@ graph TB
         N3 <-->|"Data replication"| N1
     end
     
-    subgraph "Monitoring Stack"
+    subgraph sub_monitoring_stack ["Monitoring Stack"]
         MA1["Agent 1"] --> N1
         MA2["Agent 2"] --> N2
         MA3["Agent 3"] --> N3
@@ -592,7 +592,7 @@ graph TB
         AD --> AM
     end
     
-    subgraph "User Interfaces"
+    subgraph sub_user_interfaces ["User Interfaces"]
         API["REST API<br/>(OpenAPI)"]
         CLI["CLI Tool"]
         WEB["Web Dashboard"]

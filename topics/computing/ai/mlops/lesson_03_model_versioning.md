@@ -34,26 +34,26 @@ The metadata store holds structured records: model identifiers, version numbers,
 
 ```mermaid
 flowchart TB
-    subgraph "Model Registry Architecture"
-        subgraph "Client Layer"
+    subgraph sub_model_registry_architecture ["Model Registry Architecture"]
+        subgraph sub_client_layer ["Client Layer"]
             CLI["CLI / SDK"]
             API["REST API"]
         end
 
-        subgraph "Registry Server"
+        subgraph sub_registry_server ["Registry Server"]
             AUTH["Auth & Access Control"]
             LIFE["Lifecycle State Machine"]
             LINEAGE["Lineage Graph Engine"]
         end
 
-        subgraph "Metadata Store"
+        subgraph sub_metadata_store ["Metadata Store"]
             DB[("Relational DB\n(PostgreSQL / MySQL)")]
             META["Model Metadata Table"]
             VER["Version Table"]
             EDGE["Lineage Edge Table"]
         end
 
-        subgraph "Artifact Store"
+        subgraph sub_artifact_store ["Artifact Store"]
             S3[("Object Storage\n(S3 / GCS / MinIO)")]
             CAS["Content-Addressable\nBlob Store"]
         end
@@ -679,7 +679,7 @@ The lineage graph query (full ancestry traversal) is the most expensive operatio
 
 ```mermaid
 flowchart TD
-    subgraph "Failure Mode Taxonomy"
+    subgraph sub_failure_mode_taxonomy ["Failure Mode Taxonomy"]
         DRIFT["Version Drift\nMetadata ≠ Artifact"]
         SKEW["Training-Serving Skew\nTrain pipeline ≠ Serve pipeline"]
         CONFLICT["Concurrent Registration\nRace condition on version number"]
@@ -688,7 +688,7 @@ flowchart TD
         STORAGE["Storage Exhaustion\nNo GC or retention policy"]
     end
 
-    subgraph "Mitigations"
+    subgraph sub_mitigations ["Mitigations"]
         VERIFY["Integrity Verification\n(re-hash stored artifacts)"]
         HASHCHECK["Preprocessing Hash Check\n(verify code hash at load)"]
         OCC["Optimistic Concurrency Control\n(version column + retry)"]

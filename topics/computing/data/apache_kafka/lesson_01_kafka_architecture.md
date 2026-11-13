@@ -40,7 +40,7 @@ A Kafka cluster consists of one or more **brokers** (JVM processes) coordinated 
 
 ```mermaid
 graph TD
-    subgraph "KRaft Controller Quorum"
+    subgraph sub_kraft_controller_quorum ["KRaft Controller Quorum"]
         C1["Controller\nBroker 1\n(Active)"]
         C2["Controller\nBroker 2\n(Voter)"]
         C3["Controller\nBroker 3\n(Voter)"]
@@ -48,13 +48,13 @@ graph TD
         C1 -->|"Raft replication"| C3
     end
 
-    subgraph "Kafka Cluster (Brokers)"
+    subgraph sub_kafka_cluster__brokers ["Kafka Cluster (Brokers)"]
         B1["Broker 1\n(also Controller)"]
         B2["Broker 2"]
         B3["Broker 3"]
     end
 
-    subgraph "Topic: orders  (3 partitions, RF=3)"
+    subgraph sub_topic__orders___3_partitions__rf ["Topic: orders  (3 partitions, RF=3)"]
         direction LR
         P0["P0: Leader=B1\nFollowers: B2,B3"]
         P1["P1: Leader=B2\nFollowers: B1,B3"]
@@ -197,7 +197,7 @@ stateDiagram-v2
 
 ```mermaid
 flowchart LR
-    subgraph Producer Side
+    subgraph sub_producer_side ["Producer Side"]
         App["Application\nThread"]
         Interceptor["Producer\nInterceptor"]
         Serializer["Key/Value\nSerializer"]
@@ -206,7 +206,7 @@ flowchart LR
         Sender["Sender Thread\n(async I/O)"]
     end
 
-    subgraph Broker Side
+    subgraph sub_broker_side ["Broker Side"]
         NetworkLayer["Network Layer\n(Acceptor + Processor\nthreads)"]
         RequestQueue["Request Queue"]
         IOThread["I/O Thread\n(KafkaRequestHandler)"]
@@ -215,7 +215,7 @@ flowchart LR
         ResponseQueue["Response Queue"]
     end
 
-    subgraph Consumer Side
+    subgraph sub_consumer_side ["Consumer Side"]
         Fetcher["Fetcher\n(background thread)"]
         ConsumerQueue["Completed Fetches\nQueue"]
         ConsumerApp["Consumer\nApplication Thread\npoll()"]

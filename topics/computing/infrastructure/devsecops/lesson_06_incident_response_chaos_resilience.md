@@ -1,4 +1,3 @@
-```markdown
 # Lesson 6: Incident Response, Chaos Engineering, and Resilience Patterns
 
 ## 1. First-Principles Foundations: Failure as an Invariant
@@ -52,16 +51,16 @@ As ρ → 1, E[N] → ∞. The relationship is not linear; it is hyperbolic. A s
 
 ```mermaid
 graph LR
-    subgraph "Arrival Process"
+    subgraph sub_arrival_process ["Arrival Process"]
         A["λ = Arrival Rate\n(Poisson)"]
     end
-    subgraph "Queue"
+    subgraph sub_queue ["Queue"]
         B["Waiting Requests\nE[N] = ρ/(1-ρ)"]
     end
-    subgraph "Server"
+    subgraph sub_server ["Server"]
         C["μ = Service Rate\n(Exponential)"]
     end
-    subgraph "Utilization"
+    subgraph sub_utilization ["Utilization"]
         D["ρ = λ/μ\nMust keep ρ << 1"]
     end
     A -->|"Arrivals"| B
@@ -167,19 +166,19 @@ The architecture of observability systems directly determines the efficacy of in
 
 ```mermaid
 graph TD
-    subgraph "Three Pillars of Observability"
+    subgraph sub_three_pillars_of_observability ["Three Pillars of Observability"]
         M["Metrics\n(Time-series aggregates)\nPrometheus, Datadog, CloudWatch"]
         L["Logs\n(Discrete structured events)\nElasticsearch, Loki, Splunk"]
         T["Traces\n(Causal request chains)\nJaeger, Zipkin, AWS X-Ray"]
     end
 
-    subgraph "What They Answer"
+    subgraph sub_what_they_answer ["What They Answer"]
         Q1["Is something wrong?\nWhat is the magnitude?"]
         Q2["What happened exactly?\nWhat was the context?"]
         Q3["Where did latency originate?\nWhich service call failed?"]
     end
 
-    subgraph "Correlation"
+    subgraph sub_correlation ["Correlation"]
         C["Exemplars link metric\nanomalies to specific traces.\nTrace IDs in logs link\nevents to request chains."]
     end
 
@@ -734,7 +733,7 @@ The bulkhead pattern borrows from maritime engineering: ships are divided into w
 
 ```mermaid
 graph TD
-    subgraph "Without Bulkheads"
+    subgraph sub_without_bulkheads ["Without Bulkheads"]
         P1["Shared Thread Pool\n100 threads"]
         S1["Payment API\n(slow dependency)"]
         S2["Catalog API\n(fast)"]
@@ -745,7 +744,7 @@ graph TD
         note1["Payment slowness exhausts\nall 100 threads. Catalog\nand User APIs starve."]
     end
 
-    subgraph "With Bulkheads"
+    subgraph sub_with_bulkheads ["With Bulkheads"]
         P2["Payment Pool\n20 threads"]
         P3["Catalog Pool\n50 threads"]
         P4["User Pool\n30 threads"]

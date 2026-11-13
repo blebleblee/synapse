@@ -47,11 +47,11 @@ The system must efficiently compute f(l) for reads/writes and maintain f⁻¹(p)
 
 ```mermaid
 graph TD
-    subgraph "Application View"
+    subgraph sub_application_view ["Application View"]
         A["Application"] -->|"Read/Write to Logical Block 42"| B["Virtual Volume<br/>(Logical Address Space)"]
     end
     
-    subgraph "Virtualization Engine"
+    subgraph sub_virtualization_engine ["Virtualization Engine"]
         B --> C["Address Translation Layer"]
         C --> D{"Metadata Lookup"}
         D -->|"Block 42 → Physical Extent 0x1A7"| E["Data Path Engine"]
@@ -59,7 +59,7 @@ graph TD
         F --> G["Optional: Dedup/Compression"]
     end
     
-    subgraph "Physical Layer"
+    subgraph sub_physical_layer ["Physical Layer"]
         G --> H["Physical Storage Pool"]
         H --> I["NVMe SSD"]
         H --> J["SATA SSD"]
