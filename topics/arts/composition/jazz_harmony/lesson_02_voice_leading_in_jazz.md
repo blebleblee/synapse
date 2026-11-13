@@ -2,43 +2,43 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-In jazz harmony, voice leading is a fundamental technique that ensures smooth and coherent transitions between chords. It requires a deep understanding of harmonic theory, counterpoint, and the interplay of individual voices within a chord progression. At its core, voice leading is about the movement of individual notes from one chord to the next, aiming for clarity and melodic interest while maintaining harmonic integrity. The essence lies in the independence of each voice, guiding the listener through the harmonic landscape of a jazz composition with continuity and forward motion.
+Voice leading is the connective tissue of jazz harmony. It governs how individual melodic lines within a chord progression move from one sonority to the next, operating at the intersection of counterpoint, acoustics, and cognitive psychology. At its foundation lies a deceptively simple principle: each note in a chord is a voice—an independent melodic strand—and the art of voice leading is the art of moving those strands between chords with the minimum necessary displacement while preserving harmonic clarity.
 
-From a theoretical standpoint, voice leading is grounded in the principles of counterpoint, adapted to jazz's unique harmonic language, which includes complex chord progressions, altered dominants, and extended chords. The challenge in jazz voice leading is to navigate these complex harmonic structures while maintaining the clarity and independence of each voice.
+### The Counterpoint Heritage
 
-Mathematically, voice leading can be understood through intervallic relationships and harmonic series. Each note in a chord can be seen as a point in a multi-dimensional space, where dimensions correspond to different voices. The task is to find the shortest path between these points, minimizing large leaps and dissonant intervals. This path should avoid dissonant intervals, quantifiable using intervallic metrics and harmonic series analysis.
+Jazz voice leading inherits directly from the species counterpoint tradition codified by Fux and refined through common-practice harmony. The core invariants are:
 
-The invariants in voice leading are rooted in the principles of consonance and dissonance. Consonant intervals, such as thirds and sixths, are generally preferred, providing stability and resolution. Dissonant intervals, such as sevenths and ninths, can be used for tension and interest but should be resolved smoothly to consonant intervals. The independence of voices is another invariant, ensuring each voice has its own melodic line and is not overly dependent on the others.
+- **Minimal motion principle.** Voices should move the shortest distance possible between chords. Common tones are retained; moving voices step rather than leap. This is not merely an aesthetic preference—it reflects the cognitive economy of the auditory system, which tracks melodic continuity more easily than discontinuity.
+- **Contrary motion preference.** When two voices must move, they should preferentially move in opposite directions. This preserves the acoustic independence of voices and avoids the parallel perfect intervals that collapse multiple lines into a single perceived stream.
+- **Dissonance resolution.** Dissonant intervals (tritones, sevenths, seconds, augmented intervals) resolve by step, typically downward. The classic case is the tritone of a dominant seventh chord: the 7th resolves downward by semitone to the 3rd of the next chord, and the 3rd resolves upward by semitone (or stays as a common tone) to the 7th of the next chord.
 
-## 2. Core Architecture & Mechanics
+### The Guide-Tone Principle
 
-To understand the mechanics of voice leading in jazz, it is helpful to dissect the chords and their constituent notes, along with the rules and techniques for moving between these chords. One of the key structures is the chord progression, a sequence of chords forming the harmonic foundation of a jazz composition. Each chord can be represented as a set of notes, including roots, thirds, fifths, and extensions. The task of voice leading is to find the smoothest path between these sets of notes.
+A critical invariant distinguishes jazz voice leading from its common-practice ancestor: the **guide-tone principle**. The 3rd and 7th of any chord define its quality (major, minor, dominant, half-diminished). The root is typically supplied by the bassist, and the 5th is often omitted because it contributes no information about chord quality. Effective jazz voice leading therefore reduces to the movement of two voices—the 3rd and the 7th—between successive chords.
 
-The algorithms for voice leading can be broken down into several key steps. First, identify common tones between chords—notes shared between two chords that can be held over, providing continuity and stability. Second, resolve dissonant intervals smoothly to consonant intervals using techniques like voice exchange, where a note moves to another voice, or voice doubling, where a note is doubled in two voices to create a consonant interval. Third, maintain the independence of voices through techniques such as voice crossing, where a higher voice moves below a lower voice, or voice doubling.
+In a standard ii-V-I progression in C major (Dm7 → G7 → Cmaj7), the guide tones move with remarkable parsimony:
 
-Consider the chord progression Cmaj7, D7, G7, Cmaj7. The common tones between Cmaj7 and D7 are E and D. Holding over these common tones provides continuity. The dissonant seventh of D7 can be resolved to the third of G7 (B), creating a smooth transition. Independence of voices can be maintained through voice crossing, where the third of D7 (F#) moves below the root of G7 (G).
+- **Dm7 → G7.** The 7th of Dm7 (C) resolves down by semitone to the 3rd of G7 (B). The 3rd of Dm7 (F) is retained as the 7th of G7 (F)—a common tone.
+- **G7 → Cmaj7.** The 7th of G7 (F) resolves down by semitone to the 3rd of Cmaj7 (E). The 3rd of G7 (B) is retained as the 7th of Cmaj7 (B)—a common tone.
 
-To visualize these concepts, we can use a Mermaid diagram to illustrate the voice leading between the chords in the progression:
+This creates a chain of semitone resolutions and common tones that threads through the entire progression with near-zero net displacement—the structural essence of parsimonious voice leading.
 
-```mermaid
-graph TD
-    A["Cmaj7"] --> B["D7"]
-    B --> C["G7"]
-    C --> D["Cmaj7"]
-    A -->| "E" | B
-    B -->| "F#" | C
-    C -->| "B" | D
-    B -->| "D" | C
-```
+### The Mathematical Model: Voice Leading Spaces
 
-In this diagram, nodes represent the chords, and edges represent the voice leading between them. Labels on the edges indicate notes held over or moved between chords.
+The formal treatment of voice leading draws on geometrical music theory, particularly the work of Dmitri Tymoczko. The model is as follows:
 
-## 3. High-Performance Optimization & Failure Modes
+A chord with n voices is an ordered point in ℝⁿ, where each coordinate is the pitch (in semitones or cents) of one voice. A **voice leading** from chord C = (c₁, c₂, ..., cₙ) to chord C′ = (c′₁, c′₂, ..., c′ₙ) is a vector v = (v₁, ..., vₙ) where c′ᵢ = cᵢ + vᵢ. The **size** of the voice leading is the L1 (taxicab) norm:
 
-In jazz voice leading, high-performance optimization and addressing failure modes are critical. The goal is to create smooth and coherent voice leading that is both musically compelling and technically sound, requiring a deep understanding of voice leading principles and their application in various harmonic contexts.
+    ‖v‖₁ = Σᵢ |vᵢ|
 
-A key challenge is balancing smoothness with clarity. Smooth voice leading can sometimes result in voices that are too dependent on each other, leading to a lack of clarity and interest. Maintaining voice independence while ensuring smooth transitions can be achieved through techniques like voice crossing and voice doubling.
+The goal of parsimonious voice leading is to find the voice leading that minimizes this norm over all permutations of the target chord's pitch classes, allowing octave displacement. Two voice leadings are **path-equivalent** if they differ by a uniform transposition of all voices; they are **permutation-equivalent** if they differ by a reassignment of which voice moves where.
 
-Another challenge is navigating complex harmonic structures. Jazz chord progressions often include complex chords with multiple extensions and alterations, making voice leading more challenging. A deep understanding of harmonic theory and practice of voice leading exercises are essential.
+The **voice leading space** for n-voice chords is the orbifold ℝⁿ / (Sₙ × 𝕋), where Sₙ is the symmetric group (permutations of voices) and 𝕋 is the translation group (octave shifts). This space has the structure of an n-dimensional orbifold with singularities along the "walls" where two voices coincide. For practical jazz voice leading, we work in the 4-voice orbifold (for seventh chords) or the 5-voice orbifold (for chords with extensions).
 
-Common failure modes include the use of large leaps and dissonant intervals, which can disrupt the flow. Addressing these requires careful planning and adherence to voice leading principles.
+Finding the minimal voice leading between two chords is an instance of the **assignment problem** in combinatorial optimization, solvable in O(n³) time via the Hungarian algorithm. For the small n (typically 4–6 voices) encountered in jazz, brute-force enumeration of all n! permutations is also tractable.
+
+### Invariants Summary
+
+The invariants of jazz voice leading, in order of priority:
+
+1. **Guide
