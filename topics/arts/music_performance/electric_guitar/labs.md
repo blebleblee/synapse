@@ -1,866 +1,1086 @@
-# Operational Verification Laboratory: Electric Guitar Signal Chain, Transduction Physics, and Performance Engineering
+# Electric Guitar Masterclass: Signal Chain, Fretboard Mastery, and Performance Engineering
 
-## Laboratory Objectives and Instrumentation Requirements
+## Who This Is For and How to Use It
 
-This laboratory provides rigorous, hands-on investigation of electric guitar signal generation, transduction, amplification, and digital signal processing. The exercises examine the physical principles underlying magnetic pickup operation, passive electronic circuit behavior, signal path analysis, and digital audio processing. Students will develop proficiency in systematic troubleshooting, empirical measurement, and performance optimization through controlled experimentation and quantitative analysis.
+This guide is for the guitarist who wants to understand *why* everything works the way it does — not just follow instructions blindly. You'll move between the instrument in your hands, the electronics inside it, and the signal chain that shapes your tone. Every exercise is immediately playable or testable. The theory never exceeds what you need to make a better decision in the room.
 
-### Required Laboratory Equipment
+Work through the exercises in order the first time. After that, treat each section as a reference you can drop into at any point.
 
-**Hardware:**
-- Solid-body electric guitar with electromagnetic pickups (single-coil or humbucker configuration)
-- Passive tone control circuit (capacitor-based high-frequency roll-off, typically 0.022 µF or 0.047 µF)
-- Amplifier with clean and overdrive channels, or
-- Audio interface with minimum 24-bit/96 kHz resolution and <10 ms round-trip latency
-- Shielded instrument cable (1/4" TS connector, <20 ft to minimize capacitance loading)
-- Digital multimeter for resistance and continuity measurements
-- Chromatic tuner (±1 cent accuracy)
+**What you need:**
 
-**Software:**
-- Digital Audio Workstation: Ableton Live, Reaper, or Logic Pro
-- Guitar amplifier simulator: Neural DSP Archetype suite, Positive Grid BIAS FX 2, or Native Instruments Guitar Rig 6 Pro
-- Spectrum analyzer and waveform visualization: Audacity, iZotope RX, or SPAN by Voxengo
-- Optional: SPICE circuit simulator (LTspice) for pickup loading analysis
+- Solid-body electric guitar (any pickup configuration)
+- Amplifier (tube, solid-state, or modeled) *or* audio interface + amp sim (Neural DSP, BIAS FX 2, Guitar Rig 6, or free alternatives like Amplitube CS)
+- DAW: Reaper (free evaluation), Ableton Live, Logic Pro, or GarageBand
+- Spectrum analyzer: SPAN by Voxengo (free), Audacity, or iZotope RX
+- Digital multimeter (any sub-$30 model works)
+- Chromatic tuner (clip-on or pedal, ±1 cent accuracy)
+- Metronome (phone app is fine; Tempo or Pro Metronome)
+- Two instrument cables of different lengths (10 ft and 20 ft minimum)
 
-### Safety and Grounding Protocol
+---
 
-Electric guitars operate at low voltage (<1V RMS from pickups), but amplification stages can produce hazardous audio pressure levels (>85 dB SPL) and electrical shock from improperly grounded equipment. Verify all equipment ground connections before operation. Maintain monitoring volume below 85 dB SPL during extended sessions to prevent hearing damage.
+## Module 1: The Fretboard as a System — CAGED, Intervals, and Spatial Thinking
 
-## Exercise 1: Signal Transduction Physics and Fretboard Topology
+Before touching the signal chain, you need to own the fretboard. The CAGED system is the most practical mental map available to guitarists because it converts the fretboard from a grid of 144 individual notes into five repeating shapes that your hands already know from open chords.
 
-### Part A: Electromagnetic Induction and Pickup Output Characteristics
+### 1.1 Why CAGED Works: Geometric Intervals on a Linear Neck
 
-Electric guitar pickups operate on Faraday's law of electromagnetic induction: a time-varying magnetic flux through a coil induces an electromotive force (EMF) proportional to the rate of flux change. The ferromagnetic strings, magnetized by permanent magnets in the pickup, perturb the magnetic field when vibrating. This perturbation induces an alternating current in the pickup coil.
+The guitar neck is an equal-temperament grid. Every fret is one semitone (one half-step), and the string tuning interval is a perfect fourth (5 semitones) between most strings — except B to G, which is a major third (4 semitones). This one asymmetry is the reason CAGED shapes look slightly different on each string set, and knowing it consciously prevents the confusion that makes players memorize shapes without understanding them.
 
-**Theoretical Foundation:**
-
-The induced voltage in a pickup coil is given by:
+The five CAGED shapes tile the neck without gaps or overlaps. Each shape derives from an open chord you already know. When you barre the nut with an imaginary capo, every open chord becomes movable.
 
 ```
-V_induced = -N × (dΦ/dt)
+Open E major chord shape → barre at fret 3 → G major
+Open A major chord shape → barre at fret 2 → B major  
+Open G major chord shape → barre at fret 5 → C major (partial voicing)
+Open C major chord shape → barre at fret 3 → Eb major
+Open D major chord shape → barre at fret 5 → G major (higher voicing)
 ```
 
-Where:
-- N = number of turns in the pickup coil (typically 5,000-10,000 for single-coils, 4,000-5,000 per coil for humbuckers)
-- Φ = magnetic flux through the coil
-- dΦ/dt = rate of change of magnetic flux (proportional to string velocity)
+The chain loops: E → D → C → A → G → E (cycling up the neck). Each shape connects to the next, so mastering the hand-off between shapes is as important as knowing the shapes themselves.
 
-The output impedance of a typical single-coil pickup ranges from 5-8 kΩ at DC, with significant inductive reactance (2-5 H inductance) causing frequency-dependent impedance. Humbuckers exhibit 8-15 kΩ DC resistance and higher inductance (4-10 H), resulting in reduced high-frequency response and increased output voltage.
+### 1.2 The Five Shapes in Full — Chord Voicings, Root Locations, and Fingering
 
-**Procedure 1.1: Pickup Output Voltage Measurement**
+For every shape below:
+- **R** = Root note
+- **3** = Major third
+- **5** = Perfect fifth
+- **X** = Muted string (do not sound)
+- Fret numbers are relative to the shape's lowest root position
 
-1. Connect the electric guitar to the audio interface using a shielded cable.
-2. Configure the DAW for 96 kHz sample rate, 24-bit depth, and disable all input processing.
-3. Set guitar volume and tone controls to maximum (full counterclockwise rotation typically = minimum in passive circuits; verify by ear).
-4. Pluck the low E string (82.41 Hz fundamental) at the 12th fret with moderate force.
-5. Measure peak-to-peak voltage in the DAW waveform view immediately after the attack transient.
-6. Repeat for bridge, middle (if present), and neck pickup positions.
+---
 
-**Expected Results:**
+**E-Shape Barre Chord (Root on String 6)**
 
-| Pickup Position | Typical Output (p-p) | Harmonic Content |
-|----------------|----------------------|------------------|
-| Bridge (single-coil) | 100-300 mV | Bright, emphasized >2 kHz |
-| Neck (single-coil) | 150-400 mV | Warm, emphasized 200-800 Hz |
-| Humbucker (bridge) | 300-600 mV | Balanced, reduced >4 kHz |
+This is your workhorse barre chord. Full six-string voicing, root on the low E string.
 
-The bridge pickup produces a brighter tone due to its position near the string's node, where higher harmonics have greater amplitude. The neck pickup captures more fundamental and lower-order harmonics due to greater string displacement amplitude near the neck.
+```
+           E  A  D  G  B  e
+Fret X:    R  .  .  .  .  R    ← Index finger barres all six strings
+Fret X+1:  .  .  .  .  5  .
+Fret X+2:  .  R  R  .  .  .    ← Middle: A string; Ring: D string  
+Fret X+3:  .  .  .  3  .  .    ← Pinky: G string
+```
 
-**Procedure 1.2: Frequency Response Analysis**
+Practical example — G major (E-shape, fret 3):
 
-1. Record 10 seconds of open string plucks (E, A, D, G, B, E) with each pickup.
-2. Export recordings as uncompressed WAV files.
-3. Open each recording in spectrum analyzer software.
-4. Generate FFT plots (4096-point FFT, Hann window) showing frequency distribution from 80 Hz to 8 kHz.
-5. Compare the harmonic structure and formant peaks between pickup positions.
+```
+e |---3---|
+B |---3---|
+G |---4---|  ← Pinky
+D |---5---|  ← Ring
+A |---5---|  ← Middle
+E |---3---|  ← Index barre
+```
+
+Finger assignment:
+- Index: barre fret 3, all 6 strings
+- Middle: A string, fret 5
+- Ring: D string, fret 5
+- Pinky: G string, fret 4
+
+**Common fingering error:** Players collapse the index barre at the B string. Solution — rotate the index finger slightly toward its bony edge (not the pad), and ensure your thumb is behind the middle finger, not creeping toward the headstock.
+
+---
+
+**A-Shape Barre Chord (Root on String 5)**
+
+Root moves to the A string. Mute the low E with the tip of your index finger or let it lean over and touch it lightly.
+
+```
+           E  A  D  G  B  e
+Fret X:    X  R  .  .  .  5    ← Index barre; E string muted
+Fret X+1:  .  .  .  .  .  .
+Fret X+2:  .  .  5  R  3  .    ← Ring finger barres D/G/B at X+2
+                                   OR: Middle (D), Ring (G), Pinky (B)
+```
+
+Practical example — C major (A-shape, fret 3):
+
+```
+e |---3---|  (optional — often muted or allowed to ring as a 5th)
+B |---5---|  ← Ring barre or Pinky
+G |---5---|  ← Ring barre
+D |---5---|  ← Ring barre
+A |---3---|  ← Index barre
+E |---X---|  (muted)
+```
+
+**Two valid fingering approaches:**
+1. Mini-barre: Ring finger barres D, G, B at X+2 simultaneously. Efficient for fast changes.
+2. Three-finger: Middle on D, Ring on G, Pinky on B. More control, easier to modify for minor/7th chords.
+
+For A-shape minor, simply lift the note at X+2 on the B string — it disappears from the voicing naturally.
+
+---
+
+**D-Shape Barre Chord (Root on String 4)**
+
+Highest pitched of the three primary shapes. Root on the D string. Low E and A are muted.
+
+```
+           E  A  D  G  B  e
+Fret X+2:  .  .  R  .  R  .    ← Index barre covers G, B, e at X+2
+Fret X+3:  .  .  .  .  3  .    ← Wait — see below
+Fret X+4:  .  .  .  5  .  .    ← Middle finger: G string
+Fret X+5:  .  R  .  .  .  .    ← This is now the A-shape position (linking shape)
+```
+
+Corrected practical layout — C major (D-shape, fret 10):
+
+```
+e |---10---|  ← Index barre
+B |---10---|  ← Index barre  
+G |---12---|  ← Ring finger (or Pinky)
+D |---10---|  ← Index barre (D string root)
+A |----X---|  (muted)
+E |----X---|  (muted)
+```
+
+The D-shape is most useful as a 4-string partial chord (D, G, B, e). Don't force it to be a full 6-string voicing — it isn't designed for that.
+
+---
+
+**C-Shape Barre Chord (Root on String 5, open C voicing moved up)**
+
+```
+           E  A  D  G  B  e
+Fret X:    .  .  .  R  3  5    ← Index barre if transposing (partial)
+Fret X+1:  .  .  5  .  .  .    ← Middle: D string
+Fret X+2:  .  .  .  .  .  .
+Fret X+3:  3  R  .  .  .  .    ← Ring: E string; Pinky: A string
+```
+
+The C-shape is used most often as a upper-neck partial voicing or in jazz contexts for voice leading rather than as a full barre. Its wide stretch makes it physically demanding in lower positions.
+
+---
+
+**G-Shape Barre Chord (Root on String 6 and String 1)**
+
+```
+           E  A  D  G  B  e
+Fret X:    R  .  .  .  .  R    ← Roots on strings 6 and 1
+Fret X+1:  .  .  .  .  .  .
+Fret X+2:  .  .  .  .  3  .    ← Ring finger (or barre B/e)
+Fret X+3:  .  3  5  R  .  .    ← Middle: A; Index: stretches back (challenging)
+```
+
+In practice, the G-shape full barre is awkward. It sees most real-world use in its partial form (G, B, e strings only) or as a reference point for locating scale patterns in the upper register.
+
+**Practical rule:** For most pop, rock, and blues playing, master E-shape and A-shape first to 100% fluency, then add D-shape partial voicings. C and G shapes pay dividends later in jazz and fusion contexts.
+
+---
+
+### 1.3 The CAGED Chain in Action — Linking Shapes Across the Neck
+
+Here's how the five shapes connect for the key of G major, starting at the open position and moving up the neck:
+
+```
+Open    Fret 3   Fret 5   Fret 7    Fret 10   Fret 12
+  G       G        G        G          G         G
+(G-shp) (A-shp) (C-shp) (E-shp)   (D-shp)   (G-shp)
+```
 
 ```mermaid
 graph LR
-    A["Vibrating String<br/>(Ferromagnetic)"] -->|"Perturbs Magnetic Field"| B["Permanent Magnet<br/>(AlNiCo II/V or Ceramic)"]
-    B -->|"Time-Varying Flux"| C["Pickup Coil<br/>(5k-10k turns, AWG 42-44)"]
-    C -->|"Induced EMF<br/>(50-500 mV p-p)"| D["Output Jack<br/>(1/4 inch TS)"]
-    D -->|"High-Z Signal<br/>(5-15 kΩ source impedance)"| E["Amplifier Input<br/>(1 MΩ typical input impedance)"]
-    
-    style A fill:#e1f5ff
-    style C fill:#fff4e1
-    style E fill:#f0ffe1
+    subgraph sub_caged ["CAGED Chain — Key of G Major"]
+        A["G-shape\nOpen Position\nRoot: E6, E1"] --> B["A-shape\nFret 3\nRoot: A5"]
+        B --> C["C-shape\nFret 5\nRoot: D4 area"]
+        C --> D["E-shape\nFret 7\nRoot: E6"]
+        D --> E["D-shape\nFret 10\nRoot: D4"]
+        E --> F["G-shape\nFret 12 (Octave)\nRoot: E6, E1"]
+    end
 ```
 
-### Part B: Fretboard Topology and the CAGED System
+**Drill: Connect the Chain**
 
-The guitar fretboard is organized according to equal temperament tuning, where each fret represents a semitone interval corresponding to a frequency ratio of 2^(1/12) ≈ 1.0594631. The CAGED system is a mnemonic framework for visualizing chord voicings and scale patterns across the fretboard by relating movable shapes to the five basic open chord forms: C, A, G, E, and D.
+Set your metronome to 60 BPM. Play each shape as a whole chord (4 beats per shape), then transition to the next one with no pause. Your goal is smooth, clean transitions with every note ringing.
 
-**Fretboard Physics:**
+Progression: G-shape → A-shape → C-shape → E-shape → D-shape → E-shape → A-shape → G-shape (back down)
 
-The fundamental frequency of a vibrating string segment is given by:
+Metronome targets:
+- 60 BPM — focus on clean, all notes ringing
+- 80 BPM — maintain tone quality
+- 100 BPM — fluid, relaxed transitions
 
-```
-f = (1/2L) × √(T/μ)
-```
+---
 
-Where:
-- L = vibrating length of the string
-- T = string tension (typically 15-25 lbs per string)
-- μ = linear mass density (mass per unit length)
+### 1.4 Minor and Seventh Chord Variants Within Each Shape
 
-Each fret position reduces the vibrating length by the factor 2^(-1/12), increasing frequency by one semitone. The 12th fret halves the vibrating length, doubling the frequency (one octave).
+You don't need five entirely new shapes for minor chords. Each CAGED shape has a minor modification — usually one note moves one fret.
 
-**Procedure 1.3: CAGED System Chord Voicings**
-
-The CAGED system divides the fretboard into five overlapping regions. Each region contains a movable chord shape derived from the open position equivalents. Understanding these shapes enables rapid transposition and visualization of harmonic relationships.
-
-**E-Shape Barre Chord (Major):**
+**E-shape minor (Em-shape barre):**
 
 ```
-Fret:   X   X+2 X+2 X+1 X   X
-String: E   A   D   G   B   e
-Note:   R   5   R   3   5   R
-
-Example: E-shape at 3rd fret = G major
-Fingering:
-- Index finger: Barre across all strings at fret X
-- Middle finger: A string at fret X+2
-- Ring finger: D string at fret X+2
-- Pinky finger: G string at fret X+1
+e |---3---|  ← Index barre
+B |---3---|  ← Index barre
+G |---4---|  ← Middle finger (not Pinky — one fret lower than major)
+D |---5---|  ← Ring
+A |---5---|  ← Pinky
+E |---3---|  ← Index barre
 ```
 
-The E-shape is the most commonly used barre chord form. The root note is located on the low E string at the barred fret. This shape produces a full, six-string voicing with doubled roots and fifths.
+The major 3rd (G string Pinky in E major shape) drops one fret to become a minor 3rd. Everything else stays the same.
 
-**A-Shape Barre Chord (Major):**
-
-```
-Fret:   X   X   X+2 X+2 X+2 X
-String: E   A   D   G   B   e
-Note:   -   R   5   R   3   5
-
-Example: A-shape at 5th fret = D major
-Fingering:
-- Index finger: Barre across strings A through e at fret X
-- Ring finger: Barre across D, G, and B strings at fret X+2 (or use separate fingers)
-- Low E string muted (not played)
-```
-
-The A-shape places the root on the A string. This voicing emphasizes midrange frequencies and is particularly effective for rhythm playing in dense arrangements.
-
-**D-Shape Barre Chord (Major):**
+**A-shape minor (Am-shape barre):**
 
 ```
-Fret:   X   X+5 X+4 X+2 X+3 X+2
-String: E   A   D   G   B   e
-Note:   -   -   R   3   5   R
-
-Example: D-shape at 10th fret = C major
-Fingering:
-- Index finger: Barre across G, B, and e strings at fret X+2
-- Middle finger: D string at fret X+2 (note: conflicts with index; typically use X+4 for D string)
-- Ring finger: B string at fret X+3
-- Pinky finger: A string at fret X+5
-- Low E and A strings muted
+e |---3---|  ← open/muted
+B |---5---|  ← Ring
+G |---5---|  ← Middle
+D |---5---|  ← No B-string note at X+2 — that was the major 3rd, now omitted
+A |---3---|  ← Index barre
+E |---X---|
 ```
 
-The D-shape is harmonically dense but physically demanding. The root is on the D string, producing a bright voicing that cuts through ensemble textures.
+Actually, simplest approach: A-shape minor = same as A-shape major but remove the finger on the B string (or barre only D and G with the ring finger, leaving B open to ring as a 5th — context-dependent).
 
-**C-Shape Barre Chord (Major):**
+**Dominant 7th modifications:**
 
-```
-Fret:   X+3 X+3 X+2 X   X+1 X
-String: E   A   D   G   B   e
-Note:   3   R   5   R   3   5
+E7-shape: Lift the ring finger (D string). The open D string was at X+2; now you fret one lower: D string at X+1 (using middle).
 
-Example: C-shape at 8th fret = Ab major (starting from G string)
-Fingering:
-- This shape is less commonly barred due to wide finger stretches
-- Typically used as a partial voicing starting from the A or D string
-```
+A7-shape: G string note drops one fret from X+2 to X+1 to create the minor 7th interval.
 
-The C-shape requires significant finger independence and is often played as a partial chord in practical applications.
+---
 
-**G-Shape Barre Chord (Major):**
+### 1.5 Chord Transition Mechanics and Practice Drills
 
-```
-Fret:   X   X   X   X   X+2 X+3
-String: E   A   D   G   B   e
-Note:   R   3   5   R   3   R
+**The pivot finger principle:** When two adjacent chords share one or more notes on the same fret and string, keep those fingers planted. They become pivot fingers. The remaining fingers move around them.
 
-Example: G-shape at 3rd fret = Bb major (root on low E at 3rd fret)
-Fingering:
-- Complex shape requiring ring finger barre on B and e strings
-- Less commonly used in contemporary playing styles
-```
+Example — Am to C major:
+- Am: Index on B string fret 1, Middle on D string fret 2, Ring on G string fret 2
+- C major: Middle on D string fret 2 (stays!), Ring on A string fret 3, Index on B string fret 1 (stays!)
+- Only the Ring finger moves (D string → A string)
 
-The G-shape is physically demanding and less ergonomic than E and A shapes. It is occasionally employed in jazz and fusion contexts for voice-leading purposes.
+**The guide finger principle:** When transitioning between shapes that don't share exact notes, keep one finger lightly touching a string throughout the transition to maintain positional orientation. It slides along the string without pressing down during the move, then lands cleanly at the new position.
 
-**Procedure 1.4: Chord Transition Practice and Muscle Memory Development**
+**Practice Drill — Four-Chord Workout**
 
-1. Set a metronome to 60 BPM.
-2. Practice the following chord progression using E and A shape barre chords:
-   - E major (E-shape at open position)
-   - A major (A-shape at open position)
-   - B major (A-shape at 2nd fret)
-   - C# minor (A-shape minor variant at 4th fret)
-3. Strum once per beat, ensuring clean contact with all intended strings.
-4. Gradually increase tempo to 120 BPM over multiple sessions.
-5. Record your playing at 100 BPM and analyze for:
-   - Timing accuracy (measure deviation from metronome grid in DAW)
-   - String buzz or muted notes (visible as irregular waveform envelopes)
-   - Transition noise (audible artifacts during chord changes)
-
-**Performance Optimization:**
-
-Efficient chord transitions rely on minimal finger movement and anticipatory finger placement. During the transition between chords, move fingers to the new position during the final 10-20% of the previous chord's duration. This technique, known as "ghost shifting," reduces audible gaps in the harmonic progression.
-
-### Part C: Strumming Mechanics and Rhythmic Subdivision
-
-Strumming technique affects both the temporal and spectral characteristics of the guitar signal. The angle of pick attack, the compliance of the pick material, and the velocity profile all influence the resulting waveform.
-
-**Pick Dynamics Physics:**
-
-When a pick strikes a string, it stores elastic potential energy as the string deflects. The string releases this energy when it slips off the pick edge, generating the initial high-amplitude transient. The attack transient contains broadband spectral energy, with emphasis in the 2-5 kHz range contributing to perceived "presence."
-
-Pick thickness and material affect tone:
-- Thin picks (0.38-0.60 mm): Flexible, emphasize high frequencies, produce "snappy" attack
-- Medium picks (0.60-0.88 mm): Balanced response, general-purpose
-- Heavy picks (0.88-1.50 mm): Rigid, emphasize fundamental and lower harmonics, produce "thick" tone
-
-**Procedure 1.5: Strumming Pattern Analysis**
-
-1. Configure DAW for recording at 96 kHz, 24-bit.
-2. Select a medium pick (0.73 mm) for controlled experiments.
-3. Strum an open E major chord with the following patterns at 90 BPM:
-
-**Pattern A: Quarter-note downstrokes**
-```
-Beat:     1   2   3   4
-Strum:    ↓   ↓   ↓   ↓
-```
-
-**Pattern B: Eighth-note alternating**
-```
-Beat:     1   &   2   &   3   &   4   &
-Strum:    ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑
-```
-
-**Pattern C: Syncopated sixteenth-note**
-```
-Beat:     1 e & a  2 e & a  3 e & a  4 e & a
-Strum:    ↓   ↑ ↓    ↑   ↓    ↑ ↓ ↑    ↓   ↑
-```
-
-4. Record each pattern for 8 measures.
-5. Analyze the recordings in the DAW:
-   - Measure average RMS level for downstrokes vs. upstrokes
-   - Compare attack transient duration (time from initial deflection to peak amplitude)
-   - Generate spectrogram to observe frequency content variation over time
-
-**Expected Observations:**
-
-Downstrokes typically exhibit 2-4 dB higher RMS level than upstrokes due to biomechanical leverage advantages. Downstrokes emphasize lower strings (E, A, D), while upstrokes emphasize higher strings (G, B, e), creating subtle timbral variation within the strumming pattern.
-
-```mermaid
-graph TD
-    A["String at Rest<br/>Tension T"] -->|"Pick Contact"| B["String Deflection<br/>Elastic Potential Energy"]
-    B -->|"String Slips Off Pick"| C["Transverse Wave Propagation<br/>v = √(T/μ)"]
-    C -->|"Reflection at Nut and Bridge"| D["Standing Wave Formation<br/>f₀, 2f₀, 3f₀..."]
-    D -->|"Magnetic Field Perturbation"| E["Pickup Transduction"]
-    E -->|"Electrical Signal"| F["Amplifier"]
-    
-    style B fill:#ffe1e1
-    style D fill:#e1f0ff
-    style F fill:#e1ffe1
-```
-
-## Exercise 2: Passive Electronics, Signal Loading, and Parameter Optimization
-
-### Part A: Volume and Tone Control Circuit Analysis
-
-Electric guitars employ passive RC (resistor-capacitor) networks for volume and tone control. Understanding these circuits enables informed tonal shaping and troubleshooting of signal degradation.
-
-**Volume Control Circuit:**
-
-The volume potentiometer is a variable resistor (typically 250 kΩ for single-coils, 500 kΩ for humbuckers) configured as a voltage divider. When set to maximum, the full pickup output passes to the output jack. As the control is reduced, signal voltage is attenuated according to the potentiometer's resistance ratio.
+Chord progression: G major (E-shape fret 3) → C major (A-shape fret 3) → D major (A-shape fret 5) → Em (E-shape fret 7)
 
 ```
-V_out = V_pickup × (R_pot_remaining / R_pot_total)
+Bar:  1        2        3        4
+      G        C        D        Em
+Strum: ↓ ↓ ↑ ↑ ↓ ↑  (each bar, repeat)
 ```
 
-However, the potentiometer also loads the pickup's output impedance, causing high-frequency roll-off due to the pickup's inductive reactance forming a low-pass filter with the cable capacitance and volume pot resistance.
+Metronome targets:
+- 60 BPM — analyze each transition: where does finger movement start? Make it late (last 20% of previous chord's duration)
+- 80 BPM — ghost shifting: begin moving toward new position during the strum before the change
+- 100 BPM — the transition should be inaudible; no clicks, buzzes, or dead strings
+- 120 BPM — goal tempo for performance-ready
 
-**Tone Control Circuit:**
+---
 
-The tone control adds a capacitor (typically 0.022 µF for brighter response, 0.047 µF for warmer response) in series with a potentiometer (250 kΩ or 500 kΩ) connected from the signal path to ground. This forms a variable low-pass filter.
+## Module 2: Picking Mechanics, Strumming Patterns, and Rhythmic Control
 
-The cutoff frequency is approximated by:
+### 2.1 Pick Ergonomics and Slant Mechanics
 
-```
-f_cutoff = 1 / (2π × R_tone × C_tone)
-```
+The pick should sit between the pad of the thumb and the side of the index finger's first segment — not the fingertip. The tip of the pick extends no more than 3–5 mm past the fingers. More extension = more flex and loss of control.
 
-Where:
-- R_tone = tone potentiometer resistance (varies with knob position)
-- C_tone = tone capacitor value
+**Pick slant:** This is the angle of the pick relative to the string plane.
+- **Downward pick slant (DPS):** Pick tip angled toward the floor. Favors downstroke exit and string hopping. Good for single-string lead lines moving to lower strings.
+- **Upward pick slant (UPS):** Pick tip angled toward the ceiling. Favors upstroke exit. Good for lines moving to higher strings.
+- **Neutral/flat:** Pick parallel to strings. Good for strumming. Requires deliberate escape on string changes.
 
-With a 500 kΩ tone pot at 50% rotation (250 kΩ) and 0.022 µF capacitor:
+**Economy picking vs. alternate picking:**
 
-```
-f_cutoff = 1 / (2π × 250,000 × 0.000000022)
-f_cutoff ≈ 28.9 Hz
-```
+Economy (or sweep) picking follows the direction of string change — if moving from E to A string, use a downstroke for both. This eliminates the inefficient "trapped" pick problem. Used heavily in jazz, shred, and country chicken picking.
 
-This calculation represents the first-order approximation. In practice, the pickup inductance and cable capacitance create a more complex multi-pole filter response with resonant peaks typically between 2-5 kHz.
+Alternate picking (strict down-up-down-up) is metronomically even and builds consistent timing at the cost of requiring deliberate escape strokes on string changes.
 
-**Procedure 2.1: Volume Control Frequency Response Measurement**
+For rhythm playing: use a neutral slant with relaxed wrist rotation.
+For lead lines: develop both and choose based on the phrase direction.
 
-1. Connect guitar to audio interface via shielded cable.
-2. Set tone control to maximum (full counterclockwise).
-3. Set volume control to 10 (maximum).
-4. Generate a pink noise signal in the DAW and route it to guitar amplifier simulator with a clean amp model.
-5. Simultaneously, configure the guitar to output signal to a recording track.
-6. Record 30 seconds of pink noise playback as received by the guitar pickups (this requires an external speaker playing the noise near the guitar, or use a signal generator with electromagnetic coupling - note: this is impractical; alternative approach below).
+**Pick material and thickness — practical guide:**
 
-**Revised Practical Approach for Volume Control Analysis:**
+| Thickness | Feel | Tonal Character | Best For |
+|-----------|------|-----------------|----------|
+| 0.46–0.60 mm (thin) | Flexible, bendy | Bright attack, airy | Acoustic-style strumming, light fingerstyle hybrid |
+| 0.60–0.88 mm (medium) | Slight give | Balanced, present | All-around, rock rhythm |
+| 0.88–1.14 mm (heavy) | Stiff | Full fundamental, defined | Lead, single-note lines |
+| 1.14–3.0 mm (extra heavy) | Rigid | Maximum articulation | Jazz, prog, shred |
 
-1. Set all controls to maximum.
-2. Pluck each open string and record the attack transient.
-3. Measure peak amplitude in DAW.
-4. Reduce volume control to 8, 6, 4, 2, and 0.
-5. Repeat pluck and measurement for each setting.
-6. Generate a graph plotting volume setting (x-axis) vs. peak amplitude in dBFS (y-axis).
+The pick thickness affects the attack transient: thinner picks produce a broader, snap-like attack with more high-frequency content. Thicker picks produce a tighter, more fundamental-dominant attack.
 
-**Expected Results:**
+---
 
-Most guitar volume potentiometers use an audio taper (logarithmic) rather than linear taper. This means that perceived volume changes more linearly with knob rotation, but measured voltage follows a logarithmic curve. At the 50% rotation point, output voltage is typically 20-30% of maximum rather than 50%.
+### 2.2 Strumming Mechanics — Wrist vs. Arm Motion
 
-**Procedure 2.2: Tone Control Frequency Response Measurement**
+**Common error:** New players strum from the elbow, treating the entire forearm as the pendulum. This fatigues quickly and kills dynamic control.
 
-1. Set volume to maximum.
-2. Set tone control to 10 (maximum, minimum capacitive loading).
-3. Record open string plucks for all six strings.
-4. Reduce tone control to 8, 6, 4, 2, and 0.
-5. Repeat recordings at each setting.
-6. Export recordings as WAV files.
-7. Use spectrum analyzer to generate frequency response plots (80 Hz - 10 kHz) for each tone setting.
-8. Overlay plots to visualize the progressive high-frequency roll-off.
+**Correct mechanics:**
+- The elbow anchor point stays relatively fixed (resting on the guitar body or floating just above it).
+- The strumming motion comes from wrist rotation — the same movement as turning a doorknob.
+- On downstrokes, the wrist leads slightly ahead of the pick.
+- On upstrokes, the wrist rotates back, and the pick grazes the strings lightly.
 
-**Expected Results:**
+**Dynamic control:** Upstrokes should naturally be 2–4 dB softer than downstrokes when strumming chords. This creates the micro-dynamics that make rhythm guitar feel alive rather than mechanical. When you want an accented upstroke (reggae, ska), consciously add wrist snap to match downstroke velocity.
 
-At maximum tone setting, the high-frequency response extends to the pickup's natural resonant peak (2-5 kHz for single-coils, 1.5-3 kHz for humbuckers). As the tone control is reduced, a shelving filter progressively attenuates frequencies above approximately 500 Hz. At minimum tone setting, the output has a "dark" or "muffled" character with significant attenuation above 2 kHz.
+---
 
-```mermaid
-graph TD
-    A["Pickup Output<br/>Z_source = 5-15 kΩ + jωL<br/>L = 2-10 H"] -->|"Voltage Divider"| B["Volume Potentiometer<br/>250 kΩ or 500 kΩ<br/>Audio Taper"]
-    B -->|"Variable Attenuation"| C["Tone Control Circuit"]
-    C -->|"C_tone + R_tone to GND"| D["Low-Pass Filter<br/>f_c = 1/(2πRC)"]
-    D -->|"High-Z Signal"| E["Output Jack"]
-    E -->|"Cable Capacitance<br/>30-100 pF/ft"| F["Amplifier Input<br/>R_in = 1 MΩ<br/>C_in = 10-50 pF"]
-    
-    F -.->|"Forms LPF with pickup"| A
-    
-    style A fill:#e1f5ff
-    style D fill:#ffe1e1
-    style F fill:#f0ffe1
-```
+### 2.3 Strumming Pattern Library — Notation and Execution
 
-### Part B: Cable Capacitance and Signal Degradation
-
-Instrument cables exhibit distributed capacitance (typically 30-100 pF per foot) that forms a low-pass filter with the pickup's output impedance. Longer cables result in greater capacitive loading and more high-frequency loss.
-
-**Cable Loading Theory:**
-
-The pickup inductance (L), cable capacitance (C), and total resistance (pickup DC resistance + volume pot + amplifier input resistance) form an RLC circuit with a resonant frequency:
+**Symbol legend:**
 
 ```
-f_resonance = 1 / (2π√(LC))
+↓  = Downstroke (full or partial)
+↑  = Upstroke
+×  = Muted strum (palm mute across all strings, or fret-hand mute)
+(↓) = Ghost strum (keep wrist moving, pick doesn't contact strings — maintains rhythm)
 ```
 
-For a single-coil pickup with 3 H inductance and a 20-foot cable with 70 pF/ft capacitance:
+**Keep the wrist moving constantly.** The key to clean strumming patterns is treating the wrist as a metronome. Even when a strum is "missing" from a pattern, your wrist continues the motion — just the pick doesn't make contact. This is the ghost strum principle.
+
+---
+
+**Pattern 1: Basic Folk/Pop (4/4, quarter notes)**
 
 ```
-C_total = 20 × 70 = 1400 pF = 1.4 × 10^-9 F
-f_resonance = 1 / (2π√(3 × 1.4 × 10^-9))
-f_resonance ≈ 2460 Hz
+Beat:   1    2    3    4
+        ↓    ↓    ↓    ↓
 ```
 
-The resonant peak creates emphasis around this frequency, but frequencies above the resonance are progressively attenuated at 12 dB/octave.
+Metronome: 70 → 100 BPM. Accent beats 2 and 4 (backbeat). Practice with closed eyes after learning — listen for even spacing.
 
-**Procedure 2.3: Cable Length Impact Measurement**
+---
 
-1. Connect guitar using a 10-foot cable.
-2. Record open string plucks for all six strings.
-3. Replace with a 20-foot cable and repeat recordings.
-4. Replace with a 30-foot cable and repeat recordings.
-5. Generate frequency response plots for each cable length.
-6. Measure the 3 dB roll-off frequency for each configuration.
-
-**Expected Results:**
-
-Increasing cable length shifts the resonant frequency downward and increases high-frequency roll-off. A 10-foot cable may exhibit 3 dB attenuation at 5 kHz, while a 30-foot cable shows 3 dB attenuation at 3 kHz, resulting in noticeably darker tone.
-
-**Mitigation Strategies:**
-
-- Use shorter cables when possible
-- Employ low-capacitance cables (e.g., <30 pF/ft)
-- Use active electronics (buffer preamp) at the guitar output
-- Use wireless systems with transmitter buffers
-
-### Part C: Digital Amplifier Simulation and Nonlinear Distortion
-
-Amplifier simulators model the complex nonlinear behavior of tube and solid-state amplifiers through various techniques including wave shaping, convolution, and component-level circuit modeling.
-
-**Distortion Physics:**
-
-Amplifier distortion occurs when the input signal exceeds the amplifier's linear operating region, causing waveform clipping. Soft clipping (tube amplifiers) introduces odd and even harmonics, creating "warm" distortion. Hard clipping (solid-state amplifiers) introduces primarily odd harmonics, creating "harsh" or "brittle" distortion.
-
-The transfer function of a soft clipper can be approximated by:
+**Pattern 2: Standard Rock Eighth-Note Pattern**
 
 ```
-V_out = (2/π) × arctan(k × V_in)
+Beat:   1    &    2    &    3    &    4    &
+        ↓    ↑    ↓    ↑    ↓    ↑    ↓    ↑
 ```
 
-Where k is the distortion coefficient. As k increases, the output approaches square-wave clipping.
+Metronome: 60 → 120 BPM. The upstrokes should catch only the top 3–4 strings (G, B, e), not drag all the way through. This creates natural brightness contrast.
 
-**Procedure 2.4: Amplifier Model Characterization**
+---
 
-1. Open amplifier simulator (Neural DSP, BIAS FX, or Guitar Rig).
-2. Select a clean amp model (e.g., Fender Blackface Deluxe Reverb emulation).
-3. Set all EQ controls to neutral (5 on a 0-10 scale).
-4. Set gain to minimum.
-5. Record a clean E chord strum.
-6. Increase gain to 3, 6, and 10, recording at each setting.
-7. Export recordings and generate:
-   - Waveform comparison showing progressive clipping
-   - FFT plots showing harmonic generation
-   - Total Harmonic Distortion (THD) measurements
-
-**THD Calculation:**
+**Pattern 3: Common Pop Syncopated Pattern**
 
 ```
-THD = √(V₂² + V₃² + V₄² + ... + Vₙ²) / V₁
-
-Where:
-V₁ = RMS voltage of fundamental frequency
-V₂, V₃, etc. = RMS voltage of harmonic components
+Beat:   1    &    2    &    3    &    4    &
+        ↓   (↑)   ↓    ↑   (↓)   ↑    ↓    ↑
 ```
 
-Clean amplifiers exhibit THD < 1%. Overdrive settings produce THD of 5-20%. Heavy distortion exceeds 50% THD.
+The parentheses are ghost strums — wrist moves, pick misses strings. This pattern underlies countless pop songs (Jack Johnson, John Mayer, Ed Sheeran acoustic style).
 
-**Procedure 2.5: Effects Chain Signal Flow Analysis**
+Metronome: 70 BPM learning tempo → 90–100 BPM target.
 
-Modern guitar signal processing chains involve multiple effects processors in series. The order of effects dramatically impacts the final tone.
+---
 
-**Typical Signal Chain:**
+**Pattern 4: Reggae/Ska Upstroke Pattern**
+
+```
+Beat:   1    &    2    &    3    &    4    &
+       (↓)   ↑   (↓)   ↑   (↓)   ↑   (↓)   ↑
+```
+
+Only upstrokes land. Downstrokes are ghost strums. Upstrokes are sharp and staccato — fret hand mutes immediately after each upstroke hit. This creates the characteristic chop.
+
+Metronome: 80 BPM. Practice the staccato mute independently before adding the pattern.
+
+---
+
+**Pattern 5: Sixteenth-Note Funk Pattern**
+
+```
+Beat:   1  e  &  a   2  e  &  a   3  e  &  a   4  e  &  a
+        ↓  ×  ↑  ↓   ×  ↑  ×  ↓   ↑  ×  ↓  ×   ↑  ↓  ×  ↑
+```
+
+The × marks are palm-muted or fret-hand muted percussive hits. The rhythm should feel like a groove, not a mechanical exercise. Accent the downbeats (1 and 3) and the "and" of 2 and 4 for funk feel.
+
+Metronome: Start at 60 BPM treating each sixteenth as a beat (effectively 15 BPM tempo for the full bar). Build to 80 BPM actual tempo.
+
+---
+
+### 2.4 Fingerstyle Fundamentals — Travis Picking
+
+Travis picking (alternating thumb bass + independent finger melody) is the foundation of country, folk, and acoustic fingerstyle. It applies directly to electric guitar for clean tone playing.
+
+**Hand setup:**
+- Thumb (p): handles bass strings (E, A, D — usually alternating E and A or A and D)
+- Index finger (i): G string
+- Middle finger (m): B string
+- Ring finger (a): high e string
+- Rest the heel of your hand lightly on the saddles for a slight palm mute on bass notes (optional — creates a "thump" quality)
+
+**Basic Travis Pattern (4/4):**
+
+```
+Beat:    1    &    2    &    3    &    4    &
+Thumb:   p         p         p         p
+Fingers:      i         m         i         m
+```
+
+Played simultaneously or arpeggio: thumb hits the downbeat bass note, fingers alternate on the upbeats.
+
+**On a G chord (open position):**
+
+```
+Beat:    1    &    2    &    3    &    4    &
+String:  E6        G3        A5        G3
+              B2        B2        B2        B2
+```
+
+Add melody variations by changing which finger note lands on the "2" and "4" beats.
+
+Metronome: 60 BPM one-string-at-a-time drilling, then 50 BPM integrating the full pattern → 80 BPM target → 100 BPM for musical application.
+
+---
+
+## Module 3: Electromagnetic Transduction and the Passive Signal Chain
+
+### 3.1 How Pickups Work — Practical Physics
+
+A pickup is a coil of fine wire (AWG 42–44) wound thousands of times around a magnetic core (the pole pieces). The strings, being ferromagnetic, are magnetized by the pickup's permanent magnet. When a string vibrates, it disturbs the magnetic field around the coil. That changing magnetic flux induces a small voltage in the coil — this is Faraday's law at work.
+
+**What matters practically:**
+
+The induced voltage is proportional to string *velocity* (rate of change of displacement), not displacement itself. This is why the attack transient — when string velocity is highest right after the pluck — produces the loudest, most harmonically rich signal. As the string loses energy and velocity decreases, the signal rolls off.
+
+String velocity is greatest at the midpoint between nut and bridge. The pickup's position on the body determines which part of the string's motion it captures:
+
+- **Neck pickup** sits under high-displacement, lower-velocity motion → strong fundamental, warm and full
+- **Bridge pickup** sits near the saddle where displacement is small but velocity changes rapidly → bright, cutting, harmonically complex
+- **Middle pickup** (Strat HSS or SSS) captures a balance point between both extremes
+
+**Output signal levels by position:**
+
+| Pickup Position | Typical Peak Output | Dominant Frequency Range |
+|----------------|---------------------|--------------------------|
+| Bridge (single-coil) | 100–300 mV p-p | 2–5 kHz emphasized |
+| Middle (single-coil) | 120–350 mV p-p | Balanced, mild cut ~2.5 kHz |
+| Neck (single-coil) | 150–400 mV p-p | 200 Hz – 1 kHz emphasized |
+| Bridge (humbucker) | 300–600 mV p-p | Balanced, reduced above 3 kHz |
+| Neck (humbucker) | 400–800 mV p-p | Warm, 100 Hz – 800 Hz |
+
+**Humbucker vs. single-coil:** A humbucker is two coils wound in opposite directions and wired out of phase with each other. External electromagnetic interference (60/50 Hz hum) couples equally to both coils and cancels out. The guitar signal, coming from string vibration on the pole pieces, doesn't cancel because each coil's pole pieces are under different strings. The result: hum cancellation without signal cancellation. The trade-off is higher inductance (4–10 H vs. 2–3.5 H for single-coils), which rolls off high frequencies faster.
+
+---
+
+### 3.2 Signal Chain Topology — From String to Speaker
 
 ```mermaid
 graph LR
-    A["Guitar Pickup"] -->|"High-Z Signal"| B["Tuner<br/>(Buffered Bypass)"]
-    B --> C["Compressor<br/>(Dynamics Control)"]
-    C --> D["Overdrive/Distortion<br/>(Nonlinear Waveshaping)"]
-    D --> E["EQ<br/>(Frequency Sculpting)"]
-    E --> F["Modulation<br/>(Chorus, Flanger, Phaser)"]
-    F --> G["Delay<br/>(Time-Domain Effect)"]
-    G --> H["Reverb<br/>(Spatial Simulation)"]
-    H --> I["Amplifier"]
-    
-    style A fill:#e1f5ff
-    style D fill:#ffe1e1
-    style I fill:#f0ffe1
+    subgraph sub_guitar ["Inside the Guitar"]
+        A["Vibrating String\n(Ferromagnetic steel)"] --> B["Pickup Coil\n5k–10k turns AWG 42"]
+        B --> C["Volume Pot\n250kΩ or 500kΩ\naudio taper"]
+        C --> D["Tone Circuit\nRC Low-Pass Filter\n0.022–0.047 µF cap"]
+        D --> E["Output Jack\n1/4 inch TS"]
+    end
+
+    subgraph sub_cable ["Passive Cable"]
+        F["Instrument Cable\n20–100 pF/ft\nforms LPF with pickup Z"]
+    end
+
+    subgraph sub_amp ["Amplifier / Interface"]
+        G["Amp Input\n470kΩ–1MΩ impedance\nloads pickup resonance"]
+        G --> H["Preamp / Gain Stage\nClean or clipping"]
+        H --> I["EQ / Tone Stack\nPassive or active"]
+        I --> J["Power Amp / DAW"]
+    end
+
+    E --> F --> G
+
+    style A fill:#d4e8ff
+    style B fill:#fff4cc
+    style D fill:#ffd4d4
+    style F fill:#e8e8e8
+    style G fill:#d4ffd4
+    style J fill:#d4ffd4
 ```
 
-**Effect Order Principles:**
+---
 
-1. **Dynamics before distortion:** Compressors placed before distortion create sustain by maintaining signal level above the clipping threshold. Placed after distortion, they even out the distorted signal's dynamics.
+### 3.3 Volume and Tone Controls — What They Actually Do
 
-2. **Distortion before modulation:** Placing modulation effects (chorus, flanger) after distortion prevents the modulation from being distorted, preserving clarity.
+**Volume control:** A 250 kΩ or 500 kΩ potentiometer wired as a voltage divider between the pickup output and ground. At full (10), all signal passes. As you reduce it, the pot's resistance divides the signal — but it also loads the pickup's inductive impedance, creating a resonant filter interaction. Rolling volume back changes your tone, not just your loudness. The standard fix for preserving tone at lower volumes is a **treble bleed circuit**: a small capacitor (typically 0.001 µF) in parallel with a 100–150 kΩ resistor placed across the volume pot. This creates a high-pass path that counteracts the capacitive loading.
 
-3. **Time-based effects last:** Delay and reverb should be placed at the end of the chain to create natural spatial effects that envelop the entire processed signal.
+**250 kΩ vs. 500 kΩ pots:** Single-coil pickups use 250 kΩ because the lower load damps the pickup's resonant peak slightly, taming harshness. Humbuckers use 500 kΩ to preserve their high-frequency content. Installing 500 kΩ pots on a Strat makes it brighter and more aggressive — legitimate mod choice, not a mistake.
 
-**Procedure 2.6: Effects Chain Experimentation**
+**Tone control:** A capacitor in series with a potentiometer, wired to ground. This creates a variable low-pass filter. As you turn the pot down, more capacitive loading is applied to the signal path, progressively rolling off high frequencies.
 
-1. Configure the following effects chain in Guitar Rig or equivalent:
-   - Clean amp model
-   - Compressor (ratio 4:1, threshold -20 dB, attack 10 ms, release 100 ms)
-   - Overdrive (gain 6, tone 7, level 8)
-   - Delay (time 375 ms, feedback 30%, mix 25%)
+The cap value determines *how much* treble gets rolled off:
+- 0.022 µF: Rolls off highs more aggressively; less cap = brighter tone sweep (most Fenders)
+- 0.047 µF: Wider frequency sweep; Gibsons, warmer character
+- 0.015 µF: Brighter still; boutique mod for single-coils
 
-2. Record a 16-bar progression using E, A, D, and G chords.
+**Measuring the effect yourself:**
 
-3. Reorder the chain to:
-   - Clean amp model
-   - Overdrive
-   - Compressor
-   - Delay
+1. Connect guitar to audio interface. No processing on the input.
+2. Record 10 open-string plucks (E string) at tone knob position 10.
+3. Repeat at positions 7, 5, 3, and 0.
+4. Open each recording in SPAN or Audacity. Set FFT size to 4096, Hann window.
+5. Compare the high-frequency shelf — you'll see it progressively dropping above 1–4 kHz.
 
-4. Record the same progression with identical playing technique.
+---
 
-5. Compare recordings through spectrum analysis and subjective listening assessment.
+### 3.4 Cable Capacitance and Tone Degradation
 
-**Expected Results:**
+Instrument cables have distributed capacitance — typically 20–100 picofarads per foot depending on cable quality. This capacitance, combined with the pickup's output inductance, forms an RLC resonant circuit. The practical consequences:
 
-Configuration 1 (compressor before overdrive) produces sustained distortion with even dynamics. Configuration 2 (compressor after overdrive) produces tighter, more controlled distortion with reduced sustain. The compressor in configuration 2 may introduce "pumping" artifacts as it responds to the distorted signal's envelope.
+- Longer cables shift the resonant peak downward (darker tone)
+- Higher-capacitance cables do the same
+- The resonant peak itself can add a mid-presence emphasis (some players love this)
 
-## Exercise 3: Fault Injection, Diagnostic Methodology, and Signal Path Troubleshooting
+**Practical test:**
 
-### Part A: Pickup System Faults and Electromagnetic Interference
+Record the same chord stab with a 10-foot cable, then a 20-foot cable, then a 30-foot cable (if available). Compare FFT plots. The high-frequency roll-off shift will be audible and visible in the analyzer — typically the 3 dB point drops 1–2 kHz between cable lengths.
 
-Electric guitar signal chains are susceptible to various failure modes including open circuits, short circuits, ground loops, and electromagnetic interference (EMI). Systematic diagnosis requires understanding the expected behavior of each component.
+**If you're running more than 20 feet of cable:** Use a low-impedance buffer at the guitar output. An active DI box, a true-bypass looper with a buffer, or any pedal with a good input buffer (Boss TU-3 tuner, for example) will re-drive the signal at low impedance, making it cable-length immune downstream.
 
-**Common Pickup Faults:**
+---
 
-1. **Open coil:** Complete signal loss, infinite resistance measurement
-2. **Shorted coil:** Weak output, low resistance measurement (<1 kΩ)
-3. **Intermittent connection:** Crackling, signal dropouts during movement
-4. **Microphonic feedback:** Squealing when pickup is exposed to high SPL
-5. **EMI pickup:** 60 Hz (or 50 Hz) hum, radio frequency interference
+### 3.5 Pickup Height Adjustment — Dialing In Output and Clarity
 
-**Procedure 3.1: Pickup Resistance Measurement and Verification**
+Pickup height directly affects output level, tone, and intonation. Too close to the strings: high output but magnetic pull on the string disrupts vibration, causing intonation errors and "wolf note" sustain anomalies. Too far: weak output, thin tone.
 
-1. Disconnect guitar from amplifier.
-2. Remove strings (optional, but improves access).
-3. Unsolder the pickup's hot lead from the volume potentiometer.
-4. Set multimeter to resistance mode (Ω).
-5. Measure DC resistance between the pickup's hot lead and ground.
+**Starting reference heights (measured from string underside to pole piece top, fretted at the highest fret):**
 
-**Expected Resistance Values:**
+| Pickup Type | Bass Side (Low E) | Treble Side (High e) |
+|-------------|-------------------|----------------------|
+| Single-coil (bridge) | 2.0–2.5 mm | 1.5–2.0 mm |
+| Single-coil (neck) | 2.5–3.0 mm | 2.0–2.5 mm |
+| Humbucker (bridge) | 2.5–3.0 mm | 2.0–2.5 mm |
+| Humbucker (neck) | 3.0–3.5 mm | 2.5–3.0 mm |
 
-| Pickup Type | Typical DC Resistance |
-|-------------|----------------------|
-| Stratocaster single-coil | 5.5 - 7.5 kΩ |
-| Telecaster bridge (vintage) | 6.0 - 8.0 kΩ |
-| P-90 single-coil | 7.0 - 9.0 kΩ |
-| PAF-style humbucker | 7.0 - 9.0 kΩ |
-| High-output humbucker | 12.0 - 18.0 kΩ |
+**Procedure:**
 
-Measurements outside these ranges indicate potential faults. Infinite resistance suggests an open coil (broken wire). Resistance below 1 kΩ suggests a shorted coil.
+1. Fret the low E string at the last fret (22nd or 24th). This takes the spring tension out of the neck.
+2. Measure distance from the low E string's underside to the low E pole piece.
+3. Adjust pickup mounting screws (clockwise = up) to reach target height.
+4. Repeat for the high e string side.
+5. Play each string from open to 12th fret and listen for sustain evenness. If notes around fret 12–15 on the wound strings sustain poorly or go sharp, back the pickup away from the strings.
 
-**Procedure 3.2: Electromagnetic Interference Diagnosis**
+---
 
-1. Connect guitar to amplifier with moderate gain.
-2. Set guitar volume to maximum.
-3. Position the guitar in playing position and listen for hum.
-4. Rotate the guitar 90° and observe hum level change.
-5. Touch the strings or bridge ground wire and observe hum reduction.
+## Module 4: Distortion, Saturation, and Amp Sim Configuration
 
-**EMI Sources and Mitigation:**
+### 4.1 Clipping Physics — Why Distortion Sounds Musical
 
-**60 Hz hum (North America) or 50 Hz hum (Europe, Asia):**
-- **Source:** AC power line radiation, transformer fields
-- **Diagnosis:** Hum increases when facing certain directions, decreases when rotated 90°
-- **Mitigation:** Use humbucking pickups, shield the control cavity with conductive copper foil, ensure proper grounding
+An amplifier's output is linear only within a certain voltage range. When input signal exceeds that range, the output can't follow — it gets clipped. The clipping introduces harmonics that weren't in the original signal.
 
-**Radio frequency interference (RFI):**
-- **Source:** AM/FM radio transmitters, cellular towers, digital devices
-- **Diagnosis:** Audible radio stations or buzzing that changes with proximity to electronics
-- **Mitigation:** Add capacitors (100-200 pF) between hot leads and ground, use shielded cable for internal wiring
+**Soft clipping (tube amplifiers, most overdrive pedals):** The transition from linear to clipped is gradual, introducing both odd and even harmonics. Even harmonics (2nd, 4th) are perceived as musical and warm because they correspond to octave and fifth relationships. This is why a cranked tube amp sounds "sweet" rather than harsh.
 
-**Ground loop hum:**
-- **Source:** Multiple ground paths creating current loops
-- **Diagnosis:** Hum that changes when touching strings, disappears when guitar cable is disconnected from amplifier
-- **Mitigation:** Verify bridge ground wire continuity, isolate amplifier and guitar power sources
+**Hard clipping (most solid-state high-gain circuits, fuzz):** The transition is abrupt, introducing predominantly odd harmonics (3rd, 5th, 7th). Odd harmonics at high amplitudes create the aggressive, buzzy character of metal distortion and classic fuzz tones.
 
-```mermaid
-graph TD
-    A["Pickup Coil"] -->|"Hot Signal"| B["Volume Pot"]
-    A -->|"Ground"| C["Cavity Shielding<br/>(Copper Foil/Conductive Paint)"]
-    C -->|"Ground Connection"| D["Bridge Ground Wire"]
-    D -->|"String Contact"| E["Strings<br/>(Player Body Ground)"]
-    B --> F["Output Jack<br/>Sleeve = Ground"]
-    C --> F
-    
-    G["AC Power Line<br/>60 Hz Radiation"] -.->|"EMI Coupling"| A
-    H["Human Body<br/>(Antenna for EMI)"| -.->|"Grounded via strings"| E
-    
-    style A fill:#e1f5ff
-    style C fill:#ffe1e1
-    style F fill:#f0ffe1
-    style G fill:#ffcccc
+**Stacking distortion:** A Tube Screamer (or any overdrive) placed before an amp is not adding distortion — it's doing two things:
+1. Boosting the mid-range (the TS peaks around 720 Hz), giving the amp input a shaped signal
+2. Raising the signal level so the amp's input stage hits its clipping point sooner and more consistently
+
+The amp is still doing most of the distortion character work. The overdrive pedal is a launch ramp that determines where the amp clips.
+
+---
+
+### 4.2 Amp Sim Configuration — Neural DSP, BIAS FX 2, Guitar Rig
+
+The fundamental settings that most impact tone:
+
+**Input gain (preamp gain):** Controls how hard you're driving the first gain stage. For clean tones, keep this where the signal just barely clips on strong strums. For crunch, push it into soft clipping. For high gain, stack it.
+
+**EQ (tone stack):** Most amp sims model passive Baxandall or James/Marshall EQ topologies. These are interactive — boosting bass can appear to cut mids even with the mid knob unchanged. Set EQ flat first (noon on all knobs), then sculpt by ear starting with the most problematic frequency.
+
+**Master volume:** On real amps, master volume controls output stage drive. In sims, it usually scales overall output level without affecting tone significantly — but good models will add subtle power amp saturation at high settings.
+
+**Recommended starting settings for three common tones:**
+
+*Clean, Fender-style:*
+```
+Amp:    Blackface Deluxe or Twin model
+Gain:   2–3 (just below breakup)
+Bass:   5, Mid: 4, Treble: 6
+Master: 7
+Reverb: 2–3 (spring)
 ```
 
-### Part B: Wiring Faults and Signal Path Verification
-
-Internal guitar wiring failures produce various symptoms including intermittent signal, scratchy controls, and dead pickups in specific selector positions.
-
-**Procedure 3.3: Systematic Signal Path Testing**
-
-1. **Output Jack Verification:**
-   - Set multimeter to continuity mode.
-   - Touch probes to output jack tip and sleeve.
-   - With guitar volume at maximum, continuity should show open circuit (no continuity).
-   - Touch strings while measuring; continuity should appear (confirming ground path).
-
-2. **Volume Potentiometer Verification:**
-   - Measure resistance between volume pot's outer lugs (should equal pot rating: 250 kΩ or 500 kΩ).
-   - Rotate pot through full range; resistance should change smoothly without jumps.
-   - Scratchy pots indicate worn resistive track; clean with contact cleaner or replace.
-
-3. **Pickup Selector Switch Verification:**
-   - Measure resistance between switch output lug and each pickup's hot lead.
-   - Cycle through all selector positions.
-   - Verify that each position connects the corresponding pickup(s) to the output.
-
-**Procedure 3.4: Intentional Fault Injection and Recovery**
-
-This exercise develops troubleshooting skills by intentionally introducing reversible faults.
-
-**Fault 1: Simulated Cold Solder Joint**
-
-1. Identify the connection between the volume pot and output jack.
-2. Loosen (do not remove) the solder joint by gently flexing the wire.
-3. Connect guitar to amplifier and play while manipulating the wire.
-4. Observe intermittent signal dropout.
-5. Resolder the connection with proper technique:
-   - Clean surfaces with isopropyl alcohol
-   - Heat joint with 350°C (660°F) soldering iron
-   - Apply 60/40 or 63/37 rosin-core solder
-   - Allow joint to cool without movement
-   - Inspect for shiny, concave fillet (good joint) vs. dull, convex bead (cold joint)
-
-**Fault 2: Simulated Broken Pickup Selector**
-
-1. Temporarily disconnect one pickup's hot lead from the selector switch.
-2. Test all selector positions and note which positions lose signal.
-3. Reconnect the pickup and verify signal restoration.
-
-**Procedure 3.5: Ground Loop Isolation**
-
-Ground loops occur when multiple ground paths exist, allowing AC currents to flow through the audio signal ground. This introduces hum and noise.
-
-1. Connect guitar to amplifier.
-2. Connect amplifier and audio interface to the same power strip.
-3. Connect audio interface to computer via USB.
-4. Monitor guitar signal in DAW while playing.
-5. Measure noise floor with no playing (should be <-60 dBFS).
-6. If excessive hum is present (>-40 dBFS), disconnect USB cable and measure again.
-7. If hum reduces, a ground loop exists between computer ground and audio ground.
-8. Employ one of these mitigation strategies:
-   - Use a USB isolator
-   - Ensure all equipment is plugged into the same power outlet group
-   - Use balanced audio connections where possible (not applicable for guitar direct input, but relevant for amplifier recording)
-
-### Part C: Amplifier Overdrive and Thermal Stress Testing
-
-Amplifiers, particularly tube designs, exhibit nonlinear behavior that intensifies under sustained high-power operation. Digital simulators model this behavior, but understanding physical amplifier limitations informs realistic performance practices.
-
-**Procedure 3.6: Amplifier Saturation Characteristics**
-
-1. Configure amplifier simulator with a vintage tube amp model (e.g., Marshall Plexi, Fender Bassman).
-2. Set gain to maximum.
-3. Play sustained power chords (E5, A5, D5) with heavy downstrokes.
-4. Observe waveform in DAW:
-   - At moderate input levels, soft clipping rounds the waveform peaks
-   - At high input levels, hard clipping flattens the peaks completely
-
-5. Add a tube screamer / overdrive pedal before the amp input.
-6. Set pedal gain to moderate and level to high.
-7. Observe how the pedal pre-compresses and shapes the signal before amplifier clipping.
-
-**Tube Screamer Circuit Theory:**
-
-The classic TS-808 Tube Screamer uses an operational amplifier configured as a non-inverting amplifier with asymmetric clipping diodes in the feedback path. This creates soft clipping with emphasis on mid-range frequencies (centered around 720 Hz), which helps the guitar cut through a mix.
-
+*Classic rock crunch, Marshall-style:*
 ```
-Gain = 1 + (R_feedback / R_input)
-Clipping threshold ≈ 0.7V (silicon diode forward voltage)
+Amp:    Plexi 1959 or JCM800 model
+Gain:   5–6 (preamp crunch)
+Bass:   5, Mid: 7, Treble: 6
+Presence: 6
+Master: 7
 ```
 
-The Tube Screamer acts as a "transparent" overdrive by compressing the signal's dynamic range before it hits the amplifier's input stage, allowing the amplifier's natural overdrive characteristics to dominate the tone.
+*High-gain modern metal:*
+```
+Amp:    Recto, Diezel, or EVH model
+Gain:   7–8
+Bass:   4 (avoid mud), Mid: 5–6, Treble: 7
+Presence: 5–6
+Noise Gate: threshold -30 dBFS, attack fast, release medium
+```
 
-**Procedure 3.7: Latency Measurement and Compensation**
+---
 
-Digital audio systems introduce latency (delay between input and output) due to analog-to-digital conversion, buffer processing, and digital-to-analog conversion. Excessive latency impairs performance by creating perceptible delay between string attack and audible output.
+### 4.3 Effects Chain Order — The Complete Signal Flow
 
-1. Configure audio interface for minimum buffer size (e.g., 64 samples at 48 kHz = 1.33 ms).
-2. Create two tracks in DAW:
-   - Track 1: Direct guitar input (bypassing all processing)
-   - Track 2: Guitar input with amplifier simulator plugin
-
-3. Record a series of sharp, percussive muted string attacks on both tracks simultaneously.
-4. Measure the time offset between Track 1 and Track 2 waveforms in the DAW.
-5. This offset represents the plugin processing latency.
-
-**Expected Latency Values:**
-
-| Configuration | Typical Latency |
-|--------------|----------------|
-| Hardware amplifier | <1 ms |
-| Audio interface only (64 samples @ 48 kHz) | 2-5 ms |
-| Audio interface + simple plugin | 5-10 ms |
-| Audio interface + complex convolution reverb | 10-20 ms |
-
-Latency below 10 ms is generally imperceptible for most players. Latency above 20 ms creates noticeable "slap-back" effect that disrupts performance timing.
-
-**Mitigation Strategies:**
-
-- Reduce buffer size (increases CPU load, may cause audio dropouts)
-- Use plugins with low-latency modes
-- Enable DAW's latency compensation during mixing (not applicable during recording)
-- Use hardware monitoring on audio interface to hear direct signal with zero latency, even if recorded signal has latency
+Order matters fundamentally, not cosmetically. Here's why each placement decision exists:
 
 ```mermaid
 graph LR
-    A["Guitar String Pluck<br/>t = 0 ms"] -->|"Transduction"| B["Pickup Output<br/>t = 0.1 ms"]
-    B -->|"Cable Propagation"| C["Audio Interface ADC<br/>t = 0.2 ms"]
-    C -->|"Buffer Delay<br/>(64 samples @ 48kHz)"| D["DAW Input<br/>t = 1.5 ms"]
-    D -->|"Plugin Processing<br/>(Amp Sim)"| E["DAW Output<br/>t = 6.0 ms"]
-    E -->|"Buffer Delay"| F["Audio Interface DAC<br/>t = 7.5 ms"]
-    F -->|"Monitor Output"| G["Headphones/Speakers<br/>t = 8.0 ms"]
-    
-    style A fill:#e1f5ff
-    style D fill:#ffe1e1
-    style G fill:#f0ffe1
+    subgraph sub_preamp_chain ["Pre-Amp Signal Chain"]
+        A["Guitar\n(High-Z, 100–800mV)"] --> B["Tuner\nBuffered bypass\nimpedance first"]
+        B --> C["Wah / Filter\nFreq sweep best pre-dirt"]
+        C --> D["Compressor\nDynamics before distortion\n= sustained, even drive"]
+        D --> E["Overdrive / Distortion\nNonlinear waveshaping"]
+        E --> F["EQ (pre-amp)\nSculpt signal entering amp"]
+    end
+
+    subgraph sub_amp ["Amplifier Stage"]
+        G["Amp Preamp"] --> H["Amp Power Stage\n(Sat/Clean)"]
+    end
+
+    subgraph sub_postamp ["Post-Amp / FX Loop"]
+        I["Modulation\nChorus, Flanger, Phaser\npost-dirt = clear sweep"]
+        I --> J["Delay\nTime repeats of\nfull processed signal"]
+        J --> K["Reverb\nSpatial envelope last\nin chain always"]
+    end
+
+    F --> G
+    H --> I
+
+    style A fill:#d4e8ff
+    style E fill:#ffd4d4
+    style G fill:#fff4cc
+    style K fill:#d4ffd4
 ```
 
-## Practical Reference Guide: Signal Chain Specifications and Diagnostic Procedures
+**The three rules that explain the order:**
 
-### Pickup Specifications and Expected Output
+1. **Dynamics before distortion.** A compressor before an overdrive sustains your signal into the clipping zone, creating long, even saturation. After distortion, a compressor clamps the already-clipped signal, killing sustain and potentially causing pumping artifacts. Exception: some players deliberately use a compressor after dirt for a tighter, punchier feel — it's valid but changes the character significantly.
 
-| Parameter | Single-Coil | Humbucker | P-90 |
-|-----------|-------------|-----------|------|
-| DC Resistance | 5.5 - 8.0 kΩ | 7.0 - 18.0 kΩ | 7.0 - 9.0 kΩ |
-| Inductance | 2.0 - 3.5 H | 4.0 - 10.0 H | 4.0 - 5.0 H |
-| Resonant Frequency | 2.5 - 5.0 kHz | 1.5 - 3.0 kHz | 2.0 - 4.0 kHz |
-| Output Voltage (p-p) | 100 - 400 mV | 300 - 800 mV | 200 - 500 mV |
-| Magnet Type | AlNiCo 2/5, Ceramic | AlNiCo 2/5, Ceramic | AlNiCo 2/5 |
+2. **Pitch/frequency shifting before distortion.** Wah, octave pedals, and envelope filters work on the guitar's clean harmonic content. If you run them after distortion, the complex distorted harmonics confuse the tracking and smear the effect.
 
-### Passive Component Values
+3. **Time-based effects last (or in effects loop).** Delay and reverb should process the fully-formed, fully-distorted signal as a unit. Putting delay before distortion means each delay repeat gets distorted — this can create an intentionally washy, noisy texture, but it's not the standard. Reverb before dirt creates an indistinct, muddy wash.
 
-| Component | Typical Value | Function |
-|-----------|---------------|----------|
-| Volume Pot (single-coil) | 250 kΩ audio taper | Signal attenuation |
-| Volume Pot (humbucker) | 500 kΩ audio taper | Signal attenuation |
-| Tone Pot | 250 kΩ or 500 kΩ | Variable low-pass filter |
-| Tone Capacitor (bright) | 0.022 µF | High-frequency roll-off |
-| Tone Capacitor (warm) | 0.047 µF | High-frequency roll-off |
-| Treble Bleed Capacitor | 0.001 µF | Preserve highs at low volume |
+---
 
-### Cable and Connection Specifications
+### 4.4 DAW Recording Configuration
 
-| Parameter | Specification |
-|-----------|---------------|
-| Maximum cable length (passive) | <25 feet (7.6 m) |
-| Cable capacitance (low-quality) | 80-120 pF/ft |
-| Cable capacitance (high-quality) | 20-40 pF/ft |
-| Output jack contact resistance | <0.1 Ω |
-| Proper solder joint appearance | Shiny, smooth, concave fillet |
+**Interface settings for real-time guitar monitoring:**
 
-### Amplifier Input Specifications
+| Application | Sample Rate | Bit Depth | Buffer Size | Round-Trip Latency |
+|-------------|-------------|-----------|-------------|-------------------|
+| Live amp sim monitoring | 48 kHz | 24-bit | 64–128 samples | 3–6 ms (target) |
+| Tracking with plugins | 48 kHz | 24-bit | 128–256 samples | 6–12 ms |
+| Mixing/non-realtime | 48 kHz or 96 kHz | 24-bit | 512–1024 samples | Irrelevant |
 
-| Parameter | Typical Value |
-|-----------|---------------|
-| Input impedance | 470 kΩ - 1 MΩ |
-| Input capacitance | 10 - 50 pF |
-| Maximum input level (clean) | 1 - 2 V RMS |
-| Noise floor | -80 dB to -100 dB |
+**Latency > 12 ms feels wrong.** It disrupts the physical feedback loop between your pick attack and what you hear. If your interface can't get below 12 ms round-trip at your current buffer size, switch to hardware monitoring (listen to the direct signal from the interface's monitor mix, not the DAW output) while tracking.
 
-### Troubleshooting Decision Tree
+**Input level targets:**
 
-**Symptom: No signal output**
-1. Check cable continuity → Replace cable if open circuit
-2. Check output jack continuity → Resolder or replace if intermittent
-3. Check pickup resistance → Replace pickup if open or shorted
-4. Check volume pot wiring → Repair connections
+- Peak signal on hard strums: **–12 to –6 dBFS**
+- Average level during playing: **–18 to –12 dBFS**
+- Noise floor (strings damped, no playing): **below –60 dBFS**
 
-**Symptom: Excessive hum (60/50 Hz)**
-1. Touch strings → If hum reduces, ground path is functional
-2. Rotate guitar 90° → If hum changes, EMI coupling is present
-3. Shield control cavity with copper foil
-4. Verify bridge ground wire continuity
-5. Check for ground loops in multi-amp setups
+If you're hitting 0 dBFS or clipping the input stage, reduce the interface's input gain — not the guitar's volume knob (that changes your tone and pickup loading).
 
-**Symptom: Intermittent signal**
-1. Manipulate cable while playing → Replace cable if signal drops
-2. Manipulate output jack → Resolder or replace if signal drops
-3. Move selector switch → Clean or replace if signal drops
-4. Check for cold solder joints on all connections
+---
 
-**Symptom: Weak or thin tone**
-1. Measure pickup resistance → Replace if significantly below specification
-2. Check pickup height → Adjust to 2-3 mm from strings (bass side), 1.5-2.5 mm (treble side)
-3. Verify correct pot values (500 kΩ for humbuckers, 250 kΩ for single-coils)
-4. Test with shorter cable to rule out capacitive loading
+## Module 5: Systematic Troubleshooting — Faults, Diagnosis, and Repair
 
-### CAGED System Chord Reference
+### 5.1 Troubleshooting Philosophy
 
-**Major Chord Formulas (intervals from root):**
-- Root (1), Major Third (4 semitones), Perfect Fifth (7 semitones)
+Work systematically from source to destination. Every symptom has a small number of likely causes. Eliminate the simplest and most accessible first. Avoid replacing components blindly — measure first, replace only after confirming the measurement is out of spec.
 
-**E-Shape Barre (Root on 6th string):**
-```
-e |---|---|---|---|-R-|    Fret: X
-B |---|---|---|---|-5-|    Fret: X
-G |---|---|---|-3-|---|    Fret: X+1
-D |---|---|-R-|---|---|    Fret: X+2
-A |---|---|-5-|---|---|    Fret: X+2
-E |---|-R-|---|---|---|    Fret: X (barred)
+**The substitution rule:** When in doubt, substitute a known-good component (a different cable, a different guitar, a different amp) to isolate which part of the chain has the problem. This is faster than metering every joint before you know which sub-system is failing.
+
+---
+
+### 5.2 Diagnostic Decision Trees
+
+**Symptom: No signal at all**
+
+```mermaid
+graph TD
+    subgraph sub_nosig ["No Signal Diagnosis"]
+        A["No signal at amp/DAW"] --> B{"Cable works\non different guitar?"}
+        B -->|"No"| C["Replace cable\nCheck for broken tip\nor sleeve solder"]
+        B -->|"Yes"| D{"Output jack\ncontinuity OK?"}
+        D -->|"No"| E["Resolder output jack\nor replace jack"]
+        D -->|"Yes"| F{"Volume pot at max?\nWiring intact?"}
+        F -->|"No"| G["Check all three\npot lug connections\nResolder as needed"]
+        F -->|"Yes"| H{"Pickup resistance\nin spec? See table below"}
+        H -->|"Open circuit\n= infinite Ω"| I["Broken coil wire\nRepair or replace pickup"]
+        H -->|"In spec"| J["Check selector switch\nTest each position"]
+        J -->|"All positions dead"| K["Switch output lug\nnot connected to jack\nResolder"]
+    end
 ```
 
-**A-Shape Barre (Root on 5th string):**
-```
-e |---|---|---|---|-5-|    Fret: X
-B |---|---|---|-3-|---|    Fret: X+2
-G |---|---|-R-|---|---|    Fret: X+2
-D |---|---|-5-|---|---|    Fret: X+2
-A |---|-R-|---|---|---|    Fret: X (barred)
-E |-X-|---|---|---|---|    (muted)
-```
+**Symptom: Excessive 60/50 Hz hum**
 
-### Strumming Pattern Notation
-
-```
-Symbol Legend:
-↓ = Downstroke
-↑ = Upstroke
-× = Muted strum (palm mute or fret-hand muting)
-() = Ghost note (implied but not struck)
-
-Common Patterns:
-
-Folk/Country Pattern (4/4):
-1  &  2  &  3  &  4  &
-↓     ↓  ↑  ↑  ↓  ↑
-
-Rock Pattern (4/4):
-1  &  2  &  3  &  4  &
-↓     ↓  ↑     ↑  ↓  ↑
-
-Reggae Upstroke Pattern (4/4):
-1  &  2  &  3  &  4  &
-   ↑     ↑     ↑     ↑
+```mermaid
+graph TD
+    subgraph sub_hum ["Hum Diagnosis"]
+        A["60 or 50 Hz hum\npresent"] --> B{"Touch strings\nor bridge"}
+        B -->|"Hum disappears\nor reduces greatly"| C["Ground path works\nHum is EMI pickup\nin single-coil — normal"]
+        B -->|"No change"| D{"Bridge ground wire\ncontinuity?"}
+        D -->|"Open circuit"| E["Bridge ground wire\ndisconnected\nResolder to pot casing or\ncavity ground bus"]
+        D -->|"Continuity OK"| F{"Guitar near\nfluorescent lights\nor monitors?"}
+        F -->|"Yes"| G["Move away from\nEMI sources\nConsider shielding mod"]
+        C --> H{"Rotating guitar\n90 degrees changes\nhum level?"}
+        H -->|"Yes — hum is\ndirectional"| I["External EMI field\n60Hz transformer nearby\nUse humbuckers or\nadd copper foil shielding"]
+        H -->|"No change"| J["Likely ground loop\nCheck all equipment\nshares same outlet group"]
+    end
 ```
 
-### Audio Interface Configuration Recommendations
+**Symptom: Intermittent signal (cutting in and out)**
 
-| Application | Sample Rate | Bit Depth | Buffer Size | Expected Latency |
-|-------------|-------------|-----------|-------------|------------------|
-| Recording | 48 kHz or 96 kHz | 24-bit | 256-512 samples | 10-20 ms (acceptable) |
-| Live monitoring | 48 kHz | 24-bit | 64-128 samples | 2-6 ms (ideal) |
-| Mixing | 48 kHz | 24-bit | 1024-2048 samples | Latency irrelevant |
+1. Wiggle cable at guitar end while playing → dropout? Replace cable or resolder jack.
+2. Wiggle cable at amp end → dropout? Clean or replace amp input jack.
+3. Move pickup selector switch back and forth → dropout? Clean with contact cleaner (DeoxIT D5) or replace switch.
+4. Squeeze guitar body near control cavity → dropout? Cold solder joint inside; open cavity and inspect.
+5. Turn volume or tone pot → crackling? Dirty pot track; apply contact cleaner to pot shaft, rotate 20 times. Replace if crackling persists.
 
-### Signal Level Reference (dBFS in DAW)
+**Symptom: Weak/thin tone**
 
-| Level | Description | Recommended Usage |
-|-------|-------------|-------------------|
-| 0 dBFS | Digital maximum | Absolute peak, never exceed |
-| -6 dBFS | Hot signal | Maximum peak for recorded tracks |
-| -12 dBFS | Strong signal | Typical peak for lead guitar |
-| -18 dBFS | Moderate signal | Typical peak for rhythm guitar |
-| -40 dBFS | Weak signal | Below noise floor for most interfaces |
-| -60 dBFS | Noise floor | Target for silent passages |
+1. Measure pickup resistance (procedure below). Open circuit or significantly low resistance = coil fault.
+2. Check pickup height — below 4 mm on the bass side is likely too far for most single-coils.
+3. Verify correct pot values: 500 kΩ for humbuckers, 250 kΩ for single-coils. Cross-matched values alter tonal character.
+4. Test with 10 ft cable vs. 20 ft cable — if the shorter cable restores high end, your 20 ft cable's capacitance is loading the signal excessively.
 
-### Maintenance Schedule
+---
 
-**Weekly (for active players):**
-- Clean strings with microfiber cloth after each session
-- Check tuning stability
+### 5.3 Resistance Measurement Procedure
+
+1. Disconnect guitar from all cables.
+2. Set multimeter to resistance (Ω) mode — 20 kΩ range.
+3. Unsolder the pickup's hot wire from the volume pot's input lug (or use the selector switch to route only that pickup to the output).
+4. Touch probes to: pickup hot wire (+) and pickup ground (−).
+5. Compare to spec:
+
+| Pickup Type | Normal DC Resistance | Fault Indicators |
+|-------------|---------------------|-----------------|
+| Strat single-coil | 5.6 – 7.5 kΩ | >100 kΩ = open coil; <1 kΩ = short |
+| Tele bridge single-coil | 6.0 – 8.5 kΩ | Same thresholds |
+| P-90 | 7.5 – 9.5 kΩ | Same thresholds |
+| PAF-style humbucker | 7.0 – 9.0 kΩ | Same thresholds |
+| Hot-rod humbucker | 12.0 – 18.0 kΩ | >40 kΩ suspicious |
+
+Note: DC resistance doesn't tell you *everything* about a pickup's health. A coil can test within normal resistance range but have a partial short across some windings (turns-short). Turns-shorts show up as reduced output with normal resistance. Confirm with output level comparison to a known-good reference pickup if resistance is in spec but output seems weak.
+
+---
+
+### 5.4 Solder Joint Quality — What Good vs. Bad Looks Like
+
+A good solder joint:
+- **Appearance:** Shiny, smooth, volcano-cone or concave fillet shape
+- **Probe test:** Firm, doesn't flex or crack when poked with a toothpick
+- **Resistance:** <0.1 Ω continuity
+
+A cold (bad) solder joint:
+- **Appearance:** Dull, grainy, gray surface texture, often balled up or convex
+- **Symptom:** Intermittent signal, crackling when guitar is handled
+- **Cause:** Moving the joint before solder solidified, insufficient heat, or oxidized surfaces
+
+**Rework procedure:**
+
+1. Clean the iron tip with brass wool (not wet sponge — thermal shock reduces tip life).
+2. Set temperature: 300–340°C for lead-free solder (Sn96.5/Ag3/Cu0.5); 310–325°C for 60/40 tin-lead.
+3. Heat the joint pad *and* the wire simultaneously — the solder flows to the heat, not the iron.
+4. Apply rosin-core solder (63/37 or 60/40 for easiest flow) — avoid acid-core (plumbing) solder.
+5. Remove iron, hold joint completely still for 3–5 seconds while solder solidifies.
+6. Inspect: shiny, smooth, no gaps, wire not moving relative to pad.
+
+---
+
+### 5.5 Cavity Shielding — Hum Reduction Mod
+
+If your single-coil guitar has persistent hum even with strings grounded, adding copper foil shielding to the control cavity reduces EMI pickup dramatically.
+
+**Materials:** Copper foil tape with conductive adhesive (not plain aluminum HVAC tape — it doesn't conduct through the adhesive). Available at most guitar parts suppliers or hardware stores.
+
+**Procedure:**
+
+1. Remove all controls and pickguard/cavity cover.
+2. Cut foil pieces to fit the cavity walls and floor. Overlap pieces by 5 mm minimum to ensure electrical continuity.
+3. Press foil firmly to all surfaces including the pickup cavities if accessible.
+4. Test conductivity: touch multimeter probes to two foil sections — should read <1 Ω.
+5. Connect the foil ground to the existing ground bus (pot casing, common ground wire) with a short wire soldered to the foil.
+6. Reinstall controls. The foil cage creates a Faraday shielding effect around the internal wiring, dramatically reducing hum coupling from external EMI fields.
+
+---
+
+## Module 6: Essential Scales, Riffs, and Practice Structures
+
+### 6.1 The Pentatonic Box — Your First Lead Framework
+
+The minor pentatonic scale is the foundation of blues, rock, and lead guitar. Five notes per octave, arranged in five box positions that map directly onto the CAGED system positions.
+
+**Position 1 (the "home box") — A minor pentatonic at fret 5:**
+
+```
+e |---5---8---|
+B |---5---8---|
+G |---5---7---|
+D |---5---7---|
+A |---5---7---|
+E |---5---8---|
+```
+
+Fingering: Index on fret 5, Pinky on fret 8 (or Ring on fret 7 for the middle notes).
+
+Scale degrees: Root – Minor 3rd – 4th – 5th – Minor 7th (then repeat up the octave).
+
+**Three essential patterns to drill from Position 1:**
+
+*Pattern A — Ascending/Descending (technique builder):*
+```
+E string:  5 – 8
+A string:  5 – 7
+D string:  5 – 7
+G string:  5 – 7
+B string:  5 – 8
+e string:  5 – 8 (then descend back down)
+```
+Metronome: 60 BPM with strict alternate picking → 80 → 100 → 120 BPM.
+
+*Pattern B — Cross-String Lick (phrasing builder):*
+```
+e string:  8 – 5 (pull-off)
+B string:  8 – 5 (pull-off)
+G string:  7 – 5 (pull-off)
+Repeat from top
+```
+Add a final bend: fret 7 on the G string, bend up one whole step (to the equivalent of fret 9 pitch), hold two beats, release.
+
+*Pattern C — Classic Blues Ending Lick:*
+```
+Fret:   5    8    5    7    5    7    5
+String: B    B    B    G    G    A    A
+Pick:   ↓    ↑    ↓    ↑    ↓    ↑    ↓
+```
+Metronome: 70 BPM clean, with slight swing feel → 90 BPM.
+
+---
+
+### 6.2 String Bending Mechanics and Intonation
+
+Bending is a core expressive technique — it's the guitar's equivalent of vocal vibrato and portamento.
+
+**Proper bend mechanics:**
+- Use the ring finger to execute most bends (strongest leverage).
+- Support the ring finger with the middle and index fingers behind it on the same string — all three fingers push together. Using only the ring finger alone is a common beginner error that leads to weak bends and finger fatigue.
+- The motion comes from rotating the wrist toward the headstock (for upward bends on the lower three strings), not just pushing the finger sideways.
+- Anchor the thumb over the top of the neck (or hook it around the low E side) for leverage.
+
+**Whole step (two-fret) bend on G string, 7th fret (Am pentatonic Position 1):**
+
+This takes the G (note at fret 7) up to A (the equivalent of fret 9). How you know it's in tune: fret the same string at the 9th fret without bending — that's your pitch target. Bend up to match it by ear before playing the lick.
+
+**Half-step bend:** One fret up. Used for the blues note (b5) color and for subtle country expression.
+
+**Pre-bend:** Bend the note before plucking, then release. The audience hears the note come down instead of going up — mysterious, vocal quality.
+
+**Vibrato after bend:** After reaching the top of a bend, add vibrato by repeatedly slightly releasing and re-bending within a narrow range (about 1/4 to 1/3 of the full bend). The rhythm of the vibrato should match the tempo of the music.
+
+---
+
+### 6.3 Power Chord Riff Vocabulary
+
+Power chords (5th interval — Root + 5th, optionally doubled root) are the vocabulary of rock. They're not "simplified" chords — they're harmonically ambiguous (neither major nor minor) and cut through distortion without muddiness.
+
+**Two-string power chord:**
+```
+E5 at open position:
+E |---0---|
+A |---2---|  ← Middle finger
+D |---2---|  ← Ring finger (optional — adds low octave doubling)
+```
+
+**Movable power chord shape (root on E string):**
+```
+        E  A  D
+Fret X: R  .  .
+X+2:    .  5  R    ← Middle (A) and Ring (D) fingers
+                      OR Ring (A) and Pinky (D) for more independence
+```
+
+**Classic rock riff framework — E blues progression:**
+
+```
+Tempo: 120 BPM, straight eighth feel
+
+Bar 1–2:  E5  (E string open or fret 0+2)
+Bar 3–4:  A5  (fret 5 on E string shape, OR: open A with power shape)
+Bar 5:    B5  (fret 7 on E string shape)
+Bar 6:    A5
+Bar 7–8:  E5
+
+Strum pattern: ↓ ↓ × ↓ × ↓ × ↓   (eighth note grid, × = palm mute)
+```
+
+Metronome progression: Start at 80 BPM for clean execution → 100 BPM → 120 BPM performance tempo.
+
+---
+
+### 6.4 Structured Practice Session Design
+
+A 30-minute daily practice session, organized for maximum retention:
+
+```
+0:00–5:00    Warm-up
+             Chromatic exercise: 1-2-3-4 on each string, all positions
+             Slow tempo (60 BPM), no musical content — purely mechanical
+             Focus: hand position, relaxed grip
+
+5:00–10:00   Technique drill (rotating focus)
+             Week 1: CAGED chord transitions (Module 1 drills)
+             Week 2: Picking mechanics and scale runs (Module 6.1)
+             Week 3: Bending and vibrato (Module 6.2)
+             Week 4: Strumming patterns (Module 2)
+
+10:00–20:00  Applied playing
+             Work on a specific song, riff, or chord progression
+             Use a metronome; start 20 BPM below comfortable tempo
+             Record yourself — even just on phone — and listen back
+
+20:00–28:00  Sight-reading or ear training
+             Pick up a chord chart or lead sheet you haven't played before
+             Or: listen to a chord progression and try to identify the shapes by ear
+
+28:00–30:00  Free play / enjoyment
+             No metronome, no targets — just play for fun
+             This consolidates the session's work and maintains motivation
+```
+
+**The 80% rule for tempo:** When you can play something cleanly 8 out of 10 times at a given tempo, increase by 5 BPM. Chasing 100% perfection at a low tempo before advancing is slower than incremental progressive overload.
+
+---
+
+## Module 7: Reference Tables and Quick Guides
+
+### 7.1 Pickup Specifications
+
+| Parameter | Single-Coil | P-90 | Humbucker | High-Output HB |
+|-----------|-------------|------|-----------|----------------|
+| DC Resistance | 5.5–7.5 kΩ | 7.5–9.5 kΩ | 7–9 kΩ | 12–18 kΩ |
+| Inductance | 2–3.5 H | 4–5 H | 4–10 H | 8–12 H |
+| Resonant Peak | 3–5 kHz | 2–4 kHz | 1.5–3 kHz | 1–2 kHz |
+| Output (p-p) | 100–400 mV | 200–500 mV | 300–600 mV | 500–900 mV |
+| Vol Pot (ideal) | 250 kΩ | 250–500 kΩ | 500 kΩ | 500 kΩ |
+
+### 7.2 Passive Component Reference
+
+| Component | Value | Purpose |
+|-----------|-------|---------|
+| Vol pot, single-coil | 250 kΩ audio taper | Signal attenuation |
+| Vol pot, humbucker | 500 kΩ audio taper | Signal attenuation |
+| Tone pot | 250–500 kΩ | LPF frequency range |
+| Tone cap (bright) | 0.022 µF | High-cut filter |
+| Tone cap (warm) | 0.047 µF | Wider treble roll-off |
+| Treble bleed cap | 0.001 µF | Preserve highs at low vol |
+| Treble bleed resistor | 100–150 kΩ | Pairs with treble bleed cap |
+
+### 7.3 Signal Levels in DAW
+
+| Level | Meaning | Action |
+|-------|---------|--------|
+| 0 dBFS | Digital ceiling | Never let signal reach this |
+| –6 dBFS | Hot peak | Maximum acceptable transient |
+| –12 dBFS | Healthy peak | Good lead guitar recording level |
+| –18 dBFS | Moderate | Rhythm guitar, leaves headroom |
+| –40 dBFS | Quiet | Should hear clearly above noise |
+| –60 dBFS | Near noise floor | Acceptable silent passage floor |
+
+### 7.4 Audio Interface Settings
+
+| Use Case | Sample Rate | Buffer | Expected Latency |
+|----------|-------------|--------|-----------------|
+| Amp sim monitoring | 48 kHz | 64–128 samples | 3–6 ms |
+| Tracking with FX | 48 kHz | 128–256 samples | 6–12 ms |
+| Overdubbing | 48 kHz | 256 samples | ~10 ms |
+| Mixing | 48 kHz | 512–1024 samples | Irrelevant |
+
+### 7.5 Guitar Maintenance Schedule
+
+**After every session:**
+- Wipe down strings with microfiber cloth (extends string life 2–3×)
+- Wipe down neck and body
+- Check tuning before putting away
 
 **Monthly:**
-- Clean fretboard with appropriate cleaner (lemon oil for rosewood/ebony, dry cloth for maple)
-- Check bridge, nut, and tuner tightness
-- Inspect cable for damage
-- Clean output jack with contact cleaner
+- Clean fretboard: rosewood/ebony — few drops of lemon oil, buff dry; maple — dry cloth only
+- Check bridge saddle intonation (compare fretted 12th fret to 12th fret harmonic — should match within ±1 cent)
+- Clean output jack with contact cleaner spray into the jack while cycling a plug in and out
+
+**Every 3–6 months:**
+- Replace strings (or when they lose brightness, feel rough, or won't intonate)
+- Truss rod check: sight down the neck from headstock looking for excessive forward bow (relief) or back-bow. For electric: 0.2–0.4 mm of relief at the 7th fret (capo at 1st, fret at last fret, measure gap at 7th) is normal.
+- Pickup height verification (see Module 3.5)
 
 **Annually:**
-- Replace strings
-- Deep clean all hardware
-- Check and adjust pickup height
-- Verify all solder joints and internal wiring integrity
-- Shield control cavity if not already done
+- Full inspect all solder joints inside cavity — look for cold joints, loose wires
+- Check all nut slots (strings should not bind when tuning — if they ping and jump in pitch, the nut slot needs lubrication: graphite from a pencil, or Teflon-based nut sauce)
+- Check tuning machine screw tightness
 
-This laboratory guide provides systematic procedures for understanding, measuring, and optimizing electric guitar signal generation, transmission, and processing. Mastery of these principles enables informed artistic decisions, efficient troubleshooting, and optimal signal chain configuration for any musical context.
+### 7.6 CAGED Chord Quick Reference
+
+**Key of A major — all five shapes across the neck:**
+
+```
+Shape      Root Fret   Notes
+---------  ----------  ----------------
+A-shape    Open (0)    Open A chord
+C-shape    Fret 2      Stretch position
+E-shape    Fret 5      Root: E string fret 5
+G-shape    Fret 7      Root: E string fret 7
+D-shape    Fret 9      Root: D string fret 9
+A-shape    Fret 12     Octave repeat
+```
+
+**Minor chord modifications from major shapes:**
+
+| Shape | Major → Minor Change |
+|-------|---------------------|
+| E-shape | Drop G string note 1 fret (Pinky → Ring) |
+| A-shape | Remove B string note (or drop 1 fret) |
+| D-shape | Drop B string note 1 fret |
+| C-shape | Drop G string note 1 fret |
+| G-shape | Drop B string note 1 fret |
+
+### 7.7 Common Strumming Patterns Reference
+
+```
+Legend: ↓=down  ↑=up  ×=muted  ( )=ghost strum
+
+Quarter-note (beginner):
+1    2    3    4
+↓    ↓    ↓    ↓
+
+Basic eighth-note (rock):
+1    &    2    &    3    &    4    &
+↓    ↑    ↓    ↑    ↓    ↑    ↓    ↑
+
+Syncopated pop:
+1    &    2    &    3    &    4    &
+↓   (↑)   ↓    ↑   (↓)   ↑    ↓    ↑
+
+Reggae chop:
+1    &    2    &    3    &    4    &
+(↓)  ↑   (↓)   ↑   (↓)   ↑   (↓)   ↑
+
+Funk sixteenth:
+1  e  &  a   2  e  &  a   3  e  &  a   4  e  &  a
+↓  ×  ↑  ↓   ×  ↑  ×  ↓   ↑  ×  ↓  ×   ↑  ↓  ×  ↑
+```
+
+---
+
+## Appendix: Troubleshooting at a Glance
+
+| Symptom | Most Likely Cause | First Test |
+|---------|------------------|-----------|
+| No signal | Cable or jack | Substitute known-good cable |
+| Hum disappears when touching strings | Normal grounded single-coil behavior | No action needed |
+| Hum doesn't change when touching strings | Missing bridge ground | Check bridge ground wire continuity |
+| Crackling when moving cable | Broken cable | Wiggle cable while monitoring — confirm dropout |
+| Crackling from turning pots | Dirty pot tracks | DeoxIT D5 on pot shaft, rotate 20 times |
+| Weak, thin output | Pickup too far from strings or wrong pot values | Measure pickup height; check pot values with meter |
+| Dead on one selector position | Switch contact or disconnected pickup | Test each selector position; check pickup wiring |
+| Delay between playing and hearing sound | Buffer too large | Reduce buffer size in audio interface settings |
+| Notes won't intonate above 12th fret | Nut slot too shallow or saddle position wrong | Check 12th fret harmonic vs. fretted — adjust saddle |
+| Fret buzz on specific notes | Low fret or neck relief too flat | Check neck relief; check for worn fret under affected note |

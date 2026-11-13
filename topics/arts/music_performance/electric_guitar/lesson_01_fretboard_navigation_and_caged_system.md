@@ -1,430 +1,368 @@
-# Lesson 1: Fretboard Navigation Basics — A First-Principles Technical Reference
+# Electric Guitar Masterclass: Fretboard Navigation, Technique & Musicianship
 
-## 1. First-Principles Intuition & Invariants
+## Module 1: Hands-On Fretboard Orientation
 
-### The Physics of Equal Temperament
+### Your First Day on the Neck — What to Actually Practice
 
-The electric guitar's fretboard is a physical instantiation of the equal-tempered chromatic scale. Every fret placement is computed from one invariant: adjacent semitones maintain a frequency ratio of $2^{1/12} \approx 1.05946$. The absolute frequency of any fretted note is therefore:
+Before theory, here is the physical reality: you have six strings, 22–24 frets, and two hands that need to work independently. The left hand frets; the right hand picks or strums. Neither hand knows what the other is doing until you train them together.
 
-$$f_n = f_0 \cdot 2^{n/12}$$
+**Day-one physical checklist:**
 
-where $f_0$ is the open-string frequency and $n$ is the fret number. This exponential relationship has a direct geometric consequence: fret spacing decreases logarithmically along the neck. The distance from the nut to fret $n$ on a scale-length $L$ instrument is:
+- Thumb sits behind the neck, roughly opposite your middle finger — not hooked over the top.
+- Wrist floats slightly away from the neck. If your palm is touching the neck body, your wrist has collapsed.
+- Fret with the fingertip, not the pad. Your finger should arch enough that the nail faces the ceiling.
+- Press down just behind the fret wire (between frets), not on top of it and not halfway between two frets.
+- Use only the pressure needed to get a clean note — which is far less than you think. Electric guitar action is typically 1.5–2.5 mm at the 12th fret. You are pressing a string down a couple of millimeters, not crushing a walnut.
 
-$$d_n = L \cdot \left(1 - 2^{-n/12}\right)$$
-
-For a Fender Stratocaster with $L = 648$ mm (25.5 inches), the nut-to-fret-1 distance is approximately 36.4 mm, while the nut-to-fret-12 distance is exactly $L/2 = 324$ mm — the octave invariant. This is why the 12th fret always falls at the geometric midpoint of the vibrating string, regardless of instrument or tuning.
-
-The practical implication: intonation errors accumulate multiplicatively. A saddle position error of 1 mm on a 648 mm scale introduces roughly $\pm 2.7$ cents of pitch error per octave traversed. This is the first-principles reason why saddle intonation adjustment is not optional on a well-set-up instrument.
-
-### Standard Tuning: Why These Intervals?
-
-Standard tuning — E2 (82.41 Hz), A2 (110.00 Hz), D3 (146.83 Hz), G3 (196.00 Hz), B3 (246.94 Hz), E4 (329.63 Hz) — is not arbitrary. The interval structure is predominantly perfect fourths (5 semitones) with a single major third (4 semitones) between G3 and B3. This asymmetry is a deliberate compromise between two competing constraints:
-
-1. **Chord voicing ergonomics.** A pure all-fourths tuning (E–A–D–G–C–F) produces symmetric interval patterns across all strings but makes open major chords mechanically awkward — the open E major chord would require a four-fret stretch on the first three strings.
-2. **Range and register balance.** The maj3 between G and B keeps the first and second strings close enough in pitch that melody playing in the high register remains idiomatic.
-
-The all-fourths exception means that any chord or scale shape learned on strings 6–5–4 or 4–3 must be mentally adjusted by one fret when crossing the G–B boundary — a persistent source of confusion for learners and a source of elegantly asymmetric fingerings for advanced players.
-
-### The Harmonic Series and Open String Resonance
-
-A plucked string does not produce a single frequency. It vibrates simultaneously at all integer multiples of the fundamental:
-
-$$f_m = m \cdot f_0, \quad m = 1, 2, 3, \ldots$$
-
-The relative amplitude of each partial is determined by the plucking position and string stiffness. Plucking near the bridge emphasizes high-order partials (bright tone); plucking near the 12th fret cancels even-order partials (hollow, woody tone). The 12th-fret natural harmonic — produced by lightly touching the string at its midpoint — isolates the second partial at $2f_0$, one octave above the open string. The 7th-fret harmonic isolates the third partial at $3f_0$, a perfect fifth plus one octave above the fundamental.
-
-This matters for fretboard navigation because sympathetic resonance between open strings and fretted notes produces the characteristic "openness" of certain chord voicings. An E major chord in open position resonates sympathetically across all six strings; the same chord barred at the 7th fret does not, because the open strings are no longer harmonically related to the fretted pitches. Understanding this explains why open-position chords and their barre equivalents have distinct timbral characters beyond mere register differences.
+**Right hand anchor:** Rest the heel of your right hand lightly on the bridge saddles. This gives you palm muting control and a stable reference point. Your pick angle should be roughly 30–45° relative to the string — not perfectly parallel, not perpendicular.
 
 ---
 
-## 2. Core Architecture & Mechanics
+### The Six Strings — Names, Notes, and Memory Hooks
 
-### The Fretboard as a Pitch Matrix
+```
+String 6 (thickest, lowest) ── E2  ── "Eddie"
+String 5                     ── A2  ── "Ate"
+String 4                     ── D3  ── "Dynamite"
+String 3                     ── G3  ── "Good"
+String 2                     ── B3  ── "Bye"
+String 1 (thinnest, highest) ── E4  ── "Eddie" (octave)
+```
 
-The fretboard is a two-dimensional discrete pitch space. Assign string index $s \in \{1, \ldots, 6\}$ (high E to low E) and fret index $f \in \{0, \ldots, 24\}$. The MIDI note number at any position is:
+Memory sentence: **E**ddie **A**te **D**ynamite, **G**ood **B**ye **E**ddie.
 
-$$\text{MIDI}(s, f) = \text{MIDI}_{\text{open}}(s) + f$$
+The two E strings are the same pitch class, two octaves apart. Everything you learn on the low E string repeats on the high E string — same fret numbers, same note names, octave higher.
 
-The open-string MIDI values in standard tuning are: E4=64, B3=59, G3=55, D3=50, A2=45, E2=40. The full pitch matrix for the first 12 frets is:
+**Open string drill — Day 1:**
+Say the string name and note name out loud as you pluck each string, one per click at 60 BPM. Then reverse direction. Then skip strings (6→4→2→1→3→5). Do this until "low E, A, D, G, B, high E" is as automatic as your own name.
+
+---
+
+### The Chromatic Map — Every Note Across the Neck
+
+The neck is a grid. Moving one fret up raises pitch by one semitone (a half step). Moving across to the adjacent thicker string at the same fret raises pitch by a perfect fourth (5 semitones) — except crossing from string 3 (G) to string 2 (B), which raises pitch by only a major third (4 semitones). That G→B exception is the single most important asymmetry on the instrument. It affects every scale shape, every chord voicing, and every interval you transfer across strings.
+
+**Full note map — frets 0 through 12:**
 
 ```
 String │  0    1    2    3    4    5    6    7    8    9   10   11   12
 ───────┼────────────────────────────────────────────────────────────────
-  e(1) │  E4   F4  F#4  G4  G#4  A4  A#4  B4   C5  C#5  D5  D#5  E5
-  B(2) │  B3   C4  C#4  D4  D#4  E4   F4  F#4  G4  G#4  A4  A#4  B4
-  G(3) │  G3  G#3  A3  A#3  B3   C4  C#4  D4  D#4  E4   F4  F#4  G4
-  D(4) │  D3  D#3  E3   F3  F#3  G3  G#3  A3  A#3  B3   C4  C#4  D4
-  A(5) │  A2  A#2  B2   C3  C#3  D3  D#3  E3   F3  F#3  G3  G#3  A3
-  E(6) │  E2   F2  F#2  G2  G#2  A2  A#2  B2   C3  C#3  D3  D#3  E2
+  e(1) │  E4   F    F#   G    G#   A    A#   B    C    C#   D    D#   E5
+  B(2) │  B3   C    C#   D    D#   E    F    F#   G    G#   A    A#   B4
+  G(3) │  G3   G#   A    A#   B    C    C#   D    D#   E    F    F#   G4
+  D(4) │  D3   D#   E    F    F#   G    G#   A    A#   B    C    C#   D4
+  A(5) │  A2   A#   B    C    C#   D    D#   E    F    F#   G    G#   A3
+  E(6) │  E2   F    F#   G    G#   A    A#   B    C    C#   D    D#   E3
 ```
 
-The octave equivalence invariant is immediately visible: fret 12 on any string produces the same pitch class as fret 0, one octave higher. This means every pattern, shape, or fingering repeats identically 12 frets up the neck.
+The fret-12 column is identical to fret-0 — just one octave higher. This is the octave invariant: every shape, pattern, and fingering repeats exactly 12 frets up the neck.
 
-### Interval Topology Across the Neck
-
-The fretboard has four canonical interval movements, each with a precise fret-offset interpretation:
-
-| Movement | Interval | Semitones | Fret offset | String delta |
-|---|---|---|---|---|
-| Adjacent fret, same string | Minor 2nd (semitone) | 1 | +1 | 0 |
-| Two frets, same string | Major 2nd (tone) | 2 | +2 | 0 |
-| Same fret, adjacent string (not G→B) | Perfect 4th | 5 | 0 | +1 |
-| Same fret, G→B string crossing | Major 3rd | 4 | 0 | +1 |
-| To same pitch class, next string down (not G→B) | Unison | 0 | +5 | +1 |
-| To same pitch class, next string down (G→B) | Unison | 0 | +4 | +1 |
-
-The unison offsets (+5 or +4 frets) are the operational definition of standard tuning. They are the most important navigation primitives on the instrument.
-
-```mermaid
-graph LR
-    A["E2\n(6th string, fret 0)"] -->|"+5 frets → unison on 5th string"| B["A2\n(5th string, fret 0)"]
-    B -->|"+5 frets → unison on 4th string"| C["D3\n(4th string, fret 0)"]
-    C -->|"+5 frets → unison on 3rd string"| D["G3\n(3rd string, fret 0)"]
-    D -->|"+4 frets → unison on 2nd string\n(G→B exception)"| E["B3\n(2nd string, fret 0)"]
-    E -->|"+5 frets → unison on 1st string"| F["E4\n(1st string, fret 0)"]
-```
-
-This graph is not merely descriptive — it is the derivation of every cross-string interval. Any melodic interval can be expressed as a combination of these primitives.
-
-### The CAGED System: Structural Analysis
-
-The CAGED system is a consequence of the fretboard's interval topology, not a pedagogical convention imposed upon it. Five open-position major chord voicings tile the fretboard without gaps when each shape's root is connected to the next shape's root via the cross-string unison offsets derived above.
-
-Each CAGED shape contains the same three pitch classes (root, major third, perfect fifth) but distributes them across strings differently. The critical architectural insight is that **the shapes interlock**: the highest-pitched notes of one shape overlap with the lowest-pitched notes of the next shape at the same fret range.
-
-```mermaid
-graph TD
-    C_shape["C Shape\nRoot: 5th string"] --> A_shape["A Shape\nRoot: 5th string, +2 frets"]
-    A_shape --> G_shape["G Shape\nRoot: 6th string, +3 frets"]
-    G_shape --> E_shape["E Shape\nRoot: 6th string, +2 frets"]
-    E_shape --> D_shape["D Shape\nRoot: 4th string, +2 frets"]
-    D_shape -->|"Repeats one octave higher"| C_shape2["C Shape (octave)\nRoot: 5th string, +12 frets"]
-```
-
-The fret distances between consecutive root positions are not uniform because the root migrates between strings, encountering the G→B asymmetry at different points in the cycle. This is why the G and E shapes are "wider" — they span more frets — than the C, A, and D shapes.
-
-### Signal Chain Architecture
-
-Fretboard navigation does not exist in isolation; the acoustic event produced by fretting a note is transformed by a chain of electromechanical and electronic stages before it becomes sound. Understanding this chain matters because it determines which physical techniques produce which audible results.
-
-```mermaid
-flowchart LR
-    subgraph Mechanical
-        A["String Vibration\n(fundamental + partials)"]
-        B["Nut / Saddle\nTransmission"]
-        A --> B
-    end
-
-    subgraph Electromagnetic
-        C["Pickup Coil\n(magnetic flux → EMF)"]
-        D["Volume / Tone Pot\n(RC low-pass filter)"]
-        C --> D
-    end
-
-    subgraph Amplification
-        E["Guitar Amplifier\n(preamp → power amp)"]
-        F["Speaker Cabinet\n(mechanical resonance)"]
-        E --> F
-    end
-
-    subgraph Output
-        G["Acoustic Radiation\n(air pressure waves)"]
-        F --> G
-    end
-
-    B --> C
-```
-
-A single-coil pickup (Stratocaster) samples string velocity at a fixed point. The output voltage is proportional to the rate of change of magnetic flux: $V = -N \frac{d\Phi}{dt}$. This means the pickup does not capture a "snapshot" of the waveform — it captures its derivative. High-frequency partials, which change rapidly, are therefore emphasized relative to fundamentals. A humbucker, with its two opposing coils wired in series, cancels external electromagnetic interference (hum) while summing string-vibration signal, producing higher output and a warmer frequency response due to increased inductance.
-
-The tone control is a first-order RC low-pass filter: a capacitor (typically 0.047 µF on a Stratocaster, 0.022 µF on a Les Paul) in series with a potentiometer to ground. The cutoff frequency is:
-
-$$f_c = \frac{1}{2\pi RC}$$
-
-Turning down the tone knob increases $R$, lowering $f_c$ and rolling off high-frequency partials. This is why the same fretted note sounds dramatically different at different tone settings — the timbre, not the pitch, changes.
+**Note geography drill — Week 1–2:**
+Pick one note (start with the note A). Find every A on every string from frets 0–12. Use the table above, then close the book and find them from memory. Target: locate any note on any single string within 2 seconds. Work through all 12 pitch classes over two weeks.
 
 ---
 
-## 3. Computational Fretboard Modeling
+## Module 2: Left-Hand Technique — Ergonomics and Mechanics
 
-The fretboard's mathematical structure makes it tractable to model programmatically. The following Python implementation computes pitch matrices, identifies enharmonic equivalents, finds all positions for a given note, and generates scale/chord position sets.
+### Fretting Hand Posture in Detail
 
-```python
-"""
-fretboard.py — A first-principles fretboard position calculator.
+The fretting hand has four fingers numbered 1 (index) through 4 (pinky). Thumb is not numbered — it is the anchor, not a fretting finger (except for specific thumb-over techniques used in blues and rock).
 
-Models the fretboard as a pitch matrix and provides efficient lookup,
-interval computation, and scale/chord position generation.
-"""
+**Correct arch:**
+Each finger should curve so that the tip makes contact with the string, not the pad. This prevents accidentally muting adjacent strings. Visualize holding a small ball in your palm — that natural curve is the right starting shape.
 
-from __future__ import annotations
-from dataclasses import dataclass
-from typing import Iterator
+**Thumb placement rule:**
+For frets 1–5 (wider spacing), keep the thumb behind the middle finger (finger 2). For frets 7–12 (narrower spacing), the thumb can drift slightly toward the index finger. Never let the thumb creep over the top of the neck when playing single notes — that collapses the wrist and kills your reach.
 
-# ── Constants ────────────────────────────────────────────────────────────────
+**One finger per fret (OFPF) — when to use it:**
+On most electric guitars, OFPF is comfortable from around fret 5 upward, where fret spacing tightens. In the first position (frets 1–4 on a standard 25.5" scale), stretching all four fingers across four frets is demanding for beginners. Build up to it gradually.
 
-# MIDI note numbers for open strings: index 0 = high E (string 1)
-STANDARD_TUNING_MIDI: tuple[int, ...] = (64, 59, 55, 50, 45, 40)
+### Four-Finger Independence Exercises
 
-# Chromatic note names, enharmonic-aware
-NOTE_NAMES: tuple[str, ...] = (
-    "C", "C#/Db", "D", "D#/Eb", "E", "F",
-    "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
-)
+The ring finger (3) and pinky (4) share a tendon branch from the extensor digitorum communis. This coupling is why the "pinky independent of ring finger" movement is the hardest on the instrument. These exercises address it directly.
 
-# Interval structures: semitone offsets from root
-SCALE_INTERVALS: dict[str, tuple[int, ...]] = {
-    "major":           (0, 2, 4, 5, 7, 9, 11),
-    "natural_minor":   (0, 2, 3, 5, 7, 8, 10),
-    "harmonic_minor":  (0, 2, 3, 5, 7, 8, 11),
-    "pentatonic_major":(0, 2, 4, 7, 9),
-    "pentatonic_minor":(0, 3, 5, 7, 10),
-    "blues":           (0, 3, 5, 6, 7, 10),
-    "dorian":          (0, 2, 3, 5, 7, 9, 10),
-    "mixolydian":      (0, 2, 4, 5, 7, 9, 10),
-}
+**Exercise 1 — Spider Crawl (60 BPM → 100 BPM):**
 
-CHORD_INTERVALS: dict[str, tuple[int, ...]] = {
-    "major":    (0, 4, 7),
-    "minor":    (0, 3, 7),
-    "dom7":     (0, 4, 7, 10),
-    "maj7":     (0, 4, 7, 11),
-    "min7":     (0, 3, 7, 10),
-    "dim7":     (0, 3, 6, 9),
-    "aug":      (0, 4, 8),
-    "sus2":     (0, 2, 7),
-    "sus4":     (0, 5, 7),
-}
+Play this pattern on every string pair, then advance up and down the neck. Keep fingers 1–4 assigned strictly to frets 5–6–7–8.
 
-
-# ── Core Data Model ───────────────────────────────────────────────────────────
-
-@dataclass(frozen=True)
-class FretPosition:
-    """A unique location on the fretboard."""
-    string: int   # 1-indexed, 1 = high E, 6 = low E
-    fret: int     # 0 = open string
-
-    @property
-    def midi(self) -> int:
-        return STANDARD_TUNING_MIDI[self.string - 1] + self.fret
-
-    @property
-    def pitch_class(self) -> int:
-        return self.midi % 12
-
-    @property
-    def note_name(self) -> str:
-        return NOTE_NAMES[self.pitch_class]
-
-    @property
-    def octave(self) -> int:
-        return (self.midi // 12) - 1
-
-    def __str__(self) -> str:
-        string_names = ["e", "B", "G", "D", "A", "E"]
-        return f"{string_names[self.string - 1]}:{self.fret}({self.note_name}{self.octave})"
-
-
-class Fretboard:
-    """
-    A complete model of the guitar fretboard under a given tuning.
-
-    Provides O(1) note lookup and efficient position search via
-    precomputed pitch-class index.
-    """
-
-    def __init__(
-        self,
-        tuning: tuple[int, ...] = STANDARD_TUNING_MIDI,
-        num_frets: int = 24,
-    ) -> None:
-        self.tuning = tuning
-        self.num_strings = len(tuning)
-        self.num_frets = num_frets
-
-        # Precompute: pitch_class → list of FretPosition
-        self._index: dict[int, list[FretPosition]] = {pc: [] for pc in range(12)}
-        for s in range(1, self.num_strings + 1):
-            for f in range(self.num_frets + 1):
-                pos = FretPosition(string=s, fret=f)
-                self._index[pos.pitch_class].append(pos)
-
-    def all_positions_for_note(self, pitch_class: int) -> list[FretPosition]:
-        """Return every fretboard position that produces the given pitch class (0=C … 11=B)."""
-        return self._index[pitch_class % 12]
-
-    def positions_in_range(
-        self,
-        pitch_class: int,
-        fret_min: int = 0,
-        fret_max: int | None = None,
-    ) -> list[FretPosition]:
-        """Filter positions by fret range — useful for positional playing."""
-        if fret_max is None:
-            fret_max = self.num_frets
-        return [
-            p for p in self.all_positions_for_note(pitch_class)
-            if fret_min <= p.fret <= fret_max
-        ]
-
-    def scale_positions(
-        self,
-        root_pc: int,
-        scale: str,
-        fret_min: int = 0,
-        fret_max: int = 24,
-    ) -> dict[int, list[FretPosition]]:
-        """
-        Return all fretboard positions for each degree of the given scale.
-
-        Returns a dict mapping scale degree (0-indexed) → [FretPosition].
-        """
-        intervals = SCALE_INTERVALS[scale]
-        return {
-            degree: self.positions_in_range(
-                (root_pc + semitones) % 12, fret_min, fret_max
-            )
-            for degree, semitones in enumerate(intervals)
-        }
-
-    def chord_positions(
-        self,
-        root_pc: int,
-        chord_type: str,
-        fret_min: int = 0,
-        fret_max: int = 24,
-    ) -> dict[int, list[FretPosition]]:
-        """Return all fretboard positions for each note in the given chord."""
-        intervals = CHORD_INTERVALS[chord_type]
-        return {
-            degree: self.positions_in_range(
-                (root_pc + semitones) % 12, fret_min, fret_max
-            )
-            for degree, semitones in enumerate(intervals)
-        }
-
-    def interval_between(self, pos_a: FretPosition, pos_b: FretPosition) -> int:
-        """Return the signed interval in semitones from pos_a to pos_b."""
-        return pos_b.midi - pos_a.midi
-
-    def render_positions(
-        self,
-        positions: list[FretPosition],
-        fret_min: int = 0,
-        fret_max: int = 12,
-    ) -> str:
-        """
-        Render a set of positions as a fretboard diagram.
-
-        Marks each active position with its note name; open strings with 'o'.
-        """
-        string_names = ["e", "B", "G", "D", "A", "E"]
-        pos_set = {(p.string, p.fret) for p in positions}
-        lines: list[str] = []
-
-        header = "    " + "".join(f"{f:>4}" for f in range(fret_min, fret_max + 1))
-        lines.append(header)
-        lines.append("    " + "----" * (fret_max - fret_min + 1))
-
-        for s in range(1, self.num_strings + 1):
-            label = string_names[s - 1]
-            cells: list[str] = []
-            for f in range(fret_min, fret_max + 1):
-                if (s, f) in pos_set:
-                    pos = FretPosition(string=s, fret=f)
-                    cells.append(f"{pos.note_name:>4}")
-                else:
-                    cells.append("   .")
-            lines.append(f"{label:>2}  {''.join(cells)}")
-
-        return "\n".join(lines)
-
-
-# ── Frequency Computation ─────────────────────────────────────────────────────
-
-def fret_frequency(open_freq: float, fret: int) -> float:
-    """Return the frequency of a fretted note given the open string frequency."""
-    return open_freq * (2 ** (fret / 12))
-
-
-def fret_position_mm(scale_length_mm: float, fret: int) -> float:
-    """
-    Compute the distance from the nut to a given fret in millimeters.
-
-    Derived from: d_n = L * (1 - 2^(-n/12))
-    """
-    return scale_length_mm * (1.0 - 2 ** (-fret / 12))
-
-
-def intonation_cents_error(
-    target_freq: float, actual_freq: float
-) -> float:
-    """
-    Compute the intonation error in cents.
-
-    100 cents = 1 semitone. Human pitch discrimination threshold ≈ 5–10 cents.
-    """
-    import math
-    return 1200.0 * math.log2(actual_freq / target_freq)
-
-
-# ── Demo ──────────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    import math
-
-    board = Fretboard()
-
-    # --- 1. Show all positions for the note A (pitch class 9) ---
-    print("=== All positions for A (pitch class 9) ===")
-    for pos in board.all_positions_for_note(9):
-        print(f"  {pos}")
-
-    # --- 2. Show E minor pentatonic positions in first position (frets 0–5) ---
-    print("\n=== E minor pentatonic (frets 0–5) ===")
-    E_PC = 4  # E = pitch class 4
-    scale_pos = board.scale_positions(E_PC, "pentatonic_minor", fret_min=0, fret_max=5)
-    all_pos: list[FretPosition] = []
-    for degree, positions in scale_pos.items():
-        for p in positions:
-            all_pos.append(p)
-    print(board.render_positions(all_pos, fret_min=0, fret_max=5))
-
-    # --- 3. Fret spacing for Stratocaster scale length ---
-    print("\n=== Strat fret spacing (648 mm scale) ===")
-    print(f"{'Fret':>6} {'Dist from nut (mm)':>22} {'Freq E2 (Hz)':>16}")
-    for f in range(13):
-        dist = fret_position_mm(648.0, f)
-        freq = fret_frequency(82.407, f)
-        print(f"{f:>6} {dist:>22.2f} {freq:>16.3f}")
-
-    # --- 4. Intonation error example ---
-    target = fret_frequency(82.407, 12)   # Perfect octave
-    actual = fret_frequency(82.407, 12) * 1.001  # 0.1% sharp saddle error
-    error = intonation_cents_error(target, actual)
-    print(f"\nIntonation error (0.1% saddle displacement): {error:.2f} cents")
 ```
+e|──5──6──7──8──|
+B|──5──6──7──8──|
+G|──5──6──7──8──|
+D|──5──6──7──8──|
+A|──5──6──7──8──|
+E|──5──6──7──8──|
+```
+
+Fingers: 1–2–3–4 on each string. No lifting a finger until the next pattern requires it. Each note clean and equal volume.
+
+**Exercise 2 — Ring/Pinky isolation (60 BPM):**
+
+```
+e|──7──────9──|  (fingers 3 then 4, fingers 1 and 2 resting on frets 5 and 6)
+B|──7──────9──|
+G|──7──────9──|
+```
+
+Hold fingers 1 and 2 down on frets 5 and 6 at all times. Only fingers 3 and 4 move. This forces the specific tendon slip that controls the pinky in isolation from the ring finger. Even 5 minutes daily over two weeks produces measurable improvement.
+
+**Exercise 3 — Hammer-on/Pull-off strength (70 BPM):**
+
+```
+e|──5h7──7p5──| (repeat 8 times per string)
+B|──5h7──7p5──|
+G|──5h7──7p5──|
+```
+
+Hammer-ons must be loud enough to sound without a right-hand pick stroke. Pull-offs must be a slight sideways flick, not a straight lift — the sideways motion plucks the lower string.
 
 ---
 
-## 4. The CAGED System: Geometric Proof
+## Module 3: Right-Hand Mechanics — Picking, Strumming, and Fingerstyle
 
-The CAGED system is often presented as a memorization trick. It is more correctly understood as a theorem about the fretboard's topology under standard tuning. Here is the derivation.
+### Pick Mechanics
 
-**Premise:** Every major chord consists of pitch classes {R, R+4, R+7} (root, major third, perfect fifth). These three pitch classes must appear on all six strings in a playable voicing (maximum 4-fret span, no string skipping in most positions).
+**Grip:** Hold the pick between the side of the index finger and the pad of the thumb. The pick tip should extend about 3–5 mm past your fingers. Too much pick exposed = uncontrolled flex. Too little = your fingers drag the string.
 
-**Derivation of shape transitions:** Starting from an open C major chord (root on A string, fret 3), moving to a voicing one perfect fourth higher (F major) requires the root to move up 5 semitones on the same string — fret 8 on the A string. This is impractical as a barre chord anchor on the A string because the shape becomes a compression of the C shape. Instead, the root migrates to the E string (fret 1), producing the E shape for F major.
+**Alternate picking:** Down on the beat, up on the offbeat. This is the foundational motion — consistent, symmetrical, and efficient. Practice with a metronome starting at 60 BPM. Only increase tempo when every note sounds equally clean and equally loud.
 
-This root migration between strings, governed by the cross-string unison offsets derived in Section 2, produces exactly five distinct shape classes before returning to the original shape 12 frets up. The shapes are named after the open-chord that each resembles at its lowest playable position.
+**Downstroke authority:** Most rhythm playing uses predominantly downstrokes because downstrokes produce a stronger, more forceful attack that sits better in a band mix. Reserve upstrokes for intentional articulation choices, not default habit.
+
+**Pick slant angles:**
+- Downward pick slant (DPS): pick tip angled downward. Favors downstrokes; common in rock/metal rhythm playing.
+- Upward pick slant (UPS): pick tip angled upward. Favors upstrokes; common in country and certain lead styles.
+- Neutral/flat: used for tremolo picking and strict alternate picking.
+
+**Economy picking:** Instead of always alternating, sweep in the direction of string travel when crossing strings. Moving from string 6 to string 1, use consecutive downstrokes; moving back, consecutive upstrokes. Economy picking reduces pick travel distance at high speeds.
+
+**Alternate picking drill (60 BPM → 120 BPM):**
+
+```
+e|──5─6─7─8──8─7─6─5──| (down-up-down-up throughout)
+B|──5─6─7─8──8─7─6─5──|
+(continue all strings)
+```
+
+One note per click. Increase by 5 BPM only when the previous tempo sounds effortless.
+
+### Palm Muting
+
+Rest the heel of your right hand on the strings just forward of the bridge saddles — no more than 10–15 mm from the bridge. Too far forward = dead thud. Too far back (or lifting off) = unmuted ring. The sweet spot produces a "chugging" texture.
+
+Palm muting is not a fixed position — it is dynamic. You can gradually roll your wrist forward mid-phrase to increase muting progressively, creating a swell effect. This is a core sound of rock and metal rhythm guitar.
+
+### Fingerstyle Foundation
+
+If you play without a pick, the right-hand fingers are assigned as follows:
+
+```
+Thumb (p) → strings 6, 5, 4 (bass strings)
+Index (i) → string 3
+Middle (m) → string 2
+Ring (a)   → string 1
+```
+
+**Travis picking pattern — foundational (60 BPM):**
+
+Over an open G chord (320033):
+
+```
+  T = thumb, i = index, m = middle, a = ring
+  
+  Beat: 1  +  2  +  3  +  4  +
+  Str:  6     3     5     3     (thumb alternates 6th and 5th; fingers arpeggiate)
+  R.H.: T     i     T     m
+```
+
+The thumb alternates between bass strings on beats 1 and 3 (sometimes 2 and 4), while the fingers independently pick the treble strings. This creates the illusion of two instruments playing simultaneously — it is the foundation of folk, country, and acoustic fingerstyle.
+
+---
+
+## Module 4: Open Chords — Your First Vocabulary
+
+### The Five Essential Open Chord Shapes
+
+Learn these in order. Each shape trains a different left-hand configuration.
+
+**E major (022100):**
+```
+   E A D G B e
+   0 2 2 1 0 0
+   
+   Finger 1: B string, fret 1
+   Finger 2: A string, fret 2
+   Finger 3: D string, fret 2
+   Strings 1, 3, 6: open (ring openly)
+```
+
+**A major (x02220):**
+```
+   E A D G B e
+   x 0 2 2 2 0
+   
+   Option 1: Fingers 1–2–3 on D–G–B strings, fret 2
+   Option 2: Barre all three strings (D–G–B) at fret 2 with finger 1
+   (Option 2 prepares you for barre chords)
+```
+
+**D major (xx0232):**
+```
+   E A D G B e
+   x x 0 2 3 2
+   
+   Finger 1: G string, fret 2
+   Finger 2: high e string, fret 2
+   Finger 3: B string, fret 3
+   Only strings 4–1 ring; mute strings 6 and 5
+```
+
+**G major (320003) — two fingerings:**
+```
+   Version 1 (beginner):
+   Finger 1: A string, fret 2
+   Finger 2: low E string, fret 3
+   Finger 3: B string, fret 3
+   
+   Version 2 (preferred — leaves fingers 1 and 2 free):
+   Finger 2: A string, fret 2
+   Finger 3: low E string, fret 3
+   Finger 4: high e string, fret 3
+```
+
+Version 2 of G major is superior because fingers 1 and 2 can drop immediately into a Cadd9, D, or Em shape — this is the secret to smooth chord transitions in the open position.
+
+**C major (x32010):**
+```
+   E A D G B e
+   x 3 2 0 1 0
+   
+   Finger 1: B string, fret 1
+   Finger 2: D string, fret 2
+   Finger 3: A string, fret 3
+   G and high e strings: open
+```
+
+### Minor Chord Shapes
+
+**Em (022000):**
+```
+   Finger 2: A string, fret 2
+   Finger 3: D string, fret 2
+   All other strings open — the most resonant open chord on the instrument
+```
+
+**Am (x02210):**
+```
+   Finger 1: B string, fret 1
+   Finger 2: D string, fret 2
+   Finger 3: G string, fret 2
+```
+
+**Dm (xx0231):**
+```
+   Finger 1: high e string, fret 1
+   Finger 2: G string, fret 2
+   Finger 3: B string, fret 3
+```
+
+### Chord Transition Drill — The Most Important Practice You Can Do
+
+Pick any two chords. Set a metronome to 60 BPM. Change chord on beat 1 of every other measure (every 8 beats). Increase tempo only when the change is seamless and both chords ring clean.
+
+**Priority transitions to drill:**
+1. G → D → Em → C (the "axis" progression — appears in hundreds of songs)
+2. Am → F → C → G
+3. E → A → D (power progression for rock/blues)
+
+**Pivot finger technique:** When transitioning between chords that share a note at the same string/fret, keep that finger planted. For example, going from C major to Am, your finger 1 (B string, fret 1) stays in place — it is the pivot. This eliminates one of the three fingers you need to move and dramatically speeds up the transition.
+
+---
+
+## Module 5: Barre Chords — Unlocking the Full Neck
+
+### The E-Shape Barre Chord
+
+The E major open chord shape, barred at any fret with the index finger, produces a major chord. The root is on the low E string (string 6) at the barre fret.
+
+**F major barre (133211) — the first barre chord:**
+```
+   Fret 1, full barre with finger 1 across all 6 strings
+   Finger 2: G string, fret 2
+   Finger 3: A string, fret 3
+   Finger 4: D string, fret 3
+```
+
+The barre is the hardest physical skill on the guitar. It fails in predictable ways:
+
+| Failure | Cause | Fix |
+|---|---|---|
+| B string buzzes or mutes | Finger 1 bent at middle joint, creating a gap | Straighten finger 1; roll it very slightly toward the nut (toward headstock) |
+| High e string mutes | Index finger not reaching string 1 | Extend finger farther; check thumb is behind index finger, not finger 2 |
+| All strings buzz | Not enough pressure | Ensure fret placement is just behind (nut-side of) the fret wire |
+| Wrist pain | Excess grip force | You are using 10x more force than needed; relax consciously |
+
+**E-shape barre chord root map (string 6):**
+```
+Fret:  1    2    3    4    5    6    7    8    9   10   11   12
+Root:  F    F#   G    G#   A    A#   B    C    C#   D    D#   E
+```
+
+Memorize this map. Once you know the note on the low E string at any fret, you have the chord name.
+
+**E minor barre shape:** Remove finger 2 from the E major barre. The result is a minor chord with the same root locations.
+
+### The A-Shape Barre Chord
+
+The A major open chord shape, barred at any fret, produces a major chord with the root on the A string (string 5).
+
+**B major barre (x24442):**
+```
+   Barre fret 2 with finger 1 (strings 1–5)
+   Finger 2: D string, fret 4
+   Finger 3: G string, fret 4
+   Finger 4: B string, fret 4
+   
+   Alternative: barre fret 2, then barre frets 3–4 with finger 3 (D–G–B)
+   This "mini-barre" is easier for most players.
+```
+
+**A-shape barre chord root map (string 5):**
+```
+Fret:  1    2    3    4    5    6    7    8    9   10   11   12
+Root:  A#   B    C    C#   D    D#   E    F    F#   G    G#   A
+```
+
+### Combining E-Shape and A-Shape for Any Key
+
+For any major chord, you have two barre positions: one with the root on string 6, one with the root on string 5. Use whichever puts your hand closer to where it already is. This is the beginning of voice-leading efficiency.
+
+**Example — playing a I–IV–V in G:**
+```
+G major: E-shape barre, fret 3 (root on string 6)
+C major: A-shape barre, fret 3 (root on string 5) — hand stays in position!
+D major: A-shape barre, fret 5 (root on string 5) — shift up two frets
+```
+
+No position shift for the IV chord, one shift for the V. Compare this to jumping from fret 3 (G, E-shape) to fret 8 (C, E-shape) to fret 10 (D, E-shape) — that is three large shifts for the same progression. Economy of motion is built into the system once you know both shapes.
+
+---
+
+## Module 6: The CAGED System — Fretboard Architecture
+
+### What CAGED Actually Is
+
+CAGED is not a memorization gimmick. It is a consequence of standard tuning's interval structure. Because the tuning is primarily perfect fourths with one major-third exception (G→B), only five distinct open-chord shapes exist. These five shapes — C, A, G, E, D — tile the entire fretboard in a repeating cycle, covering every position with no gaps.
+
+Each shape contains the same three pitch classes (root, major third, perfect fifth) distributed differently across the strings. The shapes interlock: the highest notes of one shape overlap with the lowest notes of the next.
 
 ```mermaid
 flowchart TB
-    subgraph sub_caged_cycle___key_of_c ["CAGED Cycle — Key of C"]
+    subgraph sub_caged_key_c ["CAGED Cycle — Key of C Major"]
+        direction TB
         C1["C shape\nFrets 0–3\nRoot: A string, fret 3"]
-        A1["A shape\nFrets 2–5\nRoot: A string, fret 5\n(= D shape barre at fret 5)"]
-        G1["G shape\nFrets 5–8\nRoot: E string, fret 8\n(= G barre at fret 8)"]
-        E1["E shape\nFrets 7–10\nRoot: E string, fret 8\n(open E barre at fret 8)"]
+        A1["A shape\nFrets 3–5\nRoot: A string, fret 5"]
+        G1["G shape\nFrets 5–8\nRoot: low E string, fret 8"]
+        E1["E shape\nFrets 7–10\nRoot: low E string, fret 8"]
         D1["D shape\nFrets 9–12\nRoot: D string, fret 10"]
         C2["C shape (octave)\nFrets 12–15\nRoot: A string, fret 15"]
 
@@ -436,143 +374,697 @@ flowchart TB
     end
 ```
 
-The fret offsets (+2, +3, +2, +2, +3) sum to 12 — one octave — confirming the cycle completes correctly. The two larger jumps (+3) occur at the G and D shapes because the root crosses the G→B string boundary, requiring one extra fret to maintain pitch equivalence.
+The fret offsets (+2, +3, +2, +2, +3) sum to 12 — one octave. The two larger jumps happen at G and D shapes because those are the moments the root crosses the G→B string boundary, requiring one extra fret to maintain pitch equivalence.
+
+### The Five Shapes with Scale Degrees Marked
+
+For each shape, the root (R), major third (3), and perfect fifth (5) locations are shown. Knowing these three tones in every shape lets you construct chords, arpeggios, and melodies from any position.
+
+**C shape (key of C, frets 0–3):**
+```
+e |──0──|──1──|──────|──3──|
+B |──────|──1──|──────|──3──|
+G |──────|──────|──2──|──────|   R=C, 3=E, 5=G
+D |──────|──────|──2──|──3──|
+A |──────|──────|──────|──3──R
+E |──────|──────|──────|──────|
+```
+
+**A shape (key of C, frets 3–5):**
+```
+e |──────|──────|──5──|
+B |──1──|──────|──5──|
+G |──1──|──2──|──────|   R=C on A string fret 3
+D |──1──|──2──|──────|
+A |──────|──────|──5──R
+E |──────|──────|──────|
+  Fret:  3     4     5
+```
+
+**G shape (key of C, frets 5–8):**
+```
+e |──5──|──────|──7──|──8──|
+B |──5──|──────|──7──|──8──|
+G |──5──|──────|──────|──7──|   R=C on low E fret 8
+D |──5──|──────|──7──|──────|
+A |──5──|──────|──7──|──────|
+E |──────|──────|──7──|──8──R
+  Fret:  5      6     7     8
+```
+
+**E shape (key of C, frets 7–10):**
+```
+e |──7──|──8──|──────|──10─|
+B |──8──|──────|──10─|──────|
+G |──7──|──9──|──────|──────|   R=C on low E fret 8
+D |──7──|──────|──9──|──10─|
+A |──7──|──8──|──────|──10─|
+E |──8──R──────|──10─|──────|
+  Fret:  7     8     9    10
+```
+
+**D shape (key of C, frets 9–12):**
+```
+e |──9──|──────|──12─|
+B |──────|──10─|──12─R(octave)
+G |──9──|──────|──12─|
+D |──────|──10─|──12─R
+A |──────|──────|──────|
+E |──────|──────|──────|
+  Fret:  9    10    12
+```
+
+### CAGED Practice Protocol
+
+Do not try to memorize all five shapes simultaneously. Work one shape per week.
+
+**Week 1 — E shape:**
+Play the E-shape barre chord at every root position from fret 1 to 12. For each position, also play the arpeggio (root → 3rd → 5th → octave root → 5th → 3rd → root) using only notes within that shape's fret span. Set metronome to 60 BPM, one note per two beats. Work up to 80 BPM.
+
+**Week 2 — A shape:**
+Repeat the same drill with the A-shape barre. Connect the A shape back to the E shape by finding the shared notes at their overlap zone (they share chord tones at the boundary frets).
+
+**Weeks 3–5 — G, C, D shapes:**
+Add one shape per week. By week 5, run the full CAGED cycle in one key (e.g., G major) up the neck without stopping.
+
+**Shape-linking drill (after week 5):**
+Choose a key. Play the chord in each CAGED shape consecutively up the neck. Transition by playing the shared note at the shape boundary, then resolving into the next shape. This builds shape continuity — the neck becomes one connected object, not five isolated boxes.
 
 ---
 
-## 5. High-Performance Navigation & Failure Mode Analysis
+## Module 7: Pentatonic and Blues Scales — Lead Guitar Foundation
 
-### Cognitive Architecture of Fretboard Mastery
+### The Minor Pentatonic Scale
 
-Expert fretboard navigation is a multi-layer cognitive skill, not a linear memorization task. The architecture has three levels:
+Five notes. Two notes per string. The most versatile lead guitar tool on the instrument.
 
-**Level 1 — Reactive (pitch class → position).** Given a target note, instantly identify all positions within reach. This requires the cross-string unison offsets (Section 2) to be internalized as motor reflexes, not conscious recall. Practice tool: "single-note geography" — name every note on every string in random order under a 1-second timeout.
+Minor pentatonic formula: Root – b3 – 4 – 5 – b7
 
-**Level 2 — Structural (position → scale/chord context).** Given a hand position, recognize which CAGED shape contains it and which scale degrees are available without shifting. This is pattern recognition on the pitch matrix defined in Section 2.
+**Position 1 (root position) — the starting point for all lead playing:**
 
-**Level 3 — Harmonic (progression → voice-leading trajectory).** Given a chord progression, plan a continuous trajectory through CAGED shapes that minimizes hand displacement while maintaining melodic voice leading. This is a shortest-path problem on the fretboard graph.
+For E minor pentatonic (root = E), position 1 sits at fret 0 (open position) or at fret 12.
 
-The Level 3 problem is formally equivalent to finding a minimum-weight path through a graph where nodes are CAGED-shape positions and edge weights represent hand displacement cost. Advanced players solve this heuristically; it can be computed exactly using dynamic programming on the pitch matrix.
+```
+e |──0──────3──|
+B |──0──────3──|
+G |──0──────2──|
+D |──0──────2──|
+A |──0──────2──|
+E |──0──────3──|
+```
 
-### Economy of Motion: Biomechanical Analysis
+For A minor pentatonic (root = A), position 1 sits at fret 5:
 
-The left hand (fretting hand) operates most efficiently when the wrist is slightly forward of the neck, the thumb sits behind the middle finger, and each finger is pre-positioned over its assigned fret before sounding. These are not stylistic preferences — they follow from the anatomy of the flexor digitorum superficialis and profundus tendons, which share a common sheath through the carpal tunnel.
+```
+e |──5──────8──|
+B |──5──────8──|
+G |──5──────7──|
+D |──5──────7──|
+A |──5──────7──|
+E |──5──────8──|
+   Fret: 5      8
+```
 
-Excessive grip strength is the primary failure mode. The force required to fret a note on a well-set-up electric guitar (action ≈ 2 mm at the 12th fret, 9–42 gauge strings) is approximately 0.5–1.5 N per string — far less than untrained players apply. Chronic overgripping compresses the median nerve (carpal tunnel syndrome) and inflames the flexor tendons. The engineering solution is proper setup (nut height, truss rod relief, saddle height) which minimizes required fretting force, and deliberate practice of minimum-force fretting.
+Fingers: use finger 1 for all the lower fret notes, finger 4 (or 3) for all the higher fret notes. This two-finger-per-string approach locks in the position cleanly.
 
-**Finger independence** is limited by the extensor digitorum communis, which shares tendon slips across all four fingers. The ring and pinky fingers share a particularly coupled connection, which is why the "ring finger down, pinky free" movement is mechanically harder than any other combination. Exercises targeting this coupling should isolate the specific tendon slip, not merely repeat chord shapes.
+### All Five Pentatonic Positions
 
-### Failure Mode Taxonomy
+The five pentatonic positions map directly onto the five CAGED shapes. This connection is not coincidental — the pentatonic scale is the skeleton of the major/minor chord. If you know CAGED, you already know where the five pentatonic positions live.
 
-| Failure Mode | Root Cause | Diagnostic | Remediation |
-|---|---|---|---|
-| Notes sound as "thuds" | Insufficient fretting-hand pressure, or finger pad touching adjacent string | Note sounds when string plucked alone but mutes in chord | Adjust finger arch; ensure tip placement |
-| Fret buzz | Fretting finger too far from fret wire, or action too low | Buzz disappears when pressing harder | Move finger closer to fret; setup adjustment |
-| Positional locking | CAGED shape memorized without interval understanding | Cannot locate a note outside the memorized box | Practice scale degrees by number, not by shape |
-| Cross-string interval errors | G→B asymmetry not internalized | Patterns that work on strings 6–4 fail on strings 3–1 | Explicitly practice crossing the G–B boundary |
-| Intonation drift up the neck | Saddle not properly intonated, or high action | Harmonics at fret 12 ≠ fretted note at fret 12 | Intonate saddle; check truss rod relief |
-| Tendon strain / RSI | Excess grip force, collapsed wrist angle | Pain along forearm or in palm | Minimum-force fretting; ergonomic wrist position |
+Here are all five positions of A minor pentatonic:
 
-### Intonation Verification Protocol
+```
+Position 1 (A shape) — frets 5–8:
+e |──5──────8──|
+B |──5──────8──|
+G |──5──────7──|
+D |──5──────7──|
+A |──5──────7──|
+E |──5──────8──|
 
-A calibrated workflow for intonation setup, expressed as executable logic:
+Position 2 (G shape) — frets 7–10:
+e |──8──────10─|
+B |──8──────10─|
+G |──7──────9──|
+D |──7──────10─|
+A |──7──────10─|
+E |──8──────10─|
 
-```python
-def verify_intonation(
-    string_index: int,
-    open_freq: float,
-    fret12_freq: float,
-    tolerance_cents: float = 3.0,
-) -> dict:
-    """
-    Verify 12th-fret intonation against the theoretical perfect octave.
+Position 3 (E shape) — frets 10–12:
+e |──10─────12─|
+B |──10─────12─|
+G |──9──────12─|
+D |──10─────12─|
+A |──10─────12─|
+E |──10─────12─|
 
-    Parameters
-    ----------
-    string_index    : 1–6 (high E to low E)
-    open_freq       : measured open-string frequency in Hz
-    fret12_freq     : measured 12th-fret frequency in Hz
-    tolerance_cents : acceptable deviation in cents (default: 3.0)
+Position 4 (D shape) — frets 12–15:
+e |──12─────15─|
+B |──13─────15─|
+G |──12─────14─|
+D |──12─────14─|
+A |──12─────14─|
+E |──12─────15─|
 
-    Returns
-    -------
-    dict with keys: expected_freq, actual_freq, error_cents, status, action
-    """
-    import math
+Position 5 (C shape) — frets 2–5 (or 14–17):
+e |──2──────5──|
+B |──1──────3──|
+G |──2──────4──|
+D |──2──────5──|
+A |──2──────5──|
+E |──2──────5──|
+```
 
-    expected = open_freq * 2.0  # Perfect octave
-    error_cents = 1200.0 * math.log2(fret12_freq / expected)
+### The Blues Scale — Adding the b5
 
-    if abs(error_cents) <= tolerance_cents:
-        status = "PASS"
-        action = "No adjustment required."
-    elif error_cents > 0:
-        status = "FAIL — SHARP"
-        action = "Move saddle away from nut (increase string length)."
-    else:
-        status = "FAIL — FLAT"
-        action = "Move saddle toward nut (decrease string length)."
+Add one note to the minor pentatonic: the flattened fifth (b5), also called the "blue note." This note creates the tension that makes blues guitar sound like blues guitar.
 
-    return {
-        "string": string_index,
-        "open_freq_hz": round(open_freq, 3),
-        "expected_12th_hz": round(expected, 3),
-        "actual_12th_hz": round(fret12_freq, 3),
-        "error_cents": round(error_cents, 2),
-        "status": status,
-        "action": action,
-    }
+A blues scale: A – C – D – D# – E – G
 
+**Position 1 of A blues scale (frets 5–8):**
+```
+e |──5──────8──|
+B |──5──────8──|
+G |──5──────7──|
+D |──5──6───7──|   ← fret 6 = D# (the blue note)
+A |──5──────7──|
+E |──5──────8──|
+```
 
-# Example: check all six strings against measured frequencies
-MEASURED_OPEN:   tuple[float, ...] = (329.63, 246.94, 196.00, 146.83, 110.00, 82.41)
-MEASURED_FRET12: tuple[float, ...] = (659.26, 493.88, 392.00, 293.66, 220.00, 164.81)
+The blue note appears on the D string at fret 6 (one fret above the root-octave shape note). It is used as a passing tone — you do not park on it. You bend through it, slide through it, or hit it and immediately resolve up or down.
 
-if __name__ == "__main__":
-    for i, (op, f12) in enumerate(zip(MEASURED_OPEN, MEASURED_FRET12), start=1):
-        result = verify_intonation(i, op, f12)
-        print(
-            f"String {result['string']}: {result['status']:18s} "
-            f"({result['error_cents']:+.2f} cents)  → {result['action']}"
-        )
+### String Bending — The Core Lead Guitar Technique
+
+A bend raises pitch by pushing the string toward the ceiling (on strings 1–3) or pulling toward the floor (on strings 4–6). One tone bend = 2 frets worth of pitch increase. Half-step bend = 1 fret. The pitch must arrive cleanly at the target — this is what separates a musical bend from an out-of-tune squawk.
+
+**How to execute a whole-step bend:**
+1. Place finger 3 (ring finger) on the note you want to bend. Place fingers 1 and 2 behind it on the same string for support — they add leverage.
+2. Push the string perpendicular to the string's length, toward the ceiling (for strings 1, 2, 3).
+3. The push comes from rotating the wrist, not from finger strength alone. The forearm rotates slightly counterclockwise as you push.
+4. Target pitch: the note two frets higher than where your finger is.
+
+**Verification drill:** Fret the target note (two frets up) so you hear it, then come back and bend up to match it. If your bend arrives at the same pitch, it is in tune. If not, adjust your wrist rotation.
+
+**Classic bend positions (A minor pentatonic, position 1):**
+```
+e |──5──────8──|
+B |──5──8b──8──|   ← fret 8 bend = whole step up to match fret 10 pitch
+G |──5──7b──7──|   ← fret 7 bend = whole step up to match fret 9 pitch  
+D |──5──7───7──|
+A |──5──7───7──|
+E |──5──────8──|
+
+"b" = whole-step bend
+```
+
+### Lead Guitar Practice Structure (Daily 20 Minutes)
+
+```
+0:00 – 5:00  → Pentatonic position 1 up and down with alternate picking (60–90 BPM)
+5:00 – 10:00 → Bending drill: 5 bends on the G string, 5 bends on the B string.
+               Each bend held for 2 beats, then released slowly. Tune each one.
+10:00 – 15:00 → Play along with a backing track in A minor.
+               Constraint: stay inside position 1 only. Focus on phrasing (pauses, 
+               dynamics) rather than playing every note as fast as possible.
+15:00 – 20:00 → Connecting positions 1 and 2. Play a phrase in position 1,
+               then slide or shift to position 2 and resolve there.
 ```
 
 ---
 
-## 6. Practice Architecture: Structured Progression
+## Module 8: Rhythm Guitar and Chord Voicings
 
-Effective fretboard mastery follows a progression from declarative knowledge (naming notes) through procedural fluency (finding intervals reflexively) to adaptive expertise (constructing lines in real time). The following structure implements this progression:
+### Power Chords — The Foundation of Rock Rhythm
 
-**Phase 1 — Note Geography (weeks 1–4).** Map all 12 notes on each string individually. The constraint: no visual pattern recognition allowed — name the note by computing its distance from the nearest open-string landmark. Target: any note on any string within 2 seconds.
+A power chord contains only two distinct pitch classes: the root and the perfect fifth. It is technically neither major nor minor, which makes it universally compatible with both.
 
-**Phase 2 — Cross-String Intervals (weeks 3–8).** Practice the 11 canonical interval relationships across all string pairs. Special emphasis on G→B crossing. Target: given any note, name the note 3 strings higher/lower at the same fret within 1 second.
+**E5 power chord (string 6, fret 0):**
+```
+E |──0──|
+A |──2──|
+D |──2──|
+G |──x──| (mute with finger 1 tip)
+B |──x──|
+e |──x──|
 
-**Phase 3 — CAGED Shape Integration (weeks 6–16).** Map each CAGED shape not as a fingering, but as a set of scale degrees. For each shape, identify the 1, 3, 5, b7 on every string. Practice connecting shapes through shared notes at their overlap zones.
+Finger 1: A string, fret 2
+Finger 3: D string, fret 2 (or barre with finger 1 tip muting)
+```
 
-**Phase 4 — Harmonic Context Navigation (ongoing).** Given a ii–V–I progression in any key, navigate it through two consecutive CAGED positions without repeating any shape. This forces Level 3 cognitive processing (Section 5) and develops the trajectory planning required for professional-level improvisation.
+**A5 power chord (string 5, fret 0):**
+```
+E |──x──|
+A |──0──|
+D |──2──|
+G |──2──|
+B |──x──|
+e |──x──|
+```
+
+For movable power chords, the same two-finger shape (root + fifth) moves up the neck on strings 6–5, or strings 5–4. The root name is determined by the note on string 6 or string 5.
+
+**Power chord palm-muted rhythm pattern — 120 BPM:**
+```
+E5 on string 6, fret 0
+
+Beat: 1  +  2  +  3  +  4  +
+      ↓  ↓  ↓  ↑  ↓  ↓  ↓  ↑
+      PM PM PM PM ── PM PM ──
+
+PM = palm muted, ── = open (lift palm slightly)
+```
+
+### Extended and Suspended Chord Voicings
+
+Once you have the CAGED shapes internalized, you can modify them to produce extended chords by adding or altering tones within the shape's fret window.
+
+**Dsus2 (xx0230) and Dsus4 (xx0233):**
+```
+Dsus2: Remove finger 1 from D major (B string goes open → major 2nd)
+Dsus4: Move finger 2 from e string fret 2 to e string fret 3 (adds 4th)
+```
+
+These two chords, alternated with D major, are a core sound of acoustic and clean electric rhythm playing.
+
+**Add9 chords — G major voicings:**
+
+```
+Gadd9 (320030 or 320033):
+e |──3──|   ← optional (finger 4)
+B |──3──|   ← optional (finger 3)
+G |──0──|
+D |──0──|
+A |──2──|   ← finger 1
+E |──3──|   ← finger 2 (or 3)
+```
+
+The add9 avoids the perfect 4th interval present in a sus chord — it adds color without suspending the third, maintaining major quality while sounding open and contemporary.
+
+**Dominant 7th chords — rhythm and funk:**
+
+```
+A7 (x02020):
+e |──0──|
+B |──2──|   ← finger 2
+G |──0──|
+D |──2──|   ← finger 1
+A |──0──|
+E |──x──|
+```
+
+This open A7 voicing is a cornerstone of blues and funk rhythm playing. The alternation of A7 → D7 covers a large percentage of blues rhythm parts.
+
+### The Rhythm Guitar Approach
+
+Rhythm guitar is not about strumming patterns — it is about locking with the drums, controlling dynamics, and placing your notes with intention.
+
+**Strum pattern fundamentals:**
+Your right hand moves in a constant down-up pendulum motion, one stroke per eighth note at all times. What changes is not the motion but whether the pick makes contact with the strings. Ghost strums (the motion without contact) maintain the groove pocket while creating rhythmic interest through accented hits.
+
+**Standard rock strum pattern (100 BPM):**
+```
+Beat: 1  +  2  +  3  +  4  +
+Str:  ↓  ↑  ↓     ↓  ↑  ↓  ↑
+      ✓  ✓  ✓  ✗  ✓  ✓  ✓  ✓
+
+✓ = contact, ✗ = ghost strum (motion only)
+```
+
+**Funk 16th-note pattern (90 BPM):**
+```
+Beat: 1  e  +  a  2  e  +  a  3  e  +  a  4  e  +  a
+Str:  ↓  ✗  ↑  ✗  ↓  ✗  ↑  ↓  ✗  ✗  ↑  ✗  ↓  ✗  ✗  ↑
+PM:   PM          PM    PM                PM
+```
+
+The accented hits define the "one" and the syncopated upstrokes create the funk feel. Keep the unaccented strokes as damped 16th-note chops (muted with the left hand releasing pressure).
+
+---
+
+## Module 9: Signal Chain Architecture
+
+The electric guitar's sound is the product of an entire chain of electromechanical and electronic stages. Understanding this chain tells you exactly where to adjust to get the sound in your head.
 
 ```mermaid
 flowchart LR
-    P1["Phase 1\nNote Geography\nDeclarative"] --> P2["Phase 2\nCross-String Intervals\nProcedural"]
-    P2 --> P3["Phase 3\nCAGED Integration\nStructural"]
-    P3 --> P4["Phase 4\nHarmonic Navigation\nAdaptive"]
-    P4 -->|"Iterative refinement"| P3
+    subgraph sub_guitar_body ["Guitar Body"]
+        STR["String Vibration\nFundamental + Harmonics"]
+        NUT["Nut / Saddle\nMechanical Coupling"]
+        STR --> NUT
+    end
+
+    subgraph sub_electronics ["Guitar Electronics"]
+        PU["Pickup\nMagnetic → Electrical"]
+        VOL["Volume Pot\nOutput Level"]
+        TONE["Tone Pot\nRC Low-Pass Filter"]
+        PU --> VOL --> TONE
+    end
+
+    subgraph sub_effects ["Effects Chain"]
+        COMP["Compressor\nDynamic Leveling"]
+        OD["Overdrive / Distortion\nHarmonic Saturation"]
+        MOD["Modulation\nChorus / Phaser / Flanger"]
+        DLY["Delay / Reverb\nTime-Based Effects"]
+        COMP --> OD --> MOD --> DLY
+    end
+
+    subgraph sub_amplifier ["Amplifier"]
+        PRE["Preamp\nGain / EQ"]
+        PWR["Power Amp\nOutput Stage"]
+        SPK["Speaker Cabinet\nMechanical Resonance / Color"]
+        PRE --> PWR --> SPK
+    end
+
+    NUT --> PU
+    TONE --> COMP
+    SPK --> AIR["Acoustic Output\nAir Pressure Waves"]
+```
+
+### Pickup Physics in One Paragraph
+
+A pickup is a coil of wire wrapped around magnets. When a steel string vibrates, it disturbs the magnetic field, inducing a voltage proportional to the rate of change of flux (not the flux itself). This means the pickup is effectively a velocity sensor: fast-changing waveforms (high harmonics) produce proportionally higher output than slow-changing ones (the fundamental). Single-coil pickups (Strat, Tele) produce bright, articulate tone with audible 60Hz hum from AC power lines. Humbuckers (Les Paul, SG) wire two opposing coils in series, canceling the hum while summing the string signal — the result is higher output, more midrange, and a warmer character due to increased coil inductance rolling off extreme highs.
+
+### Tone Control Mechanics
+
+The tone control is a first-order RC low-pass filter: a capacitor in series with a potentiometer to ground. Turning the knob down increases the resistance, lowering the cutoff frequency and progressively removing high-frequency partials. Stratocasters typically use 0.047 µF capacitors; Les Pauls use 0.022 µF — the smaller capacitor leaves more treble in the circuit at any given knob position, contributing to the Les Paul's mid-focused character even with the tone control partially rolled back.
+
+**Practical use:** Rolling the tone knob from 10 to 7 on a Stratocaster in the neck position is a faster way to get a warm jazz tone than any amount of EQ tweaking at the amp. Rolling it to 3 or 4 produces a cocked-wah timbre that cuts through a dense mix differently than a full-treble signal.
+
+### Effects Chain Ordering and Why It Matters
+
+The sequence of effects determines their interaction. Standard ordering:
+
+```
+Guitar → Tuner → Compressor → Overdrive/Distortion → 
+EQ → Modulation (Chorus/Phaser) → Delay → Reverb → Amp
+```
+
+**Why this order:**
+- Tuner first: sees the cleanest signal for accurate pitch detection.
+- Compressor before dirt: evens out pick dynamics before they hit the overdrive, producing more consistent saturation.
+- Overdrive before modulation: the overdrive distorts the dry signal; modulation then moves that distorted signal in pitch/time, creating a wider effect.
+- Delay before reverb: the delay echoes repeat into the reverb tail — this is how live sound naturally propagates in a room. Reversed (reverb → delay), the reverb tail gets delayed, creating a washed-out sludge.
+
+**Dirt before amp vs. in the effects loop:**
+An amp's effects loop sits between the preamp and power amp stages. Effects in the loop hear an already-driven preamp signal. If you place time-based effects (delay, reverb) in the loop rather than in front of the amp, the amp's preamp distortion does not color the repeats and tails — they stay clean. This is correct for high-gain setups. For clean or low-gain setups, it makes little audible difference.
+
+---
+
+## Module 10: Voice Leading and Harmonic Movement
+
+### Roman Numeral Analysis — The Key-Agnostic Framework
+
+Chords are not named by their letter names when analyzing progressions — they are named by their scale degree within the key. This lets you transfer any progression to any key instantly.
+
+In the key of G major:
+```
+I   = G major
+ii  = A minor
+iii = B minor
+IV  = C major
+V   = D major
+vi  = E minor
+vii°= F# diminished
+```
+
+Uppercase Roman numerals = major chords. Lowercase = minor. The ° symbol = diminished.
+
+The most important progressions to internalize:
+
+**I–IV–V (major key):** G – C – D. The 12-bar blues is built on this.
+**I–V–vi–IV:** G – D – Em – C. Appears in an extraordinary number of popular songs.
+**ii–V–I (jazz):** Am – D – G. The fundamental jazz cadence.
+**i–VII–VI–VII (rock/modal):** Em – D – C – D. Dorian/Aeolian rocking vamp.
+
+### Secondary Dominants
+
+The V chord in any key has strong pull toward the I chord because of the tritone tension between the third and seventh of the V7 chord. You can apply this same dominant tension to any chord in the key by temporarily treating it as a local I chord and playing the V7 of that chord.
+
+**V/V in G major:** The V is D. The V of D is A7. Playing A7 → D in a G major context creates a secondary resolution — a momentary tonicization of D without leaving the key.
+
+**Common secondary dominants in G major:**
+```
+V/ii  → E7  → Am
+V/iii → F#7 → Bm
+V/IV  → G7  → C
+V/V   → A7  → D
+V/vi  → B7  → Em
+```
+
+Each of these creates a brief but powerful intensification before resolving to its target chord. This is the harmonic tool that makes simple progressions sound sophisticated.
+
+### Connecting Chords on the Fretboard with Minimal Movement
+
+The goal of professional chord playing is smooth voice leading — moving each chord tone to the nearest available chord tone in the next chord. Jumping positions for every chord change is for beginners. Advanced players keep the hand as stationary as possible.
+
+**Example: I–V–vi–IV in C major using CAGED positions:**
+```
+Cmaj7  (x32000):  static — no barre needed
+G/B    (x20033):  bass note moves from C (A string, fret 3) to B (A string, fret 2)
+Am7    (x02010):  finger 2 stays on D string, fret 2; finger 1 moves to B string fret 1
+Fmaj7  (x33210):  barre fret 1 — this is the largest move in the progression
+```
+
+By using the maj7 and open voicings, three of the four chord changes involve minimal finger movement. The resulting progression sounds more connected and pianistic than four separate barre chords.
+
+**Rootless voicings for clean electric and jazz:**
+In a band context, the bass player handles the root. This frees the guitarist to voice chords from the third upward, producing less muddy, more harmonically interesting textures.
+
+```
+Cmaj7 rootless: ──5──4──5──3── (strings 4–1 at frets 3–5, no root C)
+Dm7 rootless:   ──5──6──5──5──
+G7 rootless:    ──4──3──3──3── (or ──4──5──3──4── for the tritone substitution voicing)
 ```
 
 ---
 
-## 7. Summary: Invariants and Key Theorems
+## Module 11: Advanced Techniques
 
-The following invariants govern the entire fretboard system and should be treated as axioms — every advanced concept derives from them:
+### Vibrato — The Human Element
 
-1. **Equal temperament axiom.** $f_n = f_0 \cdot 2^{n/12}$. All pitch relationships are computable from this formula.
+Vibrato is pitch oscillation used to sustain and expressively color notes. It is the technique that most distinguishes a guitar player's voice — identical notes played with different vibrato styles sound like different players.
 
-2. **Octave invariant.** Fret 12 is a perfect octave above fret 0 on the same string. Every pattern repeats at 12-fret displacement.
+**Types:**
+- **Wrist vibrato (classical, jazz):** The wrist rocks back and forth; the finger stays in contact with the string. The pitch oscillates above and below the target pitch. This is subtle and controlled.
+- **Arm vibrato (blues, rock):** The entire forearm rotates, using the finger as a lever. The string is pushed and partially released in cycles. This is wider and more expressive.
+- **Below-pitch vibrato (accurate blues style):** Start on the note, dip below, return to pitch. The ear perceives this as the note resolving upward, creating emotional pull.
 
-3. **Cross-string unison offsets.** Moving to the same pitch on the adjacent higher string requires +5 frets (or +4 across the G→B boundary). These two values encode the entire architecture of standard tuning.
+**Vibrato drill (60 BPM):**
+Hold a note (finger 3 on B string, fret 10 for A minor context). On each beat, begin a vibrato cycle. First week: one cycle per two beats (slow, wide). Second week: two cycles per beat (faster, controlled). The goal is consistent pitch width — each oscillation should travel the same distance.
 
-4. **CAGED completeness theorem.** The five CAGED shapes tile the fretboard without gaps, with consecutive roots separated by offsets summing to 12 (one octave). The asymmetric offsets (+2, +3, +2, +2, +3) arise directly from the G→B major-third exception.
+### Hammer-ons, Pull-offs, and Legato Lines
 
-5. **Harmonic series and timbre.** The pickup captures $\frac{d\Phi}{dt}$, not $\Phi$ directly. Plucking position, pickup position, and tone control collectively determine which partials survive to the amplifier. Fretted pitch is invariant to these parameters; timbre is not.
+Legato phrasing (hammer-ons and pull-offs) allows you to play fast lines with minimal right-hand effort. The tradeoff: each slurred note is slightly quieter than a picked note unless you apply deliberate extra force.
 
-Mastery of the electric guitar's fretboard is, at its core, mastery of these five invariants applied reflexively under the time pressure of musical performance.
+**Legato scale run (A minor pentatonic, position 1 at fret 5):**
+```
+e |──5h8────────────────|
+B |──5h8────────────────|
+G |──5h7────────────────|
+D |──5h7────────────────|
+A |──5h7────────────────|
+E |──5h8────────────────|
+
+Ascending: pick first note on each string only, hammer the second
+Descending: pick top note, pull off to lower note
+
+Speed target: 80 BPM (16th notes) → 110 BPM → 140 BPM
+```
+
+**Trill exercise (builds independence and strength):**
+```
+B |──5h7p5h7p5──| (continuous trill, 1 minute per finger pair)
+   fingers 1 and 3
+```
+
+### Sliding — Smooth Position Shifts
+
+A slide (gliss) moves between two notes by keeping the finger in contact with the string while shifting position. It retains the picked attack of the first note while arriving at the second pitch through a smooth glide.
+
+**Slide types:**
+- **Legato slide:** Pick first note, slide without re-picking the second. The second note sounds from the momentum of the first.
+- **Shift slide:** Pick both the first note and the second (after sliding). Used to re-attack after the shift.
+- **Approach slide (grace slide):** No defined starting pitch — start below the target and slide up quickly. Creates a scooping, vocal quality.
+
+**Position shift using slides (connecting pentatonic positions 1 and 2):**
+```
+On G string:
+|──5──7──────9──|
+     ↑  slide ↑
+Finger 3 at fret 7, slide to fret 9 (now in position 2)
+```
+
+### Natural and Artificial Harmonics
+
+**Natural harmonics:** Touch the string directly above a fret wire (do not press down) and pluck. The result is a bell-like tone at a specific harmonic of the open string.
+
+Main natural harmonic nodes:
+```
+Fret 12 → octave above open string (2nd harmonic)
+Fret 7  → octave + perfect 5th above open string (3rd harmonic)
+Fret 5  → 2 octaves above open string (4th harmonic)
+Fret 9  → 2 octaves + major 3rd (5th harmonic — slightly sharp of equal temperament)
+```
+
+**Practical use:** The fret 12 harmonic lets you check intonation by ear without a tuner — if the harmonic and the fretted 12th-fret note match in pitch, your intonation is correct. If the fretted note is sharp of the harmonic, the saddle needs to move away from the nut (increase string length).
+
+**Pinch harmonics (artificial harmonics):** While picking, let the thumb edge of the picking hand touch the string immediately after the pick strikes. This creates a harmonic squeal at a node determined by where the pick/thumb contact occurs relative to the bridge. The closer to the bridge, the higher the harmonic. This requires the overdrive effect or amplifier gain to sustain — on a clean signal, the volume is too low to hear.
+
+---
+
+## Module 12: Fretboard Navigation Failure Modes and Diagnosis
+
+### Common Problems with Direct Solutions
+
+| Problem | Root Cause | Diagnosis | Fix |
+|---|---|---|---|
+| Notes sound as thuds | Finger pad touching adjacent string; insufficient arch | Note sounds clean played alone, mutes in chord | Arch finger higher; fret with the very tip |
+| Fret buzz | Finger too far from fret wire; action too low | Buzz disappears when pressing harder | Move finger to just behind (nut-side of) the fret wire |
+| Positional locking | Shape memorized without interval awareness | Cannot find a note outside the box | Practice scale degrees by number, name notes as you play |
+| G→B shift errors | Asymmetry not internalized as reflex | Patterns that work on strings 6–4 fail on strings 3–1 | Explicitly drill every interval across the G–B boundary |
+| Barre chord string gaps | Index finger bent at middle joint | Specific strings buzz while others ring clean | Roll index finger slightly toward headstock; use the bony outer edge |
+| Loss of bends in tune | Insufficient target pitch awareness; wrist not rotating | Bend arrives at a vague pitch, not a clear note | Pre-hear the target; fret the target note first, then match by bending |
+| Fatigue and forearm pain | Excess grip force; collapsed wrist | Pain after 10–15 minutes of practice | Minimum-force fretting; take breaks; wrist forward of the neck |
+| Intonation drift up the neck | Saddle position wrong; relief incorrect | Harmonics at fret 12 ≠ fretted note at fret 12 | Intonate each saddle; check truss rod relief |
+
+### The Minimum Force Test
+
+Pick up the guitar and fret any note with far less force than you normally would — barely enough to touch the string. Gradually increase pressure until the note sounds clean with no buzz. That threshold is the actual required force. Most beginners apply 5–10x this force. This test, repeated over several weeks as a conscious habit during practice, rewires muscle memory toward efficiency and prevents the tendon overuse that causes playing-related injuries.
+
+### Intonation Setup Procedure
+
+1. Tune the guitar to pitch with an accurate chromatic tuner.
+2. Play the 12th-fret harmonic on string 6. Record the pitch.
+3. Fret the 12th fret firmly (normal playing force) on string 6. Record the pitch.
+4. If the fretted note is **sharp** of the harmonic: the string is too short. Move the saddle away from the nut (increase string length).
+5. If the fretted note is **flat** of the harmonic: the string is too long. Move the saddle toward the nut (decrease string length).
+6. Re-tune the open string after each saddle adjustment (moving the saddle changes the tension slightly).
+7. Repeat for all six strings.
+
+This procedure guarantees the fretted octave equals the harmonic octave within tuner accuracy. It does not guarantee perfect intonation at every fret (that is a function of string mass uniformity and setup quality), but it ensures the instrument is as in-tune as the design allows.
+
+---
+
+## Module 13: Structured Practice Architecture
+
+### Daily Practice Template (45 Minutes)
+
+The goal of structured practice is deliberate skill-building, not casual playing. Each block targets a specific skill in isolation before combining them.
+
+```
+0:00 – 5:00   │ Physical warm-up
+              │ Spider crawl exercise, frets 5–8, all strings, 60 BPM
+              │ Chromatic runs, alternate picking, 60–70 BPM
+              │
+5:00 – 10:00  │ Note geography
+              │ Name every note on one string (pick a different string each day)
+              │ No patterns — compute from the nearest open-string landmark
+              │
+10:00 – 20:00 │ Technique focus (rotate weekly)
+              │ Week 1: Barre chord transitions (E-shape, all 12 roots)
+              │ Week 2: Pentatonic position 1 lead (bends, vibrato)
+              │ Week 3: CAGED shape arpeggio (E shape → A shape connection)
+              │ Week 4: Legato runs (hammer-on/pull-off lines)
+              │
+20:00 – 30:00 │ Chord progression and rhythm
+              │ Practice this week's target progression with a metronome or drum loop
+              │ Strum pattern + clean changes + palm muting variations
+              │
+30:00 – 40:00 │ Applied musicianship
+              │ Improvise over a backing track using only the target scale/position
+              │ Restriction: play fewer notes, focus on rhythm and phrasing
+              │
+40:00 – 45:00 │ Free playing / ear training
+              │ Play anything — no rules, no metronome
+              │ Try to reproduce a melody you heard today by ear
+```
+
+### Four-Phase Mastery Progression
+
+```mermaid
+flowchart LR
+    subgraph sub_p1 ["Phase 1 — Foundation (Months 1–3)"]
+        P1A["Open chords\n(E, A, D, G, C, Em, Am)"]
+        P1B["Basic strumming\n(down-up patterns, palm muting)"]
+        P1C["Note names\n(all 6 strings, frets 0–12)"]
+        P1A --> P1B --> P1C
+    end
+
+    subgraph sub_p2 ["Phase 2 — Navigation (Months 3–8)"]
+        P2A["Barre chords\n(E and A shapes, all 12 keys)"]
+        P2B["Pentatonic scale\n(5 positions)"]
+        P2C["CAGED system\n(chord shapes + arpeggios)"]
+        P2A --> P2B --> P2C
+    end
+
+    subgraph sub_p3 ["Phase 3 — Expression (Months 6–18)"]
+        P3A["Lead techniques\n(bends, vibrato, slides)"]
+        P3B["Diatonic scales\n(major, natural minor)"]
+        P3C["Voice leading\n(connecting CAGED shapes smoothly)"]
+        P3A --> P3B --> P3C
+    end
+
+    subgraph sub_p4 ["Phase 4 — Musicianship (Ongoing)"]
+        P4A["Harmonic analysis\n(Roman numerals, secondary dominants)"]
+        P4B["Ear training\n(reproduce melodies, identify chords)"]
+        P4C["Repertoire\n(full songs + improvisation in multiple keys)"]
+        P4A --> P4B --> P4C
+    end
+
+    sub_p1 --> sub_p2 --> sub_p3 --> sub_p4
+    sub_p4 -->|"Return with new ears"| sub_p3
+```
+
+### The Backing Track Protocol
+
+A metronome tells you if you are on the beat. A drummer tells you if you are grooving. These are different skills. Once any technique is clean at metronome tempo, the next step is always to put it over a backing track (drum loop, full band minus guitar).
+
+**Platforms for backing tracks:**
+- YouTube: search "[key] [style] backing track" (e.g., "A minor blues backing track")
+- JamTracks app, iReal Pro (chord symbol playback with adjustable tempo)
+- GarageBand / REAPER: build your own simple drum loop
+
+**Constraint-based improvisation rule:** When first improvising over a new chord progression, limit yourself to three notes. Seriously — three. Pick three notes from the pentatonic scale that fit the key, and explore rhythm, timing, vibrato, and phrasing with only those three notes. Remove the note-choice cognitive load and you discover that phrasing is what actually makes music sound musical.
+
+---
+
+## Module 14: Physics of the Fretboard — What You Need to Know (And Nothing More)
+
+Equal temperament divides the octave into 12 equal semitones, each with a frequency ratio of 2^(1/12) ≈ 1.05946. Every fret raises the pitch by this ratio. At fret 12, twelve of these ratios multiply to exactly 2 — the octave. This is why fret 12 is always the geometric midpoint of the vibrating string, regardless of instrument or tuning, and why every fret pattern repeats there. The frets get physically closer together as you go up the neck because equal frequency ratios correspond to logarithmic (not linear) physical distances. The practical takeaway: pressing harder does not change pitch (beyond negligible fretting-sharp), and every fingering pattern repeats identically 12 frets higher.
+
+Standard tuning (E–A–D–G–B–E) uses predominantly perfect fourths (5 semitones) with one major third (4 semitones) between G and B. This asymmetry was chosen to make open major chord shapes practical without requiring large stretches, while keeping the treble strings close enough in pitch for single-note melody playing. The consequence is the G→B one-fret adjustment you will apply thousands of times — every pattern, interval, and chord shape shifts by one fret when it crosses that string boundary.
+
+The harmonic series means a plucked string vibrates at its fundamental frequency and simultaneously at all integer multiples of that frequency. Where you pick determines which harmonics are emphasized: near the bridge produces brightness (more upper partials); near the 12th fret produces a hollow, woody tone (even partials cancel). Open-position chords ring with sympathetic vibration across all strings because the open strings share harmonic relationships with the fretted tones. Barre the same chord up the neck and that sympathetic ring disappears — the timbre changes even though the pitch relationships are identical. This is not a problem; it is a resource.
+
+---
+
+## Quick-Reference Cards
+
+### Fret-to-Note Reference (Low E string, the navigation spine)
+
+```
+Fret:   0    1    2    3    4    5    6    7    8    9   10   11   12
+Note:   E    F    F#   G    G#   A    A#   B    C    C#   D    D#   E
+```
+
+Knowing this row perfectly means you always know the root of any E-shape barre chord and any E-string scale pattern.
+
+### Cross-String Interval Summary
+
+| Crossing | Interval at same fret | Semitones | Unison offset (same pitch) |
+|---|---|---|---|
+| String 6 → 5 | Perfect 4th | +5 | +5 frets |
+| String 5 → 4 | Perfect 4th | +5 | +5 frets |
+| String 4 → 3 | Perfect 4th | +5 | +5 frets |
+| **String 3 → 2** | **Major 3rd** | **+4** | **+4 frets** |
+| String 2 → 1 | Perfect 4th | +5 | +5 frets |
+
+The bolded row is the G→B exception. Every scale shape, chord voicing, and position shift must account for it.
+
+### Five Invariants — The Axioms of the Instrument
+
+1. **Semitone per fret.** Each fret raises pitch by 2^(1/12). Fret 12 = one octave up. All patterns repeat there.
+2. **Standard tuning.** Mostly perfect fourths (5 semitones) with one major third (G→B, 4 semitones). Know this exception reflexively.
+3. **Cross-string unison.** Same pitch on the adjacent thicker string is +5 frets (or +4 across G→B). These two values are the entire architecture of the neck.
+4. **CAGED tiling.** Five shapes cover the entire neck with no gaps. Root offsets between shapes: +2, +3, +2, +2, +3 (sum = 12). Asymmetric offsets arise from the G→B exception.
+5. **Pickup as velocity sensor.** The pickup captures rate of change of magnetic flux, not displacement. Pluck position, pickup selector, and tone control shape timbre. Fretted pitch is unaffected by any of these.
