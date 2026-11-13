@@ -1,80 +1,145 @@
 # Lesson 3: Melodic Development
 
+## Table of Contents
+
+1. [First-Principles Intuition & Invariants](#1-first-principles-intuition--invariants)
+2. [Core Architecture & Mechanics](#2-core-architecture--mechanics)
+3. [Transformational Operations: Theory & Implementation](#3-transformational-operations-theory--implementation)
+4. [Phrase Structure & Hierarchical Form](#4-phrase-structure--hierarchical-form)
+5. [Psychoacoustic Foundations](#5-psychoacoustic-foundations)
+6. [High-Performance Failure Modes & Their Remedies](#6-high-performance-failure-modes--their-remedies)
+7. [Annotated Analytical Examples](#7-annotated-analytical-examples)
+8. [Practical Exercises](#8-practical-exercises)
+
+---
+
 ## 1. First-Principles Intuition & Invariants
 
-The architecture of melody, akin to the architecture of a well-designed software system, is built upon a foundation of invariants that govern both its perception and its construction. At its most elemental level, a melody is a sequence of pitch events that unfold over time, each note contributing to a larger syntactic and semantic structure. This temporal progression, when properly orchestrated, becomes a vehicle for emotional expression that transcends the purely mathematical relationships between frequencies. The melodic line, much like a function call in a complex program, must maintain coherence while allowing for variation and development.
+A melody is not merely a sequence of pitches. It is a time-ordered structure that encodes expectation, fulfillment, and violation — the three cognitive primitives through which a listener constructs musical meaning. Understanding melody from first principles means understanding what invariants must hold for a sequence of pitch events to cohere as a *line* rather than a collection of unrelated sounds.
 
-The fundamental invariant of melodic construction lies in the relationship between pitch and time, which can be understood through the lens of psychoacoustic principles. A melody's memorability is not merely a function of its pitch content but of how those pitches are arranged in time, creating patterns of tension and release that mirror the cognitive processing of information in a computational system. The human ear, like a processor interpreting data streams, seeks patterns and predicts outcomes, and a successful melody exploits this predictive mechanism by introducing just enough surprise to maintain interest without overwhelming the listener's capacity for pattern recognition.
+### 1.1 The Fundamental Invariant: Gestalt Continuation
 
-The melodic line, when analyzed through the lens of harmonic theory, reveals itself as a series of voice-leading relationships that follow mathematical principles of motion. The concept of voice leading, which governs how individual voices move in counterpoint, mirrors the principles of data flow in a distributed system: each note must move efficiently, with minimal disruption to the overall structure, while maintaining its own identity. The melodic contour, whether ascending or descending, creates a waveform-like pattern that can be analyzed through the lens of signal processing, where the slope of the melodic line corresponds to the rate of change in frequency over time, much like how a derivative in calculus describes the rate of change of a function.
+The psychologist Max Wertheimer's Gestalt principle of *good continuation* (1923) describes the perceptual tendency to group elements that form a smooth, predictable trajectory. Applied to pitch, a listener will group notes into a single melodic voice if their intervallic motion is small and directional. Large leaps disrupt this grouping and demand resolution — either a return to the previous register or a stepwise descent that "fills in" the gap. This is not aesthetic preference; it is a property of auditory streaming, the neural mechanism by which the auditory cortex segregates simultaneous sound sources (Bregman, *Auditory Scene Analysis*, 1990).
 
-In the context of software design, a melody can be viewed as a state machine, where each note represents a state and the transitions between notes constitute the system's evolution. The melodic architecture must be robust enough to handle variations in performance, much like a well-designed API must handle edge cases and unexpected inputs. The invariant of melodic development lies in the preservation of the melodic identity through transformation, whether through transposition, inversion, or augmentation, just as a well-designed software component maintains its interface while evolving its internal implementation.
+The practical invariant derived from this: **melodic lines that are principally stepwise (seconds) are maximally perceivable as single, coherent objects.** Leaps are permissible and expressive, but they create a registral "debt" that the melodic line must repay through subsequent contrary motion or stepwise fill. When this debt is not repaid, the listener perceives a register change as structurally significant — a technique composers exploit deliberately (e.g., the opening of Beethoven's Fifth Symphony, Op. 67, where the ascending sixth in the fourth measure is answered by stepwise descent).
 
-The mathematical underpinnings of melodic development are rooted in the principles of symmetry and asymmetry, where the balance between repetition and variation creates the conditions for memorability. This balance is not arbitrary but emerges from the interaction between the listener's expectations and the composer's manipulation of those expectations. The melodic line, like a recursive function, can be broken down into smaller components that maintain the same structural properties as the whole, a principle that allows for the development of complex melodic ideas from simple seeds.
+### 1.2 Pitch as a Discrete Logarithmic Space
+
+Western equal temperament divides the octave into 12 logarithmically equal semitones. The frequency of note $n$ semitones above A4 (440 Hz) is:
+
+$$f(n) = 440 \cdot 2^{n/12}$$
+
+This means intervals are defined by *ratios*, not differences. A major second from C4 to D4 spans the same perceptual distance as a major second from G4 to A4, because both are a frequency ratio of $2^{2/12} \approx 1.122$. This is the foundational reason melodic analysis works in interval space (semitone counts) rather than absolute frequency space.
+
+The MIDI pitch numbering system encodes this directly: MIDI note 60 = C4, with each integer increment representing one semitone. All melodic interval arithmetic reduces to integer subtraction in MIDI space, which is why MIDI became the dominant computational representation for melody.
+
+### 1.3 The Melodic Line as a Markov Process
+
+Statistically, the pitch of a note in a tonal melody is not independent of its predecessor. Analyses of large corpora (Temperley, *Music and Probability*, 2007; Huron, *Sweet Anticipation*, 2006) show that:
+
+- Steps (intervals of 1–2 semitones) account for approximately 65–75% of all melodic motions in Western tonal music.
+- Leaps are followed by stepwise motion in the opposite direction more than 75% of the time.
+- The distribution of melodic intervals is heavily skewed toward small values, following approximately a Zipfian distribution.
+
+This statistical regularity is not accidental. It reflects a first-order Markov dependency: the transition probability from pitch $p_n$ to pitch $p_{n+1}$ is conditioned on $p_n$ and, with weakening weight, on $p_{n-1}$. This is the empirical foundation of the "melodic gravity" principle formalized by Hindemith (*The Craft of Musical Composition*, 1937) and later extended by Narmour's Implication-Realization model (1990).
+
+### 1.4 The Tension-Resolution Duality as an Invariant
+
+Every note in a tonal melody occupies a position in the tension hierarchy of its governing key. The scale degrees have characteristic stability values:
+
+| Scale Degree | Name | Stability (1 = most stable) |
+|---|---|---|
+| 1̂ (tonic) | Do | 1 |
+| 5̂ (dominant) | Sol | 2 |
+| 3̂ (mediant) | Mi | 3 |
+| 2̂ (supertonic) | Re | 4 |
+| 6̂ (submediant) | La | 4 |
+| 4̂ (subdominant) | Fa | 5 |
+| 7̂ (leading tone) | Ti | 6 |
+
+This hierarchy, formalized by Lerdahl in *Tonal Pitch Space* (2001), means that melodic motion from an unstable degree (7̂) to a stable one (1̂) is experienced as resolution regardless of rhythmic context. A melody that consistently ends phrases on 1̂ or 5̂ establishes closure. One that ends phrases on 7̂ or 2̂ creates forward momentum. This is the structural invariant that governs phrase endings across virtually all tonal repertoire from Bach to Tin Pan Alley.
+
+---
 
 ## 2. Core Architecture & Mechanics
 
-The melodic architecture can be understood through a hierarchical data structure that mirrors the layers of abstraction in software design. At the base level, the melodic line is represented as a sequence of pitch classes, each with associated temporal parameters and articulation characteristics. This sequence can be modeled as a linked list of note objects, where each node contains not only pitch information but also contextual data such as duration, velocity, and harmonic function.
+### 2.1 The Note as a Multi-Dimensional Object
 
+A note in a melodic line is not a scalar pitch value. It is a composite object with at least six independently variable dimensions:
+
+```mermaid
+classDiagram
+    class Note {
+        +int pitch_midi
+        +float duration_beats
+        +int velocity_midi
+        +Articulation articulation
+        +ScaleDegree harmonic_function
+        +float onset_seconds
+    }
+
+    class Articulation {
+        <<enumeration>>
+        LEGATO
+        STACCATO
+        TENUTO
+        ACCENT
+        MARCATO
+    }
+
+    class ScaleDegree {
+        <<enumeration>>
+        TONIC
+        SUPERTONIC
+        MEDIANT
+        SUBDOMINANT
+        DOMINANT
+        SUBMEDIANT
+        LEADING_TONE
+        CHROMATIC
+    }
+
+    class Motive {
+        +List~Note~ notes
+        +transform(TransformType t) Motive
+        +invert(int pivot_midi) Motive
+        +retrograde() Motive
+        +transpose(int semitones) Motive
+        +augment(float ratio) Motive
+        +diminish(float ratio) Motive
+    }
+
+    class Phrase {
+        +List~Motive~ motives
+        +ScaleDegree cadence_degree
+        +PhraseType type
+        +develop() Phrase
+    }
+
+    class PhraseType {
+        <<enumeration>>
+        ANTECEDENT
+        CONSEQUENT
+        CONTINUATION
+        CADENTIAL
+    }
+
+    Note "1..*" --o Motive
+    Motive "1..*" --o Phrase
+    Note --> Articulation
+    Note --> ScaleDegree
+    Phrase --> PhraseType
 ```
-┌─────────────┐
-│   Note      │
-├─────────────┤
-│ pitch_class │
-│ duration    │
-│ velocity    │
-│ articulation│
-│ harmonic_function│
-└─────────────┘
-       │
-       ▼
-┌─────────────┐
-│   Note      │
-├─────────────┤
-│ pitch_class │
-│ duration    │
-│ velocity    │
-│ articulation│
-│ harmonic_function│
-└─────────────┘
-       │
-       ▼
-┌─────────────┐
-│   Note      │
-├─────────────┤
-│ pitch_class │
-│ duration    │
-│ velocity    │
-│ articulation│
-│ harmonic_function│
-└─────────────┘
-```
 
-The melodic development process operates on this structure through a series of transformation algorithms that modify the sequence while preserving its essential character. The most fundamental of these transformations is the concept of melodic inversion, which mirrors the mathematical principle of reflection. When a melodic line is inverted, each interval is preserved but in the opposite direction, creating a new melodic shape that maintains the same harmonic relationships while offering a fresh perspective on the material.
+### 2.2 The Melodic Line as a Linked Temporal Structure
 
-The algorithm for melodic inversion can be expressed as:
+```mermaid
+graph LR
+    subgraph "Melodic Line (Phrase Level)"
+        P1["Phrase A\n(Antecedent)"] --> P2["Phrase A'\n(Consequent)"]
+        P2 --> P3["Phrase B\n(Continuation)"]
+        P3 --> P4["Phrase A''\n(Cadential)"]
+    end
 
-```
-for each note in melodic_line:
-    if note is not the pivot note:
-        new_interval = pivot_note.pitch - note.pitch
-        new_note = pivot_note.pitch + new_interval
-        new_note.duration = note.duration
-        new_note.velocity = note.velocity
-        new_note.articulation = note.articulation
-        new_note.harmonic_function = note.harmonic_function
-```
-
-The development of melodic motifs follows a similar pattern, where the motif is treated as a unit that can be transformed through various operations. The most common transformations include transposition, inversion, and retrograde, each of which can be implemented as a function that operates on the melodic sequence. These transformations are not merely mechanical but are guided by principles of musical logic that ensure the transformed material remains coherent with the original.
-
-The melodic architecture also incorporates the concept of phrase structure, where the melodic line is divided into segments that follow specific syntactic rules. These phrases can be modeled as hierarchical structures, where each phrase contains sub-phrases that follow the same principles of development. The relationship between these phrases mirrors the relationship between functions in a software system, where each phrase contributes to the overall structure while maintaining its own integrity.
-
-## 3. High-Performance Optimization & Failure Modes
-
-The optimization of melodic development algorithms must account for the computational complexity of maintaining coherence while allowing for variation. In software terms, this is analogous to optimizing a recursive algorithm for performance while ensuring that the recursive calls do not exceed the system's stack depth. The melodic development process must be designed to handle large datasets efficiently, particularly when dealing with complex harmonic progressions that require real-time analysis and transformation.
-
-One of the primary failure modes in melodic development is the loss of coherence, where transformations applied to the melodic line result in a sequence that no longer maintains the original's structural integrity. This can occur if the transformations are applied without consideration of the harmonic context or if the melodic line becomes too fragmented. To mitigate this, composers must carefully balance the application of transformations with an understanding of the underlying harmonic structure.
-
-Another failure mode is the overuse of repetition, which can lead to a lack of variety and interest. While repetition is a fundamental aspect of musical development, it must be used judiciously to maintain the listener's engagement. Composers should ensure that repeated motifs are varied in some way—through transposition, inversion, or other transformations—to prevent monotony.
-
-In summary, the development of a melodic line is a complex process that requires a deep understanding of both the mathematical and psychological principles that govern musical perception. By carefully balancing coherence and variation, composers can create melodies that are both memorable and emotionally resonant.
+    subgraph "Phrase A (Motive Level)"
+        M1["Motive α"] --> M2["Motive α
