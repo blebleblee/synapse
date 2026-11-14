@@ -44,6 +44,8 @@ from learning_engine.enhancer import enhance_existing_topic
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
 GIT_QUEUE = Queue()
 
+import re
+
 def git_worker():
     while True:
         task = GIT_QUEUE.get()
@@ -51,19 +53,45 @@ def git_worker():
             GIT_QUEUE.task_done()
             break
         subtopic_dir, subtopic_id, prefix = task
+        
+        # Security: validate subtopic_id to prevent commit message injection
+        if not re.match(r"^[a-zA-Z0-9_\-]+$", subtopic_id):
+            print(f"[✘] Git error: Invalid subtopic_id '{subtopic_id}'")
+            GIT_QUEUE.task_done()
+            continue
+
         published = False
         for attempt in range(5):
             try:
-                subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
-                subprocess.run(["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-                subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
+                # Add a timeout to prevent hanging git processes
+                subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15)
+                
+                # Check=False on commit because it fails if there are no changes, which is fine
+                subprocess.run(
+                    ["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum"],
+                    check=False, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=15
+                )
+                
+                # Push with check=True so we actually detect failures
+                res = subprocess.run(
+                    ["git", "push", "origin", "main"],
+                    check=True, cwd=str(WORKSPACE_ROOT), capture_output=True, timeout=30, text=True
+                )
                 print(f"[✔] Published & Pushed: {subtopic_id}")
                 published = True
                 break
-            except Exception:
-                time.sleep(1.5)
+            except subprocess.TimeoutExpired:
+                print(f"      [!] Git operation timed out for {subtopic_id} (attempt {attempt+1}/5)")
+                time.sleep(2)
+            except subprocess.CalledProcessError as e:
+                # Could be remote rejection, fast-forward error, etc.
+                time.sleep(2)
+            except Exception as e:
+                print(f"      [!] Unexpected Git error for {subtopic_id}: {e}")
+                time.sleep(2)
+                
         if not published:
-            print(f"[✘] Git error for {subtopic_id}: lock contention after 5 attempts")
+            print(f"[✘] Git error for {subtopic_id}: Failed to publish after 5 attempts")
         GIT_QUEUE.task_done()
 
 def is_topic_complete(subtopic_dir: Path) -> bool:

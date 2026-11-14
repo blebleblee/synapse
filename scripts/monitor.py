@@ -15,25 +15,39 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 LOG_FILE = WORKSPACE_ROOT / "generator.log"
+GIT_CWD = str(WORKSPACE_ROOT)
+
+def strip_ansi(text: str) -> str:
+    """Removes terminal escape sequences to prevent terminal injection."""
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
 
 def get_process_status():
-    res = subprocess.run(["pgrep", "-fl", "generate_all.py"], capture_output=True, text=True)
-    lines = [l.strip() for l in res.stdout.strip().splitlines() if l.strip()]
-    return lines
+    try:
+        res = subprocess.run(["pgrep", "-fl", "generate_all.py"], capture_output=True, text=True, timeout=5)
+        return [l.strip() for l in res.stdout.strip().splitlines() if l.strip()]
+    except Exception:
+        return []
 
 def get_recent_commits(limit=5):
-    res = subprocess.run(
-        ["git", "log", "--grep=^enhance(", f"-n{limit}", "--format=%h | %cr | %s"],
-        capture_output=True, text=True, cwd=str(WORKSPACE_ROOT)
-    )
-    return [l for l in res.stdout.strip().splitlines() if l.strip()]
+    try:
+        res = subprocess.run(
+            ["git", "log", "--grep=^enhance(", f"-n{limit}", "--format=%h | %cr | %s"],
+            capture_output=True, text=True, cwd=GIT_CWD, timeout=5
+        )
+        return [l for l in res.stdout.strip().splitlines() if l.strip()]
+    except Exception:
+        return []
 
 def get_current_diff_stat():
-    res = subprocess.run(
-        ["git", "diff", "--stat", "topics/"],
-        capture_output=True, text=True, cwd=str(WORKSPACE_ROOT)
-    )
-    return res.stdout.strip()
+    try:
+        res = subprocess.run(
+            ["git", "diff", "--stat", "topics/"],
+            capture_output=True, text=True, cwd=GIT_CWD, timeout=5
+        )
+        return res.stdout.strip()
+    except Exception:
+        return ""
 
 def get_batch_progress():
     if not LOG_FILE.exists():
@@ -53,9 +67,10 @@ def get_latest_log_lines(n=8):
         return ["(No generator.log found yet)"]
     try:
         lines = LOG_FILE.read_text(encoding="utf-8", errors="replace").splitlines()
-        return lines[-n:] if lines else ["(Waiting for log output...)"]
+        sanitized = [strip_ansi(line) for line in lines[-n:]]
+        return sanitized if sanitized else ["(Waiting for log output...)"]
     except Exception as e:
-        return [f"(Log read error: {e})"]
+        return [f"(Log read error: {type(e).__name__})"]
 
 def render():
     procs = get_process_status()

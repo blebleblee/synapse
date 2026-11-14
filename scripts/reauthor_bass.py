@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
+import os
 from pathlib import Path
+from datetime import datetime
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
@@ -8,8 +10,22 @@ if str(WORKSPACE_ROOT) not in sys.path:
 
 from learning_engine.models import AnthropicProvider, validate_generation_output
 
-p = AnthropicProvider(model="claude-opus-5-5")
-path = WORKSPACE_ROOT / "topics/arts/music_performance/bass_guitar/lesson_01_technique_and_fretboard_mechanics.md"
+if not os.getenv("ANTHROPIC_API_KEY"):
+    print("[✘] Error: ANTHROPIC_API_KEY environment variable not set", file=sys.stderr)
+    sys.exit(1)
+
+TARGET_PATH = WORKSPACE_ROOT / "topics/arts/music_performance/bass_guitar/lesson_01_technique_and_fretboard_mechanics.md"
+if not TARGET_PATH.resolve().is_relative_to(WORKSPACE_ROOT):
+    print("[✘] Security: target path escapes workspace root", file=sys.stderr)
+    sys.exit(1)
+
+# Backup existing file
+if TARGET_PATH.exists():
+    backup_path = TARGET_PATH.with_suffix(f".md.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+    backup_path.write_text(TARGET_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+    print(f"[i] Backed up existing file to {backup_path.name}")
+
+p = AnthropicProvider(model="claude-sonnet-5")
 
 prompt = """You are a master conservatory bass instructor and distinguished touring bassist.
 Write the complete, comprehensive, publication-ready masterclass lesson for:
@@ -27,8 +43,19 @@ PRACTICALITY FIRST MANDATE (85% Hands-On Execution / 15% Acoustic Grounding):
 4. Output the complete raw Markdown document starting directly with the title '# Lesson 1: Bass Guitar Fretboard Layout and Left-Hand Mechanics'. No outer code fences.
 """
 
-print("[~] Re-authoring bass_guitar lesson 1 with practical musician-first mandate...")
-res = p.generate(prompt, max_tokens=6000)
-validated = validate_generation_output(res)
-path.write_text(validated.strip() + "\n", encoding="utf-8")
-print(f"[✔] Re-authored bass_guitar lesson 1: {len(validated.splitlines())} lines!")
+# Sonnet output bounds
+MAX_TOKENS = 8192
+
+try:
+    print("[~] Re-authoring bass_guitar lesson 1 with practical musician-first mandate...")
+    res = p.generate(prompt, max_tokens=MAX_TOKENS)
+    validated = validate_generation_output(res)
+    
+    if not validated or len(validated.strip()) < 500:
+        raise ValueError("Generated content is empty or suspiciously short")
+    
+    TARGET_PATH.write_text(validated.strip() + "\n", encoding="utf-8")
+    print(f"[✔] Re-authored bass_guitar lesson 1: {len(validated.splitlines())} lines written to {TARGET_PATH.name}")
+except Exception as e:
+    print(f"[✘] Failed to generate lesson: {type(e).__name__}: {e}", file=sys.stderr)
+    sys.exit(1)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-from pathlib import Path
+import os
 import sys
+from pathlib import Path
+from datetime import datetime
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
@@ -8,7 +10,11 @@ if str(WORKSPACE_ROOT) not in sys.path:
 
 from learning_engine.models import AnthropicProvider, validate_generation_output
 
-p = AnthropicProvider(model="claude-opus-5-5")
+if not os.getenv("ANTHROPIC_API_KEY"):
+    print("[✘] Error: ANTHROPIC_API_KEY environment variable not set", file=sys.stderr)
+    sys.exit(1)
+
+p = AnthropicProvider(model="claude-sonnet-5")
 
 targets = [
     ("computing", "postgresql", WORKSPACE_ROOT / "topics/computing/data/postgresql/lesson_03_mvcc_wal_and_vacuum.md"),
@@ -19,6 +25,10 @@ targets = [
 ]
 
 for domain, subtopic, path in targets:
+    if not path.resolve().is_relative_to(WORKSPACE_ROOT):
+        print(f"[✘] Security: Skipping {path.name}, path escapes workspace root", file=sys.stderr)
+        continue
+
     title_str = path.stem.replace("_", " ").title()
     print(f"\n[~] Re-authoring complete masterclass for: {path.name} in {subtopic}...", flush=True)
     prompt = f"""You are an elite textbook author and staff engineer (MIT Press / O'Reilly standard).
@@ -32,10 +42,23 @@ OBJECTIVES:
 3. Every Mermaid diagram must use strict subgraph IDs: subgraph sub_id ["Title"].
 4. Output the complete raw Markdown document starting directly with '# {title_str}'. No outer code fences.
 """
-    res = p.generate(prompt, max_tokens=7000)
-    validated = validate_generation_output(res)
-    path.write_text(validated.strip() + "\n", encoding="utf-8")
-    lines = len(validated.splitlines())
-    print(f"[✔] Successfully authored {path.name}: {lines} lines!", flush=True)
+    try:
+        res = p.generate(prompt, max_tokens=8192)
+        validated = validate_generation_output(res)
+        
+        if not validated or len(validated.strip()) < 500:
+            print(f"[✘] Error: Generated content for {path.name} is too short", file=sys.stderr)
+            continue
+            
+        if path.exists():
+            backup_path = path.with_suffix(f".md.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+            backup_path.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+            
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(validated.strip() + "\n", encoding="utf-8")
+        lines = len(validated.splitlines())
+        print(f"[✔] Successfully authored {path.name}: {lines} lines!", flush=True)
+    except Exception as e:
+        print(f"[✘] Failed to author {path.name}: {e}", file=sys.stderr)
 
 print("\n[✔] All 5 truncated files successfully re-authored!")

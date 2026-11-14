@@ -5,14 +5,20 @@ Replaces generic kernel/eBPF stubs with authentic, topic-specific masterclass la
 """
 
 import sys
+import os
 import time
 from pathlib import Path
+from datetime import datetime
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 if str(WORKSPACE_ROOT) not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT))
 
 from learning_engine.models import AnthropicProvider, validate_generation_output
+
+if not os.getenv("ANTHROPIC_API_KEY"):
+    print("[✘] Error: ANTHROPIC_API_KEY environment variable not set", file=sys.stderr)
+    sys.exit(1)
 
 TARGETS = [
     {
@@ -54,7 +60,7 @@ TARGETS = [
 ]
 
 def main():
-    p = AnthropicProvider(model="claude-opus-5-5")
+    p = AnthropicProvider(model="claude-sonnet-5")
     print(f"[*] Starting targeted labs rework with {p.model} across {len(TARGETS)} infrastructure topics...")
 
     for item in TARGETS:
@@ -63,9 +69,12 @@ def main():
         focus = item["focus"]
         tools = item["tools"]
         out_path = WORKSPACE_ROOT / "topics" / "computing" / "infrastructure" / slug / "labs.md"
-        if not out_path.parent.exists():
-            print(f"[!] Skipping {slug}: directory not found")
+        
+        if not out_path.resolve().is_relative_to(WORKSPACE_ROOT):
+            print(f"[✘] Security: Skipping {slug}, path escapes workspace root", file=sys.stderr)
             continue
+            
+        out_path.parent.mkdir(parents=True, exist_ok=True)
 
         print(f"\n==================================================")
         print(f"[*] Authoring dedicated labs for: {slug} ({title})...")
@@ -89,23 +98,37 @@ OBJECTIVES:
 """
 
         t0 = time.time()
-        chunks = []
-        sys.stdout.write("  [~] Streaming tokens: ")
-        sys.stdout.flush()
-        try:
-            for chunk in p.generate_stream(prompt, system_instruction=f"You are a master staff engineer specializing in {title}.", max_tokens=6000):
-                chunks.append(chunk)
-                sys.stdout.write(".")
-                sys.stdout.flush()
+        for attempt in range(1, 4):
+            chunks = []
+            sys.stdout.write(f"  [~] Streaming tokens (attempt {attempt}/3): ")
+            sys.stdout.flush()
+            try:
+                for chunk in p.generate_stream(prompt, system_instruction=f"You are a master staff engineer specializing in {title}.", max_tokens=8192):
+                    chunks.append(chunk)
+                    sys.stdout.write(".")
+                    sys.stdout.flush()
 
-            raw = "".join(chunks)
-            validated = validate_generation_output(raw)
-            out_path.write_text(validated.strip() + "\n", encoding="utf-8")
-            elapsed = time.time() - t0
-            lines = len(validated.splitlines())
-            print(f"\n  [✔] Successfully generated {slug}/labs.md ({lines} lines in {elapsed:.1f}s)!")
-        except Exception as e:
-            print(f"\n  [✘] Failed {slug}: {e}")
+                raw = "".join(chunks)
+                validated = validate_generation_output(raw)
+                
+                if not validated or len(validated.strip()) < 500:
+                    raise ValueError("Generated output is too short or empty")
+                
+                if out_path.exists():
+                    backup_path = out_path.with_suffix(f".md.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+                    backup_path.write_text(out_path.read_text(encoding="utf-8"), encoding="utf-8")
+                    
+                out_path.write_text(validated.strip() + "\n", encoding="utf-8")
+                elapsed = time.time() - t0
+                lines = len(validated.splitlines())
+                print(f"\n  [✔] Successfully generated {slug}/labs.md ({lines} lines in {elapsed:.1f}s)!")
+                break
+            except Exception as e:
+                print(f"\n  [✘] Attempt {attempt} failed for {slug}: {e}")
+                if attempt < 3:
+                    time.sleep(attempt * 4)
+                else:
+                    print(f"  [✘] Skipping {slug} after 3 failures.", file=sys.stderr)
 
     print("\n[✔] All targeted infrastructure labs reworked successfully!")
 
