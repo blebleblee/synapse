@@ -4,69 +4,56 @@
 
 ## 1. First-Principles Intuition (The 15%)
 
-Two-handed coordination is the foundational skill of polyphonic keyboard performance. Before drilling exercises, understand *why* the hands resist independence and *what* you're physically training against.
+Two-handed coordination is the foundation of all polyphonic keyboard playing. Before drilling, understand why the hands resist independence and what you're training against.
 
-**The core problem:** Your two hands are wired for symmetry. The corpus callosum — the neural bridge between hemispheres — tends to synchronize homologous muscles. When your right hand lifts finger 3, your left finger 3 wants to lift too. This mirror-movement tendency is normal neurology; overcoming it is the entire project.
+**The problem:** Your two hands are neurologically biased toward symmetry. When right-hand finger 3 lifts, left-hand finger 3 wants to lift too — this mirroring tendency is normal and universal. Training independence means building inhibitory control that lets each hand run its own motor program while both stay locked to one shared sense of beat.
 
-**The core solution:** Repetition builds dedicated inhibitory pathways that selectively block cross-hemisphere crosstalk. The cerebellum stores timing templates for each hand as separate motor programs. The supplementary motor area (SMA) acts as conductor, triggering both programs from a shared metrical grid without letting them collapse into unison.
+**The anatomical catch:** Fingers 3, 4, and 5 share tendons from the extensor digitorum communis. Move finger 4 alone and it drags on 3 and 5 — this is why the 4–5 pair is always the hardest to separate. You can't out-will a tendon; you train the small intrinsic hand muscles (interossei, lumbricals) to compensate, which is slow, deliberate work, not strength training.
 
-**Acoustic consequence of timing:** Notes struck with even millisecond offsets produce comb filtering — constructive and destructive interference across the frequency spectrum. Perfectly simultaneous attacks in block chords create maximum spectral fusion; slightly staggered attacks (arpeggiaton) create a sweeping spatial bloom. You are controlling acoustic physics with finger timing, not just hitting notes together or apart.
+**The key-action physics you need to feel, not calculate:** A piano key is a lever with a catch point. The escapement releases the hammer at roughly 10mm of key depth — past that point, resistance drops sharply and the hammer is already in free flight toward the string. If your finger decelerates before that break, the hammer loses velocity and the note goes soft or doesn't sound, no matter how hard you "meant" to play. This is why tentative playing sounds weak even when the dynamic marking says forte: you have to commit through the key, not onto it.
 
-**Anatomical constraint you must know:** Fingers 3, 4, and 5 share tendons from the extensor digitorum communis. Moving finger 4 alone creates passive drag on 3 and 5. This is why the 4–5 pair is the hardest to train independently. No amount of willpower bypasses the tendon; you must train the intrinsic hand muscles (interossei, lumbricals) to compensate.
-
-**The key action physics:** A piano key is a lever. The escapement releases the hammer at roughly 10mm depth, after which key resistance drops sharply. Your finger must accelerate *through* that break point — if you decelerate before the break, the hammer loses velocity and the note goes soft or misses. This is why hesitant, timid playing sounds weak even at marked forte dynamics.
+**Why this matters for two hands together:** when both hands commit through the escapement point with the same timing, you get a fused, percussive attack (good for block chords and unison passages). When one hand's attack lags the other by even 20–30ms, you get a smeared, arpeggiated effect — useful on purpose, a flaw by accident. Coordination training is ultimately about controlling *when* each hand commits through that break point, on purpose, every time.
 
 ---
 
 ## 2. Hand Setup & Posture — Non-Negotiables
 
-Get these right before any drill. Poor mechanics make every exercise a training in injury, not skill.
+Fix these before any drill. Bad mechanics turn every exercise into a rehearsal for injury.
 
 ### 2.1 Bench Position
-
-- **Height:** Forearms roughly parallel to the floor when fingers rest on the keys. Elbows should be level with or *very slightly above* the keybed. Sitting too low forces your shoulders up; sitting too high pushes your wrists into extension.
-- **Distance:** Sit far enough that your elbows stay in front of your torso — not behind your body — when your hands are on middle-register keys. A fist's width of clearance between your body and the keyboard is a reasonable starting point.
-- **Seat depth:** Sit on the front half of the bench. This encourages a slight forward tilt of the pelvis and a neutral lumbar curve. Do not slump.
+- **Height:** forearms roughly parallel to the floor, elbows level with or very slightly above the keybed. Too low and your shoulders hike up; too high and your wrists get pushed into extension.
+- **Distance:** elbows should stay in front of your torso when your hands are on the middle keys — not pinned behind you. A fist's width between your body and the fallboard is a reasonable starting distance.
+- **Seat:** sit on the front half of the bench, pelvis tilted slightly forward, lumbar curve neutral. Don't slump into the backrest — most piano benches don't have one anyway.
 
 ### 2.2 Hand Arch & Finger Curve
+Picture holding a small apple in your palm:
+- Knuckle line (MCP joints) forms the top of the arch — elevated, never caved in.
+- Middle joint (PIP) bent about 50–60°.
+- Fingertip joint (DIP) bent 20–30°, striking the key on the pad of the fingertip, not the flat.
+- Nails trimmed short enough that they never touch the key.
 
-The ideal hand shape resembles holding a large apple:
-
-- MCP joints (knuckle line) form the apex of an arch — elevated, not collapsed
-- PIP joints (middle knuckle) bent approximately 50–60°
-- DIP joints (fingertip) bent 20–30°, contacting the key on the fingertip pad, not the flat of the finger
-- Fingernails short enough that they never contact the key surface
-
-**Common collapse failure:** The first knuckle (MCP) of finger 3 or 4 hyperextends inward, causing the arch to cave. This destroys force transfer efficiency and stresses the joint capsule. Correct it immediately — it does not self-correct with speed.
+**Watch for:** the knuckle of finger 3 or 4 buckling inward under pressure. This kills force transfer and stresses the joint capsule. It will not self-correct with speed — fix it the moment you see or feel it, even if that means stopping mid-phrase.
 
 ### 2.3 Wrist Alignment
-
-- Wrist should be in neutral position: level with or very slightly below the knuckle line
-- Avoid sustained wrist flexion (wrist dropped below keyboard level) — this compresses the carpal tunnel
-- Avoid sustained wrist extension (wrist raised above knuckles) — this strains the extensor tendons
-- The wrist acts as a shock absorber and fine-positioning device, not a primary power generator
+- Neutral: level with, or a hair below, the knuckle line.
+- No sustained wrist drop (compresses the carpal tunnel) and no sustained wrist hike (strains the extensor tendons).
+- The wrist absorbs shock and makes small positional adjustments. It is not a power source.
 
 ### 2.4 Arm Weight vs. Finger Pressure
 
-This distinction is central to mature technique:
+| Source | Use for | Avoid when |
+|---|---|---|
+| Arm weight (gravity + forearm drop) | Forte chords, octaves, singing melody tone | Fast repeated notes, quiet passages |
+| Finger flexion from the knuckle | Fast passagework, staccato, articulation | Playing loud by gripping instead of dropping weight |
+| Forearm rotation (pronation/supination) | Thumb crossings in scales, rolled chords | Substituting sideways wrist wobble for rotation |
 
-| Source | Use For | Avoid When |
-|--------|---------|------------|
-| Arm weight (gravity + forearm drop) | Forte chords, octaves, full-tone melody | Rapid repeated notes, soft passages |
-| Finger flexion | Fast passagework, articulation control, staccato | Playing fortissimo alone — causes gripping |
-| Forearm rotation (pronation/supination) | Scale thumb crossings, chord roll direction | Lateral wrist deviation as a substitute |
-
-**Practical test:** With your right hand in position, let your arm go completely loose from the shoulder. Your hand should drop onto the keys with a natural "thunk" that produces a moderate forte. If you have to actively push down to get a sound, you're working against yourself.
+**Quick test:** Let your right arm go completely dead from the shoulder and let it fall onto the keys. You should get a natural "thunk" at a moderate forte with zero conscious pushing. If you have to actively press to get sound, you're fighting your own arm.
 
 ---
 
-## 3. Keyboard Geography & Hand Coordination Maps
-
-Before the drills, internalize the spatial logic.
+## 3. Keyboard Geography & Coordination Maps
 
 ### 3.1 Five-Finger Position Box
-
-The foundation of all two-hand coordination is the five-finger box in each hand:
 
 ```
 Right Hand (C4–G4):
@@ -78,53 +65,53 @@ Left Hand (C3–G3):
   5    4    3    2    1
 ```
 
-Both hands share the same finger-number logic relative to their own thumbs (1). The hands are mirror images of each other in position but not in musical function — the left hand carries bass/harmony, the right carries melody.
+Both hands number fingers from their own thumb (1), making them geometric mirror images — but musically they have opposite jobs: left carries bass and harmony, right usually carries melody.
 
-### 3.2 Two-Hand Interval Relationship Map
+### 3.2 Two-Hand Interval Spacing Rule
 
 ```
-LH plays:   C    E    G    C (octave)
-RH plays:   C    E    G    C (octave)
+LH plays:   C    E    G    C (octave up)
+RH plays:   C    E    G    C (octave up)
 Interval:  Uni   3rd  5th  Oct
 ```
 
-When both hands play the same pitch class in different octaves, you're reinforcing harmonics (octave doubling). When hands play different pitch classes, you're creating intervals whose acoustic interaction depends on spacing. **Rule of thumb:** Bass register intervals of a third or less create muddiness due to critical band overlap — space them out.
+When both hands double the same pitch class an octave or more apart, you reinforce the harmonic series and the sound fuses. When the hands play close intervals *in the bass register* (a third or closer, below roughly C3), you get mud — the ear can't separate the overtones because they fall inside the same critical band. **Rule of thumb:** keep left-hand intervals a fourth or wider below middle C; you can voice thirds and seconds tightly only in the mid-to-upper register.
 
 ### 3.3 The Two-Hand Coordination Architecture
 
 ```mermaid
 graph TB
     subgraph sub_musical_intention ["Musical Intention"]
-        SCORE["Score / Musical Goal<br/>(Melody, Harmony, Rhythm, Expression)"]
+        SCORE["Score / Musical Goal<br/>melody, harmony, rhythm, expression"]
     end
 
     subgraph sub_central_control ["Central Timing & Planning"]
-        SMA["Supplementary Motor Area<br/>Bimanual Timing Conductor"]
-        METER["Internal Metrical Grid<br/>Shared Beat Reference"]
-        BG["Basal Ganglia<br/>Motor Habit / Automaticity"]
+        SMA["Bimanual Timing Conductor<br/>coordinates both hands"]
+        METER["Shared Metrical Grid<br/>the one beat both hands trust"]
+        BG["Motor Habit / Automaticity<br/>frees attention once learned"]
     end
 
     subgraph sub_right_hand_chain ["Right Hand Chain"]
-        RH_M1["Left Hemisphere M1<br/>RH Motor Commands"]
-        RH_CB["Cerebellum<br/>RH Timing Model"]
-        RH_EXEC["Right Hand<br/>Fingers 1–5"]
+        RH_M1["RH Motor Program"]
+        RH_CB["RH Timing Model"]
+        RH_EXEC["Right Hand<br/>fingers 1-5"]
     end
 
     subgraph sub_left_hand_chain ["Left Hand Chain"]
-        LH_M1["Right Hemisphere M1<br/>LH Motor Commands"]
-        LH_CB["Cerebellum<br/>LH Timing Model"]
-        LH_EXEC["Left Hand<br/>Fingers 1–5"]
+        LH_M1["LH Motor Program"]
+        LH_CB["LH Timing Model"]
+        LH_EXEC["Left Hand<br/>fingers 1-5"]
     end
 
     subgraph sub_instrument ["Instrument & Acoustic Output"]
-        ACTION["Piano Action<br/>Hammer / Escapement"]
-        STRING["String Vibration<br/>+ Soundboard"]
-        SOUND["Acoustic Output<br/>+ Sympathetic Resonance"]
+        ACTION["Piano Action<br/>hammer / escapement"]
+        STRING["String + Soundboard"]
+        SOUND["Acoustic Output<br/>+ sympathetic resonance"]
     end
 
-    subgraph sub_feedback ["Sensory Feedback Loop"]
-        TOUCH["Tactile / Proprioceptive<br/>Key Resistance & Depth"]
-        AUDIO["Auditory Feedback<br/>~15ms delay"]
+    subgraph sub_feedback ["Feedback Loop"]
+        TOUCH["Key Resistance & Depth<br/>felt instantly"]
+        AUDIO["Sound Reaching Ear<br/>~15ms delay"]
     end
 
     SCORE --> SMA
@@ -163,117 +150,108 @@ graph TB
     style SOUND fill:#e3f2fd
 ```
 
-The key insight from this diagram: **both hands share one metrical grid** (the METER node) but execute from independent motor programs (separate M1 and cerebellum chains). Your practice goal is to make the shared grid rock-solid while giving each chain its own autonomous program.
+The practical takeaway: both hands answer to **one** shared beat, but each runs its own independent motor program. Your practice job splits in two — make the shared beat rock-solid, and make each hand's program automatic enough to run without supervision.
 
 ---
 
 ## 4. Finger Independence Drills
 
-Work through these in order. Do not rush to the next drill until the current one is clean at the target tempo.
+Work these in order. Don't advance until the current drill is clean at target tempo.
 
-### Drill 1: Five-Finger Warm-Up (Hanon #1 Pattern)
+### Drill 1: Five-Finger Warm-Up (Hanon-Style Pattern)
 
-**Goal:** Even tone, controlled descent, no accent bumps on 3–4 crossing.
+**Goal:** even tone, no accent bump on the 3–4 crossing.
 
-**Right Hand only, C position:**
+**Right Hand, C position:**
 ```
-Fingers:  1-2-3-4-5-4-3-2 | 2-3-4-5-4-3-2-1 | ...ascending by half step
+Fingers:  1-2-3-4-5-4-3-2 | 2-3-4-5-4-3-2-1 | ...up by half step each group
 Notes:    C-D-E-F-G-F-E-D | D-E-F-G-F-E-D-C | ...
 ```
 
-**Left Hand only, same position:**
+**Left Hand, same position:**
 ```
-Fingers:  5-4-3-2-1-2-3-4 | 4-3-2-1-2-3-4-5 | ...ascending
+Fingers:  5-4-3-2-1-2-3-4 | 4-3-2-1-2-3-4-5 | ...up by half step each group
 Notes:    C-D-E-F-G-F-E-D | D-E-F-G-F-E-D-C | ...
 ```
 
-**Metronome targets:** ♩ = 60 → 80 → 100 → 120 (sixteenth notes per beat)
-- At 60: Listen for complete evenness. If any note is louder, that finger is gripping.
-- At 100+: Keep the hand arch. The moment the knuckles collapse, stop and reset.
+**Metronome targets (sixteenth notes, one group per beat):** ♩ = 60 → 80 → 100 → 120
+- At 60: listen for perfect evenness. Any note poking out means that finger is gripping instead of releasing cleanly.
+- At 100+: watch the knuckle arch in a mirror. The instant it collapses, stop and reset — don't push through a collapsed hand.
 
-**Common error:** Accent on beat 1 of each group. Practice with a "negative accent" — consciously play beat 1 quieter until the accent reflex dies.
+**Common error:** an automatic accent on beat 1 of every group. Fix it by deliberately playing beat 1 *quieter* than the rest until the reflex disappears.
 
 ---
 
-### Drill 2: Held-Note Independence (Intrinsic Muscle Isolator)
+### Drill 2: Held-Note Independence (The Tendon Isolator)
 
-This targets the specific anatomical problem — training fingers to move independently despite shared tendons.
+Targets the actual anatomical bottleneck.
 
-**Setup (Right Hand):**
+**Setup, Right Hand:**
 ```
-Hold finger 1 on C4 (sustained, do not release)
-Play: D-E-F-G with fingers 2-3-4-5, ascending then descending
+Hold finger 1 on C4 — sustained, do not release.
+Play D-E-F-G with fingers 2-3-4-5, ascending then descending.
 ```
 
 **Sequence:**
-1. Hold 1 + play 2 alone — feel if 1 trembles (it should not)
-2. Hold 1 + play 3 alone
-3. Hold 1 + play 4 alone — hardest. 4 wants to drag 3 and 5. Let it.
-4. Hold 1 + play 5 alone
-5. Hold 1+5, play 2-3-4 in sequence
-6. Hold 1+3+5, play 2 and 4 alone
+1. Hold 1, play 2 alone — check that 1 doesn't tremble.
+2. Hold 1, play 3 alone.
+3. Hold 1, play 4 alone — hardest. Finger 4 will try to drag 3 and 5 with it; let it happen at first, don't fight it with tension.
+4. Hold 1, play 5 alone.
+5. Hold 1+5 together, play 2-3-4 in sequence.
+6. Hold 1+3+5 together, play 2 and 4 alone.
 
-**Metronome:** ♩ = 60, one held note per beat. No target tempo for this drill — accuracy only.
+**Metronome:** ♩ = 60, one held note change per beat. This drill is about accuracy, not speed — there's no tempo ceiling to chase.
 
-**Left Hand:** Mirror exactly. The LH fourth finger (finger 2 in bass clef positions, but finger 4 by anatomy from thumb = 1) is typically even weaker due to less musical use historically.
+**Left Hand:** mirror the sequence exactly. LH finger 4 tends to be weaker than its RH counterpart simply from less lifetime use — give it extra reps.
 
 ---
 
 ### Drill 3: Trill Pairs — The 4–5 Problem Solver
 
 ```
-Right Hand trill pairs to drill (weakest to strongest):
-  4–5 on E–F (adjacent semitone — hardest)
-  3–4 on D–E
-  2–3 on C–D (usually strong by this point)
-  1–2 on C–D (thumb-index, usually strong)
+Right Hand pairs, weakest to strongest:
+  4-5 on E-F  (adjacent semitone — hardest)
+  3-4 on D-E
+  2-3 on C-D  (usually already fairly strong)
+  1-2 on C-D  (thumb-index, usually strongest)
 ```
 
 **Protocol per pair:**
-- 10 seconds slow alternation at ♩ = 60 (eighth notes)
-- 10 seconds at ♩ = 80
-- 10 seconds at maximum clean speed
-- 20-second rest — shake out the hand completely
-- Record your maximum clean trill speed for 4–5
+1. 10 seconds slow alternation, ♩ = 60 (eighth notes)
+2. 10 seconds at ♩ = 80
+3. 10 seconds at your maximum *clean* speed
+4. 20-second rest, shake the hand out completely
+5. Log your maximum clean 4–5 trill rate for the week
 
-**Target benchmark:**
-- Beginner: 4 Hz (4 notes per second) on weakest pairs
+**Benchmarks:**
+- Beginner: 4 Hz (4 notes/second)
 - Intermediate: 6 Hz
-- Advanced: 8+ Hz with uniform velocity
+- Advanced: 8+ Hz with even velocity across all notes
 
-**Left Hand:** Repeat the entire sequence. LH finger 4 (ring finger) is statistically the weakest finger in most pianists due to right-hand bias in practice history.
+**Left Hand:** repeat the full sequence. Statistically the LH ring finger is the weakest digit most pianists own, purely from historical right-hand bias in practice — don't skip it.
 
 ---
 
 ### Drill 4: Two-Hand Contrary Motion — C Major Scale
 
-This is where coordination actually begins. Both hands move simultaneously but in opposite directions.
+This is where real coordination starts: both hands move at once, in opposite directions.
 
 ```
-Both hands start on C4 (middle C):
-  RH ascends: C-D-E-F-G-A-B-C  (fingers: 1-2-3-1-2-3-4-5)
-  LH descends: C-B-A-G-F-E-D-C  (fingers: 1-2-3-4-1-2-3-4... wait, see below)
+Both hands start on middle C (C4):
+  RH ascends: C-D-E-F-G-A-B-C
+  Fingering:  1-2-3-1-2-3-4-5
+
+  LH descends: C4-B3-A3-G3-F3-E3-D3-C3
+  Fingering:   1 -2 -3 -4 -1 -2 -3 -4
 ```
 
-**Left Hand fingering for descending C major (starting C4 going down):**
-```
-C4: 1 (thumb)
-B3: 2
-A3: 3
-G3: 4 — thumb tucks under here to 1 on F3
-F3: 1
-E3: 2
-D3: 3
-C3: 4 (or 5 if continuing lower)
-```
+The LH thumb tucks under at G3→F3 (between fingers 4 and 1), mirroring the RH thumb tuck at E4→F4 (fingers 3 to 1). This is why contrary motion is easier as a first hands-together exercise than parallel motion — the crossings happen in anatomical mirror image, so both hands "feel" the same gesture at the same moment.
 
-**Why contrary motion first?** The hands mirror each other anatomically — when RH thumb goes under, LH thumb goes under too, in the opposite direction. This symmetry makes contrary motion *easier* than parallel motion as a first hands-together step.
-
-**Metronome targets:** ♩ = 60 → 72 → 84 → 96 (quarter notes, one note per beat initially)
+**Metronome targets (quarter notes, one note per beat initially):** ♩ = 60 → 72 → 84 → 96
 
 **Common errors:**
-- Hesitation at the thumb-under crossing: practice the crossings in isolation (3-note loops around the crossing point) before combining
-- Accent on the note after the thumb: the thumb lands quietly, like any other finger
+- Hesitation at the thumb crossing — isolate it. Loop just the three notes around the crossing point until it's seamless, then reinsert into the full scale.
+- An audible bump on the note right after the thumb lands — the thumb should land as quietly as any other finger, which means rotating the forearm into it rather than dropping it from above.
 
 ---
 
@@ -281,35 +259,33 @@ C3: 4 (or 5 if continuing lower)
 
 ### 5.1 The Grid Concept
 
-Every polyrhythm has a hidden common grid. Internalize this framework before touching the piano:
+Every polyrhythm has a hidden common grid — the least common multiple of the two subdivisions. Internalize the grid away from the piano first.
 
 ```
-2:1 → grid of 2:   | 1 . 2 . |   LH: 1 . 2 .   RH: 1 2 1 2
-3:2 → grid of 6:   | 1 2 3 4 5 6 |   LH: 1 . . 4 . .   RH: 1 . 3 . 5 .
-4:3 → grid of 12:  | 1 2 3 4 5 6 7 8 9 10 11 12 |
-                      LH: 1 . . . 5 . . . 9 . . .
-                      RH: 1 . . 4 . . 7 . . 10 . .
+2:1 → grid of 2:    LH hits 1       RH hits 1, 2
+3:2 → grid of 6:    LH hits 1, 3, 5     RH hits 1, 4
+4:3 → grid of 12:   LH hits 1, 4, 7, 10     RH hits 1, 5, 9
 ```
 
-The grid number = LH subdivisions × RH subdivisions ÷ GCD. Count it aloud before you play it.
+Grid size = LCM(LH subdivision, RH subdivision). Count the grid number aloud before you touch a key.
 
 ### 5.2 Drill: 2:1 Coordination
 
 **Setup:**
-- LH: Whole notes or half notes (C major chord shell — C + G)
-- RH: Quarter note scale passage (C-D-E-F | G-F-E-D, repeating)
+- LH: half notes, a C major shell (C + G)
+- RH: quarter-note scale fragment, C-D-E-F | G-F-E-D repeating
 - Metronome: ♩ = 72
 
 ```
 Beat:  1    2    3    4
-LH:    C...............G (hold)
-RH:    C    D    E    F  (quarter notes)
+LH:    C --(hold)-- G --(hold)--
+RH:    C    D    E    F
 ```
 
-**Practice sequence:**
-1. LH alone — hold notes cleanly, listen to resonance
-2. RH alone — even quarter notes, clean articulation
-3. Hands together — LH releases *exactly* on beat 1 of next measure, RH doesn't care about LH's note changes
+**Sequence:**
+1. LH alone — clean, resonant half notes.
+2. RH alone — even quarters, clear articulation.
+3. Together — LH changes exactly on beat 1 of the measure; RH keeps going regardless of what LH is doing.
 
 **Metronome targets:** ♩ = 60 → 80 → 100
 
@@ -317,52 +293,28 @@ RH:    C    D    E    F  (quarter notes)
 
 ### 5.3 Drill: 3:2 — The Musician's Polyrhythm
 
-This is the most practically useful polyrhythm. It appears in Chopin nocturnes, ragtime, and jazz consistently.
+The most useful polyrhythm in the repertoire — Chopin nocturnes, ragtime, jazz comping all depend on it.
 
-**Mnemonic before piano:** Say aloud: **"Not dif-fi-cult"** = 3 syllables over **"hard"** = 2 syllables.
-Or count: **1-2-3 / 1-2** simultaneously, feeling how "1" aligns and the other notes diverge.
+**Mnemonic, away from the piano:** say "*not dif-fi-cult*" (3 syllables) against "*hard*" said twice evenly (2 syllables) in the same span. Feel beat 1 land together and everything else diverge.
 
-**At the keyboard:**
-
+**The 6-unit grid for one measure of 2 beats:**
 ```
-Tempo: ♩ = 60 (triplet = ♩ = 90 effective)
-
-Beat subdivisions (6 units per beat):
-Position:  1  2  3  4  5  6
-LH (3s):   X        X        X        (hits on 1, 3, 5)
-RH (2s):   X     X     X     X     (hits on 1, 2.5, 4, 5.5 — or in 6-grid: 1, 4)
-
-Wait — let's be precise:
-
-One measure of 2 beats:
-  6-unit grid:   1  2  3  4  5  6
-  LH triplets:   X  .  .  X  .  .   (3 notes per measure pair of beats)
-  RH duplets:    X  .  .  X  .  .   ...
-
-For ONE BEAT:
-  3-unit subgrid:   1    2    3
-  LH triplet:       X    .    .    (plays on 1)  — wait, let's do it properly:
+Sub-beat:   1   2   3   4   5   6
+LH (3):     X           X           X        ← hits on 1, 3, 5
+RH (2):     X                   X            ← hits on 1, 4
 ```
 
-**Correct 3:2 over ONE measure of 2/4:**
+**Piano voicing:**
 ```
-Subdivide the measure into 6 equal parts:
-  Sub-beat:   1   2   3   4   5   6
-  LH (3):     X           X           X        ← beats at 1, 3, 5
-  RH (2):     X               X               ← beats at 1, 4
+LH: C3-E3-G3, arpeggiated upward, one triplet per beat
+RH: C5 and G5, one duplet per beat
 ```
 
-**Piano voicing for the drill:**
-```
-LH: C – E – G (triplet eighth notes, low register, C3-E3-G3 arpeggiated upward)
-RH: C5 – G5 (duplet, two half-beats apart)
-```
-
-**Step-by-step learning:**
-1. **Table drill (no piano):** Tap LH on knee in triplets, RH on knee in duplets to a metronome at ♩ = 60. Count the 6-grid aloud.
-2. **LH triplets alone on piano:** C3–E3–G3 in a triplet loop. Metronome ♩ = 60.
-3. **RH duplets alone:** C5–G5 in duplets. Same metronome.
-4. **Hands together:** Start extremely slow (♩ = 40). Verify that sub-beat 1 aligns (both hands), sub-beat 4 is RH only, sub-beats 3 and 5 are LH only.
+**Step-by-step:**
+1. **Table drill, no piano:** tap LH triplets on one knee, RH duplets on the other, metronome ♩ = 60, counting the 6-grid aloud the whole time.
+2. **LH alone on piano:** C3-E3-G3 triplet loop, ♩ = 60.
+3. **RH alone on piano:** C5-G5 duplet loop, same metronome.
+4. **Hands together:** start at ♩ = 40. Confirm sub-beat 1 lands together, sub-beat 4 is RH-only, sub-beats 3 and 5 are LH-only.
 
 **Metronome targets:** ♩ = 40 → 60 → 80 → 100
 
@@ -370,36 +322,18 @@ RH: C5 – G5 (duplet, two half-beats apart)
 
 ### 5.4 Drill: 4:3 — The Advanced Grid
 
+**The 12-unit grid, spanning 3 beats:**
 ```
-One measure, subdivide into 12 equal parts:
-  Sub-beat:   1  2  3  4  5  6  7  8  9  10  11  12
-  LH (4):     X        X        X        X              ← 1, 4, 7, 10
-  RH (3):     X           X           X                 ← 1, 5, 9
-```
-
-**Mnemonic:** Say **"Pass the god-damn but-ter"** = 4 syllables over **"pas-sa-ca-glia"** = 3 syllables. Feel the two rhythms diverge after the downbeat.
-
-**Piano drill:**
-- LH: C–G–C–G (four even quarter notes per measure in 3/4... wait)
-
-**Correct metric framing for 4:3:** Use **one measure of 12/8** or think of it as **three beats** (LH gets 4 even notes, RH gets 3 even notes across the same span).
-
-```
-Span = 3 beats of ♩ = 60
-
-LH (4 equal notes across 3 beats):   plays every 0.75 beats
-RH (3 equal notes across 3 beats):   plays every 1.0 beat
-
-12-unit grid (triplet sixteenths):
-  1  2  3  4  5  6  7  8  9  10 11 12
-  LH: X     X     X     X     X     X  ... no
-
-LH 4 against RH 3 over 12 units:
-  LH hits: 1, 4, 7, 10  (every 3 units)
-  RH hits: 1, 5, 9      (every 4 units)
+Sub-beat:   1  2  3  4  5  6  7  8  9  10  11  12
+LH (4):     X        X        X        X          ← hits on 1, 4, 7, 10
+RH (3):     X              X              X       ← hits on 1, 5, 9
 ```
 
-**Metronome targets:** ♩ = 40 → 54 → 66. This is genuinely hard. Budget 2–4 weeks of daily work.
+**Mnemonic:** say "*pass the god-damn but-ter*" (4 syllables) against "*pas-sa-ca-glia*" (3 syllables) over the same span. You'll feel the two rhythms split apart right after the shared downbeat.
+
+**Piano drill:** strip it down to single notes first — LH plays C3 four times evenly across 3 beats, RH plays C4 three times evenly across the same 3 beats.
+
+**Metronome targets:** ♩ = 40 → 54 → 66. This is genuinely difficult — budget 2–4 weeks of daily short sessions rather than expecting it in one sitting.
 
 ---
 
@@ -407,23 +341,23 @@ LH 4 against RH 3 over 12 units:
 
 ```mermaid
 graph LR
-    subgraph sub_foundation ["Foundation (Weeks 1–2)"]
-        A["2:1<br/>LH half / RH quarters"]
+    subgraph sub_foundation ["Foundation, Weeks 1-2"]
+        A["2:1<br/>LH halves / RH quarters"]
         B["Contrary motion scales<br/>simultaneous attacks"]
     end
 
-    subgraph sub_intermediate ["Intermediate (Weeks 3–6)"]
+    subgraph sub_intermediate ["Intermediate, Weeks 3-6"]
         C["3:2<br/>LH triplets / RH duplets"]
         D["Syncopation across barline<br/>LH on beat / RH off-beat"]
     end
 
-    subgraph sub_advanced ["Advanced (Weeks 7–12)"]
+    subgraph sub_advanced ["Advanced, Weeks 7-12"]
         E["4:3<br/>12-unit grid"]
         F["3:4<br/>hands reversed"]
         G["Metric modulation<br/>triplet becomes new beat"]
     end
 
-    subgraph sub_virtuoso ["Virtuoso (Month 4+)"]
+    subgraph sub_virtuoso ["Virtuoso, Month 4+"]
         H["5:4 and 5:3"]
         I["Polymetric writing<br/>3/4 vs 4/4 simultaneously"]
     end
@@ -452,90 +386,69 @@ graph LR
 
 ## 6. Harmonic Coordination — Chords, Voicing & Voice Leading
 
-### 6.1 The Two-Hand Chord Distribution System
+### 6.1 Two-Hand Chord Distribution
 
-For any four-voice chord (SATB or root-7th-9th-3rd), the standard distribution is:
+For a standard four-voice chord, split it evenly:
 
 ```
-Right Hand: upper two voices (Soprano + Alto, or melodic top notes)
-Left Hand:  lower two voices (Tenor + Bass, or root + 5th / root + 7th)
+Right Hand: the two upper voices (soprano + alto, or the melodic top notes)
+Left Hand:  the two lower voices (tenor + bass, or root + 5th / root + 7th)
 ```
 
-**C Major 7 chord (Cmaj7 = C–E–G–B):**
+**Cmaj7 (C-E-G-B), close position:**
 ```
-RH: G4 (finger 2) + B4 (finger 1 or 4) — upper voices
+RH: G4 (finger 2) + B4 (finger 5) — upper voices
 LH: C3 (finger 5) + E3 (finger 3) — lower voices
 ```
 
-**G Dominant 7 (G7 = G–B–D–F) in second position (B bass):**
+**G7 (G-B-D-F), second inversion with D in the bass:**
 ```
+RH: F5 (finger 4) + B5... more practically keep it compact:
 RH: D5 (finger 2) + F5 (finger 4)
 LH: B2 (finger 5) + G3 (finger 2)
 ```
 
 ### 6.2 Drill: I–IV–V–I Voice Leading in C Major
 
-**The smoothest voice leading possible — minimize every voice's motion:**
+The point of this drill is minimizing motion in every voice except the bass.
 
 ```
-         I        IV       V        I
-Chord:   C maj    F maj    G maj    C maj
-Soprano: E5  →   F5  →    G5  →   E5     (stepwise up, then down)
-Alto:    C5  →   C5  →    B4  →   C5     (common tone, then half-step)
-Tenor:   G4  →   A4  →    G4  →   G4     (step, back, hold)
-Bass:    C3  →   F3  →    G3  →   C3     (roots)
+         I         IV        V         I
+Chord:   C major   F major   G major   C major
+Soprano: E5   →    F5   →    G5   →    E5     (up a step, up a step, down a third)
+Alto:    C5   →    C5   →    B4   →    C5     (common tone, then half step, back)
+Tenor:   G4   →    A4   →    G4   →    G4     (step up, step down, hold)
+Bass:    C3   →    F3   →    G3   →    C3     (the roots)
 
 Fingering:
-  RH:   (3,1) → (4,1) → (5,2) → (3,1)   [Alto on 1, Soprano on 3–5]
-  LH:   (5,2) → (5,2) → (5,1) → (5,2)   [Bass on 5, Tenor on 2–1]
+  RH (alto, soprano): (1,3) → (1,4) → (2,5) → (1,3)
+  LH (tenor, bass):   (2,5) → (2,5) → (1,5) → (2,5)
 ```
 
 **Practice protocol:**
-1. **LH alone:** play bass + tenor as blocked dyads, ♩ = 60. Legato — no gap between chords.
-2. **RH alone:** play alto + soprano as blocked dyads, ♩ = 60. Legato.
-3. **Hands together:** ♩ = 50, then 60, then 72. Listen for precise simultaneity on each chord change.
-4. **Add pedal:** Depress sustain pedal immediately *after* the bass note lands on each beat (legato pedaling). This blurs nothing but sustains everything.
+1. LH alone, blocked dyads, ♩ = 60, fully legato — no gap between chords.
+2. RH alone, blocked dyads, same tempo, same legato standard.
+3. Hands together: ♩ = 50, then 60, then 72. Listen for every chord change landing as one simultaneous event.
+4. Add pedal: depress the sustain pedal immediately *after* the bass note lands on each new chord (legato pedaling, covered fully in Section 12). This connects the chords without blurring the bass attack.
 
-**Extend to all 12 keys** — cycle through the circle of fifths over weeks.
+Cycle this progression through all 12 keys over several weeks, following the circle of fifths — it's the fastest route to comfort in unfamiliar key signatures.
 
 ### 6.3 Rootless Jazz Voicings (A-Form & B-Form)
 
-Jazz pianists frequently drop the root (left to the bass player) and voice the remaining chord tones for richness. These two shapes are moveable across all keys.
+Jazz pianists typically drop the root — the bassist has it covered — and voice the remaining tones for color and smooth motion. These two shapes are moveable to any key.
 
-**A-Form (3rd in bass of RH voicing):**
+**Guide tones rule:** the 3rd and 7th of a dominant or major 7th chord define its quality. Everything else (9th, 11th, 13th) is color on top. Train your left hand to find the 3rd–7th pair automatically before adding anything else.
+
+**ii–V–I in C major, rootless:**
 ```
-Cmaj7 A-Form:
-  LH: E3 + D4   (3rd + 9th)
-  RH: G4 + B4   (5th + 7th)
-
-G7 A-Form:
-  LH: B2 + A3   (3rd + 9th... wait — G7 = G B D F)
-  LH: B3 + F4... 
-
-Correct G7 A-Form:
-  LH: B2 (3rd) + F3 (7th)
-  RH: A4 (9th) + D5 (5th... actually the 13th works better here)
-
-Standard pedagogical A/B form for dominant 7ths:
-  G7 "A" voicing (3rd on bottom):
-    LH: B2 + F3   (3rd + ♭7th)
-    RH: A4 + D5   (9th + 5th)
-
-  G7 "B" voicing (7th on bottom):
-    LH: F3 + B3   (♭7th + 3rd, inverted)
-    RH: A4 + D5   (same top)
+Dm7:    LH: F3 + C4   (3rd + b7th)     RH: E4 + A4   (9th + 5th)
+G7:     LH: B2 + F3   (3rd + b7th)     RH: A4 + D5   (13th + 5th)
+Cmaj7:  LH: E3 + B3   (3rd + 7th)      RH: D5 + G5   (9th + 5th)
 ```
 
-**Key insight:** The 3rd and 7th are the "guide tones" that define chord quality. Everything else (9ths, 11ths, 13ths) adds color. Train LH to always find the 3rd–7th pair automatically.
+**What to listen for:** the F in Dm7's left hand holds static into G7's left hand (same note, same finger if comfortable), then resolves down a half step to E in Cmaj7. That static-then-resolving motion in the inner voice is the entire sound of jazz ii-V-I language — train your ear to track it every time you play this progression.
 
-**Drill:** ii–V–I in C major with rootless voicings:
-```
-Dm7:   LH: F3 + C4  (3rd + ♭7th)    RH: E4 + A4  (9th + 5th)
-G7:    LH: B2 + F3  (3rd + ♭7th)    RH: A4 + D5  (13th + 5th)
-Cmaj7: LH: E3 + B3  (3rd + 7th)     RH: D5 + G5  (9th + 5th)
-```
-
-**Metronome:** ♩ = 60. Smooth voice leading — listen for the F in Dm7 moving to F in G7 (hold!), then resolving down to E in Cmaj7.
+**Metronome:** ♩ = 60, smooth connection between each voicing.
 
 ---
 
@@ -543,131 +456,127 @@ Cmaj7: LH: E3 + B3  (3rd + 7th)     RH: D5 + G5  (9th + 5th)
 
 ### Routine A: Finger Independence Foundation (15 minutes)
 
-**Who this is for:** Anyone whose 4–5 pair is weaker than 2–3, or who notices tone unevenness in scales.
+**For:** anyone whose 4–5 pair lags behind 2–3, or who hears uneven tone in scales.
 
 | Block | Exercise | Duration | Metronome | Focus |
-|-------|----------|----------|-----------|-------|
-| 1 | Held-note drill (hold 1, play 2–5 sequentially) | 3 min | ♩ = 60 | No sympathetic trembling in held finger |
-| 2 | Trill pairs: 2–3, 3–4, 4–5 each hand | 5 min | ♩ = 60 → 100 | Evenness, not speed |
-| 3 | Hanon #1 pattern, C → G (ascending by whole step) | 4 min | ♩ = 72 → 92 | Uniform tone, relaxed wrist |
+|---|---|---|---|---|
+| 1 | Held-note drill (hold 1, play 2–5 in sequence) | 3 min | ♩ = 60 | No trembling in the held finger |
+| 2 | Trill pairs 2-3, 3-4, 4-5, each hand | 5 min | ♩ = 60 → 100 | Evenness first, speed second |
+| 3 | Five-finger pattern, C → G by whole steps | 4 min | ♩ = 72 → 92 | Uniform tone, relaxed wrist |
 | 4 | Contrary motion C major scale, 2 octaves | 3 min | ♩ = 60 → 80 | Clean thumb crossing, no accent |
 
 ---
 
 ### Routine B: Polyrhythmic Coordination (20 minutes)
 
-**Who this is for:** Anyone working toward 3:2 or 4:3, or who loses their LH pulse when the RH gets complex.
+**For:** anyone building toward 3:2 or 4:3, or whose left hand drifts off tempo when the right hand gets busy.
 
 | Block | Exercise | Duration | Metronome | Focus |
-|-------|----------|----------|-----------|-------|
-| 1 | 2:1 warm-up: LH half notes, RH quarters (C major scale) | 3 min | ♩ = 72 | RH subdivides LH exactly |
-| 2 | Table drill — tap 3:2 on knees, count 6-grid aloud | 2 min | ♩ = 60 | Internalize grid before piano |
-| 3 | 3:2 on piano: LH triplet C–E–G / RH duplet C5–G5 | 7 min | ♩ = 40 → 72 | Sub-beat 1 always aligns |
-| 4 | 4:3 on piano, simple notes only (C3 / C4) | 5 min | ♩ = 40 → 54 | Count 12-grid aloud |
-| 5 | LH ostinato (steady quarters) + RH free rhythm improv | 3 min | ♩ = 80 | LH unshakeable regardless of RH |
+|---|---|---|---|---|
+| 1 | 2:1 warm-up: LH halves, RH quarters, C major scale | 3 min | ♩ = 72 | RH divides LH's pulse exactly |
+| 2 | Table drill: tap 3:2 on knees, count the 6-grid aloud | 2 min | ♩ = 60 | Internalize the grid before piano |
+| 3 | 3:2 on piano: LH triplet C-E-G, RH duplet C5-G5 | 7 min | ♩ = 40 → 72 | Sub-beat 1 always aligns |
+| 4 | 4:3 on piano, single notes only (C3 vs C4) | 5 min | ♩ = 40 → 54 | Count the 12-grid aloud |
+| 5 | LH steady-quarter ostinato + RH free improvised rhythm | 3 min | ♩ = 80 | LH doesn't budge, regardless of RH |
 
 ---
 
 ### Routine C: Harmonic Coordination & Voice Leading (20 minutes)
 
-**Who this is for:** Anyone working on chord accuracy, legato between changes, or jazz voicings.
+**For:** anyone working on chord accuracy, legato chord changes, or jazz voicings.
 
 | Block | Exercise | Duration | Metronome | Focus |
-|-------|----------|----------|-----------|-------|
-| 1 | Interval drill: all intervals 2nd–octave, contrary motion | 4 min | ♩ = 50 | Exact simultaneity |
-| 2 | I–IV–V–I in 3 keys (C, F, G), close voicing, legato | 5 min | ♩ = 60 | No gap between chords, listen to voice leading |
-| 3 | Block → arpeggiated chord: same chord 4 speeds | 3 min | No metro | Control over arpeggio speed gradient |
-| 4 | ii–V–I rootless voicings, C and F major | 5 min | ♩ = 60 | 3rd + 7th guide tones in LH always |
-| 5 | 4-bar phrase: soprano held in RH, LH plays bass | 3 min | ♩ = 60 | Independence of phrasing between hands |
+|---|---|---|---|---|
+| 1 | Interval drill: 2nd through octave, contrary motion | 4 min | ♩ = 50 | Exact simultaneity on each interval |
+| 2 | I-IV-V-I in C, F, and G, close voicing, legato | 5 min | ♩ = 60 | No gaps; track the voice leading |
+| 3 | Same chord, block then arpeggiated at 4 speeds | 3 min | free | Control of arpeggio speed |
+| 4 | ii-V-I rootless voicings in C and F | 5 min | ♩ = 60 | 3rd + 7th guide tones in LH, every time |
+| 5 | 4-bar phrase: RH holds the melodic line, LH plays bass independently | 3 min | ♩ = 60 | Phrasing independence between hands |
 
 ---
 
 ### Routine D: Bach Two-Part Invention Integration (25 minutes)
 
-**Who this is for:** Anyone at intermediate level building genuine contrapuntal independence.
+**For:** intermediate players building genuine contrapuntal independence — two real, equal melodic lines, not melody-plus-accompaniment.
 
-**Piece: Invention No. 1 in C Major (BWV 772)**
+**Piece: Invention No. 1 in C Major, BWV 772**
 
-The opening subject:
 ```
-RH (bars 1–2): C-D-E-F-E-D | C-E-G-C-B-C
+RH, bars 1-2:  C-D-E-F-E-D | C-E-G-C-B-C
 Fingering:     1-2-3-4-3-2 | 1-2-3-5-4-5
-```
 
-```
-LH enters in bar 3 with the same subject transposed:
-LH (bars 3–4): C-D-E-F-E-D | C-E-G-C-B-C  (one octave lower)
+LH enters bar 3, same subject one octave lower:
+LH, bars 3-4:  C-D-E-F-E-D | C-E-G-C-B-C
 Fingering:     5-4-3-2-3-4 | 5-3-2-1-2-1
 ```
 
-**Step-by-step practice protocol:**
+**Protocol:**
+1. **RH alone, bars 1–4** (3 min), ♩ = 60. Sing the left-hand part aloud while you play the right hand — this forces you to know both lines, not just your hand's own.
+2. **LH alone, bars 1–4** (3 min), ♩ = 60. Match the articulation style you used in the right hand.
+3. **Hands together, bars 1–2 only** (5 min), ♩ = 50. When the left hand holds its long note, the right hand is moving — can you still track the right hand clearly as its own line, not background noise?
+4. **Voicing balance drill** (5 min): play bars 1–4 bringing out only the left hand, louder than the right. Then reverse it. Then balance both equally. This trains independent dynamic control, the real goal of counterpoint.
+5. **Full run, bars 1–8** (5 min), ♩ = 60 → 72. Count bar numbers aloud to stay oriented inside the form.
+6. **Isolate the weak bar** (4 min): find the one bar where it falls apart. Loop it with the bar before it, 10 clean repetitions, before rejoining the full passage.
 
-1. **RH alone, bars 1–4** (3 min): ♩ = 60. Sing the other voice aloud as you play.
-2. **LH alone, bars 1–4** (3 min): ♩ = 60. Clear articulation, match the RH articulation style.
-3. **Hands together, bars 1–2 only** (5 min): ♩ = 50. When LH holds, RH moves; when LH moves in bar 3, can you still hear the RH counter-subject clearly?
-4. **Voicing exercise** (5 min): Play through bars 1–4 and deliberately bring out *only the LH* as the primary voice — make it louder than the RH. Then reverse. Then balance equally.
-5. **Full run-through, bars 1–8** (5 min): ♩ = 60 → 72. Count every bar number aloud to stay oriented.
-6. **Identify problem bar** (4 min): Find the one bar where coordination breaks down. Practice it in a 2-bar loop: bar before the problem + problem bar, 10 repetitions.
-
-**Common trouble spots in Invention No. 1:**
-- Bar 11: stretto entry (voices overlap at short interval) — learn each voice's entry note separately before combining
-- Bars 15–19: running sixteenth notes in both hands in contrary motion — slow to ♩ = 44 and subdivide in four
+**Known trouble spots in this piece:**
+- Bar 11: a stretto entry (the voices overlap at a short time interval) — learn each voice's entrance pitch in isolation before combining.
+- Bars 15–19: running sixteenths in both hands moving in contrary motion — slow to ♩ = 44 and subdivide the beat into four when counting aloud.
 
 ---
 
 ## 8. The Long-Term Skill Progression
 
-### 8.1 Weekly Milestone Map (3-Month Plan)
+### 8.1 Three-Month Milestone Map
 
 ```mermaid
 gantt
     title Two-Hand Coordination Development Plan
     dateFormat  YYYY-MM-DD
     section Foundation
-    Posture & hand setup              :done, a1, 2024-01-01, 7d
-    Five-finger box, contrary motion   :done, a2, 2024-01-01, 14d
-    Held-note & trill pair drills      :done, a3, 2024-01-08, 14d
+    Posture and hand setup             :done, a1, 2024-01-01, 7d
+    Five-finger box, contrary motion    :done, a2, 2024-01-01, 14d
+    Held-note and trill pair drills     :done, a3, 2024-01-08, 14d
     section Rhythmic Independence
-    2 to 1 polyrhythm solid           :active, b1, 2024-01-15, 14d
-    3 to 2 polyrhythm internalization  :b2, 2024-01-22, 21d
-    4 to 3 polyrhythm introduction     :b3, 2024-02-05, 21d
+    2 to 1 polyrhythm solid            :active, b1, 2024-01-15, 14d
+    3 to 2 polyrhythm internalized      :b2, 2024-01-22, 21d
+    4 to 3 polyrhythm introduced        :b3, 2024-02-05, 21d
     section Harmonic Coordination
-    I-IV-V-I all keys, legato          :c1, 2024-01-15, 21d
-    Rootless ii-V-I jazz voicings      :c2, 2024-02-01, 21d
-    4-part chorale voice leading       :c3, 2024-02-15, 14d
+    I-IV-V-I all keys, legato           :c1, 2024-01-15, 21d
+    Rootless ii-V-I jazz voicings       :c2, 2024-02-01, 21d
+    4-part chorale voice leading        :c3, 2024-02-15, 14d
     section Repertoire Integration
-    Bach Invention No. 1 (hands sep)   :d1, 2024-01-22, 14d
-    Bach Invention No. 1 (hands tog)   :d2, 2024-02-05, 21d
-    Bach Invention No. 4 or No. 8      :d3, 2024-03-01, 28d
-    Czerny Op. 299 Etudes 1-5          :d4, 2024-02-01, 56d
+    Bach Invention No 1, hands separate :d1, 2024-01-22, 14d
+    Bach Invention No 1, hands together :d2, 2024-02-05, 21d
+    Bach Invention No 4 or No 8         :d3, 2024-03-01, 28d
+    Czerny Op 299 Etudes 1-5            :d4, 2024-02-01, 56d
 ```
 
 ### 8.2 Repertoire Progression by Coordination Challenge
 
 ```mermaid
 graph TB
-    subgraph sub_level1 ["Level 1 — Homophonic (Both Hands Same Rhythm)"]
-        L1A["Bach Minuet in G (BWV Anh. 114)<br/>LH steady quarters / RH melody eighths"]
-        L1B["Clementi Sonatina Op. 36 No. 1<br/>Alberti bass vs. melody"]
+    subgraph sub_level1 ["Level 1: Homophonic, both hands same rhythm"]
+        L1A["Bach Minuet in G, BWV Anh 114<br/>LH steady quarters / RH melody eighths"]
+        L1B["Clementi Sonatina Op 36 No 1<br/>Alberti bass against melody"]
     end
 
-    subgraph sub_level2 ["Level 2 — Simple Counterpoint (2:1 Coordination)"]
-        L2A["Bach Invention No. 1 C major<br/>Subject + tonal answer"]
-        L2B["Bach Invention No. 4 D minor<br/>Thirds in one hand"]
-        L2C["Czerny Op. 299 Etudes 1–10<br/>Scale passages both hands"]
+    subgraph sub_level2 ["Level 2: Simple counterpoint, 2:1 feel"]
+        L2A["Bach Invention No 1 in C major<br/>subject and tonal answer"]
+        L2B["Bach Invention No 4 in D minor<br/>thirds inside one hand"]
+        L2C["Czerny Op 299, Etudes 1-10<br/>scale passages, both hands"]
     end
 
-    subgraph sub_level3 ["Level 3 — Florid Counterpoint + 3:2 Polyrhythm"]
-        L3A["Bach Invention No. 8 F major<br/>Perpetual motion sixteenths vs. quarters"]
-        L3B["Chopin Nocturne Op. 9 No. 2<br/>3:2 and 4:3 ornamental RH vs LH triplets"]
-        L3C["Bach Sinfonia No. 1 C major<br/>Three independent voices"]
+    subgraph sub_level3 ["Level 3: Florid counterpoint, 3:2 feel"]
+        L3A["Bach Invention No 8 in F major<br/>perpetual sixteenths against quarters"]
+        L3B["Chopin Nocturne Op 9 No 2<br/>ornamental RH against LH triplets"]
+        L3C["Bach Sinfonia No 1 in C major<br/>three independent voices"]
     end
 
-    subgraph sub_level4 ["Level 4 — Virtuoso Independence"]
-        L4A["Chopin Étude Op. 10 No. 1<br/>Wide RH arpeggios / LH melody"]
-        L4B["Chopin Étude Op. 25 No. 6<br/>Parallel thirds both hands"]
-        L4C["Brahms Intermezzo Op. 118 No. 2<br/>Polymeter implications"]
-        L4D["Ravel Sonatine Mvt. 2<br/>Extreme voice independence"]
+    subgraph sub_level4 ["Level 4: Virtuoso independence"]
+        L4A["Chopin Etude Op 10 No 1<br/>wide RH arpeggios over LH melody"]
+        L4B["Chopin Etude Op 25 No 6<br/>parallel thirds, both hands"]
+        L4C["Brahms Intermezzo Op 118 No 2<br/>polymetric implications"]
+        L4D["Ravel Sonatine, second movement<br/>extreme voice independence"]
     end
 
     L1A --> L2A
@@ -698,26 +607,24 @@ graph TB
 
 ## 9. Troubleshooting — Diagnosing Your Specific Failure Mode
 
-Before blindly drilling more, identify which coordination failure you're experiencing:
-
-### Failure Mode Diagnostic
+Identify which failure you're actually having before drilling blindly.
 
 ```mermaid
 graph TD
     subgraph sub_diagnosis ["Coordination Problem Diagnosis"]
         START["Coordination breaks down. Where?"]
 
-        Q1{"Hands drift to<br/>unison or<br/>simple ratio?"}
-        Q2{"One hand<br/>loses tempo<br/>when other<br/>gets complex?"}
-        Q3{"Wrong notes<br/>or rhythmic<br/>errors under<br/>pressure?"}
-        Q4{"Chords uneven<br/>— one voice<br/>louder than<br/>others?"}
-        Q5{"Pain or<br/>tension during<br/>playing?"}
+        Q1{"Hands drift into<br/>unison or a<br/>simpler ratio?"}
+        Q2{"One hand loses<br/>tempo when the<br/>other gets busy?"}
+        Q3{"Wrong notes or<br/>rhythm errors<br/>appear under<br/>tempo pressure?"}
+        Q4{"Chord voices<br/>uneven — one<br/>louder than<br/>the rest?"}
+        Q5{"Pain or tension<br/>during playing?"}
 
-        FIX1["Phase Locking Fix:<br/>— Return to table-top tapping drill<br/>— Practice 3:2 at ♩ = 40<br/>— Count the grid aloud, always<br/>— Weeks 3–6"]
-        FIX2["Autonomy Fix:<br/>— LH ostinato drill (Routine B block 5)<br/>— LH must work on autopilot<br/>— Practice LH alone until it plays<br/>by feel, not attention"]
-        FIX3["Automaticity Fix:<br/>— You are practicing too fast<br/>— Return to 60% target tempo<br/>— Interleave different keys<br/>— Add spaced retrieval (days apart)"]
-        FIX4["Voicing Control Fix:<br/>— Practice chord with ONE finger louder<br/>— Differential velocity drill: emphasize<br/>soprano only, then alto only, etc.<br/>— Use arm weight on target voice"]
-        FIX5["Biomechanics Fix:<br/>— STOP immediately<br/>— Check wrist angle (neutral?)<br/>— Check grip tension (forearm soft?)<br/>— Reduce tempo 40%, reduce duration<br/>— See a piano pedagogy specialist"]
+        FIX1["Phase-Locking Fix:<br/>Return to table tapping<br/>Practice 3:2 at d=40<br/>Count the grid aloud, always<br/>Expect 3-6 weeks"]
+        FIX2["Autonomy Fix:<br/>LH ostinato drill, Routine B block 5<br/>LH must run on autopilot<br/>Drill LH alone until it plays by feel"]
+        FIX3["Automaticity Fix:<br/>You are practicing too fast<br/>Drop to 60% of target tempo<br/>Interleave keys, don't block-repeat<br/>Add spaced review days apart"]
+        FIX4["Voicing Control Fix:<br/>Isolate one finger louder than the rest<br/>Drill each voice solo, then recombine<br/>Use arm weight on the target voice only"]
+        FIX5["Biomechanics Fix:<br/>Stop immediately<br/>Check wrist angle is neutral<br/>Check forearm is soft, not gripping<br/>Cut tempo 40% and session length<br/>See a piano pedagogy specialist if it persists"]
     end
 
     START --> Q1
@@ -742,102 +649,95 @@ graph TD
 
 ### Common Errors & Instant Fixes
 
-| Symptom | Root Cause | Immediate Fix |
-|---------|-----------|---------------|
-| RH races ahead of LH in fast passages | LH hasn't automatized its pattern | 20 reps LH alone at target tempo before combining |
-| "Lumpy" tone — some notes louder | Uneven finger velocity, residual tendon coupling | Held-note drills, focus on 3–4 pair specifically |
-| Thumb crossing causes audible accent | Thumb landing too hard, arm not rotating | Pronate forearm INTO the thumb crossing; thumb lands gently |
-| 3:2 collapses to 1:1 or 2:2 | No internal grid — relying on feel | Go back to table tapping + verbal counting. Piano only after grid is solid. |
-| Chord changes have gaps | Fingers releasing too early, not overlapping | Use finger legato: keep one finger down until the next chord's finger lands |
-| Left hand plays louder than right | LH habits from bass function; RH not weighted enough | Explicitly practice RH arm weight release; bring RH up 20% |
-| Fatigue after 10 minutes | Gripping — sustained co-contraction | Stop, shake out, restart at half volume. Forte from velocity, not squeeze. |
+| Symptom | Root cause | Immediate fix |
+|---|---|---|
+| RH races ahead of LH in fast passages | LH pattern isn't automatized yet | 20 reps LH alone at target tempo before recombining |
+| "Lumpy" tone, some notes louder than others | Uneven finger velocity from tendon coupling | Held-note drills, with focus specifically on the 3-4 pair |
+| Audible accent on thumb crossings | Thumb landing heavy, no forearm rotation | Rotate the forearm into the crossing; let the thumb land soft |
+| 3:2 collapses into 1:1 or 2:2 | No internalized grid, relying on feel alone | Back to table tapping plus verbal counting; piano only after the grid is solid |
+| Gaps between chord changes | Fingers releasing early, no overlap | Finger legato: hold the previous chord's finger down until the next one lands |
+| Left hand consistently louder than right | LH habituated to carrying bass weight | Explicitly practice RH arm-weight release; bring RH volume up deliberately |
+| Fatigue inside 10 minutes | Sustained co-contraction, i.e. gripping | Stop, shake out, restart at half volume; forte comes from velocity, not squeeze |
 
 ---
 
 ## 10. Measurement & Benchmarks
 
-Track these monthly to know if training is working:
-
-### Progress Benchmarks by Stage
+Check these monthly to confirm the training is actually working.
 
 | Skill | Beginner | Intermediate | Advanced |
-|-------|----------|--------------|----------|
-| Trill rate (4–5 pair) | 3–4 Hz | 5–6 Hz | 7–8+ Hz |
+|---|---|---|---|
+| Trill rate, 4-5 pair | 3-4 Hz | 5-6 Hz | 7-8+ Hz |
 | C major scale, both hands | ♩ = 60 | ♩ = 100 | ♩ = 132+ |
-| 3:2 polyrhythm steady tempo | ♩ = 50 | ♩ = 80 | ♩ = 120 |
-| 4:3 polyrhythm | Not yet | ♩ = 50 | ♩ = 80 |
-| I–IV–V–I all 12 keys, legato | 3 keys | 8 keys | All 12 |
-| Bach Invention No. 1 (clean) | Hands sep | ♩ = 60 HT | ♩ = 100 HT |
-| Timing CV (polyrhythm) | > 15% | 10–15% | < 5% |
+| 3:2 polyrhythm, steady | ♩ = 50 | ♩ = 80 | ♩ = 120 |
+| 4:3 polyrhythm | not yet | ♩ = 50 | ♩ = 80 |
+| I-IV-V-I in all 12 keys, legato | 3 keys | 8 keys | all 12 |
+| Bach Invention No. 1, clean | hands separate | ♩ = 60, hands together | ♩ = 100, hands together |
 
-**How to measure timing CV without studio equipment:**
-1. Record yourself on your phone playing 2 measures of a polyrhythm
-2. Clap along to a metronome playback and notice where you diverge
-3. If you can't hear divergence, you're consistent; if you can, the CV is too high
+**Measuring polyrhythm consistency without a lab:**
+1. Record yourself on a phone playing two measures of the polyrhythm.
+2. Play it back and clap along with a metronome — you'll hear exactly where you drift.
+3. If you can't detect drift by ear, you're consistent. If you can, that's your practice target for the week.
 
-**Free MIDI analysis option:** Most digital pianos output MIDI. Connect USB to computer, open GarageBand (free on Mac) or LMMS (free, cross-platform), record, then view the piano roll. You can see note timing visually against the grid.
+**Free MIDI option if your piano has USB-MIDI out:** connect to a computer, open GarageBand (free on Mac) or LMMS (free, cross-platform), record the passage, and look at the piano roll. You'll see your actual note timing laid against the grid lines — much more honest than your ears in the moment.
 
 ---
 
 ## 11. Practice Methodology Essentials
 
-These aren't optional refinements — they determine whether your practice time converts to skill or just repetition.
+These determine whether practice time converts into skill or just burns time.
 
-**Chunk size:** Work on 2–4 measure units maximum. Mastery criterion: 5 consecutive clean repetitions. Only then expand.
+**Chunk size:** work in 2–4 measure units. Mastery criterion: 5 clean repetitions in a row, no near-misses. Only then expand the chunk.
 
-**Slow practice rule:** If you can't play it slowly and cleanly, you cannot play it fast and cleanly. Speed is not the goal — it's the byproduct of accuracy under gradually increasing pressure.
+**Slow practice rule:** if you can't play a passage slowly and cleanly, you cannot play it fast and cleanly — speed is the byproduct of accuracy repeated under gradually rising tempo, not a separate skill to chase.
 
-**Interleaving (most important):** Do not drill the same passage 20 times in a row. Practice passage A, then B, then C, then back to A. This feels less productive but produces 40% better retention at the one-week mark. Blocked practice (AAABBBCCC) feels efficient but fades fast.
+**Interleaving:** don't drill the same passage 20 times in a row. Practice A, then B, then C, then back to A. It feels less efficient in the moment but produces meaningfully better retention a week later. Repeating one thing over and over (AAABBBCCC) feels productive and fades fast.
 
-**The 3-day test:** After learning something new, don't touch it for 3 days. When you return, what remains is real retention. What dropped out needs more spaced repetition, not more same-day grinding.
+**The 3-day test:** after learning something new, leave it alone for 3 days. What you can still play when you return is real retention. What's gone needs spaced review, not more same-day repetition.
 
-**Hands-separate to hands-together ratio:** For genuinely difficult passages, spend 60% of time hands-separate, 40% hands-together. For passages you mostly know, flip it: 20% HS, 80% HT.
+**Hands-separate to hands-together ratio:** for genuinely hard passages, spend roughly 60% of practice time hands-separate, 40% together. For passages you basically know, flip it — 20% separate, 80% together.
 
-**Mental practice:** Sit away from the piano and play through a 4-bar passage mentally — hear every note, feel every finger motion. Research confirms this activates the same motor cortex regions as physical practice. Use it on travel days or when hands need rest.
+**Mental practice:** away from the piano, play a 4-bar passage in your head — hear every note, feel every finger motion as if playing it. This engages much of the same motor planning as physical practice and is useful on travel days or when your hands need rest.
 
-**Record and listen:** Record yourself once per week on the same passage. Your ear in real-time is biased toward what you intended to play. The recording is objective. The gap between intention and recording *is* the work.
+**Record and listen:** record yourself once a week on the same passage. Your in-the-moment hearing is biased toward what you intended to play, not what actually happened. The gap between the recording and your memory of the take is the real information.
 
 ---
 
 ## 12. Sustain Pedal Integration
 
-The damper pedal (right pedal) is the third hand — but it's the hand most beginners use incorrectly.
+The damper pedal is effectively a third hand — and the one most self-taught players use backwards.
 
-**Legato pedaling technique:**
+**Legato pedaling:**
 ```
-Attack note → (slight delay, ~50ms) → Depress pedal
-                                        ↑
-                     This delay prevents blurring the attack
-On next chord: Release pedal → Immediately re-depress (syncopated pedaling)
+Attack the note first → wait roughly 30-50ms → then depress the pedal
 ```
+That brief delay is what keeps the attack of each new note clean instead of blurring it into whatever was ringing before it.
 
-**Timing diagram:**
+**Timing across a chord progression:**
 ```
-Beat:       1              2              3              4
-Keys:       [chord 1]      [chord 2]      [chord 3]      [chord 4]
-Pedal:      ↓ (hold)      ↑↓ (change)   ↑↓ (change)   ↑↓ (change)
-                   ↑
-            Pedal down just AFTER beat 1 attack
+Beat:    1                2                3                4
+Keys:    [chord 1]        [chord 2]        [chord 3]        [chord 4]
+Pedal:   down, holds      up-then-down     up-then-down     up-then-down
+              ↑ pedal goes down just after the beat-1 attack lands, not on it
 ```
 
-**Common mistake:** Depressing pedal *before or on* the attack. This blurs the bass note into whatever was ringing from before.
+**The common mistake:** depressing the pedal before or exactly on the attack, which smears the new bass note into the previous chord's decay.
 
-**Three pedal applications to drill:**
-
-1. **Legato pedaling** (above) — standard for Romantic music
-2. **Staccato with pedal** — depress pedal, play staccato notes; the pedal sustains while touch is dry. Creates a "singing staccato" (Chopin's style).
-3. **No pedal** — Bach, most Classical period music. Legato comes entirely from finger overlap, not pedal blur.
+**Three pedaling techniques worth drilling separately:**
+1. **Legato pedaling** (above) — the default for Romantic repertoire.
+2. **Staccato with pedal** — depress the pedal once, then play detached, dry-touch notes over it. The pedal sustains the resonance while the fingers stay short — this is Chopin's "singing staccato" effect.
+3. **No pedal** — Bach and most Classical-period keyboard music. Legato comes entirely from overlapping fingers, never from pedal blur.
 
 ---
 
 ## Summary: What You're Actually Training
 
-Two-hand piano coordination is not a single skill — it's a cluster of three semi-independent capabilities that must all reach threshold before the music sounds like music:
+Two-hand coordination isn't one skill — it's three semi-independent capabilities that all need to clear a threshold before the music starts sounding like music instead of an exercise:
 
-1. **Finger independence** — the mechanical ability to move each digit selectively despite shared tendons. Trained through held-note drills and trill pairs. The 4–5 pair is always the bottleneck.
+1. **Finger independence** — moving each digit selectively despite shared tendons. Built through held-note drills and trill pairs. The 4–5 pair is always the bottleneck; budget it the most time.
 
-2. **Rhythmic independence** — the neurological ability to run two pulse streams simultaneously without phase locking. Trained through the 6-unit and 12-unit grids, always with verbal counting before piano contact.
+2. **Rhythmic independence** — running two pulse streams at once without one collapsing into the other. Built through the 6-unit and 12-unit grids, always counted aloud before the hands touch the keys.
 
-3. **Harmonic coordination** — the perceptual and motor ability to distribute chord voices, execute smooth voice leading, and control differential voicing. Trained through I–IV–V–I progressions, Bach inventions, and rootless jazz voicings.
+3. **Harmonic coordination** — distributing chord voices, executing smooth voice leading, and controlling the relative volume of individual voices inside a chord. Built through I–IV–V–I cycles, Bach inventions, and rootless jazz voicings.
 
-The hands become independent when each has its own automated motor program. They become coordinated when both programs share one metrical grid. Practice the programs separately first. Then merge them on the grid.
+Hands become independent once each one has its own automated motor program. They become coordinated once both programs answer to the same shared beat. Train the two programs separately first — then merge them on the grid, not before.
