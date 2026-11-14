@@ -6,9 +6,6 @@
   <a href="CHANGELOG.md">
     <img src="https://img.shields.io/badge/version-1.0.0-emerald?style=flat" alt="Version 1.0.0">
   </a>
-  <a href="https://gitea.2464.cz/ai/synapse">
-    <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status">
-  </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   </a>
@@ -112,14 +109,14 @@ graph TB
 ## 🚀 Quick Start & Installation
 
 ### Option 1: 1-Click Desktop App (Zero Build Required)
-Download the standalone, zero-dependency desktop application from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
+Download the standalone, zero-dependency desktop application from the project releases:
 
 | Platform | Download | Instructions |
 | :--- | :--- | :--- |
-| **Windows (Portable)** | **[`Synapse-Workbench-Portable-1.0.0.exe`](https://gitea.2464.cz/ai/synapse/releases)** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
-| **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
-| **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases)** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Linux (CLI / Server)** | **[`synapse-1.0.0-py3-none-any.whl`](https://gitea.2464.cz/ai/synapse/releases)** | See Python Wheel Installation below. |
+| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.0.0.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
+| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.0.0-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
+| **macOS (Portable)** | **`Synapse-Workbench-1.0.0-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
+| **Linux (CLI / Server)** | **`synapse-1.0.0-py3-none-any.whl`** | See Python Wheel Installation below. |
 | **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
 ---
@@ -141,8 +138,8 @@ Install and run Synapse via standard Python packaging across Linux, macOS, or Wi
 python3 -m venv synapse-env
 source synapse-env/bin/activate
 
-# 2. Install the official wheel from Gitea
-pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+# 2. Install the official wheel
+pip install dist/python/synapse-1.0.0-py3-none-any.whl
 
 # 3. Launch the Socratic Workbench
 synapse serve --port 8000
@@ -159,7 +156,7 @@ synapse serve --port 8000
 Run the full Socratic Workbench in an isolated, multi-stage production container:
 
 ```bash
-git clone https://gitea.2464.cz/ai/synapse.git && cd synapse
+git clone <repo-url> && cd synapse
 docker compose up -d
 ```
 
@@ -178,7 +175,7 @@ docker compose down
 
 ```bash
 # 1. Clone repository
-git clone https://gitea.2464.cz/ai/synapse.git && cd synapse
+git clone <repo-url> && cd synapse
 
 # 2. Set up Python virtual environment
 python3 -m venv .venv

@@ -14,7 +14,7 @@ echo "[*] [Phase 1A/3] Enhancing Arts domain (33 topics) with Claude Sonnet 5...
 python3 scripts/generate_all.py --domain arts --enhance --model claude-sonnet-5
 
 echo ""
-echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published to Gitea!"
+echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published!"
 
 # Phase 1B: Generate Unwritten Arts Topics (34 missing visual arts, 3D graphics, and modular audio topics)
 echo ""

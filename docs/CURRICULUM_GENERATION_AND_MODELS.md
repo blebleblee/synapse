@@ -14,7 +14,7 @@ When drafting an unwritten syllabus node, the engine executes a multi-stage sequ
 2. **Parallel Module Drafting:** Concurrently drafts all lessons and operational labs (`labs.md`) using a `ThreadPoolExecutor` (3 concurrent workers for Claude or distributed across all online Ollama cluster nodes).
 3. **Adversarial Peer Review:** Passes the drafted markdown to an independent reviewer model (e.g. `deepseek-r1:32b`, `qwen2.5-coder:32b`, or Claude Opus) to fact-check APIs, verify invariants, and refine prose.
 4. **Mermaid Diagram Normalization:** Automatically runs all generated code through `repair_mermaid_diagrams()` to ensure strict `subgraph sub_id ["Title"]` and quoted label compliance before disk writes.
-5. **Git Versioning & Remote Push:** Commits the completed topic directory (`gen(<topic_id>): masterclass curriculum`) and automatically pushes to Gitea in real time.
+5. **Git Versioning & Remote Push:** Commits the completed topic directory (`gen(<topic_id>): masterclass curriculum`) and automatically pushes to the remote repository in real time.
 
 ### B. Deep Enhancement Mode (`--enhance`)
 Enhancement mode audits and upgrades existing curriculum units:

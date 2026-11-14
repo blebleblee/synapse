@@ -63,7 +63,7 @@ def render():
     target_count = total if total > 0 else 45
     enhanced_count = curr if total > 0 else 0
 
-    active_topic = topic_from_log if procs else "Pipeline complete & pushed to Gitea!"
+    active_topic = topic_from_log if procs else "Pipeline complete & pushed to remote!"
     diff_stat = get_current_diff_stat()
     commits = get_recent_commits()
     log_tail = get_latest_log_lines(8)

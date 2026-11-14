@@ -8,7 +8,7 @@ Comprehensive guide for installing, running, and building **Synapse** across **m
 
 The easiest way to run Synapse. No Python, Node.js, or package compilation required.
 
-Download pre-compiled Release Candidate binaries from the **[Releases](https://gitea.2464.cz/ai/synapse/releases)** page:
+Download pre-compiled Release Candidate binaries from the project releases:
 
 | Platform | Download Format | Installation Instructions |
 | :--- | :--- | :--- |
@@ -57,8 +57,8 @@ sudo apt update && sudo apt install -y python3 python3-venv  # Debian/Ubuntu
 python3 -m venv ~/synapse-env
 source ~/synapse-env/bin/activate
 
-# 3. Install the official Synapse wheel directly from Gitea
-pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+# 3. Install the official Synapse wheel
+pip install dist/python/synapse-1.0.0-py3-none-any.whl
 
 # 4. Launch Synapse Workbench
 synapse serve --port 8000
@@ -76,7 +76,7 @@ For full native terminal drawer support on Windows, run inside **WSL2** (Windows
    ```bash
    python3 -m venv ~/synapse-env
    source ~/synapse-env/bin/activate
-   pip install https://gitea.2464.cz/ai/synapse/releases/download/v1.0.0/synapse-1.0.0-py3-none-any.whl
+   pip install dist/python/synapse-1.0.0-py3-none-any.whl
    synapse serve --port 8000
    ```
 3. Open **`http://localhost:8000`** in Chrome, Edge, or Firefox in Windows.
@@ -102,7 +102,7 @@ Run the complete Socratic Workbench inside an isolated, multi-stage production c
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://gitea.2464.cz/ai/synapse.git
+git clone <repo-url>
 cd synapse
 
 # Launch with Docker Compose
@@ -140,7 +140,7 @@ For engineers developing the Python curriculum engine or React frontend.
 
 #### Step 1: Clone Repository
 ```bash
-git clone https://gitea.2464.cz/ai/synapse.git
+git clone <repo-url>
 cd synapse
 ```
 

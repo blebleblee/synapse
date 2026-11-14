@@ -57,7 +57,7 @@ def git_worker():
                 subprocess.run(["git", "add", str(subtopic_dir)], check=True, cwd=str(WORKSPACE_ROOT), capture_output=True)
                 subprocess.run(["git", "commit", "-m", f"{prefix}({subtopic_id}): masterclass curriculum"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
                 subprocess.run(["git", "push", "origin", "main"], check=False, cwd=str(WORKSPACE_ROOT), capture_output=True)
-                print(f"[✔] Published & Pushed to Gitea: {subtopic_id}")
+                print(f"[✔] Published & Pushed: {subtopic_id}")
                 published = True
                 break
             except Exception:
