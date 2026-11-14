@@ -5,6 +5,7 @@
   "description": "Synapse AI Learning Workbench - Standalone Native Desktop Shell",
   "main": "src/main.js",
   "scripts": {
+    "postinstall": "node scripts/brand-electron.js || true",
     "start": "electron .",
     "dev": "ELECTRON_DEV=1 electron .",
     "pack": "electron-builder --dir",
