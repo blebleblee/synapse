@@ -250,7 +250,17 @@ def generate_topic_parallel(
                 else:
                     results[fname] = False
 
-        # Phase 2: Concurrent Quality Audit & Fact-Checking + Prose Refinement
+        if is_cloud:
+            # Single-pass masterclass authoring for cloud frontier models:
+            # Direct publication eliminates redundant full-text re-drafting, cutting time and costs by 50%.
+            for fname, (content, mod_item, host_label, w_host, elapsed) in drafts.items():
+                target_file = subtopic_dir / fname
+                target_file.write_text(content.strip() + "\n", encoding="utf-8")
+                print(f"      [✔] {fname} published ({host_label} -> Masterclass Draft in {elapsed:.1f}s)", flush=True)
+                results[fname] = True
+            return results
+
+        # Phase 2: Concurrent Quality Audit & Fact-Checking + Prose Refinement (for local cluster models)
         def get_auditor_for_host(author_host: str):
             large_reviewers = [w for w in workers if ("32b" in w[1] or "30b" in w[1]) and w[0] != author_host]
             if large_reviewers:

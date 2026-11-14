@@ -729,7 +729,14 @@ class AnthropicProvider(LLMProvider):
             "temperature": 0.2
         }
         if system_instruction and system_instruction.strip():
-            payload["system"] = system_instruction.strip()
+            # Enable Anthropic ephemeral prompt caching (90% input discount + faster TTFT)
+            payload["system"] = [
+                {
+                    "type": "text",
+                    "text": system_instruction.strip(),
+                    "cache_control": {"type": "ephemeral"}
+                }
+            ]
 
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
