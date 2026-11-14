@@ -2,336 +2,294 @@
 
 ## 1. First-Principles Intuition (15%)
 
-Film orchestration is the strategic deployment of instrumental colors and textures to support narrative, emotion, and pacing. Unlike concert music, film scoring demands moment-to-moment flexibility—you're painting with sound to match visual rhythm, emotional arc, and often split-second dramatic shifts.
+Film orchestration is sound design for story: every instrumental choice either clarifies or muddies what the audience feels at that frame. Unlike concert writing, you don't get four minutes to develop a theme — you often get eight bars to shift the emotional temperature of a scene, and the cue has to hit a specific timecode doing it.
 
-**Core Acoustic Reality:** Every instrument produces a fundamental frequency plus a unique harmonic series (overtones). A violin's bright, penetrating timbre comes from prominent 3rd–7th harmonics, while a tuba's warmth comes from a strong fundamental with subdued upper partials. This harmonic fingerprint determines how instruments blend or cut through the mix. When you layer strings, woodwinds, and brass, you're stacking overlapping harmonic spectra—too many similar frequencies create mud; complementary spectra create clarity and depth.
+**Core acoustic reality:** every instrument's timbre is its harmonic fingerprint. A violin's bite comes from strong 3rd–7th partials; a horn's roundness comes from a dominant fundamental with softer upper partials; a trumpet sits aggressively in 2–4 kHz because of strong odd harmonics in that band. When you stack instruments, you're stacking overlapping spectra. Two instruments with similar harmonic fingerprints in the same register fuse into mud. Two instruments with complementary fingerprints (bright + dark, strong fundamental + strong overtone) stack into clarity. This is why a solo cello cuts through a string pad but a second cello doubling it in unison just makes it "thicker" without adding intelligibility — the spectra are near-identical.
 
-**Transposition Quick Reference:** B♭ trumpet sounds a major 2nd lower than written; F horn sounds a perfect 5th lower; E♭ alto sax sounds a major 6th lower; A clarinet sounds a minor 3rd lower. Write comfortably in their home keys (trumpet in D, horn in F/C) to access the strongest registers.
+**Transposition in one paragraph:** B♭ trumpet and clarinet sound a major 2nd below written pitch; F horn sounds a perfect 5th below; E♭ alto sax sounds a major 6th below. Write in each instrument's strongest written register (trumpet in D–A, horn in G–C) rather than fighting the extremes — register, not just pitch class, is what makes an instrument speak confidently or choke.
 
-**Dynamic Headroom:** Strings can whisper (*ppp*) and scream (*fff*), spanning ~60 dB. Brass have explosive *fff* but limited *pp*. Woodwinds sit in between. For film underscore, you need constant dynamic shaping—strings carry soft bed textures, brass punctuate climaxes, woodwinds add expressive solo lines.
+**Dynamic headroom:** strings run ~60 dB from *ppp* to *fff* and can sustain a true *pp* for minutes. Brass have explosive ceiling dynamics but a narrow, unstable *pp* — a horn player asked to hold *ppp* for 16 bars will crack. Budget your dynamic architecture around what each section can physically sustain, not just what looks good on the page.
+
+Everything below operationalizes this: frequency-range mapping, divisi voicing, balance ratios, transposition workflow, and ready-to-score cue templates.
+
+---
 
 ## 2. Practical Orchestration Mechanics (85%)
 
 ### Frequency Range Architecture
 
-Map your orchestral palette across the frequency spectrum:
-
 | Section | Low Register | Mid Register | High Register |
-|---------|--------------|--------------|---------------|
-| **Strings** | Cello/Bass: 40–250 Hz (foundation, bass lines) | Viola/Cello: 250–1 kHz (harmony, inner voices) | Violin: 1–4 kHz (melody, brilliance) |
-| **Woodwinds** | Bassoon/Bass Clar: 60–400 Hz (dark colors, counter-bass) | Clarinet/Oboe: 250–2 kHz (lyrical solos, doubling) | Flute/Piccolo: 500–4 kHz (airiness, sparkle) |
-| **Brass** | Tuba/Trombone: 50–400 Hz (power bass, pedal tones) | Horn/Trombone: 150–800 Hz (nobility, warmth) | Trumpet: 250–2 kHz (fanfares, aggression) |
-| **Percussion** | Timp/Bass Drum: 40–200 Hz (rhythmic foundation) | Snare/Toms: 100–500 Hz (attacks, color) | Cymbals/Triangle: 2–12 kHz (shimmer, accent) |
+|---------|--------------|--------------|----------------|
+| **Strings** | Cello/Bass: 40–250 Hz (foundation) | Viola/Cello: 250 Hz–1 kHz (inner harmony) | Violin: 1–4 kHz (melody, brilliance) |
+| **Woodwinds** | Bassoon/Bass Clar: 60–400 Hz (dark counter-bass) | Clarinet/Oboe: 250 Hz–2 kHz (lyrical, doubling) | Flute/Piccolo: 500 Hz–4 kHz (air, sparkle) |
+| **Brass** | Tuba/Bass Trbn: 50–400 Hz (pedal, power) | Horn/Trombone: 150–800 Hz (nobility, warmth) | Trumpet: 250 Hz–2 kHz (fanfare, edge) |
+| **Percussion** | Timp/Bass Drum: 40–200 Hz (rhythmic floor) | Snare/Toms: 100–500 Hz (attack, color) | Cymbal/Triangle: 2–12 kHz (shimmer) |
 
-**Practical Application:** For a dark, tense underscore, cluster activity in 60–400 Hz (low strings, bassoons, trombones). For a bright, heroic cue, push energy into 500 Hz–2 kHz (violins, trumpets, high woodwinds). Avoid frequency pile-ups—if cellos play a bass line, don't double with bassoons *and* trombones *and* tuba simultaneously unless you want intentional weight.
+**Working rule:** dark/tense cue → cluster activity 60–400 Hz. Bright/heroic cue → push energy into 500 Hz–2 kHz. If cellos already carry the bass line, adding bassoon *and* trombone *and* tuba on the same note stacks three instruments into the same 60–250 Hz pocket — fine if you want a wall of sound, wasteful if you actually wanted clarity. Decide on purpose, not habit.
+
+**Ear test for pile-up:** solo each instrument group for 4 bars in your DAW/mockup. If muting any one of three low instruments changes nothing you can hear, you have redundant mass, not reinforcement — reassign one of them to a different register or cut it.
 
 ### String Section Divisi Voicing
 
-**Standard String Layout (40-piece section):**
-- Violin I: 12 players
-- Violin II: 10 players
-- Violas: 8 players
-- Cellos: 6 players
-- Basses: 4 players
+**Standard 40-piece layout:** Violin I ×12, Violin II ×10, Viola ×8, Cello ×6, Bass ×4. (A "Hollywood scoring string" session typically runs 8-7-6-5-4 or smaller — the voicing principles below scale down identically; a 5-5-4-3-2 group divisi's the same way.)
 
-**Divisi Technique:** Split sections into 2, 3, or 4 independent voices to thicken harmony or create lush pads.
-
-**Example: Four-Part Harmony in Strings**
-
-Chord: C Major (C–E–G–C)
+**Four-part harmony example — C major triad (C–E–G):**
 
 ```
-Violin I (a2): High C + E (divisi, 6 players each)
-Violin II (a2): G + High C (divisi, 5 players each)
-Violas (unison): Middle C
-Cellos (unison): Low G
-Basses (unison): Low C
+Violin I   (div. a2): high C + E   — 6 players per note
+Violin II  (div. a2): G + high C   — 5 players per note
+Viola      (non div.): middle C
+Cello      (non div.): low G
+Bass       (non div.): low C
 ```
 
-**Notation:** Mark *div. a2* (divide in two), *div. a3* (three), or *non div.* (unison). The conductor and players automatically redistribute.
+Mark *div. a2* / *div. a3* in the part at the bar where the split starts, and *non div.* (or *unis.*) where it resolves back — players self-organize by stand partner, you don't assign desks.
 
-**Voicing Rules:**
-1. **Wide Low, Tight High:** Space bass notes an octave apart; cluster treble within an octave for warmth without mud.
-2. **Double at Octaves:** If Violin I plays high C, double with Cellos an octave (or two) lower for reinforcement.
-3. **Avoid Mid-Range Pile-Up:** Don't stack Violin II, Violas, and Cellos all in the 250–500 Hz range unless you want intentional thickness.
+**Voicing rules:**
 
-**Texture Drill:**
-- **Soft Pad (pp):** All strings *div. a2* or *a3*, slow bow changes, no vibrato → glassy, ethereal.
-- **Power Unison (fff):** All strings *non div.*, same melody, aggressive down-bows → massive, aggressive.
-- **Transparent Counterpoint:** Violin I melody, Violin II counter-melody, Violas sustained harmony, Cellos pizzicato bass → clear, detailed.
+1. **Wide low, tight high.** Space the bottom two notes an octave or more apart; cram the top notes within an octave. Mirrors the natural harmonic series (wide intervals low, narrow intervals high) so the chord sounds correct instead of boxy.
+2. **Octave-reinforce the melody, don't unison-stack it.** If Violin I carries the tune, double it an octave down in Cello rather than piling Violin II onto the same pitch — you get range and weight instead of just more of the same frequency.
+3. **Don't let Violin II + Viola + Cello collide in 250–500 Hz.** That's the "mud band" for strings; if all three sit there simultaneously, voice one of them an octave away.
+
+**Texture drill (do this with a real DAW mockup, not just on paper):**
+
+| Texture | Setup | Target sound |
+|---|---|---|
+| Soft pad (*pp*) | All sections *div. a2/a3*, slow bow changes, no vibrato | Glassy, ethereal bed |
+| Power unison (*fff*) | All sections *non div.*, same melody, aggressive down-bow | Massive, aggressive wall |
+| Transparent counterpoint | Vln I melody / Vln II countermelody / Viola sustained / Cello pizz bass | Clear, chamber-like detail |
 
 ### Brass and Woodwind Balance
 
-**Brass Dominance Problem:** A single trumpet *ff* can overpower an entire string section *mf*. Balance demands strategic doubling and dynamic shaping.
+**The problem in numbers:** a single trumpet at *ff* produces roughly as much perceived loudness as 8–10 strings at *mf*, because brass couples sound energy into the air far more efficiently per player. Balance in orchestration is ratio management, not equal dynamic markings.
 
-**Doubling Strategies:**
+**Doubling ladder:**
 
-| Brass Alone | +Woodwinds (Reinforce Color) | +Strings (Blend & Warmth) |
-|-------------|------------------------------|----------------------------|
-| 2 Horns (F) *mf*, unison melody | +2 Clarinets *mf* doubling at unison or octave | +Violin I & II *mf* doubling melody |
-| 3 Trumpets *ff* fanfare | +2 Oboes *ff* (adds edge, cuts through) | +Full strings *f* (smooths brass aggression) |
-| 4 Trombones *f* chorale | +2 Bassoons *f* (darkens, adds depth) | +Low strings *mf* (foundation, warmth) |
+| Brass alone | + Woodwinds (color) | + Strings (blend) |
+|---|---|---|
+| 2 Horns *mf* unison | +2 Clarinets *mf* at unison/octave | +Vln I & II *mf* doubling melody |
+| 3 Trumpets *ff* fanfare | +2 Oboes *ff* (adds edge) | +Full strings *f* (smooths the brass) |
+| 4 Trombones *f* chorale | +2 Bassoons *f* (darkens, deepens) | +Low strings *mf* (foundation) |
 
-**Dynamic Balancing Drill:**
-1. Write a 4-bar phrase for 4 horns *ff*.
-2. Add 2 clarinets *mf* doubling the top horn line.
-3. Add full strings *f* doubling the entire horn chord.
-4. Playback and adjust: If brass still dominates, pull brass to *f* or boost strings to *ff*.
+**Balancing drill (mockup required, trust your ears over the page):**
+1. Write 4 bars, 4 horns, *ff*, unison melody.
+2. Layer 2 clarinets *mf* doubling the top line.
+3. Layer full strings *f* doubling the whole horn chord.
+4. Play back. If brass still dominates, pull brass down one dynamic step (*ff → f*) rather than pushing strings past their comfortable ceiling — strings distort tonally when forced loud, brass doesn't.
 
-**Woodwind Choir Spacing (Dark → Bright):**
+**Woodwind choir, dark to bright:**
 ```
-2 Bassoons: Low harmony, bass doubling
-2 Clarinets: Middle harmony, lyrical doublings
-2 Oboes: Top melody, expressive leads
-2 Flutes: High shimmer, color accents
+2 Bassoons  — low harmony / bass doubling
+2 Clarinets — mid harmony / lyrical doubling
+2 Oboes     — top melody / expressive lead
+2 Flutes    — high shimmer / color accents
 ```
-
-**Avoid:** All four woodwind pairs in unison—this creates a blended, indistinct sound. Instead, stagger by octaves or assign distinct harmonic roles.
+Stagger by register or role. Four pairs in rigid unison reads as one flat color instead of four distinct voices — intentional only if you want a deliberately faceless woodwind block (useful for horror "breathing" textures, rare elsewhere).
 
 ### Transposing Instruments: Practical Workflow
 
-**Write Comfortably, Transpose Later:**
+**Compose in concert pitch, transpose at the end.** Every mainstream notation app (Dorico, Sibelius, Finale, and even Logic/Cubase score editors) has a Concert Pitch toggle — write and audition with it ON, flip it OFF only before printing parts.
 
-1. **Compose in Concert Pitch (C):** All instruments sound at written pitch during composition.
-2. **Transpose Before Engraving:** Convert parts to transposed notation for players.
+**Quick reference (from concert pitch):**
 
-**Quick Transpose Chart (from Concert Pitch):**
+| Instrument | To get written pitch | Example: concert C→ |
+|---|---|---|
+| B♭ Trumpet / B♭ Clarinet | transpose UP a major 2nd | write D |
+| F Horn | transpose UP a perfect 5th | write G |
+| E♭ Alto Sax | transpose UP a major 6th | write A |
+| B♭ Bass Clarinet | transpose UP a major 9th | write D (next octave) |
 
-| Instrument | Written Pitch | Sounds | Transpose Up/Down |
-|------------|---------------|--------|-------------------|
-| B♭ Trumpet | D | C | Up major 2nd |
-| F Horn | G | C | Up perfect 5th |
-| E♭ Alto Sax | A | C | Up major 6th |
-| A Clarinet | D | C | Up minor 3rd |
-| B♭ Bass Clarinet | D | C (octave lower) | Up major 9th |
-
-**Example: Concert C Major Triad (C–E–G)**
-
+**Concert C major triad (C–E–G) written for each:**
 ```
-Horn in F (concert C–E–G): Write G–B–D
-Trumpet in B♭ (concert C–E–G): Write D–F♯–A
-Alto Sax in E♭ (concert C–E–G): Write A–C♯–E
+Horn in F:        G – B – D
+Trumpet in B♭:    D – F♯ – A
+Alto Sax in E♭:   A – C♯ – E
 ```
 
-**Best Sounding Registers (Write in These Zones):**
-- **Trumpet in B♭:** Written F#4–C6 (sounds E4–B♭5) → brilliant, powerful.
-- **Horn in F:** Written G3–C5 (sounds C3–F4) → noble, full-bodied.
-- **Clarinet in B♭:** Written F#3–C6 (sounds E3–B♭5) → rich low register (chalumeau), brilliant high register (clarion).
+**Best-sounding written registers — memorize these, not just the transposition interval:**
 
-**Scoring Drill:** Write a 16-bar melody for trumpet, horn, and clarinet in unison at concert pitch. Transpose each part. Check that all instruments stay within their comfortable written ranges.
+| Instrument | Written sweet spot | Sounds | Character |
+|---|---|---|---|
+| Trumpet in B♭ | F♯4–C6 | E4–B♭5 | brilliant, confident |
+| Horn in F | G3–C5 | C3–F4 | noble, full |
+| Clarinet in B♭ | F♯3–C6 | E3–B♭5 | chalumeau warmth low, clarion brilliance high |
+
+Writing a trumpet part that *transposes correctly* but sits above written C6 for sixteen bars is technically right and practically unplayable at tempo — register comfort overrides raw correctness every time.
+
+**Scoring drill:** write a 16-bar unison melody at concert pitch for trumpet, horn, and clarinet. Transpose all three parts. Confirm every note sits inside the sweet-spot table above — if it doesn't, move the written melody an octave, don't ask the player to grind through it.
 
 ### Orchestration Architecture: Layering Flowchart
 
 ```mermaid
 graph TD
-    A[Define Emotional Target] --> B{Texture Density?}
-    B -->|"Sparse/Intimate"| C[Solo Instrument or Small Ensemble]
-    B -->|"Medium/Supportive"| D["Strings + 1-2 Woodwinds"]
-    B -->|"Full/Dramatic"| E["Full Orchestra: Strings + Winds + Brass"]
-    
-    C --> F[Choose Lead Timbre]
-    F -->|"Warm/Expressive"| G[Cello, Horn, or Oboe]
-    F -->|"Bright/Agile"| H[Violin, Flute, or Clarinet]
-    
-    D --> I[String Texture Foundation]
-    I --> J[Add Woodwind Color]
-    J -->|"Double Melody"| K["Flute/Oboe on Top Line"]
-    J -->|"Inner Harmony"| L["Clarinets/Bassoons in Mid-Range"]
-    
-    E --> M[Establish Low Foundation]
-    M --> N["Low Strings + Bassoons + Tuba/Bass Trombone"]
-    N --> O[Mid-Range Harmony]
-    O --> P["Horns + Violas + Mid Brass"]
-    P --> Q["Melody & Brightness"]
-    Q --> R["Violins + High Woodwinds + Trumpets"]
-    R --> S["Accent & Shimmer"]
-    S --> T["Percussion + Cymbal/Triangle"]
+    A["Define Emotional Target"] --> B{"Texture Density?"}
+    B -->|"Sparse / Intimate"| C["Solo Instrument or Small Ensemble"]
+    B -->|"Medium / Supportive"| D["Strings + 1-2 Woodwinds"]
+    B -->|"Full / Dramatic"| E["Full Orchestra: Strings + Winds + Brass"]
+
+    subgraph sub_solo ["Solo/Intimate Path"]
+        C --> F["Choose Lead Timbre"]
+        F -->|"Warm / Expressive"| G["Cello, Horn, or Oboe"]
+        F -->|"Bright / Agile"| H["Violin, Flute, or Clarinet"]
+    end
+
+    subgraph sub_medium ["Medium Texture Path"]
+        D --> I["String Texture Foundation"]
+        I --> J["Add Woodwind Color"]
+        J -->|"Double Melody"| K["Flute/Oboe on Top Line"]
+        J -->|"Inner Harmony"| L["Clarinets/Bassoons Mid-Range"]
+    end
+
+    subgraph sub_full ["Full Orchestra Path"]
+        E --> M["Establish Low Foundation"]
+        M --> N["Low Strings + Bassoons + Tuba/Bass Trombone"]
+        N --> O["Mid-Range Harmony"]
+        O --> P["Horns + Violas + Mid Brass"]
+        P --> Q["Melody & Brightness"]
+        Q --> R["Violins + High Woodwinds + Trumpets"]
+        R --> S["Accent & Shimmer"]
+        S --> T["Percussion + Cymbal/Triangle"]
+    end
 ```
 
 ### Real-World Film Scoring Scenarios
 
-**Scenario 1: Tense Underscore (Low String Cluster)**
+**Scenario 1 — Tense underscore, low string cluster (90 sec, no melody, slow dread build):**
 
 ```
-Target: 90-second scene, slow-building dread, no melody.
-
-Orchestration:
-- Cellos (div. a4): Sustained C–D♭–D–E♭ (minor 2nd clusters), no vibrato, pp → mp
-- Basses (div. a2): Low C pedal tone + slow glissando C → B♭, ppp → p
-- Bassoons (a2): Doubling cellos' top two notes (D–E♭), mp
-- Contrabassoon: Low C pedal, ppp
-- Timpani: Soft roll on C, ppp, barely audible
+Cello (div. a4):     sustained C–D♭–D–E♭ cluster, no vibrato, pp → mp
+Bass (div. a2):      low C pedal + slow gliss C → B♭, ppp → p
+Bassoon (a2):        doubles cello top two notes (D–E♭), mp
+Contrabassoon:        low C pedal, ppp
+Timpani:              soft roll on C, ppp, barely perceptible
 ```
+Entrances: strings 0:00, bassoons 0:30, timpani 1:00. Dynamic swell *ppp → mp* across the full 90 sec. Texture only — melody would release tension prematurely.
 
-**Execution:** Strings enter at 0:00, bassoons at 0:30, timpani at 1:00. Dynamic swell from *ppp* to *mp* over 90 seconds. No melody, pure texture.
-
-**Scenario 2: Heroic Fanfare (Brass-Led)**
+**Scenario 2 — Heroic fanfare, brass-led (8 bars, 120 BPM, 4/4):**
 
 ```
-Target: 8-bar triumphant theme, 120 BPM, 4/4.
-
-Orchestration:
-- 4 Horns: Unison melody, ff, sustained notes with marcato attacks
-- 3 Trumpets: Melody doubled octave higher, ff, short articulations
-- 3 Trombones: Harmony (3rd & 5th below melody), f
-- Tuba: Bass line, f
-- Strings: Full section doubling entire brass chord, ff, long bows
-- Timpani: Downbeats, ff, reinforcing tonic/dominant
+4 Horns:     unison melody, ff, marcato attacks
+3 Trumpets:  melody doubled an octave up, ff, short articulation
+3 Trombones: harmony a 3rd/5th below melody, f
+Tuba:        bass line, f
+Strings:     full section doubling entire brass chord, ff, long bows
+Timpani:     downbeats, ff, reinforcing tonic/dominant
 ```
 
-**Voicing Example (Concert Pitch, C Major Theme):**
+Bar 1, beat 1 voicing on a C major triad:
 ```
-Bar 1, Beat 1 (C Major Triad):
-Trumpets: High C (fff)
-Horns: Middle C (ff)
-Trombones: E + G (f)
-Tuba: Low C (f)
-Violin I: High C (ff)
-Violin II: G (ff)
-Violas: E (ff)
-Cellos: Middle C (ff)
-Basses: Low C (ff)
-Timpani: C (ff)
+Trumpet:   high C   (fff)
+Horn:      middle C (ff)
+Trombone:  E + G    (f)
+Tuba:      low C    (f)
+Vln I:     high C   (ff)
+Vln II:    G        (ff)
+Viola:     E        (ff)
+Cello:     middle C (ff)
+Bass:      low C    (ff)
+Timpani:   C        (ff)
+```
+Note the dynamic markings differ by instrument for the *same perceived loudness* — this is the ratio principle from the balance section applied directly.
+
+**Scenario 3 — Intimate love theme, solo + strings (32 bars, 60 BPM, 3/4 waltz):**
+
+```
+Solo Cello:         melody, espressivo, mp → mf, rich vibrato
+Vln I (div. a2):    sustained root + 5th harmony, pp, no vibrato
+Vln II:             gentle arpeggiated accompaniment, p
+Viola:              inner harmony in 3rds/6ths, pp
+Harp:               arpeggiated chords on beats 1 & 2, p
+```
+Keep the solo cello 10–20 dB above the string bed in the mockup/mix. The strings are a harmonic pillow, not competition — if the bed creeps up in dynamic during a crescendo, bring the soloist up proportionally first.
+
+### Modular Orchestration Blocks
+
+**Block A — String Pad Foundation**
+```
+Vln I+II (div. a2 each): 4-note chord, pp–mp, sustained
+Viola (div. a2):          2-note harmony, pp
+Cello+Bass (unison):      bass note, pp
+```
+**Block B — Woodwind Color Layer**
+```
+2 Flutes:    top melody or shimmer, p–mf
+2 Clarinets: mid doubling or countermelody, p
+2 Bassoons:  low harmony or bass doubling, p
+```
+**Block C — Brass Power Accent**
+```
+4 Horns:     sustained chord, mf–ff
+3 Trumpets:  short fanfare/punctuation, f–ff
+3 Trombones: low harmony, f
+Tuba:        bass reinforcement, f
+```
+**Block D — Percussion Rhythm & Color**
+```
+Timpani:            downbeats or rolls, p–ff
+Snare/Bass Drum:    rhythmic hits, mf–f
+Cymbal/Triangle:    accents or shimmer, p–mf
 ```
 
-**Scenario 3: Intimate Love Theme (Solo + Strings)**
+**32-bar assembly pattern:**
+- Bars 1–8: Block A only — soft build.
+- Bars 9–16: A + B — add color.
+- Bars 17–24: A + B + C — full power.
+- Bars 25–32: A + C + D — climax with rhythmic drive.
 
-```
-Target: 32-bar lyrical melody, 60 BPM, 3/4 waltz.
-
-Orchestration:
-- Solo Cello: Melody, espressivo, mp → mf, rich vibrato
-- Violin I (div. a2): Sustained harmony (roots and 5ths), pp, no vibrato
-- Violin II: Gentle arpeggiated accompaniment, p
-- Violas: Inner harmony (3rds and 6ths), pp
-- Harp: Arpeggiated chords on beats 1 & 2, p
-```
-
-**Texture:** Solo cello sits 10–20 dB above string bed. Strings provide harmonic pillow without competing. Harp adds shimmer without rhythmic intrusion.
-
-### Orchestration Template: Modular Blocks
-
-Use these pre-built blocks to assemble cues quickly:
-
-**Block A: String Pad Foundation**
-```
-Violin I + II (div. a2 each): 4-note chord, pp-mp, sustained
-Violas (div. a2): 2-note harmony, pp
-Cellos + Basses (unison): Bass note, pp
-```
-
-**Block B: Woodwind Color Layer**
-```
-2 Flutes: Top melody or shimmer, p-mf
-2 Clarinets: Mid-range doubling or counter-melody, p
-2 Bassoons: Low harmony or bass doubling, p
-```
-
-**Block C: Brass Power Accent**
-```
-4 Horns: Sustained chord, mf-ff
-3 Trumpets: Short fanfare or punctuation, f-ff
-3 Trombones: Low harmony, f
-Tuba: Bass reinforcement, f
-```
-
-**Block D: Percussion Rhythm & Color**
-```
-Timpani: Downbeats or rolls, p-ff
-Snare/Bass Drum: Rhythmic hits, mf-f
-Cymbals/Triangle: Accents or shimmer, p-mf
-```
-
-**Assembly Example (32-bar Dramatic Cue):**
-- Bars 1–8: Block A only (soft build)
-- Bars 9–16: Block A + Block B (add color)
-- Bars 17–24: Block A + Block B + Block C (full power)
-- Bars 25–32: Block A + Block C + Block D (climax with rhythm)
+This four-block system is the fastest way to sketch a temp cue against picture before refining individual lines — block in first, then carve detail once the overall shape matches the edit.
 
 ### Practice Drills
 
-**Drill 1: Frequency Separation Exercise**
-1. Write a 4-bar phrase using only instruments in the 60–250 Hz range (low strings, bassoons, low brass).
-2. Write the same phrase using only 1–4 kHz range (violins, flutes, trumpets).
-3. Combine both, ensuring no overlap. Listen for clarity.
+**Drill 1 — Frequency separation**
+1. Write 4 bars using only instruments in 60–250 Hz (low strings, bassoon, low brass).
+2. Write the same phrase using only 1–4 kHz instruments (violin, flute, trumpet).
+3. Combine. Confirm in playback that no register collapses into the other — if it does, move one line an octave.
 
-**Drill 2: Divisi Voicing Workout**
-1. Take a 4-note chord (e.g., C Major 7: C–E–G–B).
-2. Voice it three ways:
-   - Wide spacing (low strings octave apart, high strings clustered)
-   - Tight spacing (all notes within one octave)
-   - Mixed spacing (low notes wide, high notes tight)
-3. Render all three and compare warmth, clarity, and power.
+**Drill 2 — Divisi voicing workout**
+1. Take Cmaj7 (C–E–G–B).
+2. Voice it three ways: wide (bass notes an octave+ apart, treble clustered), tight (all notes within one octave), and mixed (wide low / tight high).
+3. Render all three in your mockup and compare warmth vs. clarity vs. power — write down which you'd use for a love theme vs. an action cue.
 
-**Drill 3: Brass/String Balance Test**
-1. Write an 8-bar brass chorale (4 horns + 3 trombones, *f*).
+**Drill 3 — Brass/string balance test**
+1. Write an 8-bar brass chorale: 4 horns + 3 trombones, *f*.
 2. Add full strings doubling at *mf*, then *f*, then *ff*.
-3. Find the string dynamic where brass and strings balance evenly.
+3. Identify which string dynamic actually balances against the *f* brass. (Expect it to land around *f* to *ff* — strings need to work harder than their markings suggest next to brass.)
 
-**Drill 4: Transposition Speed Test**
+**Drill 4 — Transposition speed test**
 1. Write a 16-bar melody in concert pitch.
-2. Transpose it for B♭ trumpet, F horn, E♭ alto sax, and A clarinet.
-3. Time yourself. Target: under 5 minutes for all four parts.
+2. Transpose for B♭ trumpet, F horn, E♭ alto sax, A clarinet.
+3. Time yourself. Target: under 5 minutes for all four, with zero notes outside each instrument's sweet-spot register.
 
-### Notation Software Workflow (Dorico/Sibelius/Finale)
+### Notation Software Workflow (Dorico / Sibelius / Finale)
 
-**Step 1: Enable Concert Pitch Mode**
-- Compose with all parts sounding at written pitch.
-- Menu: View → Concert Pitch (ON).
+1. **Concert Pitch ON** — View → Concert Pitch. Compose and audition everything at sounding pitch.
+2. **Input all parts in concert pitch** — write exactly what you want to hear.
+3. **Concert Pitch OFF** before engraving — the software auto-transposes every part to its correct written notation. Spot-check horn and clarinet parts manually; key signature auto-transposition occasionally needs a manual accidental fix at modulations.
+4. **File → Export → Parts** — generates individually transposed, correctly cued parts for the session or the players.
 
-**Step 2: Input Notes in Concert Pitch**
-- Write all parts as they should sound.
+**Common trap:** composing with Concert Pitch OFF by accident means you're auditioning transposed pitches as if they were concert pitch — chords will sound wrong by the transposition interval and you'll "fix" a problem that doesn't exist. If a chord sounds mysteriously off, check this toggle first.
 
-**Step 3: Disable Concert Pitch for Engraving**
-- Menu: View → Concert Pitch (OFF).
-- Software auto-transposes all parts to transposed notation.
+### Orchestral Blending Reference
 
-**Step 4: Export Parts**
-- File → Export → Individual Parts.
-- Each player receives correctly transposed music.
+| Technique | Setup | Result |
+|---|---|---|
+| Unison doubling | Vln I + Flute + Oboe, same pitch, *ff* | Brilliant, cutting, unified |
+| Octave doubling | Vln I (high) + Cello (octave down) | Full-spectrum warmth + brilliance |
+| Harmonic doubling | Vln I melody / Vln II 3rd below / Viola 5th below / Cello octave below | Lush chord built around the tune |
+| Timbral fusion | Horn + Clarinet, same pitch & dynamic | New blended color — darker than clarinet, brighter than horn alone |
+| Timbral fusion | Cello + Bassoon, unison, low register | Dark, resonant, mysterious |
 
-### Advanced Techniques: Orchestral Blending
-
-**Unison Doubling (Reinforce Power):**
-```
-Melody: Violins I + Flutes + Oboes (all same pitch, ff)
-Result: Brilliant, cutting, unified timbre
-```
-
-**Octave Doubling (Expand Range):**
-```
-Melody: Violins I (high) + Cellos (low, octave down)
-Result: Warmth + brilliance, full-spectrum presence
-```
-
-**Harmonic Doubling (Thicken Texture):**
-```
-Violins I: Melody
-Violins II: 3rd below
-Violas: 5th below
-Cellos: Octave below
-Result: Lush, full-bodied chord built around melody
-```
-
-**Timbral Fusion (Create New Colors):**
-```
-Horns + Clarinets (same pitch, same dynamic)
-Result: Blended color (darker than clarinet alone, brighter than horn alone)
-
-Cellos + Bassoons (unison, low register)
-Result: Dark, resonant, mysterious
-```
-
-**Key Principle:** Instruments in the same frequency range at the same dynamic fuse into a new blended timbre. Instruments separated by register or dynamic remain distinct.
+**Key principle:** instruments matched in register and dynamic fuse into a single new timbre; instruments separated by register or dynamic stay perceptually distinct. Use fusion when you want one unified color (horror drones, warm pads); use separation when you want a melody to read clearly over an accompaniment.
 
 ### Orchestration Checklist for Every Cue
 
-- [ ] **Frequency map clear:** No pile-ups in 200–500 Hz unless intentional.
-- [ ] **Transpositions verified:** All parts in comfortable written ranges for players.
-- [ ] **Dynamic balance tested:** Brass not overpowering strings/winds unless desired.
-- [ ] **Divisi marked:** *div. a2/a3* or *non div.* explicitly notated.
-- [ ] **Articulations specified:** Legato, staccato, marcato, tenuto marked consistently.
-- [ ] **Tempo & time signature locked:** Matches picture edit (if syncing to video).
-- [ ] **Dynamics shaped:** Not static—music breathes with scene pacing.
+- [ ] Frequency map clear — no unintended pile-up in 200–500 Hz.
+- [ ] All transpositions verified and every part sits in its comfortable written range.
+- [ ] Dynamic balance tested in mockup — brass doesn't swallow strings/winds unless intended.
+- [ ] Divisi explicitly marked (*div. a2/a3* / *non div.*) at the bar it changes.
+- [ ] Articulations marked consistently (legato, staccato, marcato, tenuto).
+- [ ] Tempo and time signature locked to the picture edit if syncing to video.
+- [ ] Dynamics shaped across the cue — not static, breathing with scene pacing.
+- [ ] Soloist (if any) sits 10–20 dB above the accompaniment bed in the mix.
 
-This is the practical orchestration toolkit for film scoring. Master these techniques, internalize the frequency ranges, practice divisi voicing and transposition daily, and you'll orchestrate efficiently and expressively for any narrative context.
+Master the frequency map, drill divisi voicing and transposition until they're reflexive, and build cues from the modular blocks before polishing detail — that order (shape first, detail second) is what lets you hit a locked picture deadline without losing musical intent.

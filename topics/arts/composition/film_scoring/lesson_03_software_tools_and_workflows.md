@@ -2,68 +2,60 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-Film scoring demands synchronization of three parallel streams: picture timecode, musical pulse, and emotional narrative. Unlike concert music, where tempo can float, film cues must lock to frame-accurate events while maintaining musical coherence. The tools you use—Digital Audio Workstations (DAWs), MIDI controllers, notation software, and sample libraries—are extensions of your compositional intent, converting creative decisions into synchronized audio that breathes with the image.
+Film scoring is the only musical discipline where tempo is not your decision alone — the picture dictates it. Every cue lives inside a fixed timeline: a director has already cut a scene to a specific length, specific cuts, specific emotional beats, and your music must breathe inside that container without being audibly "stretched" to fit. Unlike concert writing, where you compose the clock, in scoring you compose *against* a clock that someone else built.
 
-**Core Invariants:**
+**The four invariants that govern every session you build:**
 
-1. **Timecode Lock**: Film runs at fixed frame rates (23.976 fps, 24 fps, 25 fps, or 29.97 fps). Your DAW must maintain sample-accurate sync across tempo changes, time signature shifts, and MIDI/audio regions. A single frame at 24 fps = 41.67 ms—enough to be perceived as "off" by directors and mixers.
+1. **Timecode Lock.** Film runs at 23.976, 24, 25, or 29.97 frames per second. At 24 fps, one frame = 41.67 ms. That's roughly the gap between a snare hit landing "on" a punch versus landing just after it — small enough that a director won't describe it technically, but they will say the cue "feels late." Your DAW's video track must stay locked to absolute timecode even when you insert tempo changes upstream of it.
 
-2. **Layered Non-Destructive Editing**: Film scoring is iterative. Directors request changes to cue start/end times, orchestration, and emotional tone. Your session architecture must support rapid experimentation without destroying previous work.
+2. **Non-Destructive Layering.** You will be asked to redo the brass three times, remove the choir entirely, and then bring it back an hour later. Your session has to support that without anyone (including you) losing earlier work. This is a session-architecture problem, not a talent problem — composers get fired over blown deadlines caused by messy sessions, not bad melodies.
 
-3. **Virtual Orchestration Realism**: Sample libraries are recordings of real instruments. Realistic playback requires understanding articulation keyswitches, legato transitions, dynamic layers (pp to ff), and humanization techniques (timing, velocity variation, vibrato modulation).
+3. **Virtual Orchestration Realism.** Sample libraries are recordings of real players performing real techniques (legato bowing, spiccato, breath attacks). A mockup convinces a director only when you trigger the *correct* technique for the phrase, not just the correct pitch. Keyswitches, dynamic layers, and CC automation are how you tell the sample library which technique to use.
 
-4. **Stem Delivery Requirements**: The final deliverable isn't just a stereo mix. Mixers need stems (submixes) organized by instrument family—strings, brass, woodwinds, percussion, synths, choir—plus alternate versions (no percussion, no melody, 60-second edit, etc.).
+4. **Stem Delivery.** The thing you deliver is not a stereo file. It's a folder: strings, brass, woodwinds, percussion, synths, choir, each as its own stereo (or multichannel) file, time-aligned to the frame, plus edits like "no melody" (for trailers) or "60-second cutdown" (for broadcast).
 
-The physics beneath digital audio: Audio is converted to numbers via sampling (typically 48 kHz for film = 48,000 snapshots per second) and bit depth (24-bit = 16.7 million dynamic steps from silence to peak). MIDI is a control protocol: note number (pitch), velocity (0–127), and continuous controllers (CC) for modulation wheel, expression, breath, etc. MIDI doesn't produce sound—it triggers samples or synthesizers.
+**The minimum DSP literacy you need, in one paragraph:** Audio becomes numbers through sampling (48 kHz = 48,000 amplitude snapshots per second — the film/TV standard, versus 44.1 kHz for music-only releases) and bit depth (24-bit = ~16.7 million discrete amplitude steps, giving you ~144 dB of theoretical dynamic range to work in before quantization noise matters). MIDI is not audio — it's a control protocol carrying note number (pitch, 0–127), velocity (how hard the key was struck, 0–127), and continuous controllers (CC1 modulation, CC11 expression, CC64 sustain) that steer a sampler or synth into producing sound. Everything below this builds on those four numbers: sample rate, bit depth, note data, and CC data.
 
 ## 2. DAW Selection and Project Setup
 
-### 2.1 Industry-Standard DAWs for Film Scoring
+### 2.1 Choosing Your DAW (and Why It Matters Less Than You Think)
 
-**Logic Pro (macOS)**
-- **Strengths**: Deep integration with macOS, bundled orchestral library (Studio Strings, Studio Brass), flexible track alternatives for version comparison, streamlined MIDI editing.
-- **Typical Use**: Mid-budget films, TV episodics, composer-editors who deliver final mixes themselves.
+All five tools below can deliver a professional score. The differences matter for *workflow speed*, not sound quality — the sample libraries and your writing decide the sound.
 
-**Cubase Pro (macOS/Windows)**
-- **Strengths**: Expression Maps (single-staff control of articulation keyswitches), chord track for harmonic analysis, VariAudio pitch editing, VST3 plugin standard.
-- **Typical Use**: European composers, complex orchestral mockups requiring detailed articulation control.
+| DAW | Pick it if... | Weak point |
+|---|---|---|
+| **Logic Pro** (macOS only) | You compose and mix solo, want built-in orchestral patches to sketch fast | No AAX, less common on scoring stages for final mix |
+| **Cubase Pro** | You want per-note articulation control via Expression Maps, write dense orchestral mockups | Steeper learning curve, Windows/Mac only |
+| **Pro Tools** | You're delivering to a dub stage or mixing engineer, or recording a live orchestra | Clunky MIDI editing compared to Cubase/Logic |
+| **Digital Performer** | You manage 40+ TV cues and need independent timeline "Chunks" per cue | Smaller user base, fewer third-party templates online |
+| **Reaper** | Budget-conscious, want to script your own tools (ReaScript Lua/Python), run Linux | Smaller template ecosystem, UI needs setup work |
 
-**Pro Tools (macOS/Windows)**
-- **Strengths**: Industry mixing standard, AAX plugin format, robust stem printing, tight integration with studio hardware (Avid consoles, HDX DSP cards).
-- **Typical Use**: Large-budget scoring stages, composers who split composition (Cubase/Logic) and mixing (Pro Tools).
+A common professional split: compose and build the mockup in Cubase or Logic, then open the final session in Pro Tools for the mix pass and stem printing, because that's the format your re-recording mixer expects.
 
-**Digital Performer (macOS)**
-- **Strengths**: Chunks (independent timeline segments), sequence editor for managing multiple cue versions, consolidated window interface.
-- **Typical Use**: Composers managing 40+ cues for TV series, editors needing rapid cue variation assembly.
-
-**Reaper (macOS/Windows/Linux)**
-- **Strengths**: Scriptable via ReaScript (Lua/Python), low CPU footprint, aggressive routing capabilities, no track count limits.
-- **Typical Use**: Budget-conscious composers, Linux workflows, deep customization needs.
-
-### 2.2 Essential Session Architecture
+### 2.2 Session Architecture
 
 ```mermaid
 graph TD
     subgraph sub_project ["Film Project Root"]
-        A[Video Reference Track - Timecode Locked]
-        B[Tempo Map with Hit Points]
+        A["Video Reference Track - Timecode Locked"]
+        B["Tempo Map with Hit Points"]
         C["Marker Track - Scene/Cue Markers"]
     end
-    
+
     subgraph sub_midi ["MIDI Composition Layers"]
-        D[Strings - Violins I, II, Violas, Celli, Basses]
-        E[Brass - Horns, Trumpets, Trombones, Tuba]
-        F[Woodwinds - Flutes, Oboes, Clarinets, Bassoons]
-        G[Percussion - Timpani, Snare, Cymbals, Ethnic]
-        H["Synths & Sound Design"]
+        D["Strings - Vln I, Vln II, Vla, Vc, Db"]
+        E["Brass - Horns, Trumpets, Trombones, Tuba"]
+        F["Woodwinds - Fl, Ob, Cl, Bsn"]
+        G["Percussion - Timpani, Snare, Cymbals, Ethnic"]
+        H["Synths and Sound Design"]
     end
-    
+
     subgraph sub_audio ["Audio Processing"]
-        I[Reverb Bus - Large Hall]
-        J[Reverb Bus - Tight Room]
-        K["Master Bus - Limiting & Metering"]
+        I["Reverb Bus - Large Hall"]
+        J["Reverb Bus - Tight Room"]
+        K["Master Bus - Limiting and Metering"]
     end
-    
+
     A --> B
     B --> C
     C --> D
@@ -80,402 +72,327 @@ graph TD
     J --> K
 ```
 
-**Step-by-Step Project Setup (Logic Pro Example):**
+**Step-by-step build (Logic Pro; steps 2, 3, 4, 6 translate directly to Cubase/DP with menu-name differences noted):**
 
-1. **Create New Project**: File → New → Empty Project. Set sample rate to **48 kHz** (film standard), bit depth to **24-bit**.
+1. **New project.** File → New → Empty Project. Sample rate **48 kHz**, bit depth **24-bit**. Never mix sample rates mid-project — if picture was delivered at 48 kHz and you work at 44.1 kHz, you will get drift when the final audio is conformed back to video.
 
-2. **Import Video Reference**: File → Movie → Open Movie. Logic will create a global video track. Right-click video track → "Lock Movie to Absolute Timecode" to prevent drift if you adjust tempo.
+2. **Import picture.** File → Movie → Open Movie. Immediately right-click the video track → **Lock Movie to Absolute Timecode**. Without this, adjusting tempo later can drag the video out of sync with the edit. (Cubase: Project → Add Track → Video, then lock via the Project Synchronization Setup.)
 
-3. **Set Project Frame Rate**: File → Project Settings → Synchronization → Frame Rate. Match the video's frame rate (usually 23.976 fps or 24 fps). Verify by checking the video's properties in your editor (Premiere, Final Cut, Resolve).
+3. **Set frame rate.** File → Project Settings → Synchronization → Frame Rate. Match exactly what the picture editor delivered — check the QuickTime/ProRes file properties in Premiere or Resolve before you guess. **23.976 fps and 24 fps are not interchangeable**; a 90-second cue drifts by over 2 frames across that mismatch, enough to throw off a hit point by the time you reach the back half of a cue.
 
-4. **Build Tempo Map**:
-   - Open Tempo List (Shift+Cmd+T).
-   - Watch the scene and identify musical "hit points" (door slam, explosion, character turn).
-   - Insert tempo changes to align downbeats or accents with visual events.
-   - **Example**: If a door slam occurs at 00:01:15:08 (1 minute, 15 seconds, 8 frames), place a marker there, then adjust tempo so beat 1 of measure 17 aligns precisely.
+4. **Build the tempo map.**
+   - Open the Tempo List (Shift+Cmd+T in Logic; Project → Tempo Track in Cubase).
+   - Scrub the scene and log picture events to the frame: a door slam at 00:01:15:08 means 1 minute, 15 seconds, 8 frames.
+   - Insert a tempo event so a downbeat (not necessarily beat 1 of a bar — any strong beat) lands on that frame. Logic's Tempo Operations → "Adjust tempo so that locator position falls on nearest beat" automates the math.
+   - **Rule of thumb**: pick one tempo per emotional section, not one tempo per hit. Chasing every hit with a tempo change produces a stiff, unmusical pulse. Reserve tempo changes for structural shifts (section change, not accent emphasis) and nail small accents with orchestration hits instead.
 
-5. **Create Marker Track**:
-   - Add cycle markers for each cue: Intro, Tension Build, Chase, Resolution.
-   - Use color coding: Green = safe/happy, Red = danger, Blue = mystery.
+5. **Marker track.** One marker per cue section (Intro, Build, Peak, Release). Color code consistently across your whole career, not just this project — Green = warmth/safety, Red = danger/aggression, Blue = mystery/suspense. Directors start reading your color code within a few sessions and it speeds up spotting notes meetings.
 
-6. **Instantiate Virtual Instruments**:
-   - Load orchestral libraries (Spitfire, EastWest, Orchestral Tools) on separate MIDI tracks.
-   - Use multi-output mode for section libraries (e.g., Spitfire Studio Strings with 5 outputs: Violins I, Violins II, Violas, Cellos, Basses).
-   - Insert reverb sends on each track, routing to two aux buses: Hall (3.0s decay, Vienna MIR or Valhalla Room) and Tight Room (0.9s decay).
+6. **Load virtual instruments.**
+   - One MIDI track per articulation, not per instrument, when using multi-output section libraries (Spitfire Studio Strings: 5 outputs — Vln I, Vln II, Vla, Vc, Db — each gets its own channel so you can automate CC11 independently).
+   - Insert a reverb send on every track routed to two aux buses: **Hall** (2.5–3.0 s decay — Valhalla Room or Vienna MIR) and **Tight Room** (0.8–1.0 s decay) for rhythmic/percussive material that needs to stay punchy.
 
-7. **Configure Track Stacks/Folders**:
-   - Group Strings → Summing stack.
-   - Group Brass → Summing stack.
-   - Each summing stack goes to the master bus via the reverb sends.
+7. **Track stacks/folders.** Strings into one Summing Stack, Brass into another, each stack's output feeds the master bus through the reverb sends. This keeps your mixer window to 6–8 visible faders instead of 40 individual tracks when you're trying to balance sections fast.
 
-8. **Naming Convention**:
-   - `01_VLN1_Legato`, `02_VLN2_Spiccato`, `03_VLA_Tremolo`.
-   - Prefix with numbers for automatic sorting.
+8. **Naming convention.** Prefix with section + articulation: `01_VLN1_Legato`, `02_VLN2_Spicc`, `03_VLA_Trem`. Numeric prefixes keep track order stable when you add instruments later — Logic and Cubase both sort alphanumerically by default.
 
 ### 2.3 MIDI Controller Setup for Expressive Input
 
-**Hardware Recommendations:**
-- **88-key weighted controller**: Native Instruments Komplete Kontrol S88, Arturia KeyLab 88. Full piano range, aftertouch for vibrato control.
-- **Expression pedal**: Roland EV-5, Yamaha FC-7. Map to CC11 (Expression) for real-time dynamics.
-- **Mod wheel**: Default CC1 (Modulation), typically controls vibrato intensity.
+**Hardware:**
+- **88-key weighted controller** (Native Instruments Komplete Kontrol S88, Arturia KeyLab 88): full range for orchestral writing, aftertouch available for vibrato depth on libraries that support it.
+- **Expression pedal** (Roland EV-5, Yamaha FC-7): mapped to **CC11**. This is the single most important controller you own — expression pedal technique *is* the dynamic realism of your mockup.
+- **Mod wheel**: default **CC1**, usually vibrato intensity or dynamic-layer crossfade depending on the library.
 
-**MIDI Mapping for Orchestral Libraries:**
-- **CC1 (Mod Wheel)**: Vibrato depth or layer crossfade.
-- **CC11 (Expression)**: Volume automation (most important for realistic dynamics).
-- **CC64 (Sustain Pedal)**: Legato transitions (Spitfire libraries), or standard sustain.
-- **Keyswitches**: Map C-2 to C-1 to articulation changes (legato, staccato, pizzicato, tremolo, etc.). Write these on a dedicated track above the note data for visibility.
+**Standard CC map for orchestral libraries:**
+- **CC1 (Mod Wheel)** — vibrato depth or dynamic layer crossfade.
+- **CC11 (Expression)** — real-time volume shaping. This is where phrasing lives; a flat CC11 line is the #1 reason mockups sound robotic.
+- **CC64 (Sustain Pedal)** — triggers legato transitions on libraries like Spitfire (holding the pedal while playing overlapping notes produces a bowed/slurred transition instead of a re-attack).
+- **Keyswitches** (commonly mapped C-2 to C-1, below the playable range) — trigger articulation change: legato, staccato, pizzicato, tremolo. Write these on a dedicated keyswitch lane above the note data so you can see them at a glance while editing.
 
-**Recording Workflow:**
-1. **Record in passes**: First pass = pitch and rhythm. Second pass = expression (CC11). Third pass = vibrato/modulation (CC1). Recording all simultaneously produces inconsistent results.
-2. **Overdub keyswitches**: After recording notes, go back and insert keyswitch triggers before phrase starts.
-3. **Humanize timing**: Select all notes, apply small random timing offset (±5–10 ms) to break mechanical grid quantization. Most DAWs have a "Humanize" function (Logic: MIDI Transform → Randomize → Position).
+**Recording workflow — record in separate passes, not all at once:**
+1. **Pass 1 — pitch and rhythm.** Play the phrase with a metronome, no expression concerns, just get the notes and timing right.
+2. **Pass 2 — expression (CC11)** while listening back to pass 1, riding the expression pedal like a real player controls bow pressure.
+3. **Pass 3 — modulation/vibrato (CC1)**, layered on top.
+
+Recording all three simultaneously while sight-reading a complex line produces jittery, inconsistent CC data — your hand is fighting between note accuracy and pedal control. Separating passes is slower per-bar but faster overall because you don't re-record from scratch when the expression pass is sloppy.
+
+4. **Overdub keyswitches last**, after notes and CC are final — insert the keyswitch note 1 tick before the phrase that needs the new articulation.
+5. **Humanize timing**: select all notes, apply ±5–10 ms random offset (Logic: MIDI Transform → Randomize → Position; Cubase: MIDI → Functions → Humanize). Quantized-to-the-grid orchestral parts sound like a sequencer, not an ensemble, because real players never land in perfect unison.
 
 ## 3. Orchestral Sample Library Deep Dive
 
 ### 3.1 Library Architectures
 
-**Kontakt-Based Libraries (Native Instruments Engine)**
-- **Examples**: Spitfire Symphonic Orchestra, 8Dio Adagio Strings, Cinesamples CineBrass.
-- **Pros**: Deep scripting control, NKS integration, consistent UI across libraries.
-- **Cons**: High RAM usage (12–32 GB typical for full template), Kontakt license required for some libraries.
+**Kontakt-based (Native Instruments engine):** Spitfire Symphonic Orchestra, 8Dio Adagio Strings, Cinesamples CineBrass. Deep scripting, consistent UI across vendors, but RAM-hungry — a full orchestral template commonly needs 12–32 GB loaded, more if you keep every articulation live instead of purging unused ones.
 
-**Proprietary Engines**
-- **EastWest PLAY, VSL Synchron Player, Orchestral Tools SINE**.
-- **Pros**: Optimized streaming (less RAM), integrated mic position mixing.
-- **Cons**: Additional software to learn, separate update cycles.
+**Proprietary engines:** EastWest PLAY, VSL Synchron Player, Orchestral Tools SINE. Better disk-streaming (less upfront RAM), built-in mic-position mixing, but each has its own update cycle and quirks to learn separately.
 
-### 3.2 Articulation Strategies
+### 3.2 Articulation Strategy by Section
 
-**Strings Example (Spitfire Studio Strings):**
-- **Long**: Sustain with natural swell, use CC11 for dynamics.
-- **Legato**: Smooth note transitions with recorded portamento. Requires overlapping MIDI notes or CC64 = on.
-- **Spiccato**: Short, bounced bow strokes. Use for rhythmic ostinatos.
-- **Pizzicato**: Plucked strings. Fast decay, use sparingly for accents.
-- **Tremolo**: Rapid back-and-forth bowing, creates tension.
-- **Col Legno**: Hitting strings with wood of bow, percussive effect.
+**Strings (example patch set: Spitfire Studio Strings):**
+- **Long** — sustained note with a natural swell curve; ride CC11 for dynamics, don't just set a static velocity.
+- **Legato** — smooth bowed transitions between notes; requires either overlapping MIDI notes or CC64 held through the phrase, depending on the library's legato trigger method.
+- **Spiccato** — short bounced bow strokes, for rhythmic ostinatos and nervous-energy textures.
+- **Pizzicato** — plucked, fast decay. Use sparingly, as an accent color, not a sustained texture.
+- **Tremolo** — rapid back-and-forth bow strokes, the default color for building tension under dialogue.
+- **Col legno** — wood of the bow striking the string, a dry percussive effect for horror/thriller color.
 
-**Real-Time Articulation Switching (Cubase Expression Maps):**
+**Real-time articulation switching (Cubase Expression Maps example):**
 
 ```
 Expression Map: Spitfire Studio Strings
-Slot 1: Long (Keyswitch C-2)
-Slot 2: Legato (Keyswitch C#-2)
-Slot 3: Spiccato (Keyswitch D-2)
-Slot 4: Pizzicato (Keyswitch D#-2)
-Slot 5: Tremolo (Keyswitch E-2)
+Slot 1: Long       (Keyswitch C-2)
+Slot 2: Legato     (Keyswitch C#-2)
+Slot 3: Spiccato   (Keyswitch D-2)
+Slot 4: Pizzicato  (Keyswitch D#-2)
+Slot 5: Tremolo    (Keyswitch E-2)
 ```
 
-In the Key Editor, draw articulation changes in the articulation lane above the notes. Cubase automatically inserts the correct keyswitch MIDI notes.
+In the Key Editor's articulation lane (directly above the note grid), click to assign which slot plays under each note group. Cubase writes the correct keyswitch MIDI note automatically — you never have to manually place C-2 in the piano roll, which eliminates the most common source of wrong-articulation playback bugs.
 
-**Brass Legato Realism**:
-- French horns: Slow attack, warm legato transitions. Use CC11 swells for heroic lines.
-- Trumpets: Bright, fast attack. Staccato for fanfares, legato for lyrical lines.
-- Trombones: Deep, powerful. Use for bass reinforcement or chorale writing.
-- Tuba: Foundation of brass section. Double bass trombone or string basses.
+**Brass realism:**
+- **French horns**: slow attack, warm — use CC11 swells for heroic/triumphant lines, never a hard velocity hit for a sustained horn melody, it sounds synthetic.
+- **Trumpets**: bright, fast attack — staccato for fanfare rhythms, legato for lyrical lines.
+- **Trombones**: deep, powerful — chorale writing or bass reinforcement under the horns.
+- **Tuba**: foundation of the brass stack, frequently doubled with bass trombone or string basses an octave apart for weight.
 
-**Woodwind Breath Control**:
-- Flutes: Airy, soft attacks. Use CC2 (Breath) for dynamic shaping if library supports it.
-- Oboes: Piercing, sustained. Great for solos (think "Gabriel's Oboe" from *The Mission*).
-- Clarinets: Warm, versatile. Use chalumeau (low) register for dark colors.
-- Bassoons: Comedic or ominous. Wide dynamic range.
+**Woodwind breath control:**
+- **Flutes**: airy, soft attack — use CC2 (Breath Controller) if the library maps it, otherwise CC11 shaped with a slow attack curve.
+- **Oboes**: piercing, sustained — the classic solo voice for pathos (*Gabriel's Oboe*, *The Mission*).
+- **Clarinets**: warm, versatile — chalumeau (low) register for dark, intimate color.
+- **Bassoons**: comedic in staccato, ominous in low sustained tones — wide expressive range for a single instrument.
 
 ### 3.3 Microphone Position Mixing
 
-Modern libraries record with multiple mic arrays:
-- **Close**: Dry, detailed, 0–3 feet from instruments. Use for clarity, articulation definition.
-- **Decca Tree**: Stereo overhead, 10–15 feet above orchestra. Balanced, natural width.
-- **Outriggers**: Wide stereo, 20+ feet. Adds spaciousness.
-- **Ambient**: Far mics, 30+ feet. Captures hall reverb naturally.
+Modern libraries record multiple simultaneous mic arrays of the same performance:
+- **Close** (0–3 ft): dry, detailed — articulation clarity, good for action/rhythmic cues.
+- **Decca Tree** (10–15 ft overhead): balanced stereo image, the "main" mic position for most mixes.
+- **Outriggers** (20+ ft): adds stereo width.
+- **Ambient** (30+ ft): captures the room/hall reverb naturally, for emotional/sustained material.
 
-**Mixing Recipe for Hybrid Realism**:
+**Starting blend for hybrid realism** (percentages represent relative send level, not a sum-to-100 budget — they overlap intentionally):
 - Close: 40% (−8 dB)
 - Tree: 50% (−6 dB)
 - Outriggers: 20% (−14 dB)
 - Ambient: 30% (−10 dB)
 
-Sum exceeds 100% because they overlap. Adjust to taste—close mics for action cues, ambient mics for emotional swells.
+Push close mics up for action cues (clarity under sound effects), push ambient mics up for emotional swells (sense of space and distance).
 
 ## 4. Notation Software Integration
 
-### 4.1 Why Notation Software Matters
+### 4.1 Why It Still Matters in a MIDI-Mockup World
 
-Even if your final product is a MIDI mockup, professional film composers deliver **conductor scores** and **parts** for live recording sessions. Notation software (Dorico, Sibelius, Finale) produces publisher-grade sheet music.
+If you're recording a live section or full orchestra, the players need a conductor score and individual parts, not a DAW screenshot. Dorico, Sibelius, and Finale produce publisher-grade engraving.
 
 **Workflow: DAW → Notation Software**
 
-1. **Export MIDI from DAW**: Select all composed MIDI regions, File → Export → MIDI File. Use "Merge tracks" option to create a single multi-channel MIDI file.
+1. **Export MIDI.** Select all composed regions, File → Export → MIDI File, using the "merge tracks" option to produce one multichannel file.
+2. **Import into Dorico/Sibelius.** Dorico: File → Import → MIDI, then map MIDI channels to instrument staves. Sibelius: File → Open → MIDI File, use "Transcription" mode for intelligent quantization of the imported rhythm.
+3. **Clean up the notation:**
+   - Quantize pitches and rhythms — your humanization (±8 ms timing offsets) that made the mockup sound alive will make printed notation unreadable. Strip it before engraving.
+   - Add slurs, staccato dots, accents, and dynamic markings (pp through ff) by ear/eye from your mockup's CC11 curve.
+   - Insert tempo markings in traditional language: Allegro (120–140 BPM), Andante (76–100 BPM), Adagio (66–76 BPM).
+   - Match bar numbers to the picture editor's reference cut so the conductor and the dub stage are talking about the same measure 47.
+4. **Extract parts.** Dorico: File → Print → Layouts → select "Violin I Part" → export PDF. Repeat per instrument.
 
-2. **Import into Dorico/Sibelius**:
-   - Dorico: File → Import → MIDI. Map MIDI channels to instrument staves.
-   - Sibelius: File → Open → MIDI File. Use "Transcription" mode to quantize intelligently.
+**Engraving conventions that keep a session running on time:**
+- Stems up for upper-staff voices, down for lower, when two voices share a staff.
+- Beam by beat — in 4/4, beam eighth notes in groups of two, not across the barline.
+- Insert multi-measure rests and leave room for page turns — a player fumbling a page turn mid-take costs you a studio minute you're paying for by the hour.
 
-3. **Clean Up Notation**:
-   - **Quantize pitches and rhythms**: Remove microtiming humanization (great for playback, terrible for reading).
-   - **Add articulations**: Slurs, staccato dots, accents, dynamics (pp, mp, mf, f, ff).
-   - **Insert tempo markings**: Allegro (120–140 BPM), Andante (76–100 BPM), Adagio (66–76 BPM).
-   - **Bar numbering**: Match film's bar count for rehearsal efficiency.
+### 4.2 Notation-First Workflow (Alternate Path)
 
-4. **Extract Parts**: Dorico: File → Print → Layouts → Select "Violin I Part", export PDF. Repeat for all instruments.
+For composers who think in notation rather than piano-roll:
 
-**Engraving Best Practices**:
-- Stems: Up for upper staff voices, down for lower.
-- Beaming: Group by beat (4/4 = beam in two groups of two eighth notes).
-- Page turns: Ensure multi-measure rests for page turns in live performance.
+1. Write directly in Dorico using a MIDI keyboard or computer-keyboard note entry.
+2. Load Spitfire/EastWest libraries via the Play tab for real-time audition while writing.
+3. Export MIDI to Logic/Cubase afterward to add the detailed CC11/CC1 automation that's impractical to draw inside notation software.
 
-### 4.2 Direct Notation in Dorico (Alternate Workflow)
-
-For composers who think in notation first:
-
-1. **Write in Dorico**: Use MIDI keyboard or computer keyboard input.
-2. **Assign VST instruments**: Play tab → Load Spitfire/EastWest libraries for real-time playback.
-3. **Fine-tune in DAW**: Export MIDI from Dorico, import to Logic/Cubase, add detailed CC11/CC1 automation that's impractical to notate.
-
-**Advantage**: Perfectly readable score from the start, no cleanup.  
-**Disadvantage**: Expression automation is harder in notation software; final realism requires DAW pass.
+**Trade-off**: you get a clean, readable score from day one, but final mockup realism still requires a DAW pass — notation software's automation tools are too coarse for convincing expression curves.
 
 ## 5. Real-World Workflow: Scoring a 2-Minute Dramatic Cue
 
-**Scene Setup**: Protagonist discovers betrayal. Starts quiet (disbelief), builds to anger, ends with sorrowful acceptance.
+**Scene**: Protagonist discovers betrayal. Quiet disbelief → building anger → sorrowful acceptance.
 
-### 5.1 Spotting and Tempo Mapping (5 minutes)
+### 5.1 Spotting and Tempo Mapping (5 min)
 
-1. **Watch scene 10 times**: Note emotional beats.
-   - 00:00:00 — Door opens, protagonist enters (neutral).
-   - 00:00:15 — Sees evidence on table (realization starts).
-   - 00:00:45 — Picks up photograph (heartbreak).
-   - 01:15:00 — Smashes glass (anger peak).
-   - 01:45:00 — Sinks into chair (resignation).
+Watch the scene repeatedly and log the beats to the frame:
+- 00:00:00 — door opens, neutral entrance.
+- 00:00:15 — sees evidence on table, realization starts.
+- 00:00:45 — picks up photograph, heartbreak.
+- 01:15:00 — smashes glass, anger peak.
+- 01:45:00 — sinks into chair, resignation.
 
-2. **Set markers in DAW**: `M1_Door`, `M2_Evidence`, `M3_Photo`, `M4_Smash`, `M5_Chair`.
+Place markers: `M1_Door`, `M2_Evidence`, `M3_Photo`, `M4_Smash`, `M5_Chair`.
 
-3. **Build tempo map**:
-   - 00:00:00 — 80 BPM (slow, tentative).
-   - 00:00:45 — Ritardando to 65 BPM (time slows during heartbreak).
-   - 01:15:00 — Accelerando to 120 BPM (anger explosion).
-   - 01:45:00 — Ritardando to 50 BPM (exhaustion).
+Build the tempo map in broad strokes, not per-hit:
+- 00:00:00 — 80 BPM (tentative).
+- 00:00:45 — ritardando to 65 BPM (time stretches during heartbreak).
+- 01:15:00 — accelerando to 120 BPM (anger).
+- 01:45:00 — ritardando to 50 BPM (exhaustion).
 
-### 5.2 Harmonic and Orchestration Sketch (10 minutes)
+### 5.2 Harmony and Orchestration Sketch (10 min)
 
-**Chord Progression** (in C minor):
-- Cm — Am7♭5 — Fm — G7 (measures 1–8, disbelief).
-- A♭maj7 — B♭ — Cm — D°7 (measures 9–16, realization).
-- Fm — G7 — Cm (measures 17–20, anger).
-- A♭maj7 — E♭/G — Cm (measures 21–24, resignation).
+**Chord progression (C minor):**
+- Cm – Am7♭5 – Fm – G7 (bars 1–8, disbelief)
+- A♭maj7 – B♭ – Cm – D°7 (bars 9–16, realization)
+- Fm – G7 – Cm (bars 17–20, anger)
+- A♭maj7 – E♭/G – Cm (bars 21–24, resignation)
 
-**Orchestration Layers**:
-- **00:00–00:45**: Solo cello (low register, sul tasto for darkness), soft pad (strings, long articulation, CC11 at 40).
-- **00:45–01:15**: Add violins (tremolo, crescendo CC11 from 50 to 90), low brass (horns sustain on root notes).
-- **01:15–01:45**: Full brass stabs (marcato), timpani rolls, cymbal crash on glass smash.
-- **01:45–02:00**: Solo oboe melody over string pad, decrescendo to ppp, fade to silence.
+**Orchestration by section:**
+- 00:00–00:45: solo cello (low register, sul tasto for a hollow tone), soft string pad, CC11 held around 40.
+- 00:45–01:15: add tremolo violins crescendoing (CC11 50→90), low horns sustaining root notes underneath.
+- 01:15–01:45: full brass marcato stabs, timpani rolls, cymbal crash synced to the glass smash.
+- 01:45–02:00: solo oboe melody over a thinning string pad, decrescendo to ppp, fade to silence.
 
-### 5.3 MIDI Programming (30 minutes)
+### 5.3 MIDI Programming (30 min)
 
-1. **Cello solo** (00:00–00:45):
-   - Load Spitfire Studio Strings Cello, Legato patch.
-   - Record melody in C minor: C3 — E♭3 — F3 — G3 (quarter notes, 80 BPM).
-   - Automate CC11: Start at 30, gentle swell to 60 on G3, back to 40.
+**Cello solo (00:00–00:45):** Spitfire Studio Strings Cello, Legato patch. Melody: C3 – E♭3 – F3 – G3, quarter notes at 80 BPM. CC11: start at 30, swell to 60 on the G3, settle back to 40.
 
-2. **String tremolo build** (00:45–01:15):
-   - Violins I + II: Load Tremolo articulation.
-   - Sustained Cm chord (C4, E♭4, G4, C5), CC11 automation: Linear ramp from 50 to 100 over 30 seconds.
+**String tremolo build (00:45–01:15):** Violins I + II on Tremolo articulation, sustained Cm chord (C4, E♭4, G4, C5). CC11: linear ramp 50→100 over 30 seconds — draw this as a slightly curved ramp, not a straight line, or the crescendo will sound mechanical.
 
-3. **Brass and percussion hit** (01:15:00):
-   - 4 French horns, 3 trumpets, 3 trombones: Marcato patch, stab on downbeat of measure 17.
-   - Notes: Horns on C3, E♭3, G3; trumpets on C4, E♭4, G4; trombones on C2, G2, C3.
-   - CC11 at 120 (full force), velocity = 127.
-   - Timpani: Two hits (C1, G1), rolls leading into hit.
+**Brass/percussion hit (01:15:00):** 4 horns, 3 trumpets, 3 trombones on Marcato, stabbed on the downbeat of measure 17. Horns: C3, E♭3, G3. Trumpets: C4, E♭4, G4. Trombones: C2, G2, C3. CC11 at 120, velocity 127. Timpani: two hits (C1, G1) with a short roll leading into the stab.
 
-4. **Oboe solo** (01:45–02:00):
-   - Load Spitfire Woodwinds Oboe, Legato patch.
-   - Simple descending line: G4 — F4 — E♭4 — D4 — C4.
-   - CC11: Start at 60, fade to 20 by end.
+**Oboe solo (01:45–02:00):** Spitfire Woodwinds Oboe, Legato patch. Descending line G4 – F4 – E♭4 – D4 – C4. CC11: start at 60, fade to 20 by the final note.
 
-### 5.4 Mixing and Reverb (15 minutes)
+### 5.4 Mixing and Reverb (15 min)
 
-**Bus Structure**:
-- All strings → Hall Reverb (Valhalla Room, 2.5s decay, pre-delay 30ms).
-- All brass → Tight Room (1.2s decay, pre-delay 15ms).
-- Percussion → Hall Reverb (same as strings).
-- Solo oboe → Hall Reverb, but send level at 40% (more intimate).
+**Bus routing:**
+- Strings → Hall Reverb (Valhalla Room, 2.5 s decay, 30 ms pre-delay).
+- Brass → Tight Room (1.2 s decay, 15 ms pre-delay) — keeps the stabs punchy instead of washing them out.
+- Percussion → same Hall bus as strings, for spatial cohesion with the section it's reinforcing.
+- Solo oboe → Hall bus, but send level dropped to 40% for intimacy rather than a cavernous solo.
 
-**EQ Adjustments**:
-- Cellos: High-pass at 80 Hz (remove rumble), gentle boost at 250 Hz (warmth).
-- Violins: High-pass at 120 Hz, boost at 3 kHz (presence), gentle roll-off above 10 kHz.
-- Brass: High-pass at 100 Hz, notch at 400 Hz if muddy, boost at 2 kHz (bite).
-- Timpani: Boost at 80 Hz (fundamental), cut at 250 Hz (boxiness).
+**EQ starting points (adjust by ear against the picture, these are not fixed rules):**
+- Cellos: high-pass at 80 Hz (removes rumble below the instrument's fundamental), gentle boost at 250 Hz for warmth.
+- Violins: high-pass at 120 Hz, boost at 3 kHz for presence, slight roll-off above 10 kHz if the library's close mics are harsh.
+- Brass: high-pass at 100 Hz, notch around 400 Hz if the stack sounds muddy, boost at 2 kHz for bite/cut-through under dialogue.
+- Timpani: boost at 80 Hz (fundamental), cut at 250 Hz (boxiness).
 
-**Limiting**:
-- Insert Waves L2 or FabFilter Pro-L 2 on master bus.
-- Set ceiling to −1.0 dBFS (prevents clipping), target integrated LUFS of −16 (film mix standard).
+**Limiting:** FabFilter Pro-L 2 or Waves L2 on the master bus, ceiling at −1.0 dBFS, target integrated loudness around **−16 LUFS** (the common film/TV delivery target before the dub stage does its own pass — confirm the spec with your mixer, broadcast specs like −23 LUFS for EBU R128 differ by region and delivery format).
 
-### 5.5 Stem Export (10 minutes)
+### 5.5 Stem Export (10 min)
 
-**Required Stems**:
-1. **Strings** (cello, violins, violas).
-2. **Brass** (horns, trumpets, trombones).
-3. **Woodwinds** (oboe solo).
-4. **Percussion** (timpani).
-5. **Full Mix** (all stems combined).
+**Required stems:** Strings, Brass, Woodwinds, Percussion, Full Mix.
 
-**Export Settings (Logic Pro)**:
-- File → Bounce → Project or Section.
-- Format: WAV, 48 kHz, 24-bit.
-- File Type: Interleaved (stereo).
-- Select "Include Audio Tail" (captures reverb decay).
-- Filename: `ProjectName_StemName_Date.wav` (e.g., `Betrayal_Strings_2025-01-15.wav`).
+**Export settings (Logic Pro):** File → Bounce → Project or Section. WAV, 48 kHz, 24-bit, interleaved stereo. Enable "Include Audio Tail" so reverb decay isn't truncated at the cue's last note. Filename convention: `ProjectName_StemName_Date.wav` (e.g. `Betrayal_Strings_2025-01-15.wav`).
 
-**Solo Each Stem Group**:
-- Mute all except strings, bounce → `Betrayal_Strings.wav`.
-- Unmute, mute all except brass, bounce → `Betrayal_Brass.wav`.
-- Repeat for woodwinds, percussion, full mix.
+**Procedure:** Mute all tracks except strings, bounce → repeat for each group, unmuting/muting between passes. Always bounce the Full Mix last as a sanity check against the individually exported stems (see Drill 4 below for how to verify they actually sum correctly).
 
 ## 6. Advanced Techniques and Failure Modes
 
 ### 6.1 CPU and RAM Management
 
-**Symptom**: Playback stutters, audio dropouts, "System Overload" errors.
+**Symptom**: playback stutters, dropouts, "System Overload" errors.
 
-**Diagnosis**:
-- Open Activity Monitor (macOS) or Task Manager (Windows).
-- Check CPU usage during playback. If sustained above 80%, your session is too heavy.
-- Check RAM usage. If paging to disk (swap), you need more RAM or must freeze tracks.
+**Diagnosis**: Activity Monitor (macOS) or Task Manager (Windows) during playback. Sustained CPU above 80% means the session is too heavy for real-time processing. RAM paging to disk (swap) means you need either more RAM or fewer loaded samples.
 
-**Solutions**:
-
-1. **Freeze Tracks**: Renders MIDI + plugins to audio, disables real-time processing.
-   - Logic: Track → Freeze Track.
-   - Cubase: Right-click track → Render in Place → Settings → "Keep Source MIDI".
-   - Unfreeze to edit, re-freeze before continuing.
-
-2. **Increase Buffer Size**: Audio Settings → Buffer Size. Increase from 128 to 512 samples. Latency increases (512 samples @ 48 kHz = 10.67 ms), but CPU load drops 30–50%. Use high buffers for mixing, low buffers for recording.
-
-3. **Purge Unused Samples**: Kontakt → Memory tab → Purge. Removes unused velocity layers and articulations from RAM.
-
-4. **Bounce MIDI to Audio**: Once a part is finalized, bounce to audio and delete the virtual instrument track.
+**Fixes, in order of how often you'll use them:**
+1. **Freeze tracks.** Renders MIDI + plugins to audio, disables real-time processing for that track. Logic: Track → Freeze Track. Cubase: right-click → Render in Place → "Keep Source MIDI" so you can unfreeze and edit later.
+2. **Raise buffer size.** Audio Settings → Buffer Size, 128 → 512 samples. Latency goes up (512 samples @ 48 kHz ≈ 10.67 ms), but CPU load typically drops 30–50%. Use high buffers for mixing/playback, low buffers only when recording live MIDI input.
+3. **Purge unused samples.** Kontakt → Memory tab → Purge, which drops unloaded velocity layers and articulations from RAM — often frees several GB in a dense orchestral template.
+4. **Bounce finalized parts to audio** and delete the virtual instrument track once you're sure you won't need to re-edit the MIDI.
 
 ### 6.2 Latency Compensation and Plugin Delay
 
-**Symptom**: MIDI notes trigger late, or tracks sound out of sync.
+**Symptom**: MIDI triggers feel late, or tracks seem out of sync during playback.
 
-**Cause**: Plugins introduce processing delay (look-ahead limiters, linear-phase EQs). DAWs compensate automatically, but manual recording can feel sluggish.
+**Cause**: plugins with inherent processing delay (look-ahead limiters, linear-phase EQs). The DAW compensates automatically during playback, but live recording monitored through those plugins feels sluggish.
 
-**Solutions**:
-- **Disable latency-inducing plugins during recording**: Bypass master bus limiter, replace linear-phase EQs with minimum-phase versions.
-- **Use Low-Latency Mode**: Logic: Record button → Low Latency Mode (disables high-latency plugins during input monitoring). Cubase: Studio → Audio Performance → "Constrain Delay Compensation".
-- **Manual offset**: If a track consistently records late, nudge the region earlier by the measured latency (check DAW's latency report).
+**Fixes:**
+- Bypass the master bus limiter and swap linear-phase EQs for minimum-phase versions during recording passes.
+- Enable Low-Latency Mode (Logic: record button) or "Constrain Delay Compensation" (Cubase: Studio → Audio Performance) — this temporarily disables high-latency plugins for input monitoring only.
+- If a track consistently records late by a measurable amount, nudge the recorded region earlier by that measured offset rather than re-recording.
 
 ### 6.3 MIDI Note Bleeding and Stuck Notes
 
-**Symptom**: Notes sustain forever, or wrong articulations trigger.
+**Symptom**: notes sustain indefinitely, or the wrong articulation triggers mid-phrase.
 
-**Cause**: Missing MIDI note-off messages, or keyswitches not resetting.
+**Cause**: missing note-off messages, or a keyswitch from an earlier phrase never got reset.
 
-**Solutions**:
-- **Insert MIDI CC121 (Reset All Controllers)** at the start of each cue. This sends a "panic" message to instruments.
-- **Manually trim MIDI notes**: Ensure every note-on has a matching note-off. Select all notes, Quantize → End to Grid.
-- **Reset keyswitches between phrases**: Insert a "default" keyswitch (usually C-2 for "long" articulation) after complex passages.
+**Fixes:**
+- Insert MIDI CC121 (Reset All Controllers) at the start of every cue — a "panic" message that clears stuck states in the sampler.
+- Select all notes → Quantize → "End to Grid" to guarantee every note-on has a matching note-off.
+- Insert a default keyswitch (commonly "Long," often C-2) after a complex articulation passage so the next phrase doesn't inherit the wrong technique by accident.
 
 ### 6.4 Reverb and Spatial Coherence
 
-**Symptom**: Instruments sound pasted together, not in the same room.
+**Symptom**: instruments sound pasted together rather than performing in the same room.
 
-**Cause**: Different reverb settings per instrument, or dry/wet balance inconsistencies.
+**Cause**: inconsistent reverb settings or dry/wet balance across instruments that are supposed to share an acoustic space.
 
-**Solutions**:
-- **Single Hall Reverb Bus**: All orchestral instruments → same convolution reverb (e.g., Vienna Konzerthaus, EastWest Spaces).
-- **Adjust send levels, not reverb settings**: Closer instruments (solo cello) = 20–30% send. Distant instruments (back-row violins) = 50–60% send.
-- **Pre-delay matching**: Short pre-delay (10–20 ms) for close instruments, longer (30–50 ms) for distant. Mimics sound traveling from stage to hall mics.
+**Fixes:**
+- Route all orchestral instruments to a **single** hall reverb bus rather than giving each section its own reverb instance — real orchestras share one room.
+- Vary **send level**, not the reverb's internal settings, to place instruments front-to-back: close/solo instruments at 20–30% send, back-row or ensemble instruments at 50–60%.
+- Match pre-delay to perceived distance: 10–20 ms for close instruments, 30–50 ms for distant ones, mimicking the time sound takes to travel from the stage to the hall mics.
 
 ### 6.5 Director Revisions and Version Control
 
-**Symptom**: Director requests changes after you've delivered final mix. Original project is overwritten.
+**Symptom**: a revision request arrives after delivery, and the original session has already been overwritten.
 
-**Solutions**:
-
-1. **Save Incremental Versions**: `Project_v01.logic`, `Project_v02.logic`, etc. Never overwrite previous versions.
-
-2. **Use Track Alternatives (Logic) or Lanes (Cubase)**:
-   - Record multiple takes of the same part on different lanes.
-   - A/B compare by soloing lanes.
-   - Director can audition versions without opening separate projects.
-
-3. **Archive Stems**: Keep all stem exports with version numbers. If director says "I liked the strings from version 3 but brass from version 5," you can recompose the mix from archived stems.
-
-4. **Git for MIDI Projects (Advanced)**:
-   - Export MIDI files from DAW sessions.
-   - Track MIDI files in Git: `git add *.mid`, `git commit -m "Added tremolo build in measure 17"`.
-   - Allows diffing and rollback of compositional decisions.
+**Fixes:**
+1. **Incremental saves, never overwrites**: `Project_v01`, `Project_v02`, and so on — disk space is cheaper than rebuilding a mix from memory.
+2. **Track Alternatives (Logic) / Lanes (Cubase)**: record multiple takes of the same part on separate lanes so you can A/B by soloing, without duplicating the whole session.
+3. **Archive every stem export with its version number.** If the director says "keep the strings from v3, swap in the brass from v5," you recombine from archived stems instead of recomposing.
+4. **Git for MIDI** (optional, useful on long-running series work): export MIDI files per session, `git add *.mid`, `git commit -m "tremolo build added at m.17"`. Gives you diffable history and rollback on compositional decisions across a season's worth of cues.
 
 ## 7. Practice Drills and Competency Targets
 
-### Drill 1: Tempo Mapping to Picture (15 minutes)
-**Goal**: Lock musical downbeats to visual hit points within ±1 frame accuracy.
+### Drill 1: Tempo Mapping to Picture (15 min)
+**Goal**: lock musical downbeats to visual hit points within ±1 frame.
+1. Import a 1-minute action scene.
+2. Identify 5 hit points (explosions, punches, door slams) and mark them.
+3. Adjust tempo so measures align with the markers.
+4. **Success metric**: play a click track over the video — the clicks should feel motivated by the picture, not arbitrary.
 
-1. Import a 1-minute action scene (use stock footage or a film you're scoring).
-2. Identify 5 hit points (explosions, punches, door slams).
-3. Place markers at each hit point.
-4. Adjust tempo so measures align perfectly with markers.
-5. **Success metric**: Play a click track over video—click hits should feel motivated by the picture, not arbitrary.
-
-### Drill 2: Articulation Keyswitch Workflow (20 minutes)
-**Goal**: Seamlessly switch articulations mid-phrase for realistic playback.
-
+### Drill 2: Articulation Keyswitch Workflow (20 min)
+**Goal**: switch articulations mid-phrase without an audible seam.
 1. Load Spitfire Studio Strings Violins I.
 2. Compose an 8-bar melody using 4 articulations: long, legato, spiccato, pizzicato.
 3. Insert keyswitches 1 tick before each articulation change.
-4. Record CC11 automation for dynamics (crescendo, decrescendo).
-5. **Success metric**: Playback sounds like a live violinist changing bow techniques, not a robot.
+4. Record CC11 automation for dynamics.
+5. **Success metric**: playback sounds like one violinist changing bow technique, not four separate robotic patches stitched together.
 
-### Drill 3: Reverb Bus Mixing (30 minutes)
-**Goal**: Create spatial depth using send levels, not reverb plugins.
+### Drill 3: Reverb Bus Mixing (30 min)
+**Goal**: build spatial depth through send levels alone, not plugin settings.
+1. Four tracks: solo cello, violins, brass, percussion.
+2. One reverb bus (Valhalla Room, 2.5 s decay).
+3. Send levels: cello 25%, violins 50%, brass 40%, percussion 60%.
+4. **Success metric**: close your eyes and you can place each instrument front-to-back, not just left-to-right.
 
-1. Create 4 tracks: solo cello, violins, brass, percussion.
-2. Create 1 reverb bus (Valhalla Room, 2.5s decay).
-3. Set send levels:
-   - Cello: 25% (intimate).
-   - Violins: 50% (mid-depth).
-   - Brass: 40% (punchy but roomy).
-   - Percussion: 60% (distant).
-4. **Success metric**: Close your eyes and visualize instrument placement—front to back, not just left to right.
-
-### Drill 4: Stem Export and Reassembly (20 minutes)
-**Goal**: Verify stems sum to the full mix without phase issues.
-
+### Drill 4: Stem Export and Reassembly (20 min)
+**Goal**: verify stems sum to the full mix with zero phase cancellation.
 1. Compose a 30-second cue with strings, brass, and percussion.
 2. Export 4 stems: Strings, Brass, Percussion, Full Mix.
-3. Import all stems into a new session.
-4. Play all stems together. Use a phase meter plugin (Waves PAZ Analyzer, iZotope Insight).
-5. **Success metric**: Stems sum = full mix (identical waveform, zero phase cancellation).
+3. Import all stems into a new session, nudged to the same start point.
+4. Play them together against the Full Mix using a phase meter (Waves PAZ Analyzer, iZotope Insight).
+5. **Success metric**: summed stems match the full mix waveform exactly — if they don't, check that no stem bounce included a different reverb tail length or a muted send.
 
-### Drill 5: MIDI Humanization (15 minutes)
-**Goal**: Break robotic quantization while maintaining rhythmic integrity.
-
+### Drill 5: MIDI Humanization (15 min)
+**Goal**: break robotic quantization without losing rhythmic integrity.
 1. Program a 16-bar string ostinato, perfectly quantized to 1/16 notes.
-2. Apply humanization:
-   - Timing: ±8 ms random offset.
-   - Velocity: ±10 random variation.
-   - CC11: Draw subtle curves (not straight lines).
-3. A/B compare quantized vs. humanized.
-4. **Success metric**: Humanized version sounds like an ensemble, not a machine, but groove is still tight.
+2. Apply ±8 ms timing offset, ±10 velocity variation, and a hand-drawn (non-linear) CC11 curve.
+3. A/B the quantized version against the humanized version.
+4. **Success metric**: the humanized version sounds like an ensemble of players, but the groove is still tight enough to feel intentional, not sloppy.
 
 ## 8. Competency Milestones
 
 **Beginner (0–6 months)**
 - Set up a DAW session with video import, tempo map, and marker track.
-- Load and play a single orchestral library patch.
+- Load and play a single orchestral library patch correctly (right articulation, basic CC11 shaping).
 - Export a stereo mix at 48 kHz, 24-bit.
 
 **Intermediate (6–18 months)**
-- Build a full orchestral template with 30+ tracks (strings, brass, woodwinds, percussion).
-- Program realistic string legato with CC11 automation.
-- Mix with reverb buses and deliver 5-stem exports.
+- Build a full orchestral template with 30+ tracks across strings, brass, woodwinds, percussion.
+- Program realistic string legato with convincing CC11 automation.
+- Mix using reverb buses and deliver a clean 5-stem export.
 
 **Advanced (18–36 months)**
 - Score a 5-minute scene with tempo changes synced to hit points within ±1 frame.
-- Create conductor score and parts in Dorico/Sibelius from your MIDI mockup.
-- Manage a 50+ cue TV episode project with version control and rapid director revisions.
+- Produce a conductor score and parts in Dorico/Sibelius from your MIDI mockup.
+- Manage a 50+ cue TV episode project with version control and same-day director revisions.
 
 **Professional (36+ months)**
-- Compose and deliver a feature film score (60+ minutes of music).
-- Record live orchestra, integrating your mockup as a guide track.
-- Handle hybrid scores: orchestral samples + live recording + synths, all spatially coherent.
+- Compose and deliver a full feature score (60+ minutes of music).
+- Record a live orchestra using your mockup as the guide track for the session.
+- Handle hybrid scores combining orchestral samples, live recording, and synths, all spatially coherent in the final mix.
