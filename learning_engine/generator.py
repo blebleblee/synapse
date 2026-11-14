@@ -236,20 +236,26 @@ def generate_topic_parallel(
             mod_item, (w_host, w_model, w_provider) = job
             host_label = CLUSTER_HOST_SPECS.get(w_host, {}).get("name", w_host).upper()
             t0 = time.time()
-            try:
-                with _LLM_SEMAPHORE:
-                    content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
-                validated = validate_generation_output(content)
-                elapsed = time.time() - t0
-                print(f"          [✔] [{host_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
-                return mod_item["filename"], True, validated, mod_item, host_label, w_host, elapsed, None
-            except Exception as e:
-                print(f"          [✘] [{host_label:9s}] Failed {mod_item['filename']}: {e}", flush=True)
-                return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
+            for attempt in range(1, 4):
+                try:
+                    with _LLM_SEMAPHORE:
+                        content = w_provider.generate(mod_item["prompt"], system_instruction=system_instruction)
+                    validated = validate_generation_output(content)
+                    elapsed = time.time() - t0
+                    print(f"          [✔] [{host_label:9s}] Drafted {mod_item['filename']} in {elapsed:.1f}s", flush=True)
+                    return mod_item["filename"], True, validated, mod_item, host_label, w_host, elapsed, None
+                except Exception as e:
+                    if attempt < 3:
+                        wait_s = attempt * 6
+                        print(f"          [!] [{host_label:9s}] Transient error on {mod_item['filename']}: {e} (retrying in {wait_s}s, attempt {attempt}/3)...", flush=True)
+                        time.sleep(wait_s)
+                        continue
+                    print(f"          [✘] [{host_label:9s}] Failed {mod_item['filename']} after 3 attempts: {e}", flush=True)
+                    return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
 
-        # Phase 1: Draft modules (sequential for cloud proxies to avoid rate limits, or parallel across local cluster nodes)
-        is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() for w in workers)
-        pool_size = 1 if is_cloud else min(len(workers), len(tasks_to_run))
+        # Phase 1: Draft modules across parallel worker pool
+        is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() or "vnaipro" in w[0].lower() or "aiapiflow" in w[0].lower() for w in workers)
+        pool_size = min(len(workers), len(tasks_to_run))
         with ThreadPoolExecutor(max_workers=pool_size) as executor:
             future_to_mod = {executor.submit(run_draft_job, job): job[0]["filename"] for job in jobs}
             for fut in as_completed(future_to_mod):
@@ -361,7 +367,21 @@ def generate_subtopic_content(
     """
     subtopic_dir = validate_canonical_topic_path(subtopic_dir)
     workers = None
-    if provider:
+    vnaipro_key = os.environ.get("VNAIPRO_API_KEY")
+    vnaipro_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app")
+
+    if vnaipro_key:
+        # High-throughput multi-gateway parallel pool with concurrency headroom:
+        # 2 workers on vnaipro (safe headroom below 3-concurrency limit) + 1 worker on primary gateway (aiapiflow: 1)
+        # Total: 3 concurrent drafting streams with zero upstream 502 burst collisions!
+        workers = []
+        p_vnaipro = AnthropicProvider(base_url=vnaipro_url, api_key=vnaipro_key, model="claude-sonnet-5")
+        for i in range(1, 3):
+            workers.append((f"VNAIPRO-{i}", "claude-sonnet-5", p_vnaipro))
+        if provider:
+            p_model = getattr(provider, "model", "claude-sonnet-5")
+            workers.append(("AIAPIFLOW", p_model, provider))
+    elif provider:
         p_model = getattr(provider, "model", "custom")
         workers = [(p_model, p_model, provider)]
     return generate_topic_parallel(
