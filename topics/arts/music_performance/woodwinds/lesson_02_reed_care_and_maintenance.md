@@ -1,566 +1,211 @@
-# Lesson 2: Reed Care and Maintenance
+# Lesson 2: Reed Care, Adjustment, and Embouchure Integration
 
-## 1. First-Principles Intuition & Invariants
+## 1. Why the Reed Is Your Real Instrument
 
-The reed functions as a pressure-controlled flow modulator, converting steady breath pressure into periodic oscillations that excite the instrument's air column. Understanding this behavior requires examining three coupled systems: the player's breath mechanics, the reed's physical vibration, and the acoustic feedback from the instrument's bore.
+Everything upstream of the reed — your air, your embouchure, your tongue — only matters because of what it does to that thin strip of cane. A clarinet or saxophone body is acoustically dumb without a reed that opens and closes correctly. Get the reed right and a mediocre horn plays well; get it wrong and a $10,000 horn plays like junk. This lesson treats the reed as a piece of gear you tune, not a consumable you complain about.
 
-### The Physics of Reed Oscillation
+**The one-paragraph physics you need, no more:** A reed is a cantilever — clamped at the mouthpiece table, free at the tip. You blow air across the gap between reed and mouthpiece facing; fast-moving air drops in pressure (Bernoulli), which sucks the tip closed; once closed, airflow stops, pressure rebuilds behind the reed, and the cane's own springiness snaps it back open. Repeat a few hundred times a second and you have a tone. Thin cane flexes easily and opens/closes fast (bright, free-blowing, can be unstable). Thick cane resists flexing (dark, resistant, can be stuffy). Moisture content shifts cane between these states by softening the internal fiber matrix. That's 90% of what you need to diagnose and fix a reed — everything else in this lesson is applying that idea with a knife, sandpaper, and your ears.
 
-A reed vibrates as a cantilevered beam—one end clamped to the mouthpiece, the free end oscillating in response to airflow. The mechanism is self-sustaining: when you blow, air velocity increases at the reed-mouthpiece gap, creating a pressure drop (Bernoulli effect) that pulls the reed closed. As the gap closes, airflow decreases, pressure recovers, and the reed's elastic restoring force snaps it back open. This cycle repeats at the reed's natural frequency.
+## 2. Reed Anatomy You Can Actually Point To
 
-**Key invariants that govern reed behavior:**
-
-1. **Frequency scales inversely with length squared**: Doubling the vibrating length reduces natural frequency by a factor of four. This is why bassoon reeds (longer) vibrate slower than clarinet reeds.
-2. **Stiffness is proportional to thickness cubed**: A 10% thickness reduction decreases stiffness by approximately 27%. Small adjustments have large acoustic consequences.
-3. **Moisture content changes mechanical properties**: Dry cane (<8% moisture) becomes brittle and harsh-sounding. Over-saturated cane (>25%) loses definition and responsiveness. Optimal moisture (12-18%) balances stiffness, damping, and dimensional stability.
-4. **Material anisotropy matters**: Cane exhibits different elastic properties along the fiber direction versus perpendicular to it. Always scrape parallel to fibers to avoid tearing.
-
-The reed's timbre depends not just on its fundamental frequency but on its spectrum of higher vibrational modes. Real reeds exhibit inharmonicity—overtones are not exact integer multiples of the fundamental—which contributes to the characteristic woodwind sound. The reed's damping (internal friction in the cane) shapes attack transients and decay envelopes: high damping smooths attacks but reduces brightness; low damping produces aggressive attacks but can cause squeaks and multiphonics.
-
-### Material Science of Cane (Arundo donax)
-
-Cane is a natural composite with vascular bundles (xylem, phloem, sclerenchyma fibers) embedded in a parenchyma matrix. The fiber bundles provide tensile strength along the cane's longitudinal axis; the lignin-rich matrix provides shear resistance. Cane exhibits both elastic and viscoelastic behavior: it responds immediately to stress (elastic) but gradually softens under sustained load (viscoelastic creep). This explains why reeds "play in" during a session and require rest periods.
-
-Water molecules plasticize the hemicellulose matrix, reducing stiffness while increasing damping. This is why a dry reed sounds bright and harsh, while a properly hydrated reed sounds warm and responsive.
-
-## 2. Core Reed Architecture & Functional Zones
-
-A reed's geometry can be divided into distinct functional zones, each contributing specific vibrational properties:
+Hold a reed up to the light, flat side toward you, tip up.
 
 ```mermaid
 graph TB
-    subgraph sub_reed_zones ["Reed Functional Zones"]
-        A["Heel (Bark intact)<br/>Fixed boundary<br/>15-20mm from base"]
-        B["Vamp (Scraped region)<br/>Transition zone<br/>10-15mm"]
-        C["Heart (Central spine)<br/>Stiffness ridge<br/>8-12mm"]
-        D["Tip (Vibrating edge)<br/>3-5mm, 0.1-0.4mm thick"]
+    subgraph sub_zones ["Reed Zones — Base to Tip"]
+        A["Heel / Butt<br/>bark intact, ~3mm thick<br/>clamps to mouthpiece table"]
+        B["Vamp<br/>scraped region<br/>stiffness taper lives here"]
+        C["Heart<br/>center ridge, visible as<br/>darker U or spade shape"]
+        D["Tip<br/>0.08-0.15mm<br/>the part that actually vibrates"]
     end
-    
-    A -->|"Stress gradient"| B
-    B -->|"Elastic support"| C
-    C -->|"Cantilever anchor"| D
-    
-    subgraph sub_material_gradient ["Thickness & Stiffness Gradient"]
-        E["Heel: 3.0mm<br/>Vamp: 1.5-0.6mm<br/>Tip: 0.1-0.4mm"]
-    end
-    
-    B -.->|"Governed by"| E
-    C -.->|"Governed by"| E
-    D -.->|"Governed by"| E
+
+    A --> B --> C --> D
 ```
 
-**Heel**: The mechanical anchor. Retains the bark (epidermis and sclerenchyma layer) for maximum stiffness and wear resistance. Transfers vibrational energy to the mouthpiece.
+- **Heel** — never touch this. It's your anchor to the mouthpiece table. If it's uneven or warped, the reed leaks air at the sides no matter what you do to the tip.
+- **Vamp** — the whole scraped taper. This is where 90% of adjustment work happens.
+- **Heart** — the slightly raised, often visually darker spine in the middle of the vamp. It stiffens the reed longitudinally so it doesn't buckle; too much heart = stuffy and resistant, too little = unfocused and buzzy.
+- **Rails** — the two long edges of the vamp running up either side of the heart to the tip. These must be symmetrical or the reed vibrates crookedly and squeaks.
+- **Tip** — the last 3-4mm. Thinnest, most fragile, does the actual fast oscillating. Most cracks start here.
 
-**Vamp**: The scraped region where thickness is progressively reduced from heel to tip. The taper controls stiffness gradient and determines fundamental frequency. This is where most adjustments happen.
+You don't need calipers to feel this. Hold the reed up to a window: light passing through unevenly (bright patches, dark patches) shows you thickness variation before you ever pick up a tool.
 
-**Heart**: A subtle ridge running down the centerline, providing longitudinal stiffness that stabilizes vibration and prevents the reed from collapsing inward. Too prominent = stuffy response; too weak = unstable pitch.
+## 3. Breaking In a New Reed (Box of 10 Workflow)
 
-**Tip**: The thinnest region (0.1-0.4mm), designed for maximum flexibility to facilitate rapid oscillation. The tip edges (rails) must be balanced symmetrically for even response.
+Buy reeds in boxes of 10, never one at a time — strength numbers vary reed to reed even within a box, and you need volume to build a working rotation.
 
-### Typical Thickness Profile (B♭ Clarinet Reed)
+**Sorting a fresh box (do this before any playing):**
+1. Hold each reed to light. Reject any with visible dark streaks, uneven grain, or pith showing through near the tip.
+2. Wet each reed 60 seconds, then do a **crow test** (below) on the bare mouthpiece. Sort into three piles: too soft, about right, too stiff.
+3. Label piles. "Too soft" reeds are for loud rehearsal/outdoor playing or sanding practice. "Too stiff" reeds are candidates for clipping (Section 7) or long-term break-in. "About right" become your primary rotation.
 
-Professional reed makers measure thickness at specific landmarks:
+**Break-in schedule for the "about right" pile — do not skip this, it's the difference between a reed that lasts 60 hours and one that cracks in a week:**
 
-- **Tip**: 0.10-0.15mm
-- **3mm from tip**: 0.30-0.40mm
-- **6mm from tip**: 0.60-0.80mm
-- **9mm from tip**: 1.20-1.60mm
-- **Heel**: 2.5-3.0mm (bark intact)
+| Day | Soak | Play Time | Dynamic / Register | Articulation |
+|---|---|---|---|---|
+| 1 | 2 min, room-temp water | 5 min | pp-mp, middle register only (written G3-C5 clarinet / low Bb-high F sax) | Long tones only, no tongue |
+| 2 | 2 min | 7 min | mp-mf, add low register | Soft legato tonguing |
+| 3 | 2 min | 10 min | mf, add upper clarion/altissimo approach | Normal articulation |
+| 4-5 | 2 min | 15 min | Full dynamic range | Full articulation, scales |
+| 6-7 | 2 min | 20+ min | Full range, test altissimo | Staccato, accents — stress test |
+| 8+ | Normal | Normal | Enter full rotation | — |
 
-These measurements are adjusted iteratively while testing response. Material removal is irreversible—work in conservative increments (0.01-0.02mm).
+**Why gradual:** cane is viscoelastic — it creeps (permanently deforms a little) under sustained stress, then partially recovers at rest. Hammering a brand-new reed at forte in the altissimo immediately overloads fibers before they've equilibrated to moisture, causing permanent fiber misalignment — the reed goes dead in a week instead of lasting two months. Patience here is the single highest-leverage habit in this entire lesson.
 
-## 3. Reed Preparation and Break-In Protocol
+## 4. The Crow Test — Your 10-Second Diagnostic
 
-### The Reed Preparation Workflow
+This is the fastest, cheapest diagnostic tool you have, and most players never learn to use it properly.
 
-Reed preparation transforms raw cane into a precision acoustic component:
+**Procedure:**
+1. Remove the mouthpiece/reed from the instrument body.
+2. Take the mouthpiece fully into your mouth past the reed tip (further than normal playing) with a firm, even seal.
+3. Blow a steady, moderate airstream — don't force it.
+4. Listen to the raw, buzzy sound (the "crow").
 
-```mermaid
-graph TD
-    A["Raw Arundo donax<br/>(18-24 month growth)"]
-    B["Curing<br/>(2-3 years, ambient RH)"]
-    C["Selection & Grading<br/>(Density 550-650 kg/m³)"]
-    D["Splitting<br/>(Radial quarters)"]
-    E["Gouging<br/>(Concave inner surface)"]
-    F["Shaping<br/>(Taper profile)"]
-    G["Initial Profiling<br/>(Thickness gradient)"]
-    H["Finishing Adjustments<br/>(Micro-tuning)"]
-    I["Break-in Period<br/>(1-2 weeks playing)"]
-    
-    A --> B --> C --> D --> E --> F --> G --> H --> I
-    
-    style I fill:#e1f5ff
-```
+**What you're listening for, by instrument:**
 
-**Curing** (2-3 years): Allows biochemical stabilization. Residual growth hormones and volatile compounds evaporate, lignin cross-linking increases, moisture content equilibrates. This reduces dimensional instability.
+| Instrument | Healthy Crow Sound | Too Soft | Too Stiff |
+|---|---|---|---|
+| Bb Clarinet | Double "crow": a buzzy low note plus a clear high overtone a 12th-ish above, roughly concert C#-D | Flat, single low pitch, no overtone | High, thin squeal, hard to sustain, or no pitch at all |
+| Alto Sax | Broad, airy "AH-EEE" with a clear overtone split | Weak, closes/chokes easily, low buzz only | Sharp, resists closing, mostly hiss |
+| Oboe | Sharp double-reed crow, bright "ha-ha" bark on two close pitches | Collapses, muffled, closes under light pressure | Won't crow at all, just air noise |
+| Bassoon | Low, dark "croak," two pitches roughly an octave-ish apart | Weak single tone, airy | Won't speak, pure hiss |
 
-**Gouging**: Creates concave inner surface, reducing mass while preserving stiffness. Curvature radius (typically 10-15mm) affects reed's natural camber and resistance profile.
+Test the crow **before and after every adjustment**. If an adjustment doesn't visibly change the crow, you didn't remove enough material to matter — or you adjusted the wrong zone.
 
-**Profiling**: Establishes the critical thickness gradient. Use precision reed gauges (dial indicators with specialized feet) to measure thickness. Adjust iteratively using reed knives, files, and sanding implements. Work in 0.01-0.02mm increments.
+## 5. Daily Maintenance Routine (Follow Every Session, No Exceptions)
 
-### Break-In Protocol for New Reeds
-
-New reeds benefit from gradual conditioning to align fiber structure and establish stable moisture equilibrium:
-
-**Day 1-2: Initial Conditioning**
-- Soak in room-temperature water (20-25°C) for 2 minutes
-- Play gently for 5 minutes only: pianissimo dynamic, middle register (written G3-C5 for clarinet)
-- Focus on long tones, no tonguing
-- Rest for 24 hours in reed case
-
-**Day 3-4: Expansion**
-- Soak for 2 minutes
-- Play for 10 minutes: expand to mezzo-forte, full register
-- Include gentle tonguing and basic articulation
-- Rest for 24 hours
-
-**Day 5-7: Full Integration**
-- Soak for 2 minutes
-- Play for 15-20 minutes: full dynamic range, all articulations
-- Test altissimo register, check response across full range
-- Begin normal rotation into playing set
-
-**Why this works**: Gradual stress cycling prevents premature fatigue and allows the reed's viscoelastic properties to stabilize. Aggressive break-in (playing fortissimo immediately) causes fiber misalignment and premature softening.
-
-## 4. Daily Maintenance and Moisture Management
-
-### The Moisture Cycle
-
-A reed's moisture state directly affects its mechanical impedance. Proper conditioning establishes optimal moisture distribution:
-
-```mermaid
-sequenceDiagram
-    participant R as Reed (Dry)
-    participant W as Water Bath
-    participant M as Mouth Environment
-    participant A as Storage Case
-    
-    Note over R: Initial moisture ~8-12%
-    R->>W: Soak 2-5 minutes (20-25°C)
-    Note over W: Capillary action saturates pores
-    W->>R: Moisture → 20-25%
-    R->>M: Play-in period (5-10 min)
-    Note over M: Temp 35-37°C, RH 95-100%<br/>pH ~6.5-7.5 (saliva)
-    M->>R: Surface equilibration
-    Note over R: Working moisture ~15-18%
-    R->>A: Rest period (4-24 hours)
-    Note over A: 50-60% RH, 20-22°C
-    A->>R: Slow drying to equilibrium
-    Note over R: Storage moisture ~10-15%
-```
-
-**Pre-session soaking**: Water penetrates via capillary action through vascular structure. Outer surface absorbs faster than interior, creating temporary moisture gradient. Playing redistributes moisture through mechanical agitation and heat transfer.
-
-**Rest period**: Critical for viscoelastic recovery. Continuous playing induces creep deformation that accumulates without recovery time. Professional players rotate between 3-5 reeds to distribute mechanical fatigue and extend service life.
-
-### Post-Session Care Protocol
+**Before playing:**
+1. Soak reed in a small cup of room-temp water, or in your mouth, 60-120 seconds. Don't over-soak — waterlogged cane (visibly swollen, spongy to a fingernail press) plays dull and unresponsive until it re-equilibrates, which can take 10+ minutes.
+2. Press gently with a fingertip along the vamp — it should feel resilient, springy, not mushy.
 
 **Immediately after playing:**
-1. Remove excess surface moisture with lint-free cloth (gentle wipe, don't rub)
-2. Place in reed case with adequate ventilation (not hermetically sealed)
-3. Never leave wet reed on mouthpiece—promotes warping and bacterial growth
+1. Wipe the flat side once, gently, with a lint-free cloth or your thumb, base to tip, in the direction of the fibers. Don't scrub side to side — that works against grain and roughs up the surface.
+2. **Pull the reed off the mouthpiece.** Never leave a wet reed clamped on the mouthpiece in your case. It warps as it dries unevenly under the ligature, and it's the single most common cause of "my reed used to be great and now it's garbage."
+3. Store flat-side down in a reed case with a flat glass or plastic surface — never in the reed's original paper sleeve long-term, which lets it dry unevenly and curl.
 
-**Weekly maintenance:**
-1. Rinse reeds under pH-neutral water (removes saliva residue: proteins, sugars)
-2. Inspect tip under good light for microcracks or fiber damage
-3. Check for warping by placing reed flat on glass surface—should sit flush
+**Weekly (5 minutes, do it on the same day each week so it becomes automatic):**
+1. Rinse each reed under plain running water — this clears dried saliva residue (sugars and proteins) that otherwise feeds bacteria and leaves a gummy film that damps vibration.
+2. Lay each reed flat-side down on a flat glass or phone-screen surface. If any corner rocks or lifts, that reed is warping — flag it.
+3. Check tips under a strong lamp for hairline cracks. A crack that's just reached the vamp is still salvageable by clipping (Section 7); a crack into the heart means retire it.
 
-**Monthly deep maintenance:**
-1. Sanitize with 70% ethanol or isopropanol (30-second soak, thorough rinse)
-2. Kills bacteria without excessively drying the cane
-3. Avoid chlorine-based disinfectants—degrade lignin
-4. Re-evaluate thickness profile if response has changed
+**Monthly:**
+1. Soak reeds 30 seconds in a 70% isopropyl alcohol solution, then rinse thoroughly in water. This knocks back bacterial buildup without over-drying the cane the way bleach or hydrogen peroxide will (both attack lignin and leave the reed brittle — avoid them).
+2. Re-run the crow test on your whole rotation and compare to notes from last month — this is how you catch slow degradation before it shows up as "I can't figure out why I sound bad today."
 
-### Storage Protocol
+## 6. Reed Rotation — The Professional System
 
-**Environmental control:**
-- **Humidity**: 50-60% RH (use two-way humidity control packs)
-- **Temperature**: 18-22°C
-- **Avoid**: >70% RH (mold growth), <40% RH (excessive drying and brittleness)
+Never play on one reed every day. Cane needs recovery time between sessions (viscoelastic recovery — the fibers relax back toward their rest shape), and a single reed used daily degrades 3-4x faster than one rotated through a group.
 
-**Reed rotation strategy** (professional practice):
-- 2 "primary" reeds in peak condition (20-40 hours playing time)
-- 2 "break-in" reeds (0-20 hours, still stabilizing)
-- 2 "backup" reeds (40+ hours, approaching end-of-life but usable)
-
-This ensures consistent performance availability while distributing mechanical stress across multiple reeds.
-
-## 5. Performance Optimization and Adjustment Techniques
-
-### Material Selection Criteria
-
-Premium cane exhibits:
-- Fine, evenly spaced vascular bundles with minimal pith content
-- Uniform coloration (golden-amber, no dark streaks or green patches)
-- Density 550-650 kg/m³ for clarinet reeds (measure with precision scale and calipers: ρ = m/V)
-- Outside this range: too flexible (low density) or too stiff (high density)
-
-### Symmetry Verification
-
-Asymmetry causes uneven vibration and pitch instability. Verify using precision measurements:
-
-**Rail balance**: Measure thickness at corresponding points on left and right rails
-- Tolerance: ±0.02mm
-- Use reed gauge with feet positioned symmetrically
-
-**Tip alignment**: Tip edge must be perpendicular to centerline
-- Tolerance: ±0.5°
-- Check with machinist's square or against straight edge
-
-**Heart centering**: Central spine equidistant from both rails
-- Tolerance: ±0.3mm
-- Measure with calipers at multiple points along heart
-
-### Micro-Adjustment Techniques
-
-Fine-tuning involves targeted material removal based on specific acoustic symptoms:
-
-| Symptom | Root Cause | Correction Method |
-|---------|-----------|-------------------|
-| **Stuffy response, flat pitch** | Excessive tip thickness | Thin tip region 0.01-0.02mm, focus on tip edges. Use fine-grit sanding stick (400-600 grit) with long strokes parallel to fibers |
-| **Bright, harsh tone** | Insufficient damping, tip too thin | Increase vamp thickness slightly in transition zone, or reduce heart prominence. Work 3-6mm behind tip |
-| **Weak low register** | Tip too thin relative to heart | Strengthen heart region by thinning surrounding vamp. Ensure gradual transition—no abrupt steps |
-| **Squeaks in altissimo** | Asymmetric rails, tip misalignment | Balance rail thickness bilaterally. Check tip alignment with straight edge. Measure and match |
-| **Slow attack** | Excessive overall stiffness | Reduce vamp thickness, particularly in transition zone (6-10mm from tip). Work gradually |
-| **Poor resistance, reed closes too easily** | Tip too flexible, insufficient spine | Increase tip thickness OR reduce tip length by clipping. Strengthen heart if it's weak |
-| **Too much resistance, reed won't open** | Excessive tip stiffness, over-prominent heart | Thin tip region carefully. Reduce heart prominence by thinning centerline |
-| **Uneven response across registers** | Imbalanced thickness gradient | Check thickness profile against landmarks. Adjust transition zones for smooth gradient |
-
-**Adjustment workflow:**
-1. Identify specific symptom in playing test
-2. Measure thickness at relevant landmarks with reed gauge
-3. Make single targeted adjustment (0.01-0.02mm removal)
-4. Test response immediately
-5. Repeat if necessary, but never make multiple changes simultaneously
-
-**Tools for adjustments:**
-- **Reed knife**: Primary tool for vamp and heart adjustments. Hold at low angle (10-15°), pull toward you with controlled pressure
-- **Sanding sticks**: Fine-grit (400-600 grit) for tip work and smoothing. Always sand parallel to fibers
-- **Reed rush**: Natural abrasive for final surface finishing and micro-adjustments
-- **Reed gauge**: Dial indicator with specialized feet for precision thickness measurement
-
-### Crow Test for Quick Assessment
-
-The "crow" test provides immediate feedback on reed stiffness. Place reed on mouthpiece (no instrument), seal lips, and blow:
-
-**B♭ Clarinet optimal crow pitches:**
-- **C#-D (550-587 Hz)**: Optimal stiffness
-- **C or lower**: Reed too soft
-- **D# or higher**: Reed too stiff
-
-**Interpretation:**
-- Clear, stable crow with distinct pitches = balanced reed
-- Weak, unclear crow = tip too flexible or asymmetric
-- No crow, only hissing = reed too stiff or poor seal
-
-Test crow after each adjustment to track changes in stiffness.
-
-## 6. Failure Modes and Degradation Mechanisms
-
-### Understanding Reed Lifespan
-
-Reeds fail through multiple mechanisms operating on different timescales:
-
-**Mechanical fatigue** (20-40 playing hours):
-- Cyclic stress induces microcrack propagation in fiber bundles
-- Highest stress at tip where flexure is greatest
-- Eventually causes tip splitting (catastrophic failure)
-- At concert pitch (440 Hz), a reed accumulates ~10⁶ cycles per hour
-
-**Viscoelastic degradation** (gradual over weeks):
-- Repeated stress cycles cause irreversible structural rearrangement
-- Manifests as gradual softening: less responsive, requires more embouchure pressure, loses brightness
-- Partially reversible with extended rest (days to weeks), but never complete recovery
-
-**Biochemical degradation** (months):
-- Enzymatic hydrolysis by salivary amylase breaks glycosidic bonds in hemicellulose
-- Bacterial colonization (Streptococcus species) accelerates process
-- Rate depends on pH, temperature, moisture
-- Maintaining pH below 7.0 (mildly acidic storage) significantly reduces degradation
-
-**Moisture-induced warping**:
-- Differential moisture absorption causes dimensional changes
-- Outer surface dries faster than interior, creating stress gradients
-- Causes reed to curl or twist
-- Warped reeds seal poorly, causing air leaks and uneven response
-
-### Failure Prevention Strategy
+**Minimum working rotation: 4 reeds, rotated daily**
 
 ```mermaid
 graph LR
-    A["After Each Session"]
-    B["Remove excess moisture<br/>Store in ventilated case"]
-    C["Weekly Maintenance"]
-    D["Rinse pH-neutral water<br/>Inspect for damage"]
-    E["Monthly Maintenance"]
-    F["Sanitize 70% ethanol<br/>Re-evaluate profile"]
-    G["Storage Protocol"]
-    H["Humidity-controlled case<br/>45-55% RH, 18-22°C"]
-    
-    A --> B --> C
-    C --> D --> E
-    E --> F --> G
-    G --> H
-    
-    style B fill:#e8f5e9
-    style D fill:#fff3e0
-    style F fill:#fce4ec
-    style H fill:#e1f5fe
+    subgraph sub_rotation ["4-Reed Weekly Rotation"]
+        M["Mon: Reed A"]
+        T["Tue: Reed B"]
+        W["Wed: Reed C"]
+        Th["Thu: Reed D"]
+        F["Fri: Reed A"]
+        Sa["Sat: Reed B"]
+        Su["Sun: Reed C"]
+    end
+    M --> T --> W --> Th --> F --> Sa --> Su
 ```
 
-### Signs a Reed Needs Retirement
+Label reeds with a pencil dot code on the heel (not the vamp) so you can track which one is which across weeks. Keep a simple log: date first played, approximate cumulative hours, and a 1-10 playability rating after each session. A reed that's consistently rated 7+ for 15-20 sessions and then drops to 4-5 without any visible damage has reached end-of-life — retire it rather than trying to rescue it with more adjustment.
 
-**Replace immediately if:**
-- Visible tip crack or split extending into vamp
-- Severe warping (doesn't sit flat on glass)
-- Dark discoloration or visible mold growth
-- Fiber separation at tip (ragged, torn appearance)
+## 7. Adjustment Workshop — Diagnosing and Fixing Specific Problems
 
-**Consider retiring if:**
-- Response becomes consistently dull despite adjustments
-- Requires excessive embouchure pressure to produce tone
-- Pitch stability degrades (difficulty keeping pitch centered)
-- Attack becomes sluggish across all registers
-- Reed has 40+ hours of playing time with diminishing returns
+**Tools you need, nothing exotic:**
+- A reed knife (sharp — a dull reed knife tears fibers instead of shaving them, which is worse than not adjusting at all) or a single-edge razor blade as a budget substitute
+- 400-600 grit wet/dry sandpaper or a Dutch rush reed plant stem
+- A flat glass tile for checking warp
+- Strong, raking light (a desk lamp held at a low angle shows thickness variation as shadow far better than overhead light)
 
-**Extend service life by:**
-- Rotating between multiple reeds (distribute stress)
-- Proper moisture management (controlled soaking and drying)
-- Regular sanitization (reduce biochemical degradation)
-- Conservative adjustments (avoid over-scraping)
-- Environmental control (stable humidity and temperature)
+**Golden rules before touching any reed:**
+- Always work with the reed **wet**. Dry cane chips and cracks under a blade; wet cane shaves cleanly.
+- Remove material in passes you can barely see — think "polishing," not "carving." You can always take off more; you can never put cane back.
+- Re-test (crow test + actual playing) after every single pass. Never make two changes before testing.
+- Always sand/scrape **with the grain**, base toward tip, never side to side across the fibers.
 
-## 7. Quantitative Performance Metrics
+**The diagnostic table — match your actual playing symptom to the fix:**
 
-Objective assessment enables data-driven optimization:
+| Symptom | What's Actually Happening | Fix |
+|---|---|---|
+| Hard to get a sound, feels like blowing into a wall | Reed too stiff overall, usually tip/vamp too thick | Thin the vamp 3-8mm back from tip with sandpaper, long strokes with the grain. Re-crow after every 2-3 strokes. |
+| Reed closes up / "chokes" at loud dynamics | Tip too thin/soft relative to the rest of the reed, or heart too weak to support the vibration | Don't remove more material — this reed may just be too soft for you; move to backup pile. If heart feels flat under a fingernail, this reed is past saving. |
+| Bright, thin, harsh tone, no core | Insufficient heart/damping, tip region overly flexible relative to vamp | Lightly scrape 4-7mm back from the tip (just past the thinnest part) to thicken the transition zone slightly — counterintuitive but it restores support without killing response. |
+| Dull, stuffy, muffled tone | Heart too prominent or vamp too thick in the 5-10mm zone | Thin the shoulders of the vamp just outside the heart ridge, leaving the heart itself alone. |
+| Squeaks, especially in the upper register | Rails are asymmetric — one side thinner than the other, so the reed vibrates off-axis | Hold reed up to light: compare brightness left vs right rail. Lightly sand the thicker rail only, a few strokes, re-check under light after each pass. |
+| Sluggish articulation, tongue feels like it's fighting the reed | Overall stiffness, or tip edge slightly too thick | Fine-sand the very tip edge (last 1-2mm) with 600 grit, 3-4 light strokes, re-test tonguing immediately. |
+| Reed plays sharp compared to your other reeds | Reed is stiffer/shorter functionally — common right out of the box | Soft reeds run flatter, stiff reeds run sharp; this is normal reed-to-reed variance, not necessarily a defect — compensate with voicing/embouchure first before cutting material. |
+| Reed plays flat, hard to bring pitch up | Reed too soft/open, or badly worn in from overuse | If new: likely just a soft reed, move to "loud rehearsal" pile. If old: approaching end of life, retire. |
 
-### Resistance Measurement
+**Clipping a reed (fastest fix for "too soft"):**
+A reed that's too soft everywhere but otherwise healthy can be stiffened instantly by shortening it. Using a reed clipper (a dedicated, cheap tool — don't freehand this with scissors) or fine sandpaper on a flat block, remove 0.3-0.5mm from the very tip, square across, perpendicular to the centerline. This shortens the vibrating length, which raises stiffness and pitch center. Crow-test before and after — you'll hear the crow pitch rise immediately. Never clip more than 0.5mm at a time; over-clipping makes the reed stiff and unresponsive with no way to reverse it.
 
-Measure pressure required to open reed at threshold oscillation using manometer or differential pressure sensor:
+## 8. Troubleshooting Flowchart
 
-**Optimal resistance for B♭ clarinet:** 3-5 kPa differential pressure at onset
-**Measurement method:**
-1. Connect pressure gauge to mouthpiece chamber
-2. Blow gently, increasing pressure gradually
-3. Note pressure at which reed begins oscillating
-4. Too low (<2 kPa) = too soft; too high (>6 kPa) = too stiff
+```mermaid
+graph TD
+    A["Reed problem noticed"]
+    B{"Visible crack, warp,<br/>or mold?"}
+    C["Retire reed immediately"]
+    D{"Crow test:<br/>pitch too high?"}
+    E["Reed too stiff:<br/>thin vamp 3-8mm from tip"]
+    F{"Crow test:<br/>pitch too low or weak?"}
+    G["Reed too soft:<br/>move to backup pile,<br/>or retire if old"]
+    H{"Crow sounds uneven<br/>or lopsided?"}
+    I["Check rail symmetry<br/>under raking light,<br/>sand thicker side only"]
+    J["Reed is fine —<br/>problem is embouchure,<br/>air support, or setup"]
 
-### Microscopic Quality Assessment
+    A --> B
+    B -->|Yes| C
+    B -->|No| D
+    D -->|Yes| E
+    D -->|No| F
+    F -->|Yes| G
+    F -->|No| H
+    H -->|Yes| I
+    H -->|No| J
+```
 
-Examine tip region under 10-40× magnification (jeweler's loupe or USB microscope):
+If the reed passes every check above and the problem persists, stop blaming the reed. Check: mouthpiece table flatness (a warped table leaks air at the sides regardless of reed quality), ligature tension (too tight chokes the reed's free edges, too loose lets it buzz against the mouthpiece rails), and your own embouchure pressure and voicing — reed problems and embouchure problems produce nearly identical symptoms, and chasing the wrong one wastes reeds.
 
-**High-quality reed exhibits:**
-- Uniform fiber orientation parallel to longitudinal axis
-- Clean, smooth tip edge (no torn fibers or ragged edges)
-- No visible microcracks or fiber separation
-- Consistent vascular bundle spacing
-- Translucent amber color at tip (not opaque or dark)
+## 9. Storage and Environment
 
-**Warning signs:**
-- Torn or frayed fibers at tip edge
-- Dark spots indicating high lignin concentration or decay
-- Visible microcracks propagating from tip
-- Irregular fiber spacing or crossed fibers
+- **Humidity:** keep reed cases in 45-60% relative humidity. A cheap two-way humidity pack (the kind cigar and guitar players use) dropped into your reed case solves this for a few dollars. Below 40% RH, cane dries brittle and cracks easily; above 70%, mold risk climbs fast, especially in cases with poor airflow.
+- **Never** store reeds in a sealed plastic bag or airtight container long-term — they need slow, even air exchange to dry without warping.
+- **Temperature:** avoid leaving reed cases in a hot car or direct sun. Heat accelerates both drying and bacterial growth.
+- Flat storage (reed case with a flat retaining surface) beats round tube cases for preventing warp — the flat surface keeps the reed's bottom from cupping as it dries.
 
-### Playing Test Checklist
+## 10. End-of-Life Signs — When to Stop Fighting a Reed
 
-Systematic evaluation across performance parameters:
+**Retire immediately:**
+- Any crack reaching from the tip into the vamp
+- Visible dark mold spots (not to be confused with natural cane coloring/streaking, which is cosmetic)
+- Warping severe enough that the reed rocks visibly on a flat glass surface
+- Torn or frayed fibers at the tip edge that catch on your fingernail
 
-**Response & Attack:**
-- [ ] Clean attack in all registers (no delay, no squeak)
-- [ ] Pianissimo response stable in low register
-- [ ] Altissimo speaks cleanly without squeak or multiphonic
+**Retire soon, even without visible damage:**
+- Requires noticeably more air pressure than it used to for the same dynamic
+- Pitch has become harder to center, drifts under dynamic changes
+- You've made 4-5 adjustment passes with no improvement — further cutting will only make it worse
+- It's logged 25-40+ hours of playing time with a declining rating trend in your log
 
-**Intonation:**
-- [ ] Pitch centers easily without excessive embouchure correction
-- [ ] No register-to-register pitch drift
-- [ ] Pitch stable across full dynamic range
+A reed is a consumable with a controllable lifespan, not a permanent tool. Fighting a dead reed with more scraping wastes your practice time; swapping it costs you fifty cents.
 
-**Tone Quality:**
-- [ ] Warm, resonant sound in middle register
-- [ ] Low register projects without stuffiness
-- [ ] Altissimo clear and focused without shrillness
+## 11. Practice Lab: 30-Minute Reed Rotation Audit
 
-**Dynamic Range:**
-- [ ] Pianissimo possible without tone cutting out
-- [ ] Fortissimo possible without harsh edge
-- [ ] Smooth crescendo/diminuendo without pitch drift
+**Goal:** build the habit of systematic reed assessment so diagnosis becomes automatic instead of guesswork.
 
-**Articulation:**
-- [ ] Clean single tonguing at MM=120 sixteenth notes
-- [ ] Double tonguing evenness (if applicable)
-- [ ] Staccato response crisp without pitch sag
+**Setup:** your current reed rotation (4-6 reeds), reed knife or sandpaper, flat glass tile, strong desk lamp, a notebook or spreadsheet.
 
-Document performance over time to track degradation and optimize replacement timing.
+**Steps:**
+1. **(5 min) Visual pass** — hold each reed to the lamp. Note any uneven brightness (thickness variation), discoloration, or visible cracks. Lay each on glass, check for rocking.
+2. **(5 min) Crow test pass** — soak each reed 60 seconds, crow test each on the bare mouthpiece. Write down: pitch (too high / good / too low), and clarity (clean double-crow vs. weak/airy).
+3. **(10 min) Playing test pass** — on the full instrument, play a two-octave scale pp and then ff on each reed. Rate each 1-10 on response, pitch stability, and tone. Note the single biggest issue per reed.
+4. **(10 min) One adjustment** — pick the reed with the clearest, most fixable issue (not the worst reed — the one whose problem matches a row in the Section 7 table cleanly). Make exactly one adjustment pass. Re-crow. Re-play the same scale. Log the before/after rating.
 
-## 8. Advanced Topics: Reed Customization
-
-### Strength Modification
-
-Commercial reeds are rated by strength (e.g., 2.5, 3, 3.5), but players often need intermediate values or asymmetric properties:
-
-**To soften a reed:**
-- Thin the vamp in the transition zone (6-10mm from tip)
-- Reduce heart prominence slightly
-- Work in 0.01mm increments, test frequently
-
-**To stiffen a reed:**
-- Clip the tip: remove 0.5-1.0mm from tip edge with sharp blade
-- This shortens vibrating length, increasing natural frequency and stiffness
-- Use straight cut perpendicular to centerline
-- Smooth cut edge with fine sandpaper
-
-**Asymmetric adjustments for embouchure compensation:**
-- Some players have asymmetric embouchures (more pressure on one side)
-- Balance rail thickness to compensate: thin the rail on the high-pressure side
-- Requires careful measurement and incremental adjustment
-
-### Alternative Reed Materials
-
-**Synthetic reeds** (Légère, Forestone, etc.):
-- Consistent properties, no moisture sensitivity
-- Longer lifespan (months to years)
-- Different timbre: often brighter, less complex overtone spectrum
-- Useful for outdoor performance, extreme climates, doubling instruments
-- Break-in period still required (polymer stress relief)
-
-**Arundo donax alternatives:**
-- **Arundo plinii**: Denser, stiffer than A. donax; used for oboe/bassoon
-- **Synthetic cane composites**: Injection-molded polymer-fiber blends
-- Each material exhibits different viscoelastic properties and requires adjusted preparation techniques
-
-## 9. Practice Lab: Reed Adjustment Workshop
-
-### Objective
-Develop precision adjustment skills through systematic diagnosis and correction of common reed problems.
-
-### Required Tools
-- Reed knife (professional quality, properly sharpened)
-- Sanding sticks (400, 600, 800 grit)
-- Reed gauge (dial indicator or precision calipers)
-- Reed rush or fine emery paper
-- Flat glass surface (for flatness checking)
-- Good lighting (LED desk lamp or natural light)
-- Reed case with 3-5 reeds at different maturity stages
-
-### Lab Procedure
-
-**Part 1: Baseline Assessment (15 minutes)**
-
-For each reed in your rotation:
-
-1. **Visual inspection** (5 min):
-   - Check tip symmetry against straight edge
-   - Inspect for cracks, warping, fiber damage
-   - Note coloration and moisture staining patterns
-
-2. **Thickness mapping** (5 min):
-   - Measure thickness at landmarks: tip, 3mm, 6mm, 9mm from tip
-   - Record measurements for both rails and centerline
-   - Calculate symmetry deviation (left rail - right rail)
-
-3. **Playing test** (5 min):
-   - Crow test: record pitch and stability
-   - Full-range scale: note response anomalies by register
-   - Dynamic test: pianissimo and fortissimo in middle C
-   - Document issues in playing log
-
-**Part 2: Diagnostic Practice (20 minutes)**
-
-Select one reed with identified issues and systematically diagnose:
-
-1. **Match symptom to root cause** using adjustment table (Section 5)
-2. **Measure current thickness** at relevant landmarks
-3. **Calculate target thickness** (0.01-0.02mm reduction)
-4. **Plan adjustment sequence** (which zone, which tool)
-
-**Part 3: Precision Adjustment (30 minutes)**
-
-Execute planned adjustment on selected reed:
-
-1. **Setup workstation**:
-   - Secure reed on flat surface or reed holder
-   - Position light for clear visibility
-   - Have measuring tools within reach
-
-2. **Make single adjustment**:
-   - Use appropriate tool (knife, sanding stick, rush)
-   - Work parallel to fibers, long smooth strokes
-   - Remove material conservatively (0.01mm target)
-
-3. **Measure result**:
-   - Re-measure thickness at adjustment zone
-   - Confirm material removal within target range
-
-4. **Test response**:
-   - Soak reed for 2 minutes
-   - Perform playing test focusing on target symptom
-   - Document change in response
-
-5. **Iterate if necessary**:
-   - If symptom persists, plan next adjustment
-   - If symptom resolved, move to next reed
-   - If symptom worsened, diagnose overcorrection
-
-**Part 4: Long-Term Tracking (ongoing)**
-
-Establish reed performance tracking system:
-
-1. **Create reed logbook**:
-   - Reed ID number and acquisition date
-   - Initial thickness profile measurements
-   - Playing hours log (cumulative)
-   - Adjustment history with dates and descriptions
-   - Performance notes (subjective ratings 1-10)
-
-2. **Schedule maintenance**:
-   - Weekly: visual inspection, rinse, moisture check
-   - Monthly: deep sanitization, profile re-measurement
-   - Quarterly: review rotation strategy, retire end-of-life reeds
-
-3. **Analyze patterns**:
-   - Which reeds last longest? (identify optimal initial profile)
-   - Which adjustments most effective? (refine technique)
-   - When does performance degrade? (optimize replacement timing)
-
-### Success Metrics
-
-After completing this lab, you should be able to:
-- [ ] Diagnose specific reed problems from playing symptoms
-- [ ] Measure reed thickness accurately within ±0.01mm
-- [ ] Execute precision adjustments that improve specific symptoms
-- [ ] Track reed performance over time with quantitative data
-- [ ] Optimize reed rotation strategy for consistent performance
-
-### Common Mistakes to Avoid
-
-1. **Over-adjusting**: Making multiple changes before testing response
-2. **Working too fast**: Removing too much material at once
-3. **Ignoring symmetry**: Adjusting one side without balancing the other
-4. **Poor lighting**: Missing subtle thickness variations
-5. **Inconsistent measurement**: Not measuring from same landmarks
-6. **Impatient break-in**: Playing new reeds at full intensity immediately
-7. **Neglecting moisture**: Testing reeds at inconsistent hydration states
-8. **Skipping documentation**: Losing track of what works and what doesn't
-
-## 10. Conclusion: The Reed as a Precision Instrument Component
-
-Reed maintenance is not ancillary to woodwind performance—it is central to it. The difference between mediocre and excellent playing often comes down to reed quality and consistent maintenance practices. By understanding the physics of reed vibration, the material science of cane, and the mechanical principles of adjustment, you gain control over this critical interface between breath and sound.
-
-The investment in reed care skills pays dividends throughout your playing career:
-- **Consistency**: Predictable response across practice and performance contexts
-- **Economy**: Extended reed lifespan reduces replacement costs
-- **Musicality**: Optimal tone quality and dynamic range enable expressive playing
-- **Troubleshooting**: Rapid diagnosis and correction of performance issues
-- **Independence**: Self-sufficiency rather than reliance on commercial reed availability
-
-Approach reed care with the same rigor you apply to technical practice: systematic, incremental, documented. Over time, you'll develop intuition for reed behavior and the confidence to optimize reeds to your specific embouchure, instrument, and musical goals.
-
-**Next steps:**
-- Establish baseline measurements for your current reed rotation
-- Implement daily moisture management protocol
-- Practice precision adjustment techniques on retired reeds
-- Begin systematic performance tracking in reed logbook
-- Experiment with break-in protocols to optimize new reed conditioning
-
-The reed is not a consumable—it's a tunable acoustic element. Treat it with the care and precision it deserves.
+**Success check:** by the end of this lab you should have a written rating for every reed in your rotation and one completed, tested adjustment with a measured before/after change. Do this audit weekly for a month and you'll start predicting which reeds are about to go bad before they actually fail mid-rehearsal.
