@@ -1,904 +1,339 @@
-# Operational Verification Labs: Music Theory
+# Music Theory for Performing Musicians: Harmony at the Keyboard, Fretboard, and Staff
 
-## Theoretical Foundation
+## Why This Lesson Exists
 
-### The Physics of Pitch: Frequency, MIDI, and Equal Temperament
+The original material treats music theory as a computer science exercise: `music21` scripts verifying semitone arrays. That is useful for software engineers building notation tools, but it teaches nothing about playing. A pianist who can print `[2, 2, 1, 2, 2, 2, 1]` to a console still can't voice a ii-V-I in a jazz standard or sightread a key signature.
 
-Musical pitch is a perceptual phenomenon rooted in the physics of vibrating bodies. A string vibrating at frequency $f$ produces a tone; doubling that frequency to $2f$ yields a pitch perceived as the same note one octave higher. This 2:1 ratio defines the octave, the most fundamental interval in virtually all musical systems.
+This rewrite keeps the acoustic theory (capped, as it should be) and redirects 85% of the content toward what you do with your hands: scale fingerings across two instruments, chord voicings you can grip immediately, a circle of fifths you use to transpose on the fly, and ear-training drills with metronome targets. The `music21` code is retained in a single compact appendix for the musicians who also write software, but it no longer drives the lesson.
 
-Western music partitions the octave into 12 equal semitones using **12-tone equal temperament (12-TET)**. The frequency of any semitone $n$ steps above a reference pitch is:
+---
 
-$$f = f_{ref} \times 2^{n/12}$$
+## Part 1: The Physics You Actually Need (Capped at One Section)
 
-where $f_{ref}$ is the reference frequency (A4 = 440 Hz by international convention, ISO 16:1975). The MIDI standard assigns integer note numbers to equal-tempered pitches, with A4 mapped to note 69. Thus:
+Pitch is vibration rate. Double the frequency, the ear hears the same note one octave up — this 2:1 ratio is the only fixed point in the entire system. Western instruments divide that octave into 12 equal semitones (12-tone equal temperament, 12-TET) so that a piano tuned once can play in all 12 keys without retuning. The fixed reference is A4 = 440 Hz; every other pitch is a fixed multiplier of 2^(1/12) ≈ 1.0595 away from its neighbor.
 
-$$f = 440 \times 2^{(n - 69)/12}$$
-
-This formula underpins every digital synthesis engine and MIDI-aware library, including `music21`. When `music21` writes a MIDI file, it encodes each note as a numeric value using this mapping. When it computes intervals or transposes pitches, it performs arithmetic on these semitone offsets.
+The practical consequence you will hear constantly: equal temperament is a *compromise*. The perfect fifth (C to G) is detuned by about 2 cents from pure — inaudible. The major third (C to E) is detuned by about 14 cents — audible, and it's why a tempered major chord sounds slightly "brighter" and less glassy than a barbershop quartet or a cappella choir tuning thirds by ear. When you hear singers or a string quartet lock in a chord with no beating, they are bending off the piano's equal-tempered grid toward just intonation. That's the entire physics budget for this lesson — everything else below is fingers, frets, and ears.
 
 ```mermaid
 graph LR
-    subgraph sub_pitch_frequency_midi_relationshi ["Pitch-Frequency-MIDI Relationship"]
-        MIDI["MIDI Note (n)"] -->|"f = 440 × 2^((n−69)/12)"| FREQ["Frequency (Hz)"]
-        FREQ --> PERCEIVED["Perceived Pitch"]
+    subgraph sub_temperament ["Why Equal Temperament Exists"]
+        PURE["Just Intonation<br/>Pure ratios (3:2, 5:4)<br/>Beautiful in one key only"] --> COMPROMISE["12-TET<br/>Every interval slightly off<br/>except the octave"]
+        COMPROMISE --> FREE["Benefit: play in any key,<br/>modulate freely, fretted<br/>instruments become possible"]
     end
-    MIDI -->|"n = 69"| A4["A4 = 440 Hz"]
-    MIDI -->|"n = 60"| C4["C4 ≈ 261.63 Hz"]
-    MIDI -->|"n = 72"| C5["C5 ≈ 523.25 Hz"]
-    MIDI -->|"n = 48"| C3["C3 ≈ 130.81 Hz"]
 ```
 
-Equal temperament is a compromise. In **just intonation**, intervals are tuned to pure integer ratios derived from the harmonic series (e.g., perfect fifth = 3:2, major third = 5:4). The harmonic series of a fundamental $f$ includes $f$, $2f$, $3f$, $4f$, $5f$, $6f$, $7f$, ... — the octave, fifth, and major third appear naturally as overtones. This is why these intervals sound consonant: they reinforce the overtone structure of the fundamental.
+---
 
-12-TET slightly detunes every interval except the octave so that all 12 keys are playable without retuning. A just-intonation perfect fifth is exactly 1.5 (702 cents); in 12-TET it is $2^{7/12} \approx 1.4983$ (700 cents). The 2-cent discrepancy is imperceptible to most listeners. The major third diverges more sharply: just intonation gives 5:4 = 1.25 (386 cents), while 12-TET gives $2^{4/12} \approx 1.2599$ (400 cents), a 14-cent discrepancy that is audible and explains the "bright" quality of equally-tempered major thirds in direct comparison.
+## Part 2: Scales as Hand Shapes, Not Number Sequences
 
-### Scale Construction: The Semitone Architecture
+A scale's semitone pattern (W-W-H-W-W-W-H for major) matters because it determines *where your fingers physically go*. Treat the pattern as a fingering rule, not trivia.
 
-A scale is an ordered set of pitches spanning an octave, defined by a fixed pattern of semitone intervals. The **major scale** (Ionian mode) follows the interval pattern 2-2-1-2-2-2-1, where each number is the semitone distance between consecutive scale degrees:
+### 2.1 Piano: C Major Scale, Right Hand
 
-| Degree | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8(1) |
-|--------|---|---|---|---|---|---|---|------|
-| Interval from root (semitones) | 0 | 2 | 4 | 5 | 7 | 9 | 11 | 12 |
-| Step from previous | — | 2 | 2 | 1 | 2 | 2 | 2 | 1 |
+Standard fingering, one octave ascending:
 
-The **natural minor scale** (Aeolian mode) uses the pattern 2-1-2-2-1-2-2:
+| Degree | C | D | E | F | G | A | B | C |
+|--------|---|---|---|---|---|---|---|---|
+| Finger (RH) | 1 | 2 | 3 | 1 | 2 | 3 | 4 | 5 |
 
-| Degree | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8(1) |
-|--------|---|---|---|---|---|---|---|------|
-| Interval from root (semitones) | 0 | 2 | 3 | 5 | 7 | 8 | 10 | 12 |
-| Step from previous | — | 2 | 1 | 2 | 2 | 1 | 2 | 2 |
+The thumb (1) crosses under after the 3rd finger plays E, landing on F. This thumb-cross is the single most important mechanical event in the scale — it's where beginners rush or stumble. Left hand descending uses the mirror logic: 5-4-3-2-1-3-2-1.
 
-The critical difference is the third degree: the major scale places it at +4 semitones (a major third), the minor scale at +3 semitones (a minor third). This single-semitone shift is responsible for the perceptual distinction between "bright" (major) and "dark" (minor) tonalities.
+**Drill — Hanon-style scale isolation:**
+1. Practice only the thumb-cross (E→F, finger 3 to finger 1) in isolation, both hands, 20 reps.
+2. Full one-octave scale, hands separately: metronome 60 BPM, quarter notes, for 2 minutes.
+3. Hands together, same tempo, for 2 minutes. Listen for the thumb-cross causing a rhythmic bump — if you hear one, slow down.
+4. Progress 60 → 80 → 100 → 120 BPM, two octaves, only advancing once the previous tempo is bump-free.
+
+Posture check while doing this: fingers curved as if holding a small ball, wrist level with the forearm (not cocked up or sagging), weight transferred from the forearm into the fingertip rather than stabbed from the finger joint alone. A sagging wrist is the #1 cause of tension injuries in developing pianists.
+
+### 2.2 Bass Guitar: C Major Scale, One Position
+
+On bass, in the lower register (frets 1–5), use Simandl 1-2-4 fingering, never one-finger-per-fret — your hand doesn't have the reach, and OFPF in this range strains the webbing between fingers 3 and 4.
+
+Starting on the A string, 5th fret (C):
+
+| String | Fret | Note | Finger |
+|--------|------|------|--------|
+| A | 5 | C | 1 |
+| A | 7 | D | 4 (reach, or shift) |
+| D | 2 | E | 1 |
+| D | 3 | F | 2 |
+| D | 5 | G | 4 |
+| D | 7 | A | shift, finger 1 |
+| G | 2 | B | 1 |
+| G | 3 | C | 2 |
+
+In practice, most bassists play this scale by shifting position rather than stretching finger 4 to fret 7 from a fret-5 anchor. The rule: **anchor the thumb on the back of the neck roughly opposite the middle finger**, keep the wrist straight (not bent toward the palm), and let position shifts happen from elbow and arm motion, not by overextending fingers 1 and 4.
+
+**Floating thumb muting:** while playing on the D string, rest your plucking-hand thumb on the A string. This kills sympathetic ringing from the open/lower string without you having to think about it mid-phrase. Reset the thumb to the new adjacent lower string every time you cross strings.
+
+**Drill:** Metronome 50 BPM, eighth notes, scale up and down, two full octaves using position shifts. Advance by 10 BPM only when you can play 4 consecutive clean reps with zero fret buzz.
+
+### 2.3 Guitar: C Major Scale via CAGED, Position 1 ("C shape")
+
+The CAGED system gives you five movable scale/chord zones across the neck. For C major in open position:
+
+```
+e|--0--1--3--|
+B|--1--3-----|
+G|--0--2-----|
+D|--0--2--3--|
+A|--0--2--3--|
+E|--0--1--3--|
+```
+
+Fret numbers shown; fingering follows one-finger-per-fret logic above the 4th fret but in open position use fingers 1 (fret 1), 2 (fret 2), 3 (fret 3), leaving open strings unfretted. Picking: alternate (down-up-down-up) for even note spacing; switch to economy picking (continue in the same direction when crossing to an adjacent string in the same picking direction) once you reach 120+ BPM, since strict alternation wastes motion at speed.
+
+**Drill:** metronome 70 → 90 → 110 BPM, strict alternate picking, full scale ascending/descending, palm-mute the strings you're not playing with the picking-hand edge to kill open-string ring.
+
+### 2.4 The Minor Scale: One Semitone, Total Mood Shift
+
+Natural minor differs from major only at the 3rd, 6th, and 7th degrees — each lowered by a semitone (W-H-W-W-H-W-W). On piano, this means the C minor scale fingering is *identical* to C major (1-2-3-1-2-3-4-5) — only the black/white key choice changes (Eb, Ab, Bb instead of E, A, B). Play C major then C minor back to back, same fingering, and listen to the mood flip entirely from one finger's worth of pitch change at the third degree. That's the whole emotional engine of major/minor tonality, felt under your hand rather than read as a table.
 
 ```mermaid
 graph LR
-    subgraph sub_major_scale__2_2_1_2_2_2_1 ["Major Scale: 2-2-1-2-2-2-1"]
-        R1["Root<br/>0 st"] -->|"+2"| D1["2nd<br/>2 st"]
-        D1 -->|"+2"| E1["3rd<br/>4 st"]
-        E1 -->|"+1"| F1["4th<br/>5 st"]
-        F1 -->|"+2"| G1["5th<br/>7 st"]
-        G1 -->|"+2"| A1["6th<br/>9 st"]
-        A1 -->|"+2"| B1["7th<br/>11 st"]
-        B1 -->|"+1"| O1["Octave<br/>12 st"]
-    end
-    subgraph sub_natural_minor_scale__2_1_2_2_1_2 ["Natural Minor Scale: 2-1-2-2-1-2-2"]
-        R2["Root<br/>0 st"] -->|"+2"| D2["2nd<br/>2 st"]
-        D2 -->|"+1"| Eb2["3rd<br/>3 st"]
-        Eb2 -->|"+2"| F2["4th<br/>5 st"]
-        F2 -->|"+2"| G2["5th<br/>7 st"]
-        G2 -->|"+1"| Ab2["6th<br/>8 st"]
-        Ab2 -->|"+2"| Bb2["7th<br/>10 st"]
-        Bb2 -->|"+2"| O2["Octave<br/>12 st"]
+    subgraph sub_major_minor_hand ["Same Fingering, Different Color"]
+        FING["RH fingering: 1-2-3-1-2-3-4-5<br/>(identical for both scales)"] --> MAJ["C Major: C D E F G A B<br/>3rd degree = E (bright)"]
+        FING --> MIN["C Minor: C D Eb F G Ab Bb<br/>3rd degree = Eb (dark)"]
     end
 ```
 
-### Chord Construction: Stacking Thirds
+### 2.5 Scale Reference Table (All Instruments, C Tonic)
 
-A chord is a simultaneous sounding of three or more pitches. Triads — the foundational chord type — are built by stacking two thirds on a root pitch. The quality of those thirds (major = 4 semitones, minor = 3 semitones) determines the chord quality:
+| Scale | Pattern | Notes | Piano RH fingering (1 octave) |
+|-------|---------|-------|-------------------------------|
+| Major (Ionian) | W-W-H-W-W-W-H | C D E F G A B | 1-2-3-1-2-3-4-5 |
+| Natural minor (Aeolian) | W-H-W-W-H-W-W | C D Eb F G Ab Bb | 1-2-3-1-2-3-4-5 |
+| Dorian | W-H-W-W-W-H-W | C D Eb F G A Bb | 1-2-3-1-2-3-4-5 |
+| Mixolydian | W-W-H-W-W-H-W | C D E F G A Bb | 1-2-3-1-2-3-4-5 |
+| Harmonic minor | W-H-W-W-H-WH-H | C D Eb F G Ab B | 1-2-3-1-2-3-4-5 |
+| Melodic minor (asc.) | W-H-W-W-W-W-H | C D Eb F G A B | 1-2-3-1-2-3-4-5 |
 
-| Chord Quality | Lower Third | Upper Third | Total from Root | Example (C root) |
-|---------------|-------------|-------------|-----------------|-------------------|
-| Major | Major (+4) | Minor (+3) | +7 (perfect 5th) | C–E–G |
-| Minor | Minor (+3) | Major (+4) | +7 (perfect 5th) | C–Eb–G |
-| Diminished | Minor (+3) | Minor (+3) | +6 (diminished 5th) | C–Eb–Gb |
-| Augmented | Major (+4) | Major (+4) | +8 (augmented 5th) | C–E–G# |
+(WH = augmented second, 3 semitones — the characteristic exotic leap in harmonic minor.)
 
-Seventh chords extend the triad by stacking an additional third. The **dominant seventh chord** (e.g., C7) adds a minor seventh (+10 semitones from root) to a major triad: C–E–G–Bb. This creates harmonic tension because the interval between the third (E) and seventh (Bb) is a tritone — six semitones, the most dissonant interval in the system — which resolves inward by step in typical voice-leading patterns (E→F, Bb→A in the key of F major).
+---
+
+## Part 3: Chords You Can Grip Right Now
+
+### 3.1 Why Thirds Stack the Way They Do
+
+A triad is root + third + fifth. The *quality* of the lower third decides whether the chord sounds major or minor — this is the same single-semitone mechanism as the scale's 3rd degree. Memorize this as hand shapes, not ratios:
+
+| Quality | Formula | Piano LH shape (root C) | Guitar open-position grip |
+|---------|---------|--------------------------|----------------------------|
+| Major | R, +4, +7 | C-E-G, fingers 5-3-1 | C: x-3-2-0-1-0 |
+| Minor | R, +3, +7 | C-Eb-G, fingers 5-3-1 | Cm (barre): x-3-1-0-1-3 |
+| Diminished | R, +3, +6 | C-Eb-Gb, fingers 5-3-1 | rare open form; use barre |
+| Augmented | R, +4, +8 | C-E-G#, fingers 5-2-1 | symmetrical, movable by minor 3rds |
+
+### 3.2 Piano: Rootless Jazz Voicings (The Voicing You'll Actually Use)
+
+Real jazz comping rarely plays the root in the right hand — the bassist already has it. Learn these two rootless shapes for a dominant 7th and a minor 7th; they're the voicings behind 90% of jazz piano comping.
+
+**C7 rootless (Type A voicing), right hand:** E - G - Bb - D (3rd, 5th, b7th, 9th), fingers 1-2-3-5 or 1-2-4-5 depending on hand size.
+
+**Cm7 rootless (Type A voicing):** Eb - G - Bb - D (b3rd, 5th, b7th, 9th), same fingers.
+
+**ii-V-I drill in F major** (Gm7 - C7 - Fmaj7), right hand only, left hand plays roots an octave below:
+
+| Chord | RH voicing (bottom to top) |
+|-------|------------------------------|
+| Gm7 | F - Bb - D - A |
+| C7 | E - A - Bb - D (or E-G-Bb-D) |
+| Fmaj7 | E - A - C - E |
+
+Metronome 60 BPM, one chord per bar (whole notes), left hand plays the root as a half note on beats 1 and 3. Once smooth, move the whole progression up a whole step (Am7-D7-Gmaj7) and repeat — this builds the voicing as a transposable shape instead of a memorized spelling.
+
+### 3.3 Guitar: CAGED Triad Shapes Across the Neck
+
+The same C major triad (C-E-G) appears in five positions as you move up the neck. Learn all five before calling a chord "known":
+
+```
+C shape (open):      x-3-2-0-1-0
+A shape (3rd fret):  x-3-5-5-5-3
+G shape (5th fret):  3-5-5-4-3-3 (barre)
+E shape (8th fret):  8-10-10-9-8-8 (barre)
+D shape (10th fret): x-x-10-12-13-12
+```
+
+**Drill:** play the C shape, then slide to the nearest CAGED shape up the neck without lifting your strumming hand's rhythm — this is how you learn to voice-lead chord changes smoothly instead of jumping position blindly. Metronome 70 BPM, one chord shape per 2 bars, cycle through all five C-major CAGED shapes ascending the neck, then descend.
+
+### 3.4 Bass: Dominant 7th Arpeggio Box (C7)
+
+Root-3rd-5th-b7th box pattern starting on the A string:
+
+| String | Fret | Degree |
+|--------|------|--------|
+| A | 3 | C (root) |
+| A | 7 | E (3rd) — or D string fret 2 |
+| D | 5 | G (5th) |
+| D | 7 | Bb (b7th) |
+
+Use Simandl 1-2-4 fingering for frets 3-5-7 if staying in position (finger 1 on fret 3, finger 2 bridges to fret 5, finger 4 reaches fret 7). This is the "walking bass" box you'll use constantly over blues and jazz dominant chords — practice outlining it in quarter notes under a C7 vamp at 80 BPM before trying to connect it with chromatic approach tones (e.g., B natural approaching C from below, or Db approaching C from above on the beat before the chord change).
+
+### 3.5 The Tritone: Why Dominant 7th Chords Pull Toward Resolution
+
+In C7 (C-E-G-Bb), the interval between E and Bb is a tritone — six semitones, the most unstable interval in the system, equidistant from both notes of the octave. Your ear wants it to resolve. In the standard V7-I cadence (C7 → F major), the tritone resolves by each note moving in by a half or whole step: E rises to F, Bb falls to A.
+
+**Ear-training drill:** play C7 then immediately F major on piano or guitar, 10 times, listening specifically to the E→F and Bb→A motion. Then play C major → F major (no tritone) back to back and compare — the resolution is audibly weaker without the tritone pulling it. This single exercise explains more about functional harmony than any amount of chord-table memorization.
 
 ```mermaid
 graph TD
-    subgraph sub_c_major_triad__stacking_thirds ["C Major Triad (Stacking Thirds)"]
-        C_M["C4 — Root (0 st)"] --> E_M["E4 — Major 3rd (+4 st)"]
-        E_M --> G_M["G4 — Perfect 5th (+7 st)"]
-    end
-    subgraph sub_c_minor_triad ["C Minor Triad"]
-        C_m["C4 — Root (0 st)"] --> Eb_m["Eb4 — Minor 3rd (+3 st)"]
-        Eb_m --> G_m["G4 — Perfect 5th (+7 st)"]
-    end
-    subgraph sub_c_dominant_7th__c7 ["C Dominant 7th (C7)"]
-        C_7["C4 — Root (0 st)"] --> E_7["E4 — Major 3rd (+4 st)"]
-        E_7 --> G_7["G4 — Perfect 5th (+7 st)"]
-        G_7 --> Bb_7["Bb4 — Minor 7th (+10 st)"]
-        E_7 -.->|"tritone (6 st)"| Bb_7
+    subgraph sub_dominant_resolution ["C7 → F Major: The Tritone Resolves"]
+        C7["C7: C-E-G-Bb"] -->|"E rises (half step)"| F1["F"]
+        C7 -->|"Bb falls (whole step)"| A1["A"]
+        F1 --> FMAJ["F major triad: F-A-C"]
+        A1 --> FMAJ
     end
 ```
 
-### The Circle of Fifths
+---
 
-The circle of fifths organizes the 12 chromatic pitch classes by perfect-fifth relationships. Moving clockwise, each step ascends by a perfect fifth (7 semitones) and adds one sharp to the key signature. Moving counterclockwise, each step descends by a perfect fifth (equivalently ascends by a perfect fourth, 5 semitones) and adds one flat. The enharmonic intersection occurs at F#/Gb (6 sharps / 6 flats).
+## Part 4: The Circle of Fifths as a Practice and Transposition Tool
+
+The circle of fifths isn't trivia — it's the fastest way to (a) find key signatures, (b) transpose a tune on the spot, and (c) understand why certain chord progressions (ii-V-I, vi-ii-V-I) feel inevitable.
 
 ```mermaid
 graph TD
-    C["C major<br/>0 sharps"] -->|"+1 ♯"| G["G major<br/>1 ♯"]
-    G -->|"+1 ♯"| D["D major<br/>2 ♯"]
-    D -->|"+1 ♯"| A["A major<br/>3 ♯"]
-    A -->|"+1 ♯"| E["E major<br/>4 ♯"]
-    E -->|"+1 ♯"| B["B major<br/>5 ♯"]
-    B -->|"+1 ♯"| Fs["F♯ major<br/>6 ♯"]
-    Fs -->|"+1 ♯"| Cs["C♯ major<br/>7 ♯"]
-    C -->|"+1 ♭"| F["F major<br/>1 ♭"]
-    F -->|"+1 ♭"| Bb["B♭ major<br/>2 ♭"]
-    Bb -->|"+1 ♭"| Eb["E♭ major<br/>3 ♭"]
-    Eb -->|"+1 ♭"| Ab["A♭ major<br>4 ♭"]
-    Ab -->|"+1 ♭"| Db["D♭ major<br/>5 ♭"]
-    Db -->|"+1 ♭"| Gb["G♭ major<br/>6 ♭"]
-    Gb -->|"+1 ♭"| Cb["C♭ major<br/>7 ♭"]
-    Fs -.->|"enharmonic"| Gb
+    C["C major — 0 sharps/flats"] -->|"+1 sharp"| G["G major — 1♯"]
+    G -->|"+1 sharp"| D["D major — 2♯"]
+    D -->|"+1 sharp"| A["A major — 3♯"]
+    A -->|"+1 sharp"| E["E major — 4♯"]
+    E -->|"+1 sharp"| B["B major — 5♯"]
+    B -->|"+1 sharp"| Fs["F♯ major — 6♯"]
+    C -->|"+1 flat"| F["F major — 1♭"]
+    F -->|"+1 flat"| Bb["B♭ major — 2♭"]
+    Bb -->|"+1 flat"| Eb["E♭ major — 3♭"]
+    Eb -->|"+1 flat"| Ab["A♭ major — 4♭"]
+    Ab -->|"+1 flat"| Db["D♭ major — 5♭"]
+    Db -->|"+1 flat"| Gb["G♭ major — 6♭"]
+    Fs -.->|"enharmonic (same pitch)"| Gb
 ```
 
-The circle of fifths is not an arbitrary diagram — it falls directly out of the mathematics of 12-TET. Since $7 \times 12 = 84$ and $84 \mod 12 = 0$, ascending by perfect fifths 12 times returns to the starting pitch class. The same holds for fourths ($5 \times 12 = 60$, $60 \mod 12 = 0$). This modular arithmetic property is what makes the chromatic universe finite and cyclic under fifth-transposition.
+**Practical use 1 — instant key signatures:** count steps clockwise from C to get sharps, counterclockwise to get flats. Three steps clockwise (G, D, A) = A major has 3 sharps. You should be able to name any key's accidentals in under 2 seconds; drill this with flashcards until automatic.
 
-## Lab Setup
+**Practical use 2 — transposing a horn chart on sight:** if a trumpet player hands you a chart in Bb and you play a C instrument, find Bb on the circle, move however many steps the transposition requires, and read the new key signature directly off the circle instead of doing interval math mid-performance.
 
-This laboratory uses the `music21` toolkit (MIT License), developed by Michael Cuthbert at MIT. `music21` provides a comprehensive framework for symbolic music computation, including pitch, interval, scale, chord, meter, and voice-leading primitives.
+**Practical use 3 — ii-V-I drilling around the whole circle.** This is the single most valuable jazz practice routine: play ii-V-I in every key, moving around the circle of fifths (C → F → Bb → Eb...). On piano, use the rootless voicings from section 3.2, transposing the shape up a fourth each time. Metronome 50 BPM, one key per 4 bars, all the way around all 12 keys without stopping — this builds both harmonic fluency and the physical transposition reflex.
 
-Install `music21` via pip:
+---
+
+## Part 5: Intervals — The Melodic/Harmonic Divide
+
+A critical distinction many players never internalize: **intervals within a scale are mostly dissonant, and that's fine.** The major scale is built entirely from whole and half steps (M2 and m2), both dissonant intervals — consonance in tonal music is a harmonic (vertical, simultaneous) property, not a melodic (horizontal, sequential) one. Nobody minds a dissonant melodic step because it resolves by continuing the line; what matters harmonically is which notes stack *at the same time*.
+
+### 5.1 Sight-Singing / Ear-Training Interval Drill
+
+Sing or play these interval pairs, ascending, from any starting pitch, until you can identify each by ear without the piano:
+
+| Interval | Semitones | Mnemonic (first two notes of a familiar tune) |
+|----------|-----------|-----------------------------------------------|
+| m2 | 1 | "Jaws" theme |
+| M2 | 2 | "Happy Birthday" (first two notes) |
+| m3 | 3 | "Greensleeves" opening |
+| M3 | 4 | "Kumbaya" / "Oh When the Saints" |
+| P4 | 5 | "Here Comes the Bride" |
+| A4 (tritone) | 6 | "The Simpsons" theme opening leap |
+| P5 | 7 | "Twinkle Twinkle Little Star" |
+| m6 | 8 | "The Entertainer" opening |
+| M6 | 9 | "My Bonnie Lies Over the Ocean" |
+| m7 | 10 | "There's a Place for Us" (Bernstein) leap |
+| M7 | 11 | "Take On Me" chorus leap |
+| P8 | 12 | "Somewhere Over the Rainbow" |
+
+**Drill procedure:** have a partner (or a randomized interval-trainer app) play two notes; name the interval within 3 seconds. Start untimed for accuracy, then add the 3-second constraint once you're above 80% correct. Do this for 10 minutes daily — this is the single highest-leverage ear-training exercise for any instrumentalist.
+
+### 5.2 Inversion as a Fretboard/Keyboard Shortcut
+
+Flipping an interval (playing the lower note an octave higher) follows a predictable rule: major becomes minor and vice versa, perfect stays perfect, and the interval number complements to 9 (a 3rd inverts to a 6th, a 4th to a 5th). Practically: if you know the C-E major 3rd shape on guitar, you already know the E-C minor 6th shape — it's the same two notes, reordered. This halves the amount of shape-memorization needed for harmony work.
+
+---
+
+## Part 6: Putting It Together — A 30-Minute Daily Practice Routine
+
+| Time | Activity | Target |
+|------|----------|--------|
+| 0–5 min | Major + minor scale, your main instrument, hands/positions as above | Clean at a comfortable tempo, then +10 BPM from yesterday |
+| 5–10 min | Triad/7th chord shape drill (rootless voicings on piano, CAGED on guitar, arpeggio box on bass) | Zero buzz/muffled notes, smooth position shifts |
+| 10–15 min | ii-V-I around the circle of fifths, 2–4 keys per session | Clean voice-leading, no root-finding hesitation |
+| 15–20 min | Interval ear training (table in 5.1) | ≥80% ID accuracy within 3 seconds |
+| 20–30 min | Repertoire or improvisation applying the above over a backing track or metronome | Apply voicings/scale fragments in musical context, not isolated drilling |
+
+Progress the metronome by 10 BPM only when the current tempo is error-free for 4 consecutive repetitions — rushing tempo before accuracy is the most common cause of plateaued technique.
+
+---
+
+## Appendix: `music21` for Programmatic Verification (Optional, for Musician-Coders)
+
+If you also write software and want to verify theory claims computationally — confirming a voicing's interval content, batch-transposing a lead sheet, or generating practice MIDI files — `music21` is the standard toolkit.
 
 ```bash
 pip install "music21>=9.1"
-```
-
-Verify the installation and check the version:
-
-```bash
 python -c "import music21; print(music21.__version__)"
 ```
 
-A working Python 3.9+ environment is required. The lab assumes familiarity with Python and with the theoretical concepts introduced above. Each exercise is self-contained and designed to be run as an independent script or interactively in a REPL.
-
-```mermaid
-graph TD
-    subgraph sub_music21_object_hierarchy ["music21 Object Hierarchy"]
-        Score["Score / Stream"] --> Part["Part"]
-        Part --> Measure["Measure"]
-        Measure --> Note["Note"]
-        Measure --> Chord["Chord"]
-        Measure --> Rest["Rest"]
-        Measure --> TS["TimeSignature"]
-        Measure --> KS["KeySignature"]
-        Note --> Pitch["Pitch"]
-        Pitch --> NName["name (e.g. 'C#4')"]
-        Pitch --> NMidi["midi (integer 0–127)"]
-        Pitch --> NFreq["frequency (Hz, float)"]
-        Chord --> Pitches["List of Pitch objects"]
-    end
-```
-
-## Exercise 1: Foundational Practical Implementation
-
-This exercise constructs a C major scale and C major triad programmatically, inspects the internal representation, and exports both to MIDI. The code includes frequency computation and interval labeling to demonstrate the connection between symbolic and acoustic representations.
-
 ```python
 """
-Exercise 1: Foundational Practical Implementation
-Construct and inspect C major scale and C major triad.
+Verify the ii-V-I rootless voicings from Section 3.2 and confirm
+the tritone resolution mechanics from Section 3.5.
 """
-
-from music21 import scale, chord, stream, note, pitch, environment
-import logging
-import os
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-
-# Suppress music21's internal verbose output during import/analysis
-env = environment.Environment()
-env["warnings"] = False
-
-
-def print_separator(title: str) -> None:
-    width = 60
-    logger.info(f"\n{'=' * width}\n{title.center(width)}\n{'=' * width}")
-
-
-def analyze_pitch(p: pitch.Pitch) -> str:
-    """Return a formatted string with pitch name, MIDI number, and frequency."""
-    return (
-        f"{p.nameWithOctave:<6} "
-        f"MIDI={p.midi:>3}  "
-        f"freq={p.frequency:>8.2f} Hz  "
-        f"interval_from_C4={p - pitch.Pitch('C4')}"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Part A: C Major Scale
-# ---------------------------------------------------------------------------
-print_separator("C Major Scale Construction")
-
-c_major = scale.MajorScale("C")
-logger.info(f"Scale type: {c_major.type}")
-logger.info(f"Tonic: {c_major.tonic}")
-logger.info(f"Relative minor: {c_major.relative.minor.tonic}")
-
-# Generate one octave: C4 through C5 inclusive
-c_major_notes = c_major.getPitches("C4", "C5")
-logger.info(f"\nNotes generated: {len(c_major_notes)}")
-logger.info("Pitch analysis:")
-for p in c_major_notes:
-    logger.info(f"  {analyze_pitch(p)}")
-
-# Verify semitone pattern against the theoretical 2-2-1-2-2-2-1
-semitone_steps = [c_major_notes[i+1].midi - c_major_notes[i].midi
-                  for i in range(len(c_major_notes) - 1)]
-logger.info(f"\nSemitone intervals between consecutive notes: {semitone_steps}")
-assert semitone_steps == [2, 2, 1, 2, 2, 2, 1], \
-    f"Expected [2, 2, 1, 2, 2, 2, 1], got {semitone_steps}"
-logger.info("Verified: semitone pattern matches theoretical major scale (2-2-1-2-2-2-1)")
-
-# Build a stream and insert the notes
-scale_stream = stream.Stream()
-scale_stream.insert(0, note.Note("C4"))  # placeholder to establish context
-for n in [note.Note(p) for p in c_major_notes]:
-    scale_stream.append(n)
-
-# Remove the placeholder
-scale_stream.remove(scale_stream[0])
-
-# Display as text
-print_separator("Stream Text Representation")
-scale_stream.show("text")
-
-# Write to MIDI
-output_dir = "output"
-os.makedirs(output_dir, exist_ok=True)
-midi_path = os.path.join(output_dir, "c_major_scale.mid")
-scale_stream.write("midi", midi_path)
-logger.info(f"\nMIDI written to: {os.path.abspath(midi_path)}")
-
-# ---------------------------------------------------------------------------
-# Part B: C Major Triad
-# ---------------------------------------------------------------------------
-print_separator("C Major Triad Construction")
-
-c_major_chord = chord.Chord(["C4", "E4", "G4"])
-logger.info(f"Chord: {c_major_chord.commonName}")
-logger.info(f"Root: {c_major_chord.root()}")
-logger.info(f"Bass: {c_major_chord.bass()}")
-logger.info(f"Quality: {c_major_chord.quality}")
-
-# Display interval structure
-intervals = c_major_chord.intervalVector
-logger.info(f"Interval vector (ICF): {intervals}")
-
-# Pitch details
-logger.info("\nPitch analysis:")
-for p in c_major_chord.pitches:
-    logger.info(f"  {analyze_pitch(p)}")
-
-# Verify intervals from root
-root = c_major_chord.root()
-for p in c_major_chord.pitches:
-    ivl = interval.Interval(root, p) if (interval := __import__('music21').interval) else None
-    from music21 import interval as intv_mod
-    ivl = intv_mod.Interval(root, p)
-    logger.info(f"  {p.nameWithOctave}: {ivl.name} from root ({ivl.semitones} st)")
-
-# Build a stream for the chord
-chord_stream = stream.Stream()
-chord_stream.append(c_major_chord)
-
-print_separator("Chord Stream Text Representation")
-chord_stream.show("text")
-
-midi_path_chord = os.path.join(output_dir, "c_major_chord.mid")
-chord_stream.write("midi", midi_path_chord)
-logger.info(f"\nMIDI written to: {os.path.abspath(midi_path_chord)}")
-```
-
-### Verification Checkpoints
-
-After running Exercise 1, confirm the following:
-
-1. The semitone pattern output is `[2, 2, 1, 2, 2, 2, 1]` — matching the theoretical major scale.
-2. The chord's `commonName` reports `major triad` and its `quality` is `major`.
-3. The interval from C4 to E4 is labeled `major third` (4 semitones) and from C4 to G4 is `perfect fifth` (7 semitones).
-4. The MIDI files are created in the `output/` directory and are non-zero in size.
-
-## Exercise 2: Parameter Variation and Empirical Analysis
-
-This exercise generates parallel structures in C minor and constructs a dominant seventh chord, then performs a systematic comparison of interval content, pitch-class sets, and harmonic tension metrics against the Exercise 1 outputs.
-
-```python
-"""
-Exercise 2: Parameter Variation & Empirical Analysis
-Compare C major vs. C minor scales and C major triad vs. C7 chord.
-"""
-
-from music21 import scale, chord, stream, pitch, interval
-import logging
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-
-
-def print_separator(title: str) -> None:
-    logger.info(f"\n{'=' * 60}\n{title.center(60)}\n{'=' * 60}")
-
-
-def get_semitone_pattern(notes: list) -> list:
-    """Return the semitone intervals between consecutive pitches."""
-    return [notes[i+1].midi - notes[i].midi for i in range(len(notes) - 1)]
-
-
-def get_pitch_classes(notes: list) -> list:
-    """Return the pitch class (0-11) for each note."""
-    return [p.pitchClass for p in notes]
-
-
-def analyze_chord(c: chord.Chord) -> dict:
-    """Return a structured analysis of a chord."""
-    root = c.root()
-    return {
-        "commonName": c.commonName,
-        "quality": c.quality,
-        "root": str(root),
-        "pitches": [str(p) for p in c.pitches],
-        "pitch_classes": [p.pitchClass for p in c.pitches],
-        "interval_vector": list(c.intervalVector),
-        "semitones_from_root": [
-            intv.Interval(root, p).semitones for p in c.pitches
-        ],
-        "third_quality": "major" if intv.Interval(root, c.pitches[1]).semitones == 4
-                         else "minor",
-    }
-
-
-# ---------------------------------------------------------------------------
-# Part A: C Minor Scale vs. C Major Scale
-# ---------------------------------------------------------------------------
-print_separator("Scale Comparison: C Major vs. C Natural Minor")
-
-c_major_notes = scale.MajorScale("C").getPitches("C4", "C5")
-c_minor_notes = scale.MinorScale("C").getPitches("C4", "C5")
-
-major_pattern = get_semitone_pattern(c_major_notes)
-minor_pattern = get_semitone_pattern(c_minor_notes)
-
-logger.info(f"{'Property':<30} {'C Major':<25} {'C Minor':<25}")
-logger.info(f"{'-'*30} {'-'*25} {'-'*25}")
-logger.info(f"{'Semitone pattern':<30} {str(major_pattern):<25} {str(minor_pattern):<25}")
-logger.info(f"{'Pitch classes':<30} {str(get_pitch_classes(c_major_notes)):<25} "
-            f"{str(get_pitch_classes(c_minor_notes)):<25}")
-logger.info(f"{'3rd degree (semitones)':<30} {major_pattern[0] + major_pattern[1]:<25} "
-            f"{minor_pattern[0] + minor_pattern[1]:<25}")
-logger.info(f"{'6th degree (semitones)':<30} "
-            f"{sum(major_pattern[:5]):<25} {sum(minor_pattern[:5]):<25}")
-logger.info(f"{'7th degree (semitones)':<30} "
-            f"{sum(major_pattern[:6]):<25} {sum(minor_pattern[:6]):<25}")
-
-# Identify the divergent scale degrees
-major_pcs = set(get_pitch_classes(c_major_notes))
-minor_pcs = set(get_pitch_classes(c_minor_notes))
-logger.info(f"\nDivergent pitch classes (major XOR minor): "
-            f"{major_pcs.symmetric_difference(minor_pcs)}")
-logger.info("These correspond to the 3rd, 6th, and 7th degrees — "
-            "the 'variable' degrees that define modal color.")
-
-# Write both scales to MIDI for auditory comparison
-major_stream = stream.Stream()
-minor_stream = stream.Stream()
-for n in c_major_notes:
-    major_stream.append(note.Note(n))
-for n in c_minor_notes:
-    minor_stream.append(note.Note(n))
-
-major_stream.write("midi", "output/c_major_scale.mid")
-minor_stream.write("midi", "output/c_minor_scale.mid")
-logger.info("\nMIDI files: output/c_major_scale.mid, output/c_minor_scale.mid")
-
-# ---------------------------------------------------------------------------
-# Part B: C Major Triad vs. C Dominant 7th
-# ---------------------------------------------------------------------------
-print_separator("Chord Comparison: C Major Triad vs. C7 (Dominant 7th)")
-
-c_major_triad = chord.Chord(["C4", "E4", "G4"])
-c7_chord = chord.Chord(["C4", "E4", "G4", "Bb4"])
-
-triad_analysis = analyze_chord(c_major_triad)
-c7_analysis = analyze_chord(c7_chord)
-
-logger.info(f"{'Property':<25} {'C Major Triad':<25} {'C7 (Dom. 7th)':<25}")
-logger.info(f"{'-'*25} {'-'*25} {'-'*25}")
-for key in triad_analysis:
-    logger.info(f"{key:<25} {str(triad_analysis[key]):<25} {str(c7_analysis.get(key, 'N/A')):<25}")
-
-# Tension analysis: the tritone between 3rd and 7th
-from music21 import note as m21_note
-e4 = pitch.Pitch("E4")
-bb4 = pitch.Pitch("Bb4")
-tritone = interval.Interval(e4, bb4)
-logger.info(f"\nTritone analysis (E4 to Bb4):")
-logger.info(f"  Interval name: {tritone.name}")
-logger.info(f"  Semitones: {tritone.semitones}")
-logger.info(f"  This tritone creates the characteristic tension of the "
-            f"dominant 7th chord.")
-logger.info(f"  Resolution tendency: E→F (up half step), Bb→A (down whole step) "
-            f"in the key of F major.")
-
-# Write both chords to MIDI
-chord_stream_major = stream.Stream()
-chord_stream_c7 = stream.Stream()
-chord_stream_major.append(c_major_triad)
-chord_stream_c7.append(c7_chord)
-
-chord_stream_major.write("midi", "output/c_major_chord.mid")
-chord_stream_c7.write("midi", "output/c7_chord.mid")
-logger.info("\nMIDI files: output/c_major_chord.mid, output/c7_chord.mid")
-```
-
-### Empirical Analysis Questions
-
-1. The minor scale differs from the major at exactly three scale degrees (3, 6, 7). Each is lowered by one semitone. Why does lowering only the third degree have the most dramatic perceptual effect on tonal color?
-2. The C7 chord's interval vector is `[0, 0, 0, 0, 1, 1]` (one tritone, one minor seventh in terms of interval class content). The C major triad's is `[0, 0, 1, 1, 0, 0]`. What does the presence of interval class 6 (the tritone) signal about harmonic function?
-3. Play the C major triad followed by the C7 chord in sequence. The C7 should sound restless or unresolved. Now play C7 followed by an F major triad. The tension releases. This is a V7–I cadence in F major. The tritone E–Bb resolves to the tonic and third of F (F and A).
-
-## Exercise 3: Fault Injection and Stress Testing
-
-This exercise deliberately feeds invalid inputs to `music21` to observe failure modes, then validates recovery. Understanding error behavior is essential for building robust musical software — user input in real applications is rarely clean.
-
-```python
-"""
-Exercise 3: Fault Injection & Stress Testing
-Test music21's error handling with invalid inputs and verify recovery.
-"""
-
-from music21 import scale, chord, stream, pitch
-import logging
-import traceback
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-
-
-def print_separator(title: str) -> None:
-    logger.info(f"\n{'=' * 60}\n{title.center(60)}\n{'=' * 60}")
-
-
-def test_fault(label: str, fn, *args) -> dict:
-    """
-    Execute a function with given args, capture any exception.
-    Returns a dict with 'raised', 'exception_type', 'message'.
-    """
-    result = {"label": label, "raised": False, "exception_type": None, "message": ""}
-    try:
-        fn(*args)
-        result["message"] = "No exception raised (unexpected)"
-    except Exception as e:
-        result["raised"] = True
-        result["exception_type"] = type(e).__name__
-        result["message"] = str(e)
-    return result
-
-
-def report_result(r: dict) -> None:
-    status = "CAUGHT" if r["raised"] else "MISSED"
-    logger.info(f"[{status}] {r['label']}")
-    if r["raised"]:
-        logger.info(f"  Exception: {r['exception_type']}")
-        logger.info(f"  Message: {r['message']}")
-    logger.info("")
-
-
-# ---------------------------------------------------------------------------
-# Fault Case 1: Invalid pitch name for scale tonic
-# ---------------------------------------------------------------------------
-print_separator("Fault Case 1: Invalid Scale Tonic ('Z')")
-
-result1 = test_fault(
-    "MajorScale('Z') — invalid pitch name",
-    lambda tonic: scale.MajorScale(tonic),
-    "Z"
-)
-report_result(result1)
-
-# The expected behavior: music21 raises a PitchException or similar
-# because 'Z' is not a valid diatonic pitch name.
-# Valid pitch names: C, D, E, F, G, A, B (with optional accidentals)
-
-# ---------------------------------------------------------------------------
-# Fault Case 2: Invalid note in chord construction
-# ---------------------------------------------------------------------------
-print_separator("Fault Case 2: Invalid Chord Note ('Z4')")
-
-result2 = test_fault(
-    "Chord(['C4', 'E4', 'G4', 'Z4']) — invalid pitch",
-    lambda notes: chord.Chord(notes),
-    ["C4", "E4", "G4", "Z4"]
-)
-report_result(result2)
-
-# ---------------------------------------------------------------------------
-# Fault Case 3: Empty chord
-# ---------------------------------------------------------------------------
-print_separator("Fault Case 3: Empty Chord")
-
-result3 = test_fault(
-    "Chord([]) — empty list",
-    lambda notes: chord.Chord(notes),
-    []
-)
-report_result(result3)
-
-# ---------------------------------------------------------------------------
-# Fault Case 4: Invalid octave number
-# ---------------------------------------------------------------------------
-print_separator("Fault Case 4: Invalid Octave")
-
-result4 = test_fault(
-    "Note('C99') — invalid octave",
-    lambda n: pitch.Pitch(n),
-    "C99"
-)
-report_result(result4)
-
-# ---------------------------------------------------------------------------
-# Fault Case 5: Duplicate pitches with different enharmonic spellings
-# ---------------------------------------------------------------------------
-print_separator("Fault Case 5: Enharmonic Equivalence Edge Case")
-
-result5 = test_fault(
-    "Chord(['C4', 'C#4', 'Db4']) — enharmonic duplicates",
-    lambda notes: chord.Chord(notes),
-    ["C4", "C#4", "Db4"]
-)
-report_result(result5)
-
-# C#4 and Db4 are enharmonically equivalent (both MIDI 61) but spelled differently.
-# music21 preserves the distinction — this is NOT an error, but a potential
-# source of confusion in analysis code.
-
-# ---------------------------------------------------------------------------
-# Recovery: Verify correct operation after fault injection
-# ---------------------------------------------------------------------------
-print_separator("Recovery Verification")
-
-# Correct scale
-correct_scale = scale.MajorScale("C")
-correct_notes = correct_scale.getPitches("C4", "C5")
-correct_stream = stream.Stream()
-for p in correct_notes:
-    correct_stream.append(note.Note(p))
-correct_stream.show("text")
-correct_stream.write("midi", "output/recovery_scale.mid")
-logger.info("Scale recovery: VERIFIED")
-
-# Correct chord
-correct_chord = chord.Chord(["C4", "E4", "G4", "Bb4"])
-correct_chord_stream = stream.Stream()
-correct_chord_stream.append(correct_chord)
-correct_chord_stream.show("text")
-correct_chord_stream.write("midi", "output/recovery_chord.mid")
-logger.info("Chord recovery: VERIFIED")
-
-# ---------------------------------------------------------------------------
-# Summary
-# ---------------------------------------------------------------------------
-print_separator("Fault Injection Summary")
-results = [result1, result2, result3, result4, result5]
-caught = sum(1 for r in results if r["raised"])
-logger.info(f"Total fault cases: {len(results)}")
-logger.info(f"Exceptions caught: {caught}")
-logger.info(f"Unexpected passes: {len(results) - caught}")
-logger.info("\nKey takeaway: Always validate user-supplied pitch names before "
-            "passing them to music21 constructors. A simple regex or "
-            "pitch.Pitch() pre-validation can catch errors early.")
-```
-
-## Exercise 4: Interval Computation and Analysis
-
-Intervals are the atomic units of melodic and harmonic analysis. This exercise demonstrates programmatic interval computation, inversion, and the relationship between interval names and semitone counts.
-
-```python
-"""
-Exercise 4: Interval Computation & Analysis
-Demonstrate interval arithmetic, inversion, and consonance classification.
-"""
-
-from music21 import interval, pitch
-import logging
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-
-
-def print_separator(title: str) -> None:
-    logger.info(f"\n{'=' * 60}\n{title.center(60)}\n{'=' * 60}")
-
-
-# Interval classification by consonance
-CONSONANCES = {
-    "Perfect": {"P1", "P4", "P5", "P8"},
-    "Imperfect": {"m3", "M3", "m6", "M6"},
-}
-# Everything else is dissonant
-
-
-def classify_consonance(ivl: interval.Interval) -> str:
-    """Classify an interval as consonant or dissonant."""
-    name = ivl.simpleName
-    if name in CONSONANCES["Perfect"]:
-        return "Perfect consonance"
-    elif name in CONSONANCES["Imperfect"]:
-        return "Imperfect consonance"
-    else:
-        return "Dissonance"
-
-
-# ---------------------------------------------------------------------------
-# Part A: Interval table — all intervals within one octave
-# ---------------------------------------------------------------------------
-print_separator("Interval Table: All Intervals 0-12 Semitones")
-
-c4 = pitch.Pitch("C4")
-logger.info(f"{'Semitones':<12} {'Ascending from C4':<20} {'Name':<15} "
-            f"{'Abbrev':<8} {'Classification':<22}")
-logger.info("-" * 77)
-
-for semitones in range(13):
-    target = pitch.Pitch(midi=c4.midi + semitones)
-    target.octave = c4.octave + (c4.midi + semitones) // 12
-    ivl = interval.Interval(c4, target)
-    cls = classify_consonance(ivl)
-    logger.info(f"{semitones:<12} {target.nameWithOctave:<20} "
-                f"{ivl.name:<15} {ivl.simpleName:<8} {cls:<22}")
-
-# ---------------------------------------------------------------------------
-# Part B: Interval inversion
-# ---------------------------------------------------------------------------
-print_separator("Interval Inversion: The Mirror Relationship")
-
-logger.info("Inverting an interval swaps its quality and complements its number:")
-logger.info("  Major ↔ Minor, Perfect ↔ Perfect, Augmented ↔ Diminished")
-logger.info("  Number: n ↔ 9-n (e.g., 3rd ↔ 6th, 5th ↔ 4th)\n")
-
-test_intervals = [
-    ("C4", "E4"),   # M3
-    ("C4", "Eb4"),  # m3
-    ("C4", "G4"),   # P5
-    ("C4", "Bb4"),  # m7
-    ("C4", "F#4"),  # A4 (tritone)
-    ("C4", "C5"),   # P8
-]
-
-logger.info(f"{'Original':<25} {'Name':<12} {'Inverted':<25} {'Inv. Name':<12}")
-logger.info("-" * 74)
-for p1_name, p2_name in test_intervals:
-    p1 = pitch.Pitch(p1_name)
-    p2 = pitch.Pitch(p2_name)
-    ivl = interval.Interval(p1, p2)
-    ivl_inv = ivl.invert()
-    logger.info(f"{p1_name + ' → ' + p2_name:<25} {ivl.simpleName:<12} "
-                f"{p2_name + ' → ' + p1_name:<25} {ivl_inv.simpleName:<12}")
-
-# ---------------------------------------------------------------------------
-# Part C: Melodic interval sequence analysis
-# ---------------------------------------------------------------------------
-print_separator("Melodic Interval Analysis: C Major Scale as Intervals")
-
-c_major_scale = scale.MajorScale("C").getPitches("C4", "C5")
-logger.info("Analyzing consecutive intervals in the C major scale:\n")
-
-for i in range(len(c_major_scale) - 1):
-    p1 = c_major_scale[i]
-    p2 = c_major_scale[i + 1]
-    ivl = interval.Interval(p1, p2)
-    logger.info(f"  {p1.nameWithOctave} → {p2.nameWithOctave}: "
-                f"{ivl.simpleName} ({ivl.semitones} st) — "
-                f"{classify_consonance(ivl)}")
-
-logger.info("\nThe major scale contains only major and minor seconds (whole "
-            "and half steps), which are dissonant intervals. Consonance in "
-            "tonal music emerges from the vertical (harmonic) dimension, "
-            "not the horizontal (melodic) one.")
-```
-
-## Exercise 5: Frequency Analysis and Temperament Comparison
-
-This exercise computes frequencies for all 12 chromatic pitches, compares equal-tempered frequencies against just-intonation ratios, and quantifies the deviation in cents.
-
-```python
-"""
-Exercise 5: Frequency Analysis & Temperament Comparison
-Compare 12-TET frequencies against just-intonation ratios.
-"""
-
-import math
-import logging
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-
-
-def print_separator(title: str) -> None:
-    logger.info(f"\n{'=' * 60}\n{title.center(60)}\n{'=' * 60}")
-
-
-def midi_to_freq_eq_tempered(n: int) -> float:
-    """Convert MIDI note number to frequency (Hz) using 12-TET."""
-    return 440.0 * 2 ** ((n - 69) / 12)
-
-
-def cents_diff(f1: float, f2: float) -> float:
-    """Compute the difference between two frequencies in cents."""
-    return 1200 * math.log2(f1 / f2)
-
-
-# ---------------------------------------------------------------------------
-# Part A: Chromatic frequency table
-# ---------------------------------------------------------------------------
-print_separator("Chromatic Frequency Table (12-TET)")
-
-A4_MIDI = 69
-NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-
-logger.info(f"{'Note':<6} {'MIDI':<8} {'Frequency (Hz)':<18} {'Cents from A4'}")
-logger.info("-" * 52)
-
-for semitones in range(-9, 4):  # C4 to C5
-    midi_note = A4_MIDI + semitones
-    freq = midi_to_freq_eq_tempered(midi_note)
-    note_name = NOTE_NAMES[midi_note % 12]
-    octave = midi_note // 12 - 1
-    cents_from_a4 = semitones * 100
-    logger.info(f"{note_name}{octave:<4} {midi_note:<8} {freq:<18.4f} "
-                f"{cents_from_a4:+d}")
-
-# ---------------------------------------------------------------------------
-# Part B: Just intonation vs. Equal temperament
-# ---------------------------------------------------------------------------
-print_separator("Just Intonation vs. Equal Temperament (from C4)")
-
-# Just intonation ratios from C
-just_ratios = {
-    "C":  (60, 1 / 1),      # Unison
-    "C#": (61, 25 / 24),    # Minor second (chromatic semitone)
-    "D":  (62, 9 / 8),      # Major second
-    "Eb": (63, 6 / 5),      # Minor third
-    "E":  (64, 5 / 4),      # Major third
-    "F":  (65, 4 / 3),      # Perfect fourth
-    "F#": (66, 45 / 32),    # Augmented fourth
-    "G":  (67, 3 / 2),      # Perfect fifth
-    "Ab": (68, 8 / 5),      # Minor sixth
-    "A":  (69, 5 / 3),      # Major sixth
-    "Bb": (70, 9 / 5),      # Minor seventh
-    "B":  (71, 15 / 8),     # Major seventh
+from music21 import chord, interval, pitch
+
+# Rootless voicings for Gm7 - C7 - Fmaj7 (Section 3.2)
+voicings = {
+    "Gm7":   ["F4", "Bb4", "D5", "A5"],
+    "C7":    ["E4", "A4", "Bb4", "D5"],
+    "Fmaj7": ["E4", "A4", "C5", "E5"],
 }
 
-c4_midi = 60
-c4_freq = midi_to_freq_eq_tempered(c4_midi)
+for name, notes in voicings.items():
+    c = chord.Chord(notes)
+    print(f"{name:7} -> commonName={c.commonName:28} pitches={[str(p) for p in c.pitches]}")
 
-logger.info(f"Reference: C4 = {c4_freq:.4f} Hz (12-TET)\n")
-logger.info(f"{'Note':<6} {'12-TET (Hz)':<14} {'Just (Hz)':<14} "
-            f"{'Ratio':<10} {'Δ cents':<10} {'Verdict'}")
-logger.info("-" * 75)
+# Confirm the tritone resolution mechanics (Section 3.5)
+e4, bb4 = pitch.Pitch("E4"), pitch.Pitch("Bb4")
+tt = interval.Interval(e4, bb4)
+print(f"\nTritone E4->Bb4: {tt.name}, {tt.semitones} semitones")
 
-for name, (midi_note, ratio) in just_ratios.items():
-    eq_freq = midi_to_freq_eq_tempered(midi_note)
-    just_freq = c4_freq * ratio
-    delta_cents = cents_diff(eq_freq, just_freq)
-
-    if abs(delta_cents) < 2:
-        verdict = "negligible"
-    elif abs(delta_cents) < 8:
-        verdict = "noticeable"
-    else:
-        verdict = "significant"
-
-    logger.info(f"{name:<6} {eq_freq:<14.4f} {just_freq:<14.4f} "
-                f"{ratio:<10.4f} {delta_cents:+.2f}      {verdict}")
-
-logger.info("\nKey observations:")
-logger.info("  • Perfect 5th (G): ~2 cents deviation — imperceptible")
-logger.info("  • Major 3rd (E): ~14 cents deviation — audible, the most")
-logger.info("    glaring compromise of 12-TET")
-logger.info("  • Minor 7th (Bb): ~18 cents deviation — significant,")
-logger.info("    but this interval is naturally dissonant anyway")
-logger.info("  • The octave is exact in both systems (2:1 ratio)")
+f4, a4 = pitch.Pitch("F4"), pitch.Pitch("A4")
+print("Resolution check: E4 -> F4 is", interval.Interval(e4, f4).directedSimpleName)
+print("Resolution check: Bb4 -> A4 is", interval.Interval(bb4, a4).directedSimpleName)
 ```
 
-```mermaid
-graph TD
-    subgraph sub_12_tet_vs_just_intonation_deviat ["12-TET vs Just Intonation Deviation"]
-        UNI["Unison (C)<br/>0 cents"] --> M2["Major 2nd (D)<br/>+3.91 cents"]
-        M2 --> m3["Minor 3rd (Eb)<br/>+15.64 cents"]
-        m3 --> M3["Major 3rd (E)<br/>-13.69 cents"]
-        M3 --> P4["Perfect 4th (F)<br/>-1.96 cents"]
-        P4 --> TT["Tritone (F#)<br/>-9.78 cents"]
-        TT --> P5["Perfect 5th (G)<br/>+1.96 cents"]
-        P5 --> m6["Minor 6th (Ab)<br/>+13.69 cents"]
-        m6 --> M6["Major 6th (A)<br/>-15.64 cents"]
-        M6 --> m7["Minor 7th (Bb)<br/>+17.60 cents"]
-        m7 --> M7["Major 7th (B)<br/>-11.73 cents"]
-    end
-```
+Expected output confirms `C7` reports `commonName` containing "dominant seventh," the tritone reports exactly 6 semitones, and the two resolution intervals are a minor 2nd ascending (E→F) and a major 2nd descending (Bb→A) — the exact motion you practiced by ear in Section 3.5.
 
-## Practical Cheat Sheet and Quick Reference
+---
 
-### Scale Construction
+## Quick Reference
 
-| Constructor | Scale Type | Semitone Pattern | Example Notes (C tonic) |
-|-------------|-----------|-----------------|--------------------------|
-| `scale.MajorScale('C')` | Major (Ionian) | 2-2-1-2-2-2-1 | C D E F G A B |
-| `scale.MinorScale('C')` | Natural minor (Aeolian) | 2-1-2-2-1-2-2 | C D Eb F G Ab Bb |
-| `scale.DorianScale('C')` | Dorian | 2-1-2-2-2-1-2 | C D Eb F G A Bb |
-| `scale.MixolydianScale('C')` | Mixolydian | 2-2-1-2-1-2-2 | C D E F G A Bb |
-| `scale.HarmonicMinorScale('C')` | Harmonic minor | 2-1-2-2-1-3-1 | C D Eb F G Ab B |
-| `scale.MelodicMinorScale('C')` | Melodic minor (ascending) | 2-1-2-2-2-2-1 | C D Eb F G A B |
-| `scale.ChromaticScale('C')` | Chromatic | 1-1-1-1-1-1-1-1-1-1-1-1 | C C# D D# E F F# G G# A A# B |
-| `scale.PentatonicScale('C')` | Major pentatonic | 2-2-3-2-3 | C D E G A |
-| `scale.WholeToneScale('C')` | Whole tone | 2-2-2-2-2-2 | C D E F# G# A# |
+### Scale Patterns (semitones between degrees)
 
-### Chord Construction
+| Scale | Pattern |
+|-------|---------|
+| Major | 2-2-1-2-2-2-1 |
+| Natural minor | 2-1-2-2-1-2-2 |
+| Dorian | 2-1-2-2-2-1-2 |
+| Mixolydian | 2-2-1-2-2-1-2 |
+| Harmonic minor | 2-1-2-2-1-3-1 |
 
-| Constructor | Chord Type | Semitones from Root | Example |
-|-------------|-----------|---------------------|---------|
-| `chord.Chord(['C4','E4','G4'])` | Major triad | 0-4-7 | C E G |
-| `chord.Chord(['C4','Eb4','G4'])` | Minor triad | 0-3-7 | C Eb G |
-| `chord.Chord(['C4','Eb4','Gb4'])` | Diminished triad | 0-3-6 | C Eb Gb |
-| `chord.Chord(['C4','E4','G#4'])` | Augmented triad | 0-4-8 | C E G# |
-| `chord.Chord(['C4','E4','G4','B4'])` | Major 7th (Cmaj7) | 0-4-7-11 | C E G B |
-| `chord.Chord(['C4','E4','G4','Bb4'])` | Dominant 7th (C7) | 0-4-7-10 | C E G Bb |
-| `chord.Chord(['C4','Eb4','G4','Bb4'])` | Minor 7th (Cm7) | 0-3-7-10 | C Eb G Bb |
-| `chord.Chord(['C4','Eb4','Gb4','Bb4'])` | Half-diminished (Cm7b5) | 0-3-6-10 | C Eb Gb Bb |
-| `chord.Chord(['C4','Eb4','Gb4','Bbb4'])` | Fully diminished (Cdim7) | 0-3-6-9 | C Eb Gb Bbb |
+### Triad/Seventh Formulas (semitones from root)
 
-### Key `music21` API Methods
+| Chord | Formula |
+|-------|---------|
+| Major triad | 0-4-7 |
+| Minor triad | 0-3-7 |
+| Diminished triad | 0-3-6 |
+| Augmented triad | 0-4-8 |
+| Dominant 7th | 0-4-7-10 |
+| Major 7th | 0-4-7-11 |
+| Minor 7th | 0-3-7-10 |
+| Half-diminished 7th | 0-3-6-10 |
 
-| Method | Description |
-|--------|-------------|
-| `scale.XxxScale(tonic)` | Construct a scale object with the given tonic pitch |
-| `scale.getPitches(start, end)` | Return list of Pitch objects within the range |
-| `chord.Chord(pitch_list)` | Construct a chord from a list of pitch name strings or Pitch objects |
-| `chord.root()` | Return the theoretical root pitch of the chord |
-| `chord.bass()` | Return the lowest pitch in the chord |
-| `chord.quality` | Return chord quality string: `'major'`, `'minor'`, `'diminished'`, `'augmented'` |
-| `chord.commonName` | Human-readable name: `'major triad'`, `'dominant seventh chord'` |
-| `chord.intervalVector` | 6-element tuple: counts of interval classes 1-6 present |
-| `stream.Stream()` | Container for musical objects (notes, chords, rests, metadata) |
-| `stream.append(element)` | Add an element (or list of elements) to the end of the stream |
-| `stream.show('text')` | Print a text representation of the stream's contents |
-| `stream.show('midi')` | Open a MIDI player (requires system MIDI playback configured) |
-| `stream.write('midi', path)` | Write the stream to a MIDI file |
-| `stream.write('musicxml', path)` | Write the stream to a MusicXML file |
-| `interval.Interval(p1, p2)` | Compute the interval between two pitches |
-| `interval.semitones` | Integer semitone distance of the interval |
-| `interval.simpleName` | Abbreviated name: `'M3'`, `'m7'`, `'P5'`, `'A4'`, `'d5'` |
-| `interval.invert()` | Return the inversion of the interval |
-| `pitch.Pitch(name)` | Construct a pitch from a name string (`'C#4'`) |
-| `pitch.midi` | Integer MIDI note number (0-127) |
-| `pitch.frequency` | Frequency in Hz (float), computed from MIDI note number |
-| `pitch.pitchClass` | Integer 0-11 representing the pitch class |
+### Practice Progression Checklist
 
-### Common Interval Abbreviations
-
-| Abbreviation | Full Name | Semitones | Consonance |
-|-------------|-----------|-----------|-----------|
-| P1 | Perfect unison | 0 | Perfect |
-| m2 | Minor second | 1 | Dissonance |
-| M2 | Major second | 2 | Dissonance |
-| m3 | Minor third | 3 | Imperfect |
-| M3 | Major third | 4 | Imperfect |
-| P4 | Perfect fourth | 5 | Perfect |
-| A4 / d5 | Augmented fourth / Diminished fifth (tritone) | 6 | Dissonance |
-| P5 | Perfect fifth | 7 | Perfect |
-| m6 | Minor sixth | 8 | Imperfect |
-| M6 | Major sixth | 9 | Imperfect |
-| m7 | Minor seventh | 10 | Dissonance |
-| M7 | Major seventh | 11 | Dissonance |
-| P8 | Perfect octave | 12 | Perfect |
-
-### Verification Checklist
-
-- [ ] C major scale semitone pattern equals `[2, 2, 1, 2, 2, 2, 1]`
-- [ ] C natural minor scale semitone pattern equals `[2, 1, 2, 2, 1, 2, 2]`
-- [ ] C major triad quality is `major`; semitones from root are `[0, 4, 7]`
-- [ ] C7 chord quality is `dominant`; semitones from root are `[0, 4, 7, 10]`
-- [ ] C major and C minor scales differ at pitch classes 3, 8, and 10 (Eb, Ab, Bb)
-- [ ] MIDI note 69 (A4) maps to 440.0 Hz
-- [ ] MIDI note 60 (C4) maps to approximately 261.63 Hz
-- [ ] The tritone (E to Bb) spans exactly 6 semitones
-- [ ] Interval inversion swaps major/minor quality and complements the number (n ↔ 9-n)
-- [ ] Equal-tempered perfect fifth deviates from just intonation by ~2 cents
-- [ ] Equal-tempered major third deviates from just intonation by ~14 cents
-- [ ] Invalid pitch names (e.g., `'Z'`) raise an exception, not a silent failure
+- [ ] Scale fingering clean with zero thumb-cross bump (piano) or buzz (guitar/bass) at current tempo
+- [ ] Rootless/CAGED/arpeggio-box voicing grips without looking at the hand
+- [ ] ii-V-I executed in at least 6 keys around the circle of fifths from memory
+- [ ] Interval ID drill at ≥80% accuracy within 3 seconds
+- [ ] Tritone resolution (V7→I) sung or played and clearly heard as more resolved than a plain V→I
+- [ ] Metronome tempo increased only after 4 clean consecutive reps at the current tempo

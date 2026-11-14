@@ -1,270 +1,251 @@
-# Lesson 1: Music Notation — A First-Principles Architecture of Musical Language
+# Lesson 1: Music Notation — Reading the Staff Fluently at the Instrument
 
-## 1. First-Principles Intuition & Invariants
+## 1. What Notation Actually Encodes (Read This Once, Then Go Practice)
 
-Music notation is a precision-engineered information encoding system that maps the continuous, multidimensional phenomenon of sound onto a discrete, two-dimensional visual representation. Unlike natural language, which evolved organically, Western music notation was deliberately designed over centuries to solve a specific problem: transmit musical performance instructions across time and space with minimal loss of fidelity.
+Notation maps four things onto paper: **pitch** (vertical position), **rhythm** (horizontal position + notehead shape), **dynamics** (letters/symbols), and **articulation** (marks above/below the note). It is a lossy, practical shorthand — it tells a competent musician *enough* to reconstruct the music, and leaves the rest (microtiming, exact loudness, tone color) to tradition and taste. You don't need the information theory to read music. You need to drill the four encodings until your eye sees "G major triad" instead of three separate dots.
 
-### The Core Problem: Dimensionality Reduction
-
-Musical sound exists in at least four fundamental dimensions:
-
-1. **Frequency (pitch)**: Continuous from ~20 Hz to ~20,000 Hz, but Western music discretizes this into a logarithmic scale of pitches separated by frequency ratios
-2. **Time (rhythm and duration)**: Continuous temporal flow, discretized into beats, measures, and hierarchical subdivisions
-3. **Amplitude (dynamics)**: Continuous intensity from silence to maximum loudness, coarsely quantized into discrete dynamic levels
-4. **Timbre (tone quality)**: Multidimensional spectral characteristics, indicated through instrument specification and articulation markings
-
-Music notation compresses these dimensions onto a two-dimensional staff using position (vertical axis for pitch, horizontal axis for time) augmented with symbols (for dynamics, articulation, and timbre cues). This is fundamentally a lossy compression scheme—nuances of intonation, microtiming, dynamic shading, and timbral variation that exist in live performance cannot be fully captured. The notation system evolved to preserve the invariants deemed most essential for musical identity while allowing performer interpretation to fill in the rest.
-
-### The Staff: A Quantized Pitch Grid
-
-The five-line staff is not arbitrary but represents an optimization for the perceptual range of Western diatonic music. The staff maps discrete pitches to vertical positions with a resolution of one diatonic scale step (whole tone or semitone) per line or space. This design choice reflects two constraints:
-
-1. **Perceptual resolution**: Human pitch discrimination in musical contexts clusters around the semitone (~6% frequency difference), making finer gradations unnecessary for most Western music
-2. **Visual parsability**: Five lines provide sufficient range (spanning a ninth in pitch space) while remaining visually distinct and readable at typical page distances
-
-The staff implements a **relative positioning system** rather than absolute frequency notation. The same vertical position on the staff can represent different pitches depending on the clef—a form of offset encoding that extends the system's range without adding visual complexity.
+The one piece of physics worth carrying in your head: pitch is logarithmic. Going up an octave doubles the frequency, but on the staff it's always the same visual jump of seven lines/spaces. That's why staff position, not frequency, is the right mental model — stop thinking in Hz and start thinking in steps.
 
 ```mermaid
 graph TB
-    subgraph sub_staff_encoding_system ["Staff Encoding System"]
-        A["Continuous Frequency Space<br/>(20 Hz - 20,000 Hz)"] -->|"Logarithmic discretization"| B["12-TET Pitch Classes<br/>(C, C♯, D, ... B)"]
-        B -->|"Octave + pitch class"| C["Absolute Pitch Space<br/>(C0, C♯0, ... B8)"]
-        C -->|"Clef defines mapping"| D["Staff Position<br/>(line/space)"]
-    end
-    
-    subgraph sub_clef_as_coordinate_transform ["Clef as Coordinate Transform"]
-        E["Treble Clef<br/>(G4 anchor)"] -.->|"offset +7 semitones"| D
-        F["Bass Clef<br/>(F3 anchor)"] -.->|"offset -5 semitones"| D
-        G["Alto Clef<br/>(C4 anchor)"] -.->|"offset 0 semitones"| D
+    subgraph sub_notation_map ["What You're Actually Reading"]
+        A["Vertical position"] --> B["Pitch (line/space + clef)"]
+        C["Horizontal position + notehead"] --> D["Rhythm (duration + placement in measure)"]
+        E["Letters above staff"] --> F["Dynamics (p, f, mf...)"]
+        G["Marks on noteheads"] --> H["Articulation (staccato, accent, slur)"]
     end
 ```
 
-### Clefs: Offset Encoding for Range Extension
+## 2. The Staff and Clefs — Build Instant Recognition, Not Counting
 
-A clef functions as a **coordinate system origin** that defines the mapping between staff position and pitch. The treble clef (G clef) designates the second line from the bottom as G4 (392 Hz in A440 tuning), while the bass clef (F clef) designates the fourth line from the bottom as F3 (174.6 Hz). This is analogous to setting different viewport origins in computer graphics—the same geometric pattern (five lines and four spaces) can represent different pitch ranges.
+The five-line staff gives you nine slots (5 lines + 4 spaces), each one diatonic step from its neighbor. A clef just tells you which pitch sits on which line. Stop counting up from a known line every time — that's the #1 speed killer for beginning readers. Memorize anchor points and read by shape.
 
-The specific pitches chosen for clef anchors are not arbitrary:
+### Treble clef (G clef) — anchor: G4 on the 2nd line from bottom
 
-- **Treble clef (G4)**: Centers the staff on the primary melodic range for soprano voices, violins, flutes, and right-hand piano parts (approximately E4 to F5 on-staff range)
-- **Bass clef (F3)**: Centers the staff on the bass vocal range and left-hand piano parts (approximately G2 to A3 on-staff range)
-- **Alto clef (C4)**: Centers the staff on middle C for instruments like viola, placing their primary playing range symmetrically around the middle line
+| Position | Bottom → Top |
+|---|---|
+| Lines | E4 – G4 – B4 – D5 – F5 |
+| Spaces | F4 – A4 – C5 – E5 |
 
-The 15-semitone gap between treble and bass clef anchors is deliberate: it positions the two clefs such that middle C (C4) sits just below the treble staff (one ledger line) and just above the bass staff (one ledger line), creating a continuous pitch space when the two staves are combined in the grand staff.
+Mnemonics: Lines = "**E**very **G**ood **B**oy **D**oes **F**ine." Spaces spell **FACE**.
 
-### Duration: Binary Subdivision and Temporal Hierarchy
+### Bass clef (F clef) — anchor: F3 on the 4th line from bottom
 
-Note duration encoding implements a strict binary tree structure rooted in powers of two:
+| Position | Bottom → Top |
+|---|---|
+| Lines | G2 – B2 – D3 – F3 – A3 |
+| Spaces | A2 – C3 – E3 – G3 |
 
-$$\text{duration}_n = \frac{\text{whole note}}{2^n}$$
+Mnemonics: Lines = "**G**ood **B**oys **D**o **F**ine **A**lways." Spaces = "**A**ll **C**ows **E**at **G**rass."
 
-where $n \in \{0, 1, 2, 3, 4, 5, 6, ...\}$ generates the sequence: whole, half, quarter, eighth, sixteenth, thirty-second, sixty-fourth notes.
+### Alto clef (C clef) — anchor: middle C (C4) on the middle line (viola players: this is your home clef)
 
-This binary subdivision scheme is not merely conventional but reflects deep cognitive and mathematical properties:
+| Position | Bottom → Top |
+|---|---|
+| Lines | F3 – A3 – C4 – E4 – G4 |
+| Spaces | G3 – B3 – D4 – F4 |
 
-1. **Perceptual naturalness**: Human rhythm perception operates on hierarchical metrical grids where each level subdivides into 2 or 3 sub-pulses. The binary system captures the duple aspect
-2. **Combinatorial efficiency**: Powers of two allow any duration to be expressed as a sum of binary note values without remainder (any rational duration $\frac{p}{2^n}$ is expressible)
-3. **Visual composability**: The notational shapes (filled/unfilled noteheads, stems, flags, beams) map cleanly to the binary hierarchy
-
-The whole note is defined as the reference unit, but its absolute duration is determined by the **tempo** (beats per minute) and **time signature**. In 4/4 time at 60 BPM where the quarter note receives the beat, a whole note lasts exactly 4 seconds. This separation of relative duration (notated) from absolute duration (tempo-dependent) is another dimensionality reduction: the notation captures rhythmic relationships while leaving performance speed as a separate parameter.
-
-```mermaid
-graph TD
-    A["Whole Note<br/>(1)"] -->|"÷2"| B["Half Note<br/>(1/2)"]
-    A -->|"÷2"| C["Half Note<br/>(1/2)"]
-    B -->|"÷2"| D["Quarter Note<br/>(1/4)"]
-    B -->|"÷2"| E["Quarter Note<br/>(1/4)"]
-    C -->|"÷2"| F["Quarter Note<br/>(1/4)"]
-    C -->|"÷2"| G["Quarter Note<br/>(1/4)"]
-    D -->|"÷2"| H["Eighth Note<br/>(1/8)"]
-    D -->|"÷2"| I["Eighth Note<br/>(1/8)"]
-    
-    style A fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style B fill:#161D2B,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style C fill:#161D2B,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style D fill:#0F131C,stroke:#6EE7B7,stroke-width:1px,color:#fff
-    style E fill:#0F131C,stroke:#6EE7B7,stroke-width:1px,color:#fff
-    style F fill:#0F131C,stroke:#6EE7B7,stroke-width:1px,color:#fff
-    style G fill:#0F131C,stroke:#6EE7B7,stroke-width:1px,color:#fff
-```
-
-### Invariants and Conservation Laws
-
-Music notation preserves several critical invariants:
-
-1. **Measure invariant**: Within a given time signature, the sum of note durations in each measure must equal the measure's total duration (e.g., 4 quarter notes in 4/4 time). This is enforced syntactically through barlines
-2. **Pitch spelling invariant**: Each staff position represents exactly one letter name (A–G), though it can be modified by accidentals. This ensures that harmonic and scalar relationships are visually apparent
-3. **Voice leading continuity**: In multi-voice notation, each voice maintains a continuous thread, with stem direction (up/down) and voicing separation preserving the independence of simultaneous melodic lines
-
-These invariants are not just conventions—they constitute the grammar of musical notation, and violations signal either errors or intentional extensions of the system (contemporary music often deliberately breaks these rules for expressive purposes).
-
-## 2. Core Architecture & Mechanics
-
-### The Staff System: Line-Space Encoding
-
-The five-line staff implements a bijective mapping between vertical position and diatonic pitch. Each staff position (line or space) advances by one scale degree in the prevailing diatonic collection. The staff provides nine discrete positions (five lines + four spaces), spanning a diatonic ninth (e.g., E4 to F5 in treble clef).
-
-**Treble clef (G clef) pitch mapping** with G4 on the second line:
-- Lines (bottom to top): E4, G4, B4, D5, F5
-- Spaces (bottom to top): F4, A4, C5, E5
-
-**Bass clef (F clef) pitch mapping** with F3 on the fourth line:
-- Lines (bottom to top): G2, B2, D3, F3, A3
-- Spaces (bottom to top): A2, C3, E3, G3
-
-**Alto clef (C clef)** with middle C (C4) on the middle line:
-- Lines (bottom to top): F3, A3, C4, E4, G4
-- Spaces (bottom to top): G3, B3, D4, F4
-
-The staff system extends beyond its five lines using **ledger lines**—short horizontal line segments that temporarily extend the staff above or below. Ledger lines follow the same alternating line-space pattern, maintaining the diatonic step relationship. However, excessive ledger lines reduce readability, which is why clef changes or octave transposition symbols (8va, 8vb) are introduced when music consistently sits far above or below the staff.
+**Practical rule:** treat bass clef as its own language, not "treble clef minus something." Students who translate bass clef through treble clef permanently cap their reading speed around 60 BPM. Learn it cold.
 
 ```mermaid
 graph LR
-    subgraph sub_grand_staff_architecture ["Grand Staff Architecture"]
-        A["Treble Staff<br/>(G clef)<br/>Range: ~E4-F5"] 
-        B["Bass Staff<br/>(F clef)<br/>Range: ~G2-A3"]
-        C["Middle C (C4)<br/>Bridge Pitch"]
+    subgraph sub_grand_staff ["Grand Staff Bridge"]
+        A["Treble staff<br/>E4-F5 on-staff"] --- C["Middle C (C4)<br/>one ledger line either way"]
+        B["Bass staff<br/>G2-A3 on-staff"] --- C
     end
-    
-    A ---|"Ledger line below"| C
-    B ---|"Ledger line above"| C
-    
-    style A fill:#0F131C,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style B fill:#0F131C,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style C fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#fff
 ```
 
-### Accidentals: Chromatic Offset Modifiers
+### Ledger lines
 
-The staff positions encode only the seven-note diatonic collection (C, D, E, F, G, A, B). To access the remaining five chromatic pitches in the twelve-tone equal temperament (12-TET) system, **accidentals** are used:
+Ledger lines extend the staff using the same line-space alternation. Past two ledger lines, don't count from scratch — use octave displacement: mentally drop the pitch an octave onto a staff position you know instantly, identify it, then shift back up. Example: three ledger lines above treble staff = C6, which is exactly one octave above the first-ledger-line C5.
 
-- **Sharp (♯)**: Raises the pitch by one semitone (+100 cents)
-- **Flat (♭)**: Lowers the pitch by one semitone (-100 cents)
-- **Natural (♮)**: Cancels a previous accidental, returning to the diatonic pitch
-- **Double sharp (𝄪)**: Raises by two semitones
-- **Double flat (𝄫)**: Lowers by two semitones
+## 3. Accidentals and Key Signatures — The State Machine You Must Automate
 
-Accidentals apply to all subsequent notes at the same staff position within the same measure, then reset at the barline. This is a form of **state-based encoding** where the accidental establishes a local modification that persists within its scope.
+**Accidentals** (♯ raise a semitone, ♭ lower a semitone, ♮ cancel) apply to every note at that exact staff position for the rest of the *measure*, then reset at the barline. Miss this and you'll play a wrong note on beat 3 that was correct on beat 1.
 
-The choice between enharmonic spellings (e.g., C♯ vs. D♭) is governed by harmonic context and voice leading logic. In a D major scale, the second scale degree is spelled E♮, not F♭♭, because each letter name should appear exactly once in the scale. This **pitch spelling constraint** preserves the visual representation of scale structure and functional harmony.
+**Key signatures** front-load the accidentals for the whole piece. Sharps accumulate F♯-C♯-G♯-D♯-A♯-E♯-B♯; flats accumulate B♭-E♭-A♭-D♭-G♭-C♭-F♭. Don't count them — use the identification shortcuts:
 
-### Key Signatures: Global Offset State
-
-A **key signature** is a set of accidentals placed at the beginning of each staff that establishes a persistent modification to specific pitches for the entire piece (or until a new key signature is introduced). This is an optimization: instead of writing the same accidental repeatedly, the key signature encodes the prevailing diatonic collection.
-
-Key signatures follow strict ordering rules based on the **circle of fifths**:
-
-**Sharp keys** add sharps in the order: F♯, C♯, G♯, D♯, A♯, E♯, B♯
-- G major: F♯
-- D major: F♯, C♯
-- A major: F♯, C♯, G♯
-- (continuing up to C♯ major with seven sharps)
-
-**Flat keys** add flats in the order: B♭, E♭, A♭, D♭, G♭, C♭, F♭
-- F major: B♭
-- B♭ major: B♭, E♭
-- E♭ major: B♭, E♭, A♭
-- (continuing up to C♭ major with seven flats)
-
-This ordering is not arbitrary but follows the sequence of fifths, which reflects the harmonic structure of diatonic scales. The key signature effectively **transposes the coordinate system** defined by the staff positions.
+- **Sharp keys:** the last sharp in the signature is the leading tone (7th degree). Go up a semitone → that's the major key. Signature ends on C♯? Key is D major.
+- **Flat keys:** the *second-to-last* flat is the tonic. Flats are B♭-E♭-A♭? Tonic is E♭ major. (One flat only = F major; memorize this single exception.)
 
 ```mermaid
 graph LR
-    subgraph sub_circle_of_fifths__key_signature ["Circle of Fifths: Key Signature Derivation"]
-        C["C Major<br/>(0♯ 0♭)"] -->|"+1♯ (F♯)"| G["G Major<br/>(1♯)"]
-        G -->|"+1♯ (C♯)"| D["D Major<br/>(2♯)"]
-        D -->|"+1♯ (G♯)"| A["A Major<br/>(3♯)"]
-        C -->|"+1♭ (B♭)"| F["F Major<br/>(1♭)"]
-        F -->|"+1♭ (E♭)"| Bb["B♭ Major<br/>(2♭)"]
-        Bb -->|"+1♭ (A♭)"| Eb["E♭ Major<br/>(3♭)"]
+    subgraph sub_circle_fifths ["Circle of Fifths — Key Signature Build-Up"]
+        C0["C Major (0)"] -->|"+F#"| G1["G Major (1#)"]
+        G1 -->|"+C#"| D2["D Major (2#)"]
+        D2 -->|"+G#"| A3["A Major (3#)"]
+        C0 -->|"+Bb"| F1["F Major (1b)"]
+        F1 -->|"+Eb"| Bb2["Bb Major (2b)"]
+        Bb2 -->|"+Ab"| Eb3["Eb Major (3b)"]
     end
-    
-    style C fill:#1E2636,stroke:#38BDF8,stroke-width:3px,color:#fff
-    style G fill:#161D2B,stroke:#6EE7B7,stroke-width:2px,color:#fff
-    style D fill:#161D2B,stroke:#6EE7B7,stroke-width:2px,color:#fff
-    style F fill:#161D2B,stroke:#6EE7B7,stroke-width:2px,color:#fff
 ```
 
-### Time Signatures: Metrical Framework
+## 4. Rhythm — Binary Subdivision You Can Tap
 
-A **time signature** consists of two numbers stacked vertically:
-- **Numerator**: Number of beats per measure
-- **Denominator**: Note value that receives one beat (expressed as a fraction of a whole note: 4 = quarter note, 8 = eighth note, 2 = half note)
+Durations halve: whole → half → quarter → eighth → sixteenth → thirty-second. That's it — each note is worth exactly half the one before it, which is why beaming and flags visually nest. Tempo (BPM) then converts these *relative* values into real seconds: a quarter note at 120 BPM lasts 0.5 seconds (60 ÷ BPM).
 
-Common time signatures:
-- **4/4 (common time)**: Four quarter-note beats per measure; the most prevalent meter in Western music
-- **3/4**: Three quarter-note beats per measure; waltz meter
-- **6/8**: Six eighth-note beats per measure, typically grouped as two dotted-quarter beats (compound duple meter)
-- **2/2 (cut time)**: Two half-note beats per measure; faster-feeling than 4/4 despite similar notation
-
-The denominator defines the **beat unit**, while the numerator defines the **metrical grouping**. Time signatures enforce the measure invariant: the sum of note durations in each measure must equal $\frac{\text{numerator}}{\text{denominator}}$ whole notes.
-
-**Simple vs. compound meter**: Simple meters have beat units divisible by 2 (2/4, 3/4, 4/4), while compound meters have beat units divisible by 3 (6/8, 9/8, 12/8). In 6/8, the six eighth notes are grouped into two beats of three eighths each, creating a lilting feel distinct from 3/4's three quarter-note beats.
+**Time signature** = beats per measure (top) / note value that gets one beat (bottom). 4/4 and 3/4 are simple meter (beat divides into 2); 6/8, 9/8, 12/8 are compound meter (beat divides into 3 — six eighths group as TWO beats of three, not six).
 
 ```mermaid
 graph TD
-    subgraph sub_time_signature_taxonomy ["Time Signature Taxonomy"]
-        A["Time Signature<br/>(numerator/denominator)"] --> B["Simple Meter<br/>(beat divides by 2)"]
-        A --> C["Compound Meter<br/>(beat divides by 3)"]
-        
-        B --> D["2/4: Duple Simple"]
-        B --> E["3/4: Triple Simple"]
-        B --> F["4/4: Quadruple Simple"]
-        
-        C --> G["6/8: Duple Compound"]
-        C --> H["9/8: Triple Compound"]
-        C --> I["12/8: Quadruple Compound"]
-    end
-    
-    style A fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#fff
-    style B fill:#161D2B,stroke:#6EE7B7,stroke-width:2px,color:#fff
-    style C fill:#161D2B,stroke:#6EE7B7,stroke-width:2px,color:#fff
+    W["Whole (1)"] --> H1["Half (1/2)"]
+    W --> H2["Half (1/2)"]
+    H1 --> Q1["Quarter (1/4)"]
+    H1 --> Q2["Quarter (1/4)"]
+    Q1 --> E1["Eighth (1/8)"]
+    Q1 --> E2["Eighth (1/8)"]
 ```
 
-### Dynamics: Coarse Amplitude Quantization
+## 5. Dynamics and Articulation — The Envelope of Each Note
 
-Dynamics specify relative loudness using Italian abbreviations:
+Dynamics are *ordinal*, not decibel values: pp < p < mp < mf < f < ff. Hairpins (`<` crescendo, `>` decrescendo) show gradual change. Articulation shapes attack/release: staccato (·) cuts the note to roughly half its written length, tenuto (−) holds full value with slight weight, accent (>) punches the attack, legato (slur) connects notes with zero gap, fermata holds at the performer's discretion. Think of these as a hand-drawn ADSR envelope layered on top of the pitch/rhythm grid.
 
-- **pp (pianissimo)**: Very soft
-- **p (piano)**: Soft
-- **mp (mezzo-piano)**: Moderately soft
-- **mf (mezzo-forte)**: Moderately loud
-- **f (forte)**: Loud
-- **ff (fortissimo)**: Very loud
+**Tempo terms**, approximate BPM: Largo 40–60, Adagio 66–76, Andante 76–108, Moderato 108–120, Allegro 120–168, Presto 168–200. A metronome marking (♩ = 120) removes the ambiguity entirely — use it when precision matters more than character.
 
-Extended dynamics include **ppp** (pianississimo), **fff** (fortississimo), and even further extremes in some 20th-century scores. Gradual changes are indicated by hairpin symbols: **crescendo** (<) for getting louder, **diminuendo/decrescendo** (>) for getting softer.
+## 6. Hands-On Reading Drills
 
-Dynamics are **ordinal rather than cardinal**—they specify relative loudness ordering but not absolute decibel levels. The mapping from dynamic marking to actual amplitude depends on the instrument, acoustic environment, and performer interpretation. This is another instance of lossy compression: the notation captures the salient structure (soft vs. loud, gradual vs. sudden changes) while leaving continuous parameters to real-time performance decisions.
+### Drill 1 — Treble Clef Staff Position Sprint
+Metronome 60 BPM. On each click, point to a random line/space and say the pitch name out loud before the next click. Cycle all nine positions randomly. Progress 60 → 80 → 100 BPM once you hit zero errors for two full passes.
+**Trap:** B4 (middle line) vs D5 (one line up) — B4 sits dead center of the staff, D5 is clearly above it.
 
-### Articulation: Attack and Release Shaping
+### Drill 2 — Bass Clef Staff Position Sprint
+Same procedure, bass clef only, no mental translation through treble. Anchor on F3 (4th line) and A2 (1st space) as your two reference points, read everything relative to those. 60 → 80 → 100 BPM.
 
-Articulation markings modify the attack, sustain, and release characteristics of individual notes:
+### Drill 3 — Ledger Line Navigation
+Start with one ledger line each direction (treble: D4 below, A5 above; bass: F2 below, B3 above). Name each aloud, then add a second ledger line, then a third. At three-plus, use the octave-displacement trick from Section 2.
 
-- **Staccato (·)**: Shorten the note to roughly half its written duration, with silence filling the remainder
-- **Tenuto (−)**: Hold the note for its full duration with slight emphasis
-- **Accent (>)**: Emphasize the note's attack with increased initial amplitude
-- **Marcato (^)**: Strong, separated accent; even more emphatic than accent
-- **Legato (slur/curved line)**: Play notes smoothly connected with no separation
-- **Fermata (𝄐)**: Hold the note longer than its written value (duration at performer's discretion)
+### Drill 4 — Rhythm Subdivision Grid (physical tapping)
+Metronome 60 BPM = quarter note.
+1. Right hand quarters, left hand eighths (1:2) — two taps per click, evenly spaced.
+2. Right hand quarters, left hand sixteenths (1:4) — four taps per click.
+3. Right hand dotted quarters, left hand eighths (3:2 polyrhythm) — the classic trap rhythm.
+4. Right hand half notes, left hand eighth-note triplets (1:6).
 
-These markings encode the **temporal envelope** of each note—parameters analogous to the attack-decay-sustain-release (ADSR) envelope in electronic synthesis. The notation provides discrete categories where the underlying phenomenon is continuous, relying on shared performance practice to fill in the specifics.
+Master each level at 60 BPM with zero drift before moving to 80, then 100 BPM. At 120 BPM your left hand is firing 8 sixteenths per second — that's baseline speed for fast classical/jazz reading.
 
-### Tempo: Absolute Time Scaling
+### Drill 5 — Key Signature Flash Recognition
+Flashcards (physical or app) showing a key signature on a blank staff. Name the major key AND its relative minor instantly using the shortcuts in Section 3. Timed challenge: one card per metronome click at 60 BPM, then 80 BPM.
 
-Tempo markings specify the absolute speed of the beat using either Italian terms or metronome markings:
+### Drill 6 — Interval Recognition by Staff Distance
+Reference from C4 (treble): m2/M2 = adjacent staff position, m3/M3 = two positions, P4 = three positions, P5 = four positions, octave = seven positions. Write 20 random note-pairs, identify the interval by counting positions first, adjust for accidentals second, then sing it to lock the sound to the shape. Target: 30 intervals/minute.
+**Trap:** M3 (two positions: line-space-line) vs P4 (three positions: line-space-line-space) — count the positions, don't eyeball the gap.
 
-**Traditional Italian terms** (approximate BPM ranges):
-- **Largo**: 40–60 BPM; very slow, broad
-- **Adagio**: 66–76 BPM; slow, at ease
-- **Andante**: 76–108 BPM; walking pace
-- **Moderato**: 108–120 BPM; moderate
-- **Allegro**: 120–168 BPM; fast, cheerful
-- **Presto**: 168–200 BPM; very fast
-- **Prestissimo**: 200+ BPM; as fast as possible
+### Drill 7 — Rhythmic Dictation
+Use a metronome app with a programmable click pattern, or have a practice partner clap patterns. Listen, clap it back to confirm, then notate it with correct beaming.
+- Week 1: quarters and halves only
+- Week 2: add eighths
+- Week 3: add dotted rhythms
+- Week 4: add sixteenths
+- Week 5: syncopation
 
-**Metronome markings** provide precise tempo: ♩ = 120 means 120 quarter notes per minute (one every 0.5 seconds). This removes ambiguity but sacrifices the expressive connotations of Italian terms.
+### Drill 8 — Grand Staff Clef Switching (piano)
+Hanon No. 1 or any simple two-hand exercise. Hands separately at 40 BPM first, then together at 50 BPM. Read in chunks, not note-by-note: a C major triad in either clef is "space-line-space" — recognize the whole snowman shape, not three isolated dots. Progress 40 → 60 → 80 → 100 BPM; 100 BPM hands-together is the entry speed for Bach's Two-Part Inventions.
 
-Tempo multiplies all durations by a constant factor, converting the relative time values encoded in note durations into absolute wall-clock time:
+## 7. Applied Repertoire Walkthroughs
 
-$$t_{\text{absolute}} = \frac{60}{\text{BPM}} \times \frac{\text{beats in note}}{\text{1}}$$
+### Bach — Minuet in G Major (BWV Anh. 114)
+**Setup:** Key signature 1♯ (F♯ everywhere unless cancelled). Time signature 3/4. Right hand treble (melody), left hand bass (Alberti-style accompaniment).
 
-For a quarter note at 120 BPM: $t = \frac{60}{120} \times 1 = 0.5$ seconds
+**Measure 1, right hand:** D5 (beat 1) – G4 (beat 2) – A4 (beat 3), all quarter notes.
+**Measure 1, left hand:** G2 held through the bar (dotted half, or half+quarter depending on edition).
+
+**Practice sequence:**
+1. Clap the right-hand rhythm at 60 BPM, speaking pitch names.
+2. Right hand alone at 40 BPM — every F must be F♯.
+3. Left hand alone at 40 BPM.
+4. Hands together at 40 BPM → 60 BPM (performance tempo) → 80 BPM for fluency margin.
+
+**Watch for:** forgetting the key signature on F (playing F♮), and rushing beat 3 of the waltz — keep all three beats equal weight until you intentionally shape the phrase.
+
+### Beethoven — "Ode to Joy" Theme (simplified, C major)
+Entirely stepwise quarter notes, 4/4. If you ever see a leap larger than a 3rd in this melody, you misread a note — check immediately.
+
+**Drill:** Sing the melody on note names first. Then play measures 1–4 piano and measures 5–8 forte at 60 BPM — the dynamic contrast is the actual lesson here, not the pitches.
+
+### Scott Joplin — "The Entertainer" (opening strain, right hand)
+2/4 time, C major. Beat 1 contains a sixteenth rest followed by three sixteenths — the melody enters *after* the beat, which is what makes it ragtime syncopation rather than a straight march.
+
+**Practice sequence:**
+1. Clap the rhythm on one pitch at 40 BPM, counting "1-e-and-a, 2-and" aloud.
+2. Add pitches at 40 BPM, keeping the three sixteenths perfectly even.
+3. Build to 60 BPM, then 100 BPM.
+
+**Trap:** playing those opening sixteenths on the beat instead of after it erases the syncopation entirely — it will sound like a different, boring piece.
+
+## 8. Sight-Reading Protocol
+
+**Rule one: never stop.** A wrong note that keeps tempo is recoverable; a stop breaks the one thing sight-reading is testing — your ability to keep moving forward under uncertainty.
+
+**20-minute daily routine:**
+- Weeks 1–2: rhythm only. Clap one new piece per day from a graded sight-reading book (Paul Harris, "Improve Your Sight-Reading," Grade 1), metronome 60 BPM, counting aloud. Never repeat a piece — repetition turns sight-reading into memorization.
+- Weeks 3–4: single-line melody, 50 BPM, 30-second preview allowed (key signature, time signature, contour), then play through once.
+- Weeks 5–6: grand staff, both hands, 60-second preview, 40 BPM, prioritize rhythm over pitch accuracy.
+- Week 7+: raise tempo 40 → 50 → 60 BPM, add syncopation and triplets, start tracking dynamics/articulation.
+
+**Error priority when something goes wrong mid-read:** fix rhythm first (it destroys ensemble/flow), then pitch (sounds wrong but harmony survives), then articulation/dynamics last (polish, not survival). Target 90% rhythmic accuracy and 70% pitch accuracy on a true first read — professionals don't sight-read perfectly either.
+
+**30-second preview checklist before any new piece:** key signature and tonic, time signature and beat unit, tempo marking, whether hands-separate practice is possible, and the highest/lowest pitches plus cadence points.
+
+## 9. Notation Software — Getting Music Onto the Page
+
+### Choosing a platform
+- **MuseScore** (free): best starting point, full classical/jazz/pop feature set, exports PDF/MIDI/MusicXML/audio.
+- **Sibelius** (commercial): industry standard for film scoring and publishing-grade engraving.
+- **Dorico** (commercial): newest pro tool, best engraving automation and multi-part extraction.
+- **Finale** (commercial, legacy, no longer developed): still common in older workflows.
+
+### Building a lead sheet in MuseScore (concrete steps)
+1. File → New Score → "Lead Sheet" template → set key (C major) and time signature (4/4) → 16 measures.
+2. Click measure 1 beat 1, press **N** (note input mode), press **5** (quarter note), type letter names or click the staff to enter C4-D4-E4-F4.
+3. Press **4** for eighth notes, enter G4-A4; press **6** for a half note, enter B4.
+4. Click the note under a chord change, press **Ctrl+K** (**Cmd+K** on Mac), type `Cmaj7` — it renders as a proper chord symbol. Press **Space** to advance and repeat at each chord change.
+5. Press **Space** to audition playback. Export via File → Export → PDF (print), MIDI (DAW/slow-down tools), or MusicXML (cross-platform compatibility with Sibelius/Dorico/Finale).
+
+### Universal keyboard shortcuts
+`N` note input · `Esc` exit input · `5/6/7/8` quarter/half/eighth/sixteenth duration · `↑/↓` diatonic step · `Ctrl+↑/↓` chromatic step · `R` repeat last note/passage · `Space` play/pause · `Delete` remove selection.
+
+### Multi-voice piano notation (e.g., Bach, Chopin)
+1. Open a piano (grand staff) score, click the first treble-clef note.
+2. Press **1** for Voice 1 (stems up) — enter the melody.
+3. Press **2** for Voice 2 (stems down) — enter the accompanying held notes.
+4. Press **Esc** to exit. The staff now shows two independent rhythmic layers, which is exactly how polyphonic piano writing is read and performed.
+
+## 10. Troubleshooting Common Reading Errors
+
+**Pitch reading is too slow to hold tempo.** You're reading note-by-note instead of recognizing shapes. Fix: drill intervals as shapes (Drill 6), memorize triad/seventh-chord outlines as single units, and practice re-labeling a C-major piece in scale-degree numbers (1-2-3...) instead of letter names to force pattern thinking.
+
+**Rhythm is correct in pitch but uneven in time.** Your internal pulse is weak. Fix: metronome on for every practice session for two months minimum, tap your foot on every beat even when it feels awkward, count subdivisions aloud ("1-e-and-a"). Record yourself; if tempo drifts more than 5 BPM across a passage, your pulse needs recalibration.
+
+**You forget the key signature partway through.** Fix: write the signature at the start of every line while learning (redundant but effective), say the key aloud before each line ("G major, one sharp, F♯"), and warm up on the scale of the piece's key before reading it so the accidentals are in your hands before your eyes need them.
+
+**You read bass clef as if it were treble, or vice versa.** Fix: cover one staff with paper and drill the other clef in isolation for a full week; use dedicated flashcards for the weak clef 10 minutes/day; try playing a bass-clef melody with your right hand to decouple "clef" from "hand" in your brain.
+
+**Ledger lines cause hesitation.** Fix: memorize landmark pitches just outside the staff (treble: C4 below, A5 above) and use octave displacement for anything further out — shift the note down an octave to a position you know cold, identify it, then shift back up mentally.
+
+## 11. Mastery Checklist
+
+**Weeks 1–2:**
+- [ ] Name any treble-clef line/space pitch in under 1 second
+- [ ] Name any bass-clef line/space pitch in under 1 second
+- [ ] Instantly identify key signatures up to 3 sharps/flats
+- [ ] Clap quarter/half/eighth rhythms cleanly at 60 BPM
+
+**Weeks 3–4:**
+- [ ] Sight-read simple single-clef melodies at 50 BPM, new material daily
+- [ ] Identify any interval unison–octave by staff distance
+- [ ] Play dotted rhythms and basic syncopation accurately
+- [ ] Read two ledger lines above/below the staff without hesitation
+
+**Weeks 5–8:**
+- [ ] Sight-read Grade 2 piano repertoire hands-together at 40 BPM
+- [ ] Transcribe a clapped four-beat rhythm into correct notation
+- [ ] Build a lead sheet with chord symbols in MuseScore from scratch
+- [ ] Instantly identify all 15 key signatures (0–7 sharps/flats)
+
+**Month 3+:**
+- [ ] Sight-read Grade 3–4 repertoire at 75% of marked tempo
+- [ ] Read alto and/or tenor clef fluently
+- [ ] Notate independent multi-voice piano textures
+- [ ] Pull basic harmonic analysis directly off the page (continues in Lesson 2: Harmony Fundamentals)
+
+The only way notation becomes transparent is repetition under a metronome. Treat every drill above as a strength-training exercise for your eyes and hands, not a reading comprehension test — speed comes from reps, not from understanding the system better.
