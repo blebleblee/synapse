@@ -117,6 +117,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
 
+  // Node Model Pins State
+  const [nodePins, setNodePins] = useState<{ [host: string]: string }>({});
+
+  const fetchNodePins = async () => {
+    try {
+      const res = await fetch('/api/settings/cluster-pins');
+      if (res.ok) {
+        const data = await res.json();
+        setNodePins(data.pins || {});
+      }
+    } catch (err) {
+      console.error('Failed to load node pins:', err);
+    }
+  };
+
+  const handleUpdateNodePin = async (host: string, modelName: string) => {
+    const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const updated = { ...nodePins };
+    if (!modelName || modelName === '__auto__') {
+      delete updated[cleanHost];
+      delete updated[host];
+    } else {
+      updated[cleanHost] = modelName;
+    }
+    setNodePins(updated);
+
+    try {
+      await fetch('/api/settings/cluster-pins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pins: updated })
+      });
+    } catch (err) {
+      console.error('Failed to save cluster pin:', err);
+    }
+  };
+
   const fetchPackages = async () => {
     setIsLoadingPackages(true);
     try {
@@ -153,6 +190,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     if (isOpen) {
       fetchPackages();
       fetchDiscoveredModels();
+      fetchNodePins();
     }
   }, [isOpen]);
 
@@ -556,41 +594,74 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="cluster-nodes-list">
                   {clusterNodes.map((host, idx) => {
                     const status = nodeStatuses[host];
+                    const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                    const currentPin = nodePins[cleanHost] || nodePins[host] || '__auto__';
+
                     return (
-                      <div key={host} className="cluster-node-item">
-                        <div className="node-info">
-                          <span className="node-idx">#{idx + 1}</span>
-                          <span className="node-url">{host}</span>
-                          {status && (
-                            <span
-                              className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
-                              title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                      <div key={host} className="cluster-node-item" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                          <div className="node-info">
+                            <span className="node-idx">#{idx + 1}</span>
+                            <span className="node-url">{host}</span>
+                            {status && (
+                              <span
+                                className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
+                                title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
+                              >
+                                {status.testing
+                                  ? 'Pinging...'
+                                  : status.online
+                                  ? `Online (${status.latency_ms}ms)`
+                                  : 'Offline'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="node-actions">
+                            <button
+                              type="button"
+                              className="btn-node-action"
+                              onClick={() => handlePingSingleNode(host)}
+                              title="Ping node"
                             >
-                              {status.testing
-                                ? 'Pinging...'
-                                : status.online
-                                ? `Online (${status.latency_ms}ms)`
-                                : 'Offline'}
-                            </span>
-                          )}
+                              Ping
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-node-action remove"
+                              onClick={() => handleRemoveNode(idx)}
+                              title="Remove node from cluster"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="node-actions">
-                          <button
-                            type="button"
-                            className="btn-node-action"
-                            onClick={() => handlePingSingleNode(host)}
-                            title="Ping node"
+
+                        <div className="node-pin-control" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '4px' }}>
+                          <span style={{ color: 'var(--text-muted, #888)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            📌 <strong>Pinned Model:</strong>
+                          </span>
+                          <select
+                            className="select-input"
+                            style={{ flex: 1, padding: '4px 8px', fontSize: '12px', background: 'var(--bg-secondary, #121214)', border: '1px solid rgba(255,255,255,0.1)' }}
+                            value={currentPin}
+                            onChange={(e) => handleUpdateNodePin(host, e.target.value)}
                           >
-                            Ping
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-node-action remove"
-                            onClick={() => handleRemoveNode(idx)}
-                            title="Remove node from cluster"
-                          >
-                            <Trash2 size={12} />
-                          </button>
+                            <option value="__auto__">⚡ Auto-Select (Dynamic / Best Match)</option>
+                            {status?.models && status.models.length > 0 ? (
+                              <optgroup label="Models on this Node">
+                                {status.models.map((m) => (
+                                  <option key={m} value={m}>{m}</option>
+                                ))}
+                              </optgroup>
+                            ) : null}
+                            {discoveredModels && discoveredModels.length > 0 ? (
+                              <optgroup label="All Discovered Cluster Models">
+                                {discoveredModels.map((m) => (
+                                  <option key={`disc-${m}`} value={m}>{m}</option>
+                                ))}
+                              </optgroup>
+                            ) : null}
+                          </select>
                         </div>
                       </div>
                     );
@@ -1001,8 +1072,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="form-group compact">
                   <label>Node Model Pins (.synapse_node_pins.json)</label>
                   <span className="field-hint">
-                    Resets any manually pinned models for cluster hosts back to auto-discovery mode.
+                    Current host model pin overrides. You can configure individual pins directly in the <strong>Cluster & Nodes</strong> tab.
                   </span>
+
+                  {Object.keys(nodePins).length > 0 ? (
+                    <div style={{ margin: '8px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {Object.entries(nodePins).map(([host, model]) => (
+                        <div key={host} style={{ fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '5px 8px', borderRadius: '4px' }}>
+                          <span style={{ fontFamily: 'monospace', color: 'var(--accent, #e5a93c)' }}>{host}</span>
+                          <span style={{ color: 'var(--text-muted, #aaa)' }}>📌 {model}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="field-hint" style={{ display: 'block', margin: '6px 0', fontStyle: 'italic' }}>
+                      No nodes currently pinned (dynamic selection active across all nodes).
+                    </span>
+                  )}
+
                   <button
                     type="button"
                     className="btn-secondary-sm"
@@ -1016,6 +1103,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             body: JSON.stringify({ pins: {} })
                           });
                           if (res.ok) {
+                            setNodePins({});
                             alert('Node model pins reset successfully.');
                           }
                         } catch {

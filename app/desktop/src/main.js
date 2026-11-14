@@ -147,8 +147,8 @@ function createMainWindow() {
     minHeight: 700,
     backgroundColor: '#121214',
     title: 'Synapse AI Learning Workbench',
-    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-    trafficLightPosition: { x: 14, y: 14 },
+    frame: true,
+    titleBarStyle: 'default',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
