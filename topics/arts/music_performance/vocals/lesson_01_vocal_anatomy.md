@@ -2,141 +2,137 @@
 
 ## Overview
 
-This lesson bridges the gap between anatomy and actionable technique. You will learn *why* the voice behaves the way it does — and immediately apply that understanding through physical exercises, targeted drills, and self-diagnostic tools. The original material was anatomically rigorous but performer-inaccessible. This rewrite keeps the physics where it matters and replaces the rest with exercises you can run in the practice room today.
+Your voice is a biological signal chain: **power → oscillator → filter**. Every technical flaw traces back to a breakdown in one of those three systems, or in the handoff between two of them. This lesson gives you the physical model in the minimum detail needed to make smart decisions, then spends the rest of the time on drills you run today with a metronome, a mirror, and (for one drill) a cocktail straw.
 
 **What you'll walk away with:**
-- A mental map of your respiratory, phonatory, and articulatory systems — in terms that change *how you sing*
-- Concrete warm-up and conditioning drills with tempo, duration, and progression targets
-- A self-diagnostic checklist for the most common technique failures
-- Recovery and maintenance protocols used by professional voice users
+- A working map of breath, larynx, and vocal tract that changes what you *do*, not just what you know
+- Daily drills with explicit tempo, rep, and duration progressions
+- A self-diagnostic flowchart for the three most common technique failures
+- A warm-up sequence and recovery protocol you can run before/after every rehearsal or gig
 
 ---
 
-## 1. The Three-System Architecture — Why It Matters for Technique
-
-Your voice is a **biological signal chain**: power → oscillator → filter. Every technical flaw traces back to a breakdown in one of these three systems, or in the connection between them.
+## 1. The Three-System Architecture
 
 ```mermaid
 flowchart LR
-    subgraph sub_power ["System 1: Power (Breath)"]
-        A["Diaphragm\n(Primary Inspiratory Muscle)"]
-        B["Intercostals + Abdominals\n(Expiratory Control)"]
+    subgraph sub_power ["System 1: Power — Breath"]
+        A["Diaphragm<br/>(inspiratory piston)"]
+        B["Intercostals + Abdominals<br/>(expiratory brake)"]
     end
 
-    subgraph sub_oscillator ["System 2: Oscillator (Larynx)"]
-        C["Vocal Folds\n(Pitch + Register)"]
-        D["Intrinsic Muscles\nCT · TA · LCA · IA · PCA"]
+    subgraph sub_oscillator ["System 2: Oscillator — Larynx"]
+        C["Vocal Folds<br/>(pitch, register, closure)"]
+        D["CT / TA / LCA / IA / PCA<br/>(intrinsic muscles)"]
     end
 
-    subgraph sub_filter ["System 3: Filter (Vocal Tract)"]
-        E["Pharynx · Mouth · Nose"]
-        F["Tongue · Jaw · Lips\n(Articulators)"]
+    subgraph sub_filter ["System 3: Filter — Vocal Tract"]
+        E["Pharynx, Mouth, Nose"]
+        F["Tongue, Jaw, Lips<br/>(articulators)"]
     end
 
     A --> B --> C --> D --> E --> F
-    F -->|"Radiated Sound"| G["Audience / Microphone"]
+    F -->|"Radiated sound"| G["Audience / Mic"]
 
     style sub_power fill:#e8f4fd,stroke:#3498db
     style sub_oscillator fill:#fdecea,stroke:#e74c3c
     style sub_filter fill:#eafaf1,stroke:#27ae60
 ```
 
-**Why this matters practically:** A "tight" tone is almost always a System 1 or System 3 problem, not a throat problem. A cracking register break is a System 2 coordination issue. Solving the right system first saves weeks of misdirected practice.
+**Why this matters on the practice room floor:** a "tight" or "thin" tone is almost always a System 1 (breath) or System 3 (tract shape) problem, not a throat problem. A cracking register break is a System 2 coordination issue. Diagnose which system is failing before you drill anything — singers waste months fixing resonance when the real problem is a collapsed breath support, or fixing breath when the real problem is jaw tension choking the filter.
 
 ---
 
 ## 2. System 1: Breath — Your Power Source
 
-### 2.1 The Mechanics in Plain Terms
+### 2.1 The Mechanics, in Practice Terms
 
-The diaphragm (a dome-shaped muscle beneath the lungs) contracts downward on inhale, increasing lung volume and dropping internal air pressure so air rushes in. On exhale, the diaphragm releases while the abdominal wall and intercostal muscles provide a controlled *brake* — slowing the ascent of the diaphragm to maintain steady subglottal pressure under the vocal folds.
+On inhale, the diaphragm contracts and flattens downward, the ribs flare outward and upward (think "umbrella opening"), and the belly releases forward — not because you're pushing it out, but because the descending diaphragm displaces the abdominal contents.
 
-This controlled braking is the physiological basis of **appoggio** (Italian: "to lean") — the breath support technique central to classical and contemporary trained singing alike.
+On exhale, you are **not pushing air out**. The diaphragm wants to spring back up immediately; your job is to use the intercostal muscles and abdominal wall to *brake* that return, so the ascent is slow and controlled instead of a collapse. That controlled brake is **appoggio** ("to lean") — the support mechanism underneath every trained vocal style, classical or contemporary.
 
-> **Core principle:** You are not *pushing* air out. You are *managing the rate* at which the diaphragm returns to its resting position. Good breath support is active resistance, not propulsion.
+> **Core principle:** good breath support is active resistance against collapse, not propulsion. If you feel like you're "pushing from the gut," you're doing the opposite of what works.
 
-Subglottal pressure targets by context:
+Rough subglottal pressure by context — you'll never measure this, but it explains what you feel:
 - Conversational speech: 5–8 cm H₂O
-- Legit/musical theatre singing: 10–18 cm H₂O
+- Musical theatre / legit singing: 10–18 cm H₂O
 - Classical operatic forte: 20–30 cm H₂O
 
-You will never measure this in practice — but you will *feel* it as the difference between floating on a column of air and running out in the first four bars.
+The difference between "floating on the breath" for a long phrase and gasping by bar 4 is entirely this braking mechanism, not lung capacity.
 
 ### 2.2 Breath Diagnosis: The Clavicular Test
 
-Before drilling, identify your current breathing pattern:
+Run this before drilling anything:
 
-1. Place one hand on your chest (clavicle level), one hand on your belly.
-2. Take a deep breath as if you're about to sing a long phrase.
-3. Observe: which hand moves first and furthest?
+1. One hand on the chest (clavicle level), one hand on the belly, just below the navel.
+2. Inhale deeply, as if about to sing a long phrase.
+3. Watch which hand moves first and furthest.
 
-**Clavicular breathing** (chest/shoulders rise first): Your power source is the wrong muscles. The upper chest has poor mechanical advantage for sustained pressure — you'll run out of air quickly and recruit neck muscles to compensate, loading the larynx.
+- **Chest/shoulders rise first (clavicular breathing):** wrong muscles doing the work. The upper chest has poor leverage for sustained pressure — you'll run out of air fast and recruit neck muscles to compensate, which loads tension straight onto the larynx.
+- **Belly and lower ribs expand first, chest stays quiet (abdominal-costal):** correct. The diaphragm is doing its job.
 
-**Abdominal-costal breathing** (belly and ribs expand first, chest follows naturally): Correct engagement. The diaphragm is doing its job.
+If you're clavicular, do Drill 1 lying on your back for the first week — gravity removes the chest's ability to cheat.
 
 ### 2.3 Breath Foundation Drills
 
-#### Drill 1 — The Hissing Resistance Exercise
+#### Drill 1 — Hissing Resistance
 
-**Purpose:** Train the appoggio balance — feel the diaphragm resisting the abdominal pull.
+**Purpose:** feel the appoggio balance — ribs resisting collapse while the abdomen slowly engages.
 
-1. Inhale low and wide (ribs expand like an umbrella, belly releases forward).
-2. Exhale on a steady **sss** hiss, targeting a uniform sound intensity for the full duration.
-3. Keep the ribs expanded as long as possible — feel the tension between expanding ribs and contracting abdomen.
-4. No collapse until the last moment.
+1. Inhale low and wide, 3–4 seconds, no shoulder lift.
+2. Exhale on a steady **sss**, aiming for one constant volume of hiss from start to finish — not loud-to-soft decay.
+3. Keep the rib cage expanded as long as possible; the squeeze comes from the abdominal wall, not from the ribs collapsing.
+4. No sudden drop-off at the end — taper, don't crash.
 
-| Week | Duration Target | Rest Between |
-|------|----------------|--------------|
-| 1    | 10 seconds      | 15 seconds   |
-| 2    | 15 seconds      | 15 seconds   |
-| 3    | 20 seconds      | 10 seconds   |
-| 4    | 25 seconds      | 10 seconds   |
+| Week | Duration Target | Rest Between Reps | Reps |
+|------|-----------------|--------------------|------|
+| 1 | 10 sec | 15 sec | 5 |
+| 2 | 15 sec | 15 sec | 5 |
+| 3 | 20 sec | 10 sec | 6 |
+| 4 | 25 sec | 10 sec | 6 |
 
-**What you're building:** The intercostal + abdominal antagonism that creates steady subglottal pressure. If your hiss wobbles, your breath support will wobble in performance.
+**Self-check:** record yourself on your phone. If the hiss amplitude wobbles or fades unevenly, your support will wobble in performance exactly the same way — this drill is diagnostic as much as conditioning.
 
 #### Drill 2 — Pulsed Breath (8-Count Pattern)
 
-**Purpose:** Develop rapid breath replenishment for fast-moving vocal lines.
+**Purpose:** rapid breath replenishment for fast passagework and rhythmic articulation.
 
-1. Inhale for 4 counts (low and wide).
-2. Exhale in 8 short pulses on **sh** — one pulse per count. Each pulse equal pressure.
-3. Counts: **sh - sh - sh - sh - sh - sh - sh - sh** then immediately back to 4-count inhale.
-4. Use a metronome: start at **♩= 60**, progress to **♩= 80** over two weeks.
+1. Inhale 4 counts, low and wide, shoulders still.
+2. Exhale in 8 even pulses on **sh**: *sh-sh-sh-sh-sh-sh-sh-sh*, one pulse per count, identical pressure on every pulse.
+3. Immediately re-inhale for 4 counts and repeat.
 
-**Common errors:**
-- Shoulders rising on inhale → consciously keep them still
-- Pulsed hisses uneven → slow down and even them out before speeding up
+Metronome progression: **♩ = 60** week 1 → **♩ = 80** week 3. Don't move the tempo up until every pulse is audibly equal in intensity at the current tempo — speeding up uneven pulses just bakes in the error.
 
-#### Drill 3 — The Candle/Tissue Test
+**Common errors:** shoulders creeping up on the inhale (fix: do this in front of a mirror); pulses front-loaded loud then fading (fix: slow back down two clicks and re-even them before progressing).
 
-Hold a tissue (or imagine a candle flame) 30 cm in front of your mouth. Exhale *without* moving it on a sustained **sss**. This builds awareness of the air stream — you want efficient, not wasteful, airflow. If the tissue flutters heavily, you are over-pressuring or under-adducting at the fold level.
+#### Drill 3 — Candle/Tissue Airflow Check
+
+Hold a tissue strip (or your own fingertip) about 30 cm from your mouth. Sustain **sss** without disturbing it heavily. A tissue that flutters violently means you're over-pressuring the air relative to how well the folds are adducting — you're wasting air instead of converting it to sound. This is a fast gut-check before a gig: if your hiss is wasteful, your singing will run out of air early.
 
 ---
 
-## 3. System 2: The Laryngeal Oscillator — Pitch, Register, and Fold Mechanics
+## 3. System 2: The Laryngeal Oscillator
 
-### 3.1 How Your Vocal Folds Actually Work
+### 3.1 How the Folds Actually Vibrate
 
-The vocal folds are not simple flaps. They are layered tissue structures that vibrate in a wave-like motion — the **mucosal wave** — where the lower margin opens before the upper margin, and closes after it. This wave requires the outer cover (epithelium + superficial lamina propria) to be pliable and hydrated. Dehydration, inflammation, or vocal nodules disrupt this wave, reducing voice quality before you lose it entirely.
+The vocal folds aren't flaps that bang open and shut — they ripple in a traveling wave (the **mucosal wave**), where the lower lip of the fold opens first and the upper lip follows a beat behind, then closes in the same order. That wave only propagates cleanly through a pliable, hydrated cover layer. Dehydration, swelling, or nodules stiffen that layer and kill the wave — which is *why* hydration and warm-up change your tone quality before you'd ever notice an actual injury.
 
-Vibration frequency (pitch) is controlled by two opposing muscle groups:
+Two muscle pairs set pitch by opposing each other:
 
-| Muscle Pair | Action | Register Effect |
-|-------------|--------|----------------|
-| **Cricothyroid (CT)** | Stretches and thins folds | Head voice / falsetto — higher pitches |
-| **Thyroarytenoid (TA)** | Shortens and thickens folds | Chest voice / modal — lower pitches |
+| Muscle | Action | Register Effect |
+|--------|--------|------------------|
+| **Cricothyroid (CT)** | Tilts thyroid cartilage, stretches/thins the folds | Head voice, higher pitch |
+| **Thyroarytenoid (TA)** | Shortens/thickens the folds | Chest voice, lower pitch |
 
-**Mixed voice / passaggio navigation** is the CT-TA co-contraction zone — both muscles share the load. This is the technique goal of most intermediate-to-advanced singers: coordinating both muscles across the entire range so there is no register break, only a smooth blend.
+**Mixed voice** is CT and TA sharing the load simultaneously rather than handing off abruptly. That coordination — not some separate "third register" — is what removes the audible break. It's a trainable motor skill, not a vocal type you either have or don't.
 
 ### 3.2 The Passaggio — Where Registers Meet
 
-Every voice has natural register transitions. These are not defects; they are acoustic reality. The goal is not to eliminate them but to navigate them without collision.
+Approximate transition zones by voice type (these shift ±1 step person to person — use them as a starting map, not a diagnosis):
 
-Approximate passaggio locations by voice type:
-
-| Voice Type | First Passaggio (Primo) | Second Passaggio (Secondo) |
-|------------|------------------------|---------------------------|
-| Bass | C3–E3 (C2=65Hz) | F3–A3 |
+| Voice Type | First Passaggio | Second Passaggio |
+|------------|------------------|---------------------|
+| Bass | C3–E3 | F3–A3 |
 | Baritone | D3–F3 | G3–B♭3 |
 | Tenor | E3–G3 | A3–C4 |
 | Mezzo | G3–A3 | C4–D4 |
@@ -144,19 +140,19 @@ Approximate passaggio locations by voice type:
 
 ```mermaid
 flowchart LR
-    subgraph sub_chest ["Chest Voice (TA Dominant)"]
-        A["Thick folds\nFull contact area\nLow pitch ceiling"]
+    subgraph sub_chest ["Chest Voice — TA Dominant"]
+        A["Thick folds<br/>Full contact area<br/>Lower pitch ceiling"]
     end
 
-    subgraph sub_mix ["Mixed/Passaggio (CT+TA Balance)"]
-        B["Transitional coordination\nThinning begins\nRisk of break if uncoordinated"]
+    subgraph sub_mix ["Mixed / Passaggio — CT+TA Balance"]
+        B["Transitional coordination<br/>Thinning begins<br/>Break risk if uncoordinated"]
     end
 
-    subgraph sub_head ["Head Voice (CT Dominant)"]
-        C["Thin, stretched folds\nEdge contact only\nUpper range"]
+    subgraph sub_head ["Head Voice — CT Dominant"]
+        C["Thin, stretched folds<br/>Edge contact only<br/>Upper range"]
     end
 
-    A -->|"Primo Passaggio"| B -->|"Secondo Passaggio"| C
+    A -->|"Primo passaggio"| B -->|"Secondo passaggio"| C
 
     style sub_chest fill:#fdecea,stroke:#e74c3c
     style sub_mix fill:#fef9e7,stroke:#f39c12
@@ -165,167 +161,148 @@ flowchart LR
 
 ### 3.3 Register Bridging Drills
 
-#### Drill 4 — The Lip Trill Glide (Primary Passaggio Navigation Tool)
+#### Drill 4 — Lip Trill Glide (Primary Passaggio Tool)
 
-The lip trill (motorboat lips with phonation) is the single most effective exercise for passaggio coordination because:
-- The semi-occluded tract reduces impact stress on the folds
-- The back-pressure from occluded lips levels out CT-TA transition abruptness
-- It externalizes the air flow so you get immediate feedback
+Why it works: the semi-occluded lips create back-pressure in the mouth that reduces the pressure drop across the folds, so the CT-TA handoff happens with less collision force and less chance of an audible "flip." It also externalizes airflow feedback — if your lips stop fluttering, you know immediately that something upstream broke.
 
 **Execution:**
-1. Blow a steady air stream through relaxed, loosely closed lips — they flutter.
-2. Add voice beneath the flutter. Maintain even lip vibration throughout.
-3. Slide up a **5th** (do-to-sol) on the lip trill.
-4. Slide back down. Keep the fluttering lips even on both directions.
+1. Blow a steady stream through loose, relaxed lips until they flutter (not clamped in the teeth).
+2. Add voice underneath the flutter, keeping the lip vibration even.
+3. Glide up a 5th (do → sol), then back down. Flutter must stay even in both directions.
 
-**Progression:**
-
-| Stage | Shape | Metronome | Description |
-|-------|-------|-----------|-------------|
-| 1 | 5th glide up-down | No click needed | Feel the passaggio — don't fix it yet, just notice it |
-| 2 | Octave glide | ♩= 60 | Let the register shift happen, keep lips fluttering |
-| 3 | 1.5-octave scale | ♩= 72 | Smooth out any breaks by reducing pressure mid-transition |
-| 4 | 2-octave glide | ♩= 80 | Full range, continuous tone, uniform lip vibration |
+| Stage | Shape | Metronome | Goal |
+|-------|-------|-----------|------|
+| 1 | 5th glide up/down | No click | Just notice the passaggio, don't try to fix it yet |
+| 2 | Octave glide | ♩ = 60 | Let the register shift happen, flutter stays even |
+| 3 | 1.5-octave scale | ♩ = 72 | Smooth the transition by easing breath pressure mid-glide |
+| 4 | 2-octave glide | ♩ = 80 | Full range, one continuous tone, uniform lip vibration |
 
 **Troubleshooting:**
-- Lips stop fluttering mid-glide → too much subglottal pressure, reduce breath drive
-- Large audible "crack" at passaggio → TA letting go too abruptly; sustain the chest resonance a half-step higher than feels comfortable, then release gradually
-- Voice goes completely to falsetto above passaggio → TA not engaging in mix; practice at a slower tempo and consciously "hold on" to the chest quality while ascending
+- Lips stall mid-glide → too much subglottal pressure; back off the air drive, don't push harder through it.
+- Audible "crack" at the passaggio → TA is releasing too abruptly. Deliberately hold the chest-voice quality a half-step *above* where it wants to break, then ease off gradually rather than letting go all at once.
+- Falls straight into disconnected falsetto above the passaggio → TA isn't engaging in the mix at all. Slow the tempo down and consciously "carry" some chest resonance upward before trying it at speed.
 
-#### Drill 5 — Messa di Voce (Crescendo-Decrescendo)
+#### Drill 5 — Messa di Voce (Crescendo–Decrescendo)
 
-**Purpose:** The gold standard exercise for CT-TA coordination and fold adduction control.
+**Purpose:** the gold-standard drill for CT-TA coordination and fold adduction control — because it forces you to maintain pitch and closure while breath pressure changes underneath you.
 
-1. Sustain a single pitch in your mid-range (around C4 for mezzos, B3 for baritones).
-2. Begin pianissimo (almost no volume) — folds barely touching.
-3. Slowly crescendo over 8 counts to forte.
-4. Decrescendo back to pianissimo over 8 counts. The tone must stay perfectly on pitch throughout.
-5. No wobble, no register flip, no air leakage on soft end.
+1. Sustain one pitch in your mid-range (roughly C4 for mezzos, B3 for baritones).
+2. Start pianissimo — folds barely touching, almost no air.
+3. Crescendo smoothly to forte over 8 counts.
+4. Decrescendo back to pianissimo over 8 counts, staying exactly on pitch with no air leak at the quiet end.
 
-| Week | Duration of Each Phase | Notes |
-|------|----------------------|-------|
-| 1 | 4 counts each | Focus on even crescendo curve |
-| 2 | 6 counts each | Pianissimo should be audible but tiny |
-| 3 | 8 counts each | Smooth — no "steps" in the volume arc |
-| 4 | 10 counts each | Test on a pitch that crosses your passaggio |
+| Week | Each Phase | Focus |
+|------|------------|-------|
+| 1 | 4 counts | Even crescendo curve, no sudden jumps |
+| 2 | 6 counts | Pianissimo audible but genuinely tiny |
+| 3 | 8 counts | No "steps" in the volume arc |
+| 4 | 10 counts | Try it on a pitch that crosses the passaggio |
 
-**Why it works:** The pianissimo requires precise CT-TA balance with minimal air. The crescendo adds breath pressure. The decrescendo is the hardest part — it requires you to reduce breath support without losing fold adduction. This trains the entire coordination range in one exercise.
+The decrescendo is the hard part — reducing air while keeping the folds adducted trains exactly the coordination that collapses into breathiness under fatigue.
 
-#### Drill 6 — The "Ng" Slide for Head Voice Connection
+#### Drill 6 — "Ng" Slide for Head Voice Connection
 
-For singers who either lose voice at the top or flip into a disconnected falsetto:
+1. Rest a finger lightly on the larynx (Adam's apple).
+2. Say "singing," feeling the larynx stay low and stable on the "ng."
+3. Sustain the "ng," slide up a 5th. Resist any urge to let the larynx ride upward.
+4. At the top, open "ng" into "ah" without the resonance dropping into the throat.
+5. Run on a full 5-note scale: 1-2-3-4-5-4-3-2-1.
 
-1. Place finger lightly on larynx (Adam's apple).
-2. Say "singing" — feel the larynx stay low and stable on the "ng" resonance.
-3. Sustain the "ng" and slide up a 5th. Keep the larynx low; resist the urge to squeeze up.
-4. At the top of the slide, open to a vowel (try "ng → ah"). The resonance should stay in the head, not drop to throat.
-5. Run this on a 5-note scale (1-2-3-4-5-4-3-2-1).
-
-**Metronome:** ♩= 60 → ♩= 76 as the connection solidifies.
+Metronome: **♩ = 60 → ♩ = 76** as the connection becomes reliable.
 
 ---
 
-## 4. System 3: The Vocal Tract Filter — Resonance and Vowel Shaping
+## 4. System 3: The Vocal Tract Filter
 
-### 4.1 How Resonance Actually Works in Performance Terms
+### 4.1 Resonance in Performance Terms
 
-Your vocal tract is a shaped tube from glottis to lips — roughly 14–17 cm long. It has natural resonant peaks called **formants** (F1, F2, F3...). When a harmonic in your voice's output lands near a formant frequency, that frequency gets amplified — essentially for free, with no extra muscular effort. This is the basis of:
+The vocal tract — roughly 14–17 cm from glottis to lips — is a shaped tube with natural resonant peaks called **formants**. When a harmonic from the folds lands near a formant frequency, it gets amplified for free, no extra muscular effort required. This single fact underlies vowel identity, projection, and "placement."
 
-- **Vowel identity** (which formant combination your brain recognizes as "ah" vs. "ee" vs. "oo")
-- **Ring/projection** (the singer's formant at ~2.8–3.2 kHz in male voices, ~3.2–3.8 kHz in females)
-- **Resonance placement** ("chest resonance" vs. "head resonance" as sensory feedback of which formants are most active)
+The two formants that matter most day-to-day:
+- **F1** — set mainly by jaw height / mouth opening. Open jaw raises F1.
+- **F2** — set mainly by tongue front/back position. Tongue forward raises F2.
 
-The two most important formants for singers:
-- **F1** — controlled primarily by jaw height and mouth opening. Open jaw → F1 rises. Closed jaw → F1 falls.
-- **F2** — controlled primarily by tongue position (front/back). Tongue forward → F2 rises. Tongue back → F2 falls.
+> **Practical rule:** on notes above the passaggio, open the jaw more than feels natural. This raises F1 to meet the rising fundamental, which is *why* "open up on high notes" works — you're tuning a formant to the pitch, not just making a bigger shape for show.
 
-> **Practical rule:** On high notes (above passaggio), open the jaw more than feels natural. This raises F1 to meet the fundamental frequency, dramatically increasing resonant power. This is why "open up on the high notes" is universally correct pedagogy — it's formant tuning, not just aesthetics.
-
-### 4.2 The Vowel Space — What to Adjust and When
+### 4.2 The Vowel Space
 
 ```mermaid
 graph TB
     subgraph sub_vowel_space ["Vowel Space — Articulatory Map"]
         direction TB
-        V1["ee (heat)\nTongue high-front\nF1 low · F2 high"]
-        V2["ih (bit)\nTongue high-front (relaxed)\nF1 mid · F2 high"]
-        V3["eh (bet)\nTongue mid-front\nF1 mid · F2 mid-high"]
-        V4["ah (father)\nTongue low\nJaw open\nF1 high · F2 mid"]
-        V5["oh (boat)\nTongue mid-back\nLips rounded\nF1 mid · F2 low"]
-        V6["oo (boot)\nTongue high-back\nLips rounded\nF1 low · F2 low"]
+        V1["ee (heat)<br/>Tongue high-front<br/>F1 low, F2 high"]
+        V2["ih (bit)<br/>Tongue high-front relaxed<br/>F1 mid, F2 high"]
+        V3["eh (bet)<br/>Tongue mid-front<br/>F1 mid, F2 mid-high"]
+        V4["ah (father)<br/>Tongue low, jaw open<br/>F1 high, F2 mid"]
+        V5["oh (boat)<br/>Tongue mid-back, lips rounded<br/>F1 mid, F2 low"]
+        V6["oo (boot)<br/>Tongue high-back, lips rounded<br/>F1 low, F2 low"]
     end
 
     V1 -->|"Lower tongue"| V3
     V3 -->|"Open jaw"| V4
     V4 -->|"Retract + round"| V5
     V5 -->|"Raise tongue"| V6
-    V6 -.->|"Advance tongue (front)"| V1
+    V6 -.->|"Advance tongue"| V1
 
     style V4 fill:#fff3cd,stroke:#f0ad4e
     style V1 fill:#d1ecf1,stroke:#17a2b8
     style V6 fill:#f8d7da,stroke:#dc3545
 ```
 
-**Performance applications:**
+**On-the-fly fixes:**
 
-| Situation | Adjustment | Why |
-|-----------|-----------|-----|
-| Vowels darkening/clouding on high notes | Open jaw slightly; bring tongue marginally forward | Raises F1 to track the rising fundamental |
-| "ee" sounds spread and thin above passaggio | Maintain lip rounding from "oo" on "ee" vowel (Umlaut technique) | Lowers F2 slightly, reduces spread |
-| "ah" sounds pressed or white on forte | Drop jaw more, widen pharynx | Separates F1 and F2 for fuller resonance |
-| Consonants killing legato line | Minimize jaw movement; keep vowel resonance through consonants | Maintains formant continuity |
+| Problem | Adjustment | Why It Works |
+|---------|-----------|----------------|
+| Vowels darken/muddy on high notes | Open jaw slightly, tongue marginally forward | Raises F1 to track the rising fundamental |
+| "ee" goes spread and thin above the passaggio | Borrow lip rounding from "oo" while shaping "ee" | Lowers F2, reduces spread, keeps the vowel recognizable |
+| "ah" sounds pressed/white on forte | Drop jaw further, widen the pharynx | Separates F1 and F2, fuller resonance at the same effort |
+| Consonants break the legato line | Minimize jaw movement on consonants; keep the vowel resonance shape | Preserves formant continuity through the word |
 
-### 4.3 The Singer's Formant — Creating Natural Projection
+### 4.3 The Singer's Formant
 
-The **singer's formant** is a cluster of F3, F4, and F5 around 2.8–3.2 kHz (male voices) produced by narrowing the laryngopharynx (the tube above the larynx). The practical way to access it:
+A cluster of F3–F5 around 2.8–3.2 kHz (male voices, slightly higher for female) produces the "ring" that cuts through an orchestra or band without extra volume. To access it:
 
-1. **Lower the larynx slightly** — imagine beginning a yawn. Feel the spaciousness in the throat.
-2. **Narrow the aryepiglottic sphincter** — the tube just above the vocal folds narrows, raising that region's resonant frequency to match F3–F5 clustering.
-3. The result is a "ring" or "ping" in the tone — audible as brightness that cuts through accompaniment without raising volume.
+1. Lower the larynx slightly — the first half-inch of a yawn, nothing more.
+2. Narrow the space just above the folds (aryepiglottic area) — imagine a slight "pinching" sensation at the very top of the throat, not in the jaw or tongue.
+3. The resulting brightness is a cutting "ping," not a louder voice — it's a different frequency balance, same effort level.
 
-**Sensory cue:** Imagine the sound coming from behind your upper teeth, or feeling a buzzing in the bridge of your nose. These are forward resonance tracking sensations — they indicate the singer's formant is active.
+**Sensory cue:** imagine the sound radiating from behind your upper front teeth, or a light buzz at the bridge of the nose. That's forward-resonance feedback, not literal nasal placement — don't actually push the sound into the nose.
 
 ### 4.4 Resonance Placement Drills
 
-#### Drill 7 — The "Vv" / "Zz" Buzz Placement Exercise
+#### Drill 7 — "Vv" / "Mmm" Buzz Placement
 
-**Purpose:** Find forward mask resonance without throat tension.
+1. Sustain **vvvvv**, feeling the vibration in lips and face.
+2. Transition to "mmm," letting the buzz migrate to lips and nose bridge.
+3. Open "mmm" into "mmm-ah," keeping the same forward buzz as the vowel opens.
+4. Run ascending on a 5-note scale: *mm-ah · mm-ah · mm-ah · mm-ah · mm-ah*.
 
-1. Sustain a **vvvvv** (voiced labiodental fricative) — feel the vibration in your lips and face.
-2. Transition to a "mmm" hum — feel the resonance move to lips and nose bridge.
-3. Open "mmm" to "mmm-ah." The goal: retain the mask resonance feeling as the vowel opens.
-4. Run this on a 5-note ascending scale: **mm-ah · mm-ah · mm-ah · mm-ah · mm-ah**.
-5. Metronome: **♩= 66 → ♩= 84** over three weeks.
+Metronome: **♩ = 66 → ♩ = 84** over three weeks.
 
-#### Drill 8 — Pharyngeal Space Exercise ("The Inner Smile")
+#### Drill 8 — Pharyngeal Space ("Inner Smile")
 
-**Purpose:** Create the spacious pharynx needed for singer's formant and consistent vowel quality.
-
-1. Begin with a silent, relaxed yawn posture — feel the back of the throat lift and open.
+1. Start from a silent, relaxed yawn posture — feel the back of the throat lift and widen.
 2. Hold that openness and sing a 5-tone scale on "ah" (1-2-3-4-5-4-3-2-1).
-3. Keep the sensation of the lifted soft palate and open pharynx throughout. The yawn feeling should not make you sound like you're actually yawning — it's a subtle lifting, not a grotesque openness.
-4. Listen for: increased warmth and depth, less nasality, more consistent tone color across the scale.
-5. Metronome: **♩= 60 → ♩= 76**.
+3. Keep the lifted-soft-palate sensation throughout — subtle lift, not a cartoonish gape.
+4. Listen for warmth and depth increasing, nasality decreasing, and tone color staying consistent across the scale.
+
+Metronome: **♩ = 60 → ♩ = 76**.
 
 ---
 
-## 5. Semi-Occluded Vocal Tract Exercises (SOVTE) — The Daily Warm-Up Protocol
+## 5. SOVTE — The Daily Semi-Occluded Warm-Up Protocol
 
-SOVTEs are exercises that partially obstruct the lips (lip trill, tongue trill, straw phonation, humming on "ng"). The partial obstruction creates back-pressure that:
-
-1. Reduces the air pressure differential across the folds → less collision impact per cycle
-2. Promotes deeper, more complete fold vibration without excessive muscular force
-3. Allows you to sing through your full range at low effort — perfect for warm-up and cool-down
+Semi-occluded vocal tract exercises (lip trill, tongue trill, straw phonation, "ng" humming) partially block the lips, which raises oral back-pressure and lowers the pressure drop across the folds — meaning less collision force per cycle while you still get full-range motion.
 
 ```mermaid
 flowchart TD
     subgraph sub_sovte_mechanism ["SOVTE Mechanism"]
-        A["Semi-Occluded Lips\n(lip trill / straw / ng)"]
-        B["Increased Oral Back-Pressure"]
-        C["Reduced Transglottal Pressure Drop"]
-        D["Lower Fold Collision Velocity"]
-        E["Less Impact Stress Per Cycle"]
-        F["Tissue-Protective Warm-Up"]
+        A["Semi-occluded lips<br/>(lip trill / straw / ng)"]
+        B["Increased oral back-pressure"]
+        C["Reduced transglottal pressure drop"]
+        D["Lower fold collision velocity"]
+        E["Less impact stress per cycle"]
+        F["Tissue-protective warm-up"]
     end
 
     A --> B --> C --> D --> E --> F
@@ -334,48 +311,45 @@ flowchart TD
     style F fill:#d5f5e3,stroke:#27ae60
 ```
 
-### 5.1 The Complete 15-Minute SOVTE Warm-Up Sequence
+### 5.1 The 15-Minute SOVTE Sequence
 
-Use this sequence before any vocal session — rehearsal, lesson, performance, or recording.
+Run this before any rehearsal, lesson, performance, or recording session.
 
 | Time | Exercise | Instruction |
 |------|----------|-------------|
-| 0:00–2:00 | **Breath alignment** | Hissing resistance drill (Drill 1). 5 reps, 10 sec each |
-| 2:00–4:30 | **Lip trill 5th glides** | Slide up and down a 5th, covering easy low-to-mid range. No pushing. ♩= 60 |
-| 4:30–6:30 | **Straw phonation** | Use a standard cocktail straw. Hum-glide through mid range, 1-octave slides |
-| 6:30–8:30 | **Ng hum — 5-tone scales** | "Ng" through the passaggio region. Feel larynx stable. ♩= 66 |
-| 8:30–10:30 | **Vvv-ah transitions** | Drill 7. Build forward resonance. ♩= 66 → ♩= 72 |
-| 10:30–12:30 | **Lip trill octave slides** | Full-range slides through both passaggi. ♩= 60 → ♩= 72 |
-| 12:30–15:00 | **Open vowel scales** | 5-tone scales on "ah," "oh," "ay." Pharynx open (Drill 8). ♩= 72 |
+| 0:00–2:00 | Breath alignment | Drill 1, 5 reps × 10 sec |
+| 2:00–4:30 | Lip trill 5th glides | Easy low-to-mid range, no pushing, ♩ = 60 |
+| 4:30–6:30 | Straw phonation | Hum-glide through mid-range, 1-octave slides |
+| 6:30–8:30 | "Ng" hum, 5-tone scales | Through the passaggio, larynx stable, ♩ = 66 |
+| 8:30–10:30 | "Vvv-ah" transitions | Drill 7, ♩ = 66 → 72 |
+| 10:30–12:30 | Lip trill octave slides | Through both passaggi, ♩ = 60 → 72 |
+| 12:30–15:00 | Open vowel scales | "ah," "oh," "ay," pharynx open (Drill 8), ♩ = 72 |
 
-**Straw phonation setup:** Use a standard cocktail straw (~5 mm diameter, 15 cm long). Place it loosely between the lips — not clamped in the teeth — and hum into it with tone. The straw resistance creates the optimal back-pressure for tissue-protective phonation.
+**Straw setup:** a standard cocktail straw (~5 mm diameter, 15 cm long), held loosely between the lips, not clamped by the teeth. Hum into it with voiced tone — the resistance it creates is the sweet spot for tissue-protective warm-up.
 
 ---
 
-## 6. Self-Diagnostic Chart — Identifying What's Actually Wrong
-
-Before calling a vocal coach, run through this diagnostic. Most acute problems trace to one clear cause.
+## 6. Self-Diagnostic Flowchart
 
 ```mermaid
 flowchart TD
-    START["Problem: Voice Not Working Correctly"] --> Q1{"Is the problem\nin a specific\npitch range?"}
+    START["Problem: voice not working correctly"] --> Q1{"Is the problem limited<br/>to a specific range?"}
 
-    Q1 -->|"Yes — upper range"| Q2{"Does it\ncrack/flip\nor go weak?"}
-    Q1 -->|"No — whole range"| Q3{"Is it airy/breathy\nor tight/pressed?"}
+    Q1 -->|"Upper range"| Q2{"Crack/flip,<br/>or just weak?"}
+    Q1 -->|"Whole range"| Q3{"Airy/breathy,<br/>or tight/pressed?"}
+    Q1 -->|"Lower range gone"| A7["Speaking voice loss or illness<br/>→ rest + hydrate<br/>→ ENT if lasting more than 5 days"]
 
-    Q2 -->|"Crack/flip"| A1["Passaggio coordination\n→ Drill 4 (Lip Trill)\n→ Drill 5 (Messa di Voce)"]
-    Q2 -->|"Weak/thin"| A2["Head voice not connecting\n→ Drill 6 (Ng Slide)\n→ Lower larynx (Drill 8)"]
+    Q2 -->|"Crack/flip"| A1["Passaggio coordination<br/>→ Drill 4 (lip trill)<br/>→ Drill 5 (messa di voce)"]
+    Q2 -->|"Weak/thin"| A2["Head voice not connecting<br/>→ Drill 6 (ng slide)<br/>→ Drill 8 (lower larynx)"]
 
-    Q3 -->|"Airy/breathy"| Q4{"Morning or\nafter speaking\nall day?"}
-    Q3 -->|"Tight/pressed"| Q5{"Throat tight or\nshoulder/neck\ntension?"}
+    Q3 -->|"Airy/breathy"| Q4{"Morning, or after<br/>talking all day?"}
+    Q3 -->|"Tight/pressed"| Q5{"Throat tight, or<br/>neck/shoulder tension?"}
 
-    Q4 -->|"Morning"| A3["Normal — folds need\nwarm-up. Run full\nSOVTE sequence"]
-    Q4 -->|"After heavy use"| A4["Vocal fatigue / edema\n→ Vocal rest 24–48h\n→ Systemic hydration\n→ SOVTE at half-intensity only"]
+    Q4 -->|"Just woke up"| A3["Normal — folds need warm-up<br/>→ run full SOVTE sequence"]
+    Q4 -->|"After heavy use"| A4["Vocal fatigue / edema<br/>→ 24–48h vocal rest<br/>→ hydrate systemically<br/>→ half-intensity SOVTE only"]
 
-    Q5 -->|"Throat tight"| A5["Extrinsic laryngeal tension\n→ Release jaw (Drill 8)\n→ Reduce breath pressure\n→ SOVTE first"]
-    Q5 -->|"Neck/shoulder"| A6["Postural loading\n→ Alexander Technique\nalignment check\n→ Reduce head-forward posture"]
-
-    Q1 -->|"Lower range gone"| A7["Morning speaking voice\nloss or illness?\n→ Rest + hydration\n→ See ENT if >5 days"]
+    Q5 -->|"Throat tight"| A5["Extrinsic laryngeal tension<br/>→ Drill 8 jaw release<br/>→ reduce breath pressure<br/>→ SOVTE first"]
+    Q5 -->|"Neck/shoulder"| A6["Postural loading<br/>→ alignment check<br/>→ reduce head-forward posture"]
 
     style A1 fill:#d5f5e3,stroke:#27ae60
     style A2 fill:#d5f5e3,stroke:#27ae60
@@ -388,116 +362,104 @@ flowchart TD
 
 ---
 
-## 7. Vocal Failure Modes — What They Feel and Sound Like
-
-Understanding pathology in performance terms (not clinical terms) helps you catch problems early.
+## 7. Failure Modes — What They Feel and Sound Like
 
 ### 7.1 Phonotrauma Warning Signs
 
-| Sign | What It Means | Immediate Action |
-|------|--------------|-----------------|
-| Voice "warms up" but stays slightly rough after 30+ minutes | Edema (swelling) in Reinke's space | Reduce vocal load, increase hydration |
-| Sudden mid-phrase loss of a note (a "hole" in the range) | Possible early nodule at max-collision point | Full vocal rest 48h, ENT evaluation |
-| Voice drops in pitch after heavy use | Tissue edema adding mass to folds | Rest and hydration; if persistent >3 days, see ENT |
-| "Two voices" on the same pitch | Polyp or cyst causing asymmetric vibration | ENT evaluation — do not push through this |
-| Morning voice that never clears | GERD (acid reflux) burning laryngeal tissue | ENT/GI evaluation; avoid eating 3h before sleep |
+| Sign | Likely Cause | Immediate Action |
+|------|--------------|-------------------|
+| Tone stays rough after 30+ minutes of warm-up | Edema (swelling) in Reinke's space | Reduce load, increase hydration |
+| Sudden mid-phrase "hole" in the range | Early nodule forming at the max-collision point | Full 48h vocal rest, get it checked |
+| Pitch drops after heavy use | Fluid mass added to the folds | Rest + hydrate; ENT if it persists beyond 3 days |
+| "Two voices" audible on one pitch | Polyp or cyst causing asymmetric vibration | ENT evaluation — don't sing through this |
+| Morning voice that never clears | Acid reflux irritating laryngeal tissue | ENT/GI evaluation; stop eating 3h before bed |
 
 ### 7.2 The Three Most Common Technique-Caused Problems
 
-**Problem 1: Register Break at Passaggio (the "Crack")**
-Cause: TA releasing too abruptly as CT takes over. The folds go from full-contact chest vibration to edge-only falsetto instantly.
-Fix: Lip trill through the passaggio daily (Drill 4). Practice the "yodel" intentionally — exaggerate the break, then gradually smooth it. Reduce breath pressure 2–3 semitones before the transition.
+**Register break at the passaggio ("the crack")**
+TA is releasing too abruptly as CT takes over, so the folds jump from full-contact chest vibration straight to edge-only falsetto with no transition.
+*Fix:* lip trill through the passaggio daily (Drill 4). Exaggerate the break on purpose (the "yodel"), then gradually smooth it. Ease breath pressure 2–3 semitones before the transition instead of pushing through it.
 
-**Problem 2: Pressed/Strained High Notes**
-Cause: Pushing subglottal pressure up instead of adjusting resonance. The folds are being forced closed by excess air pressure rather than optimal adduction.
-Fix: On any note feeling pressed, reduce breath pressure and open the jaw further. The resonance adjustment (F1 tuning) will give you more power with less effort. Drill 5 (Messa di Voce) in the pressed range.
+**Pressed/strained high notes**
+Subglottal pressure is being pushed up instead of the resonance being adjusted — the folds are forced shut by air pressure instead of closing efficiently.
+*Fix:* on any note that feels pressed, back off the air and open the jaw further. The F1 adjustment gives you more perceived power for less effort. Work the pressed range with Drill 5.
 
-**Problem 3: Breathy/Airy Mid-Range**
-Cause: Inadequate adduction — folds not closing fully during the closed phase of vibration. Often caused by under-supporting (insufficient subglottal pressure) rather than a fold problem.
-Fix: Firmer breath support with pulsed exercises (Drill 2). "Vvv-ah" exercise to feel fold engagement (Drill 7). If breathy tone persists despite good support, have folds examined — a small lesion can prevent full closure.
+**Breathy/airy mid-range**
+Incomplete fold closure during the vibration cycle, usually from under-supporting (not enough subglottal pressure), not from a fold defect.
+*Fix:* firmer, more even breath support via Drill 2. "Vvv-ah" (Drill 7) to feel engagement at the fold level. If breathiness persists despite solid support, get the folds examined — a small lesion can physically prevent closure no matter how good your technique is.
 
 ---
 
-## 8. Vocal Health Maintenance Protocol
+## 8. Vocal Health Maintenance
 
-### 8.1 Daily Hydration and Mucosal Health
+### 8.1 Hydration and Mucosal Health
 
-The superficial lamina propria (the outer pliable layer of the fold) must stay viscous for the mucosal wave to propagate. Dehydration stiffens it — small increases in tissue stiffness require disproportionately more muscular effort to maintain normal vibration.
+The outer, pliable layer of the fold must stay moist for the mucosal wave to travel properly. Dehydration stiffens it, and small increases in stiffness demand disproportionately more muscular effort to vibrate normally — this is why a dry voice feels like "more work" for the same note.
 
 **Daily targets:**
-- **Systemic hydration:** 2–2.5 L water minimum. Test: urine should be pale straw-colored by midday.
-- **Caffeine offset:** Each coffee or caffeinated tea → add one additional glass of water.
-- **Steam inhalation:** 10 minutes of steam (40–50°C, face over a bowl with towel tent) before heavy vocal use — temporarily reduces fold viscosity.
-- **Room humidity:** 40–50% ambient RH. Use a cool-mist humidifier at night during dry seasons.
+- Systemic hydration: 2–2.5 L water minimum; urine should be pale straw by midday.
+- Each caffeinated drink → one extra glass of water.
+- Steam inhalation: 10 minutes, 40–50°C, face over a bowl with a towel tent, before heavy vocal use.
+- Room humidity: 40–50% RH; cool-mist humidifier at night in dry seasons.
 
 **Avoid:**
-- Throat clearing (each throat clear = an aggressive fold collision; substitute with a wet swallow or sip of water)
-- Whispering when vocally fatigued — whisper requires equal or greater laryngeal tension than normal phonation
-- Alcohol and antihistamines before singing — both dehydrate the laryngeal mucosa
-- Smoking — no negotiation here; the mucosal thickening and edema are progressive and irreversible with continued exposure
+- Throat clearing — each clear is a hard fold collision; swallow or sip water instead.
+- Whispering when fatigued — whisper often uses more laryngeal tension than normal phonation.
+- Alcohol and antihistamines before singing — both dehydrate laryngeal tissue.
+- Smoking — mucosal thickening and edema from smoking are progressive and don't reverse with continued exposure.
 
-### 8.2 Vocal Dose — Know Your Limits
+### 8.2 Vocal Dose
 
-Your vocal folds are on a collision cycle at the rate of your fundamental frequency. At A4 (440 Hz), that's 440 impacts per second. During a 2-hour rehearsal of continuous singing, that's millions of cycles. Volume, pitch height, and voice type all affect impact stress per cycle.
+At A4 (440 Hz) the folds are colliding 440 times per second. A two-hour rehearsal of continuous singing adds up to millions of cycles — volume, pitch height, and voice type all change the impact stress per cycle.
 
-**Practical guidelines:**
-- Heavy vocal use (rehearsal + performance): no more than 4–6 hours total phonation
-- After an intensive performance: 24 hours reduced load, SOVTE-only the next morning
-- Warning sign of overuse: reduced range, increased roughness, delayed "warm-up" time (voice not clearing within 15 minutes of warming up)
-- If range is reduced by more than a 3rd and doesn't improve with 15 minutes of SOVTE, rest that day entirely
+**Guidelines:**
+- Heavy use day (rehearsal + show): cap total phonation at 4–6 hours.
+- After an intensive performance: 24 hours reduced load, SOVTE-only the next morning.
+- Overuse warning signs: reduced range, increased roughness, warm-up taking longer than 15 minutes to clear.
+- If range is down more than a 3rd and doesn't recover with 15 minutes of SOVTE, take the day off entirely.
 
-### 8.3 Recovery Protocol — Post-Performance / Post-Heavy Use
+### 8.3 Recovery Protocol
 
 | Timing | Protocol |
-|--------|---------|
-| Immediately post-performance | Water (not ice cold), no talking for 15–20 minutes if possible |
-| 1–2 hours post | Light straw phonation or lip trills — 5 minutes only. No scales, no pushed notes |
-| Morning after | SOVTE warm-up (full 15-minute sequence). Assess range before committing to any rehearsal |
-| If voice is rough Day 2 | Relative vocal rest (speaking only when necessary, no singing). Hydration + steam |
-| If rough Day 3+ | ENT evaluation. Do not attempt to push through — you risk converting acute edema into chronic lesions |
+|--------|----------|
+| Immediately post-show | Water (not ice-cold); no talking for 15–20 min if possible |
+| 1–2 hours post | Light straw phonation or lip trills, 5 minutes only, no scales or pushed notes |
+| Morning after | Full 15-minute SOVTE sequence; assess range before committing to rehearsal |
+| Day 2 if still rough | Relative vocal rest — speak only when necessary, hydrate, steam |
+| Day 3+ if still rough | ENT evaluation — pushing through converts acute swelling into chronic damage |
 
 ---
 
-## 9. Acoustic Objective Measures — How Clinicians Assess Your Voice
+## 9. Acoustic Measures You'll Hear in a Clinic or Studio
 
-You will encounter these terms in medical or studio contexts. Here's what they mean practically:
+| Measure | Reflects | Normal | Alert |
+|---------|----------|--------|-------|
+| **Jitter** | Cycle-to-cycle frequency variation | < 1.0% | > 2% = instability |
+| **Shimmer** | Cycle-to-cycle amplitude variation | < 3.0% | > 5% = adduction/symmetry issue |
+| **HNR** | How periodic (clean) the signal is | > 20 dB | < 15 dB = incomplete closure or asymmetry |
+| **MPT** (Maximum Phonation Time) | Seconds sustained on one breath | > 15 sec | < 10 sec = support/efficiency problem |
 
-| Measure | What It Reflects | Normal Range | Performance Alert |
-|---------|-----------------|--------------|------------------|
-| **Jitter** | Cycle-to-cycle frequency variation | < 1.0% | > 2% → significant instability |
-| **Shimmer** | Cycle-to-cycle amplitude variation | < 3.0% | > 5% → adduction or fold symmetry issue |
-| **HNR** (Harmonics-to-Noise Ratio) | How cleanly periodic the voice is | > 20 dB | < 15 dB → noise in the signal (incomplete closure or asymmetry) |
-| **MPT** (Maximum Phonation Time) | Seconds sustained on one breath | > 15 sec | < 10 sec → efficiency or respiratory support issue |
-
-A simple home MPT test: Sustain "ah" on a comfortable pitch at comfortable volume after a full breath. Time it. Below 12 seconds for a singer is a flag worth investigating.
+**Home MPT test:** full breath, sustain "ah" at a comfortable pitch and volume, time it. Under 12 seconds for a trained singer is worth investigating further.
 
 ---
 
-## 10. Theory Reference: Source-Filter and Why It's Practical
+## 10. Why Source-Filter Independence Is a Practical Shortcut
 
-The **source-filter model** (Fant, 1960s) is not abstract — it has a direct consequence for every technique decision:
+**Source = vocal folds** (pitch, register, voice quality). **Filter = vocal tract shape** (vowels, resonance, projection). These two are independent — you can change your resonance without touching pitch, and change pitch without touching resonance.
 
-**Source = vocal folds** (pitch, voice quality, register)
-**Filter = vocal tract shape** (vowels, resonance, formants)
-
-These two are *independent* — you can change resonance without changing pitch, and change pitch without changing resonance. This independence is what makes technique training efficient: you can fix a resonance problem without touching the larynx, and fix an adduction problem without changing your mouth shape.
-
-The **mucosal wave** at the fold surface is not theoretical — it's visible on laryngoscopy and directly correlates with voice quality. When a clinician says "your mucosal wave is reduced on the right fold," they mean that side's cover layer is too stiff (edema, scar, or dehydration) to generate its portion of the wave. That manifests as asymmetric vibration — the acoustic signature is elevated shimmer and reduced HNR.
-
-For the purposes of technique training: think of the source as your *engine* and the filter as your *acoustic space*. Keep the engine (folds) healthy, hydrated, and efficiently adducted. Shape the space (tract) for resonance, projection, and vowel clarity.
+That independence is the entire reason technique training is efficient: a resonance problem (muddy vowels, lack of ring) gets fixed in the tract without touching the larynx, and an adduction problem (breathiness, pressed tone) gets fixed at the fold level without reshaping the mouth. When you diagnose a problem, always ask "is this a source problem or a filter problem?" before picking a drill — it tells you which half of the lesson to open.
 
 ---
 
 ## Lesson Summary
 
-The voice is a three-system instrument: **breath (power) → folds (oscillator) → vocal tract (filter)**. Technique failures are almost always locatable to one of these systems or the transition between two of them.
+Three systems: **breath (power) → folds (oscillator) → vocal tract (filter)**. Almost every technique failure lives in one system or in the handoff between two.
 
-Your practice priorities from this lesson:
+**Practice priorities from this lesson:**
+1. Breath foundation daily — Drills 1 and 2 until appoggio is automatic, not something you think about mid-phrase.
+2. Passaggio navigation — lip trill glides (Drill 4) and messa di voce (Drill 5) are your primary tools.
+3. Resonance development — Drills 7 and 8 for forward placement and pharyngeal space.
+4. SOVTE warm-up every session — the 15-minute sequence protects tissue and surfaces problems before they become injuries.
+5. Hydrate and monitor — daily water intake, weekly MPT self-test, rest aggressively at the first sign of roughness beyond normal warm-up.
 
-1. **Establish breath foundation** — Drills 1 and 2 daily until appoggio balance is automatic
-2. **Navigate the passaggio** — Lip trill glides (Drill 4) and Messa di Voce (Drill 5) are your primary register tools
-3. **Develop resonance** — Drills 7 and 8 for forward placement and pharyngeal space
-4. **Warm up with SOVTEs every session** — the 15-minute sequence protects tissue and reveals problems before they become injuries
-5. **Hydrate and monitor** — daily water intake, MPT self-test weekly, rest aggressively at the first sign of roughness beyond normal warm-up
-
-The next lesson builds on this architecture to address **registration in depth** — including mixed voice across a 2-octave range, contemporary belting mechanics, and stylistic resonance adjustment for different genres.
+Next lesson builds on this architecture for registration in depth: mixed voice across a full two-octave range, contemporary belting mechanics, and resonance adjustments across genres.
