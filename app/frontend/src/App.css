@@ -4852,8 +4852,6 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 190px;
-  overflow-y: auto;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 6px;

@@ -35,6 +35,7 @@
       "output": "../../dist/desktop"
     },
     "mac": {
+      "icon": "assets/icon.icns",
       "category": "public.app-category.education",
       "target": [
         "dmg",

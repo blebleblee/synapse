@@ -9,7 +9,9 @@ const fs = require('fs');
 const http = require('http');
 const { spawn } = require('child_process');
 
-// Explicitly define application display name
+// Explicitly define application display name across OS process tree
+process.title = 'Synapse Workbench';
+app.name = 'Synapse Workbench';
 app.setName('Synapse Workbench');
 
 let mainWindow = null;

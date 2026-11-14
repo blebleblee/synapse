@@ -436,128 +436,135 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <form onSubmit={handleSubmit} className="settings-form">
           <div className="settings-tab-content">
             {activeTab === 'appearance' && (
-            <div className="settings-section">
-              <div className="section-title">
-                <Palette size={14} />
-                <span>Theme & Custom Appearance</span>
-              </div>
+              <div className="settings-section compact">
+                <div className="section-title">
+                  <Palette size={14} />
+                  <span>Appearance, Theme & Reader Layout</span>
+                </div>
 
-              <div className="form-group">
-                <label>Color Scheme Theme</label>
-                <div className="theme-options-grid">
-                  {[
-                    { id: 'studio', label: 'Studio Obsidian', desc: 'Deep OLED Carbon & Gold' },
-                    { id: 'github_dimmed', label: 'GitHub Dimmed', desc: 'Slate Navy & High Contrast' },
-                    { id: 'nordic', label: 'Nordic Frost', desc: 'Polar Night & Arctic Cyan' },
-                    { id: 'monokai', label: 'Monokai Pro', desc: 'Toasted Espresso & Neon Pastels' },
-                    { id: 'dracula', label: 'Dracula Noir', desc: 'Deep Violet Indigo & Pink' },
-                    { id: 'solarized', label: 'Solarized Dark', desc: 'Teal Oceanic & Warm Amber' },
-                    { id: 'titanium', label: 'Titanium Daybreak', desc: 'Clean High-Contrast Light Mode' },
-                  ].map((t) => (
-                    <button
-                      type="button"
-                      key={t.id}
-                      className={`theme-card ${formData.theme === t.id ? 'active' : ''}`}
-                      onClick={() => setFormData({ ...formData, theme: t.id as any })}
-                    >
-                      <div className="theme-card-header">
-                        <span className="theme-name">{t.label}</span>
-                        {formData.theme === t.id && <Check size={14} className="check-icon" />}
-                      </div>
-                      <span className="theme-desc">{t.desc}</span>
-                    </button>
-                  ))}
+                {/* Box 1: Theme & Accents (Dropdowns to save space) */}
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Color Scheme & Accent Palette</h4>
+                  <div className="settings-row-2col">
+                    <div className="form-group compact">
+                      <label>Color Scheme Theme</label>
+                      <select
+                        value={formData.theme}
+                        onChange={(e) => setFormData({ ...formData, theme: e.target.value as any })}
+                      >
+                        <option value="studio">Studio Obsidian — Deep OLED Carbon & Gold</option>
+                        <option value="github_dimmed">GitHub Dimmed — Slate Navy & High Contrast</option>
+                        <option value="nordic">Nordic Frost — Polar Night & Arctic Cyan</option>
+                        <option value="monokai">Monokai Pro — Toasted Espresso & Neon Pastels</option>
+                        <option value="dracula">Dracula Noir — Deep Violet Indigo & Pink</option>
+                        <option value="solarized">Solarized Dark — Teal Oceanic & Warm Amber</option>
+                        <option value="titanium">Titanium Daybreak — Clean High-Contrast Light Mode</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Accent Highlight Color</label>
+                      <select
+                        value={formData.accentColor || 'gold'}
+                        onChange={(e) => setFormData({ ...formData, accentColor: e.target.value as any })}
+                      >
+                        <option value="gold">🟡 Amber Gold (#fbbf24)</option>
+                        <option value="cyan">🔵 Electric Cyan (#06b6d4)</option>
+                        <option value="emerald">🟢 Matrix Emerald (#10b981)</option>
+                        <option value="amethyst">🟣 Royal Amethyst (#a855f7)</option>
+                        <option value="rose">🔴 Crimson Rose (#f43f5e)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Box 2: Typography & Reader Geometry (Balanced 3-column row) */}
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Reading Typography & Geometry</h4>
+                  <div className="settings-row-3col">
+                    <div className="form-group compact">
+                      <label>Reading Typography</label>
+                      <select
+                        value={formData.fontFamily || 'sans'}
+                        onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
+                      >
+                        <option value="sans">Modern Sans (Inter / Clean UI)</option>
+                        <option value="serif">Academic Serif (Charter / Book)</option>
+                        <option value="mono">Technical Mono (JetBrains Code)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Reading Column Width</label>
+                      <select
+                        value={formData.readerWidth || 'constrained'}
+                        onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
+                      >
+                        <option value="constrained">Comfortable Column (860px)</option>
+                        <option value="full">Full Width (Fluid 100%)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Line Spacing</label>
+                      <select
+                        value={formData.lineHeight || 'balanced'}
+                        onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
+                      >
+                        <option value="dense">Compact (1.45 - Reference)</option>
+                        <option value="balanced">Balanced (1.68 - Standard)</option>
+                        <option value="relaxed">Relaxed (1.92 - Longform)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Box 3: Sizing & Localization (Balanced 3-column row) */}
+                <div className="settings-panel-box">
+                  <h4 className="panel-box-heading">Sizing & Localization</h4>
+                  <div className="settings-row-3col">
+                    <div className="form-group compact">
+                      <label>UI Font Size</label>
+                      <select
+                        value={formData.fontSize || 'standard'}
+                        onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
+                      >
+                        <option value="compact">Compact (14px)</option>
+                        <option value="standard">Standard (15px)</option>
+                        <option value="large">Large (16px)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Curriculum Translation</label>
+                      <select
+                        value={formData.language || 'en'}
+                        onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
+                      >
+                        <option value="en">English (Original Masterclass)</option>
+                        <option value="cs">Czech (Čeština)</option>
+                        <option value="de">German (Deutsch)</option>
+                        <option value="es">Spanish (Español)</option>
+                        <option value="ru">Russian (Русский)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group compact">
+                      <label>Terminal Font Size</label>
+                      <select
+                        value={formData.terminalFontSize || '13px'}
+                        onChange={(e) => setFormData({ ...formData, terminalFontSize: e.target.value as any })}
+                      >
+                        <option value="12px">Compact (12px)</option>
+                        <option value="13px">Standard (13px)</option>
+                        <option value="14px">Large (14px)</option>
+                        <option value="15px">Extra Large (15px)</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div className="form-group" style={{ marginTop: '14px' }}>
-                <label>Accent Highlight Color</label>
-                <div className="accent-options-row">
-                  {[
-                    { id: 'gold', label: 'Amber Gold', color: '#fbbf24' },
-                    { id: 'cyan', label: 'Electric Cyan', color: '#06b6d4' },
-                    { id: 'emerald', label: 'Matrix Emerald', color: '#10b981' },
-                    { id: 'amethyst', label: 'Royal Amethyst', color: '#a855f7' },
-                    { id: 'rose', label: 'Crimson Rose', color: '#f43f5e' },
-                  ].map((a) => (
-                    <button
-                      type="button"
-                      key={a.id}
-                      className={`accent-chip ${formData.accentColor === a.id ? 'active' : ''}`}
-                      onClick={() => setFormData({ ...formData, accentColor: a.id as any })}
-                    >
-                      <span className="accent-dot" style={{ backgroundColor: a.color }} />
-                      <span>{a.label}</span>
-                      {formData.accentColor === a.id && <Check size={12} />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="settings-row-4col" style={{ marginTop: '14px' }}>
-                <div className="form-group compact">
-                  <label>Reading Typography</label>
-                  <select
-                    value={formData.fontFamily || 'sans'}
-                    onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value as any })}
-                  >
-                    <option value="sans">Modern Sans (Inter / UI)</option>
-                    <option value="serif">Academic Serif (Charter / Book)</option>
-                    <option value="mono">Technical Mono (JetBrains Code)</option>
-                  </select>
-                </div>
-
-                <div className="form-group compact">
-                  <label>Reader Line Spacing</label>
-                  <select
-                    value={formData.lineHeight || 'balanced'}
-                    onChange={(e) => setFormData({ ...formData, lineHeight: e.target.value as any })}
-                  >
-                    <option value="dense">Compact (1.45 - Reference)</option>
-                    <option value="balanced">Balanced (1.68 - Standard)</option>
-                    <option value="relaxed">Relaxed (1.92 - Longform)</option>
-                  </select>
-                </div>
-
-                <div className="form-group compact">
-                  <label>UI Font Size</label>
-                  <select
-                    value={formData.fontSize}
-                    onChange={(e) => setFormData({ ...formData, fontSize: e.target.value as any })}
-                  >
-                    <option value="compact">Compact (14px)</option>
-                    <option value="standard">Standard (15px)</option>
-                    <option value="large">Large (16px)</option>
-                  </select>
-                </div>
-
-                <div className="form-group compact">
-                  <label>Reading Width</label>
-                  <select
-                    value={formData.readerWidth}
-                    onChange={(e) => setFormData({ ...formData, readerWidth: e.target.value as any })}
-                  >
-                    <option value="full">Full Width (Fluid 100%)</option>
-                    <option value="constrained">Comfortable Column (860px)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group compact" style={{ marginTop: '12px' }}>
-                <label>Curriculum Translation Language</label>
-                <select
-                  value={formData.language || 'en'}
-                  onChange={(e) => setFormData({ ...formData, language: e.target.value as any })}
-                >
-                  <option value="en">English (Original Masterclass Source)</option>
-                  <option value="cs">Czech (Čeština)</option>
-                  <option value="de">German (Deutsch)</option>
-                  <option value="es">Spanish (Español)</option>
-                  <option value="ru">Russian (Русский)</option>
-                </select>
-              </div>
-            </div>
-          )}
+            )}
 
           {activeTab === 'inference' && (
             <div className="settings-section compact">
@@ -656,9 +663,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="cluster-nodes-manager">
-                <div className="cluster-manager-header">
-                  <label>Active Cluster Worker Nodes & Model Pinning</label>
+              <div className="settings-panel-box">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 className="panel-box-heading" style={{ margin: 0 }}>Cluster Worker Nodes & Model Pinning</h4>
+                  {Object.keys(nodePins).length > 0 && (
+                    <button
+                      type="button"
+                      className="btn-secondary-sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={async () => {
+                        if (confirm('Reset all cluster node pins back to automatic model selection?')) {
+                          try {
+                            const res = await fetch('/api/settings/cluster-pins', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ pins: {} })
+                            });
+                            if (res.ok) {
+                              setNodePins({});
+                            }
+                          } catch {
+                            alert('Failed to reset pins.');
+                          }
+                        }
+                      }}
+                    >
+                      <RefreshCw size={10} />
+                      <span>Reset Pins</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="cluster-nodes-list">
@@ -668,51 +701,48 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     const currentPin = nodePins[cleanHost] || nodePins[host] || '__auto__';
 
                     return (
-                      <div key={host} className="cluster-node-item" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                          <div className="node-info">
-                            <span className="node-idx">#{idx + 1}</span>
-                            <span className="node-url">{host}</span>
-                            {status && (
-                              <span
-                                className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
-                                title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
-                              >
-                                {status.testing
-                                  ? 'Pinging...'
-                                  : status.online
-                                  ? `Online (${status.latency_ms}ms)`
-                                  : 'Offline'}
-                              </span>
-                            )}
-                          </div>
-                          <div className="node-actions">
-                            <button
-                              type="button"
-                              className="btn-node-action"
-                              onClick={() => handlePingSingleNode(host)}
-                              title="Ping node"
+                      <div
+                        key={host}
+                        className="cluster-node-item"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '6px 12px',
+                          background: 'var(--bg-secondary, #121214)',
+                          borderRadius: '6px',
+                          border: '1px solid var(--border-color, rgba(255,255,255,0.08))'
+                        }}
+                      >
+                        {/* Host URL & Online Status */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '220px' }}>
+                          <span className="node-idx" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>#{idx + 1}</span>
+                          <span className="node-url" style={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 600 }}>{cleanHost}</span>
+                          {status && (
+                            <span
+                              className={`node-status-badge ${status.online ? 'online' : status.testing ? 'testing' : 'offline'}`}
+                              style={{ padding: '2px 6px', fontSize: '10px' }}
+                              title={status.error || (status.models ? `Models: ${status.models.slice(0, 5).join(', ')}` : '')}
                             >
-                              Ping
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-node-action remove"
-                              onClick={() => handleRemoveNode(idx)}
-                              title="Remove node from cluster"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
+                              {status.testing ? 'Pinging...' : status.online ? `${status.latency_ms}ms` : 'Offline'}
+                            </span>
+                          )}
                         </div>
 
-                        <div className="node-pin-control" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '4px' }}>
-                          <span style={{ color: 'var(--text-muted, #888)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            📌 <strong>Pinned Model:</strong>
-                          </span>
+                        {/* Model Pinning Selector (Directly Inline!) */}
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>📌 Pin:</span>
                           <select
                             className="select-input"
-                            style={{ flex: 1, padding: '4px 8px', fontSize: '12px', background: 'var(--bg-secondary, #121214)', border: '1px solid rgba(255,255,255,0.1)' }}
+                            style={{
+                              flex: 1,
+                              padding: '3px 8px',
+                              fontSize: '11.5px',
+                              height: '28px',
+                              background: 'var(--bg-tertiary, #1c2128)',
+                              border: '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '4px'
+                            }}
                             value={currentPin}
                             onChange={(e) => handleUpdateNodePin(host, e.target.value)}
                           >
@@ -733,12 +763,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             ) : null}
                           </select>
                         </div>
+
+                        {/* Node Actions */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <button
+                            type="button"
+                            className="btn-node-action"
+                            style={{ padding: '3px 8px', fontSize: '11px', height: '28px' }}
+                            onClick={() => handlePingSingleNode(host)}
+                            title="Ping node"
+                          >
+                            Ping
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-node-action remove"
+                            style={{ padding: '3px 6px', height: '28px' }}
+                            onClick={() => handleRemoveNode(idx)}
+                            title="Remove node from cluster"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="add-node-row">
+                <div className="add-node-row" style={{ marginTop: '8px' }}>
                   <input
                     type="text"
                     value={newNodeUrl}
@@ -763,7 +815,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Add Node</span>
                   </button>
                 </div>
-                <span className="field-hint">Supports Ollama (port 11434) and LocalAI / OpenAI-compatible (port 8080) endpoints.</span>
               </div>
 
               {/* Box 3: Cloud API Credentials & Gateways */}
