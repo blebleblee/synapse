@@ -237,4 +237,33 @@ class RealtimeFrequencyVisualizer(bpy.types.Operator):
         if event.type == 'TIMER':
             # Update mesh vertices based on current frequency data
             obj = bpy.data.objects.get("Plane")  # Your mesh object
-            if obj and
+            if obj and obj.type == 'MESH':
+                mesh = obj.data
+                for idx, vert in enumerate(mesh.vertices):
+                    freq_idx = idx % len(self._freq_data)
+                    vert.co.z = float(self._freq_data[freq_idx]) * 2.5
+                mesh.update()
+        return {'PASS_THROUGH'}
+
+    def execute(self, context):
+        wm = context.window_manager
+        self._timer = wm.event_timer_add(0.016, window=context.window)
+        wm.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+    def cancel(self, context):
+        wm = context.window_manager
+        wm.event_timer_remove(self._timer)
+
+def register():
+    bpy.utils.register_class(RealtimeFrequencyVisualizer)
+
+def unregister():
+    bpy.utils.unregister_class(RealtimeFrequencyVisualizer)
+```
+
+### Verification Checklist & Troubleshooting
+- Ensure `python-osc` is installed inside Blender's bundled Python interpreter via `pip install python-osc`.
+- Verify port 5005 is not blocked by local firewalls when routing OSC packets from your DAW.
+- Monitor console frame rates using `bpy.context.screen.areas` to ensure 60 FPS real-time viewport responsiveness.
+

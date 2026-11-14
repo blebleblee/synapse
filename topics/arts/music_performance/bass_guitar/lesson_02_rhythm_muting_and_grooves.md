@@ -21,15 +21,15 @@
 
 ### What Makes Bass Unique: The Rhythmic-Harmonic Bridge
 
-The bass guitar does two jobs no other instrument does at the same intensity: it tells the band **where the chord is** (harmonic root) and **when the beat lands** (rhythmic anchor). Every technical decision — which note, how long it rings, exactly when it dies — serves one or both of those jobs.
+The bass guitar does two jobs no other instrument does at the same intensity: it tells the band **where the chord is** (harmonic root) and **when the beat lands** (rhythmic anchor). Every technical decision you make — which note, how long it rings, exactly when it dies — serves one or both of those jobs. If you remember nothing else from this masterclass, remember this: bass is a rhythm instrument that happens to also carry pitch, not the other way around.
 
-Standard four-string tuning is **E1–A1–D2–G2** (41 Hz, 55 Hz, 73 Hz, 98 Hz). These low frequencies ring long — an open low E can sustain 5–8 seconds unmuted. At 120 BPM a sixteenth note lasts 125 ms. That gap between "how long the string wants to vibrate" and "how long the groove allows it to vibrate" is the central technical problem of the instrument. **You must stop notes as deliberately as you start them.** Muting isn't a finishing touch, it's the floor the rest of your technique stands on.
+Standard four-string tuning is **E1–A1–D2–G2** (41 Hz, 55 Hz, 73 Hz, 98 Hz). These low frequencies ring long — an open low E can sustain 5–8 seconds unmuted. At 120 BPM a sixteenth note lasts 125 ms. That gap between "how long the string wants to vibrate" and "how long the groove allows it to vibrate" is the central technical problem of the instrument. **You must stop notes as deliberately as you start them.** Muting isn't a finishing touch, it's the floor the rest of your technique stands on. Nearly every "sloppy" bassist you've heard has fine note choice and bad muting.
 
-One paragraph of physics, no more: pitch comes from string length, tension, and mass per unit length ($f = \frac{1}{2L}\sqrt{T/\mu}$). A bass E string (~.105") carries roughly double the mass of a guitar's low E, so it has more inertia — once moving, it keeps moving unless you intervene. That's the physical reason bass muting requires more deliberate hand contact than guitar muting does; lighter strings decay faster on their own, bass strings don't do you any favors.
+One paragraph of physics, no more: pitch comes from string length, tension, and mass per unit length. A bass E string (~.105") carries roughly double the mass of a guitar's low E, so it has more inertia — once moving, it keeps moving unless you intervene. That's the physical reason bass muting demands more deliberate hand contact than guitar muting does; lighter strings decay faster on their own, bass strings don't do you any favors. You don't need the formula to use this — you need the habit of touching strings off as deliberately as you pluck them on.
 
 ### The Pocket: Kick Drum Relationship
 
-Bass and kick drum are one rhythmic organism. Lock your note attacks to land **with or just behind** the kick's transient. Aligned, the low end feels solid; drifting even 20–30 ms apart, it turns to mud. A metronome alone never builds this skill — you need to practice against real or programmed drums, because the kick's transient shape (not just its timing) is what you're locking to.
+Bass and kick drum are one rhythmic organism. Lock your note attacks to land **with or just behind** the kick's transient. Aligned, the low end feels solid; drifting even 20–30 ms apart, it turns to mud. A metronome alone never builds this skill — you need to practice against real or programmed drums, because the kick's transient shape (not just its timing) is what you're locking to. Section 5.3 gives you the staged drill for this; treat it as mandatory, not optional listening homework.
 
 ---
 
@@ -474,6 +474,52 @@ Example: Cmaj9 (root = C, fret 3 / A string)
 A: |–3–––––7–––5–|  C (root), E (M3), D (9th)
 D: |–––––5––––––|   G (fifth)
 G: |–––––5––––––|   C (octave)
+```
+
+### 4.6 Fretboard Mastery Decision Tree
+
+Use this to decide which shape family to reach for in real time, without stopping to think through theory mid-song.
+
+```mermaid
+graph TD
+    subgraph sub_start ["Chord Symbol On The Chart"]
+        A["Read chord symbol<br/>(e.g. Dm7, G7, Cmaj9)"]
+        B{"What string<br/>is the root on?"}
+        A --> B
+    end
+
+    subgraph sub_estring ["Root On E String"]
+        C1["Use Shape 1 family<br/>(Section 4.1 / 4.2 / 4.5)"]
+    end
+
+    subgraph sub_astring ["Root On A String"]
+        C2["Use Shape 2 family<br/>(Section 4.1 / 4.2 / 4.5)"]
+    end
+
+    subgraph sub_dstring ["Root On D String"]
+        C3["Use Shape 3 family<br/>(Section 4.1)"]
+    end
+
+    subgraph sub_quality ["Apply Chord Quality"]
+        D{"Chord quality?"}
+        D1["Major / Maj7 → Major box<br/>(M3, M7 intervals)"]
+        D2["Minor / m7 → Minor box<br/>(m3, m7 intervals)"]
+        D3["Dominant 7 → Dominant box<br/>(M3, b7 intervals)"]
+        D4["Maj9 / m9 → Extended box<br/>(add 9th, Section 4.5)"]
+    end
+
+    B -->|"E string"| C1
+    B -->|"A string"| C2
+    B -->|"D string"| C3
+
+    C1 --> D
+    C2 --> D
+    C3 --> D
+
+    D -->|"Major"| D1
+    D -->|"Minor"| D2
+    D -->|"Dom7"| D3
+    D -->|"9th chord"| D4
 ```
 
 ---
@@ -1877,3 +1923,5 @@ WEEKLY TEMPO TARGETS (4-Week Foundation):
   (Adjust based on individual progress)
 
 ═══════════════════════════════════════════════════════════════
+```
+

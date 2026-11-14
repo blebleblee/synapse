@@ -378,3 +378,5 @@ VIBRATO CORE RULES
   Target extent-> +/-10-14 cents. Visible on strobe tuner. Symmetric above/below center.
   On/Off       -> Vibrato starts and stops on a designated beat. No drift.
   Ensemble     -> Section = straight tone or principal-matched rate. Solo = expressive.
+```
+

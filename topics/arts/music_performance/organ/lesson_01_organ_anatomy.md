@@ -760,3 +760,5 @@ Footage   Pitch Relationship          Example Stops
  1⅓'      Nineteenth                  Larigot - use sparingly
    1'     Three octaves above         Sifflöte, Mixture component
 Mixture   Multiple ranks at once      Mixture, Fourniture, Cymbale, Scharf, Zimbel
+```
+

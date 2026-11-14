@@ -205,3 +205,5 @@ Run through this checklist before any client delivery, film scoring stage delive
       check 'Export Range' is set past the last audible decay, not just to the last note-on
 [ ] Reference Playback: Play the exported file back in a fresh session or external player (not the same
       Cubase session) to catch plugin-state-dependent rendering errors before sending to client
+```
+
