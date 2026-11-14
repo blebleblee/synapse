@@ -27,7 +27,7 @@ from .models import (
 )
 from .topic_manager import get_domain_persona
 from .security import validate_canonical_topic_path
-from .domain_strategies import build_topic_modules
+from .domain_strategies import build_topic_modules, GLOBAL_REGISTRY
 
 # Global semaphore to limit concurrent LLM requests and avoid rate limits
 _LLM_SEMAPHORE = threading.Semaphore(4)
@@ -118,6 +118,11 @@ Output JSON only in this exact format:
 
         if len(parsed_lessons) >= 2:
             print(f"      [★] Pre-Flight Scoping: {tier} ({len(parsed_lessons)} Lessons + Labs) -> {rationale}", flush=True)
+            
+            strategy = GLOBAL_REGISTRY.get_strategy(domain, category)
+            blueprint = strategy.get_blueprint(subtopic_title, category_title)
+            default_audience = blueprint.lessons[0].audience if blueprint.lessons else f"Practitioners and specialists in {category_title}"
+
             dynamic_modules = []
             for i, l in enumerate(parsed_lessons):
                 num = i + 1
@@ -133,20 +138,24 @@ Output JSON only in this exact format:
                 lesson_prompt = f"""Write {title} for the masterclass curriculum on '{subtopic_title}'.
 Domain: '{domain_title}' | Discipline/Course: '{category_title}'.
 
-Target Audience: Senior software engineers, systems programmers, and domain architects.
+Target Audience: {default_audience}
 Lesson Focus: {focus}
+
+CRITICAL RELEVANCE & ANTI-BLEED MANDATE:
+- Focus 80% on actionable, hands-on practitioner execution, physical/software mechanics, and authentic workflows for '{subtopic_title}' in '{category_title}'.
+- STRICT TOOLCHAIN ISOLATION: Utilize ONLY tools, software, instruments, and concepts native to '{category_title}'. ABSOLUTELY NEVER mention bpftool, eBPF, Linux kernel tracing, or unrelated software boilerplate in arts, music, visual media, or business topics.
 
 Structure:
 # {title}
 
 ## 1. First-Principles Intuition & Invariants
-(Deep narrative exposition establishing theoretical grounding, problem space, and invariants)
+(Deep narrative exposition establishing theoretical grounding, problem space, and core invariants)
 
 ## 2. Core Architecture & Mechanics
-(Dissect internal data structures, algorithms, or execution models with ASCII or clean Mermaid diagrams)
+(Dissect internal data structures, signal paths, physical mechanics, or execution models with ASCII or clean Mermaid diagrams)
 
 ## 3. High-Performance Optimization & Failure Modes
-(Concurrency, resource scaling, boundary edge cases, and failure mitigations)
+(Workflow optimization, resource scaling, boundary edge cases, and failure mitigations)
 
 Remember: Write in rich, continuous book prose like an O'Reilly or MIT Press author. Avoid lazy bullet point lists.
 Output publication-grade Markdown only."""
