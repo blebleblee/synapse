@@ -14,8 +14,7 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Search,
-  Wrench
+  Search
 } from 'lucide-react';
 
 export interface AppSettings {
@@ -69,7 +68,7 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (newSettings: AppSettings) => void;
-  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance';
+  initialTab?: 'appearance' | 'cluster' | 'models' | 'store' | 'maintenance' | 'inference' | 'storage';
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -79,11 +78,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveSettings,
   initialTab,
 }) => {
-  const [activeTab, setActiveTab] = useState<'appearance' | 'cluster' | 'models' | 'store' | 'maintenance'>('appearance');
+  type SettingsTab = 'appearance' | 'inference' | 'storage';
+  const resolveTab = (tab?: string): SettingsTab => {
+    if (tab === 'cluster' || tab === 'models' || tab === 'inference') return 'inference';
+    if (tab === 'store' || tab === 'maintenance' || tab === 'storage') return 'storage';
+    return 'appearance';
+  };
+
+  const [activeTab, setActiveTab] = useState<SettingsTab>(resolveTab(initialTab));
 
   useEffect(() => {
     if (isOpen && initialTab) {
-      setActiveTab(initialTab);
+      setActiveTab(resolveTab(initialTab));
     }
   }, [isOpen, initialTab]);
   const [formData, setFormData] = useState<AppSettings>(settings);
@@ -407,39 +413,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             onClick={() => setActiveTab('appearance')}
           >
             <Palette size={14} />
-            <span>Theme & Reader</span>
+            <span>Appearance & Reader</span>
           </button>
           <button
             type="button"
-            className={`settings-nav-tab ${activeTab === 'cluster' ? 'active' : ''}`}
-            onClick={() => setActiveTab('cluster')}
+            className={`settings-nav-tab ${activeTab === 'inference' ? 'active' : ''}`}
+            onClick={() => setActiveTab('inference')}
           >
             <Cpu size={14} />
-            <span>Ollama Cluster ({clusterNodes.length})</span>
+            <span>AI Models & Cluster Pins ({clusterNodes.length})</span>
           </button>
           <button
             type="button"
-            className={`settings-nav-tab ${activeTab === 'models' ? 'active' : ''}`}
-            onClick={() => setActiveTab('models')}
-          >
-            <Settings size={14} />
-            <span>AI Models & Cloud API</span>
-          </button>
-          <button
-            type="button"
-            className={`settings-nav-tab ${activeTab === 'store' ? 'active' : ''}`}
-            onClick={() => setActiveTab('store')}
+            className={`settings-nav-tab ${activeTab === 'storage' ? 'active' : ''}`}
+            onClick={() => setActiveTab('storage')}
           >
             <Package size={14} />
-            <span>Curriculum Store & Addons</span>
-          </button>
-          <button
-            type="button"
-            className={`settings-nav-tab ${activeTab === 'maintenance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('maintenance')}
-          >
-            <Wrench size={14} />
-            <span>System & Maintenance</span>
+            <span>Storage & Addon Packs</span>
           </button>
         </div>
 
@@ -569,26 +559,106 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {activeTab === 'cluster' && (
-            <div className="settings-section">
-              <div className="section-title">
-                <Cpu size={14} />
-                <span>Distributed Ollama Inference Cluster</span>
-              </div>
-
-              <div className="cluster-nodes-manager">
-                <div className="cluster-manager-header">
-                  <label>Active Cluster Worker Nodes</label>
+          {activeTab === 'inference' && (
+            <div className="settings-section compact">
+              <div className="section-title-row">
+                <div className="section-title">
+                  <Cpu size={14} />
+                  <span>AI Models, Inference Routing & Cluster Pins</span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     type="button"
-                    className="btn-secondary-sm btn-scan-cluster"
+                    className="btn-secondary-sm"
                     onClick={handleScanCluster}
                     disabled={isScanningCluster}
                     title="Ping and test latency across all cluster nodes"
                   >
                     <RefreshCw size={11} className={isScanningCluster ? 'spin' : ''} />
-                    <span>{isScanningCluster ? 'Scanning...' : 'Test All Nodes'}</span>
+                    <span>{isScanningCluster ? 'Testing...' : 'Test Cluster Nodes'}</span>
                   </button>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    onClick={fetchDiscoveredModels}
+                    disabled={isLoadingModels}
+                    title="Rescan endpoints for available models"
+                  >
+                    <RefreshCw size={11} className={isLoadingModels ? 'animate-spin' : ''} />
+                    <span>{isLoadingModels ? 'Pulling...' : 'Pull Models'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Box 1: Active Model Roles */}
+              <div className="settings-panel-box">
+                <h4 className="panel-box-heading">Active Model Roles</h4>
+                <div className="settings-row-3col">
+                  <div className="form-group compact">
+                    <label>Primary Generation Model</label>
+                    <select
+                      value={formData.primaryModel}
+                      onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
+                    >
+                      {!formData.primaryModel && <option value="">Select Primary Model...</option>}
+                      {formData.primaryModel && !discoveredModels.includes(formData.primaryModel) && (
+                        <option value={formData.primaryModel} title={formData.primaryModel}>
+                          {formData.primaryModel.length > 34 ? `${formData.primaryModel.slice(0, 32)}...` : formData.primaryModel}
+                        </option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`p-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group compact">
+                    <label>Reviewer / Audit Model</label>
+                    <select
+                      value={formData.reviewerModel}
+                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
+                    >
+                      {!formData.reviewerModel && <option value="">Select Reviewer Model...</option>}
+                      {formData.reviewerModel && !discoveredModels.includes(formData.reviewerModel) && (
+                        <option value={formData.reviewerModel} title={formData.reviewerModel}>
+                          {formData.reviewerModel.length > 34 ? `${formData.reviewerModel.slice(0, 32)}...` : formData.reviewerModel}
+                        </option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`r-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group compact">
+                    <label>Socratic Mentor Model (AI Tutor)</label>
+                    <select
+                      value={formData.mentorModel || ''}
+                      onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
+                    >
+                      {!formData.mentorModel && <option value="">Select Mentor Model...</option>}
+                      {formData.mentorModel && !discoveredModels.includes(formData.mentorModel) && (
+                        <option value={formData.mentorModel} title={formData.mentorModel}>
+                          {formData.mentorModel.length > 34 ? `${formData.mentorModel.slice(0, 32)}...` : formData.mentorModel}
+                        </option>
+                      )}
+                      {discoveredModels.map((m) => (
+                        <option key={`m-${m}`} value={m} title={m}>
+                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cluster-nodes-manager">
+                <div className="cluster-manager-header">
+                  <label>Active Cluster Worker Nodes & Model Pinning</label>
                 </div>
 
                 <div className="cluster-nodes-list">
@@ -695,101 +765,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
                 <span className="field-hint">Supports Ollama (port 11434) and LocalAI / OpenAI-compatible (port 8080) endpoints.</span>
               </div>
-            </div>
-          )}
 
-          {activeTab === 'models' && (
-            <div className="settings-section compact">
-              <div className="section-title-row">
-                <div className="section-title">
-                  <Settings size={14} />
-                  <span>AI Models & Cloud API Keys</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn-secondary-sm"
-                  onClick={fetchDiscoveredModels}
-                  disabled={isLoadingModels}
-                  title="Rescan endpoints for available models"
-                >
-                  <RefreshCw size={12} className={isLoadingModels ? 'animate-spin' : ''} />
-                  <span>{isLoadingModels ? 'Scanning...' : 'Pull Models from Endpoints'}</span>
-                </button>
-              </div>
-
-              {/* Box 1: Active Model Routing (Full Width 3-Column Row) */}
+              {/* Box 3: Cloud API Credentials & Gateways */}
               <div className="settings-panel-box">
-                <h4 className="panel-box-heading">Active Model Routing</h4>
-                <div className="settings-row-3col">
-                  <div className="form-group compact">
-                    <label>Primary Generation Model</label>
-                    <select
-                      value={formData.primaryModel}
-                      onChange={(e) => setFormData({ ...formData, primaryModel: e.target.value })}
-                    >
-                      {!formData.primaryModel && <option value="">Select Primary Model...</option>}
-                      {formData.primaryModel && !discoveredModels.includes(formData.primaryModel) && (
-                        <option value={formData.primaryModel} title={formData.primaryModel}>
-                          {formData.primaryModel.length > 34 ? `${formData.primaryModel.slice(0, 32)}...` : formData.primaryModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`p-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group compact">
-                    <label>Reviewer / Audit Model</label>
-                    <select
-                      value={formData.reviewerModel}
-                      onChange={(e) => setFormData({ ...formData, reviewerModel: e.target.value })}
-                    >
-                      {!formData.reviewerModel && <option value="">Select Reviewer Model...</option>}
-                      {formData.reviewerModel && !discoveredModels.includes(formData.reviewerModel) && (
-                        <option value={formData.reviewerModel} title={formData.reviewerModel}>
-                          {formData.reviewerModel.length > 34 ? `${formData.reviewerModel.slice(0, 32)}...` : formData.reviewerModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`r-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group compact">
-                    <label>Socratic Mentor Model (AI Tutor)</label>
-                    <select
-                      value={formData.mentorModel || ''}
-                      onChange={(e) => setFormData({ ...formData, mentorModel: e.target.value })}
-                    >
-                      {!formData.mentorModel && <option value="">Select Mentor Model...</option>}
-                      {formData.mentorModel && !discoveredModels.includes(formData.mentorModel) && (
-                        <option value={formData.mentorModel} title={formData.mentorModel}>
-                          {formData.mentorModel.length > 34 ? `${formData.mentorModel.slice(0, 32)}...` : formData.mentorModel}
-                        </option>
-                      )}
-                      {discoveredModels.map((m) => (
-                        <option key={`m-${m}`} value={m} title={m}>
-                          {m.length > 34 ? `${m.slice(0, 32)}...` : m}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Box 2: Cloud API Credentials & Gateways (Spacious Full Width) */}
-              <div className="settings-panel-box">
-                <h4 className="panel-box-heading">Cloud API Credentials & Gateways</h4>
+                <h4 className="panel-box-heading">Cloud API Gateways & Credentials</h4>
 
                 <div className="settings-row-2col">
                   <div className="form-group compact">
-                    <label>Anthropic API Key (Claude 3.5 Sonnet / Opus)</label>
+                    <label>Anthropic API Key (Claude Sonnet / Opus)</label>
                     <input
                       type="password"
                       value={formData.anthropicApiKey}
@@ -821,7 +804,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   <div className="form-group compact">
-                    <label>Google Gemini Base URL (Optional Gateway / Proxy)</label>
+                    <label>Google Gemini Base URL (Optional Gateway)</label>
                     <input
                       type="text"
                       value={formData.geminiBaseUrl || ''}
@@ -834,7 +817,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {activeTab === 'store' && (
+          {activeTab === 'storage' && (
             <div className="settings-section">
               <div className="section-title-row">
                 <div className="section-title">
@@ -1001,125 +984,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                   ))}
               </div>
-            </div>
-          )}
 
-          {activeTab === 'maintenance' && (
-            <div className="settings-section">
-              <div className="section-title">
-                <Wrench size={14} />
-                <span>System Health & Runtime Maintenance</span>
-              </div>
-
-              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
-                <h4 className="panel-box-heading">Workspace Transient Data & Progress</h4>
-                <div className="form-group compact">
-                  <label>Session Artifacts & Study Progress</label>
-                  <span className="field-hint">
-                    Clears temporary markdown chat sessions (.workspace_sessions), cached export bundles, or resets lesson completion checkmarks.
-                  </span>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      onClick={async () => {
-                        if (confirm('Clear all transient chat sessions and temporary exports?')) {
-                          try {
-                            const res = await fetch('/api/clean', { method: 'POST' });
-                            if (res.ok) {
-                              const data = await res.json();
-                              alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
-                            }
-                          } catch {
-                            alert('Cleanup failed.');
-                          }
-                        }
-                      }}
-                    >
-                      <Trash2 size={12} />
-                      <span>Clear Transient Artifacts</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-secondary-sm"
-                      onClick={async () => {
-                        if (confirm('Reset all lesson completion checkmarks across all courses?')) {
-                          try {
-                            const res = await fetch('/api/clean', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ sessions: false, exports: false, mastery: true })
-                            });
-                            if (res.ok) {
-                              alert('Lesson completion progress reset.');
-                              window.location.reload();
-                            }
-                          } catch {
-                            alert('Reset failed.');
-                          }
-                        }
-                      }}
-                    >
-                      <RefreshCw size={12} />
-                      <span>Reset Lesson Progress</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="settings-panel-box" style={{ marginBottom: '16px' }}>
-                <h4 className="panel-box-heading">Inference Cluster & Model Pinning</h4>
-                <div className="form-group compact">
-                  <label>Node Model Pins (.synapse_node_pins.json)</label>
-                  <span className="field-hint">
-                    Current host model pin overrides. You can configure individual pins directly in the <strong>Cluster & Nodes</strong> tab.
-                  </span>
-
-                  {Object.keys(nodePins).length > 0 ? (
-                    <div style={{ margin: '8px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {Object.entries(nodePins).map(([host, model]) => (
-                        <div key={host} style={{ fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '5px 8px', borderRadius: '4px' }}>
-                          <span style={{ fontFamily: 'monospace', color: 'var(--accent, #e5a93c)' }}>{host}</span>
-                          <span style={{ color: 'var(--text-muted, #aaa)' }}>📌 {model}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="field-hint" style={{ display: 'block', margin: '6px 0', fontStyle: 'italic' }}>
-                      No nodes currently pinned (dynamic selection active across all nodes).
-                    </span>
-                  )}
-
-                  <button
-                    type="button"
-                    className="btn-secondary-sm"
-                    style={{ marginTop: '8px', width: 'fit-content' }}
-                    onClick={async () => {
-                      if (confirm('Reset all cluster node pins back to automatic model selection?')) {
-                        try {
-                          const res = await fetch('/api/settings/cluster-pins', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ pins: {} })
-                          });
-                          if (res.ok) {
-                            setNodePins({});
-                            alert('Node model pins reset successfully.');
-                          }
-                        } catch {
-                          alert('Failed to reset pins.');
-                        }
-                      }
-                    }}
-                  >
-                    <RefreshCw size={12} />
-                    <span>Reset Model Pins</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="settings-panel-box">
-                <h4 className="panel-box-heading">Database & Workspace Storage</h4>
+              {/* Workspace Storage & Maintenance */}
+              <div className="settings-panel-box" style={{ marginTop: '14px' }}>
+                <h4 className="panel-box-heading">Workspace Storage & Maintenance</h4>
                 <div className="maintenance-info-grid">
                   <div className="maintenance-info-item">
                     <span className="info-label">Runtime DB</span>
@@ -1137,6 +1005,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span className="info-label">User Credentials</span>
                     <span className="info-val">~/.config/synapse/env</span>
                   </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    onClick={async () => {
+                      if (confirm('Clear all transient chat sessions and temporary exports?')) {
+                        try {
+                          const res = await fetch('/api/clean', { method: 'POST' });
+                          if (res.ok) {
+                            const data = await res.json();
+                            alert(`Successfully cleaned ${data.cleaned} transient artifacts.`);
+                          }
+                        } catch {
+                          alert('Cleanup failed.');
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <span>Clear Transient Artifacts</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary-sm"
+                    onClick={async () => {
+                      if (confirm('Reset all lesson completion checkmarks across all courses?')) {
+                        try {
+                          const res = await fetch('/api/clean', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ sessions: false, exports: false, mastery: true })
+                          });
+                          if (res.ok) {
+                            alert('Lesson completion progress reset.');
+                            window.location.reload();
+                          }
+                        } catch {
+                          alert('Reset failed.');
+                        }
+                      }
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                    <span>Reset Lesson Progress</span>
+                  </button>
                 </div>
               </div>
             </div>

@@ -9,6 +9,9 @@ const fs = require('fs');
 const http = require('http');
 const { spawn } = require('child_process');
 
+// Explicitly define application display name
+app.setName('Synapse Workbench');
+
 let mainWindow = null;
 let backendProcess = null;
 let isQuitting = false;
@@ -140,13 +143,16 @@ async function ensureBackendRunning() {
  * Creates the primary native window.
  */
 function createMainWindow() {
+  const appIcon = path.join(__dirname, '../assets/icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
     minWidth: 1024,
     minHeight: 700,
     backgroundColor: '#121214',
-    title: 'Synapse AI Learning Workbench',
+    title: 'Synapse Workbench',
+    icon: fs.existsSync(appIcon) ? appIcon : undefined,
     frame: true,
     titleBarStyle: 'default',
     show: false,
@@ -300,6 +306,16 @@ ipcMain.on('toggle-devtools', () => {
 
 // App Lifecycle
 app.whenReady().then(async () => {
+  app.setName('Synapse Workbench');
+
+  // Set dock icon on macOS
+  if (process.platform === 'darwin' && app.dock) {
+    const dockIcon = path.join(__dirname, '../assets/icon.png');
+    if (fs.existsSync(dockIcon)) {
+      app.dock.setIcon(dockIcon);
+    }
+  }
+
   setupNativeMenu();
 
   const ready = await ensureBackendRunning();

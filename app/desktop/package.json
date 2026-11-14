@@ -1,5 +1,6 @@
 {
   "name": "synapse-desktop",
+  "productName": "Synapse Workbench",
   "version": "1.0.0",
   "description": "Synapse AI Learning Workbench - Standalone Native Desktop Shell",
   "main": "src/main.js",
