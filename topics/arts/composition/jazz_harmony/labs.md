@@ -1,343 +1,155 @@
-# Operational Verification Labs: Jazz Harmony
+# Jazz Harmony at the Keyboard: Voicings, Substitution, and Reharmonization
 
-## Objective & Lab Setup
+## How to Use This Material
 
-### Objective
+This is a hands-on course for pianists who already read chord symbols and can play a major scale in both hands. You will spend most of your time with fingers on keys, not reading theory. Every voicing is written with exact notes, exact left-hand fingering, and a metronome target. The theory paragraphs exist only to explain *why* a voicing or substitution works so you can transpose the logic yourself instead of memorizing shapes by rote.
 
-This laboratory provides rigorous, hands-on implementation of jazz harmonic principles through systematic practice, empirical analysis, and real-time performance drills. You will construct harmonic progressions at the keyboard, analyze their intervallic architecture through score study and ear training, and master the voice-leading constraints, chord-scale relationships, and functional substitution patterns that govern harmonic motion in the jazz idiom.
-
-By the end of these exercises, you will internalize the structural mechanics that distinguish jazz harmony from common-practice tonality: extended tertian chords (9ths, 11ths, 13ths), tritone substitution, modal interchange, upper-structure triads, and the tension-resolution cycles that drive improvisation. Every exercise includes keyboard drills with specific fingerings, metronome progressions, and computational verification tools.
-
-### Lab Setup
-
-Prepare the following environment:
-
-**Primary Instrument: Piano or MIDI Keyboard**
-- 61+ keys (minimum 5 octaves)
-- Weighted or semi-weighted action preferred for dynamic control
-- MIDI output capability for DAW integration
-
-**Notation and Analysis**
-- **MuseScore 4.x** (open-source, cross-platform) for score entry, playback, and MIDI export
-- **music21** Python library (≥9.1) for computational music analysis, chord recognition, and Roman numeral analysis
-
-**Digital Audio Workstation**
-- **Reaper** (lightweight, MIDI-capable) or **Ableton Live** for MIDI playback, track routing, and real-time parameter adjustment
-- VST/AU instrument: **Keyscape**, **Addictive Keys**, or **Pianoteq** for realistic piano voicings
-
-**Python Environment**
-- Python 3.10 or later
-- Libraries: `music21`, `numpy`, `matplotlib`, `scipy`, `pandas`
-- Install via: `pip install music21 numpy matplotlib scipy pandas`
-
-**Additional Tools**
-- **iReal Pro** (optional) for chord chart playback and transposition
-- **Sonic Visualiser** with Chordino plugin for audio-to-chord analysis
-- Metronome app or hardware metronome
-
-Verify installation:
-
-```bash
-python3 --version
-python3 -c "import music21; print(music21.__version__)"
-```
-
-Configure music21 to use MuseScore for MIDI playback:
-
-```python
-from music21 import environment
-us = environment.UserSettings()
-us['musescoreDirectPNGPath'] = '/usr/bin/mscore'  # or /Applications/MuseScore 4.app/Contents/MacOS/mscore
-us['musicxmlPath'] = '/usr/bin/mscore'
-```
+Keep a real piano or weighted MIDI keyboard in front of you while reading. Nothing here is learned by eye.
 
 ---
 
-## Exercise 1: Foundational Keyboard Implementation – ii-V-I with Extended Voicings
+## Lab Setup
 
-### Exercise Overview
+**Instrument:** 61+ key weighted or semi-weighted keyboard, or acoustic piano. You need the full left-hand range from roughly E2 to C4 for voicings in this lesson.
 
-You will physically practice the ii-V-I progression—the fundamental harmonic cell of jazz—at the keyboard with rootless voicings and extended tensions (9ths, 11ths, 13ths). This exercise establishes the intervallic stack that defines jazz comping and demonstrates how voice-leading efficiency (minimizing melodic motion between adjacent chords) creates smooth harmonic flow.
+**Notation/playback:** MuseScore 4 (free) for writing out voicings and hearing swing playback. Set Format → Style → Score → Swing to "Eighth note swing" so comping rhythms sound idiomatic rather than stiff.
 
-**Theoretical Foundation: Why ii-V-I Works (15%)**
+**Practice loop:** iReal Pro or a simple DAW (Reaper, GarageBand) to loop a progression so you can comp and solo over a static backing instead of always playing both hands of the changes.
 
-The ii-V-I progression in C major (Dm7 → G7 → Cmaj7) functions as a circle-of-fifths descent: root motion by descending perfect fifth creates strong harmonic momentum. The V chord (G7) contains the tritone B–F, which resolves by contrary motion to C and E in the I chord. The ii chord prepares the V by establishing subdominant function and placing the 7th of the V chord (F) as a common tone.
+**Metronome:** Any metronome app with accent-on-beat-1 capability. You will use it in nearly every drill.
 
-In jazz, chords are extended with diatonic tensions:
-- **Dm9(11)**: D–F–A–C + E (9th) + G (11th) → typical voicing omits root
-- **G13**: G–B–D–F + A (9th) + E (13th) → typical voicing omits root and 5th
-- **Cmaj9**: C–E–G–B + D (9th) → typical voicing omits 5th
+Optional, if you want to verify your own voicings computationally rather than just by ear — this is a sanity-check tool, not a substitute for playing:
 
-Rootless voicings place the 3rd or 7th in the bass (left hand), allowing the bassist to outline the root motion. This creates a more open, transparent texture essential for comping behind soloists.
-
-### Step-by-Step Procedure
-
-#### 1. Keyboard Drill: A-Form Rootless Voicings (LH: 7-3-5-9)
-
-**Hand Position & Ergonomics:**
-- Sit at keyboard center (middle C directly in front of your navel)
-- Feet flat on floor, thighs parallel to ground
-- Elbows slightly above keyboard, wrists level (no wrist drop or elevation)
-- Curved fingers, fingertips perpendicular to keys
-- Weight transfers from shoulder through relaxed forearm, not finger-pushing
-
-**A-Form Voicing Structure (3rd in bass):**
-
-The A-form places the 3rd of the chord in the bass (LH lowest note), followed by the 7th, 9th, and 5th in ascending order.
-
-**C Major ii-V-I in A-Form (LH Only):**
-
-```
-Dm9:   LH: F (3rd) – C (b7) – E (9th) – A (5th)
-       Fingering: 5 – 3 – 2 – 1
-
-G13:   LH: B (3rd) – F (b7) – A (9th) – E (13th)
-       Fingering: 5 – 3 – 2 – 1
-
-Cmaj9: LH: E (3rd) – B (M7) – D (9th) – G (5th)
-       Fingering: 5 – 3 – 2 – 1
+```bash
+pip install music21
+python3 -c "from music21 import chord; print(chord.Chord(['F3','C4','E4','A4']).pitchedCommonName)"
 ```
 
-**Practice Drill 1A: Static Voicing Changes**
+That should print something resembling `D-minor-ninth`. If it doesn't, you've mis-voiced the chord — trust your ear and the fingerings below over the script, but the check catches typos.
 
-1. Set metronome to 60 BPM
-2. Play Dm9 voicing as whole note (4 beats), all notes simultaneously
-3. Transition to G13 voicing on beat 1 of next measure
-4. Transition to Cmaj9 on beat 1 of third measure
-5. Hold Cmaj9 for 4 beats, return to Dm9
-6. Focus on minimal hand movement: fingers should stay close to keys, no unnecessary lifting
+---
 
-**Success Criteria:**
-- All four notes sound simultaneously with balanced volume
-- Smooth transitions with no audible gaps or overlapping chord tones
-- Consistent dynamic level (mezzo-forte)
+## Exercise 1: Rootless Voicings — The ii–V–I Engine
 
-**Practice Drill 1B: Voice-Leading Analysis**
+### Why rootless voicings exist
 
-Play each voicing slowly and identify the voice-leading motion:
+In a working rhythm section the bassist already states the root. If the pianist also plays the root, you get two instruments competing for the same low frequency, and the voicing sounds thick and dated. Bill Evans popularized the solution: the piano's left hand plays only the 3rd, 7th, and upper color tones (9th, 13th), leaving the root to the bass. This is not a simplification — it's a deliberate removal of redundant information that opens space in the texture.
 
-```
-Dm9 → G13:
-  F → B (augmented 4th up / tritone)
-  C → F (perfect 4th up)
-  E → A (perfect 4th up)
-  A → E (perfect 4th down)
+The two voicings you need are built around guide tones: the 3rd and 7th of each chord. These two notes alone define whether a chord is major, minor, or dominant, and whether it needs to resolve. Everything else is color.
 
-G13 → Cmaj9:
-  B → E (perfect 4th up)
-  F → B (augmented 4th up / tritone)
-  A → D (perfect 4th up)
-  E → G (minor 3rd up)
-```
+In C major, Dm7 → G7 → Cmaj7, watch what the 7th of each chord does:
+- Dm7's 7th is C. It becomes the 3rd of... no — it stays as a common tone into G7's voicing (C is the b7 of G7 too, in root position thinking)... more usefully: G7 contains the tritone **B–F** (3rd and 7th). That tritone is harmonically unstable and wants to contract inward. It resolves to **C and E** — the root and 3rd of Cmaj7. That one interval, contracting by half step on each side, is the entire reason the V–I cadence feels conclusive. Everything you build below is decoration around that one moving tritone.
 
-Notice the predominance of perfect 4th motion—this quartal movement creates smooth voice-leading with minimal hand displacement.
+### A-Form voicings (3rd in the bass)
 
-**Practice Drill 1C: Rhythmic Comping (60 → 80 → 100 → 120 BPM)**
-
-Once static voicing changes are secure, add rhythmic variation:
-
-1. Start at 60 BPM, 4/4 time
-2. Play the following rhythm (x = chord attack, - = rest):
+A-form stacks: **3rd – 7th – 9th – 5th**, read bottom to top, left hand only.
 
 ```
-Measure 1 (Dm9):   |x - - x|
-Measure 2 (G13):   |x - x -|
-Measure 3 (Cmaj9): |x - - -|
-Measure 4 (Cmaj9): |x - - -|
+Dm9     LH: F3  C4  E4  A4      (3rd, b7, 9th, 5th)
+G13     LH: B3  F4  A4  E5      (3rd, b7, 9th, 13th)
+Cmaj9   LH: E3  B3  D4  G4      (3rd, 7th, 9th, 5th)
 ```
 
-3. Increase tempo in 20 BPM increments: 60 → 80 → 100 → 120 BPM
-4. At 120 BPM, add syncopation:
+**Left-hand fingering (all three chords): 5–3–2–1**, thumb on top. Keep the hand in one compact shape — you are not reaching, you are repositioning a fixed claw.
+
+**Hand posture check before you play a note:**
+- Sit so middle C is in front of your sternum, not your left shoulder.
+- Wrist level with the forearm — no breaking downward into the keys.
+- Fingers curved as if holding a small ball; strike with the pad of the fingertip, not the flat finger.
+- Drop the chord using arm weight falling through a relaxed wrist, not four fingers stabbing independently. You should feel the attack originate near the elbow.
+
+### Drill 1A — Static voicing changes (60 BPM)
+
+1. Play Dm9 as a half-note chord — all four notes hit exactly together, no smearing.
+2. On beat 1 of the next bar, move to G13.
+3. On beat 1 of the bar after, move to Cmaj9. Hold two bars.
+4. Loop back to Dm9.
+
+**What "clean" sounds like:** when you lift off Dm9 and land on G13, there should be zero gap (sounds like a held pedal tone bleeding through) and zero overlap (sounds like a smear/cluster). Record yourself on your phone — your ear catches sloppy transitions far better in playback than in the moment.
+
+### Drill 1B — Why this voice-leads well
+
+Write out the motion between adjacent chords, note by note, bottom to top:
 
 ```
-Measure 1 (Dm9):   |x - x -|- x - -|
-Measure 2 (G13):   |- x - x|- - x -|
-Measure 3 (Cmaj9): |x - - -|- - - -|
+Dm9 → G13:     F→B (tritone)   C→F (4th up)   E→A (4th up)   A→E (4th down)
+G13 → Cmaj9:   B→E (4th up)    F→B (tritone)  A→D (4th up)   E→G (m3 up)
 ```
 
-**Practice Drill 1D: Two-Hand Voicings with RH Melody**
+Three of four voices move by a perfect 4th in each transition. A 4th on the keyboard is a small physical reach — roughly the width of your hand's natural span between two fingers. This is why rootless A/B-form voicings feel almost static under the hand even though the chord symbols are changing completely: the *physical* motion is small even when the *harmonic* motion (a full descending-fifth root movement) is large. That mismatch between small hand motion and large harmonic motion is the main technical payoff of learning rootless voicings at all.
 
-Add right-hand melody on top of LH voicings:
+### Drill 1C — Add comping rhythm (60 → 120 BPM)
 
-```
-Measure 1 (Dm9 in LH):   RH plays: A (5) → C (5) → E (5) → G (5) (quarter notes)
-Measure 2 (G13 in LH):   RH plays: G (5) → B (4) → D (5) → F (5)
-Measure 3 (Cmaj9 in LH): RH plays: E (5) → G (5) → C (5) → rest
-```
-
-Fingerings shown in parentheses. This creates independent melodic motion in the right hand while maintaining harmonic support in the left.
-
-#### 2. Keyboard Drill: B-Form Rootless Voicings (LH: 3-7-9-5)
-
-**B-Form Voicing Structure (7th in bass):**
-
-The B-form places the 7th of the chord in the bass (LH lowest note), followed by the 3rd, 5th, and 9th in ascending order.
-
-**C Major ii-V-I in B-Form (LH Only):**
+Static whole-note chords are a practice scaffold, not real comping. Add this syncopated pattern once Drill 1A is solid (x = attack, dash = held/rest within the beat):
 
 ```
-Dm9:   LH: C (b7) – F (3rd) – A (5th) – E (9th)
-       Fingering: 5 – 3 – 2 – 1
-
-G13:   LH: F (b7) – B (3rd) – E (13th) – A (9th)
-       Fingering: 5 – 3 – 2 – 1
-
-Cmaj9: LH: B (M7) – E (3rd) – G (5th) – D (9th)
-       Fingering: 5 – 3 – 2 – 1
+Dm9 (1 bar):   x . x .  (beats 1 and 3)
+G13 (1 bar):   . x . x  (beats 2 and 4, anticipating resolution)
+Cmaj9 (2 bars): x . . .  | . . . .
 ```
 
-**Practice Drill 2A: Alternating A-Form and B-Form**
+Run the full 4-bar phrase at 60, then 80, then 100, then 120 BPM. Do not advance tempo until the previous tempo is clean for four consecutive loops without listening to the metronome — if you lose the click, you're not ready to move up.
 
-1. Metronome at 60 BPM
-2. Play one cycle of ii-V-I in A-form (see Drill 1A)
-3. Immediately follow with one cycle in B-form
-4. Focus on the hand shift: B-form sits approximately one octave higher than A-form
-5. Repeat 10 times, alternating forms
+### Drill 1D — Two-hand independence: RH melody over LH comping
 
-**Success Criteria:**
-- Clean transitions between A-form and B-form with no hesitation
-- Consistent dynamic level across both forms
-- Muscle memory for both fingering patterns
+```
+Bar 1 (LH: Dm9 held):   RH quarter notes: A4(5) C5(5) E5(5) G5(5)
+Bar 2 (LH: G13 held):   RH quarter notes: G4(5) B4(4) D5(5) F5(5)
+Bar 3 (LH: Cmaj9 held): RH quarter notes: E4(5) G4(5) C5(5) rest
+```
+(RH fingering in parentheses — these are mostly 5th-finger-led arpeggiations; use 4-3-2-1 for the descending notes within each beat group as needed for your hand size.)
 
-#### 3. All-Keys Transposition Drill
+The point of this drill is hand independence: the left hand's rhythm (from Drill 1C) and the right hand's melody must NOT lock into the same rhythmic pattern. Practice LH alone, RH alone, then combine at half speed before bringing it to tempo.
 
-Jazz musicians must execute voicings in all 12 keys. Use the circle of fifths for systematic transposition.
+### B-Form voicings (7th in the bass)
 
-**Circle of Fifths Sequence:**
+B-form stacks: **7th – 3rd – 5th – 9th**. This is the A-form voicing inverted up — same four pitch classes, different note on the bottom.
+
+```
+Dm9     LH: C4  F4  A4  E5
+G13     LH: F4  B4  E5  A5
+Cmaj9   LH: B3  E4  G4  D5
+```
+
+Fingering: **5–3–2–1** again. Notice B-form sits roughly an octave higher than A-form for the same chord — this is intentional. In real comping, you alternate A-form and B-form specifically so your hand doesn't have to jump the full octave every time you move from a ii chord to a V chord; instead you alternate "low voicing → high voicing → low voicing" and the hand travels in small, comfortable steps.
+
+### Drill 2A — Alternate A-form and B-form (60 BPM)
+
+1. Play the full Dm9–G13–Cmaj9 cycle in A-form.
+2. Immediately repeat the cycle in B-form, one register higher.
+3. Alternate ten times without stopping. Watch for hesitation exactly at the switch point — that hesitation is where your muscle memory is weakest and where you should slow down and isolate just that transition for thirty seconds before resuming the full loop.
+
+### Drill 3 — All twelve keys
+
+Use the circle of fifths for transposition order, not alphabetical or random order — fifths-related keys share the most voicing shapes, so this order builds transfer fastest:
+
+```
 C → F → Bb → Eb → Ab → Db → Gb → B → E → A → D → G → C
-
-**Practice Drill 3A: Single-Key Mastery**
-
-For each key, practice the following sequence:
-1. A-form ii-V-I progression, 4 repetitions at 80 BPM
-2. B-form ii-V-I progression, 4 repetitions at 80 BPM
-3. Alternate A-form and B-form, 4 cycles at 100 BPM
-
-**Daily Practice Schedule:**
-- **Week 1:** C, F, Bb, Eb (flat keys)
-- **Week 2:** Ab, Db, Gb, B (flat/sharp transition keys)
-- **Week 3:** E, A, D, G (sharp keys)
-- **Week 4:** All 12 keys, random selection
-
-**Practice Drill 3B: Ii-V-I Cycle in All Keys**
-
-Play continuous ii-V-I progressions descending by whole steps:
-
-```
-C major:  Dm9 – G13 – Cmaj9 (2 bars each)
-Bb major: Cm9 – F13 – Bbmaj9
-Ab major: Bbm9 – Eb13 – Abmaj9
-Gb major: Abm9 – Db13 – Gbmaj9
-E major:  F#m9 – B13 – Emaj9
-... continue through all keys
 ```
 
-Metronome at 80 BPM, each chord held for 2 beats. This drill builds fluency in all tonal centers and prepares you for real-book tunes that modulate frequently.
+**Four-week schedule:**
+- Week 1: C, F, Bb, Eb — A-form and B-form, 4 reps each at 80 BPM
+- Week 2: Ab, Db, Gb, B — same drill
+- Week 3: E, A, D, G — same drill
+- Week 4: All twelve, randomized order, 100 BPM, no repeats of a key until all twelve are played once
 
-#### 4. Score Entry in MuseScore for Verification
+**A fast way to transpose without re-deriving the voicing:** the A-form shape for a minor ii chord is always *interval pattern* (root+3, root+10, root+2 up an octave, root+7) relative to the chord's root — but the faster practical method is to recognize that A-form Dm9 and B-form G13 share almost the same four notes (compare: Dm9 A-form is F-C-E-A; G13 B-form is F-B-E-A — only one note differs). Once you see that ii and V chords one fifth apart share 3 of 4 voice tones, you stop thinking "what are the notes of Ab13" and start thinking "what's the one note that moves."
 
-Open MuseScore and create a new score:
-- Instrument: Piano (Grand Staff)
-- Time signature: 4/4
-- Key signature: C major
-- Tempo: 120 BPM (medium swing)
-
-Enter the A-form voicings from Drill 1A in the treble and bass clefs:
-
-| Measure | Chord   | LH (Bass Clef)       | RH (Treble Clef) |
-|---------|---------|----------------------|------------------|
-| 1       | Dm9     | F3, C4, E4, A4       | D5, F5, A5       |
-| 2       | G13     | B3, F4, A4, E5       | G5, B5, D6       |
-| 3       | Cmaj9   | E3, B3, D4, G4       | C5, E5, G5       |
-
-Add chord symbols above the staff: `Dm9`, `G13`, `Cmaj9`.
-
-Enable swing playback: Format → Style → Score → Set "Swing" to "Eighth note swing (2:1 ratio)".
-
-Export the score as MIDI: File → Export → MIDI.
-
-#### 5. Computational Analysis with music21
-
-Analyze the harmonic structure programmatically:
-
-```python
-from music21 import stream, chord, roman, key, interval
-import matplotlib.pyplot as plt
-
-# Define the progression using A-form voicings
-progression_stream = stream.Stream()
-progression_stream.append(key.Key('C'))
-
-dm9 = chord.Chord(['F3', 'C4', 'E4', 'A4'])  # Dm9 rootless A-form
-g13 = chord.Chord(['B3', 'F4', 'A4', 'E5'])  # G13 rootless A-form
-cmaj9 = chord.Chord(['E3', 'B3', 'D4', 'G4'])  # Cmaj9 rootless A-form
-
-progression_stream.append(dm9)
-progression_stream.append(g13)
-progression_stream.append(cmaj9)
-
-# Analyze each chord
-tonic = key.Key('C')
-for i, ch in enumerate(progression_stream.getElementsByClass(chord.Chord)):
-    print(f"\n=== Chord {i+1} ===")
-    
-    # Infer root from chord tones (music21 sometimes misidentifies rootless voicings)
-    # Manually correct if needed
-    roots_manual = ['D', 'G', 'C']
-    ch_root = roots_manual[i]
-    
-    print(f"Root (manual): {ch_root}")
-    print(f"Voicing: {[p.nameWithOctave for p in ch.pitches]}")
-    
-    # Calculate intervals from inferred root
-    root_pitch = chord.Chord([ch_root + '3']).pitches[0]
-    intervals_from_root = []
-    for p in ch.pitches:
-        intv = interval.Interval(root_pitch, p)
-        intervals_from_root.append(intv.simpleName)
-    print(f"Intervals from root: {intervals_from_root}")
-
-# Voice-leading analysis: measure semitone motion between adjacent chords
-print("\n=== Voice-Leading Motion ===")
-chords = list(progression_stream.getElementsByClass(chord.Chord))
-for i in range(len(chords) - 1):
-    ch1 = chords[i]
-    ch2 = chords[i + 1]
-    
-    print(f"\nChord {i+1} → Chord {i+2}:")
-    pitches1 = sorted(ch1.pitches, key=lambda p: p.ps)
-    pitches2 = sorted(ch2.pitches, key=lambda p: p.ps)
-    
-    total_motion = 0
-    for j in range(min(len(pitches1), len(pitches2))):
-        intv = interval.Interval(pitches1[j], pitches2[j])
-        print(f"  {pitches1[j].nameWithOctave} → {pitches2[j].nameWithOctave}: {intv.directedName} ({intv.semitones} semitones)")
-        total_motion += abs(intv.semitones)
-    
-    print(f"  Total motion: {total_motion} semitones")
-```
-
-Expected output confirms the efficient voice-leading: total motion between adjacent chords should be 10–15 semitones, indicating smooth contrary and oblique motion typical of rootless jazz voicings.
-
-#### 6. Voice-Leading Diagram
+### Voice-leading diagram
 
 ```mermaid
 graph LR
-    subgraph sub_dm9 ["Dm9 (A-Form)"]
-        A["F (3rd)<br/>C (♭7)<br/>E (9th)<br/>A (5th)"]
+    subgraph sub_dm9 ["Dm9 (A-Form): F C E A"]
+        A["3rd-b7-9th-5th"]
     end
-    
-    subgraph sub_g13 ["G13 (A-Form)"]
-        B["B (3rd)<br/>F (♭7)<br/>A (9th)<br/>E (13th)"]
+    subgraph sub_g13 ["G13 (A-Form): B F A E"]
+        B["3rd-b7-9th-13th"]
     end
-    
-    subgraph sub_cmaj9 ["Cmaj9 (A-Form)"]
-        C["E (3rd)<br/>B (M7)<br/>D (9th)<br/>G (5th)"]
+    subgraph sub_cmaj9 ["Cmaj9 (A-Form): E B D G"]
+        C["3rd-7th-9th-5th"]
     end
-    
-    A -->|"Tritone resolution<br/>Perfect 4th motion"| B
-    B -->|"Tritone resolution<br/>Perfect 4th motion"| C
-    
+    A -->|"3 voices move a 4th,<br/>1 voice holds tritone"| B
+    B -->|"3 voices move a 4th,<br/>tritone resolves"| C
     style A fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#E5E7EB
     style B fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
     style C fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
@@ -345,1093 +157,495 @@ graph LR
 
 ---
 
-## Exercise 2: Tritone Substitution & Chromatic Voice-Leading
+## Exercise 2: Tritone Substitution
 
-### Exercise Overview
+### The mechanism, concretely
 
-You will systematically practice **tritone substitution** (replacing V7 with bII7) at the keyboard, analyzing the chromatic bass line and shared tritone interval that make this substitution function. This exercise introduces advanced reharmonization techniques essential for jazz arranging and improvisation.
+Any dominant 7th chord's identity comes from its tritone: the interval between its 3rd and 7th. G7's tritone is B–F. Now find the *other* dominant 7th chord in the universe that also contains the interval B–F as its guide tones — that's Db7 (3rd = F, 7th = Cb, which is enharmonically B). Two completely different chords, same tritone, same pull toward resolution. Db is a tritone away from G (six semitones in either direction — that's where the name comes from), so this substitution is always "the dominant chord built on the b5 of the original."
 
-**Theoretical Foundation: Tritone Substitution (15%)**
+The payoff is the bass line. A standard ii–V–I moves D (ii) → G (V) → C (I) — a 4th down, then a 5th up. Substitute the V and you get D (ii) → Db (subV) → C (I) — a chromatic step down, then another chromatic step down. Chromatic bass motion sounds smoother and more "inevitable" than leaping 4ths and 5ths, which is why tritone subs became a reharmonization staple rather than just a curiosity.
 
-The tritone substitution replaces a dominant seventh chord with another dominant seventh chord whose root is a tritone away. In C major, G7 (root G, 3rd B, 7th F) can be replaced by Db7 (root Db, 3rd F, 7th Cb/B). The tritone interval B–F is identical in both chords (enharmonically), but the bass line becomes chromatic: D → Db → C instead of D → G → C.
-
-This creates smoother voice-leading while maintaining dominant function. The tritone (augmented 4th / diminished 5th) is the defining interval of dominant harmony because it creates harmonic instability that demands resolution to the tonic.
-
-### Step-by-Step Procedure
-
-#### 1. Keyboard Drill: Standard ii-V-I vs. ii-bII-I
-
-**Standard ii-V-I (A-Form):**
+### Drill 2A — Side by side (60 BPM)
 
 ```
-Dm9:   LH: F3 – C4 – E4 – A4
-G13:   LH: B3 – F4 – A4 – E5
-Cmaj9: LH: E3 – B3 – D4 – G4
+Standard:     Dm9 (LH: F3 C4 E4 A4) → G13 (LH: B3 F4 A4 E5) → Cmaj9 (LH: E3 B3 D4 G4)
+Tritone sub:  Dm9 (same)           → Db13(LH: F3 B3 Eb4 Ab4) → Cmaj9 (same)
 ```
 
-**Tritone Substitution ii-bII-I (A-Form):**
+Play four bars standard, immediately four bars substituted. Listen specifically to the bass note under beat 1 of bar 2: standard jumps a tritone (F to B going up, or think of it as the LH lowest note going F→B), tritone-sub version has **F stay on F** — it's a literal common tone between Dm9 and Db13. That shared note is why the substitution feels seamless rather than jarring: one whole voice doesn't move at all.
+
+### Drill 2B — Isolate the guide tones
+
+Strip each chord to just 3rd and 7th, two notes:
 
 ```
-Dm9:     LH: F3 – C4 – E4 – A4 (same as standard)
-Db13:    LH: F3 – Cb4(B3) – Eb4 – Ab4  [Tritone sub for G13]
-Cmaj9:   LH: E3 – B3 – D4 – G4 (same as standard)
+G7:  B3 F4   (3rd, 7th)
+Db7: F3 B3   (3rd, 7th — same two pitch classes, inverted)
 ```
 
-**Practice Drill 2A: Side-by-Side Comparison**
+Play G7's guide tones, then Db7's guide tones, back and forth, ten times, listening for the fact that they are the *same dyad*. This two-note drill is the fastest way to internalize why the substitution is legitimate rather than arbitrary — you're hearing the shared tritone directly with no other notes to distract you.
 
-1. Set metronome to 60 BPM
-2. Play standard ii-V-I (4 bars: 1 bar per chord + 1 bar rest)
-3. Immediately play tritone-sub ii-bII-I (4 bars)
-4. Compare the bass motion:
-   - **Standard:** F → B (tritone leap) → E (perfect 4th)
-   - **Tritone sub:** F → F (common tone) → E (semitone)
-
-**Observation:** The tritone substitution creates a chromatic bass line descent (Db in the root motion: D → Db → C) while preserving the tritone guide tones (3rd and 7th). Notice that F is a common tone between Dm9 and Db13.
-
-**Practice Drill 2B: Isolated Tritone Analysis**
-
-Play only the 3rd and 7th of each chord (two-note voicing):
-
-```
-G7:   B (3rd) – F (7th) in LH
-Db7:  F (3rd) – Cb/B (7th) in LH
-```
-
-These are the **guide tones**—the 3rd and 7th define chord quality and function. Notice that G7 and Db7 share the same tritone (B–F), just inverted. This is why the substitution works: harmonic function is preserved while root motion changes.
-
-#### 2. Keyboard Drill: Tritone Sub in All Keys
-
-Transpose the ii-bII-I progression through the circle of fifths:
+### Drill 2C — All twelve keys (80 → 120 BPM)
 
 ```
 C major:  Dm9 – Db13 – Cmaj9
 F major:  Gm9 – Gb13 – Fmaj9
-Bb major: Cm9 – B13 – Bbmaj9
-Eb major: Fm9 – E13 – Ebmaj9
-... continue
+Bb major: Cm9 – B13  – Bbmaj9
+Eb major: Fm9 – E13  – Ebmaj9
 ```
+Continue around the circle of fifths. Two beats per chord, 80 BPM to start, pushing to 120. The sub chord root is always a half step above the I chord's root resolving down to it (e.g., Db→C, Gb→F, B→Bb) — use that relationship as a mental shortcut instead of calculating "tritone from G" every time.
 
-**Practice Drill 2C: All-Keys Cycle (80 → 100 → 120 BPM)**
-
-1. Start at 80 BPM, 2 beats per chord
-2. Play the complete 12-key cycle (3 chords × 12 keys = 36 chords total)
-3. Focus on the chromatic semitone motion in the bass from ii to bII
-4. Increase tempo: 80 → 100 → 120 BPM
-
-**Success Criteria:**
-- Smooth chromatic voice-leading with no hesitation
-- Clean tritone guide-tone resolution in each key
-- Consistent tempo and dynamic level
-
-#### 3. Practical Application: Reharmonizing "Autumn Leaves"
-
-Standard progression (first 8 bars, key of G minor):
+### Applying it: "Autumn Leaves," first 8 bars (G minor)
 
 ```
-| Cm7  | F7   | Bbmaj7 | Ebmaj7 |
-| Am7b5| D7   | Gm7    | Gm7    |
+Original:        | Cm7   | F7    | Bbmaj7 | Ebmaj7 |
+                 | Am7b5 | D7    | Gm7    | Gm7    |
+
+Tritone-subbed:  | Cm7   | B7    | Bbmaj7 | Ebmaj7 |   (F7 → B7)
+                 | Am7b5 | Ab7   | Gm7    | Gm7    |   (D7 → Ab7)
 ```
 
-Apply tritone substitution to dominant chords:
+Learn the original with A/B-form voicings first — you need the unaltered version in your ear before the substitution will sound like a *choice* rather than an error. Then swap in the subbed chords and play both versions back to back, noting that the melody of the tune (if you're comping under a singer or horn) may now clash with the new chord unless you check it against the new guide tones.
 
-```
-| Cm7  | B7   | Bbmaj7 | Ebmaj7 |  [F7 → B7]
-| Am7b5| Ab7  | Gm7    | Gm7    |  [D7 → Ab7]
-```
-
-**Practice Drill 3A: Reharmonized "Autumn Leaves"**
-
-1. Learn the standard progression in both A-form and B-form voicings
-2. Practice the reharmonized version with tritone subs
-3. Play through both versions consecutively, comparing the harmonic color
-
-**Practice Drill 3B: Improvising with Tritone Subs**
-
-1. Record or loop the chord progression (use a DAW or iReal Pro)
-2. Improvise melodically over the progression, using chord tones and tensions
-3. Notice how the tritone sub creates unexpected chromatic movement in the bass, opening new melodic possibilities
-
-#### 4. Computational Analysis: Voice-Leading Efficiency
-
-```python
-from music21 import stream, chord, key, interval
-
-# Standard ii-V-I
-standard = stream.Stream()
-standard.append(chord.Chord(['F3', 'C4', 'E4', 'A4']))  # Dm9
-standard.append(chord.Chord(['B3', 'F4', 'A4', 'E5']))  # G13
-standard.append(chord.Chord(['E3', 'B3', 'D4', 'G4']))  # Cmaj9
-
-# Tritone substitution ii-bII-I
-tritone_sub = stream.Stream()
-tritone_sub.append(chord.Chord(['F3', 'C4', 'E4', 'A4']))  # Dm9
-tritone_sub.append(chord.Chord(['F3', 'B3', 'Eb4', 'Ab4']))  # Db13
-tritone_sub.append(chord.Chord(['E3', 'B3', 'D4', 'G4']))  # Cmaj9
-
-def calculate_voice_leading_cost(progression, name):
-    """Calculate total semitone motion between adjacent chords."""
-    chords = list(progression.getElementsByClass(chord.Chord))
-    total_cost = 0
-    
-    print(f"\n=== {name} ===")
-    for i in range(len(chords) - 1):
-        ch1 = chords[i]
-        ch2 = chords[i + 1]
-        
-        pitches1 = sorted(ch1.pitches, key=lambda p: p.ps)
-        pitches2 = sorted(ch2.pitches, key=lambda p: p.ps)
-        
-        chord_cost = 0
-        for j in range(min(len(pitches1), len(pitches2))):
-            intv = interval.Interval(pitches1[j], pitches2[j])
-            chord_cost += abs(intv.semitones)
-        
-        total_cost += chord_cost
-        print(f"Chord {i+1} → {i+2}: {chord_cost} semitones")
-    
-    print(f"Total voice-leading cost: {total_cost} semitones\n")
-    return total_cost
-
-standard_cost = calculate_voice_leading_cost(standard, "Standard ii-V-I")
-tritone_cost = calculate_voice_leading_cost(tritone_sub, "Tritone Sub ii-bII-I")
-
-print(f"Voice-leading efficiency gain: {standard_cost - tritone_cost} semitones")
-```
-
-Expected output: The tritone substitution should show a lower total voice-leading cost (fewer semitones of motion) due to the chromatic bass line and common-tone preservation between Dm9 and Db13.
-
-#### 5. Tritone Substitution Flowchart
+### Flowchart
 
 ```mermaid
 graph TD
     subgraph sub_analysis ["Tritone Substitution Mechanics"]
-        A["Original: G7<br/>Root: G | 3rd: B | 7th: F"] --> B{"Locate tritone<br/>interval"}
-        B --> C["Tritone: B–F"]
-        C --> D["New root = tritone<br/>away from G"]
-        D --> E["Substitute: D♭7<br/>Root: D♭ | 3rd: F | 7th: C♭(B)"]
-        E --> F["Guide tones preserved<br/>B–F becomes F–B"]
-        F --> G["Bass motion:<br/>D → D♭ → C<br/>(chromatic descent)"]
+        A["G7: root G, 3rd B, 7th F"] --> B["Guide-tone tritone: B-F"]
+        B --> C["Db is a tritone from G"]
+        C --> D["Db7: root Db, 3rd F, 7th Cb(B)"]
+        D --> E["Same tritone, roots reversed"]
+        E --> F["Bass motion becomes chromatic:<br/>D to Db to C"]
     end
-    
     style A fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#E5E7EB
     style C fill:#1E2636,stroke:#F59E0B,stroke-width:2px,color:#E5E7EB
     style E fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
-    style G fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
+    style F fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
 ```
 
 ---
 
 ## Exercise 3: Modal Interchange & Upper-Structure Triads
 
-### Exercise Overview
+### Modal interchange, in practice
 
-You will practice **modal interchange** (borrowing chords from the parallel minor) and **upper-structure triads** (superimposing triads over dominant chords to create complex tensions). These techniques expand harmonic color and create darker, more ambiguous tonalities characteristic of modern jazz.
-
-**Theoretical Foundation: Modal Interchange (15%)**
-
-Modal interchange borrows chords from the parallel minor key. In C major, chords borrowed from C natural minor include:
-- **iv (Fm7)** instead of IV (Fmaj7)
-- **♭VI (A♭maj7)** instead of vi (Am7)
-- **♭VII (B♭7)** instead of vii° (Bm7♭5)
-- **♭III (E♭maj7)** instead of iii (Em7)
-
-These chords introduce ♭3, ♭6, and ♭7 scale degrees, creating darker harmonic colors while remaining functional within the tonal center. Modal interchange is common in jazz standards like "All the Things You Are" (borrowed ♭VI in the bridge) and "Blue Bossa" (borrowed iv).
-
-**Upper-Structure Triads:**
-
-Upper-structure triads superimpose a major or minor triad in the right hand over a dominant 7th chord shell (root, 3rd, 7th) in the left hand. This creates complex tensions without thinking about stacked intervals.
-
-Example: G7 with E♭ major triad on top
-- LH: G (root), B (3rd), F (7th)
-- RH: E♭ (♭13), G (root), B♭ (♭9)
-- Result: G7♭9♭13 (altered dominant)
-
-### Step-by-Step Procedure
-
-#### 1. Keyboard Drill: iv Minor Plagal Cadence
-
-**Standard IV-I (Major Plagal):**
+"Borrowing from the parallel minor" means: you're in C major, but you reach into C minor's key signature (Eb, Ab, Bb) and pull out a chord. The four most useful borrowed chords, and what they replace:
 
 ```
-Fmaj7: LH: E3 – A3 – C4 – F4 (rootless A-form)
-Cmaj7: LH: E3 – B3 – D4 – G4
+iv   (Fm7)     replaces IV (Fmaj7)    — introduces Ab
+bVI  (Abmaj7)  replaces vi (Am7)      — introduces Ab, Eb
+bVII (Bb7)     replaces vii° (Bm7b5)  — introduces Bb, Eb
+bIII (Ebmaj7)  replaces iii (Em7)     — introduces Eb
 ```
 
-**Borrowed iv-I (Minor Plagal):**
+Why it works without sounding "wrong": you're keeping the chord in a *functional* role (iv still behaves like a subdominant, bVI still behaves like a predominant/submediant) while changing its color. The ear accepts the new color because the function — where the chord sits in the phrase, what it resolves to — hasn't changed.
+
+### Drill 3A — Major vs. minor plagal cadence (60 BPM)
 
 ```
-Fm7:   LH: Eb3 – Ab3 – C4 – F4 (rootless A-form)
-Cmaj7: LH: E3 – B3 – D4 – G4
+Major plagal:  Fmaj7 (LH: E3 A3 C4 F4) → Cmaj7 (LH: E3 B3 D4 G4)
+Minor plagal:  Fm7   (LH: Eb3 Ab3 C4 F4) → Cmaj7 (same)
 ```
 
-**Practice Drill 3A: Major vs. Minor Plagal Comparison**
+Play each cadence, 4 beats per chord, ten times alternating. Listen for the Ab in Fm7 resolving down a half step to G, the 5th of Cmaj7 — that half-step pull is the "Amen cadence" sound used constantly in gospel, soul, and modal jazz (think the end of "My Favorite Things" or the IV-chord moment in countless ballads).
 
-1. Set metronome to 60 BPM
-2. Play Fmaj7 → Cmaj7 (major plagal), hold each chord for 4 beats
-3. Play Fm7 → Cmaj7 (minor plagal), hold each chord for 4 beats
-4. Alternate between major and minor plagal cadences 10 times
-
-**Observation:** The minor plagal (iv-I) has a darker, more melancholic quality due to the ♭3 (A♭) in Fm7, which resolves by semitone to G (5th of Cmaj7). This creates a characteristic "Amen cadence" sound common in gospel and modal jazz.
-
-#### 2. Keyboard Drill: ♭VI Borrowed Chord
-
-**Standard vi-ii-V-I (Diatonic):**
+### Drill 3B — bVI borrowed chord (80 BPM)
 
 ```
-Am7:   LH: G3 – C4 – E4 – B4
-Dm7:   LH: F3 – C4 – E4 – A4
-G7:    LH: B3 – F4 – A4 – D5
-Cmaj7: LH: E3 – B3 – D4 – G4
+Diatonic:  Am7(G3 C4 E4 B4) – Dm7(F3 C4 E4 A4) – G7(B3 F4 A4 D5) – Cmaj7(E3 B3 D4 G4)
+Borrowed:  Abmaj7(G3 C4 Eb4 Ab4) – Dm7 – G7 – Cmaj7
 ```
 
-**Borrowed ♭VI-ii-V-I:**
+The bass note under the first chord doesn't change (G stays G in both versions, since Abmaj7's voicing here keeps G as a chord tone) — only the quality shifts from minor to major-with-flat-color. This is a good drill for proving to your ear that borrowing a chord is a *color* change, not necessarily a *bass line* change.
+
+### Upper-structure triads: practical construction
+
+An upper-structure triad is a major or minor triad played in the right hand, sitting on top of a left-hand dominant 7th "shell" (just root, 3rd, 7th — no 5th, no 9th written separately, because the RH triad supplies the extra color tones).
+
+**The three you'll use constantly, over G7:**
 
 ```
-A♭maj7: LH: G3 – C4 – Eb4 – Ab4  [borrowed ♭VI]
-Dm7:    LH: F3 – C4 – E4 – A4
-G7:     LH: B3 – F4 – A4 – D5
-Cmaj7:  LH: E3 – B3 – D4 – G4
+LH shell (all three): G2  B2  F3   (root, 3rd, b7)
+
+RH Db major triad (Db F Ab):  → chord tones added: b5, b7(dup), b9  → sounds as G7(b5,b9)
+RH Eb major triad (Eb G Bb):  → chord tones added: b13, root(dup), b9 → sounds as G7(b9,b13)
+RH F# minor triad (F# A C#):  → chord tones added: maj7(!), 9, #11  → sounds as G7(9,#11) — Lydian dominant color
 ```
 
-**Practice Drill 3B: ♭VI Chromatic Motion**
+Note the F# minor triad case: it adds an F# which is the major 7th of G, an unusual color on a dominant chord, giving a bright, modern "Lydian dominant" sound rather than a dark altered sound. This is the triad to reach for over a non-resolving or vamping dominant (modal jazz contexts); use the Db or Eb triads when the dominant is resolving strongly to a minor or tonic chord.
 
-1. Metronome at 80 BPM
-2. Play the diatonic vi-ii-V-I progression
-3. Play the borrowed ♭VI-ii-V-I progression
-4. Compare the bass motion:
-   - **Diatonic:** G (vi bass) → F (ii bass) → B (V bass) → E (I bass)
-   - **Borrowed:** G (♭VI bass) → F (ii bass) → B (V bass) → E (I bass)
+### Drill 3C — Upper-structure catalog (60 → 100 BPM)
 
-Notice that the bass voice-leading is identical, but the chord quality change (A♭maj7 instead of Am7) introduces ♭6 (A♭) and ♭3 (E♭), creating harmonic ambiguity.
+For each of the three triads above:
+1. Play the LH shell alone, 4 beats.
+2. Add the RH triad, hold 4 beats — listen to the specific color before moving on.
+3. Play both hands together as a single gesture, 4 beats.
+4. Resolve to Cmaj9 (LH: E3 B3 D4 G4), 4 beats.
 
-#### 3. Keyboard Drill: Upper-Structure Triads on Dominant Chords
+Keep the RH triad voiced at least an octave above the LH shell. If you stack them close together you get mud, not color — the whole point of an upper-structure is that the ear parses it as two separate layers (bass-register dominant function, treble-register bright triad), not as one dense cluster.
 
-Upper-structure triads are built on specific scale degrees of the altered scale. The three most common upper-structures for G7:
-
-**G7 with D♭ major triad (♭5, ♭7, ♭9):**
+### Drill 3D — Insert into a ii-V-I
 
 ```
-LH: G2 – B2 – F3 (root, 3rd, 7th shell)
-RH: Db4 – F4 – Ab4 (D♭ major triad)
-Result: G7♭5♭9
+| Dm9 (2 bars) | G7-shell + Eb-major-triad (2 bars) | Cmaj9 (2 bars) |
 ```
+Run this in all twelve keys. This is the actual comping vocabulary you'll use behind a soloist on a standard — static ii-V-I with a colored V chord.
 
-**G7 with E♭ major triad (♭13, root, ♭9):**
+### "All the Things You Are" bridge — modal interchange in the wild
 
+Original key Ab major, bridge (measures 17–24):
 ```
-LH: G2 – B2 – F3
-RH: Eb4 – G4 – Bb4 (E♭ major triad)
-Result: G7♭9♭13
+| Fmaj7  | Fmaj7  | Bbm7 | Eb7 |   (Bbm7 is borrowed iv, in the key of F)
+| Abmaj7 | Abmaj7 | Am7  | D7  |   (Am7-D7 is a ii-V into G major)
 ```
-
-**G7 with F# minor triad (M7, 9, #11):**
-
+Transposed to C major for practice:
 ```
-LH: G2 – B2 – F3
-RH: F#4 – A4 – C#5 (F# minor triad)
-Result: G7(#11,M7,9) [Lydian dominant color]
+| Cmaj7  | Cmaj7  | Fm7  | Bb7 |
+| Ebmaj7 | Ebmaj7 | Em7  | A7  |
 ```
+Learn this transposition — the pattern of "borrow iv, then pivot via a secondary ii-V" recurs constantly in standards and is worth having under your hands independent of the specific tune.
 
-**Practice Drill 3C: Upper-Structure Catalog**
-
-For each upper-structure:
-1. Play the LH shell alone (4 beats)
-2. Add the RH triad (4 beats)
-3. Play both hands simultaneously (4 beats)
-4. Resolve to Cmaj9 voicing (4 beats)
-
-Repeat at 60 → 80 → 100 BPM.
-
-**Practice Drill 3D: Upper-Structure Reharmonization**
-
-Take a standard ii-V-I and add upper-structure triads to the V chord:
-
-```
-| Dm9 (2 bars) | G7 + E♭ maj triad (2 bars) | Cmaj9 (2 bars) |
-```
-
-Practice in all 12 keys using the circle of fifths.
-
-#### 4. Modal Interchange Progression: "All the Things You Are" Bridge
-
-The bridge of "All the Things You Are" (measures 17-24 in original key of A♭ major) uses modal interchange:
-
-```
-| Fmaj7 | Fmaj7 | Bbm7  | Eb7  |  [Bbm7 is borrowed iv from F minor]
-| Abmaj7| Abmaj7| Am7   | D7   |  [Am7-D7 is ii-V to G major]
-```
-
-**Practice Drill 3E: "All the Things" Bridge**
-
-1. Learn the bridge in the original key (A♭ major → F major → G major modulations)
-2. Practice the borrowed iv (B♭m7) → I (A♭maj7) resolution, focusing on the ♭3 (D♭) moving to C (3rd of A♭maj7)
-3. Transpose the bridge to C major:
-
-```
-| Cmaj7 | Cmaj7 | Fm7   | Bb7  |  [Fm7 is borrowed iv from C minor]
-| Ebmaj7| Ebmaj7| Em7   | A7   |
-```
-
-#### 5. Computational Analysis: Modal Interchange Tension
-
-```python
-from music21 import stream, chord, scale, pitch
-import numpy as np
-
-def analyze_borrowed_chord_tension(key_tonic, borrowed_chord_pitches):
-    """Analyze non-diatonic pitch content in a borrowed chord."""
-    
-    # Define the diatonic scale
-    major_scale = scale.MajorScale(key_tonic)
-    diatonic_pitches = [p.name for p in major_scale.pitches]
-    
-    # Check each pitch in the borrowed chord
-    non_diatonic = []
-    for p in borrowed_chord_pitches:
-        if p.name not in diatonic_pitches:
-            non_diatonic.append(p.name)
-    
-    tension_ratio = len(non_diatonic) / len(borrowed_chord_pitches)
-    
-    return non_diatonic, tension_ratio
-
-# Example: Fm7 borrowed into C major
-c_major_key = 'C'
-fm7_chord = chord.Chord(['F3', 'Ab3', 'C4', 'Eb4'])
-
-non_diatonic, tension = analyze_borrowed_chord_tension(c_major_key, fm7_chord.pitches)
-
-print(f"Key: {c_major_key} major")
-print(f"Borrowed chord: {fm7_chord.pitchedCommonName}")
-print(f"Chord pitches: {[p.name for p in fm7_chord.pitches]}")
-print(f"Non-diatonic pitches: {non_diatonic}")
-print(f"Tension ratio: {tension:.2f} ({len(non_diatonic)}/{len(fm7_chord.pitches)} pitches)")
-
-# Compare to diatonic IV chord (Fmaj7)
-fmaj7_chord = chord.Chord(['F3', 'A3', 'C4', 'E4'])
-non_diatonic_diatonic, tension_diatonic = analyze_borrowed_chord_tension(c_major_key, fmaj7_chord.pitches)
-
-print(f"\nDiatonic comparison: {fmaj7_chord.pitchedCommonName}")
-print(f"Non-diatonic pitches: {non_diatonic_diatonic}")
-print(f"Tension ratio: {tension_diatonic:.2f}")
-```
-
-Expected output: Fm7 will show 2 non-diatonic pitches (A♭, E♭) out of 4 total, giving a tension ratio of 0.50. Fmaj7 will show 0 non-diatonic pitches, tension ratio 0.00.
-
-#### 6. Modal Interchange & Upper-Structure Diagram
+### Diagram
 
 ```mermaid
 graph TB
     subgraph sub_parallel ["Parallel Key Borrowing"]
-        A["C Major<br/>C D E F G A B"] --> B{"Borrow from<br/>C Natural Minor"}
-        B --> C["C Minor<br/>C D E♭ F G A♭ B♭"]
-        C --> D["Borrowed chords:<br/>iv (Fm7)<br/>♭VI (A♭maj7)<br/>♭VII (B♭7)"]
+        A["C Major: C D E F G A B"] --> B["Borrow from C natural minor"]
+        B --> C["C Minor color tones: Eb Ab Bb"]
+        C --> D["iv = Fm7, bVI = Abmaj7, bVII = Bb7"]
     end
-    
     subgraph sub_upper ["Upper-Structure Triads"]
-        E["G7 shell<br/>G–B–F"] --> F{"Superimpose<br/>RH triad"}
-        F --> G["E♭ major triad<br/>E♭–G–B♭"]
-        G --> H["Result: G7♭9♭13<br/>Altered dominant"]
+        E["G7 shell: G B F"] --> F["Add RH triad"]
+        F --> G["Eb major triad: Eb G Bb"]
+        G --> H["Result: G7(b9,b13)"]
     end
-    
-    D --> I["Darker harmonic<br/>color"]
+    D --> I["Darker, richer color<br/>same function"]
     H --> I
-    
     style A fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#E5E7EB
     style C fill:#1E2636,stroke:#F59E0B,stroke-width:2px,color:#E5E7EB
-    style D fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
     style H fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
     style I fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
 ```
 
 ---
 
-## Exercise 4: Diminished Passing Chords & Symmetrical Harmony
+## Exercise 4: Diminished Passing Chords
 
-### Exercise Overview
+### The one fact that explains everything about dim7 chords
 
-You will practice **diminished 7th passing chords** and explore **symmetrical harmony**—chord structures that divide the octave into equal intervals. Diminished 7th chords (four notes separated by minor 3rds) create smooth chromatic voice-leading and function as approach chords to diatonic targets.
+A diminished 7th chord stacks four notes a minor 3rd apart: C–Eb–Gb–A. Four minor 3rds add up to exactly an octave (3+3+3+3=12 semitones), which means the chord is perfectly symmetrical — every inversion sounds like a root-position diminished chord, just spelled differently. Practical consequence: **there are only three diminished 7th chords in all of music**, not twelve. Cdim7 = Ebdim7 = Gbdim7 = Adim7, all the same four pitches. Learning three shapes gets you all twelve diminished chords for free.
 
-**Theoretical Foundation: Diminished 7th Chords (15%)**
-
-A fully diminished 7th chord consists of four pitches separated by minor 3rds (3 semitones). Example: Cdim7 = C–E♭–G♭–A (or B♭♭).
-
-Key properties:
-- **Symmetrical:** Each inversion is another diminished 7th chord
-- **Enharmonic equivalence:** Only 3 unique diminished 7th chords exist (12 semitones ÷ 4 notes = 3)
-- **Function:** Leading-tone diminished (vii°7) or chromatic passing/approach chord
-
-In jazz, diminished 7th chords most commonly function as chromatic approach chords a semitone below the target chord. Example: #iidim7 → iii7 (D#dim7 → Em7 in C major).
-
-### Step-by-Step Procedure
-
-#### 1. Keyboard Drill: Diminished 7th Inversions
-
-Play the four inversions of Cdim7:
+### Drill 4A — The four inversions of Cdim7 (60 BPM)
 
 ```
-Root position:   C – Eb – Gb – A   (Fingering: 1 – 2 – 3 – 5)
-1st inversion:   Eb – Gb – A – C   (Fingering: 1 – 2 – 3 – 5)
-2nd inversion:   Gb – A – C – Eb   (Fingering: 1 – 2 – 3 – 5)
-3rd inversion:   A – C – Eb – Gb   (Fingering: 1 – 2 – 3 – 5)
+Root:      C  Eb  Gb  A     fingering 1-2-3-5
+1st inv:   Eb Gb  A   C     fingering 1-2-3-5
+2nd inv:   Gb A   C   Eb    fingering 1-2-3-5
+3rd inv:   A  C   Eb  Gb    fingering 1-2-3-5
 ```
+Play each as a whole note, ascend through all four, then descend. Every inversion has the identical sound and interval structure — confirm this by ear, not just intellectually: it should genuinely be hard to tell which inversion you just played without looking.
 
-**Practice Drill 4A: Symmetrical Inversion Cycle**
-
-1. Set metronome to 60 BPM
-2. Play each inversion as a whole note (4 beats)
-3. Move through all four inversions ascending, then descending
-4. Notice that each inversion has identical intervallic structure (minor 3rds)
-
-**Practice Drill 4B: Three Diminished Families**
-
-There are only 3 unique diminished 7th chords (transposed enharmonically):
-
-**Family 1:** Cdim7 = Ebdim7 = Gbdim7 = Adim7
-**Family 2:** Dbdim7 = Edim7 = Gdim7 = Bbdim7
-**Family 3:** Ddim7 = Fdim7 = Abdim7 = Bdim7
-
-Play each family in root position ascending through all enharmonic spellings:
+### Drill 4B — The three diminished families (80 BPM)
 
 ```
-Family 1: C–Eb–Gb–A  →  Eb–Gb–A–C  →  Gb–A–C–Eb  →  A–C–Eb–Gb
+Family 1: C / Eb / Gb / A     — all spell the same four notes
+Family 2: Db / E / G / Bb
+Family 3: D / F / Ab / B
 ```
+Pick Family 1 and play it ascending through its four enharmonic "roots": C-Eb-Gb-A → Eb-Gb-A-C → Gb-A-C-Eb → A-C-Eb-Gb. Two beats per chord. This drill is really just the inversion drill from 4A relabeled — the insight to absorb is that "transposing a dim7 chord up a minor 3rd" does nothing to its sound.
 
-Metronome at 80 BPM, 2 beats per chord.
+### Chromatic approach chords — the real-world use
 
-#### 2. Keyboard Drill: Chromatic Approach with Diminished Chords
-
-**Standard ii-V-I:**
-
+The most common jazz use of a dim7 chord is as a half-step approach to a diatonic target, inserted between two chords that are a step apart. Standard ii-V-I:
 ```
 Dm7 – G7 – Cmaj7
 ```
-
-**Diminished Passing Chord Version:**
-
+Insert a diminished chord a half step above Dm7's root to approach the next diatonic chord up (iii, i.e. Em7), and you get a longer, smoother line:
 ```
 Dm7 – D#dim7 – Em7 – G7 – Cmaj7
 ```
+Wait — notice this inserts an *extra* chord (iii) that wasn't in the original progression at all. That's intentional: diminished approach chords are often used to connect two chords a *whole step* apart by inserting a passing diatonic chord plus its diminished approach, turning two chords into four and creating a stepwise bass line: D (ii) – D# (passing dim) – E (iii) – ... – G (V) – C (I).
 
-The D#dim7 functions as a chromatic approach chord leading to Em7. Voice-leading:
-
-```
-Dm7:     LH: F3 – C4 – E4 – A4
-D#dim7:  LH: F#3 – C4 – D#4 – A4  [chromatic passing]
-Em7:     LH: G3 – D4 – F#4 – B4
-G7:      LH: B3 – F4 – A4 – D5
-Cmaj7:   LH: E3 – B3 – D4 – G4
-```
-
-**Practice Drill 4C: Chromatic Approach Patterns**
-
-1. Metronome at 60 BPM
-2. Play the standard ii-V-I progression (4 bars)
-3. Play the diminished passing chord version (5 bars: ii, #ii°7, iii, V, I)
-4. Focus on the chromatic voice-leading from Dm7 → D#dim7 → Em7
-
-**Practice Drill 4D: All-Keys Diminished Approach**
-
-For each key in the circle of fifths, practice:
+### Drill 4C — Chromatic approach pattern (60 BPM)
 
 ```
-ii7 – #ii°7 – iii7 – V7 – Imaj7
+Dm7:     LH F3 C4 E4 A4
+D#dim7:  LH F#3 C4 D#4 A4
+Em7:     LH G3 D4 F#4 B4
+G7:      LH B3 F4 A4 D5
+Cmaj7:   LH E3 B3 D4 G4
 ```
+Play the plain ii-V-I first (4 bars), then the 5-chord expanded version. Focus entirely on the half-step motion from Dm7's bass (F, as the 3rd) into D#dim7 (F#) — one finger moving one key.
 
-Example in F major:
+### Drill 4D — All twelve keys
+
+Template: ii7 – #ii°7 – iii7 – V7 – Imaj7. Example in F major: Gm7 – G#dim7 – Am7 – C7 – Fmaj7. Run the circle of fifths, 80 BPM, 2 beats per chord.
+
+### The diminished (octatonic) scale for soloing
 
 ```
-Gm7 – G#dim7 – Am7 – C7 – Fmaj7
+C whole-half diminished: C D Eb F Gb Ab A B C
 ```
+Alternating whole step, half step. This scale is what you improvise with over any of these dim7 chords.
 
-#### 3. Keyboard Drill: Diminished Scale & Improvisation
+### Drill 4E/4F — Scale and arpeggio practice
 
-The diminished scale (also called octatonic scale) alternates whole steps and half steps:
+1. Play the scale ascending/descending, one octave: RH fingering ascending 1-2-3-1-2-3-4-5, descending 5-4-3-2-1-3-2-1.
+2. Play it in diminished triads: C-Eb-Gb, D-F-Ab, Eb-Gb-A, etc. — notice every triad you build from this scale is itself diminished, another symmetry consequence.
+3. Loop a Cdim7 vamp in your DAW/iReal Pro for 4 bars. Improvise using the scale, landing specifically on chord tones (C, Eb, Gb, A) on beats 1 and 3, and passing tones (D, F, Ab, B) on beats 2 and 4. This beat-placement discipline is what makes diminished-scale lines sound intentional instead of just "all the notes that fit."
 
-**C Whole-Half Diminished:** C–D–Eb–F–Gb–Ab–A–B–C
-
-This scale fits over diminished 7th chords and provides a melodic framework for improvisation.
-
-**Practice Drill 4E: Diminished Scale Patterns**
-
-1. Play the C whole-half diminished scale ascending and descending, one octave
-2. Finger patterns:
-   - Ascending: 1-2-3-1-2-3-4-5 (RH)
-   - Descending: 5-4-3-2-1-3-2-1
-3. Play the scale in 3rds: C–Eb, D–F, Eb–Gb, F–Ab, etc.
-4. Play the scale in triads: C–Eb–Gb (diminished triad), D–F–Ab (diminished triad), etc.
-
-**Practice Drill 4F: Diminished Arpeggio & Scale Improv**
-
-1. Loop a Cdim7 chord in the DAW (4-bar loop)
-2. Improvise melodically using the C whole-half diminished scale
-3. Target chord tones (C, Eb, Gb, A) on strong beats (1 and 3)
-4. Use passing tones (D, F, Ab, B) on weak beats (2 and 4)
-
-#### 4. Practical Application: "Inner Urge" (Joe Henderson)
-
-Joe Henderson's "Inner Urge" uses diminished 7th chords as structural harmony:
+### Applying it: Joe Henderson's "Inner Urge"
 
 ```
 | Ebm7  | Ab7   | Dbmaj7 | Dbmaj7 |
 | Ddim7 | Ddim7 | Ebm7   | Ebm7   |
 ```
-
-The Ddim7 chord (measures 5-6) functions as a chromatic pivot, creating ambiguous tonality before resolving back to Ebm7.
-
-**Practice Drill 4G: "Inner Urge" Diminished Section**
-
-1. Learn the progression in the original key (E♭ minor)
-2. Practice the Ddim7 voicing:
-
+The Ddim7 in bars 5-6 is not resolving anywhere immediately — it functions as a floating, ambiguous color before the return to Ebm7. Voice it as:
 ```
-Ddim7: LH: F3 – B3 – D4 – Ab4 (1st inversion)
+Ddim7: LH F3 B3 D4 Ab4   (1st inversion — F in the bass gives a smoother link from Dbmaj7's bass)
 ```
-
-3. Improvise over the Ddim7 using the D whole-half diminished scale
-4. Transpose to C minor:
-
+Improvise over it with the D whole-half diminished scale. Transpose the whole passage to C minor for a second key:
 ```
 | Cm7   | F7    | Bbmaj7 | Bbmaj7 |
 | Bdim7 | Bdim7 | Cm7    | Cm7    |
 ```
 
-#### 5. Computational Analysis: Symmetrical Interval Distribution
-
-```python
-from music21 import chord, interval
-import numpy as np
-
-def analyze_symmetry(chord_obj):
-    """Analyze interval symmetry in a chord."""
-    
-    pitches = sorted(chord_obj.pitches, key=lambda p: p.ps)
-    intervals = []
-    
-    # Calculate intervals between adjacent pitches
-    for i in range(len(pitches) - 1):
-        intv = interval.Interval(pitches[i], pitches[i + 1])
-        intervals.append(intv.semitones)
-    
-    # Check for symmetry (all intervals equal)
-    is_symmetric = len(set(intervals)) == 1
-    
-    return intervals, is_symmetric
-
-# Analyze Cdim7
-cdim7 = chord.Chord(['C4', 'Eb4', 'Gb4', 'A4'])
-intervals, symmetric = analyze_symmetry(cdim7)
-
-print(f"Chord: {cdim7.pitchedCommonName}")
-print(f"Pitches: {[p.nameWithOctave for p in cdim7.pitches]}")
-print(f"Adjacent intervals (semitones): {intervals}")
-print(f"Symmetrical: {symmetric}")
-
-# Compare to Cmaj7 (asymmetrical)
-cmaj7 = chord.Chord(['C4', 'E4', 'G4', 'B4'])
-intervals_maj, symmetric_maj = analyze_symmetry(cmaj7)
-
-print(f"\nChord: {cmaj7.pitchedCommonName}")
-print(f"Pitches: {[p.nameWithOctave for p in cmaj7.pitches]}")
-print(f"Adjacent intervals (semitones): {intervals_maj}")
-print(f"Symmetrical: {symmetric_maj}")
-```
-
-Expected output: Cdim7 will show `[3, 3, 3]` (all minor 3rds), symmetrical = True. Cmaj7 will show `[4, 3, 5]` (major 3rd, minor 3rd, major 3rd), symmetrical = False.
-
-#### 6. Diminished Harmony Diagram
+### Diagram
 
 ```mermaid
 graph TD
     subgraph sub_dim ["Diminished 7th Structure"]
-        A["C dim7<br/>C–E♭–G♭–A"] --> B["Minor 3rd<br/>intervals"]
-        B --> C["Symmetrical:<br/>4 identical intervals"]
-        C --> D["Enharmonic<br/>equivalence"]
-        D --> E["Only 3 unique<br/>dim7 chords"]
+        A["Cdim7: C Eb Gb A"] --> B["Minor 3rd intervals throughout"]
+        B --> C["Symmetrical: all inversions identical"]
+        C --> D["Only 3 unique dim7 chords exist"]
     end
-    
-    subgraph sub_function ["Functional Applications"]
-        F["Chromatic<br/>approach"] --> G["#ii°7 → iii7"]
-        H["Leading-tone"] --> I["vii°7 → I"]
-        J["Dominant<br/>substitute"] --> K["°7 = alt. V7♭9"]
+    subgraph sub_function ["Functional Uses"]
+        E["Chromatic approach a<br/>half step below target"] --> F["#ii°7 leads to iii7"]
+        G["Leading-tone function"] --> H["vii°7 leads to I"]
     end
-    
-    E --> L["Octatonic<br/>scale"]
-    G --> L
-    I --> L
-    K --> L
-    
+    D --> I["Whole-half diminished<br/>scale for soloing"]
+    F --> I
+    H --> I
     style A fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#E5E7EB
     style C fill:#1E2636,stroke:#F59E0B,stroke-width:2px,color:#E5E7EB
-    style E fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
-    style L fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
+    style D fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
+    style I fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
 ```
 
 ---
 
-## Exercise 5: Integration Lab – "Rhythm Changes" Complete Reharmonization
+## Exercise 5: Integration Lab — Reharmonizing Rhythm Changes
 
-### Exercise Overview
+"Rhythm Changes" is the chord progression under "I Got Rhythm," "Anthropology," "Oleo," and dozens of other bebop standards. It's the second-most-used harmonic form in jazz after the 12-bar blues, which makes it the ideal testbed for combining everything above.
 
-You will apply all learned techniques (rootless voicings, tritone substitution, modal interchange, diminished passing chords) to reharmonize the "Rhythm Changes" progression—the harmonic foundation of hundreds of jazz standards including "I Got Rhythm," "Anthropology," and "Oleo."
+### The standard form (Bb major, AABA, 32 bars)
 
-**Theoretical Foundation: Rhythm Changes Form (15%)**
-
-"Rhythm Changes" is a 32-bar AABA form based on George Gershwin's "I Got Rhythm." The standard progression in B♭ major:
-
-**A section (8 bars):**
 ```
+A section (8 bars):
 | Bbmaj7 | G7    | Cm7   | F7    |
 | Dm7    | G7    | Cm7   | F7    |
-```
 
-**B section (8 bars, "bridge"):**
-```
+B section / bridge (8 bars):
 | D7     | D7    | G7    | G7    |
 | C7     | C7    | F7    | F7    |
 ```
 
-### Step-by-Step Procedure
-
-#### 1. Keyboard Drill: Standard Rhythm Changes (A Section)
-
-Learn the A section with rootless voicings:
+### Step 1 — Learn the plain A section with rootless voicings (60 → 120 BPM)
 
 ```
-Measure 1-2: Bbmaj7 – G7
-  Bbmaj7: LH: A3 – D4 – F4 – C5 (A-form rootless)
-  G7:     LH: B3 – F4 – A4 – D5 (A-form rootless)
-
-Measure 3-4: Cm7 – F7
-  Cm7:    LH: Bb3 – Eb4 – G4 – D5
-  F7:     LH: A3 – Eb4 – G4 – C5
-
-Measure 5-6: Dm7 – G7
-  Dm7:    LH: C4 – F4 – A4 – E5
-  G7:     LH: B3 – F4 – A4 – D5
-
-Measure 7-8: Cm7 – F7
-  (same as measures 3-4)
+Bbmaj7: LH A3 D4 F4 C5     G7:  LH B3 F4 A4 D5
+Cm7:    LH Bb3 Eb4 G4 D5   F7:  LH A3 Eb4 G4 C5
+Dm7:    LH C4 F4 A4 E5     G7:  LH B3 F4 A4 D5
 ```
+Two beats per chord. This is your unreharmonized baseline — don't skip it. You need it in your fingers before any substitution will register as a deliberate choice.
 
-**Practice Drill 5A: Standard A Section (60 → 120 BPM)**
-
-1. Start at 60 BPM, 2 beats per chord
-2. Play through the 8-bar A section with metronome
-3. Focus on smooth voice-leading transitions
-4. Increase tempo incrementally: 60 → 80 → 100 → 120 BPM
-
-#### 2. Reharmonization Level 1: Tritone Substitution on Dominant Chords
-
-Replace all dominant 7th chords with tritone substitutes:
+### Step 2 — Tritone-sub the dominants
 
 ```
-Original:      | Bbmaj7 | G7     | Cm7   | F7     |
-Tritone sub:   | Bbmaj7 | Db7    | Cm7   | B7     |
-
-Original:      | Dm7    | G7     | Cm7   | F7     |
-Tritone sub:   | Dm7    | Db7    | Cm7   | B7     |
+Original:    | Bbmaj7 | G7  | Cm7 | F7 |
+Substituted: | Bbmaj7 | Db7 | Cm7 | B7 |
 ```
-
-**Practice Drill 5B: Tritone Sub Voicings**
-
 ```
-Db7 (tritone sub for G7):
-  LH: F3 – Cb4(B3) – Eb4 – Ab4
-
-B7 (tritone sub for F7):
-  LH: Eb3 – A3 – C#4 – F#4
+Db7 voicing: LH F3 B3 Eb4 Ab4
+B7 voicing:  LH Eb3 A3 C#4 F#4
 ```
+Play original, then substituted, at 80 → 100 → 120 BPM.
 
-Practice the reharmonized A section at 80 → 100 → 120 BPM.
+### Step 3 — Add diminished passing chords for a fully chromatic bass line
 
-#### 3. Reharmonization Level 2: Diminished Passing Chords
-
-Add diminished 7th passing chords between major and minor chords:
+Chain the ii, the diminished approach, and the tritone sub together so the left-hand *lowest note* walks chromatically through the bar:
 
 ```
-Original:      | Bbmaj7 | G7     | Cm7   | F7     |
-With dim:      | Bbmaj7 | Bdim7  | Cm7   | C#dim7 | Dm7 | Db7 | Cm7 | B7 |
+Bbmaj7 (bass A) → Bdim7 (bass B) → Cm7 (bass Bb) → C#dim7 (bass C#) →
+Dm7 (bass C) → Db7 (bass F, tritone sub) → Cm7 (bass Bb) → B7 (bass Eb, tritone sub)
 ```
-
-This creates a chromatic ascending bass line: Bb → B → C → C# → D → Db → C → B.
-
-**Practice Drill 5C: Chromatic Bass Line**
-
-Focus on the bass motion (left hand lowest note) in the reharmonized progression:
-
+Voicings:
 ```
-Bbmaj7: A (LH bass)
-Bdim7:  B (LH bass) [chromatic ascent]
-Cm7:    Bb (LH bass)
-C#dim7: C# (LH bass) [chromatic ascent]
-Dm7:    C (LH bass)
-Db7:    F (LH bass) [tritone sub]
-Cm7:    Bb (LH bass)
-B7:     Eb (LH bass) [tritone sub]
+Bbmaj7: A3 D4 F4 C5         Bdim7:  B3 D4 F4 Ab4
+Cm7:    Bb3 Eb4 G4 D5       C#dim7: C#4 E4 G4 Bb4
+Dm7:    C4 F4 A4 E5         Db7:    F3 B3 Eb4 Ab4
+Cm7:    Bb3 Eb4 G4 D5       B7:     Eb3 A3 C#4 F#4
 ```
+Practice this bass line alone first, left hand only, slowly — your ear should hear a clear stepwise descent/ascent, not a series of unrelated leaps. If any pair of adjacent bass notes jumps more than a step, re-check your voicing before adding the right hand.
 
-#### 4. Reharmonization Level 3: Modal Interchange on Bridge
-
-The bridge modulates through secondary dominants. Apply modal interchange:
+### Step 4 — Modal interchange on the bridge
 
 ```
-Standard bridge:
-| D7     | D7    | G7    | G7    |
-| C7     | C7    | F7    | F7    |
+Standard bridge:  | D7  | D7  | G7  | G7  |
+                  | C7  | C7  | F7  | F7  |
 
-Modal interchange:
-| Dm7    | Ab7   | G7    | Db7   |  [Ab7 = tritone sub, Db7 = tritone sub]
-| Cm7    | Gb7   | F7    | B7    |  [Gb7 = tritone sub, B7 = tritone sub]
+Reharmonized:      | Dm7 | Ab7 | G7  | Db7 |
+                   | Cm7 | Gb7 | F7  | B7  |
 ```
+Here each original secondary dominant (D7, G7, C7, F7) is preceded by its related minor chord and the following dominant is tritone-subbed, giving the bridge a darker, more modern color while preserving the underlying cadential motion every two bars.
 
-#### 5. Complete Integration: Full 32-Bar Reharmonized Rhythm Changes
-
-**A Section (bars 1-8):**
-```
-| Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
-| Dm7    | Db7    | Cm7   | B7     |
-```
-
-**A Section (bars 9-16):**
-```
-(repeat bars 1-8)
-```
-
-**B Section (bars 17-24):**
-```
-| Dm7    | Ab7    | Gmaj7 | Db7    |
-| Cm7    | Gb7    | F7    | B7     |
-```
-
-**A Section (bars 25-32):**
-```
-| Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
-| Dm7    | Db7    | Cm7   | B7     | Bbmaj7 (final) |
-```
-
-**Practice Drill 5D: Complete Form at Performance Tempo**
-
-1. Learn each section separately at 60 BPM
-2. Chain sections together: A + A + B + A
-3. Increase tempo: 60 → 100 → 140 → 180 BPM (fast bebop tempo)
-4. Record yourself playing the reharmonized progression with a metronome
-5. Analyze the recording: check for rhythmic accuracy, voice-leading smoothness, and dynamic consistency
-
-#### 6. Improvisation Practice: Solo Over Reharmonized Changes
-
-**Practice Drill 5E: Chord-Scale Relationships**
-
-For each chord in the reharmonized progression, practice the appropriate scale:
+### Full 32-bar reharmonized chart
 
 ```
-Bbmaj7: Bb major scale (Ionian)
-Bdim7:  B whole-half diminished scale
-Cm7:    C Dorian scale
-C#dim7: C# whole-half diminished scale
-Dm7:    D Dorian scale
-Db7:    Db Lydian dominant scale (4th mode of Ab melodic minor)
-B7:     B altered scale (7th mode of C melodic minor)
+A (1-8):    | Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
+            | Dm7    | Db7    | Cm7   | B7     |
+A (9-16):   (repeat bars 1-8)
+B (17-24):  | Dm7    | Ab7    | G7    | Db7    |
+            | Cm7    | Gb7    | F7    | B7     |
+A (25-32):  | Bbmaj7 | Bdim7  | Cm7   | C#dim7 |
+            | Dm7    | Db7    | Cm7   | B7     | Bbmaj7 (final tag) |
 ```
 
-**Practice Drill 5F: Two-Chorus Solo Structure**
+### Drill 5D — Full form at tempo
 
-1. Record or loop the reharmonized rhythm changes (use iReal Pro or DAW)
-2. Play a two-chorus solo:
-   - **Chorus 1:** Outline chord tones only (roots, 3rds, 5ths, 7ths)
-   - **Chorus 2:** Add tensions (9ths, 11ths, 13ths) and chromatic approach notes
-3. Record your solo and analyze note choices over each chord
+1. Learn each 8-bar section separately at 60 BPM until clean.
+2. Chain A–A–B–A without stopping at section boundaries — the section seams are where hesitation hides.
+3. Push tempo: 60 → 100 → 140 → 180 BPM (standard bebop "Oleo" tempo).
+4. Record every session. Listen back specifically for: are the diminished chords landing exactly on the beat, or dragging? Is the bass line audible as a connected line, or do the voicings bury it?
 
-#### 7. Computational Analysis: Full Progression Harmonic Tension Graph
+### Drill 5E — Chord-scale map for soloing over the reharmonization
 
-```python
-from music21 import stream, chord, key
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Define the reharmonized 32-bar progression (simplified to 8-bar A section for clarity)
-progression = stream.Stream()
-progression.append(key.Key('Bb'))
-
-chords_reharmonized = [
-    chord.Chord(['A3', 'D4', 'F4', 'C5']),   # Bbmaj7
-    chord.Chord(['B3', 'D4', 'F4', 'Ab4']),  # Bdim7
-    chord.Chord(['Bb3', 'Eb4', 'G4', 'D5']), # Cm7
-    chord.Chord(['C#4', 'E4', 'G4', 'Bb4']), # C#dim7
-    chord.Chord(['C4', 'F4', 'A4', 'E5']),   # Dm7
-    chord.Chord(['F3', 'B3', 'Eb4', 'Ab4']), # Db7
-    chord.Chord(['Bb3', 'Eb4', 'G4', 'D5']), # Cm7
-    chord.Chord(['Eb3', 'A3', 'C#4', 'F#4']),# B7
-]
-
-for ch in chords_reharmonized:
-    progression.append(ch)
-
-def calculate_dissonance(chord_obj):
-    """Calculate dissonance based on semitone clusters."""
-    pitches = sorted([p.ps for p in chord_obj.pitches])
-    dissonance = 0
-    
-    for i in range(len(pitches) - 1):
-        interval_semitones = pitches[i + 1] - pitches[i]
-        if interval_semitones in [1, 2, 6]:  # m2, M2, tritone
-            dissonance += 1
-    
-    return dissonance / (len(pitches) - 1) if len(pitches) > 1 else 0
-
-# Calculate dissonance for each chord
-dissonance_values = [calculate_dissonance(ch) for ch in chords_reharmonized]
-
-# Plot
-fig, ax = plt.subplots(figsize=(14, 6))
-bar_positions = np.arange(1, len(chords_reharmonized) + 1)
-ax.bar(bar_positions, dissonance_values, color='#38BDF8', alpha=0.8, edgecolor='#1E2636', linewidth=1.5)
-
-ax.set_xlabel('Measure', fontsize=13, fontweight='bold')
-ax.set_ylabel('Dissonance Coefficient', fontsize=13, fontweight='bold')
-ax.set_title('Harmonic Tension Analysis: Reharmonized Rhythm Changes (A Section)', fontsize=15, fontweight='bold')
-ax.set_xticks(bar_positions)
-ax.set_xticklabels(['1\nB♭maj7', '2\nBdim7', '3\nCm7', '4\nC#dim7', '5\nDm7', '6\nD♭7', '7\nCm7', '8\nB7'])
-ax.grid(True, axis='y', alpha=0.3)
-ax.set_ylim(0, 1)
-
-plt.tight_layout()
-plt.savefig('rhythm_changes_tension.png', dpi=300)
-plt.show()
 ```
+Bbmaj7:  Bb major (Ionian)
+Bdim7:   B whole-half diminished
+Cm7:     C Dorian
+C#dim7:  C# whole-half diminished
+Dm7:     D Dorian
+Db7:     Db Lydian dominant (4th mode of Ab melodic minor)
+B7:      B altered scale (7th mode of C melodic minor)
+```
+These last two — Lydian dominant and altered — are standard scale choices for tritone-sub dominants; use Lydian dominant when the chord still has a bright/unresolved color, altered when it's pulling hard toward resolution.
 
-The graph will show tension spikes at the diminished chords (Bdim7, C#dim7) and tritone-substituted dominants (Db7, B7), illustrating how reharmonization increases harmonic complexity.
+### Drill 5F — Two-chorus solo discipline
 
-#### 8. Final Integration Flowchart
+Chorus 1: chord tones only (root, 3rd, 5th, 7th of whatever's sounding) — no tensions, no chromaticism. This forces your ear to track the reharmonized changes accurately before you add color. Chorus 2: add 9ths/13ths and chromatic approach notes into the chord tones from chorus 1. Record both choruses and check chorus 1 against the actual chord symbols — wrong notes here mean you don't actually know the changes yet, no amount of "outside" playing in chorus 2 will fix that.
+
+### Final integration diagram
 
 ```mermaid
 graph TB
     subgraph sub_standard ["Standard Rhythm Changes"]
-        A["A: B♭ I–vi–ii–V"] --> B["A: repeat"]
-        B --> C["B: III7–VI7–II7–V7<br/>(secondary dominants)"]
+        A["A: Bb I-VII7-ii-V7"] --> B["A: repeat"]
+        B --> C["Bridge: secondary dominants<br/>D7-G7-C7-F7"]
         C --> D["A: return"]
     end
-    
-    subgraph sub_reharmonization ["Reharmonization Techniques"]
-        E["Tritone<br/>substitution"] --> F["Chromatic<br/>bass motion"]
-        G["Diminished<br/>passing"] --> F
-        H["Modal<br/>interchange"] --> F
+    subgraph sub_reharm ["Reharmonization Layers"]
+        E["Tritone substitution"] --> F["Chromatic bass motion"]
+        G["Diminished passing chords"] --> F
+        H["Modal interchange on bridge"] --> F
     end
-    
-    subgraph sub_result ["Enhanced Progression"]
-        I["Chromatic voice-leading"] --> J["Increased harmonic<br/>density"]
-        J --> K["Modern jazz<br/>vocabulary"]
+    subgraph sub_result ["Result"]
+        I["Fully chromatic walking bass line"] --> J["Denser harmonic rhythm"]
+        J --> K["Bebop/modern comping vocabulary"]
     end
-    
     D --> E
     D --> G
     D --> H
     F --> I
-    
     style A fill:#1E2636,stroke:#6EE7B7,stroke-width:2px,color:#E5E7EB
-    style E fill:#1E2636,stroke:#F59E0B,stroke-width:2px,color:#E5E7EB
     style F fill:#1E2636,stroke:#38BDF8,stroke-width:2px,color:#E5E7EB
     style K fill:#1E2636,stroke:#6EE7B7,stroke-width:3px,color:#E5E7EB
 ```
 
 ---
 
-## Comprehensive Practice Routine: 30-Day Mastery Protocol
+## 30-Day Practice Protocol
 
-### Week 1-2: Foundation Building
+### Weeks 1–2: Foundation (60 min/day)
 
-**Daily Practice (60 minutes):**
+- **Rootless voicings (20 min):** A-form and B-form ii-V-I, 3 keys/day via circle of fifths, 80 → 120 BPM. Static changes first, then Drill 1C comping rhythm.
+- **Tritone substitution (20 min):** standard vs. substituted comparison in 2 keys/day, then apply to "Autumn Leaves" or "Blue Bossa."
+- **Ear training (20 min):** before playing a voicing, sing its guide tones (3rd and 7th) from the chord symbol alone. Then play it and check pitch. Transcribe one 4-bar Bill Evans or McCoy Tyner voicing passage per week.
 
-1. **Rootless Voicings Drill (20 min)**
-   - A-form and B-form ii-V-I in 3 keys per day (circle of fifths)
-   - Metronome 80 → 100 → 120 BPM
-   - Static voicing changes, then rhythmic comping
+### Week 3: Advanced techniques (75 min/day)
 
-2. **Tritone Substitution (20 min)**
-   - Standard vs. tritone sub comparison in 2 keys
-   - Voice-leading analysis and chromatic bass motion
-   - Apply to simple standards ("Autumn Leaves," "Blue Bossa")
+- **Modal interchange (25 min):** borrowed iv, bVI, bVII in 2 keys/day; apply to the "All the Things You Are" bridge.
+- **Upper-structure triads (25 min):** the three-triad catalog (Db, Eb, F# major triads over a dominant shell), reharmonize a ii-V-I, 2 keys/day.
+- **Diminished chords (25 min):** chromatic approach patterns (ii–#ii°7–iii), whole-half diminished scale improv; apply to "Inner Urge."
 
-3. **Ear Training (20 min)**
-   - Sing chord tones of each voicing before playing
-   - Play a chord, identify the guide tones (3rd and 7th)
-   - Transcribe simple voicings from recordings (Bill Evans, McCoy Tyner)
+### Week 4: Integration (90 min/day)
 
-### Week 3: Advanced Techniques
+- **Rhythm Changes reharmonization (40 min):** full 32-bar form, 100 → 140 → 180 BPM, two-chorus solo discipline from Drill 5F.
+- **Real-book application (30 min):** one standard per day ("Stella by Starlight," "Giant Steps," "Confirmation") — find where the tune's own harmony already uses these devices before inventing your own substitutions.
+- **Performance simulation (20 min):** one full standard, recorded, reharmonized comping. Listen back and name exactly one specific fix for tomorrow — not a vague "play better," a specific bar or transition.
 
-**Daily Practice (75 minutes):**
+### Weekly maintenance after day 30
 
-1. **Modal Interchange (25 min)**
-   - Borrowed iv, ♭VI, ♭VII progressions in 2 keys
-   - Compare major vs. minor plagal cadences
-   - Apply to "All the Things You Are" bridge
-
-2. **Upper-Structure Triads (25 min)**
-   - Catalog of 3 upper-structures per key (Db, Eb, F# over V7)
-   - Reharmonize ii-V-I with upper-structures
-   - Practice in 2 keys
-
-3. **Diminished Chords (25 min)**
-   - Chromatic approach patterns (ii–#ii°7–iii)
-   - Diminished scale improvisation over dim7 chords
-   - Apply to "Inner Urge" and similar tunes
-
-### Week 4: Integration & Performance
-
-**Daily Practice (90 minutes):**
-
-1. **Rhythm Changes Reharmonization (40 min)**
-   - Full 32-bar form with all techniques
-   - Increase tempo: 100 → 140 → 180 BPM
-   - Two-chorus solo over reharmonized changes
-
-2. **Real-Book Application (30 min)**
-   - Choose one standard per day ("Stella by Starlight," "Giant Steps," "Confirmation")
-   - Analyze existing harmony, apply learned reharmonization techniques
-   - Play through with metronome and record
-
-3. **Performance Simulation (20 min)**
-   - Play one complete standard with reharmonized comping
-   - Record and critically listen: voice-leading smoothness, time feel, dynamic balance
-   - Identify one specific area for next-day improvement
-
-### Ongoing Maintenance
-
-**Weekly Schedule:**
-- **Monday:** Rootless voicings in all 12 keys
-- **Tuesday:** Tritone substitution and chromatic voice-leading
-- **Wednesday:** Modal interchange and upper-structures
-- **Thursday:** Diminished chords and symmetrical harmony
-- **Friday:** Rhythm Changes integration
-- **Saturday:** Transcription and ear training
-- **Sunday:** Performance simulation and repertoire expansion
+```
+Mon: rootless voicings, all 12 keys
+Tue: tritone substitution and chromatic bass lines
+Wed: modal interchange and upper-structures
+Thu: diminished chords and the octatonic scale
+Fri: Rhythm Changes integration
+Sat: transcription and ear training
+Sun: performance simulation / repertoire expansion
+```
 
 ---
 
-## Assessment & Verification Checklist
+## Assessment Checklist
 
-### Technical Proficiency
+**Technical**
+- [ ] A-form and B-form rootless ii-V-I in all 12 keys at 120 BPM, no audible gaps or overlaps
+- [ ] Tritone substitution with correct chromatic bass motion, any key, on request
+- [ ] Diminished passing chords inserted into a ii-V-I with clean half-step voice-leading
+- [ ] Upper-structure triads voiced with at least an octave separation from the LH shell
+- [ ] Full 32-bar reharmonized Rhythm Changes at 140+ BPM without stopping
 
-- [ ] Execute A-form and B-form rootless voicings in all 12 keys at 120 BPM
-- [ ] Smooth voice-leading transitions with no audible gaps or overlapping tones
-- [ ] Tritone substitution applied correctly with chromatic bass motion
-- [ ] Diminished passing chords integrated into progressions with chromatic approach
-- [ ] Upper-structure triads voiced correctly on altered dominants
-- [ ] Complete 32-bar reharmonized Rhythm Changes at 140+ BPM
+**Theoretical**
+- [ ] Can name the guide tones (3rd, 7th) of any chord symbol by ear, instantly
+- [ ] Can explain why a tritone substitution preserves dominant function (shared tritone)
+- [ ] Can spot a borrowed chord in a real lead sheet and name which parallel-minor scale degree it comes from
+- [ ] Can explain why there are only 3 unique diminished 7th chords
 
-### Theoretical Understanding
-
-- [ ] Identify guide tones (3rd and 7th) in any voicing by ear
-- [ ] Explain why tritone substitution preserves dominant function
-- [ ] Analyze borrowed chords from parallel minor in real-book standards
-- [ ] Recognize symmetrical interval structures in diminished 7th chords
-- [ ] Calculate voice-leading cost (semitone motion) between adjacent voicings
-
-### Musical Application
-
-- [ ] Comp behind a soloist with rhythmic variation and dynamic sensitivity
-- [ ] Reharmonize a standard tune using at least 3 learned techniques
-- [ ] Improvise melodically over reharmonized progressions using appropriate scales
-- [ ] Transcribe voicings from professional recordings and apply to own playing
-- [ ] Perform one complete standard with reharmonized comping in a live or recorded setting
+**Musical**
+- [ ] Can comp behind a soloist with rhythmic variation, not just whole-note chords
+- [ ] Can reharmonize an unfamiliar standard using at least 3 techniques from this lesson
+- [ ] Can improvise over reharmonized changes using the matched chord-scale from Drill 5E
+- [ ] Has a recorded, self-critiqued performance of one full standard with reharmonized comping
 
 ---
 
-## Troubleshooting Guide
+## Troubleshooting
 
-### Problem: Voicings Sound Muddy or Unclear
+**Voicings sound muddy.** You're voicing too low. Keep LH rootless voicings at or above C3 — below that, close intervals (minor 2nds, major 2nds between adjacent tensions) read as mud rather than color because the ear can't resolve close harmonics in the bass register. Also check you haven't doubled the 3rd or 7th by accident, which thickens the chord without adding information.
 
-**Diagnosis:**
-- Notes too close together in low register
-- Incorrect voice-leading causing note collisions
+**Can't execute at tempo.** You're adding speed before the shape is automatic. Go back to 40 BPM, hold each voicing statically for a full four counts, and don't move the metronome up until four consecutive clean loops happen without you watching your hands.
 
-**Solution:**
-- Keep rootless voicings above middle C (C3) in left hand
-- Use wider intervals (4ths and 5ths) in bass register
-- Check that 3rd and 7th are clearly voiced, not doubled
+**Tritone substitution sounds wrong, not colorful.** Almost always a guide-tone mismatch — check that the substitute chord's 3rd and 7th are literally the same two pitches (reordered) as the original's 7th and 3rd. If they're not, you've built the wrong substitute chord, not a legitimately "edgy" one.
 
-### Problem: Cannot Execute Voicings at Tempo
+**Upper-structure triads sound like noise.** Either the triad doesn't belong to that dominant's altered/Lydian-dominant scale, or it's voiced too close to the LH shell. Fix the octave spacing first — that alone resolves most muddiness complaints before you even reconsider the triad choice.
 
-**Diagnosis:**
-- Insufficient muscle memory
-- Hand position inefficiency
-
-**Solution:**
-- Practice each voicing statically for 1 minute before adding tempo
-- Use consistent fingering (5-3-2-1 for LH)
-- Practice slow (40 BPM), increase by 5 BPM increments only when perfect
-
-### Problem: Tritone Substitution Sounds "Wrong"
-
-**Diagnosis:**
-- Incorrect guide-tone resolution
-- Melodic line conflicts with substitute harmony
-
-**Solution:**
-- Verify that 3rd and 7th of original chord match 7th and 3rd of substitute
-- Adjust melody to accommodate chromatic bass motion
-- Listen to recordings of Herbie Hancock, Bill Evans using tritone subs
-
-### Problem: Upper-Structure Triads Sound Dissonant
-
-**Diagnosis:**
-- Incorrect triad choice for chord-scale relationship
-- Voicing too dense or intervals too close
-
-**Solution:**
-- Reference upper-structure catalog (Db, Eb, F# for altered dominants)
-- Space RH triad above LH shell by at least one octave
-- Start with simpler tensions (9, 13) before complex upper-structures
-
-### Problem: Diminished Chords Don't Resolve Smoothly
-
-**Diagnosis:**
-- Incorrect voice-leading from dim7 to target chord
-- Wrong diminished scale choice
-
-**Solution:**
-- Use chromatic approach: dim7 one semitone below target (D#dim7 → Em7)
-- Practice isolated dim7 → target resolutions before full progressions
-- Verify whole-half vs. half-whole diminished scale choice
+**Diminished chords don't resolve smoothly.** Check that your approach chord sits exactly a half step below its target's root (D#dim7 approaching Em7, not some other diminished chord). Also confirm you're choosing whole-half diminished scale for chords functioning as dominant-adjacent approach tones — half-whole diminished is for a different context (altered dominant soloing) and will clash here.
 
 ---
 
-## Further Study & Resources
+## Further Study
 
-### Recommended Method Books
+**Method books:** Mark Levine's *The Jazz Piano Book* (the standard reference for everything in this lesson, in far more depth); Jamey Aebersold *Volume 3: The II-V-I Progression* for play-along practice in all keys; Barry Harris masterclasses for bebop diminished-scale vocabulary; Bert Ligon's *Connecting Chords with Linear Harmony* for voice-leading beyond block voicings.
 
-- **Mark Levine, *The Jazz Piano Book*** – Comprehensive voicing catalog and reharmonization techniques
-- **Jamey Aebersold, *Volume 3: The II-V-I Progression*** – Play-along tracks in all keys
-- **Barry Harris, *Master Class Series*** – Diminished scales and bebop lines
-- **Bert Ligon, *Connecting Chords with Linear Harmony*** – Voice-leading and linear harmony
+**Transcribe these specifically:** Bill Evans, "Waltz for Debby" (rootless voicings in motion) and "My Foolish Heart" (modal interchange); McCoy Tyner, "Passion Dance" (quartal voicings) and "Blues on the Corner" (upper-structures); Herbie Hancock, "Dolphin Dance" (dense reharmonization); Chick Corea, "Windows" (diminished-based substitution).
 
-### Transcription Study
-
-**Essential Pianists:**
-- Bill Evans: "Waltz for Debby" (rootless voicings), "My Foolish Heart" (modal interchange)
-- McCoy Tyner: "Passion Dance" (quartal voicings), "Blues on the Corner" (upper-structures)
-- Herbie Hancock: "Maiden Voyage" (sus chords), "Dolphin Dance" (reharmonization)
-- Chick Corea: "Spain" (modal harmony), "Windows" (diminished substitutions)
-
-### Real-Book Standards for Application
-
-- **Beginner:** "Autumn Leaves," "Summertime," "Blue Bossa"
-- **Intermediate:** "All the Things You Are," "Stella by Starlight," "Confirmation"
-- **Advanced:** "Giant Steps," "Inner Urge," "Nefertiti"
-
-### Computational Tools
-
-- **music21 documentation:** https://web.mit.edu/music21/doc/
-- **Hookpad** (online chord progression analyzer)
-- **Sonic Visualiser** (chord extraction from audio)
-- **Transcribe!** (slowdown software for transcription)
+**Repertoire progression:** start with "Autumn Leaves," "Summertime," "Blue Bossa"; move to "All the Things You Are," "Stella by Starlight," "Confirmation"; graduate to "Giant Steps," "Inner Urge," "Nefertiti."
 
 ---
 
-## Conclusion
+## Closing Note
 
-Mastery of jazz harmony requires physical practice at the keyboard, theoretical understanding of functional harmony, and musical application in real-time performance. This laboratory has provided systematic drills for rootless voicings, tritone substitution, modal interchange, upper-structure triads, and diminished passing chords—the essential techniques of modern jazz reharmonization.
-
-Continue the 30-day practice protocol, focusing on consistent daily repetition across all 12 keys. Record yourself weekly to track progress. Transcribe professional pianists to internalize vocabulary. Apply learned techniques to real-book standards and jam sessions.
-
-Jazz harmony is a living, evolving language. The techniques in this lab are not rules but tools for creative expression. Experiment, listen critically, and develop your own voice within the tradition.
+Every technique here — rootless voicings, tritone subs, borrowed chords, diminished passing chords — exists to solve one problem: making harmonic motion sound smoother and richer than the raw chord symbols suggest. Learn them as tools tied to that one goal, not as a checklist. The test of mastery isn't whether you can name a bVI chord on demand; it's whether, mid-tune, your hands find the smoothest path between two chords without you having to think about it.
