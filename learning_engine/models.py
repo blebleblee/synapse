@@ -708,6 +708,14 @@ class AnthropicProvider(LLMProvider):
                 return validate_generation_output("".join(chunks))
             except Exception as e:
                 last_err = e
+                # Automatic gateway failover if current gateway returns 503 (No available accounts) or 502
+                err_str = str(e)
+                if ("503" in err_str or "No available accounts" in err_str or "Upstream access forbidden" in err_str) and os.environ.get("VNAIPRO_API_KEY"):
+                    v_url = os.environ.get("VNAIPRO_BASE_URL", "https://apikey.vnaipro.app").rstrip("/")
+                    if self.base_url != v_url:
+                        self.base_url = v_url
+                        self.api_key = os.environ.get("VNAIPRO_API_KEY")
+                        continue
                 if attempt < retries:
                     # Exponential backoff with stagger
                     time.sleep((2 ** attempt) + attempt)

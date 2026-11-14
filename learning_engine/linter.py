@@ -141,6 +141,33 @@ def lint_curriculum(domain_filter: str = "") -> Dict[str, Any]:
         issues = lint_markdown_file(md_file)
         all_issues.extend(issues)
 
+    # Check for missing lesson sequence gaps across topic directories
+    scanned_topics = set()
+    for md_file in target_dir.glob("**/lesson_*.md"):
+        topic_dir = md_file.parent
+        if topic_dir in scanned_topics:
+            continue
+        scanned_topics.add(topic_dir)
+
+        lesson_files = list(topic_dir.glob("lesson_*.md"))
+        numbers = []
+        for f in lesson_files:
+            m = re.match(r"^lesson_(\d+)_", f.name)
+            if m:
+                numbers.append(int(m.group(1)))
+        
+        if numbers:
+            expected = set(range(1, max(numbers) + 1))
+            missing = expected - set(numbers)
+            if missing:
+                rel_dir = str(topic_dir.relative_to(WORKSPACE_ROOT))
+                all_issues.append({
+                    "file": rel_dir,
+                    "severity": "error",
+                    "code": "MISSING_LESSON_IN_SEQUENCE",
+                    "message": f"Topic directory has missing lesson number(s) in sequence: {sorted(list(missing))}"
+                })
+
     error_count = sum(1 for i in all_issues if i["severity"] == "error")
     warning_count = sum(1 for i in all_issues if i["severity"] == "warning")
     clean_files = scanned_files - len({i["file"] for i in all_issues if i["severity"] == "error"})
