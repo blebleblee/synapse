@@ -1,727 +1,326 @@
-# Songwriting: Harmonic Architecture and Composition Craft
+# Songwriting: Harmonic Craft, Melody, and Composition Workflow
 
-## 1. First-Principles Intuition & Acoustic Foundations
+## 1. How Harmony Creates Feeling (The 15% You Need)
 
-### The Harmonic Series as the Source of Songwriting Coherence
+A vibrating string produces a fundamental pitch plus a stack of overtones above it (2×, 3×, 4× the fundamental frequency, and so on). Two notes sound stable together when their overtones line up; they sound restless when the overtones clash and beat against each other. That's the entire acoustic basis for why a V chord "wants" to move to I and why a tritone feels like it must resolve. You don't need the full physics paper to use this — you need three practical facts:
 
-Every song is built on harmonic progressions that feel *inevitable* or *surprising* — but this inevitability is not arbitrary. It emerges from the physics of vibrating strings and the neuroscience of how the human auditory system processes pitch relationships.
+1. **The perfect fifth (3:2 ratio) is the strongest consonance after the octave.** This is why basslines built on descending fifths (D→G→C) feel unshakably solid, and why the V chord, sitting a fifth above I, is the natural launchpad back home.
+2. **The tritone is the most unstable interval in Western harmony.** In a V7 chord (G–B–D–F in C major), the B and F form a tritone. It resolves by both notes stepping inward: B→C, F→E. That two-semitone pull is the engine behind almost every cadence you'll write.
+3. **Equal temperament (12-TET) spreads tuning error evenly across all 12 keys**, which is why you can freely modulate anywhere on guitar or piano without it sounding "broken." Every key is equally, imperceptibly out of tune. That's a feature, not a flaw — it's what lets you write in any key on a fixed-pitch instrument.
 
-When a string vibrates at a fundamental frequency *f₀*, it simultaneously produces overtones at integer multiples: 2f₀, 3f₀, 4f₀, 5f₀, and so on. This **harmonic series** is the acoustic foundation of all tonal music. Two pitches sound consonant when their overtone series share many common partials — the basilar membrane in the inner ear experiences minimal beating (amplitude fluctuation). Two pitches whose overtones collide at incongruent frequencies produce roughness, which the brain encodes as dissonance.
-
-The critical frequency ratios that govern songwriting:
-
-| Interval | Ratio | Cents (Just) | Cents (12-TET) | Acoustic Character |
-|---|---|---|---|---|
-| Perfect Fifth | 3:2 | 701.96 | 700 | Most consonant after octave; backbone of tonal harmony |
-| Perfect Fourth | 4:3 | 498.04 | 500 | Consonant; weaker than fifth |
-| Major Third | 5:4 | 386.31 | 400 | Consonant; slightly bright in 12-TET |
-| Minor Third | 6:5 | 315.64 | 300 | Consonant; slightly dark in 12-TET |
-| Major Seventh | 15:8 | 1088.27 | 1100 | Dissonant; used to create tension |
-| Tritone | 45:32 | 590.22 | 600 | Maximally dissonant; demands resolution |
-
-The perfect fifth (3:2 ratio) dominates songwriting because the third harmonic of the lower pitch coincides exactly with the second harmonic of the upper pitch — perfect acoustic alignment. This is why V→I cadences feel like *home*, and why progressions built on descending fifths (ii–V–I, V–I) feel structurally inevitable.
-
-### Why Equal Temperament Enables Modern Songwriting
-
-Just intonation produces pure consonance, but creates a problem: a scale tuned purely in C major will have severely mistuned chords when you modulate to F♯ major. Western songwriting solved this around 1700 by adopting **twelve-tone equal temperament (12-TET)**, where every semitone is an identical frequency ratio:
-
-$$r = 2^{1/12} \approx 1.05946$$
-
-This distributes the Pythagorean comma (≈23.46 cents) uniformly across all 12 fifths, flattening each by approximately 1.96 cents. No key is perfectly in tune, but every key is *equally out of tune* — which is perceptually acceptable and allows free modulation between any keys. This is the acoustic reason why modern songwriting can move between any harmonic regions without listeners perceiving it as "broken."
-
-### The Tonic as Gravitational Center
-
-In any song, the **tonic** is the gravitational center around which all other harmonies orbit. This is not a theoretical abstraction — neuroscience shows that the auditory cortex maintains an active harmonic expectation model. When an unexpected chord from a distant key appears (breaking the listener's tonal model), measurable ERAN (Early Right Anterior Negativity) responses appear in fMRI scans.
-
-The tonic chord is stable because:
-1. Its root is reinforced by the harmonic series — it appears as a prominent partial in many other chords in the key.
-2. It contains no unresolved tendency tones (scale degrees that aurally "pull" toward adjacent semitones).
-3. It shares the most overtones with other diatonic chords, making it acoustically central.
-
-### Harmonic Function: The Three Forces Organizing Every Song
-
-Every chord in a song operates in one of three **harmonic functions**, formalized by Hugo Riemann's functional harmony (1893):
-
-**Tonic function (T):** Chords I, iii, and vi. These are stable. They require no further motion and can end phrases. In C major: C major, E minor, A minor.
-
-**Subdominant function (S):** Chords IV and ii. These move *away* from the tonic, creating tension and forward momentum. IV (F–A–C in C major) is the acoustic mirror of I (C–E–G), rotated around the tonic — it feels like a departure. ii7 is functionally identical but smoother in voice leading. ii–V–I is the most elegant harmonic progression in songwriting.
-
-**Dominant function (D):** Chords V and vii°. These create the strongest pull back to the tonic. The V chord (G–B–D in C major) contains the leading tone (B, one semitone below C), which aurally *wants* to resolve upward. The V7 chord (G–B–D–F) adds the minor seventh (F), which forms a tritone with B — a maximally unstable interval that resolves by contrary semitone motion (B→C, F→E), landing directly on the tonic triad. This is mechanical: the tritone is the most dissonant possible interval, and resolution is the only way to discharge that tension.
-
-```
-V7→I Resolution (G7→Cmaj in C major):
-
-V7:  G  B  D  F
-        |     |
-        ↓     ↓
-I:   C  C  E  E
-    (B→C: leading tone, up 1 semitone)
-    (F→E: seventh resolution, down 1 semitone)
-```
-
-This is not aesthetic preference. It is the most efficient harmonic resolution available in tonal music.
+Everything below this point is execution: chord shapes, fingerings, progressions, and a repeatable workflow for building a song.
 
 ---
 
-## 2. Building Songs: Diatonic Chord Palette and Voice Leading
+## 2. The Diatonic Palette: Chords You Actually Play
 
-### The Seven Diatonic Chords and Their Functions
+### Major key (example: C major)
 
-In any major key, you have seven diatonic triads, one built on each scale degree:
+| Degree | Chord | Notes | Guitar (open) | Piano (RH, root position) | Function |
+|---|---|---|---|---|---|
+| I | C | C–E–G | x32010 | C-E-G (1-3-5) | Tonic — home |
+| ii | Dm | D–F–A | xx0231 | D-F-A (1-3-5) | Subdominant |
+| iii | Em | E–G–B | 022000 | E-G-B | Tonic (weak) |
+| IV | F | F–A–C | xx3211 (or x33211 barre) | F-A-C | Subdominant — departure |
+| V | G | G–B–D | 320003 | G-B-D | Dominant — tension |
+| vi | Am | A–C–E | x02210 | A-C-E | Tonic (relative) |
+| vii° | Bdim | B–D–F | x2340x | B-D-F | Dominant (rare, passing) |
 
-| Degree | Chord | Notes | Quality | Primary Function |
-|---|---|---|---|---|
-| I | Imaj | C–E–G | Major | Tonic |
-| ii | ii | D–F–A | Minor | Subdominant |
-| iii | iii | E–G–B | Minor | Tonic (weak) |
-| IV | IV | F–A–C | Major | Subdominant |
-| V | V | G–B–D | Major | Dominant |
-| vi | vi | A–C–E | Minor | Tonic (relative) |
-| vii° | vii° | B–D–F | Diminished | Dominant (rare) |
+**Minor key (example: A minor)** — use these borrowed/altered forms depending on whether you want the melodic pull of a raised 7th:
 
-In a minor key, the situation is more complex because the 6th and 7th scale degrees can be natural or raised, giving you access to more chords:
-
-| Degree | Natural Minor | Harmonic Minor | Melodic Minor | Function |
-|---|---|---|---|---|
-| i | i | i | i | Tonic |
-| ii° | ii° | ii° (rare) | ii° | Subdominant |
-| III | III | III+ | III | Tonic (relative) |
-| iv | iv | iv | iv | Subdominant |
-| v | v | V (raised 7th) | v | Dominant (variable) |
-| VI | VI | VI | VI | Subdominant |
-| VII | VII | vii° | vii° | Dominant |
-
-Most songwriters in rock, pop, and folk operate in a hybrid space between major and minor, borrowing chords from parallel keys to add emotional color.
-
-### Seventh Chords: The Vocabulary of Modern Songwriting
-
-Extending triads to seventh chords (stacking a third above the fifth) is how modern songwriting adds harmonic sophistication:
-
-| Quality | Formula | Sonic Character | Common Usage |
+| Degree | Natural minor | Harmonic minor (raised 7th) | Function |
 |---|---|---|---|
-| maj7 | R–M3–P5–M7 | Bright, open, jazzy | I, IV |
-| 7 (dominant) | R–M3–P5–m7 | Tense, bluesy, demands resolution | V (strongest resolution force) |
-| m7 | R–m3–P5–m7 | Dark, floating, stable | ii, iii, vi |
-| m(maj7) | R–m3–P5–M7 | Introspective, uncommon but striking | vi variations in jazz/neo-soul |
-| sus2, sus4 | R–M2/P4–P5 | Ambiguous, suspenseful | Transitional chords; avoid as endpoints |
-| add9 | R–M3–P5–M9 | Modern, open, folk-influenced | I, IV variations |
+| i | Am | Am | Tonic |
+| ii° | Bdim | Bdim | Subdominant |
+| III | C | C+ (rare) | Tonic (relative) |
+| iv | Dm | Dm | Subdominant |
+| v / V | Em | E (G♯ raised) | Dominant — use E major for a real pull to Am |
+| VI | F | F | Subdominant |
+| VII / vii° | G | G♯dim | Dominant |
 
-The dominant seventh (V7) is the workhorse of songwriting. Its tritone (between the third and seventh: B–F in G7) creates maximum tension and demands resolution to I. This is why V7→I is the most powerful cadence available.
+**Practical rule:** in minor keys, swap the v minor chord for V major (raise the 7th) whenever you want a cadence that actually resolves. Em→Am is soft; E→Am has a leading tone (G♯→A) and lands hard.
 
-### Voice Leading: How Individual Notes Create Smoothness
+### Guitar CAGED mapping for these chords
+Every chord above has five movable positions across the neck via CAGED (C-shape, A-shape, G-shape, E-shape, D-shape). For songwriting purposes you don't need all five — you need **two**: an open/low-fret version for a warm, ringing verse, and a barre version 5–7 frets up for a tighter, more aggressive chorus. Try writing the same progression in both positions and listen to how register changes the emotional weight.
 
-A chord progression is not really about chords in isolation — it is about **voice leading**, the independent melodic motion of each voice (soprano, alto, tenor, bass) through the progression.
+### Piano voicing tip: rootless jazz voicings
+Once you're comfortable with root-position triads, drop the root in your right hand and let the left hand (or bass) carry it. For Dm7–G7–Cmaj7:
+- **Dm7 (no root):** F–A–C (3-5-7), RH fingers 1-2-4 or 2-3-5
+- **G7 (no root):** B–D–F (3-5-7)
+- **Cmaj7 (no root):** E–G–B (3-5-7)
 
-Four canonical voice-leading principles from 18th-century counterpoint pedagogy:
-
-**1. Stepwise motion is preferred.** Each voice should move by step (a second) when possible, not leap. This minimizes acoustic discontinuity between chords.
-
-```
-Smooth voice leading (stepwise motion):
-
-C major → F major:
-Soprano:  C ──→ F (leap, necessary)
-Alto:     E ──→ A (step up)
-Tenor:    G ──→ F (step down)
-Bass:     C ──→ F (fifth down, structural)
-
-C–E–G
-│ │ │
-F–A–C
-```
-
-**2. Common tones are retained.** If adjacent chords share a pitch, keep it in the same voice — it acts as an acoustic anchor.
-
-```
-I → IV (C major → F major):
-Both chords contain C and G.
-
-Voice 1: C ──→ C (retained)
-Voice 2: E ──→ F (step)
-Voice 3: G ──→ A (step)
-Voice 4: C ──→ F (bass fifth)
-```
-
-**3. Parallel perfect fifths and octaves should be avoided in classical/jazz writing** (but are exploited deliberately in rock for power and density). Two voices moving in the same direction by perfect fifth or octave momentarily merge into a single acoustic entity.
-
-```
-AVOID (classical):
-Voice 1: C → G (up 7 semitones)
-Voice 2: F → C (up 7 semitones)
-Result: Loss of independence.
-
-EMBRACE (rock/stadium):
-Power chord slides maintain rhythmic/percussive emphasis.
-```
-
-**4. Contrary motion is preferred to parallel motion.** When voices must move, opposite directions (one ascending, one descending) preserve independence.
-
-```
-Contrary motion (preferred in classical):
-Voice 1: C ──→ E (up)
-Voice 2: G ──→ D (down)
-
-Parallel motion (less preferred in classical, fine in rock):
-Voice 1: C ──→ D (up)
-Voice 2: G ──→ A (up)
-```
-
-These rules encode solutions to how the auditory system tracks multiple independent melodic lines simultaneously — voice-leading rules maximize the perceptual conditions for stream segregation.
+Notice the top note barely moves (F→F→E, essentially a drone), while the middle voices do the work. This is the "smooth jazz piano" sound — smooth because nothing leaps.
 
 ---
 
-## 3. The Fundamental Progressions: The Backbone of Songwriting
+## 3. Seventh Chords: Adding Color Without Adding Clutter
 
-### I–IV–V–I: The Universal Narrative Arc
+| Quality | Formula | Where to use it | Guitar shape (movable, E-shape barre) |
+|---|---|---|---|
+| maj7 | 1–3–5–7 | I, IV — bright, floating | x-x-(fret)-(fret+1)-(fret)-x variants; easiest: Cmaj7 = x32000 |
+| dom7 | 1–3–5–♭7 | V — tension, blues | G7 = 320001 |
+| m7 | 1–♭3–5–♭7 | ii, iii, vi — dark, stable | Am7 = x02010 |
+| m(maj7) | 1–♭3–5–7 | vi substitute, noir/neo-soul color | Am(maj7) = x02110 |
+| sus4 | 1–4–5 | transitional only, resolve to the triad | Dsus4 = xx0233 |
+| add9 | 1–3–5–9 | I, IV — open, modern/folk | Cadd9 = x32030 |
+
+**Drill:** play I–IV–V as plain triads, then replay as Imaj7–IVmaj7–V7. Nothing about the chord roots changed — only the color. This is the fastest way to make a stock progression sound more considered without altering your harmonic plan.
+
+---
+
+## 4. Voice Leading: Making Chord Changes Feel Smooth
+
+Voice leading means tracking what each individual note does when you move from one chord to the next, not just naming the chords.
+
+**Rule 1 — keep common tones still.** C major (C–E–G) → F major (F–A–C) shares the note C. If you're voicing this on piano, keep C in the same hand position and only move E→A and G→F.
+
+```
+C major:  C  E  G
+F major:  C  F  A
+          |  |  |
+       (hold)(step)(step)
+```
+
+**Rule 2 — move by the smallest distance available.** When a chord tone has to change, check whether it can move by a half or whole step before leaping. In G7→C, the leading tone B wants to go up to C (half step), and the 7th (F) wants to go down to E (half step) — don't fight this by inverting unnecessarily.
+
+**Rule 3 — avoid parallel fifths/octaves in close vocal or string writing**, because two voices moving in lockstep by a fifth briefly stop sounding independent and start sounding like one fat unison. This matters for choir/string arrangements. It does **not** matter in rock rhythm guitar — power chords are built on exactly this effect, and that's why they sound massive rather than "wrong."
+
+**Guitar-specific application:** when changing chords, look for a shared fret or finger you can pivot on instead of lifting the whole hand. Am (x02210) → C (x32010) shares the open high E and B strings fretted the same way — only your 3rd finger moves from the D string to the A string. Minimizing hand movement isn't just about tone, it's what makes fast chord changes physically possible.
+
+---
+
+## 5. The Core Progressions You'll Use 90% of the Time
+
+### I–IV–V–I — the universal arc
 
 ```mermaid
 graph LR
-    I["I (Tonic)\nC–E–G\nHome"]
-    IV["IV (Subdominant)\nF–A–C\nDeparture"]
-    V["V (Dominant)\nG–B–D\nTension"]
-    I2["I (Tonic)\nResolution"]
-
-    I -->|"Subdominant motion"| IV
-    IV -->|"Dominant motion"| V
-    V -->|"Leading tone resolution\nB→C, F→E"| I2
-
-    style I fill:#2d6a4f,stroke:#000,stroke-width:2px,color:#fff
-    style IV fill:#e9c46a,stroke:#000,stroke-width:2px,color:#000
-    style V fill:#e76f51,stroke:#000,stroke-width:2px,color:#fff
-    style I2 fill:#2d6a4f,stroke:#000,stroke-width:2px,color:#fff
+    subgraph prog1 ["I – IV – V – I in C major"]
+    I["I: C major\nhome"] -->|"departure"| IV["IV: F major"]
+    IV -->|"max tension\ntritone in V7"| V["V: G major"]
+    V -->|"B→C, F→E"| I2["I: C major\nresolution"]
+    end
 ```
 
-The I–IV–V–I progression maps onto the fundamental narrative of departure and return: stability → tension → maximum tension → resolution. This is the skeleton of countless songs across genres (The Beatles' *Let It Be*, thousands of pop choruses, hymns, classical sonatas).
+Play it: C (2 bars) – F (2 bars) – G (2 bars) – C (2 bars), 80 BPM, four-on-the-floor strum. This is the harmonic shape behind thousands of hymns, pop choruses, and folk songs. It works because each chord does a distinct emotional job: stability, departure, maximum tension, return.
 
-**Why it works:**
-- I is home (tonic stability).
-- IV moves away (subdominant function), introducing a new tonal area.
-- V maximizes distance with the tritone (B–F in G7), creating maximum tension.
-- I provides return and resolution.
-
-### ii–V–I: Jazz's Engine and Modern Songwriting's Secret Weapon
+### ii–V–I — the smoothest possible motion
 
 ```mermaid
 graph LR
-    ii["ii7 (Pre-dominant)\nD–F–A–C"]
-    V7["V7 (Dominant)\nG–B–D–F\nTritone: B–F"]
-    Imaj7["Imaj7 (Tonic)\nC–E–G–B"]
-
-    ii -->|"Descending fifth bass\nD→G"| V7
-    V7 -->|"Tritone resolution\nB→C, F→E"| Imaj7
-
-    style ii fill:#457b9d,stroke:#000,stroke-width:2px,color:#fff
-    style V7 fill:#e76f51,stroke:#000,stroke-width:2px,color:#fff
-    style Imaj7 fill:#2d6a4f,stroke:#000,stroke-width:2px,color:#fff
+    subgraph prog2 ["ii – V – I: descending fifths"]
+    ii["ii7: Dm7"] -->|"bass falls a 5th"| V7["V7: G7\n(tritone B–F)"]
+    V7 -->|"B→C, F→E"| I["Imaj7: Cmaj7"]
+    end
 ```
 
-The ii–V–I is the most efficient progression in modern songwriting. Why:
+The bass falls by a fifth twice in a row (D→G→C), which is the most stable root motion in tonal music, and the top voices only move by semitone at the final resolution. **Use this for bridges and refined sections** — it's the backbone of jazz standards and neo-soul choruses (think D'Angelo, Corinne Bailey Rae).
 
-1. **All three harmonic functions present:** ii (subdominant), V (dominant), I (tonic).
-2. **Bass moves by descending fifths (D→G→C)** — the most acoustically stable bass motion, rooted in the harmonic series.
-3. **Minimal voice leading:** Only semitone movements between V7 and Imaj7 (B→C, F→E).
-4. **Universally applicable:** Works in jazz, R&B, neo-soul, modern pop ballads.
-
-**Practical application:** If you want a smooth, sophisticated harmonic motion for a song's bridge or final chorus, ii–V–I is your template.
-
-### vi–IV–I–V: The Pop Ballad Loop
+### vi–IV–I–V — the contemporary pop loop
 
 ```mermaid
 graph LR
-    vi["vi (Relative minor)\nA–C–E"]
-    IV["IV (Subdominant)\nF–A–C"]
-    I["I (Tonic)\nC–E–G"]
-    V["V (Dominant)\nG–B–D"]
-
-    vi --> IV
-    IV --> I
-    I --> V
-    V -.->|Often loops| vi
-
-    style vi fill:#52b788,stroke:#000,stroke-width:2px,color:#fff
-    style IV fill:#e9c46a,stroke:#000,stroke-width:2px,color:#000
-    style I fill:#2d6a4f,stroke:#000,stroke-width:2px,color:#fff
-    style V fill:#e76f51,stroke:#000,stroke-width:2px,color:#fff
+    subgraph prog3 ["vi – IV – I – V loop"]
+    vi["vi: Am\nintrospective"] --> IV["IV: F"]
+    IV --> I["I: C"]
+    I --> V["V: G"]
+    V -.->|"loops back"| vi
+    end
 ```
 
-This progression (also known as the "vi–IV–I–V" or "sensitive female chord progression") has become ubiquitous in contemporary pop ballads, singer-songwriter material, and indie rock. Why:
+This progression (Adele's *Someone Like You*, Journey's *Don't Stop Believin'*, countless others) opens on the relative minor instead of the tonic, which makes the first chord feel reflective rather than triumphant, then resolves through all three harmonic functions before looping. It can repeat indefinitely because the melody — not the harmony — carries the sense of progress.
 
-1. **Starts on vi (relative minor)**, creating an introspective opening.
-2. **Moves through all three functions naturally.**
-3. **Can loop indefinitely** without feeling repetitive if melodic interest is maintained.
-
-Examples: Adele *Someone Like You* (uses vi–IV–I–V), Lady Gaga *Bad Romance* (uses variations), countless indie ballads.
-
-### The Circle of Fifths as Harmonic Navigation
+### Circle of fifths as a modulation map
 
 ```mermaid
 graph TD
-    C["C major / A minor"]
-    G["G major / E minor"]
-    D["D major / B minor"]
-    A["A major / F♯ minor"]
-    E["E major / C♯ minor"]
-    B["B major / G♯ minor"]
-    Fs["F♯/G♭ major"]
-    Db["D♭ major / B♭ minor"]
-    Ab["A♭ major / F minor"]
-    Eb["E♭ major / C minor"]
-    Bb["B♭ major / G minor"]
-    F["F major / D minor"]
-
-    C -->|"Clockwise: ascending fifths"| G
-    G --> D
-    D --> A
-    A --> E
-    E --> B
-    B --> Fs
-    Fs --> Db
-    Db --> Ab
-    Ab --> Eb
-    Eb --> Bb
-    Bb --> F
-    F -->|"Counter-clockwise: descending fifths"| C
-
-    style C fill:#2d6a4f,stroke:#000,stroke-width:2px,color:#fff
-    style G fill:#e76f51,stroke:#000,stroke-width:2px,color:#fff
-    style F fill:#457b9d,stroke:#000,stroke-width:2px,color:#fff
+    subgraph circle ["Circle of Fifths — Harmonic Distance"]
+    C["C major"] -->|"clockwise = +1 sharp"| G["G major"]
+    G --> D["D major"]
+    D --> A["A major"]
+    F["F major"] -->|"counter-clockwise = +1 flat"| C
+    Bb["B♭ major"] --> F
+    end
 ```
 
-The circle of fifths is not a mnemonic — it is a topological map of harmonic distance. Keys adjacent on the circle share six of seven diatonic pitches and differ by one accidental. Progressions moving clockwise (I→V, ascending fifths) create *tension*. Progressions moving counter-clockwise (V→I, descending fifths) create *resolution*. The ii–V–I is a counter-clockwise motion: D→G→C.
-
-**Practical application:** To modulate smoothly between keys in a song, move clockwise on the circle of fifths. C major → G major (add F♯) requires only one new accidental. C major → A♭ major (move counter-clockwise three times) requires a more dramatic shift.
+Adjacent keys on the circle share six of seven notes. If you want a chorus or bridge to feel like a *lift* without jarring the listener, move one step clockwise (C→G, add one sharp). Moving several steps in one jump (C→A♭) reads as a dramatic, deliberate shift — save it for key-change choruses in the last third of a song.
 
 ---
 
-## 4. Emotional Color: Modal Harmony and Borrowed Chords
+## 6. Modes and Borrowed Chords: Coloring Outside Major/Minor
 
-### The Seven Modes: Beyond Major and Minor
+You don't need to "think in modes" while writing — you need to know which single note to alter to borrow a mode's flavor.
 
-A major scale rotated onto different roots produces seven distinct modes, each with a different emotional character:
-
-| Mode | Formula from C | Characteristic Interval | Emotional Quality | Song Application |
-|---|---|---|---|---|
-| Ionian (Major) | C D E F G A B | Major 7th | Bright, resolved, victorious | Choruses, affirmative statements |
-| Dorian | C D E♭ F G A B♭ | Major 6th on minor | Dark but hopeful, jazzy | Verses, introspection with momentum |
-| Phrygian | C D♭ E♭ F G A♭ B♭ | Flat 2nd | Tense, Spanish/Flamenco, exotic | Avant-garde, world music, drama |
-| Lydian | C D E F♯ G A B | Sharp 4th | Dreamy, floating, ethereal | Ambient passages, strangeness |
-| Mixolydian | C D E F G A B♭ | Flat 7th | Bluesy, rock, blues-rock dominant | Verses in blues/rock, groovy sections |
-| Aeolian (Natural Minor) | C D E♭ F G A♭ B♭ | No leading tone | Melancholic, resigned | Minor verses, sad sections |
-| Locrian | C D♭ E♭ F G♭ A♭ B♭ | Flat 5th | Extremely unstable, dark, disorienting | Rare; horror/avant-garde contexts |
-
-**Practical application:** To add emotion without changing key signature:
-
-- **Use Dorian** when you want a minor sound that feels active (add a major 6th to a minor chord: Am → Am(maj6) or A–C–E–F♯).
-- **Use Mixolydian** when you want a major sound with blues flavor (C major with a B♭ floating on top: C–E–G–B♭, the "blues I7").
-- **Use Lydian** to create dreamy, timeless moods (substitute the IV chord's F with F♯: C–E–G–F♯ instead of C–E–G–F).
-
-### Modal Mixture (Borrowing): Pulling from Parallel Keys
-
-Modal mixture — borrowing chords from the parallel minor or other modes — is one of the most powerful expressive tools in songwriting. In C major, you can borrow from C minor, C Dorian, C Mixolydian, etc.
-
-**Most common borrowed chords in pop/rock/classical:**
-
-| Borrowed Chord | Source | Contains | Effect | Song Context |
-|---|---|---|---|---|
-| ♭VII (B♭ major) | C Mixolydian | C Mixolydian ♭7 | Anthemic, power, uplift | The Beatles *Hey Jude* (IV–♭VII–I), stadium rock |
-| iv (F minor) | C minor | F–A♭–C | Emotional depth, heaviness | Dramatic descents, minor subdominant |
-| ♭VI (A♭ major) | C minor | A♭–C–E♭ | Contrast, distance from I | ♭VI–♭VII–I power progression |
-| ♭III (E♭ major) | C minor | E♭–G–B♭ | Mediant color, tonal distance | Chromatic planing, Renaissance/Romantic passages |
-| ii° (D diminished) | C minor | D–F–A♭ | Passing chord, darkness | Rare; baroque counterpoint |
-
-**Practical application in songwriting:**
-
-To create an emotional pivot in your song without changing key, borrow ♭VII (the flatted seventh chord) or iv (the minor subdominant). In C major:
-
-- **I → ♭VII → IV** (C major → B♭ major → F major): Creates anthemic lift and has been used in countless rock songs.
-- **I → iv → V** (C major → F minor → G major): Adds darkness and introspection to a major-key progression.
-
-These moves maintain the key signature (no accidentals needed for ♭VII if you think of it as borrowed; for iv you add A♭) but shift emotional color dramatically.
-
-### Secondary Dominants: Tonicization Without Modulation
-
-A **secondary dominant** is a V7 chord applied to a chord other than I, creating a momentary sense that this chord is a local tonic. It creates harmonic intrigue without a full key change.
-
-In C major, the most common secondary dominants:
-
-| Secondary Dominant | Resolves To | Leading Tone Of | Example |
+| Want this feeling | Alter this note | Result | Example use |
 |---|---|---|---|
-| V7/ii (A7) | ii (D minor) | A7 → Dm (F♯ is leading tone of D) |
-| V7/iii (B7) | iii (E minor) | B7 → Em (A♯ is leading tone of E) |
-| V7/IV (C7) | IV (F major) | C7 → F (B♭ makes C a dom. 7th) |
-| V7/V (D7) | V (G major) | D7 → G (C♯ is leading tone of G) |
-| V7/vi (E7) | vi (A minor) | E7 → Am (D♯ is leading tone of A) |
+| Minor but hopeful, not sad (Dorian) | Raise the ♭6 to 6 in a minor key | Am → add F♯ (A Dorian) | Cold, driving minor-key verses — Radiohead, Pink Floyd |
+| Major but bluesy/grounded (Mixolydian) | Flatten the 7th | C major → add B♭ | Rock/blues verses, Southern rock riffs |
+| Dreamy, suspended, unresolved (Lydian) | Raise the 4th | F major → add F♯ instead of F natural | Film-score shimmer, dream-pop choruses |
+| Darker, heavier major-key moment | Borrow iv (minor subdominant) | C major verse → drop into Fm briefly | Emotional pivot without a key change |
+| Anthemic rock lift | Borrow ♭VII | C → B♭ → F → C | The Beatles' *Hey Jude*, countless stadium choruses |
 
-```
-Secondary Dominant Flow (C major key):
+**Concrete drill:** take your I–IV–V–I progression in C and replace the final IV with ♭VII (B♭ major) before landing on I: **C – B♭ – F – C**. Play it at 90 BPM. Notice the lift feels bigger than a plain IV→I because B♭ sits outside the key, creating a brief sense of a wider harmonic world before snapping back home.
 
-I ──→ V7/V (D7) ──→ V (G) ──→ I
-      (tonicizes G    (G feels like
-       momentarily)   temporary home)
-```
+### Secondary dominants: a fast way to add intrigue
+A secondary dominant is just "the V chord of a chord that isn't your tonic." The only one you need memorized cold is **V7/V**, because it's the most common pre-chorus tool in pop and rock:
 
-This is how songwriters add harmonic sophistication and interest without key changes. Use it in bridges, transitions between sections, or as a surprise harmonic detour.
+- Key of C: V7/V = **D7** (resolves to G)
+- Progression: **C – Am – D7 – G** (I – vi – V7/V – V), ending unresolved on G to launch into the chorus.
+
+Play this at the end of a pre-chorus and let it sit on G for a full bar before the chorus drops — the D7 makes G feel like a mini-arrival, raising the stakes right before the hook.
 
 ---
 
-## 5. Harmonic Rhythm and Phrase Structure
+## 7. Cadences: How You End a Phrase Changes What the Listener Expects
 
-### Harmonic Rhythm: The Pulse of Harmonic Change
-
-**Harmonic rhythm** is the rate at which chords change, independent of the notated beat. It is a structural dimension entirely separate from melodic or rhythmic content.
-
-| Harmonic Rhythm | Rate | Emotional Effect | Songwriting Application |
+| Cadence | Motion | Feeling | Where to use it |
 |---|---|---|---|
-| Slow | One chord per 4–8 bars | Spacious, contemplative, ambient | Intro passages, sustained verses |
-| Moderate | One chord per 1–2 bars | Conversational, grounded, standard | Most pop/rock verses and choruses |
-| Fast | Chord changes per half-beat or quarter-beat | Urgency, complexity, dense texture | Transitions, climactic sections, bridge builds |
+| Perfect Authentic (PAC) | V→I, both root position, melody lands on tonic | Full stop, total resolution | Final chorus, song ending |
+| Imperfect Authentic (IAC) | V→I but inverted or melody lands on 3rd/5th | Resolved but not final | Mid-song chorus endings (leaves room for another verse) |
+| Half Cadence | anything→V, unresolved | A question — demands continuation | End of verse, right before pre-chorus |
+| Plagal ("Amen") | IV→I | Gentle, accepting, settled | Codas, outros, after the main cadence already landed |
+| Deceptive | V→vi instead of V→I | Surprise, delayed resolution | Extending a bridge, avoiding a too-early ending |
 
-In classical and jazz composition, harmonic rhythm often **accelerates toward cadences** — the density of chord changes increases as the phrase approaches its conclusion, creating a sense of forward momentum and arrival.
-
-**Practical application:** If your song's verse feels static, increase harmonic rhythm in the pre-chorus (more frequent chord changes) to build momentum. If your chorus feels chaotic, slow harmonic rhythm to let each chord breathe.
-
-### Cadences: How Phrases End and Demand Continuation
-
-A **cadence** is a harmonic formula that punctuates and terminates a musical phrase. There are four primary types:
-
-#### 1. Perfect Authentic Cadence (PAC): V→I
-
-The strongest possible ending. The bass moves from V root to I root (both in root position). This is the conclusive close — any listener knows the phrase has ended.
-
-```
-Soprano:  D ──→ C
-Alto:     B ──→ E
-Tenor:    G ──→ G (held)
-Bass:     G ──→ C
-
-V: G–B–D
-I: C–E–G
-```
-
-The leading tone (B) resolves upward to the tonic (C), and the seventh (if present in V7) resolves downward. This is the cadence of finality.
-
-#### 2. Imperfect Authentic Cadence (IAC): V→I (inverted or non-root position)
-
-A softer landing than PAC. Either the V chord is inverted (bass not on G), or the I chord is inverted, or the melody does not arrive on the tonic (arrives on the third or fifth). It creates closure but leaves a sense that something could still happen.
-
-#### 3. Half Cadence: (any chord)→V
-
-A phrase that ends on V without resolving to I. It is a **question** without an answer — it demands continuation. Often used for antecedent phrases in period forms or song structures.
-
-```
-Verse ends on V (unresolved):
-Listener's expectation: "What comes next?"
-```
-
-#### 4. Plagal Cadence: IV→I (the "Amen" Cadence)
-
-The bass descends by a fourth (F→C in C major). It lacks the leading-tone urgency of the authentic cadence and therefore feels gentle, accepting, almost liturgical. Often used as a coda or final confirmation after V→I has already resolved.
-
-#### 5. Deceptive Cadence: V→vi (or V→♭VI)
-
-The expected resolution to I is interrupted by a substitution. This delays resolution and creates harmonic surprise. Schubert, Brahms, and Wagner used this repeatedly to avoid premature closure and extend emotional tension.
-
-**Practical application in songwriting:** End your verse with a half cadence (V unresolved) or IAC to propel the listener into the chorus. End your final chorus with a perfect authentic cadence (V→I, both in root position, melody on C) for maximum finality.
+**Drill:** write one 4-bar phrase and end it four different ways — half cadence, PAC, plagal, deceptive — recording each on your phone. Listen back immediately. You'll hear the difference in finality within seconds; this ear-training matters more than memorizing the names.
 
 ---
 
-## 6. Composing a Song: Step-by-Step Harmonic Framework
+## 8. Harmonic Rhythm: Pacing Your Chord Changes
 
-### The Five-Part Song Architecture
+Harmonic rhythm is how *often* chords change, independent of tempo. It's a separate lever from melody and arrangement, and it's the fastest fix for a section that "feels flat."
 
-Most successful songs follow this harmonic skeleton:
+| Harmonic rhythm | Typical rate | Effect | Use it for |
+|---|---|---|---|
+| Slow | 1 chord per 4–8 bars | Spacious, ambient, patient | Intros, sparse verses |
+| Moderate | 1 chord per 1–2 bars | Grounded, conversational | Most verses and choruses |
+| Fast/accelerating | Chord changes every 1–2 beats | Urgency, lift | Pre-choruses, bridge climaxes |
+
+**The single most useful trick in this entire lesson:** if your pre-chorus feels like it's not building, don't change the chords — change the *rate* of the chords. Stretch the same two chords (say IV and V) so IV lasts a full bar, then compress the next bar into two beats of IV and two beats of V7/V, then land on V for the final bar. Nothing new harmonically, but the acceleration alone creates the sensation of momentum.
+
+---
+
+## 9. Full Song Architecture and Build Workflow
 
 ```mermaid
 flowchart TD
-    Intro["Intro (8–16 bars)\nEstablish key and mood\nHarmonic rhythm: slow\nSuggested: I or vi"]
-    Verse["Verse 1 (8–16 bars)\nTell story, build interest\nHarmonic rhythm: moderate\nSuggested: vi–IV–I–V or I–IV–V–I"]
-    PreChorus["Pre-Chorus (4–8 bars)\nBuild tension toward chorus\nHarmonic rhythm: accelerate\nSuggested: IV–V or ii–V"]
-    Chorus["Chorus (8–16 bars)\nPayoff, emotional peak\nHarmonic rhythm: match verse or slower\nSuggested: I or I–V–vi–IV"]
-    Bridge["Bridge (8 bars)\nContrast, new harmonic area\nSuggested: ♭VI–♭VII–I or key change"]
-
-    Intro --> Verse
-    Verse --> PreChorus
-    PreChorus --> Chorus
+    subgraph arch ["Five-Part Song Architecture"]
+    Intro["Intro — 8 bars\nslow harmonic rhythm\nI or vi"]
+    Verse["Verse — 8–16 bars\nmoderate rhythm\nvi–IV–I–V"]
+    Pre["Pre-Chorus — 4–8 bars\naccelerating rhythm\nIV–V7/V–V"]
+    Chorus["Chorus — 8–16 bars\nI–V–vi–IV loop\nPAC on final pass"]
+    Bridge["Bridge — 8 bars\nborrowed chords or\nrelative-key shift"]
+    Intro --> Verse --> Pre --> Chorus
     Chorus --> Verse
-    Chorus -.->|After 2nd chorus| Bridge
-    Bridge --> Chorus
-
-    style Intro fill:#d4f1d4
-    style Verse fill:#e8f4f8
-    style PreChorus fill:#fff4e6
-    style Chorus fill:#ffe6e6
-    style Bridge fill:#f0e6ff
+    Chorus -.->|"after 2nd chorus"| Bridge --> Chorus
+    end
 ```
 
-### Practical Composition Workflow
+### Step-by-step build (concrete, in C major)
 
-**Step 1: Choose a tonic and harmonic function palette.**
-Decide: Are you in major or minor? Will you borrow chords from parallel keys? This determines your available harmonic vocabulary.
-
-**Step 2: Create the verse harmonic progression (8–16 bars).**
-Use one of the fundamental progressions (I–IV–V–I, ii–V–I, vi–IV–I–V, or a borrowed-chord variant). Keep harmonic rhythm moderate (one chord per 1–2 bars). Write a melody *over* these chords.
-
+**1. Verse (8 bars) — vi–IV–I–V, 2 bars each.**
 ```
-Verse example in C major (8 bars):
-Bar 1–2: vi (A minor) – melody over A–C–E
-Bar 3–4: IV (F major) – melody over F–A–C
-Bar 5–6: I (C major) – melody over C–E–G
-Bar 7–8: V (G major) – melody over G–B–D
+Bars 1–2: Am   | melody opens on A or C, stepwise motion
+Bars 3–4: F    | melody moves to F or A
+Bars 5–6: C    | melody settles on C, G, or E
+Bars 7–8: G    | melody rises toward B (leading tone), left unresolved
 ```
+Metronome: 85 BPM. The verse ends on an unresolved V — this is a half cadence, and it's deliberate. It pulls the listener into the pre-chorus.
 
-**Step 3: Create the pre-chorus (4–8 bars).**
-Increase harmonic rhythm and move toward the dominant via secondary dominants or fast chord changes. Build momentum.
+**2. Pre-chorus (4 bars) — accelerate toward the dominant.**
+```
+Bar 1: F          (full bar)
+Bar 2: F          (full bar)
+Bar 3: F (2 beats) → D7 (2 beats)   [V7/V — secondary dominant]
+Bar 4: G          (full bar, held, unresolved — setup for chorus)
+```
+The melody should rise in pitch across these 4 bars, mirroring the harmonic acceleration. Try ending bar 4 on a sustained high note over G, then cut it off right as the chorus hits — the silence before the downbeat does as much work as the chord does.
 
+**3. Chorus (8 bars) — I–V–vi–IV loop, repeated once, catchy and repetitive on purpose.**
 ```
-Pre-chorus example (4 bars):
-Bar 1–2: IV (F major) – preparation
-Bar 3: V7/V (D7) – secondary dominant tonicizing V
-Bar 4: V (G major) – arrival on dominant, unresolved
-(Listener expects chorus on I)
+Bars 1–2: C
+Bars 3–4: G
+Bars 5–6: Am
+Bars 7–8: F  → loop back to C, or on final repeat resolve V→I for a PAC
 ```
+Melody rule: land on the root or fifth of each chord on beat 1, keep rhythm identical across all four chords (this repetition is what makes hooks memorable — the harmony changes, the rhythmic shape doesn't).
 
-**Step 4: Create the chorus (8–16 bars).**
-This is your emotional and harmonic payoff. You can either:
-- **Repeat the verse harmonic progression** but with stronger melody and arrangement (common in pop).
-- **Use a new progression** (e.g., a loop like I–V–vi–IV for maximum catchiness).
-- **End with a strong authentic cadence** (V→I) to emphasize resolution.
-
+**4. Bridge (8 bars) — contrast via relative minor or borrowed chords.**
 ```
-Chorus example (8 bars):
-Bar 1–2: I (C major)
-Bar 3–4: V (G major)
-Bar 5–6: vi (A minor)
-Bar 7–8: IV (F major), then loop or V→I cadence
+Bars 1–2: Am  (i in A minor — reframe the vi chord as a new home)
+Bars 3–4: E   (V of A minor — secondary dominant, raises tension)
+Bars 5–6: Dm  (iv — emotional low point)
+Bars 7–8: E   (V, held, sets up return to C major chorus)
 ```
-
-**Step 5: Create the bridge (8 bars).**
-Harmonic contrast is key. Options:
-- **Modulate to the relative minor** (C major → A minor): Reharmonize the melody in A minor.
-- **Use borrowed chords** (♭VI–♭VII–I in C major: A♭–B♭–C): Creates dramatic pivot.
-- **Modulate to a related key** (C major → G major or F major): Moves clockwise or counter-clockwise on circle of fifths.
-
-```
-Bridge example in C major (8 bars):
-Modulate to A minor (relative):
-Bar 1–2: vi (A minor) in the key of A minor (i)
-Bar 3–4: V/iv (E major) – secondary dominant
-Bar 5–6: iv (D minor) – emotional nadir
-Bar 7–8: V (E major) – return to home key momentum
-Then: Return to chorus in original key (C major)
-```
+This works because Am was already present in your verse/chorus as vi — pivoting it to feel like a temporary tonic costs you nothing structurally but buys a real sense of departure.
 
 ---
 
-## 7. Reference: Harmonic Progressions Organized by Emotional Character
+## 10. Reharmonization: Changing the Chords Under an Existing Melody
 
-### Progressions for Uplifting, Major-Key Moments
+Reharmonization keeps the melody fixed and swaps what's underneath it — the single most powerful tool for turning a plain idea into something that sounds considered.
 
-| Progression | Function | Song Context | Execution |
-|---|---|---|---|
-| I–V–vi–IV | Modern pop backbone | Chorus, main hook | Play each for 2 bars; end with IV on beat 4 as setup for next loop |
-| I–IV–V–I | Classic cadence | Verse, chorus, or bridge | Slow harmonic rhythm (1 bar per chord) for weight |
-| I–vi–IV–V | Introspective major | Verse opening, reflective chorus | Begin on I, establish tonic before descending to vi |
-| IV–I–V–I | Inverted opening | Surprising opener, bridge | Starts away from tonic; tension before resolution |
+**Melody (C major): C – E – G – E – C** (quarter notes, one per bar)
 
-### Progressions for Dark, Minor-Key or Borrowed-Chord Moments
-
-| Progression | Function | Song Context | Execution |
-|---|---|---|---|
-| vi–IV–I–V | Relative minor intro | Verse, pre-chorus tension | Introspective opening, builds toward dominant |
-| i–VII–VI–VII (or i–♭VII–♭VI–♭VII) | Minor cadential loop | Dark verse, minor chorus | Modal mixture; creates hypnotic, heavy feel |
-| i–V | Minimal minor | Sparse verse, ambient section | Extreme harmonic rhythm simplification |
-| iv–V | Pre-dominant tension | Bridge, climax setup | Tight, driving motion without tonic |
-| i–III–VI (C minor: Cm–E♭–A♭) | Chromatic planing | Dramatic shift, key change setup | Mediant chords (non-functional); move stepwise |
-
-### Progressions for Sophisticated, Jazz-Influenced Modern Writing
-
-| Progression | Function | Song Context | Execution |
-|---|---|---|---|
-| ii–V–I | Jazz standard foundation | Verse, chorus refrain, bridge | Descending bass fifths; most elegant cadential motion |
-| ii7–V7–Imaj7 | Extended jazz voicings | Contemporary ballad, R&B verse | Use seventh chords throughout for sophisticated color |
-| vi–ii–V–I | Jazz reharmonization of I–IV–V–I | Verse underneath instrumental solo | Extend functional harmony |
-| IVmaj7–V7sus4–V7 | Rhythmic suspension tension | Pre-chorus, transition | Suspend resolution; build anticipation |
-| I–♯IV° (tritone substitution of V7) | Chromatic dominant sub | Modern jazz, neo-soul detour | ♯IV diminished functions as V7 (B♭° in C major ≈ G7) |
-
----
-
-## 8. Computational Harmonic Analysis: Understanding Chord Relationships
-
-### Pitch-Class Set Representation (Forte Theory)
-
-Every chord can be represented as a set of pitch classes (0–11, where C=0, C♯=1, etc.), independent of octave. This allows systematic harmonic analysis:
-
-```
-C major triad:  {0, 4, 7}    (C, E, G)
-F major triad:  {5, 9, 0}    (F, A, C) = {0, 5, 9}
-G7 chord:       {7, 11, 2, 5} (G, B, D, F) = {2, 5, 7, 11}
-```
-
-**Forte Prime Form:** Every pitch-class set has a canonical form (prime form) that is unique under transposition and inversion. For example:
-- Prime form of {0, 4, 7} (major triad) is [0, 4, 7].
-- Prime form of {0, 3, 7} (minor triad) is [0, 3, 7].
-
-This formalization allows:
-1. **Harmonic distance measurement:** Two chords are harmonically close if they differ by one or two pitch classes.
-2. **Chord substitution rules:** A vi chord (A–C–E = {0, 4, 9} in relation to C) shares pitch classes with I (C–E–G = {0, 4, 7}), explaining why vi feels like a tonic substitute.
-3. **Algorithmic composition:** Rules for valid progressions can be encoded computationally.
-
----
-
-## 9. Advanced Techniques: Reharmonization and Variation
-
-### Reharmonization: Substituting New Chords Under the Same Melody
-
-Reharmonization is the art of placing different chords underneath an existing melody to change its emotional character without changing the melody itself.
-
-**Example: Reharmonizing a simple melody (C–E–G–E) in C major**
-
-| Harmony Version | Chords | Effect |
+| Version | Chords | Why it works |
 |---|---|---|
-| Simple | I (C–E–G over C) → I (G over E) → I (E over G) → I (E over E) | Homophonic, static |
-| Jazz reharmonization | Imaj7 → V7/V → V7 → I | Sophisticated, walking bass |
-| Minor-key borrowed | vi → IV → ii → V | Introspection before resolution |
-| Chromatic planing | I → ♭VII → ♭VI → V | Descending chromatic bass, dramatic |
+| Plain | I – iii – V – iii – I | Every chord tone matches the melody directly; stable, a little static |
+| Smoother bass | I – vi – IV – I – I | vi and IV both contain the melody notes (C is in vi, E is in IV) while giving the bass more movement |
+| Jazz | Imaj7 – V7/ii – ii7 – V7 – Imaj7 | Bass walks C→A→D→G→C, mostly descending fifths; melody floats, harmony does the work |
 
-Reharmonization is the secret tool of jazz musicians and modern arrangers. To reharmonize a melody:
-
-1. **Identify the melody notes** and their target arrival points (cadence, phrase endings).
-2. **Under each melody note, choose a chord that contains it.** (E can be in I, iii, vi, V7/ii, etc.)
-3. **Prioritize voice leading:** Choose chords such that the lower voices move smoothly.
-4. **Create bass line independent of the original chords** (often using circle-of-fifths descending motion or chromatic descent).
-
-### Chromatic Voice Leading: Moving Between Chords
-
-Chromatic voice leading — moving one or more voices by semitone between chords — is a 20th-century and contemporary technique that adds sophistication and smoothness.
-
-Example in C major:
-
-```
-I to ♭VII (C major to B♭ major):
-Soprano:  C ──→ B♭ (semitone down, chromatic)
-Alto:     E ──→ D (semitone down, chromatic)
-Tenor:    G ──→ B♭ (leap to doubled root)
-Bass:     C ──→ B♭ (semitone down)
-
-Creates: Smooth, unexpected shift to ♭VII
-```
-
-This technique is central to neo-Riemannian theory and is widely used in contemporary pop (Radiohead, Bon Iver, modern indie) and classical (Debussy, Ravel).
+**How to reharmonize anything, step by step:**
+1. List every chord that legally contains each melody note (E, for instance, lives in I, iii, vi, and V7/ii).
+2. Pick a chord for each melody note that also gives you a strong bass line — favor roots that move by descending fifth or by step.
+3. Check voice leading between your chosen chords: are the inner voices moving by step or common tone? If a jump appears, see if a different legal chord choice removes it.
+4. Play it against the original melody. If a chord sounds wrong even though it "contains" the note, it's because the note is being treated as a tension (7th, 9th) rather than landing on a stable chord tone — that's fine for a jazzier color, just make sure it's a choice, not an accident.
 
 ---
 
-## 10. Practical Songwriting Exercises
+## 11. Practice Drills
 
-### Exercise 1: Compose a Simple Verse (Duration: 30 minutes)
+### Drill 1 — Internalize function (20 min)
+Play Am–F–C–G (vi–IV–I–V) in C major at 70 BPM, then transpose the same shapes to F major (Dm–B♭–F–C) and G major (Em–C–G–D). On guitar, this means relearning the same four chord *qualities* in new fret positions — on piano, it means shifting your hand block up by the same intervals. Goal: recognize that the *function* (introspective → departure → home → tension) stays identical regardless of key.
 
-**Objective:** Internalize the relationship between harmonic function and emotional narrative.
+### Drill 2 — Harmonic acceleration (15 min)
+Take any two chords (IV and V work well). Play IV for 4 full beats, then 2 beats IV / 2 beats V, then 1 beat IV / 1 beat V / 1 beat IV / 1 beat V, then land on V held for a full bar. Metronome at 90 BPM. This single exercise trains the "build" feeling you need for every pre-chorus you'll ever write.
 
-**Steps:**
+### Drill 3 — Cadence ear training (15 min)
+Record yourself playing the same 4-bar phrase with four different endings: half cadence, PAC, plagal, deceptive. Listen back without looking at notation and name which is which purely by feel. If you can't tell them apart yet, slow down to 60 BPM and isolate just the last two chords of each.
 
-1. Choose a major or minor key (suggest: C major or A minor for keyboard/guitar simplicity).
-2. Compose an 8-bar verse using the progression **vi–IV–I–V** (in C major: Am–F–C–G).
-3. Each chord gets 2 bars. Write a melody line that:
-   - Starts on the root or third of each chord.
-   - Moves mostly by step within each chord.
-   - Ends on a tendency tone (B in this case) at bar 8 to pull toward the next section.
-4. Play it through on your instrument with a metronome at 90 BPM. Does it feel balanced?
-5. Transpose the same progression to two other keys (suggest F major and G major) to internalize the pattern.
-
-**Variation:** Replace the I chord (bar 5–6) with a IV chord. How does the emotional arc change?
-
-### Exercise 2: Compose a Pre-Chorus with Acceleration (Duration: 20 minutes)
-
-**Objective:** Understand how increasing harmonic rhythm builds momentum.
-
-**Steps:**
-
-1. Use the same key as Exercise 1 (C major).
-2. Compose a 4-bar pre-chorus with **accelerating harmonic rhythm:**
-   - Bar 1: IV (F major) for full bar (slow).
-   - Bar 2: IV (F major) for full bar (slow).
-   - Bar 3: IV (F major) for 2 beats, then V7/V (D7) for 2 beats (faster).
-   - Bar 4: V (G major) for full bar (unresolved, setting up chorus).
-3. Write a melody that rises in pitch as harmonic rhythm accelerates (creates parallel tension).
-4. Play it at 90 BPM. Does the listener feel anticipation at bar 4?
-
-### Exercise 3: Compose a Chorus with Maximum Catchiness (Duration: 45 minutes)
-
-**Objective:** Create a self-repeating harmonic loop that is instantly memorable.
-
-**Steps:**
-
-1. Use the **I–V–vi–IV loop** in C major: C–G–Am–F.
-2. Each chord gets 2 bars (8-bar total loop).
-3. Compose a memorable melody that:
-   - Emphasizes the root of each chord (C over I, G over V, A over vi, F over IV).
-   - Has rhythmic repetition (same rhythmic phrase repeated over each chord).
-   - Uses singable intervals (no leaps larger than a sixth).
-4. Play the loop 4 times (32 bars total). Is it catchy after repetition?
-5. Variation: On the 4th loop, break the pattern by inserting a V→I cadence (ending the loop with resolution to I instead of returning to C).
-
-### Exercise 4: Reharmonize a Simple Melody (Duration: 60 minutes)
-
-**Objective:** Understand chord substitution and voice leading depth.
-
-**Given melody (in C major):** C–E–G–E–C (5 notes, quarter notes)
-
-**Task A: Simple Diatonic Reharmonization**
-
-```
-Melody:        C    E    G    E    C
-Harmony 1:     I    iii  V    iii  I
-Harmony 2:     I    vi   IV   I    I (using voice leading to prioritize stepwise motion)
-```
-
-Write both out and play them. Which feels more interesting? Why?
-
-**Task B: Jazz Reharmonization**
-
-Underneath the same melody, compose this progression:
-```
-Melody:        C    E    G    E    C
-Harmony 3:     Imaj7 V7/ii ii7  V7  Imaj7
-Bass line:     C (whole) ─→ D (whole) ─→ G (whole) ─→ C
-```
-
-The bass moves by descending fifths (circle of fifths); the melody floats on top. This is the texture of jazz arrangements.
+### Drill 4 — Full song skeleton (60 min)
+Using the Section 9 workflow verbatim, write a complete verse/pre-chorus/chorus in C major. Record a rough guitar or piano take at 85 BPM with a click. Then transpose the entire thing up to D major (one step clockwise on the circle of fifths) and play it again — this forces you to actually understand the shapes rather than relying on muscle memory in one key.
 
 ---
 
-## 11. Troubleshooting: Common Songwriting Harmonic Problems and Solutions
+## 12. Troubleshooting
 
-| Problem | Cause | Solution |
+| Symptom | Likely cause | Fix |
 |---|---|---|
-| "My verse feels static / boring" | Harmonic rhythm too slow; same chords for too long | Increase harmonic rhythm by 50% (split chords in half). Add a secondary dominant (V7/V) in bar 6. |
-| "My chorus doesn't feel like a payoff" | Chorus uses same progression as verse; no climactic chord | Shift to a borrowed chord (♭VII) or modulate up by a step. End with a strong authentic cadence (V→I). |
-| "The transition from verse to chorus is awkward" | No bridge harmony; abrupt jump | Insert a 4-bar pre-chorus that accelerates harmonic rhythm and arrives on V. |
-| "My bridge feels disconnected from the rest of the song" | Bridge uses chords unrelated to verse/chorus | Modulate to relative minor (vi becomes i) or to a key one step up (circle of fifths). Establish relationship early. |
-| "My melody doesn't sit on the chords; feels 'off'" | Melody contains wrong notes relative to harmony | Transpose melody so it starts on root, third, or fifth of opening chord. Check for passing tones that align with chord tones on strong beats. |
-| "Parallel major triads in my progression sound thin/empty" | Root-position chords only; no voice leading | Invert some chords (play IV/ii—F/C in second inversion). Add seventh extensions (I → Imaj7). Use voice leading to create smooth bass line. |
-| "My song ends abruptly; no sense of finality" | No final cadence; last chord is ambiguous | End with a clear V→I cadence. Play V on beat 3, I on beat 1 of the next measure; hold for 2–4 beats. |
+| Verse feels static | Harmonic rhythm too slow, or chords never leave tonic/subdominant | Add a secondary dominant (V7/V) two bars before the section ends; shorten chord durations in the back half |
+| Chorus doesn't feel like a payoff | Same progression as verse, no distinct arrival chord | Borrow ♭VII or iv for one chord; end the final chorus pass with a full PAC (root-position V→I, melody on the tonic) |
+| Verse-to-chorus transition is jarring | No pre-chorus, or pre-chorus doesn't end on V | Insert 4 bars that accelerate harmonic rhythm and land squarely on V, held |
+| Bridge feels like a different song | Bridge chords share no notes with verse/chorus | Pivot off a chord already in your palette (usually vi) and reframe it as a temporary tonic, rather than introducing unrelated chords |
+| Melody feels "off" against the chords | Melody landing on tensions (2nds, 4ths against the chord) on strong beats | Move melody notes that fall on beat 1 to a chord tone (root, 3rd, 5th); keep non-chord tones on weak beats as passing motion |
+| Progression sounds thin on guitar | All open-position root triads, no movement in inner voices | Add a 7th to one chord (I→Imaj7), or invert one chord by playing it higher up the neck |
+| Song has no sense of ending | Final chord is ambiguous or faded out mid-phrase | End on root-position I with the melody landing on the tonic note, held for at least 2 full beats after the V chord resolves |
 
 ---
 
-## Summary: The Harmonic Composing Checklist
+## 13. Pre-Release Checklist
 
-Before finalizing your song, verify:
-
-- [ ] **Tonic established:** The key is clear by bar 4.
-- [ ] **Three functions present:** Tonic, subdominant, and dominant appear in your verse/chorus.
-- [ ] **Harmonic rhythm varied:** Verse slower (1–2 bars per chord), pre-chorus faster (accelerating).
-- [ ] **Voice leading smooth:** Most voices move by step or hold common tones; no awkward leaps.
-- [ ] **Cadences clear:** Verse/chorus/bridge endings use recognizable cadences (V→I, half cadence, plagal).
-- [ ] **Emotional arc complete:** Intro establishes, verse tells, pre-chorus builds, chorus resolves, bridge contrasts, final chorus closes.
-- [ ] **Melody sits on harmony:** Melody notes align with chord tones on strong beats; passing tones on weak beats.
-- [ ] **Borrowed chords intentional:** Any out-of-key chords serve a clear emotional purpose (not accidental mistakes).
+- [ ] Key is unambiguous within the first 4 bars
+- [ ] All three harmonic functions (tonic, subdominant, dominant) appear in verse and chorus
+- [ ] Harmonic rhythm is deliberately varied: slower in verse, accelerating in pre-chorus
+- [ ] At least one voice-leading pass done — no unnecessary leaps, common tones held where possible
+- [ ] Verse ends on a half cadence or IAC; final chorus ends on a PAC
+- [ ] Melody lands on a chord tone on beat 1 of each bar; passing tones only on weak beats
+- [ ] Any borrowed chord (♭VII, iv, ♭VI) serves a specific emotional beat, not used by accident
+- [ ] Bridge shares at least one chord with the rest of the song to avoid feeling disconnected
 
 ---
 
-## Core References & Further Study
+## Further Study
 
-1. **Piston, Walter.** *Harmony* (5th ed., 1987). — Classical voice-leading reference; highly technical.
-2. **Kostka, Stefan, and Dorothy Payne.** *Tonal Harmony* (8th ed., 2017). — Comprehensive diatonic and chromatic harmony; excellent progression library.
-3. **Forte, Allen.** *The Structure of Atonal Music* (1973). — Pitch-class set theory for systematic harmonic analysis.
-4. **Everett, Walter.** *The Foundations of Rock* (2019). — Harmonic analysis of rock and pop; highly practical.
-5. **Terefenko, Dariusz.** *Jazz Theory: From Basic to Advanced Study* (2014). — Jazz reharmonization, secondary dominants, tritone substitution.
-6. **Riemann, Hugo.** *Vereinfachte Harmonielehre* (1893, English trans. 1895). — Original functional harmony theory; foundational.
+1. **Kostka & Payne**, *Tonal Harmony* — the standard reference for diatonic and chromatic progressions, with a strong progression library.
+2. **Everett, Walter**, *The Foundations of Rock* — harmonic analysis specifically of pop/rock repertoire, highly practical for songwriters.
+3. **Terefenko, Dariusz**, *Jazz Theory: From Basic to Advanced Study* — reharmonization, secondary dominants, tritone substitution in depth.
+4. **Riemann, Hugo**, *Vereinfachte Harmonielehre* — the original source for tonic/subdominant/dominant functional theory.
