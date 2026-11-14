@@ -95,12 +95,21 @@ def git_worker():
         GIT_QUEUE.task_done()
 
 def is_topic_complete(subtopic_dir: Path) -> bool:
-    """Checks if topic already has a masterclass lesson and operational labs."""
+    """
+    Checks if a topic is fully authored and complete.
+    A topic is complete if:
+    1. Directory exists and contains at least one lesson_*.md with valid masterclass depth (> 1,000 bytes)
+    2. Has a valid labs.md file (> 800 bytes)
+    """
     if not subtopic_dir.exists():
         return False
-    has_lesson = any(f.name.startswith("lesson_01_") for f in subtopic_dir.glob("*.md"))
-    has_labs = (subtopic_dir / "labs.md").exists()
-    return has_lesson and has_labs
+    try:
+        lessons = [f for f in subtopic_dir.glob("lesson_*.md") if f.stat().st_size > 1000]
+        labs_file = subtopic_dir / "labs.md"
+        has_labs = labs_file.exists() and labs_file.stat().st_size > 800
+        return bool(lessons) and has_labs
+    except Exception:
+        return False
 
 def is_topic_enhanced(subtopic_id: str) -> bool:
     """Checks if a masterclass enhancement has already been committed to git for this topic."""

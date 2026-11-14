@@ -5,28 +5,20 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
 echo "=================================================="
-echo " 🚀 SYNAPSE TRIPLE PIPELINE: ARTS ENHANCE -> ARTS EXPAND -> FRONTIER COMPUTING"
+echo " 🚀 SYNAPSE IDEMPOTENT PIPELINE: ARTS EXPAND -> FRONTIER COMPUTING"
 echo "=================================================="
 
-# Phase 1A: Arts Masterclass Enhancement (33 existing music topics)
+# Phase 1: Generate Unwritten Arts Topics (strictly missing courses only)
 echo ""
-echo "[*] [Phase 1A/3] Enhancing Arts domain (33 topics) with Claude Sonnet 5..."
-python3 scripts/generate_all.py --domain arts --enhance --model claude-sonnet-5
-
-echo ""
-echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published!"
-
-# Phase 1B: Generate Unwritten Arts Topics (34 missing visual arts, 3D graphics, and modular audio topics)
-echo ""
-echo "[*] [Phase 1B/3] Generating unwritten Arts topics (34 courses: Blender, DaVinci, Modular Synthesis, ZBrush)..."
+echo "[*] [Phase 1/2] Generating unwritten Arts topics (Blender, DaVinci, Drawing, Sound Design)..."
 python3 scripts/generate_all.py --domain arts --model claude-sonnet-5
 
 echo ""
-echo "[✔] Phase 1B Complete: All 34 missing Arts topics generated and published!"
+echo "[✔] Phase 1 Complete: All Arts topics authored and published!"
 
-# Phase 2: Frontier Computing Generation (117 unwritten topics)
+# Phase 2: Frontier Computing Generation (strictly missing courses only)
 echo ""
-echo "[*] [Phase 2/3] Generating Frontier & Software Computing topics (117 courses: Quantum, Swarms, Web3, Cilium, ArgoCD)..."
+echo "[*] [Phase 2/2] Generating Frontier & Software Computing topics (Cilium, ArgoCD, Swarms, Web3)..."
 python3 scripts/generate_all.py --domain computing --model claude-sonnet-5
 
 echo ""
