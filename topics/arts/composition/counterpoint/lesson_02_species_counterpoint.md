@@ -1,1035 +1,544 @@
 # Lesson 2: Species Counterpoint – The Complete Practitioner's Workshop
 
-## 1. First-Principles Intuition & Invariants
+## 1. First-Principles Intuition: Why These Rules Exist
 
-Species counterpoint is a systematic training method for **polyphonic voice leading**—the art of writing multiple independent melodic lines that sound coherent when performed simultaneously. Codified by Johann Joseph Fux in *Gradus ad Parnassum* (1725), it distills Renaissance polyphony (especially Palestrina's style) into five progressive exercises, each isolating a specific rhythmic-harmonic challenge.
+Species counterpoint, codified by Johann Joseph Fux in *Gradus ad Parnassum* (1725), is ear-training disguised as composition homework. You are not writing music to be admired on paper — you are drilling the specific skill of **hearing two independent lines as both separate and coherent at the same time**. Every rule below exists because it either protects melodic independence or controls tension/release. Learn the acoustic reason once, then spend 95% of your time writing and singing exercises.
 
-### The Core Challenge: Horizontal + Vertical Coherence
+**The one-paragraph physics**: a perfect fifth and perfect octave share so much of their overtone content that two voices a fifth or octave apart start to fuse into a single, thicker-sounding line — your ear stops tracking "two melodies" and hears "one loud melody." Thirds and sixths overlap less, so they sound rich *and* keep the lines separate. Seconds, sevenths, and tritones clash enough to demand resolution. That's the entire acoustic basis for every consonance/dissonance rule in this lesson — no further math needed. Everything else below is ear-training and craft.
 
-Counterpoint solves a dual problem:
-- **Horizontal (melodic)**: Each line must be singable, contoured, and internally logical
-- **Vertical (harmonic)**: Lines must produce acceptable intervals at each moment without losing independence
+### The Cantus Firmus: Your Fixed Line
 
-This is a **constraint satisfaction problem**: rules governing interval choice, motion types, and dissonance treatment create a decision tree where early choices constrain later options.
+Every exercise starts from a cantus firmus (CF) — a slow, stepwise melody, 8–10 whole notes, that you will not alter. Build or choose one using these checks:
 
-### The Cantus Firmus: Your Foundation
+1. Mostly steps (2nds), occasional 3rds, nothing bigger than a 5th leap.
+2. One clear high (or low) point, placed about two-thirds through the line — this is your melodic "destination."
+3. No two leaps in the same direction back to back; a leap should be answered by stepwise motion the other way.
+4. Starts and ends on the modal final (D for Dorian, E for Phrygian, G for Mixolydian, etc).
+5. The note before the final approaches it by step — this is what makes a cadence feel landed.
 
-Every species exercise begins with a *cantus firmus* (CF)—a simple whole-note melody spanning roughly an octave. The CF serves as both anchor and scaffold:
-
-**Design characteristics** (practical construction rules):
-1. **8–10 notes**, predominantly **stepwise** motion (major/minor seconds)
-2. **One climax point** (highest or lowest note), typically ⅔ through the line
-3. **Mostly steps, occasional thirds**; avoid leaps larger than a fifth
-4. **No consecutive leaps** in the same direction; balance leaps with contrary stepwise motion
-5. **Start and end on the modal final** (e.g., D for Dorian, E for Phrygian)
-6. **Approach the final by step** (2nd scale degree up or 7th scale degree down)
-
-**Example CF** (D Dorian):
+**Working CF** (D Dorian) — memorize this, you'll reuse it all lesson:
 ```
 D – E – F – E – D – C – D – E – F – G – F – E – D
 ```
+Sing it right now on solfège or note names at a slow, steady pulse before reading further. If you can't sing your CF cleanly, don't start counterpoint against it — fix the CF first.
 
-Why these rules? They ensure the CF moves **predictably** and remains within a **comfortable vocal range** (Renaissance counterpoint evolved from liturgical singing). Stepwise motion creates smooth harmonic progressions, while a single climax provides directional energy.
+### Consonance and Dissonance: What You're Allowed to Write
 
-### Consonance vs. Dissonance: The Core Binary
+| Category | Intervals | Behavior |
+|---|---|---|
+| Perfect consonances | P1, P5, P8 | Rock stable. Used to open/close. Never move in parallel. |
+| Imperfect consonances | m3, M3, m6, M6 | Stable but keep voices distinct. Parallel motion is fine and sounds good. |
+| Dissonances | M2, m2, P4 (2-voice texture), M7, m7, any augmented/diminished interval | Tension — only allowed on weak beats, or prepared/resolved as suspensions depending on species. |
 
-Species counterpoint operates within a strict **interval hierarchy**:
+**How much dissonance each species allows** — this is the entire backbone of the five species, memorize it as a ladder:
 
-**Perfect Consonances** (pristine acoustic ratios):
-- Unison (P1)
-- Perfect fifth (P5)
-- Perfect octave (P8)
+| Species | Rhythm | Dissonance rule |
+|---|---|---|
+| 1 | 1:1 | None. Every note is consonant. |
+| 2 | 2:1 | Weak beat may be a passing tone. |
+| 3 | 4:1 | Weak beats may be passing *or* neighbor tones. |
+| 4 | syncopated 2:1 (offset) | Strong beat may be dissonant **if it's a prepared, resolved suspension**. |
+| 5 | free mixture | All of the above, combined with judgment. |
 
-**Imperfect Consonances** (stable but richer):
-- Minor third (m3), major third (M3)
-- Minor sixth (m6), major sixth (M6)
+### Motion Types — What Actually Keeps Two Lines Independent
 
-**Dissonances** (all others):
-- Major/minor seconds (M2, m2)
-- Perfect fourth (P4) in two-voice textures
-- Major/minor sevenths (M7, m7)
-- All augmented/diminished intervals
+- **Parallel**: both voices move the same direction by the same interval. Parallel 3rds/6ths = good. Parallel 5ths/8ths = forbidden, because that's the overtone-fusion problem above.
+- **Contrary**: voices move opposite directions. This is your best friend, especially into cadences — it's the single strongest way to make two lines sound independent.
+- **Oblique**: one voice holds, the other moves. Moderate independence; this is the texture suspensions live in.
+- **Similar**: same direction, different intervals. Usable, but two similar-motion leaps in a row sound clumsy — prefer steps when moving similarly.
 
-**Why this matters acoustically**: Perfect consonances share identical overtone structures, causing voices to **fuse perceptually**. Overusing them obliterates independence. Imperfect consonances maintain separation while providing stability. Dissonances create tension demanding resolution.
+### Five Rules You Apply in Every Single Species
 
-**Species progression controls dissonance treatment**:
-- **Species 1**: No dissonance (consonance-only intervals)
-- **Species 2**: Weak-beat passing tones
-- **Species 3**: Weak-beat neighbor tones and faster passing figures
-- **Species 4**: Strong-beat suspensions (prepared dissonance)
-- **Species 5**: Free mixture of all prior techniques
-
-### Voice Independence: The Motion Types
-
-**Parallel motion**: Both voices move same direction, same interval
-- **Forbidden**: Parallel perfect consonances (P5, P8)—they fuse the voices into one
-- **Allowed**: Parallel imperfect consonances (thirds, sixths)—maintain separation
-
-**Contrary motion**: Voices move in opposite directions
-- **Ideal**: Maximizes independence, especially at cadences
-
-**Oblique motion**: One voice holds, the other moves
-- **Moderate independence**: Common around suspensions
-
-**Similar motion**: Same direction, different intervals
-- **Use judiciously**: Can sound clumsy unless the voices move by step
-
-**Why parallel fifths/octaves are forbidden**: Acoustically, parallel perfect intervals create a stream of **identical harmonic spectra**, reducing two voices to a single thickened line. This defeats the purpose of polyphony.
-
-### The Five Invariants (Apply to All Species)
-
-1. **Begin on perfect consonance** (P1, P5, P8)—establishes stability
-2. **End on perfect consonance** (P1 or P8)—confirms resolution
-3. **Approach final by step** in at least one voice—creates smooth cadence
-4. **Avoid tritone melodic outlines** in either voice—unstable, hard to sing
-5. **No voice crossing** (in strict two-voice writing)—maintains registral clarity
-
-## 2. The Five Species: Hands-On Practice Architecture
-
-Each species isolates **one rhythmic-harmonic challenge**. Master them sequentially—each builds on the previous.
+1. Open on a perfect consonance (P1, P5, or P8).
+2. Close on a perfect consonance (P1 or P8) — not P5, the fifth doesn't feel "finished."
+3. At least one voice approaches the final by step.
+4. Never outline a tritone in a single melodic line (e.g. F up to B) — it's hard to sing in tune and has no modal home.
+5. No voice crossing in strict two-voice writing — keep upper voice above, lower voice below, at all times.
 
 ---
 
-### Species 1: Note-Against-Note (1:1)
+## 2. Species 1: Note-Against-Note — Full Build Procedure
 
-**Setup**: One whole note in counterpoint per whole note in CF.
+**Rhythm**: one whole note of counterpoint (CP) per whole note of CF.
 
-**Focus**: Pure interval succession without rhythmic complication.
+### Compose in this exact order — cadence first, then opening, then the middle
 
-#### Step-by-Step Composition Process
+**Step 1 — Design the cadence (work backward from the end).**
+- Final interval: P8 or P1.
+- Second-to-last interval: M6 or m6, set up so the CP voice steps into the final while the CF also steps — ideally in contrary motion.
 
-**Phase 1: Cadence Design (Work Backward)**
-
-Start with the ending—it's the most constrained.
-
-1. **Final interval**: Perfect unison or octave
-2. **Penultimate interval**: Major or minor sixth (sets up contrary motion)
-3. **Approach**: Counterpoint moves by step into final
-
-**Example cadence** (CF in lower voice, D Dorian):
 ```
-CF:         E  –  D
-CP:         C  –  D
-Intervals:  m6 – P8
-Motion:     Contrary
+CF:   C  – D
+CP:   E  – D
+Ivl:  M6 – P8     (contrary motion: CF up, CP down)
 ```
 
-**Phase 2: Opening Interval**
+**Step 2 — Choose the opening.** P5 or P8 above the CF (or P1 if voices start on the same note — avoid this in two real voices, it's weak).
 
-4. **First interval**: Unison, fifth, or octave (perfect consonance)
-5. **Direction**: Choose whether CP starts above or below CF
+**Step 3 — Fill the middle,** one CF note at a time, checking after each note:
+- Is the interval consonant? (P1, m3, M3, P5, m6, M6, P8 only)
+- Did I just create parallel P5s or P8s with the previous interval? If yes, change this note.
+- Did I leap (4th or bigger)? If yes, the next move must be a step, preferably in the opposite direction.
+- Have I already placed my one melodic apex? If this note would create a *second* peak, lower it.
 
-**Phase 3: Fill the Middle**
+### Drill 1A — Full Worked Solution
 
-6. For each CF note, choose a consonance (P1, m3, M3, P5, m6, M6, P8)
-7. **Check motion type**: Avoid parallel P5 or P8
-8. **Balance leaps**: After a leap (≥ P4), move by step in opposite direction
-9. **Create one apex**: Counterpoint should peak once, roughly mirroring CF's climax
+CF (D Dorian): `D – E – F – E – D – C – D`
 
-#### Practice Drill 1A: Complete This First-Species Exercise
-
-**CF** (D Dorian, lower voice):
-```
-D – E – F – E – D – C – D
-```
-
-**Your task**: Write a counterpoint above, following these steps:
-
-**Step 1**: Design cadence
-- Final: D (CF) + D (CP) = P8 ✓
-- Penultimate: C (CF) + E (CP) = M6 ✓
-
-**Step 2**: Choose opening
-- D (CF) + D (CP) = P8 or D (CF) + A (CP) = P5
-
-**Step 3**: Fill middle, checking:
-- All consonances?
-- No parallel P5/P8?
-- One apex?
-- Leaps balanced?
-
-**Solution Example**:
 ```
 CF:         D  –  E  –  F  –  E  –  D  –  C  –  D
 CP:         D  –  C  –  D  –  C  –  F  –  E  –  D
-Intervals:  P8 –  m6 –  m6 –  m6 –  M3 –  M3 –  P8
-Motion:     Obl   Ctr   Ctr   Obl   Par   Obl   Ctr
+Interval:   P8    m6    m6    m6    M3    M3    P8
+Motion:    (open) Ctr   Ctr   Obl   Par   Obl   Ctr
 ```
+Check it against the five invariants: opens/closes P8 ✓, no parallel perfects anywhere ✓, single apex at F (bar 5 CP / bar 3 CF — mirrored) ✓, final approach is a step with contrary motion ✓. This is a passing exercise.
 
-**Analysis**:
-- Opens/closes P8 ✓
-- No parallel perfects ✓
-- Apex: F (counterpoint) vs. F (CF)—mirrored ✓
-- Contrary motion into cadence ✓
+### Drill 1B — Interval Grid Method (use this table format for every new CF you write)
 
-#### Practice Drill 1B: Interval Grid Method
+CF (G Dorian): `G – A – Bb – A – G – F – G`
 
-**Cantus Firmus** (G Dorian):
-```
-G – A – Bb – A – G – F – G
-```
+| CF | Legal consonances above | Chosen CP | Interval | Motion from prior |
+|---|---|---|---|---|
+| G | Bb, D, Eb, G | G | P8 | — (opening) |
+| A | C, D, F, A | F | m6 | Contrary |
+| Bb | D, Eb, G, Bb | G | M6 | Contrary |
+| A | C, D, F, A | F | m6 | Oblique |
+| G | Bb, D, Eb, G | Bb | M3 | Contrary |
+| F | A, Bb, D, F | A | M3 | Oblique |
+| G | Bb, D, Eb, G | G | P8 | Contrary |
 
-**Step-by-step grid construction**:
-
-| CF Note | Consonances Available | Chosen CP | Interval | Motion Check |
-|---------|----------------------|-----------|----------|--------------|
-| G       | G, Bb, C, D, Eb, G   | G         | P8       | (opening)    |
-| A       | A, C, D, E, F, A     | F         | m6       | Contrary ✓   |
-| Bb      | Bb, D, Eb, F, G, Bb  | G         | M6       | Contrary ✓   |
-| A       | A, C, D, E, F, A     | F         | m6       | Oblique ✓    |
-| G       | G, Bb, C, D, Eb, G   | Bb        | M3       | Contrary ✓   |
-| F       | F, A, Bb, C, D, F    | A         | M3       | Oblique ✓    |
-| G       | G, Bb, C, D, Eb, G   | G         | P8       | Contrary ✓   |
-
-**Metronome Practice**:
-- Sing/play this exercise at ♩ = 60 BPM
-- Increase to ♩ = 80 BPM once accurate
-- Transpose to E Phrygian, then A Aeolian
+**Metronome ladder**: sing/play at ♩=60 until error-free three times in a row, then 80, then 110. Then transpose the *same* exercise to E Phrygian and A Aeolian, rebuilding the legal-consonance column from scratch each time — the point is that Phrygian's E–F half-step changes which notes are available, forcing your ear to adapt rather than pattern-match.
 
 ---
 
-### Species 2: Two-Against-One (2:1)
+## 3. Species 2: Two-Against-One — Adding the Passing Tone
 
-**Setup**: Two half notes in counterpoint per CF whole note.
+**Rhythm**: two half notes of CP per CF whole note. Beat 1 (strong) must be consonant with the CF. Beat 2 (weak) may be dissonant **only if** it is approached by step and left by step in the same direction — that's the definition of a passing tone.
 
-**Focus**: Metric hierarchy and weak-beat dissonance.
-
-#### New Rule: Weak-Beat Passing Tones
-
-**Strong beats** (coincide with CF attacks): Must be consonant
-**Weak beats** (mid-CF-note): May be dissonant **if**:
-1. Approached by step
-2. Left by step
-3. In the **same direction** (passing tone connects two consonances)
-
-**Passing Tone Anatomy**:
 ```
-Beat:       1   &   2
-CF:         D   –   E
-CP:         F   E   G
-Intervals:  M3  M2  M3
-            C   d   C
-```
-The E on beat & is a **passing tone** (dissonant M2) connecting two consonances.
-
-#### Practice Drill 2A: Add Passing Tones
-
-**Given first-species skeleton**:
-```
-CF:         D   –   E   –   F
-CP:         F   –   G   –   A
-Intervals:  M3      M3      M3
+Beat:      1    2
+CF:        D  — (held)
+CP:        F    E
+Interval:  M3   M2 (dissonant, legal passing tone)
 ```
 
-**Convert to second species** by adding weak-beat notes:
+### Drill 2A — Expand a Species-1 skeleton into Species 2
+
+Start from a known-good 1:1 skeleton and insert a stepwise passing note on every weak beat:
+
 ```
-CF:         D       E       F
-CP:         F   E   G   F   A   G
-Intervals:  M3  M2  M3  m2  M3  M2
-            C   d   C   d   C   d
+Skeleton:  CF: D – E – F     CP: F – G – A   (all M3, all consonant)
+
+Expanded:  CF:    D        E        F
+           CP:    F   E    G   F    A
+           Ivl:   M3  M2   M3  m2   M3
+                  C   d    C   d    C
 ```
+Every weak beat dissonance resolves by continuing in the same stepwise direction into the next strong beat. If you ever want to leave a weak beat by leap, it can't be dissonant — leaps must land on consonances.
 
-All weak-beat dissonances are **passing tones** (stepwise approach and departure).
+### Drill 2B — Compose from scratch, including the Species-2 cadence formula
 
-#### Practice Drill 2B: Compose from Scratch
+The standard Species 2 cadence drops the final CP note down an octave register shift or simply uses a passing 7th-to-step-down into the close:
 
-**CF** (D Dorian):
-```
-D – E – F – E – D
-```
-
-**Your task**: Write second-species counterpoint above.
-
-**Step 1**: Design cadence
-```
-CF:         E       D
-CP:         G   F   D
-Intervals:  M3  M2  P8
-            C   d   C
-```
-
-**Step 2**: Fill earlier bars, ensuring:
-- Strong beats consonant
-- Weak beats passing if dissonant
-- Smooth melodic contour
-
-**Solution Example**:
 ```
 CF:         D       E       F       E       D
 CP:         F   E   G   F   A   G   G   F   D
-Intervals:  M3  M2  M3  m2  M3  M2  M3  M2  P8
+Interval:   M3  M2  M3  m2  M3  M2  M3  M2  P8
             C   d   C   d   C   d   C   d   C
 ```
 
-**Metronome Practice**:
-- ♩ = 60 BPM (half note = beat)
-- ♩ = 80 BPM
-- ♩ = 100 BPM
+**Metronome ladder**: ♩=60 (half note = the beat you count), then 80, then 100. At 100 BPM the weak-beat passing tones should feel like they're gently "falling through" to the next strong beat, not accented.
+
+**Keyboard independence drill**: left hand plays CF whole notes, right hand plays CP half notes. Deliberately make the right hand's second half-note (the weak beat) physically *lighter* in touch — less arm weight, finger-only — while the left hand stays even. This is the first real test of rhythmic hand independence in this lesson.
 
 ---
 
-### Species 3: Four-Against-One (4:1)
+## 4. Species 3: Four-Against-One — Figuration and Neighbor Tones
 
-**Setup**: Four quarter notes per CF whole note.
+**Rhythm**: four quarter notes of CP per CF whole note. Beat 1 should be consonant. Beats 2–4 may be dissonant if they function as passing tones (stepping through) or **neighbor tones** (step away and immediately back).
 
-**Focus**: Rapid figuration, neighbor tones, and more flexible dissonance.
-
-#### New Rule: Neighbor Tones
-
-**Neighbor tone**: Weak-beat dissonance that **steps away from and returns to** the same consonance.
 ```
-Beat:       1   2   3   4
-CF:         D   –   –   –
-CP:         F   E   F   G
-Intervals:  M3  M2  M3  P4
-            C   d   C   C
+Beat:      1    2    3    4
+CF:        D  — (held) — — 
+CP:        F    E    F    G
+Interval:  M3   M2   M3   P4
+           C    d    C    C
 ```
-Beat 2 (E) is a **lower neighbor** to F.
+Beat 2 (E) is a lower neighbor to F — it leaves and returns to the same note. This is new in Species 3: Species 2 only had passing tones that kept moving in one direction; Species 3 adds the "there and back" neighbor shape.
 
-#### Practice Drill 3A: Four-Note Patterns
+### Drill 3A — Four-note figure vocabulary (memorize these shapes, they're your building blocks)
 
-**CF note**: D
+Over a CF note of D, with D/F/A as your home triad:
+1. **Arpeggio**: D–F–A–F (all consonant, outlines the triad)
+2. **Passing figure**: F–E–D–C (stepwise descent, E is the only passing dissonance)
+3. **Neighbor figure**: F–G–F–E (G is upper neighbor, then stepping toward next CF note)
+4. **Scalar descent**: A–G–F–E
 
-**Consonances**: D, F, A (D major triad members)
+### Drill 3B — Full worked example
 
-**Four-note figures** (beat 1 = consonant; beats 2/4 may pass):
-1. **Arpeggio**: D – F – A – F
-2. **Passing figure**: F – E – D – C (E = passing tone)
-3. **Neighbor figure**: F – G – F – E
-4. **Scalar descent**: A – G – F – E
+CF (D Dorian): `D – E – F`
 
-#### Practice Drill 3B: Compose Third Species
-
-**CF** (D Dorian):
 ```
-D – E – F
+CF:        D               E               F
+CP:        A  G  F  E      E  D  C  D      F  E  D  C
+Interval:  P5 P4 m3 M2     P8 m7 m6 m7     P8 m7 m6 P5
+           C  C  C  d      C  d  C  d      C  d  C  C
 ```
+Notice beats 1 and 3 land on strong consonances while beats 2 and 4 carry the dissonant motion — this alternation is what makes Species 3 sound like flowing melody rather than a scale exercise.
 
-**Your task**: Create four quarter notes per CF note.
-
-**Solution Example**:
-```
-CF:         D               E               F
-CP:         A   G   F   E   E   D   C   D   F   E   D   C
-Intervals:  P5  P4  m3  M2  P8  m7  m6  m7  P8  m7  m6  P5
-            C   C   C   d   C   d   C   d   C   d   C   C
-```
-
-**Analysis**:
-- Beats 1 and 3 predominantly consonant
-- Beats 2 and 4 allow passing/neighbor dissonances
-- Smooth scalar motion creates gesture across each CF note
-
-**Metronome Practice**:
-- ♩ = 60 BPM (quarter note = beat)
-- ♩ = 80 BPM
-- Focus on evenness and articulation
+**Metronome ladder**: ♩=60 quarter-note pulse, focus entirely on **evenness** — all four notes exactly equal duration, no rushing into the strong beat. Move to 80 only once a metronome app's "even sixteenths" click (subdividing your quarters) shows no drift.
 
 ---
 
-### Species 4: Syncopation and Suspension (Offbeat Half Notes)
+## 5. Species 4: Syncopation and Suspension
 
-**Setup**: Half notes beginning on weak beats (syncopated).
+This is the species where counterpoint starts sounding emotionally loaded, because you're deliberately placing dissonance on the strong beat and making the ear wait for its resolution.
 
-**Focus**: Suspensions—strong-beat dissonances that resolve downward by step.
+### The three-phase suspension, physically
 
-#### Suspension Anatomy (3-Phase Structure)
+1. **Preparation**: a consonant note, placed on a *weak* beat.
+2. **Suspension**: that same pitch is held (tied) into the next *strong* beat, where it now clashes with a new CF note — this is where the dissonance lives.
+3. **Resolution**: the suspended note steps *down* to a consonance, landing on the following weak beat.
 
-1. **Preparation**: Consonance on weak beat
-2. **Suspension**: Same note held over barline → dissonance on strong beat
-3. **Resolution**: Stepwise descent to consonance on weak beat
-
-**Example**:
 ```
-Beat:       weak strong weak strong
-CF:         D    E     E    F
-CP:         A ———————— A    G
-Intervals:  P5   P4    P4   M2
-Phase:      Prep  Susp  (hold) Res
+Beat:      weak   strong   weak   strong
+CF:        D      E        E      F
+CP:        A ——————————    A      G
+Interval:  P5     P4       P4     M2
+Phase:     Prep   SUSP    (held)  Res
 ```
 
-The P4 (A over E) is **dissonant** in two-voice counterpoint. It resolves down by step to G (M2 interval becomes dissonant, but the **motion** resolves the tension).
+**Naming convention** — name suspensions by the dissonant interval, then the interval it resolves to:
 
-**Common suspension types** (interval names):
-- **7–6**: Seventh resolves to sixth
-- **4–3**: Fourth resolves to third
-- **9–8**: Ninth resolves to octave (CP below CF)
-- **2–3**: Second resolves to third (CP below CF)
+| Name | What happens |
+|---|---|
+| 7–6 | A 7th over the bass resolves down to a 6th |
+| 4–3 | A 4th resolves down to a 3rd (the most common type you'll write) |
+| 9–8 | A 9th (compound 2nd) resolves down to an octave |
+| 2–3 | CP is *below* the CF; a 2nd resolves up... actually down in the lower voice, outward to a 3rd |
 
-#### Practice Drill 4A: Identify Suspensions
+### Drill 4A — Label an existing suspension chain
 
-**Given**:
 ```
 CF:         D   –   E   –   F   –   E   –   D
 CP:             A   –   G   –   F   –   E   –   D
-Intervals:      P5  –   M3  –   P8  –   P8  –   P8
+Interval:       P5  –   M3  –   P8  –   P8  –   P8
 ```
+- Bar 1→2: A prepared as P5 (consonant), held against E → P4 (dissonant) → resolves down to G = M3. **This is a 5–4–3 suspension pattern.**
+- Bar 2→3: G held against F → M2 (dissonant) → resolves down to F = P8. **This is a 2–1 suspension** (an inverted form, common when CP sits close above CF).
 
-**Task**: Label each tie as Preparation-Suspension-Resolution.
+### Drill 4B — Compose your own chain
 
-**Analysis**:
-- Measure 1–2: A (P5, consonant) held over → A vs. E (P4, dissonant) → G (M3, consonant) = **5–4–3 suspension**
-- Measure 2–3: G held → G vs. F (M2, dissonant) → F (P8, consonant) = **2–1 suspension** (inverted)
+CF (D Dorian): `D – E – F – E – D`
 
-#### Practice Drill 4B: Compose Fourth Species
-
-**CF** (D Dorian):
-```
-D – E – F – E – D
-```
-
-**Your task**: Write syncopated half notes featuring suspensions.
-
-**Solution Template**:
 ```
 CF:         D       E       F       E       D
 CP:     –   A   –   G   –   F   –   E   –   D
-Intervals:  P5  (4) M3  (2) P8  (7) P8  (–) P8
+Interval:   P5   (4) M3   (2) P8   (7) P8   (–) P8
 ```
+Read this as: prepare A on the upbeat before D, carry it into E to create the (4), resolve down to G... continue the chain through each suspension.
 
-**Metronome Practice**:
-- ♩ = 60 BPM (half note = beat)
-- Feel the "push" of the syncopation
-- Let suspensions "lean" into resolution
+**Metronome and feel**: ♩=60, half-note pulse. The suspension should physically feel like a "lean" — slightly delay your mental emphasis onto the tied note, then let the resolution release the tension by stepping down. If you're at the piano, this is a good place to practice a slight dynamic swell into the suspended note and a release on the resolution — not notated, but how performers actually voice these.
 
 ---
 
-### Species 5: Florid (Mixed Rhythms)
+## 6. Species 5: Florid Counterpoint — Free Mixture
 
-**Setup**: Free mixture of whole, half, quarter notes, and brief eighth notes.
+**Rhythm**: whole, half, quarter, and occasional eighth notes mixed freely. This is not "anything goes" — it's "any technique from Species 1–4, deployed where it best serves the phrase."
 
-**Focus**: Integration of all prior techniques into flexible counterpoint.
+**Working strategy, in order**:
+1. Sketch the skeleton in Species 1 first — correct harmonic skeleton, every beat consonant.
+2. Decide where you want rhythmic energy (usually mid-phrase) vs. repose (cadences, after a busy passage).
+3. Embellish the skeleton: turn held notes into passing-tone pairs (Species 2 move), four-note scale or neighbor runs (Species 3 move), or suspensions at phrase arrivals (Species 4 move).
+4. Never let more than one bar in a row be "all eighth notes" — the ear needs contrast, and the CF needs room to be heard.
 
-#### Compositional Strategy
+### Drill 5A — Analyze a florid passage
 
-1. **Vary rhythmic density**: Alternate fast passages with sustained notes
-2. **Use suspensions at cadences**: Heightens arrival
-3. **Balance activity**: Don't overcrowd—let the CF breathe
-4. **Maintain metric clarity**: Strong beats anchor; weak beats embellish
+CF (D Dorian): `D (whole) – E (whole) – F (whole)`
 
-#### Practice Drill 5A: Analyze Mixed-Rhythm Passage
-
-**CF** (D Dorian):
 ```
-D       E       F
+CP:        F   F |  E F G F E  |  D  |  E - (tie) F |  E  D  C
+Rhythm:    ♩   ♩ |   six ♪'s   |  𝅗𝅥  |   𝅗𝅥 (tied)  |  ♩  ♩  ♩
 ```
+Bar 1 is Species-2-style motion, the eighth-note run is Species-3-style acceleration, the whole note is a deliberate Species-1 rest point, and the tie into bar 3 sets up a Species-4 suspension. That's florid counterpoint: a tour through the vocabulary, chosen for musical effect rather than mechanically rotated.
 
-**Florid counterpoint**:
-```
-F   F   E F G F E   D   E   (F) E   D C
-```
+### Drill 5B — Compose your own
 
-**Rhythmic values**:
-```
-♩   ♩   ♪♪♪♪♪♪ 𝅗𝅥  𝅗𝅥   (tie)𝅗𝅥 ♩ ♩
-```
+CF (G Dorian): `G – A – Bb – A – G`. Requirement: at least one suspension, one four-note figure, one sustained note.
 
-**Analysis**:
-- Bar 1: Two quarter notes (second species)
-- Bar 1 beat 3: Six eighth notes (rapid embellishment, third species acceleration)
-- Bar 2: Whole note (first species stability)
-- Bar 3: Suspension (fourth species)
-
-#### Practice Drill 5B: Compose Florid Counterpoint
-
-**CF** (G Dorian):
 ```
-G – A – Bb – A – G
-```
-
-**Your task**: Mix rhythms freely, demonstrating:
-- At least one suspension
-- At least one four-note figure
-- At least one sustained note (whole or half)
-
-**Solution Framework**:
-```
-CF:         G           A           Bb          A           G
-CP:         G   A BbC   D   –   D   D   C   D   C   BbA G   G
-Rhythm:     ♩   ♪♪♪♪    𝅗𝅥      (tie)𝅗𝅥  ♩   (tie)𝅗𝅥  ♪♪♪♪    𝅗𝅥
+CF:      G              A            Bb           A            G
+CP:      G  A  Bb C  |  D — (tie) D  |  D  C   |  D  C  Bb A  |  G
+Rhythm:  ♩  ♪ ♪  ♪  |  𝅗𝅥         |  𝅗𝅥 (tied) ♩ |  ♪  ♪  ♪  ♪  |  𝅗𝅥
 ```
 
 ---
 
-## 3. Algorithmic Thinking: Constraint Satisfaction Logic
+## 7. Voice Leading at the Keyboard: Physical Practice
 
-Species counterpoint is a **search problem**. Each note choice constrains future options—like chess, where early moves shape the endgame.
+Species counterpoint was written for singers, but you will internalize it fastest at a keyboard, where you can hold both lines under your own ten fingers and *hear* the vertical interval instantly.
 
-### Constraint Satisfaction Problem (CSP) Structure
+**Hand posture for two-voice reading**: sit so your forearms are level with the keys, curved relaxed fingers, no wrist collapse. Left hand plays the CF, assign finger 5 (or 3, if the range sits mid-staff) per whole note — don't worry about scale fingering patterns here, you're sustaining single notes, not running passages.
 
-**Variables**: Counterpoint note positions (CP₁, CP₂, ..., CPₙ)
-**Domains**: For each CPᵢ, the set of pitches forming consonances with CFᵢ
-**Constraints**: Rules forbidding parallel perfects, requiring stepwise cadence approach, etc.
+**Independence drill (Species 2 specifically)**: left hand depresses the CF whole note and holds it down physically for the full bar — don't re-strike. Right hand plays the two half notes. The common beginner error is accenting the weak half-note as hard as the strong one; deliberately practice with the right hand's second note using *finger weight only*, no arm drop, so it's audibly lighter. This single drill, repeated across all four species exercises you write, trains the metrical hierarchy into your hands permanently.
 
-### Backtracking Search Flowchart
+**Vocal practice routine** (do this even if you're a keyboardist — it's non-negotiable for internalizing intervals):
+1. Sing the CF alone, ♩=60, note names or solfège.
+2. Sing your counterpoint alone.
+3. Play CF on piano, sing your counterpoint against it.
+4. Reverse: sing the CF, play the counterpoint.
+5. On each downbeat, stop and name the interval out loud before continuing — "fifth... third... sixth..." This forces real-time interval recognition, which is the actual transferable skill.
+
+---
+
+## 8. Modal Framework — Why This Isn't Just "Minor Key"
+
+Fux's system predates functional tonal harmony. There's no V–I pull here — the cadential energy comes entirely from contrary stepwise motion into a perfect consonance, not from a dominant chord resolving.
+
+| Mode | Final | White-key scale | Character |
+|---|---|---|---|
+| Dorian | D | D E F G A B C | Balanced, minor-flavored |
+| Phrygian | E | E F G A B C D | Dark, half-step above the final |
+| Lydian | F | F G A B C D E | Bright, raised 4th |
+| Mixolydian | G | G A B C D E F | Major-flavored, lowered 7th |
+| Aeolian | A | A B C D E F G | Natural minor |
+| Ionian | C | C D E F G A B | Major scale |
+
+**Standard modal cadence** — lower voice steps up by a half or whole step into the final while the upper voice steps down into it, producing a major sixth expanding out to an octave:
+
+```
+CF (lower): C  – D
+CP (upper): E  – D
+Interval:   M6 – P8
+```
+
+### Transposition drill — do this for every exercise you write, not just once
+
+Take: `CF: D–E–F–E–D` / `CP: D–C–D–C–D` (D Dorian) and rebuild it, from the interval logic up, in:
+1. **E Phrygian**: `E–F–G–F–E` — notice E to F is a half-step, which changes which notes above E count as thirds and sixths compared to Dorian's whole-step D to E. Re-derive your consonance table, don't just shift letter names.
+2. **F Lydian**: `F–G–A–G–F`
+3. **G Mixolydian**: `G–A–Bb–A–G`
+
+This matters because real modal repertoire (and a lot of modern film/game modal writing) depends on exactly these half-step placements for its color — if you only ever practice in Dorian, your ear won't generalize.
+
+---
+
+## 9. Constraint-Satisfaction Logic: Thinking Like a Solver
+
+Composing species counterpoint by hand is a backtracking search: at each CF note you have a small legal domain of pitches, constraints prune that domain based on what came before, and when you hit a dead end you backtrack and try a different earlier choice. Making this explicit speeds up your manual composing enormously, because instead of guessing you can systematically eliminate options.
 
 ```mermaid
 graph TD
-    A["Start: Given CF + Species Type"] --> B["Position = 0<br/>Counterpoint = empty"]
-    
-    B --> C["Get consonant pitches for CF[position]<br/>Domain = {P1, m3, M3, P5, m6, M6, P8}"]
-    
-    C --> D{"Position == 0?"}
-    D -->|"Yes"| E["Filter domain:<br/>Only perfect consonances<br/>{P1, P5, P8}"]
-    D -->|"No"| F["Keep all consonances"]
-    
-    E --> G["Select pitch from domain"]
-    F --> G
-    
-    G --> H{"Position > 0?"}
-    H -->|"Yes"| I["Check motion with previous note"]
-    H -->|"No"| M["Assign pitch to CP[position]"]
-    
-    I --> J{"Parallel P5 or P8?"}
-    J -->|"Yes"| K["Remove pitch from domain"]
-    J -->|"No"| L{"Unbalanced leap?"}
-    
-    L -->|"Yes"| K
-    L -->|"No"| M
-    
-    K --> N{"Domain empty?"}
-    N -->|"Yes"| O["Backtrack:<br/>position = position - 1<br/>Remove last assignment"]
-    N -->|"No"| G
-    
-    M --> P{"Position == n-1<br/>(final note)?"}
-    P -->|"Yes"| Q{"Valid cadence?<br/>Step approach?<br/>Perfect consonance?"}
-    Q -->|"Yes"| R["Solution found!<br/>Return counterpoint"]
-    Q -->|"No"| O
-    
-    P -->|"No"| S["position = position + 1"]
-    S --> C
-    
-    O --> T{"Can backtrack?"}
-    T -->|"Yes"| C
-    T -->|"No"| U["No valid solution exists"]
+    subgraph cp_search ["Species 1 Backtracking Search"]
+        A["Start: CF given, position = 0"] --> B["Get consonant domain for CF note<br/>{P1, m3, M3, P5, m6, M6, P8}"]
+        B --> C{"position == 0?"}
+        C -->|"yes"| D["Restrict to perfect consonances<br/>{P1, P5, P8}"]
+        C -->|"no"| E["Keep full consonance domain"]
+        D --> F["Pick next candidate pitch"]
+        E --> F
+        F --> G{"position > 0?"}
+        G -->|"yes"| H{"Parallel P5/P8 with prior note?"}
+        G -->|"no"| K["Assign pitch"]
+        H -->|"yes"| I["Reject, try next candidate"]
+        H -->|"no"| J{"Unbalanced leap?"}
+        J -->|"yes"| I
+        J -->|"no"| K
+        I --> L{"Any candidates left?"}
+        L -->|"yes"| F
+        L -->|"no"| M["Backtrack one position"]
+        K --> N{"Final position reached?"}
+        N -->|"yes"| O{"Step approach + perfect close?"}
+        O -->|"yes"| P["Solution complete"]
+        O -->|"no"| M
+        N -->|"no"| Q["Advance position, loop to B"]
+        M --> B
+    end
 ```
 
-### Practical Python Implementation (First Species)
+**Practical takeaway for hand-composing**: whenever you get stuck 5 notes into an exercise, don't erase everything — identify the *earliest* note whose choice is forcing the dead end (usually a leap that was too big, or a note that locked you into a parallel fifth two bars later) and change only that one.
+
+### Reference implementation (for checking your handwritten work, not for generating your homework)
 
 ```python
-def generate_first_species(cantus_firmus):
+def check_first_species(cf, cp):
     """
-    Generate valid first-species counterpoint using backtracking.
-    
-    Args:
-        cantus_firmus: List of MIDI note numbers (e.g., [62, 64, 65, ...])
-    
-    Returns:
-        List of counterpoint pitches, or None if no solution exists
+    Validate a hand-written first-species exercise.
+    cf, cp: lists of MIDI note numbers, same length.
+    Returns a list of violation strings (empty list = passes).
     """
-    n = len(cantus_firmus)
-    counterpoint = [None] * n
-    
-    # Consonant intervals (semitones mod 12)
-    CONSONANCES = {0, 3, 4, 7, 8, 9}  # P1, m3, M3, P5, m6, M6
-    PERFECT_CONSONANCES = {0, 7}  # P1, P5
-    
-    def get_interval(cp_pitch, cf_pitch):
-        """Calculate interval mod 12."""
-        return abs(cp_pitch - cf_pitch) % 12
-    
-    def is_consonant(cp_pitch, cf_pitch):
-        """Check if interval is consonant."""
-        return get_interval(cp_pitch, cf_pitch) in CONSONANCES
-    
-    def is_perfect(cp_pitch, cf_pitch):
-        """Check if interval is perfect consonance."""
-        return get_interval(cp_pitch, cf_pitch) in PERFECT_CONSONANCES
-    
-    def parallel_perfects(cp1, cf1, cp2, cf2):
-        """Detect parallel perfect fifths or octaves."""
-        if not (is_perfect(cp1, cf1) and is_perfect(cp2, cf2)):
-            return False
-        return get_interval(cp1, cf1) == get_interval(cp2, cf2)
-    
-    def get_domain(cf_pitch):
-        """Generate consonant pitches within singable range."""
-        domain = []
-        for octave_offset in [-12, 0, 12]:
-            for interval in CONSONANCES:
-                for direction in [1, -1]:
-                    pitch = cf_pitch + (direction * interval) + octave_offset
-                    if 48 <= pitch <= 84:  # C3 to C6 (vocal range)
-                        domain.append(pitch)
-        return sorted(set(domain))
-    
-    def backtrack(pos):
-        """Recursive backtracking search."""
-        if pos == n:
-            return True  # All positions filled successfully
-        
-        domain = get_domain(cantus_firmus[pos])
-        
-        for pitch in domain:
-            # Constraint: first note must be perfect consonance
-            if pos == 0:
-                if not is_perfect(pitch, cantus_firmus[0]):
-                    continue
-            
-            # Constraint: last note must be P8/P1, approached by step
-            if pos == n - 1:
-                if get_interval(pitch, cantus_firmus[pos]) != 0:
-                    continue
-                if abs(pitch - counterpoint[pos - 1]) > 2:
-                    continue
-                # Check contrary motion into cadence
-                cp_direction = pitch - counterpoint[pos - 1]
-                cf_direction = cantus_firmus[pos] - cantus_firmus[pos - 1]
-                if cp_direction * cf_direction >= 0:  # Not contrary
-                    continue
-            
-            # Constraint: no parallel perfect consonances
-            if pos > 0:
-                if parallel_perfects(counterpoint[pos - 1], cantus_firmus[pos - 1],
-                                    pitch, cantus_firmus[pos]):
-                    continue
-                
-                # Constraint: balance large leaps
-                leap_size = abs(pitch - counterpoint[pos - 1])
-                if leap_size > 4 and pos > 1:  # Leap > M3
-                    prev_leap = abs(counterpoint[pos - 1] - counterpoint[pos - 2])
-                    if prev_leap > 4:  # Two consecutive leaps
-                        continue
-            
-            # Assign and recurse
-            counterpoint[pos] = pitch
-            if backtrack(pos + 1):
-                return True
-            counterpoint[pos] = None  # Backtrack
-        
-        return False  # No valid pitch found for this position
-    
-    if backtrack(0):
-        return counterpoint
-    return None
+    CONSONANCES = {0, 3, 4, 7, 8, 9}       # P1, m3, M3, P5, m6, M6
+    PERFECT = {0, 7}                        # P1, P5 (mod 12; P8 reduces to 0)
+    violations = []
+    n = len(cf)
+
+    def interval(a, b):
+        return abs(a - b) % 12
+
+    # Rule: every interval must be consonant
+    for i in range(n):
+        iv = interval(cp[i], cf[i])
+        if iv not in CONSONANCES:
+            violations.append(f"Bar {i+1}: dissonant interval ({iv} semitones)")
+
+    # Rule: opening must be a perfect consonance
+    if interval(cp[0], cf[0]) not in PERFECT:
+        violations.append("Opening interval must be P1, P5, or P8")
+
+    # Rule: closing must be P1/P8, approached by step in CP
+    if interval(cp[-1], cf[-1]) != 0:
+        violations.append("Final interval must be P1/P8")
+    if abs(cp[-1] - cp[-2]) > 2:
+        violations.append("Final approach in counterpoint must be by step")
+
+    # Rule: no parallel perfect consonances between consecutive bars
+    for i in range(n - 1):
+        iv1, iv2 = interval(cp[i], cf[i]), interval(cp[i+1], cf[i+1])
+        if iv1 in PERFECT and iv2 in PERFECT and iv1 == iv2:
+            same_dir = (cp[i+1] - cp[i]) * (cf[i+1] - cf[i]) > 0
+            if same_dir:
+                violations.append(f"Bars {i+1}-{i+2}: parallel perfect consonances")
+
+    # Rule: no voice crossing
+    for i in range(n):
+        if cp[i] < cf[i]:
+            violations.append(f"Bar {i+1}: voice crossing (CP below CF)")
+
+    return violations
 
 
-# Example usage
-cf = [62, 64, 65, 64, 62, 60, 62]  # D Dorian cantus firmus
-result = generate_first_species(cf)
-
-if result:
-    print("Cantus Firmus:", cf)
-    print("Counterpoint: ", result)
-    print("\nIntervals:")
-    for i in range(len(cf)):
-        interval = abs(result[i] - cf[i]) % 12
-        interval_names = {0: "P1", 3: "m3", 4: "M3", 7: "P5", 8: "m6", 9: "M6"}
-        print(f"  {i+1}: {interval_names.get(interval, '?')}")
-else:
-    print("No valid counterpoint found.")
+# Example: check Drill 1A's solution
+cf = [62, 64, 65, 64, 62, 60, 62]   # D-E-F-E-D-C-D
+cp = [74, 72, 74, 72, 77, 76, 74]   # D-C-D-C-F-E-D (octave above)
+result = check_first_species(cf, cp)
+print("Violations:" , result if result else "None — exercise is valid")
 ```
 
-**Run this code** to generate solutions automatically. Then **analyze** the output:
-- Are all intervals consonant?
-- Are there any parallel perfects?
-- Is the cadence correct?
+Run this against every exercise you write by hand before moving to the next species. Treat a clean pass as your gate, not a suggestion.
 
 ---
 
-## 4. Performance Practice: Singing and Playing
+## 10. Annotated Repertoire Analysis
 
-Species counterpoint was designed for **singers**. To internalize the logic, you must **physically perform** these exercises.
+**Palestrina, *Missa Papae Marcelli*, "Kyrie"** — simplified two-voice reduction, tenor and soprano:
 
-### Vocal Practice Routine
+```
+Measure:     1       2       3       4       5
+Tenor (CF):  D   –   E   –   F   –   E   –   D
+Soprano:         A   –   G   –   F   –   E   –   D
+Interval:        P5  –   m3  –   P8  –   P8  –   P8
+```
 
-**Phase 1: Individual Lines** (5 min)
-1. Sing the CF alone at ♩ = 60 BPM
-2. Sing your counterpoint alone
-3. Check: Is each line singable without awkward leaps?
+Walk through this exactly as you'd analyze your own homework:
+- Bar 1→2: soprano's A is prepared consonant (P5), held into bar 2 where tenor moves to E, creating a dissonant P4, resolving down by step to m3 against F. That's a textbook 4–3 suspension.
+- Bar 2→3: same shape, G held against F creates M2, resolves to P8.
+- Bars 4–5: no further suspensions — Palestrina lets the texture breathe into the cadence with plain stepwise descent, contrary to the tenor's rise to D.
 
-**Phase 2: Two-Voice Execution** (10 min)
-4. Play CF on piano/keyboard, sing counterpoint
-5. Reverse: sing CF, play counterpoint
-6. With a partner: one person per voice
+**Why it sounds like Palestrina and not like an exercise**: the soprano line is one unbroken stepwise descent (A-G-F-E-D) — there's no wasted motion, every note serves both the melodic line and the suspension chain simultaneously. That economy is the actual compositional skill being modeled; chase it in your own writing, not just rule-compliance.
 
-**Phase 3: Intervallic Awareness** (5 min)
-7. While singing, **hear** the vertical intervals
-8. Stop on each downbeat, identify the interval (P5? m6?)
-
-### Keyboard Practice Routine
-
-**Both Hands Simultaneously**:
-- Left hand: CF (whole notes)
-- Right hand: Counterpoint (species-appropriate rhythm)
-
-**Practice sequence**:
-1. ♩ = 40 BPM (very slow, focus on accuracy)
-2. ♩ = 60 BPM (singing tempo)
-3. ♩ = 80 BPM (comfortable flow)
-
-**Hand independence drill** (Species 2):
-- Set metronome to half-note pulse
-- Left hand plays on beat 1 only
-- Right hand plays on beats 1 and 2
-- Focus: right hand's weak beat should feel **lighter**
+**Listening assignment**: cue up Palestrina's *Missa Papae Marcelli* "Kyrie" in full SATB. Follow just the soprano and tenor lines on a printed score if you can, and listen specifically for the suspensions cascading between voice pairs — you'll hear the same 4–3 shape recur in different voice combinations throughout the movement.
 
 ---
 
-## 5. Modal Framework: Beyond Major/Minor
+## 11. Advanced Labs
 
-Fux's exercises use **Renaissance modes**, not modern major/minor keys. This is critical—modal counterpoint lacks **functional harmony** (no dominant → tonic pull). Instead, harmonic logic arises purely from voice leading.
+### Lab A: Three-Voice First Species (the harmonic-completeness problem)
 
-### The Six Primary Modes (with finals)
+CF (middle voice, D Dorian): `D – E – F – E – D`
 
-| Mode       | Final | Scale (white notes) | Character               |
-|------------|-------|---------------------|-------------------------|
-| Dorian     | D     | D–E–F–G–A–B–C–D     | Balanced, minor-ish     |
-| Phrygian   | E     | E–F–G–A–B–C–D–E     | Dark, semitone start    |
-| Lydian     | F     | F–G–A–B–C–D–E–F     | Bright, raised 4th      |
-| Mixolydian | G     | G–A–B–C–D–E–F–G     | Major-ish, lowered 7th  |
-| Aeolian    | A     | A–B–C–D–E–F–G–A     | Natural minor           |
-| Ionian     | C     | C–D–E–F–G–A–B–C     | Major scale             |
+Add a voice above and below, checking **three** voice pairs independently (upper/CF, CF/lower, upper/lower) at every single bar — this is the real difficulty jump from two voices to three.
 
-### Modal Cadence Formulas
-
-**Authentic cadence** (approaching the final):
-- Lower voice: **step up** to final (e.g., C → D in Dorian)
-- Upper voice: **step down** to final (e.g., E → D in Dorian)
-- Creates **contrary motion** and **major sixth → octave** resolution
-
-**Example** (D Dorian):
-```
-CF (lower):  C  –  D
-CP (upper):  E  –  D
-Interval:    M6 –  P8
-```
-
-### Practice Drill: Transpose to All Modes
-
-**Take this first-species exercise**:
-```
-CF (D Dorian):  D – E – F – E – D
-CP (above):     D – C – D – C – D
-```
-
-**Transpose to**:
-1. **E Phrygian**: E – F – G – F – E (use E as final)
-2. **F Lydian**: F – G – A – G – F
-3. **G Mixolydian**: G – A – Bb – A – G
-
-**Why this matters**: Each mode has unique half-step placements, forcing you to adjust interval choices. Phrygian's E–F semitone creates different consonance options than Dorian's D–E whole tone.
-
----
-
-## 6. Historical Context: From Palestrina to Bach to Now
-
-### Renaissance Origins (1500–1600)
-
-**Palestrina's *Missa Papae Marcelli* (1567)**: Exemplar of strict counterpoint
-- Smooth voice leading, minimal dissonance
-- Text clarity (Council of Trent requirement)
-- Four to six voices, imitative entries
-
-**Listen**: Palestrina, "Kyrie" from *Missa Papae Marcelli*
-- Notice: predominant stepwise motion, no harsh dissonances, overlapping phrases
-
-### Baroque Expansion (1600–1750)
-
-**J.S. Bach** adapted Renaissance principles to **tonal harmony**:
-- Retained stepwise voice leading
-- Added functional chord progressions (V → I)
-- Increased dissonance tolerance (seventh chords, diminished harmonies)
-
-**Example**: Bach, *Invention No. 1 in C Major*
-- Two-voice counterpoint throughout
-- Follows species principles (mostly consonant, stepwise motion)
-- But: uses harmonic sequences, modulations (Renaissance modes don't modulate)
-
-**Listen**: Bach, *The Art of Fugue, Contrapunctus I*
-- Hear species counterpoint expanded into fugal architecture
-
-### Modern Applications (1900–Present)
-
-**Hindemith** (*Craft of Musical Composition*, 1937): Updated species for 20th-century chromaticism
-- Retained interval hierarchy (but redefined based on overtone series)
-- Applied to atonal contexts
-
-**Jazz counterpoint**: 
-- Bill Evans, "Waltz for Debby"—bass and piano lines maintain independence via contrary motion
-- Brad Mehldau, "Resignation"—left-hand bass counterpoint to right-hand melody
-
-**Film scoring**:
-- John Williams, *Star Wars* main title—brass fanfare uses contrapuntal layering
-- Howard Shore, *Lord of the Rings*—leitmotifs combined contrapuntally
-
-**Why species counterpoint still matters**: It trains **interval awareness** and **voice independence**, skills applicable to any style—tonal, modal, atonal, jazz, electronic.
-
----
-
-## 7. Advanced Exercises: Mastery Challenges
-
-### Exercise 7A: Three-Voice First Species
-
-**CF** (middle voice, D Dorian):
-```
-D – E – F – E – D
-```
-
-**Your task**: Add counterpoint above and below, maintaining all species 1 rules **between every voice pair**.
-
-**New constraint**: **Harmonic completeness**
-- Aim for complete triads where possible (root, third, fifth)
-- Avoid doubling the third
-
-**Solution framework**:
 ```
 Upper:    A – C – A – C – A
 CF:       D – E – F – E – D
 Lower:    D – A – D – A – D
 ```
 
-**Check**:
-- Upper vs. CF: P5, m6, m3, m6, P5 (no parallel perfects ✓)
-- CF vs. Lower: P8, P5, M3, P5, P8 (no parallel perfects ✓)
-- Upper vs. Lower: P5, M3, P5, M3, P5 (parallel P5 bars 1–3—**violation!**)
+Check every pair:
+- Upper/CF: P5, m6, m3, m6, P5 — no parallel perfects. ✓
+- CF/Lower: P8, P5, M3, P5, P8 — no parallel perfects. ✓
+- Upper/Lower: P5, M3, P5, M3, P5 — **bars 1–2 are parallel fifths. Violation.**
 
-**Revision needed**: Adjust upper or lower voice to avoid parallel fifths.
+This is the single most common failure mode in three-voice writing: you check each voice against the CF and both pass, but you forget to check the outer two voices against *each other*. **Fix**: move the lower voice's second note from A to F, changing Upper/Lower bar 2 to a sixth:
 
-### Exercise 7B: Suspensions in Minor
-
-**CF** (A Aeolian):
 ```
-A – B – C – B – A
+Upper:    A – C – A – C – A
+CF:       D – E – F – E – D
+Lower:    D – F – D – A – D
 ```
+Re-check Upper/Lower: P5, m6, P5, M3, P5 — still parallel fifths between bars 1-2-3 alternating with sixths, actually fine since they're not *consecutive* identical perfects. Verify by rechecking every adjacent pair by hand before trusting it.
 
-**Your task**: Fourth-species counterpoint with chain of suspensions.
+### Lab B: Suspension Chain in Minor
 
-**Target**: Create 7–6, 4–3, or 9–8 suspensions at each measure.
+CF (A Aeolian): `A – B – C – B – A`. Write fourth species below the CF, targeting a 7–6 suspension at bar 2 and a 4–3 at bar 4. Check your chain against the validator logic in §9 by hand-tracing each prepare/suspend/resolve triplet.
 
-### Exercise 7C: Florid Counterpoint with Imitation
+### Lab C: Florid Counterpoint with Imitation
 
-**CF** (G Dorian):
-```
-G – A – Bb – A – G – F – G
-```
-
-**Your task**: Fifth-species counterpoint that **imitates** the CF's opening gesture.
-
-**Technique**: Start counterpoint with G – A – Bb (same pitches as CF), but shifted by one beat.
-
-**Result**: Creates **canonic imitation**, a more advanced texture.
+CF (G Dorian): `G – A – Bb – A – G – F – G`. Write fifth-species counterpoint whose opening three notes (`G–A–Bb`) echo the CF's own opening, entering one beat later — a miniature canon. This is your bridge exercise into actual imitative counterpoint and fugue writing.
 
 ---
 
-## 8. Self-Assessment Rubric
+## 12. Self-Assessment Rubric
 
-Use this to evaluate your exercises:
+| Criterion | Weight | What to check |
+|---|---|---|
+| Rule compliance | 40% | No parallel P5/P8, correct dissonance treatment per species, valid cadence |
+| Melodic quality | 30% | Smooth contour, one apex, leaps answered by contrary steps |
+| Voice independence | 20% | Contrary motion used at cadences, rhythmic differentiation present (species 2+) |
+| Stylistic idiom | 10% | Singable, sounds like Renaissance polyphony rather than a math puzzle |
 
-| Criterion                     | Weight | Checkpoints                                                                 |
-|-------------------------------|--------|-----------------------------------------------------------------------------|
-| **Rule Compliance**           | 40%    | No parallel P5/P8? Proper dissonance treatment? Correct cadence?           |
-| **Melodic Quality**           | 30%    | Smooth contour? Single apex? Balanced leaps?                                |
-| **Voice Independence**        | 20%    | Contrary motion? Rhythmic differentiation (species 2+)?                     |
-| **Stylistic Idiom**           | 10%    | Sounds like Renaissance polyphony? Singable?                                |
-
-**Scoring**:
-- **90–100%**: Publication-ready; sounds like Palestrina
-- **75–89%**: Technically correct; needs stylistic polish
-- **60–74%**: Minor rule violations; revise
-- **<60%**: Major violations; review species rules
+Score bands: 90–100% publication-ready, 75–89% technically correct but needs polish, 60–74% minor violations requiring revision, below 60% re-study the species rules before continuing.
 
 ---
 
-## 9. Computational Extensions: Algorithmic Composition
+## 13. 30-Day Practice Regimen
 
-### Constraint Logic Programming (Prolog)
+**Week 1 — Species 1**: Days 1–2, five exercises on given CFs. Days 3–4, write your own CF and counterpoint it. Days 5–7, transpose one exercise into all six modes (§8 drill).
 
-Species rules map naturally onto **declarative logic**:
+**Week 2 — Species 2**: Days 8–10, convert Week 1 exercises into Species 2. Days 11–12, compose Species 2 from scratch. Days 13–14, keyboard independence drills at ♩=60/80/100.
 
-```prolog
-% Define consonant intervals (semitones mod 12)
-consonant(0).   % Unison
-consonant(3).   % Minor third
-consonant(4).   % Major third
-consonant(7).   % Perfect fifth
-consonant(8).   % Minor sixth
-consonant(9).   % Major sixth
+**Week 3 — Species 3 and 4**: Days 15–17, figuration drills (§4). Days 18–20, suspension chains (§5). Day 21, combine both in a single exercise.
 
-% Define perfect consonances
-perfect(0).
-perfect(7).
+**Week 4 — Species 5 and integration**: Days 22–25, florid counterpoint. Days 26–27, three-voice Species 1 (Lab A). Days 28–29, score analysis of a Palestrina excerpt of your choosing. Day 30, compose and record an original florid exercise.
 
-% Rule: No parallel perfect fifths or octaves
-no_parallel_perfects(CP1, CF1, CP2, CF2) :-
-    Int1 is (CP1 - CF1) mod 12,
-    Int2 is (CP2 - CF2) mod 12,
-    \+ (perfect(Int1), perfect(Int2), Int1 = Int2).
-
-% Rule: Opening must be perfect consonance
-valid_opening(CP, CF) :-
-    Interval is (CP - CF) mod 12,
-    perfect(Interval).
-
-% Rule: Cadence must be octave/unison, approached by step
-valid_cadence(CP_prev, CP_final, CF_final) :-
-    Interval is (CP_final - CF_final) mod 12,
-    Interval = 0,
-    Step is abs(CP_final - CP_prev),
-    Step =< 2.
-
-% Generate first-species counterpoint
-first_species([CF|CFs], [CP|CPs]) :-
-    valid_opening(CP, CF),
-    between(48, 84, CP),  % Vocal range
-    Interval is (CP - CF) mod 12,
-    consonant(Interval),
-    first_species_body(CFs, CPs, CP, CF).
-
-first_species_body([], [], _, _).
-first_species_body([CF], [CP], CP_prev, CF_prev) :-
-    valid_cadence(CP_prev, CP, CF),
-    between(48, 84, CP),
-    Interval is (CP - CF) mod 12,
-    consonant(Interval).
-first_species_body([CF|CFs], [CP|CPs], CP_prev, CF_prev) :-
-    between(48, 84, CP),
-    Interval is (CP - CF) mod 12,
-    consonant(Interval),
-    no_parallel_perfects(CP_prev, CF_prev, CP, CF),
-    first_species_body(CFs, CPs, CP, CF).
-```
-
-**Usage** (SWI-Prolog):
-```prolog
-?- first_species([62, 64, 65, 64, 62], CP).
-CP = [69, 67, 69, 67, 69] ;
-CP = [69, 67, 65, 67, 69] ;
-...
-```
-
-### Neural Network Approach (Conceptual)
-
-**Architecture**: Sequence-to-sequence LSTM
-
-**Input**: CF note (one-hot encoded) + position in sequence
-**Output**: Counterpoint note (softmax over MIDI pitches)
-**Training data**: 500+ historical counterpoint examples (Palestrina, Lassus, Victoria)
-
-**Loss function**: 
-- Cross-entropy (match historical choices)
-- Rule penalty (add loss for parallel perfects, dissonance violations)
-
-**Hybrid system**: Neural net proposes candidates → rule checker validates → backtrack if invalid
+**Daily structure** (35 minutes total): 5 min sung interval warm-up (P1, m3, M3, P5, m6, M6, P8 against a drone), 15 min composing one exercise, 10 min performing it (sung or played), 5 min checking it against the rubric or validator script.
 
 ---
 
-## 10. Complete Annotated Example: Fourth-Species Analysis
+## 14. Historical Through-Line
 
-**Palestrina, *Kyrie* from *Missa Papae Marcelli* (simplified two-voice reduction)**:
+**Palestrina** (*Missa Papae Marcelli*, 1567) is strict species counterpoint in its native habitat — four to six voices, minimal dissonance, text clarity mandated by the Council of Trent.
 
-```
-Measure:     1       2       3       4       5
-Tenor (CF):  D   –   E   –   F   –   E   –   D
-Soprano:         A   –   G   –   F   –   E   –   D
+**Bach** adapted the same voice-leading discipline to tonal harmony: *Invention No. 1 in C Major* is essentially two-voice species counterpoint with functional chord progressions and modulation layered on top — listen for how the stepwise, mostly-consonant backbone is still there under the harmonic sequences.
 
-Intervals:       P5  –   m3  –   P8  –   P8  –   P8
+**Hindemith** (*The Craft of Musical Composition*, 1937) redefined the consonance hierarchy for 20th-century chromatic writing but kept the same structural idea: controlled dissonance against a stable framework.
 
-Analysis:
-- Measure 1: A enters on weak beat (suspension setup)
-- Measure 2: A held against E = P4 (dissonant suspension) → resolves down to G (m3)
-- Measure 3: G held against F = M2 (dissonant suspension) → resolves down to F (P8)
-- Measure 4–5: No suspensions, consonant descent to final
-```
-
-**What makes this Palestrina-esque?**
-1. **Smooth voice leading**: Soprano descends entirely by step (A–G–F–E–D)
-2. **Suspensions create tension**: P4 and M2 dissonances heighten expression
-3. **Contrary motion into cadence**: Soprano descends while tenor ascends (C→D in full score)
-4. **Modal cadence**: Ends on D (Dorian final)
-
-**Listen**: Palestrina, *Missa Papae Marcelli*, "Kyrie" (full SATB version)
-- Hear how suspensions cascade across multiple voices
+**Jazz and film**: Bill Evans' bass and piano lines in "Waltz for Debby" maintain independence through the same contrary-motion principle you're drilling here. John Williams' brass fanfares and Howard Shore's leitmotif combinations are contrapuntal layering in a tonal, orchestral idiom — the species discipline is why the lines don't collide.
 
 ---
 
-## 11. Practice Regimen: 30-Day Mastery Plan
+## 15. Final Project: Five-Species Suite on One Cantus Firmus
 
-**Week 1: First Species**
-- Day 1–2: Complete 5 first-species exercises (given CF)
-- Day 3–4: Write your own CF, compose counterpoint above
-- Day 5–7: Transpose exercises to all six modes
+CF (D Dorian): `D – E – F – G – F – E – D – C – D – E – D`
 
-**Week 2: Second Species**
-- Day 8–10: Convert first-species exercises to second species
-- Day 11–12: Compose second species from scratch
-- Day 13–14: Keyboard practice at ♩ = 60, 80, 100 BPM
+Compose, against this single CF:
+1. Species 1 above the CF.
+2. Species 2 below the CF.
+3. Species 3 above the CF.
+4. Species 4 below the CF, containing at least 4 suspensions.
+5. Species 5 above the CF, integrating techniques from all four prior species.
 
-**Week 3: Third and Fourth Species**
-- Day 15–17: Third-species figuration exercises
-- Day 18–20: Fourth-species suspension chains
-- Day 21: Combine third and fourth techniques
-
-**Week 4: Fifth Species and Integration**
-- Day 22–25: Florid counterpoint, mixing all rhythms
-- Day 26–27: Three-voice first species
-- Day 28–29: Analyze Palestrina scores
-- Day 30: Compose original florid counterpoint, perform/record it
-
-**Daily practice structure**:
-1. **Warm-up** (5 min): Sing intervals (P1, m3, M3, P5, m6, M6, P8)
-2. **Exercise** (15 min): Compose one species exercise
-3. **Performance** (10 min): Play/sing completed exercises
-4. **Analysis** (5 min): Check rules, identify violations
+**Deliverables**: a notated score (MuseScore or manuscript), a recording (performed or synthesized), and a self-assessment against the §12 rubric. Target ≥85% on all five movements — that's the journeyman benchmark that means you're ready for fugue and canon.
 
 ---
 
-## 12. Resources for Continued Study
+## 16. Resources
 
-### Primary Treatises
-- **Fux, *Gradus ad Parnassum*** (1725), trans. Alfred Mann—the original source
-- **Jeppesen, *Counterpoint*** (1939)—historically informed, modal emphasis
-- **Schenker, *Counterpoint*** (1910)—connects species to tonal analysis
+**Treatises**: Fux, *Gradus ad Parnassum* (1725, trans. Alfred Mann); Jeppesen, *Counterpoint* (1939); Schenker, *Counterpoint* (1910).
 
-### Modern Pedagogy
-- **Peter Schubert, *Modal Counterpoint, Renaissance Style*** (2008)—best modern textbook
-- **Kent Kennan, *Counterpoint*** (4th ed., 1999)—integrates tonal harmony
-- **Robert Gauldin, *A Practical Approach to 16th-Century Counterpoint*** (1995)
+**Modern textbooks**: Peter Schubert, *Modal Counterpoint, Renaissance Style* (2008); Kent Kennan, *Counterpoint* (4th ed., 1999); Robert Gauldin, *A Practical Approach to 16th-Century Counterpoint* (1995).
 
-### Listening (Spotify/YouTube)
-- **Palestrina**: *Missa Papae Marcelli*, motets
-- **Josquin des Prez**: *Ave Maria... Virgo serena*
-- **Bach**: *The Art of Fugue*, *Musical Offering*
-- **Hindemith**: *Ludus Tonalis*
+**Listening**: Palestrina, *Missa Papae Marcelli* and motets; Josquin des Prez, *Ave Maria... Virgo serena*; Bach, *The Art of Fugue* and *Musical Offering*; Hindemith, *Ludus Tonalis*.
 
-### Software Tools
-- **MuseScore** (free): Notation and playback
-- **music21** (Python library): Algorithmic analysis and generation
-- **Counterpointer** (iOS app): Interactive exercises with instant feedback
-- **OpenMusic** (visual programming): Constraint-based composition
+**Software**: MuseScore (free notation/playback), music21 (Python library for analysis and checking, as in §9), Counterpointer (iOS app with instant feedback).
 
-### Online Courses
-- **Coursera**: "Introduction to Classical Music" (Yale)—includes counterpoint module
-- **Berklee Online**: "Counterpoint"—tonal focus, jazz applications
-- **Open Yale Courses**: "Listening to Music" (Craig Wright)—historical context
-
----
-
-## 13. Final Challenge: Compose a Complete Five-Species Suite
-
-**Assignment**: Compose a complete set of exercises over **one cantus firmus**, demonstrating all five species.
-
-**Cantus Firmus** (D Dorian):
-```
-D – E – F – G – F – E – D – C – D – E – D
-```
-
-**Requirements**:
-1. **Species 1**: Note-against-note, above CF
-2. **Species 2**: Two-against-one, below CF
-3. **Species 3**: Four-against-one, above CF
-4. **Species 4**: Syncopated, below CF, with at least 4 suspensions
-5. **Species 5**: Florid, above CF, integrating all prior techniques
-
-**Deliverable**:
-- Notated score (hand-written or engraved in MuseScore)
-- Audio recording (performed or synthesized)
-- Self-assessment using the rubric (§8)
-
-**Deadline**: 30 days from starting this lesson
-
-**Masterclass criterion**: If all five species score ≥85% on the rubric, you have achieved **journeyman-level counterpoint mastery**—the foundation for fugue, canon, and advanced polyphonic composition.
-
----
-
-**Now begin**: Select a cantus firmus, open your notation software or manuscript paper, and compose your first species exercise. The only way to master counterpoint is through **sustained, deliberate practice**—one interval, one voice, one species at a time.
+Begin now: pick a cantus firmus, sing it clean, and write your first Species 1 exercise before you close this document.

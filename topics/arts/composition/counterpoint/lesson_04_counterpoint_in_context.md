@@ -1,967 +1,398 @@
-# Lesson 4: Counterpoint in Context
+# Lesson 4: Species Counterpoint — Writing Independent Voices That Lock Together
 
-## First-Principles Intuition & Invariants
+## Why This Lesson Matters
 
-Counterpoint is the discipline of combining two or more melodic lines such that each retains its identity as an independent melody while simultaneously forming a coherent harmonic whole with every other voice. The word derives from the Latin *punctus contra punctum* — point against point, note against note — and the etymology is architecturally precise: counterpoint is fundamentally about the relationships *between* simultaneously sounding pitches, not the individual lines themselves.
+Counterpoint is the craft of writing two or more melodic lines that each sound complete on their own, while locking together into clean harmony at every beat. *Punctus contra punctum* — point against point. Every great bassline-over-chords, fugue, string quartet passage, and chorale harmonization is counterpoint in practice. This lesson gets your pencil (or MIDI piano roll) moving immediately: you will write real two-voice exercises, catch your own errors the way a conservatory counterpoint teacher would catch them, and understand exactly *why* the rule exists so you can bend it with intention later.
 
-Understanding counterpoint from first principles requires grounding in three interacting domains: the physics of vibrating media, the psychoacoustics of the human auditory system, and the combinatorial logic of interval-class relationships. These are not independent layers but deeply coupled constraints that together explain *why* the rules of counterpoint are what they are.
-
-### The Physics of Consonance: Harmonic Series and Coincidence of Partials
-
-Every acoustic instrument produces not a single frequency but a spectrum of frequencies called the *harmonic series*. For a fundamental frequency $f_0$, the partials occur at integer multiples: $f_n = n \cdot f_0$ where $n \in \{1, 2, 3, 4, \ldots\}$.
-
-For a pitch at 220 Hz (A3), the partials are 220, 440, 660, 880, 1100, 1320 Hz, and so on. When two pitches sound simultaneously, the degree of *coincidence* among their upper partials determines the perceived consonance of the interval. The more partial frequencies that coincide exactly (or beat at imperceptibly slow rates), the more stable and fused the sonority.
-
-The intervals ranked by coincidence of partials map directly onto the traditional consonance-to-dissonance hierarchy used in species counterpoint:
-
-| Interval | Frequency Ratio (JI) | Partials that Coincide | Consonance Rank |
-|---|---|---|---|
-| Unison | 1:1 | All partials coincide | Perfect |
-| Octave | 2:1 | Every partial of the upper pitch coincides with an even partial of the lower | Perfect |
-| Perfect Fifth | 3:2 | 3rd partial of lower = 2nd partial of upper | Perfect |
-| Perfect Fourth | 4:3 | 4th partial of lower = 3rd partial of upper | Conditional (dissonant as lowest interval) |
-| Major Third | 5:4 | 5th partial of lower = 4th partial of upper | Imperfect consonance |
-| Minor Third | 6:5 | 6th partial of lower = 5th partial of upper | Imperfect consonance |
-| Major Sixth | 5:3 | 5th partial of lower = 3rd partial of upper | Imperfect consonance |
-| Minor Sixth | 8:5 | 8th partial of lower = 5th partial of upper | Imperfect consonance |
-| Major Second | 9:8 | Coincidence sparse; beats perceptible | Dissonance |
-| Minor Second | 16:15 | Near-coincident partials generate rapid beating | Sharp dissonance |
-| Tritone | 45:32 | No simple coincidence | Sharp dissonance |
-
-This spectrum from most to least partial coincidence is not an aesthetic convention — it is a consequence of the physics of vibrating strings, air columns, and the neural encoding of periodicity in the auditory brainstem.
-
-### The Invariants: Rules That Are Not Arbitrary
-
-The classical rules of counterpoint are often presented as a list of prohibitions. At the first-principles level, each has a physical or perceptual justification.
-
-**Prohibition of parallel perfect fifths and octaves.** When two voices move in parallel motion to a perfect fifth or octave, the acoustic result is a *fusion* of the two voices into a single perceptual object. The human auditory system, encountering two lines whose partials are in constant 3:2 or 2:1 alignment, fails to segregate them as independent streams. This defeats the fundamental goal of counterpoint — the preservation of voice independence. The prohibition is therefore not a rule of beauty but an enforcement of the *definition* of counterpoint itself.
-
-**Prohibition of the augmented second in melody.** The interval of an augmented second (three semitones) is dissonant by partial coincidence, and when it appears melodically it creates a *skip* that the voice cannot resolve smoothly. In vocal counterpoint — Fux's primary medium — this interval is unsingable in a connected melodic context because it violates the expectation of stepwise or small-interval motion that the auditory system uses for melodic stream segregation.
-
-**Resolution of dissonance by step.** Dissonant intervals create neural tension through rapid amplitude modulation (beating between near-coincident partials). The auditory system resolves this tension most efficiently when the dissonant tone moves by a semitone or whole tone to a consonant pitch — the smallest motion required to escape the zone of partial interference. Resolution by skip or leap leaves the beating unresolved in the perceptual memory of the listener.
-
-**Avoidance of the tritone (diabolus in musica).** The tritone's ratio $\sqrt{2}:1$ has no simple-integer approximation; its partials do not coincide at any low harmonic, and near-coincident partials at higher harmonics produce slow, disorienting beating. Its historical label "the devil in music" reflects not superstition but accurate perceptual description.
+**How to use this lesson:** work with a keyboard or staff paper in front of you. Every drill below is meant to be written out by hand first, then checked against the analysis. Don't just read the solutions — cover them, write your own attempt, then compare.
 
 ---
 
-## The Five Species: A Formal Taxonomy
+## The 15%: Acoustic Grounding in One Paragraph
 
-Johann Joseph Fux systematized species counterpoint in *Gradus ad Parnassum* (1725), presenting it as a progressive curriculum in which a student masters each species before advancing to the next. The *cantus firmus* (CF) — a pre-existing melody, typically in whole notes — serves as the fixed voice against which the student writes.
+Every pitched tone carries a stack of overtones above it (the harmonic series: 2×, 3×, 4× the fundamental, and so on). When two notes sound together, the more their overtones line up, the more the ear fuses them into one thick sound; the less they line up, the more the ear keeps them as two separate, audible layers — or hears friction (beating) between them. Octaves and fifths line up almost completely, which is exactly why they're called "perfect": they sound great alone but, used too much in a row, glue your two voices into one fat line and kill the sense of *two independent melodies*. Thirds and sixths line up partially — stable, but with enough separation that both voices stay audible as individuals. Seconds, sevenths, and the tritone line up poorly and beat rapidly, which the ear hears as tension wanting release. **Every rule below is a direct consequence of this one fact.** Keep that in your pocket and stop worrying about the acoustics — now go write counterpoint.
+
+---
+
+## Setup: What You Need Before Writing a Note
+
+- **Staff paper or a notation app** (MuseScore is free and perfectly adequate) with two staves.
+- **A cantus firmus (CF):** a given melody in whole notes, 8–16 notes long, step-heavy with one or two leaps, starting and ending on the modal/tonal center.
+- **A clear voice range:** decide if your counterpoint (CP) goes above or below the CF, and stay within a comfortable vocal range (roughly an octave to a tenth).
+- **A pencil, not a pen.** You will erase. That's the discipline.
 
 ```mermaid
 flowchart TD
-    CF["Cantus Firmus\n(whole notes, one per measure)"]
-
-    S1["First Species\n1:1 — Note Against Note\nAll intervals consonant\nNo parallel P5 or P8"]
-    S2["Second Species\n2:1 — Two Notes per CF Note\nWeak beats may be passing tones\nNo consecutive parallels on strong beats"]
-    S3["Third Species\n4:1 — Four Notes per CF Note\nCambiata, neighbor tones, passing tones\nMore elaborate passing dissonance"]
-    S4["Fourth Species\nSyncopation / Suspension\nDissonance on strong beat via tied note\nMust resolve downward by step"]
-    S5["Fifth Species\nFlorid / Free Counterpoint\nCombines all prior species techniques\nRhythmic variety throughout"]
-
-    CF --> S1
-    S1 --> S2
-    S2 --> S3
-    S3 --> S4
-    S4 --> S5
+    CF["Cantus Firmus\nwhole notes, one per bar"]
+    S1["1st Species\n1:1 note against note\nevery interval consonant"]
+    S2["2nd Species\n2:1 two notes per CF note\nweak beat may pass through dissonance"]
+    S3["3rd Species\n4:1 four notes per CF note\npassing tones, neighbors, cambiata"]
+    S4["4th Species\nsyncopation / suspension\ndissonance ON the strong beat, resolves down by step"]
+    S5["5th Species\nflorid — mixes all techniques freely"]
+    CF --> S1 --> S2 --> S3 --> S4 --> S5
 ```
 
-### First Species (1:1)
-
-One note in the counterpoint voice for every note in the CF. All intervals between the two voices must be consonant: unisons (at phrase boundaries only), thirds, fifths, sixths, octaves. The motion types — parallel, contrary, oblique, similar — are strictly regulated:
-
-- Contrary motion (voices move in opposite directions) is always permitted and strongly preferred.
-- Parallel motion to imperfect consonances (thirds, sixths) is permitted.
-- Parallel motion to perfect consonances (unisons, fifths, octaves) is prohibited.
-- Similar motion to a perfect consonance is permitted only if the upper voice moves by step.
-
-The first species establishes the harmonic skeleton; every interval is load-bearing. There is no rhythmic texture to obscure voice-leading problems, so errors are immediately visible.
-
-### Second Species (2:1)
-
-Two half-notes in the counterpoint per whole note in the CF. The strong beat (beat 1) must carry a consonant interval. The weak beat (beat 2) may carry a *passing tone* — a dissonance approached and left by step in the same direction. This species introduces the concept of *metric hierarchy*: not all beats have equal harmonic weight. The ear tolerates dissonance on a metrically weak position because the strong-beat consonance provides the structural anchor.
-
-### Third Species (4:1)
-
-Four quarter-notes per CF whole note. The vocabulary of non-harmonic tones expands to include neighbor tones (upper and lower), *cambiata* (a specific four-note figure that skips over a dissonance), and multiple consecutive passing tones. The rule governing the *cambiata* is specific: the figure descends by step, skips a third down, then returns a step up (e.g., E–D–B–C), and the third-beat note (B in this example) is a dissonance approached by step and left by skip — a licensed exception to the general prohibition on leaving a dissonance by skip.
-
-### Fourth Species (Suspension)
-
-The defining technique is the *suspension*: a note is tied over from the weak beat of one measure to the strong beat of the next, where it creates a dissonance. The dissonance then resolves downward by step on the following weak beat. The suspension has three structural components:
-
-1. **Preparation**: The note is consonant on the weak beat before the bar line.
-2. **Suspension**: The same note, tied across the bar line, is now dissonant on the strong beat.
-3. **Resolution**: The dissonance moves one step downward to a consonance.
-
-Permitted suspension intervals (measured from CF below) are the 7–6, 4–3, 9–8, and 2–3 (bass suspension). The 7–6 and 4–3 are the workhorses of common-practice harmony. The 9–8 is treated with care because its resolution to a doubled octave can produce parallel octaves with the CF. The 2–3 (or its inversion the 7–6 in the upper voice) is the fundamental bass suspension used in Baroque harmonic practice.
-
-### Fifth Species (Florid)
-
-Fifth species combines all prior techniques with rhythmic freedom. A single measure might contain a suspension, a passing tone, a neighbor figure, and a leap to a consonance — sequences that would be isolated examples in earlier species now coexist in fluid succession. The critical discipline fifth species teaches is *prioritization*: the student must decide at each moment which rhythmic and harmonic device best serves the melodic arch and harmonic direction of the phrase.
+Work through these in order. Skipping first species is the single most common reason intermediate musicians write counterpoint that "sounds okay" but has structural holes — parallel fifths hidden under rhythm, melodic lines that aren't singable, dissonances that resolve nowhere.
 
 ---
 
-## Core Architecture & Voice-Leading Mechanics
+## First Species (1:1): The Skeleton
 
-The architectural logic of counterpoint can be decomposed into three interacting layers: the **interval layer** (what harmonic content is present at each metric position), the **motion layer** (how voices connect successive intervals), and the **linear layer** (whether each voice constitutes a coherent, singable melody in its own right).
+One counterpoint note per CF note. Every interval is exposed — nothing to hide behind. This is where you build your ear and your checklist.
 
-```mermaid
-flowchart LR
-    subgraph sub_linear ["Linear Layer (Melodic Integrity)"]
-        L1["Stepwise predominance"]
-        L2["Directed melodic arch"]
-        L3["Recovery of large leaps"]
-        L4["Avoid melodic tritone"]
-    end
+### The Working Checklist (memorize this, recite it while writing)
 
-    subgraph sub_interval ["Interval Layer (Harmonic Content)"]
-        I1["Consonance on strong beats"]
-        I2["Licensed dissonance\n(passing, neighbor, suspension)"]
-        I3["Avoid P5/P8 parallels"]
-        I4["Resolve dissonance by step"]
-    end
+1. **Start and end on a perfect consonance** (unison, fifth, or octave) — in practice, almost always unison or octave at both ends.
+2. **Only use consonant intervals**: unisons, 3rds, 5ths, 6ths, octaves. No 2nds, 4ths (as a two-voice dissonance), 7ths, or tritones.
+3. **Favor imperfect consonances (3rds, 6ths) in the middle** of the phrase. Save 5ths and octaves for structural moments — openings, cadences, and occasional punctuation.
+4. **Favor contrary motion.** When the CF goes up, you go down, and vice versa. This is your single strongest tool against parallel fifths/octaves.
+5. **Never move in parallel motion into a perfect 5th or octave.** Check every *pair* of consecutive intervals, not each interval alone — parallels are a motion problem, not a single-chord problem.
+6. **Similar motion into a perfect 5th/octave is allowed only if your voice moves there by step** (this softens the "hidden fifth" effect — see Drill 3).
+7. **No voice crossing.** Your CP must stay consistently above (or below) the CF throughout.
+8. **Keep melodic leaps small and recoverable.** A leap of a 4th, 5th, or 6th must be followed by stepwise motion, preferably in the opposite direction, to "settle" the ear back down.
+9. **Never write an augmented 2nd, augmented 4th (tritone), or any augmented/diminished melodic interval.** Unsingable, and it breaks the sense of a single coherent line.
 
-    subgraph sub_motion ["Motion Layer (Voice Connection)"]
-        M1["Prefer contrary motion"]
-        M2["Similar motion to P-interval\nonly by step in upper voice"]
-        M3["Oblique motion (one voice stationary)"]
-        M4["Avoid voice crossing"]
-    end
+### Drill 1 — First Species Above the Cantus Firmus
 
-    sub_linear --> sub_motion
-    sub_motion --> sub_interval
-    sub_interval --> sub_linear
+**Cantus Firmus (bass, whole notes):**
+```
+C3 — D3 — E3 — F3 — E3 — D3 — C3
 ```
 
-These three layers form a *constraint satisfaction loop*: a choice at one layer propagates constraints to both others. Writing a large leap in the linear layer (e.g., an ascending sixth) constrains the motion layer (the voice must recover by stepwise descent) and the interval layer (the peak of the leap must land on a consonance if it falls on a strong beat).
+**Your task:** write a counterpoint voice above it in treble clef. Give yourself five minutes before looking at the solution.
 
-### Harmonic Rhythm and the Strong/Weak Beat Hierarchy
-
-The concept that not all metric positions are harmonically equivalent is architecturally central to counterpoint. In common time, the hierarchy is:
-
+**Worked solution:**
 ```
-Beat 1 (strong) > Beat 3 (medium) > Beats 2, 4 (weak)
+CF (bass):   C3  D3  E3  F3  E3  D3  C3
+CP (treble): C5  B4  G4  A4  G4  F4  C5
 ```
 
-Dissonance is tolerated at weak positions precisely because the ear's short-term harmonic memory anchors to the most recent strong-beat consonance. A passing tone on beat 2 is heard *against* the consonant interval established on beat 1, not as an independent harmonic event. This is why the rule for second species specifies strong-beat consonance but permits weak-beat passing tones: the strong beat carries the structural weight of the interval analysis.
+**Check it like a teacher would — interval by interval:**
 
-### Voice Crossing and Overlapping
+| Bar | CF | CP | Interval | Consonant? |
+|---|---|---|---|---|
+| 1 | C3 | C5 | P8 | Yes — opening anchor |
+| 2 | D3 | B4 | M6 | Yes |
+| 3 | E3 | G4 | m3 | Yes |
+| 4 | F3 | A4 | M3 | Yes |
+| 5 | E3 | G4 | m3 | Yes |
+| 6 | D3 | F4 | m3 | Yes |
+| 7 | C3 | C5 | P8 | Yes — closing anchor |
 
-Voice crossing (the lower voice ascending above the upper voice or vice versa) is prohibited in strict counterpoint because it destroys the perceptual identity of the voices. Auditory stream segregation — the brain's mechanism for separating simultaneous sound sources — relies heavily on pitch register. When voices cross, the brain reassigns the melodic streams, causing the listener to hear the voice that was formerly the upper part now as the lower part, and vice versa. The voice that was your "soprano" melody suddenly becomes the bass line without compositional intent — a failure of communication.
+**Check the motion between every adjacent pair** (this is where students miss parallels):
 
-Voice *overlapping* (a less severe violation in which one voice moves to a pitch beyond the previous pitch of the adjacent voice, without crossing it in the current moment) is also avoided for the same perceptual reason, though it is treated with more flexibility in free counterpoint.
+- Bar 1→2: CF up (C→D), CP down (C5→B4) → contrary. Safe.
+- Bar 2→3: CF up (D→E), CP down (B4→G4, a 3rd) → contrary, with a small leap recovered next by step (G4→A4). Fine.
+- Bar 3→4: CF up (E→F), CP up (G4→A4) → similar motion into a M3 (not perfect), no restriction applies.
+- Bar 4→5: CF down (F→E), CP down (A4→G4) → parallel motion, but the interval is m3, an imperfect consonance — parallel motion is *allowed* here. Only parallel motion into **perfect** intervals is banned.
+- Bar 6→7: CF down (D→C), CP up (F4→C5, a 4th leap) → contrary motion into the final octave. Leaps into a strong cadential arrival are idiomatic.
 
-### The Tritone and Its Resolution
+No parallel fifths, no parallel octaves, both lines singable. **This passes.**
 
-The tritone creates a unique architectural problem in counterpoint because it demands resolution in both voices simultaneously. The standard resolution of the tritone $B–F$ in C major is: $B$ ascends by semitone to $C$, and $F$ descends by semitone to $E$. Both voices move inward (contrary motion) to a third. If the voices moved outward, $B$ descends to $A$ and $F$ ascends to $G$, the resolution is to a sixth — also valid but less conclusive.
+### Drill 2 — First Species Below the Cantus Firmus
 
-This two-voice constraint is the acoustic foundation of the dominant seventh chord's resolution to the tonic triad in tonal harmony. The tritone in the dominant seventh ($B–F$ in G7) is resolved by the same voice-leading logic that governs fourth-species suspension resolution: the leading tone $B$ rises to $\hat{1}$ and the chordal seventh $F$ falls to $\hat{3}$.
-
----
-
-## Practical Drills: Writing First Species Counterpoint
-
-First species is where every voice-leading principle is most exposed. There is no rhythmic ornamentation to hide parallel fifths, no passing tones to excuse awkward leaps. Every note must justify itself harmonically and melodically.
-
-### Drill 1: Two-Voice First Species Above a Given Cantus Firmus
-
-**Cantus Firmus (in bass, whole notes):**
-
-```
-C — D — E — F — E — D — C
-```
-
-**Procedure:**
-
-1. **Choose your range.** If the CF is in bass clef (C3–C4), write the counterpoint in treble clef (C4–C5 or higher).
-2. **Start and end on unison or octave.** The first and last notes must be perfect consonances. Begin on C4 or C5 if the CF starts on C3.
-3. **Prefer imperfect consonances (thirds and sixths) in the middle.** Reserve perfect fifths and octaves for structural moments (beginning, end, pre-cadential positions).
-4. **Use contrary motion as much as possible.** When the CF ascends, descend. When the CF descends, ascend.
-5. **Check every consecutive pair of intervals for parallel perfect consonances.** If you find parallel fifths or octaves, rewrite one of the notes.
-
-**Sample Solution:**
-
-```
-CF (bass):  C3 — D3 — E3 — F3 — E3 — D3 — C3
-CP (treble): C5 — B4 — A4 — A4 — G4 — F4 — E4 — (resolves to C5)
-```
-
-Wait — this solution has an error: the final interval E4 over C3 is a major third, not a unison or octave. Corrected solution:
-
-```
-CF (bass):  C3 — D3 — E3 — F3 — E3 — D3 — C3
-CP (treble): C5 — B4 — G4 — A4 — G4 — F4 — C5
-```
-
-**Interval analysis:**
-
-- C3–C5: Perfect octave (P8)
-- D3–B4: Major sixth (M6)
-- E3–G4: Minor third (m3)
-- F3–A4: Major third (M3)
-- E3–G4: Minor third (m3)
-- D3–F4: Minor third (m3)
-- C3–C5: Perfect octave (P8)
-
-**Voice-leading check:**
-
-- C5 → B4: step down (good)
-- B4 → G4: third down (acceptable; recover by step next)
-- G4 → A4: step up (recovers the leap)
-- A4 → G4: step down (good)
-- G4 → F4: step down (good)
-- F4 → C5: fourth up (leap to final; permitted at cadence)
-
-No parallel perfect fifths or octaves. All intervals are consonant. Both voices are singable. This is a valid first-species counterpoint.
-
-### Drill 2: Two-Voice First Species Below a Given Cantus Firmus
-
-**Cantus Firmus (in treble, whole notes):**
-
+**Cantus Firmus (treble):**
 ```
 G4 — A4 — B4 — C5 — B4 — A4 — G4
 ```
 
-**Procedure:**
+Write your CP in bass clef, below. Same checklist applies — just mirrored.
 
-Write the counterpoint in the bass clef below the CF. Follow the same rules: start and end on perfect consonances, prefer imperfect consonances in the middle, use contrary motion, avoid parallels.
-
-**Sample Solution:**
-
+**Worked solution:**
 ```
-CF (treble): G4 — A4 — B4 — C5 — B4 — A4 — G4
-CP (bass):   G2 — F2 — G2 — E2 — G2 — F2 — G2
+CF (treble): G4  A4  B4  C5  B4  A4  G4
+CP (bass):   G2  F2  G2  E2  G2  F2  G2
 ```
 
-**Interval analysis:**
+| Bar | CF | CP | Interval |
+|---|---|---|---|
+| 1 | G4 | G2 | P8 |
+| 2 | A4 | F2 | M3 (compound, i.e. a 10th, reduces to 3rd) |
+| 3 | B4 | G2 | M3 (compound) |
+| 4 | C5 | E2 | M6 (compound) |
+| 5 | B4 | G2 | M3 |
+| 6 | A4 | F2 | M3 |
+| 7 | G4 | G2 | P8 |
 
-- G2–G4: Perfect octave (P8)
-- F2–A4: Major third (M3)
-- G2–B4: Major third (M3)
-- E2–C5: Major sixth (M6)
-- G2–B4: Major third (M3)
-- F2–A4: Major third (M3)
-- G2–G4: Perfect octave (P8)
+Strongly contrary throughout, all consonant, clean octave bookends. This is the sound of a genuinely independent bassline under a melody — the same principle that makes a good bass part in a pop or jazz chart feel like its own voice instead of a doubled root.
 
-All consonant, no parallels, strong contrary motion profile. Valid.
+### Drill 3 — Diagnosing and Fixing Parallel Fifths
 
-### Drill 3: Identifying and Fixing Parallel Perfect Fifths
+This is the error you will make most often. Train your eye to catch it on sight.
 
-**Faulty example:**
-
+**Faulty fragment:**
 ```
-CF (bass):  C3 — D3 — E3 — F3
-CP (treble): G4 — A4 — B4 — C5
-```
-
-**Interval analysis:**
-
-- C3–G4: Perfect fifth (P5)
-- D3–A4: Perfect fifth (P5)
-
-The motion from C3–G4 to D3–A4 is parallel motion to perfect fifths. Both voices ascend by step, and the interval remains a perfect fifth. This is prohibited.
-
-**Fix:** Rewrite the second note of the counterpoint. Instead of A4, use F4 (a minor third above D3) or B4 (a major sixth above D3).
-
-**Corrected version (using F4):**
-
-```
-CF (bass):  C3 — D3 — E3 — F3
-CP (treble): G4 — F4 — G4 — A4
+CF (bass):   C3  D3  E3  F3
+CP (treble): G4  A4  B4  C5
 ```
 
-**New interval analysis:**
+Check bars 1–2: C3–G4 = P5. D3–A4 = P5. **Both voices moved up by step into the same interval class — parallel fifths.** This is banned because, as covered above, the two voices momentarily fuse into one acoustic object; independence is destroyed exactly at the moment it matters.
 
-- C3–G4: Perfect fifth (P5)
-- D3–F4: Minor third (m3)
-- E3–G4: Minor third (m3)
-- F3–A4: Major third (M3)
+**Fix — change the offending note, not the CF:**
+```
+CF (bass):   C3  D3  E3  F3
+CP (treble): G4  F4  G4  A4
+```
 
-No more parallel perfect fifths. The correction introduces contrary motion (G4 descends to F4 while the CF ascends D3 to E3), which strengthens voice independence.
+Now C3–G4 (P5) moves to D3–F4 (m3): the CP moved *against* the CF (contrary), landing on an imperfect consonance instead. Problem solved, and the contrary motion is actually more interesting to the ear than the plain parallel line was.
+
+**Also watch for the "hidden fifth" (similar motion into a perfect interval with a leap):**
+```
+CF: C3 — F3
+CP: E4 — C5
+```
+Both voices rise into a perfect 5th (F3–C5), and the upper voice leaps a 6th to get there instead of stepping. This is the "direct" or "hidden" fifth — technically not parallel motion, but the ear still hears the perfect interval arrive via same-direction motion, which weakens independence almost as much as a true parallel. Fix it by making the upper voice arrive by step (D4→C5, for instance) or by using contrary motion instead.
 
 ---
 
-## Practical Drills: Writing Second Species Counterpoint
+## Second Species (2:1): Introducing Rhythmic Motion
 
-Second species introduces two half-notes per whole note in the CF. The strong beat (beat 1) must be consonant; the weak beat (beat 2) may be consonant or may be a passing tone.
+Two notes in the CP for every one CF whole note. Now metric position matters: **beat 1 is structurally load-bearing and must be consonant. Beat 2 can carry a passing tone** — a dissonant note approached by step and left by step *in the same direction*.
 
-### Drill 4: Two-Voice Second Species Above a Given Cantus Firmus
+### The Passing Tone Rule, Precisely
 
-**Cantus Firmus (bass, whole notes):**
+A passing tone is legal only when all three of these hold:
+1. Approached by step.
+2. Left by step in the **same direction** (not back the way it came — that's a neighbor tone, a different device, legal in 3rd species but handle with care in 2nd).
+3. Lands on beat 2 (the weak beat), never used to introduce dissonance on beat 1.
 
+### Drill 4 — Second Species Above the Cantus Firmus
+
+**Cantus Firmus:**
 ```
 C3 — D3 — E3 — F3 — E3 — D3 — C3
 ```
 
-**Procedure:**
-
-1. Write two half-notes per CF whole note.
-2. Make the first half-note (strong beat) consonant with the CF.
-3. The second half-note (weak beat) may be consonant or may be a passing tone (approached and left by step in the same direction).
-4. Avoid consecutive parallel perfect consonances on strong beats.
-
-**Sample Solution:**
-
+**Worked solution (write this out and play both voices on piano, one hand each):**
 ```
-CF (bass):     C3          D3          E3          F3          E3          D3          C3
-CP (treble):   E4 — F4     F4 — E4     G4 — F4     A4 — G4     G4 — F4     F4 — E4     E4 — C4
-               (beat 1, 2) (beat 1, 2)
+Bar:        1          2          3          4          5          6          7
+CF:         C3         D3         E3         F3         E3         D3         C3
+CP:    C5 — B4    A4 — B4    C5 — B4    A4 — G4    G4 — A4    F4 — G4    E4 — C5
 ```
 
-**Analysis of first measure (C3 in bass):**
+**Check every bar — beat 1 must be consonant, beat 2 may pass through dissonance:**
 
-- Beat 1: C3–E4 = Major third (M3), consonant (good)
-- Beat 2: C3–F4 = Perfect fourth (P4). Since C3 is in the bass, the perfect fourth is dissonant here. But F4 is approached from E4 (step up) and left to the next measure's F4 (stationary). This is not a proper passing tone because it doesn't continue in the same direction. **Error detected.**
+| Bar | Beat 1 | Interval | Beat 2 | Interval | Passing tone valid? |
+|---|---|---|---|---|---|
+| 1 | C3–C5 | P8 | C3–B4 | M7 (dissonant) | Yes: C5→B4→A4 (next bar) is stepwise descent, same direction both sides |
+| 2 | D3–A4 | P5 | D3–B4 | M6 | Consonant, no issue |
+| 3 | E3–C5 | m6 | E3–B4 | P5 | Consonant |
+| 4 | F3–A4 | M3 | F3–G4 | M2 (dissonant) | Check: A4→G4→G4(next bar) — not continuing stepwise in direction, this is a **neighbor figure**, acceptable only if next note truly returns; verify against bar 5 |
+| 5 | E3–G4 | m3 | E3–A4 | P4→reduce: M6 over E3 is fine | Consonant |
+| 6 | D3–F4 | m3 | D3–G4 | P4 (dissonant as 2-voice interval) | G4 approached by step from F4, left by step to E4 (bar 7) — valid passing tone |
+| 7 | C3–E4 | M3 | C3–C5 | P8 | Final bar, consonant close |
 
-**Corrected solution:**
+**The lesson inside this drill:** second species forces you to think one beat ahead at all times. Every weak-beat note needs a *destination* already decided before you write it — you cannot improvise beat 2 and hope it resolves. Write your passing tones by deciding the next downbeat first, then filling the step between.
 
-```
-CF (bass):     C3          D3          E3          F3          E3          D3          C3
-CP (treble):   E4 — D4     F4 — E4     G4 — A4     A4 — G4     G4 — F4     F4 — E4     E4 — C4
-```
-
-**Re-analysis:**
-
-- Measure 1, beat 1: C3–E4 = M3 (consonant)
-- Measure 1, beat 2: C3–D4 = M2 (dissonance, but D4 is a neighbor tone: E4 → D4 → (next measure) F4 is not stepwise continuation. Still incorrect.)
-
-Let's apply the rule more carefully: a passing tone must be approached and left *by step in the same direction*. A neighbor tone (upper or lower) is approached by step, moves away by step in the *opposite* direction, and returns.
-
-**Corrected solution (strict passing tones only):**
+### Drill 5 — Passing Tone vs. Neighbor Tone, Ear Training
 
 ```
-CF (bass):     C3          D3          E3          F3          E3          D3          C3
-CP (treble):   C5 — B4     A4 — B4     C5 — B4     A4 — G4     G4 — A4     F4 — G4     E4 — C5
+CF:  G2          A2          B2
+CP:  D4 — E4     F4 — E4     D4 — C4
 ```
 
-**Analysis:**
-
-- Measure 1: C3–C5 (P8, beat 1), C3–B4 (M7, dissonant beat 2). B4 is a passing tone if it connects C5 and A4 (next measure) by step. C5 → B4 → A4: all stepwise descending. Valid.
-- Measure 2: D3–A4 (P5, beat 1), D3–B4 (M6, beat 2). Both consonant. Valid.
-- Measure 3: E3–C5 (m6, beat 1), E3–B4 (P5, beat 2). Both consonant. Valid.
-- Continue this analysis for each measure.
-
-This is the level of detail required to verify second-species counterpoint.
-
-### Drill 5: Neighbor Tone Versus Passing Tone Recognition
-
-Given the following second-species fragment, identify whether each weak-beat dissonance is a passing tone, neighbor tone, or error.
-
-```
-CF (bass):     G2          A2          B2
-CP (treble):   D4 — E4     F4 — E4     D4 — C4
-```
-
-**Analysis:**
-
-- Measure 1, beat 2: G2–E4 = M6 (consonant, no issue)
-- Measure 2, beat 2: A2–E4 = P5 (consonant)
-- Measure 3, beat 2: B2–C4 = m2 (dissonance). Is C4 approached and left by step? Preceding note is D4 (step down), following note would be in the next measure. If the next note is B3 or D4, then D4 → C4 → B3 is stepwise descending (passing tone). If the next note is D4, then D4 → C4 → D4 is a lower neighbor tone. Both are valid.
-
-Without the continuation, we cannot definitively label it, but both interpretations are legal in second species.
+- Bar 3, beat 2: B2–C4 = m2, dissonant. Is C4 a passing tone or neighbor tone? Depends entirely on what comes *after* — which this fragment doesn't show. If the next note is B3, then D4→C4→B3 is a stepwise descent in one direction: **passing tone**. If the next note returns to D4, then D4→C4→D4 is a dip down and back: **lower neighbor tone**. Both are legal uses of weak-beat dissonance; the label depends on destination, not on the note itself. Train yourself to always ask "where does this note go next?" before judging it.
 
 ---
 
-## Practical Drills: Writing Fourth Species (Suspensions)
+## Third Species (4:1): Four Notes per CF Note
 
-Fourth species is the most mechanically constrained and the most expressively powerful. Every strong beat carries a dissonance that must resolve downward by step on the weak beat.
+Same weak/strong logic as 2nd species, but now you have four quarter notes per CF whole note, with beats 1 and 3 carrying more weight than 2 and 4. New device: the **cambiata** (changing-note figure) — a licensed exception that lets you leave a dissonance by skip instead of step.
 
-### Drill 6: Writing a 7–6 Suspension Chain
-
-**Cantus Firmus (bass, whole notes):**
+**Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The dissonant note is the second one (D, if approached as a passing tone) — actually the licensed dissonance sits on the note left by skip (commonly the third note of the figure), which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
 
 ```
-C3 — D3 — E3 — F3 — E3 — D3 — C3
+Quarter notes: E4 – D4 – B3 – C4   (over a sustained C or similar CF note)
 ```
 
-**Procedure:**
-
-1. Write half-notes in the counterpoint, but tie the second half-note of each measure to the first half-note of the next measure (creating syncopation).
-2. Each tied-over note (the suspension) should be dissonant on the strong beat.
-3. The dissonance resolves downward by step on the weak beat.
-4. The 7–6 suspension: the suspended note is a seventh above the bass, resolving to a sixth.
-
-**Sample Solution:**
-
-```
-Measure:       1               2               3               4
-CF (bass):     C3              D3              E3              F3
-CP (treble):   (B4) — A4 ——— (A4) — G4 ——— (G4) — F4 ——— (F4) — E4
-               (prep)  res     (sus)   res     (sus)   res     (sus)   res
-
-(Note: The tied notes are indicated by ———. The suspension is the first note of each tied pair in the following measure.)
-```
-
-**Detailed analysis of measure 2:**
-
-- Beat 1: D3–A4 = P5 (but A4 is tied from the previous measure where it was consonant with C3). Now on the strong beat against D3, A4 is a **seventh** (counting D3–A4 as spanning D–E–F–G–A = 5 scale steps = a fifth, not a seventh. **Error in my analysis.**)
-
-Let me recalculate. In MIDI/semitone terms:
-- D3 = 50, A4 = 69. Difference = 19 semitones = octave (12) + fifth (7) = compound fifth, which reduces to a fifth.
-
-The 7–6 suspension requires the suspended note to be a **minor seventh** above the bass. So A4 over D3 is not a seventh; it's a perfect fifth. To write a 7–6 suspension against D3, the suspended note must be C5 (which is a minor seventh above D3: D3 = 50, C5 = 72, difference = 22 semitones = octave (12) + minor seventh (10) = compound minor seventh, reducing to a minor seventh).
-
-**Corrected 7–6 suspension chain:**
-
-```
-Measure:       1               2               3               4
-CF (bass):     C3              D3              E3              F3
-CP (treble):   C5 — B4 ——— (B4) — A4 ——— (A4) — G4 ——— (G4) — F4
-```
-
-**Analysis:**
-
-- Measure 1, beat 1: C3–C5 = P8 (preparation, consonant)
-- Measure 1, beat 2: C3–B4 = M7 (would need to be tied to next measure to be suspension, but it resolves immediately. This is not yet a suspension; it's second species. Let me restart with proper fourth species.)
-
-In true fourth species, you begin with a half-rest, then write tied half-notes throughout. Let me rewrite:
-
-```
-Measure:       1               2               3               4               5
-CF (bass):     C3              D3              E3              F3              E3
-CP (treble):   [rest] — E4 ——— E4 — D4 ——— D4 — C4 ——— C4 — B3 ——— B3 — C4
-
-Ties indicated with ———
-```
-
-**Analysis:**
-
-- Measure 1, beat 2: C3–E4 = M3 (preparation, consonant)
-- Measure 2, beat 1: D3–E4 (tied from previous) = M2 (dissonance, suspension)
-- Measure 2, beat 2: D3–D4 = P8 (resolution, consonant)
-- Measure 3, beat 1: E3–D4 (tied from previous) = m7 (dissonance, suspension)
-- Measure 3, beat 2: E3–C4 = m6 (resolution, consonant)
-- Measure 4, beat 1: F3–C4 (tied from previous) = P5 (consonant, not a suspension — this breaks the chain. Need to adjust.)
-
-The challenge in writing a continuous suspension chain is ensuring that each resolution note (the weak-beat note) is consonant with the CF, and also prepares the next suspension. This requires careful planning of the CF and counterpoint together, or choosing a CF that cooperates with the suspension pattern.
-
-**Working 7–6 suspension chain against a cooperative CF:**
-
-```
-CF (bass):     C3 — B2 — A2 — G2
-CP (treble):   [rest] — A4 ——— A4 — G4 ——— G4 — F4 ——— F4 — E4
-```
-
-**Analysis:**
-
-- Measure 1, beat 2: C3–A4 = M6 (preparation)
-- Measure 2, beat 1: B2–A4 = m7 (suspension)
-- Measure 2, beat 2: B2–G4 = M6 (resolution)
-- Measure 3, beat 1: A2–G4 = m7 (suspension)
-- Measure 3, beat 2: A2–F4 = M6 (resolution)
-- Measure 4, beat 1: G2–F4 = m7 (suspension)
-- Measure 4, beat 2: G2–E4 = M6 (resolution)
-
-Perfect. This is a 7–6 suspension chain. Each strong beat has a minor seventh (dissonance), each weak beat resolves down by step to a major sixth (consonance).
+Play it slowly on piano, both hands if needed, until the *shape* feels like a single gesture rather than four separate notes. This figure shows up constantly in Palestrina and in Bach's slow movements disguised as ornamental melody.
 
 ---
 
-## Modal Counterpoint: Before Common-Practice Tonality
+## Fourth Species (Suspensions): The Most Expressive Device in the System
 
-Fux's *Gradus ad Parnassum* was itself a systematization of *Renaissance polyphony* — the counterpoint of Palestrina, Victoria, and Lassus — not Baroque or Classical practice. The modal system underlying Renaissance counterpoint differs from tonal counterpoint in ways that are architecturally significant.
+Fourth species is where counterpoint starts to sound like real music. The defining move: tie a consonant note over the barline so it becomes **dissonant on the new strong beat**, then resolve it **down by step** on the following weak beat.
 
-In modal counterpoint, the governing interval relationships derive from the *church modes* (Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Ionian) rather than from the tonal major/minor key system. The critical difference is the treatment of the leading tone: in Phrygian mode, for example, the cadential motion is from the supertonic ($\hat{2}$) down by semitone to the final ($\hat{1}$), not from the leading tone ($\hat{7}$) up. This inverts the direction of the most structurally weighted melodic motion in the system.
+### Anatomy of a Suspension — Three Parts, Always in This Order
 
-The following table maps modal structure onto the interval-class constraints relevant to counterpoint:
+1. **Preparation** — the note is consonant, on a weak beat, before the tie.
+2. **Suspension** — the same pitch, now tied across the barline, lands on the new strong beat as a dissonance.
+3. **Resolution** — the dissonant pitch steps down to a consonance on the following weak beat.
 
-| Mode | Final | Characteristic Interval | Cadence Type | Leading Tone Behavior |
+The two workhorse suspension types (numbers count the dissonant interval, then the resolved interval, both measured up from the bass):
+
+- **7–6 suspension**: dissonant minor/major 7th resolving down to a 6th.
+- **4–3 suspension**: dissonant 4th resolving down to a 3rd.
+
+These two patterns are the literal DNA of the V7–I cadence in tonal harmony — when you hear a dominant seventh chord resolve, you are hearing a 4th-species suspension compressed into a block chord.
+
+### Drill 6 — Building a 7–6 Suspension Chain
+
+Suspension chains need a cooperating bass — not every CF supports a clean chain without adjustment. Here's a bass written specifically to let the chain work (this is a real compositional skill: when you write your own CF for a suspension exercise, work backward from the chain).
+
+**Cantus Firmus (bass):**
+```
+C3 — B2 — A2 — G2
+```
+
+**Counterpoint (treble), built as tied half notes:**
+```
+Bar:        1                2                3                4
+CF:         C3               B2               A2               G2
+CP:    [rest] — A4 ———tie——— A4 — G4 ———tie——— G4 — F4 ———tie——— F4 — E4
+```
+
+**Check every strong beat for the dissonance, every weak beat for the resolution:**
+
+| Bar | Beat 1 (strong) | Interval | Beat 2 (weak) | Interval |
 |---|---|---|---|---|
-| Dorian | D | Minor third above final | Stepwise or raised 7th | Raised 7th common in cadences |
-| Phrygian | E | Minor second above final | Semitone descent to final | No leading tone; descending $\hat{2}$–$\hat{1}$ |
-| Lydian | F | Augmented fourth above final | Stepwise descent; avoid tritone | Lowered 4th to avoid tritone |
-| Mixolydian | G | Minor seventh above final | Stepwise descent | Lowered 7th (no leading tone) |
-| Aeolian | A | Natural minor | Variable; raised 6th/7th common | Raised 6th and 7th in cadences |
-| Ionian | C | Major | Authentic cadence | Standard leading tone ($\hat{7}$–$\hat{1}$) |
+| 1 | — | (rest, setting up prep) | C3–A4 | M6 (preparation, consonant) |
+| 2 | B2–A4 | m7, **suspension** | B2–G4 | M6, **resolution** |
+| 3 | A2–G4 | m7, **suspension** | A2–F4 | M6, **resolution** |
+| 4 | G2–F4 | m7, **suspension** | G2–E4 | M6, **resolution** |
 
-The absence of a leading tone in Phrygian mode means that the goal-directed harmonic tension that underpins fourth-species suspension resolution (which relies on the leading tone's drive toward the tonic) is unavailable. Phrygian counterpoint instead uses the downward semitone motion from $\hat{2}$ as its primary closure gesture — a fundamentally different architectural logic for phrase endings.
+Every strong beat is a dissonant 7th that resolves down by step to a consonant 6th. This is the textbook 7–6 chain. **Play this slowly on piano** (CF in left hand, CP in right hand) at 50 BPM, half note = 1 click, and listen for the characteristic "lean and release" of each suspension. That lean-and-release feeling is literally what a dominant 7th chord resolving to tonic feels like — you are training the exact ear-reflex that makes functional harmony sound satisfying.
 
-### Practical Drill: Phrygian Cadence in Two Voices
+**Common mistake to avoid:** students often pick an arbitrary bass line first, then try to force a suspension chain onto it, and discover bar 4's strong beat accidentally lands on a consonance — breaking the chain. If that happens, you have two options: (a) adjust the bass note, or (b) accept that bar as a non-suspended consonant bar and resume the chain later. Don't force a dissonance where the harmony doesn't call for one.
 
-Write a two-voice first-species counterpoint ending with a Phrygian cadence to E.
+---
 
-**Cantus Firmus (Phrygian mode on E):**
+## Modal Cadences: Writing in Dorian and Phrygian
 
+Before major/minor tonality, Renaissance counterpoint (Palestrina, Victoria, Lassus) worked in the church modes. The single most practically important difference: **Phrygian mode has no leading tone.** Its cadence closes by the supertonic stepping *down* a half step to the final (2̂–1̂), not by a leading tone stepping up.
+
+### Drill 7 — Phrygian Cadence in Two Voices
+
+**Cantus Firmus (Phrygian on E):**
 ```
 E3 — F3 — G3 — F3 — E3
 ```
 
-**Counterpoint (treble):**
-
+**Counterpoint:**
 ```
 E4 — D4 — E4 — D4 — E4
 ```
 
-**Cadence analysis (final two notes):**
+**The cadence (final two notes) is the whole point of this drill:**
+- Bass: F3 → E3, a half-step descent (2̂–1̂). This is the Phrygian fingerprint.
+- Upper voice: D4 → E4, a whole-step ascent.
 
-- CF: F3 — E3 (stepwise descent by semitone)
-- CP: D4 — E4 (stepwise ascent by whole tone)
+Play this cadence on piano at a slow tempo and compare it immediately to a standard authentic cadence (G–C in C major, leading tone B rising to C). The Phrygian close sounds softer, less "final," almost suspended in air — because there's no leading-tone pull driving it. Composers exploit this on purpose: it's why Renaissance motets often end a middle phrase on a Phrygian half-cadence to keep momentum going, saving a true authentic-feeling close for the very end.
 
-The interval F3–D4 is a major sixth; the final interval E3–E4 is a perfect octave. The characteristic Phrygian cadence is the bass descending by semitone ($\hat{2}$–$\hat{1}$) while the upper voice ascends by whole tone ($\hat{7}$–$\hat{1}$, but in Phrygian the "seventh" is a whole tone below the final, not a semitone). This cadence sounds less conclusive than the Ionian authentic cadence because it lacks the leading-tone resolution, but it is the idiomatic closure for Phrygian mode.
+**Practice target:** write four more 5-note Phrygian phrases ending the same way, varying only the approach. Internalizing this sound is essential if you ever write modal jazz lines (Phrygian is also the basis of the classic "Spanish" cadence heard in flamenco and in modal jazz tunes) — the counterpoint drill and the improviser's ear are training the same reflex.
 
 ---
 
 ## Invertible Counterpoint at the Octave
 
-*Invertible counterpoint* (also called *double counterpoint*) is a technique in which two melodic lines are composed so that they remain valid counterpoint when their vertical positions are exchanged — the former upper voice becomes the lower, and vice versa. For this exchange to produce no new voice-leading violations, the interval structure must be symmetric under inversion at the designated interval of invertibility.
+Write two voices so that swapping which one is on top (transposing the lower voice up an octave, the upper voice down an octave) still produces valid counterpoint. This is a real compositional technique — Bach uses it constantly in fugue expositions to make the same material work as both subject-under-countersubject and countersubject-under-subject.
 
-The most common form is double counterpoint at the octave. When a two-voice texture is inverted at the octave, each interval $n$ (in scale-step terms, where unison = 1) becomes its octave complement $9 - n$. The transformation table for octave inversion is:
+**The one fact you need:** when you invert at the octave, every interval flips to its complement: a 3rd becomes a 6th, a 6th becomes a 3rd, an octave becomes a unison. **The dangerous one is the 5th, which becomes a 4th** — and a bare 4th in two-voice writing is treated as a dissonance (no third voice below to support it as a 6/4 chord). 
 
-| Original Interval (scale steps) | Inverted Interval (scale steps) | Consonance Preserved? |
-|---|---|---|
-| Unison (1) | Octave (8) | Yes |
-| Second (2) | Seventh (7) | Dissonance ↔ Dissonance |
-| Third (3) | Sixth (6) | Yes |
-| Fourth (4) | Fifth (5) | Conditional — P4 becomes P5 |
-| Fifth (5) | Fourth (4) | Conditional — P5 becomes P4 |
-| Sixth (6) | Third (3) | Yes |
-| Seventh (7) | Second (2) | Dissonance ↔ Dissonance |
-| Octave (8) | Unison (1) | Yes |
+**Practical rule: avoid perfect 5ths entirely when writing invertible counterpoint for two voices**, unless a third voice will always be present to catch the inversion.
 
-The critical problem is the fifth/fourth exchange: a perfect fifth in the original becomes a perfect fourth in the inversion, and in strict counterpoint a perfect fourth above the bass is a dissonance (because the bass note is not the root of the interval). To write double counterpoint at the octave, the composer must therefore either avoid perfect fifths entirely or ensure that any fifth occurs in a context where the resulting fourth in the inversion will be consonant (e.g., if another voice provides a consonant foundation).
+### Drill 8 — Writing and Testing an Invertible Pair
 
-### Practical Drill: Writing Invertible Counterpoint at the Octave
-
-Compose a two-voice first-species counterpoint that remains valid when inverted at the octave.
-
-**Original version:**
-
-```
-Voice 1 (upper): C5 — D5 — E5 — F5 — E5 — D5 — C5
-Voice 2 (lower): C4 — B3 — A3 — A3 — G3 — F3 — C4
-```
-
-**Interval analysis (original):**
-
-- C4–C5: P8
-- B3–D5: M3 (compound)
-- A3–E5: P5 (compound)
-- A3–F5: M6 (compound)
-- G3–E5: M6 (compound)
-- F3–D5: M6 (compound)
-- C4–C5: P8
-
-**Inverted version (voices swapped and transposed):**
-
-```
-Voice 1 (upper): C5 — B4 — A4 — A4 — G4 — F4 — C5  (was Voice 2, transposed up an octave)
-Voice 2 (lower): C4 — D4 — E4 — F4 — E4 — D4 — C4  (was Voice 1, transposed down an octave)
-```
-
-**Interval analysis (inverted):**
-
-- C4–C5: P8
-- D4–B4: M6
-- E4–A4: P4 (here's the problem — perfect fourth above the bass)
-- F4–A4: M3
-- E4–G4: m3
-- D4–F4: m3
-- C4–C5: P8
-
-The third interval (E4–A4) is a perfect fourth with the lower voice as the bass. In strict two-voice counterpoint, this is a dissonance. The original fifth (A3–E5) became a fourth (E4–A4) upon inversion, and since there is no third voice to support it, the inversion is not valid strict counterpoint.
-
-**Fix:** Avoid the perfect fifth in the original. Replace the third interval pair.
-
-**Corrected original version:**
-
+**Original (avoiding 5ths from the start):**
 ```
 Voice 1 (upper): C5 — D5 — E5 — D5 — E5 — D5 — C5
 Voice 2 (lower): C4 — B3 — C4 — B3 — G3 — F3 — C4
 ```
 
-**Interval analysis (original, corrected):**
+Check the original for any perfect 5ths before inverting — there are none (M3, M3, M3, M6, M6 throughout). Good start.
 
-- C4–C5: P8
-- B3–D5: M3
-- C4–E5: M3
-- B3–D5: M3
-- G3–E5: M6
-- F3–D5: M6
-- C4–C5: P8
-
-No perfect fifths. Now invert:
-
-**Inverted version (corrected):**
-
+**Now invert** — Voice 2 moves up an octave to become the new top, Voice 1 moves down an octave to become the new bottom:
 ```
 Voice 1 (upper): C5 — B4 — C5 — B4 — G4 — F4 — C5
 Voice 2 (lower): C4 — D4 — E4 — D4 — E4 — D4 — C4
 ```
 
-**Interval analysis (inverted, corrected):**
-
-- C4–C5: P8
-- D4–B4: M6
-- E4–C5: M6
-- D4–B4: M6
-- E4–G4: m3
-- D4–F4: m3
-- C4–C5: P8
-
-All intervals are consonant in both versions. This is valid double counterpoint at the octave.
+Check again: P8, M6, M6, M6, m3, m3, P8 — all consonant. **The pair survives inversion intact.** This is the actual test you run every time: write it, invert it on paper, re-check every interval. If a 4th shows up where a 5th used to be, go back and remove the 5th from the original before you've built anything on top of it.
 
 ---
 
-## Counterpoint in Tonal Harmony: The Bridge to Common Practice
+## From Species Counterpoint to Chorale Writing
 
-The transition from species counterpoint to tonal harmonic practice is not a rupture but a compression. The chord progressions of common-practice tonality can be understood as the residue of voice-leading constraints operating across multiple simultaneous voices. The *IV–V–I* cadential formula is, at the voice-leading level, a species counterpoint exercise: soprano descends $\hat{5}–\hat{4}–\hat{3}$ or $\hat{3}–\hat{2}–\hat{1}$, the leading tone in the tenor ascends $\hat{7}–\hat{1}$, and the bass descends by fifth $\hat{5}–\hat{1}$ or a full plagal $\hat{4}–\hat{5}–\hat{1}$. Each voice is following the stepwise or semitone-motion preferences of linear counterpoint; the "chord progression" is the harmonic cross-section of several simultaneous melodic lines.
+The IV–V–I cadence you already know from harmony class is counterpoint in disguise: four lines, each obeying stepwise/suspension logic, that happen to cross-section into named chords. Writing a four-voice chorale is the direct, practical extension of everything above.
 
-```mermaid
-flowchart LR
-    subgraph sub_soprano ["Soprano Voice"]
-        S1["E5 (M̂3)"]
-        S2["D5 (M̂2)"]
-        S3["C5 (M̂1)"]
-    end
+### Drill 9 — Four-Voice Chorale with Voice-Leading Priority
 
-    subgraph sub_alto ["Alto Voice"]
-        A1["C5 (M̂1)"]
-        A2["B4 (M̂7)"]
-        A3["C5 (M̂1)"]
-    end
-
-    subgraph sub_tenor ["Tenor Voice"]
-        T1["G4 (P̂5)"]
-        T2["G4 (P̂5)"]
-        T3["E4 (M̂3)"]
-    end
-
-    subgraph sub_bass ["Bass Voice"]
-        B1["C3 (M̂1)"]
-        B2["G2 (P̂5)"]
-        B3["C3 (M̂1)"]
-    end
-
-    S1 --> S2 --> S3
-    A1 --> A2 --> A3
-    T1 --> T2 --> T3
-    B1 --> B2 --> B3
-
-    S1 & A1 & T1 & B1 -.->|"I (C major)"| CH1[" "]
-    S2 & A2 & T2 & B2 -.->|"V (G major)"| CH2[" "]
-    S3 & A3 & T3 & B3 -.->|"I (C major)"| CH3[" "]
-```
-
-The I–V–I progression here is generated by the voice-leading requirements: each voice moves to the nearest available consonant pitch. The "harmonic" analysis (I, V, I) is a *labeling* of the vertical cross-sections; the causal logic is the horizontal motion of the voices, not the other way around. This is the fundamental insight that separates voice-leading–based analysis (Schenkerian analysis) from chord-symbol–based analysis (Roman numeral theory).
-
-### Practical Drill: Four-Voice Chorale Harmonization with Voice-Leading Priority
-
-Harmonize the following soprano melody in four voices (SATB), prioritizing voice-leading over harmonic completeness.
-
-**Soprano melody:**
-
+**Soprano given:**
 ```
 C5 — D5 — E5 — F5 — E5 — D5 — C5
 ```
 
-**Procedure:**
+**Procedure, in order — do not skip steps:**
+1. Write the bass first: establish tonic and dominant arrival points, start and end on the tonic note.
+2. Fill alto and tenor with the smoothest possible stepwise motion — treat them like counterpoint voices against both soprano and bass simultaneously.
+3. After every chord, check **every pair of voices** (S–A, S–T, S–B, A–T, A–B, T–B — six pairs total) for parallel 5ths/octaves between consecutive chords. This is tedious and nobody skips it without paying for it later.
+4. Resolve the leading tone up by step whenever it appears in any voice, unless it's in an outer voice moving as part of a deliberate melodic descent at a deceptive or plagal gesture.
 
-1. Bass line: establish a strong harmonic foundation. Start and end on C (tonic). Use I, IV, V, and vi as primary chords.
-2. Alto and tenor: fill in the inner voices using stepwise motion as much as possible.
-3. Avoid parallel fifths and octaves between any pair of voices.
-4. Resolve the leading tone (B) upward to C when it appears in an inner voice.
-
-**Sample harmonization:**
-
+**First attempt (deliberately includes a common student error, for diagnostic purposes):**
 ```
-Soprano: C5    D5    E5    F5    E5    D5    C5
-Alto:    E4    F4    G4    A4    G4    F4    E4
-Tenor:   G3    A3    C4    C4    C4    B3    G3
-Bass:    C3    D3    C3    F2    C3    G2    C3
-
-Chords:  I     viio6  I6   IV    I6    V6    I
+Soprano: C5   D5   E5   F5   E5   D5   C5
+Alto:    E4   F4   G4   A4   G4   F4   E4
+Tenor:   G3   A3   C4   C4   C4   B3   G3
+Bass:    C3   D3   C3   F2   C3   G2   C3
 ```
 
-**Voice-leading analysis:**
+**Run the six-pair check on bars 1–2 specifically between Soprano and Tenor:**
+- Bar 1: C5–G3 = P5.
+- Bar 2: D5–A3 = P5.
 
-- Soprano: stepwise throughout (good)
-- Alto: stepwise throughout (good)
-- Tenor: G3 → A3 (step), A3 → C4 (minor third, acceptable), C4 → C4 (stationary), C4 → C4 (stationary), C4 → B3 (step), B3 → G3 (minor third, acceptable)
-- Bass: C3 → D3 (step), D3 → C3 (step), C3 → F2 (fourth down, acceptable for bass), F2 → C3 (fourth up), C3 → G2 (fourth down), G2 → C3 (fourth up)
+Both voices moved up by step into the same interval class. **Parallel fifths between soprano and tenor** — easy to miss because you were watching soprano/bass and alto/tenor, and this pair slipped through. This is exactly why you check all six pairs, every time, without exception.
 
-**Check for parallel perfect fifths and octaves:**
-
-- Soprano–Alto: C5/E4 (M6) → D5/F4 (M6) — no parallels
-- Soprano–Tenor: C5/G3 (P5) → D5/A3 (P5) — **parallel perfect fifths detected!**
-
-This harmonization has a voice-leading error. The parallel fifths between soprano and tenor in the first two chords must be corrected.
-
-**Corrected harmonization:**
-
+**Corrected:**
 ```
-Soprano: C5    D5    E5    F5    E5    D5    C5
-Alto:    E4    F4    G4    A4    G4    F4    E4
-Tenor:   G3    G3    C4    C4    C4    B3    G3  ← Tenor G3 held stationary
-Bass:    C3    B2    C3    F2    C3    G2    C3
-
-Chords:  I     V6/5  I     IV    I6    V     I
+Soprano: C5   D5   E5   F5   E5   D5   C5
+Alto:    E4   F4   G4   A4   G4   F4   E4
+Tenor:   G3   G3   C4   C4   C4   B3   G3
+Bass:    C3   B2   C3   F2   C3   G2   C3
 ```
 
-**Re-check for parallel perfect fifths:**
+Tenor now holds G3 stationary into bar 2 instead of moving to A3. Re-check S–T: bar 1 C5–G3 (P5), bar 2 D5–G3 (P5) — the interval class repeats, but the tenor voice didn't move (oblique motion). **Oblique motion into a repeated perfect interval is not the banned parallel motion** — only *both voices moving* into consecutive perfect intervals is prohibited. This passes.
 
-- Soprano–Tenor: C5/G3 (P5) → D5/G3 (P5) — both notes are perfect fifths, but the tenor is *stationary* (oblique motion). This is permitted because it is not parallel motion.
-
-No more parallel fifths. This is a valid four-voice harmonization with strong voice-leading.
+**Practice target:** harmonize four different 7-note soprano melodies this way, checking all six voice pairs by hand every time, before moving to chorale harmonization with a figured bass given. Speed comes after accuracy — don't rush this step.
 
 ---
 
-## Common Errors and Their Structural Causes
+## Common Errors — Quick Diagnostic Table
 
-The following table maps the most frequent species counterpoint errors to their underlying perceptual or acoustic cause, providing a diagnostic framework rather than a checklist.
+Use this as a final-pass checklist on every exercise you write.
 
-| Error | Surface Description | Underlying Cause |
+| What you see on the page | What it means | Fix |
 |---|---|---|
-| Parallel perfect fifths | Two voices move to a perfect fifth in parallel motion | Perceptual fusion: voices lose independence as a single acoustic stream |
-| Parallel octaves | Two voices move to an octave in parallel motion | Complete fusion: upper voice doubles lower, destroying contrapuntal texture |
-| Hidden (direct) fifths | Similar motion to a P5 with the upper voice leaping | Implicit parallel motion; the skip implies the intermediate parallel motion aurally |
-| Consecutive unisons | Voices converge to a unison and remain there | Total stream merger; voices cease to exist independently |
-| Augmented melodic interval | Melody skips an augmented second, fourth, or other augmented interval | Unsingable in vocal style; auditory stream discontinuity |
-| Unresolved suspension | A dissonance on the strong beat is left by leap or not resolved | The partial-beating tension is not resolved; listener perceives incompletion |
-| Voice crossing | Lower voice ascends above upper voice | Auditory stream reassignment; listener re-labels the voices |
-| Leap to a dissonance | A melodic skip lands on a dissonant interval | The dissonance has no prepared context; sounds arbitrary and harsh |
-| Failure to recover large leap | A sixth or octave leap is not followed by stepwise motion in the opposite direction | The melodic line loses its linear coherence; sounds fragmented |
-| Similar motion to perfect consonance without stepwise upper voice | Both voices move in same direction to P5 or P8, upper voice leaps | Creates the effect of parallel motion; weakens independence |
+| Two voices both leap or step into a 5th or octave, same direction | Parallel perfect motion — voices fuse | Change one note; prefer contrary motion |
+| Similar motion into a 5th/octave, upper voice arrives by leap | "Hidden" fifth/octave — same fusion effect, disguised | Make the upper voice approach by step, or use contrary motion |
+| A weak-beat dissonant note that doesn't continue stepwise in one direction | Not a valid passing tone | Decide the destination note before writing the passing note |
+| A tied-over dissonance that resolves up or by leap | Broken suspension | Suspensions always resolve **down by step** |
+| A melodic augmented 2nd or tritone | Unsingable, breaks the sense of a single line | Respell or rewrite around the interval |
+| One voice crosses above/below the other | Auditory stream reassignment — the ear re-labels which line is "on top" | Keep each voice in its lane throughout the exercise |
+| A 6th or octave leap with no stepwise recovery after | Line loses coherence, sounds like two disconnected fragments | Follow any leap of a 4th or larger with stepwise motion, ideally reversing direction |
 
 ---
 
-## Formal Representation: Counterpoint as a Constraint Satisfaction Problem
+## Practice Plan: Building This Into Real Fluency
 
-Counterpoint is precisely specifiable as a *constraint satisfaction problem* (CSP). This formulation underpins algorithmic approaches used in computational counterpoint generation systems from Schoenberg's theoretical formalism to Ebcioglu's CHORAL expert system (1988).
+This is not a one-read topic. Schedule it like technique practice on an instrument:
 
-**Variables:** Each note position in the counterpoint voice is a variable $x_i$ with domain $D_i$ (the set of pitches permitted in the range of the voice).
+- **Week 1:** First species only. Write five CFs of your own (8 notes, mostly steps, one leap of a 3rd or 4th, start/end on tonic). Write CP above and below each. Check every pair of intervals by hand.
+- **Week 2:** Second species. Take your Week 1 first-species solutions and "subdivide" them — turn some whole notes into passing-tone pairs. This teaches you to hear the skeleton underneath the ornamentation.
+- **Week 3:** Fourth species. Deliberately write suspension chains (7–6 and 4–3) over new CFs. Play them on piano at 50–60 BPM and listen for the lean-and-release.
+- **Week 4:** Four-voice chorale harmonization of a given soprano line, full six-pair parallel check on every chord change.
 
-**Constraints:**
-
-- $\text{interval}(x_i, \text{CF}_i) \in \text{Consonances}$ for all strong-beat positions $i$
-- $\neg\text{parallel\_perfect}(x_{i-1}, x_i, \text{CF}_{i-1}, \text{CF}_i)$ for all consecutive pairs
-- $|\text{melodic\_interval}(x_{i-1}, x_i)| \leq 8$ semitones (avoid leaps larger than a sixth, with exceptions)
-- $\text{recover}(x_{i-1}, x_i, x_{i+1})$ when $|\text{melodic\_interval}(x_{i-1}, x_i)| > 4$ semitones
-
-The search space is exponential in the length of the CF, but the constraint density makes it tractable for typical CF lengths (8–16 notes) with backtracking search. The following Python implementation demonstrates a first-species CSP solver using backtracking with forward checking:
-
-```python
-"""
-First-species counterpoint solver using backtracking with constraint propagation.
-Operates over a diatonic scale (C major by default); intervals are computed
-in semitone space for precision.
-"""
-
-from __future__ import annotations
-from typing import Sequence
-
-# Pitch representation: MIDI note numbers (C4 = 60)
-# Interval quality lookup in semitones
-CONSONANCES = {0, 3, 4, 7, 8, 9, 12}  # unison, m3, M3, P5, m6, M6, octave
-PERFECT_CONSONANCES = {0, 7, 12}       # unison, P5, octave
-
-C_MAJOR_SCALE = [60, 62, 64, 65, 67, 69, 71, 72]  # C4–C5
-
-
-def interval_semitones(pitch_a: int, pitch_b: int) -> int:
-    """Return the interval class (mod 12, non-negative) between two pitches."""
-    return abs(pitch_a - pitch_b) % 12
-
-
-def is_consonant(pitch_a: int, pitch_b: int) -> bool:
-    return interval_semitones(pitch_a, pitch_b) in CONSONANCES
-
-
-def is_perfect_consonance(pitch_a: int, pitch_b: int) -> bool:
-    return interval_semitones(pitch_a, pitch_b) in PERFECT_CONSONANCES
-
-
-def parallel_perfect(cf_prev: int, cf_curr: int,
-                     cp_prev: int, cp_curr: int) -> bool:
-    """
-    Return True if the motion from (cf_prev, cp_prev) to (cf_curr, cp_curr)
-    constitutes parallel motion to a perfect consonance.
-    """
-    if not is_perfect_consonance(cf_curr, cp_curr):
-        return False
-    # Both voices must move in the same direction (parallel motion)
-    cf_motion = cf_curr - cf_prev
-    cp_motion = cp_curr - cp_prev
-    # Parallel motion: both non-zero and same sign
-    if cf_motion == 0 or cp_motion == 0:
-        return False  # Oblique motion, not parallel
-    return (cf_motion > 0 and cp_motion > 0) or (cf_motion < 0 and cp_motion < 0)
-
-
-def direct_fifth_or_octave(cf_prev: int, cf_curr: int,
-                            cp_prev: int, cp_curr: int) -> bool:
-    """
-    Return True if similar motion leads to a perfect fifth or octave
-    without the upper voice moving by step (the 'hidden' or 'direct' fifth/octave).
-    """
-    interval = interval_semitones(cf_curr, cp_curr)
-    if interval not in {7, 12}:  # P5 or P8
-        return False
-    cf_motion = cf_curr - cf_prev
-    cp_motion = cp_curr - cp_prev
-    # Similar motion: same direction, but not both stationary
-    if cf_motion == 0 or cp_motion == 0:
-        return False
-    is_similar = (cf_motion > 0 and cp_motion > 0) or (cf_motion < 0 and cp_motion < 0)
-    if not is_similar:
-        return False
-    # Upper voice (cp) must move by step if approaching P5 or P8 in similar motion
-    # Assume cp is upper voice
-    upper_voice_stepwise = abs(cp_curr - cp_prev) <= 2  # semitones
-    return not upper_voice_stepwise  # Error if upper voice does NOT move by step
-
-
-def melodic_ok(prev_pitch: int, curr_pitch: int) -> bool:
-    """
-    Validate a melodic interval:
-    - Stepwise motion (semitones 1–2) always permitted.
-    - Thirds (3–4 semitones) permitted.
-    - Fourths (5 semitones) permitted.
-    - Fifths (7 semitones) permitted with care; allowed here.
-    - Sixths (8–9 semitones) permitted but disfavored.
-    - Sevenths (10–11 semitones), tritones (6 semitones) prohibited.
-    """
-    diff = abs(curr_pitch - prev_pitch)
-    return diff in {0, 1, 2, 3, 4, 5, 7, 8, 9}
-
-
-def solve_first_species(
-    cantus_firmus: Sequence[int],
-    voice_range: Sequence[int],
-    start_index: int = 0,
-    partial: list[int] | None = None,
-) -> list[int] | None:
-    """
-    Backtracking solver for first-species counterpoint.
-
-    Args:
-        cantus_firmus: Sequence of MIDI pitches for the CF voice.
-        voice_range:   Allowable MIDI pitches for the counterpoint voice.
-        start_index:   Current position in the CF (used in recursion).
-        partial:       Partial solution built so far.
-
-    Returns:
-        A complete counterpoint solution, or None if no solution exists.
-    """
-    if partial is None:
-        partial = []
-
-    if start_index == len(cantus_firmus):
-        return partial  # Complete solution found
-
-    cf_pitch = cantus_firmus[start_index]
-    is_first = start_index == 0
-    is_last = start_index == len(cantus_firmus) - 1
-
-    for cp_pitch in voice_range:
-        # --- Harmonic constraints ---
-        if not is_consonant(cf_pitch, cp_pitch):
-            continue
-        # Final measure must be unison or octave
-        if is_last and interval_semitones(cf_pitch, cp_pitch) not in {0, 12}:
-            continue
-        # Avoid unison except at phrase boundaries in strict style
-        if not is_first and not is_last:
-            if interval_semitones(cf_pitch, cp_pitch) == 0:
-                continue
-
-        # --- Melodic constraints ---
-        if partial and not melodic_ok(partial[-1], cp_pitch):
-            continue
-
-        # --- Motion constraints (requires at least one prior note) ---
-        if partial:
-            cf_prev = cantus_firmus[start_index - 1]
-            cp_prev = partial[-1]
-
-            if parallel_perfect(cf_prev, cf_pitch, cp_prev, cp_pitch):
-                continue
-            if direct_fifth_or_octave(cf_prev, cf_pitch, cp_prev, cp_pitch):
-                continue
-            # Prohibit voice crossing (assuming cp is upper voice)
-            if cp_pitch < cf_pitch:
-                continue
-
-        # Recurse
-        result = solve_first_species(
-            cantus_firmus, voice_range,
-            start_index + 1, partial + [cp_pitch]
-        )
-        if result is not None:
-            return result
-
-    return None  # Backtrack
-
-
-if __name__ == "__main__":
-    # Cantus firmus: C D E F G A G F E D C (C major)
-    cf = [60, 62, 64, 65, 67, 69, 67, 65, 64, 62, 60]
-
-    # Counterpoint voice range: a tenth above the CF
-    cp_range = list(range(64, 81))  # E4 to A5
-
-    solution = solve_first_species(cf, cp_range)
-
-    if solution:
-        note_names = ['C', 'C#', 'D', 'D#', 'E', 'F',
-                      'F#', 'G', 'G#', 'A', 'A#', 'B']
-        def midi_to_name(m: int) -> str:
-            return f"{note_names[m % 12]}{m // 12 - 1}"
-
-        print("Cantus Firmus:   ", " ".join(midi_to_name(p) for p in cf))
-        print("Counterpoint:    ", " ".join(midi_to_name(p) for p in solution))
-        intervals = [interval_semitones(c, s) for c, s in zip(cf, solution)]
-        print("Interval classes:", intervals)
-    else:
-        print("No solution found.")
-```
-
-The solver above enforces the invariants as hard constraints and uses backtracking to explore the domain of permissible counterpoint notes. For production use, this architecture would be extended with heuristic ordering (prefer contrary motion, prefer thirds and sixths over fifths and octaves) and arc-consistency propagation to prune the search space before backtracking.
+At the keyboard, play your CF in the left hand and your CP in the right hand at a slow, steady tempo — start at 50 BPM, quarter note = 1 click for species with subdivision, half note = 1 click for first species — and only increase tempo once you can play it with zero hesitation and correct fingering in both hands. The goal isn't speed; it's internalizing the sound of correct voice-leading so thoroughly that a parallel fifth sounds *wrong* to your ear before you've even finished writing it down.
 
 ---
 
-## Interval Taxonomy and Motion Types: A Reference Architecture
+## The Five Invariants — What Never Changes, Regardless of Species or Style
 
-```mermaid
-flowchart TD
-    subgraph sub_consonances ["Consonances (Structurally Stable)"]
-        PC["Perfect Consonances\nUnison (P1)\nPerfect Fifth (P5)\nOctave (P8)"]
-        IC["Imperfect Consonances\nMajor/Minor Third (M3/m3)\nMajor/Minor Sixth (M6/m6)"]
-    end
+No matter how ornamented the rhythm gets — first species up through full Baroque fugue — these five properties hold:
 
-    subgraph sub_dissonances ["Dissonances (Require Resolution)"]
-        MD["Mild Dissonances\nMajor/Minor Second (M2/m2)\nMajor/Minor Seventh (M7/m7)"]
-        SD["Sharp Dissonance\nAugmented Fourth / Tritone (A4/d5)"]
-    end
+1. **Voice independence.** Each line must remain audibly its own melody. Parallel perfect motion, voice crossing, and static repetition all work against this.
+2. **Metric hierarchy.** Dissonance is only ever tolerated when a nearby strong-beat consonance anchors it. The stronger the beat, the stronger the anchor needed.
+3. **Linear coherence.** Every voice must be singable and directional on its own. Leaps get recovered; they don't get abandoned.
+4. **Directed resolution.** Every dissonance has a specific, required destination reached by step — down for suspensions, continuing direction for passing tones. There's no such thing as an unresolved dissonance that "just sounds fine."
+5. **Acoustic grounding.** None of this is arbitrary convention. It follows directly from how overtones align (or don't) and how the ear groups simultaneous sounds into separate streams versus one fused sound.
 
-    subgraph sub_motion ["Motion Types Between Two Voices"]
-        CM["Contrary Motion\nVoices move in opposite directions\n(Strongest independence signal)"]
-        PM["Parallel Motion\nVoices move same direction, same interval size\n(Fusion risk; forbidden to perfect intervals)"]
-        SM["Similar Motion\nVoices move same direction, different interval sizes\n(Permitted with restrictions)"]
-        OM["Oblique Motion\nOne voice stationary\n(Always permitted; no motion conflicts)"]
-    end
-
-    PC -->|"Used freely as structural pillars"| CM
-    IC -->|"Preferred for inner phrases"| CM
-    MD -->|"Allowed on weak beats as passing/neighbor tones"| SM
-    SD -->|"Avoided; resolved inward by step"| OM
-```
-
-### Why Imperfect Consonances Are Preferred in Inner Phrases
-
-A common misconception is that perfect consonances — fifths and octaves — are the "best" intervals and therefore most desirable. In counterpoint, the opposite is pragmatically true for inner phrase positions. Perfect consonances are so acoustically fused that their overuse destroys voice independence. The two voices collapse into a single perceptual stream. Imperfect consonances (thirds and sixths) provide harmonic stability while maintaining enough spectral difference between the voices that the auditory system segregates them as distinct melodic streams. This is the same perceptual mechanism that makes parallel thirds and sixths in folk harmonization (gymel in medieval English practice, thirds in Iberian villancicos) so effective: consonant enough to be stable, independent enough to be interesting.
-
----
-
-## Summary: The System Invariants
-
-Counterpoint is a formal system with the following core invariants — properties that must hold for any valid solution at any level of species complexity:
-
-1. **Voice independence**: Every voice must be auditorily segregable as a distinct melodic stream at all times. Parallel perfect consonances, voice crossing, and monotone repetition all violate this invariant.
-
-2. **Metric hierarchy**: Dissonance is permissible only in contexts where a proximate consonance (on a metrically stronger beat) provides the harmonic anchor. The strength of the anchor scales with its metric weight.
-
-3. **Linear coherence**: Each voice, read in isolation, must constitute a singable, directionally coherent melody. Leaps must be followed by recovery; large skips must be earned by prior context.
-
-4. **Directed resolution**: Every dissonance has a specific resolution target — a consonant pitch reachable by step in the direction dictated by the dissonance type (downward for suspensions, continuation of direction for passing tones). Deviation from this target is a structural failure, not merely an aesthetic one.
-
-5. **Acoustic grounding**: The preference for consonance and the prohibition on specific dissonances are grounded in the physics of partial-tone coincidence. The rules are not arbitrary cultural conventions; they are specifications of the conditions under which the human auditory system perceives multiple simultaneous sound streams as a coherent, organized whole rather than an undifferentiated noise field.
-
-These five invariants apply equally to two-voice first species and to the eight-voice choral polyphony of Palestrina or the six-voice ricercars of Bach. The species scaffold is a pedagogical reduction; the invariants are the architecture.
+Master these at the two-voice level and you have, in miniature, everything you need to read a Bach chorale, write a convincing bassline against a chord progression, or understand why a four-part vocal arrangement either breathes or collapses into mud.
