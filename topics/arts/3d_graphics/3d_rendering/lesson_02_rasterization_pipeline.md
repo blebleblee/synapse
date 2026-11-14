@@ -1,0 +1,121 @@
+# Lesson 2: Rasterization Pipeline Architecture
+
+## 1. First-Principles Intuition & Invariants
+
+The rasterization pipeline is the bridge between mathematical geometry—infinitely precise triangles, lines, and curves defined in continuous 3D space—and the discrete pixel grid of your display. When you load a 3D model into Blender or any real-time renderer, that model exists initially as a collection of vertex coordinates, normal vectors, texture coordinates, and topology rules. The rasterization pipeline's job is to transform those abstract mathematical primitives into a grid of colored pixels that your monitor can display at interactive frame rates.
+
+To build intuition, imagine tracing a single triangle from 3D space onto a 2D canvas using a perspective camera. First, you must project each vertex from world space through the camera's view matrix and then apply the perspective division—essentially crushing the 3D point onto a 2D screen plane. Once all three vertices land on the screen as 2D points, you need to determine which pixels inside the triangle's boundary should be filled. This process of determining which pixels belong to a primitive is called rasterization, and it is the core operation that transforms continuous geometry into discrete pixels.
+
+But the process doesn't stop at determining which pixels to fill. Each pixel in the final image must also store depth information so that overlapping triangles are rendered in the correct order—a closer triangle should occlude a farther one. Additionally, each pixel carries color, lighting, and material information, all of which must be interpolated smoothly across the surface of the triangle based on values stored at the vertices. The rasterization pipeline orchestrates all of these operations in a highly parallel fashion, processing millions of triangles and billions of pixels per frame.
+
+The fundamental invariant underlying modern rasterization is that it is *order-independent* at the per-pixel level—meaning that the final pixel color is determined solely by which primitive is closest to the camera, not by the order in which primitives are submitted to the renderer. This is achieved through the depth buffer (also called the z-buffer), a 2D array that stores the depth value of the closest fragment seen so far at each pixel. When a new fragment arrives, its depth is compared against the stored depth; only if it is closer does the fragment update both the depth buffer and the color buffer. This depth-testing mechanism is what enables us to render complex scenes with millions of overlapping triangles without worrying about drawing them in back-to-front order.
+
+Another foundational principle is that the rasterization pipeline operates in parallel stages. Modern GPUs contain thousands of small processors that operate independently on different vertices, different primitives, and different pixels simultaneously. Understanding this parallelism is essential because it shapes how you organize data, how you structure your shaders, and how you think about performance bottlenecks. A vertex shader runs in parallel on every vertex; a fragment shader (also called a pixel shader) runs in parallel on every pixel covered by a primitive. If your vertex shader is inefficient, it becomes a bottleneck for all vertices; if your fragment shader is inefficient, it becomes a bottleneck for all pixels.
+
+The rasterization pipeline also enforces a strict separation of concerns through its fixed-function hardware stages. Some stages—like vertex transformation and primitive assembly—are highly optimized for specific mathematical operations and cannot be customized. Other stages—like vertex shading and fragment shading—are programmable through GLSL, HLSL, or other shader languages, allowing you to implement custom lighting, material effects, and visual processing. Still other stages—like the depth test and blending—are configurable through API calls but are implemented in fixed hardware. Understanding which stages are programmable, which are configurable, and which are immutable is crucial for effective GPU programming.
+
+The final invariant is that rasterization is fundamentally a *scan-conversion* problem. Given a triangle defined by three 2D points (after projection), we must efficiently determine which pixels fall inside or on the boundary of that triangle. This seems simple for a single triangle, but when you are processing billions of pixels per frame, the scan-conversion algorithm's efficiency directly impacts frame rate. Early GPU rasterizers used simple edge functions to test each pixel; modern GPUs use hierarchical z-buffers, early z-rejection, and conservative rasterization to accelerate this process dramatically.
+
+## 2. Core Architecture & Mechanics
+
+The rasterization pipeline consists of several distinct stages, each with its own data structures and algorithms. Understanding the data flow through these stages is essential for optimizing rendering performance and diagnosing visual artifacts.
+
+### Vertex Processing and Transformation
+
+The journey begins with vertex processing. Each vertex in your mesh arrives as a bundle of attributes: position (usually in local object space), surface normal, tangent vector, texture coordinates, vertex color, bone weights (for skeletal animation), and any custom per-vertex data your shader requires. The vertex shader is your opportunity to modify these attributes before they proceed downstream.
+
+In the vertex shader, you typically perform several standard transformations. First, you transform the vertex position from local object space into world space by multiplying by the model matrix. Then you transform into camera (view) space by multiplying by the view matrix. Finally, you apply the perspective projection matrix to move the vertex into clip space. This chain of multiplications—model-view-projection or MVP—is so common that it is often precomputed as a single combined matrix to reduce per-vertex computation.
+
+Beyond coordinate transformation, the vertex shader is also responsible for per-vertex lighting calculations in older forward-rendering pipelines, vertex animation (bone deformation), displacement mapping, and any other per-vertex effects. The key constraint is that the vertex shader has access only to the current vertex's data; it cannot access neighboring vertices or any global scene information. This limitation is what enables massive parallelism—each vertex can be processed independently on a different GPU core.
+
+After vertex shading, each vertex exits with its transformed position in clip space, meaning coordinates range from −1 to +1 (or 0 to 1 in some APIs) along each axis. Crucially, the vertex also carries an additional coordinate: the *w* component, which represents the homogeneous coordinate used for perspective projection. This w value varies across the screen based on distance from the camera; nearby geometry has a larger w, while distant geometry has a smaller w. The w coordinate is essential for correct interpolation of varying data across the triangle surface, as you will see shortly.
+
+### Primitive Assembly and Clipping
+
+Once vertices exit the vertex shader, they are grouped into primitives. In most rendering, primitives are triangles—the most common choice because any convex or non-convex polygon can be decomposed into triangles, and triangles have the mathematical property that they always lie in a single plane, making rasterization straightforward.
+
+After vertices are assembled into triangles, the next stage is clipping. Clipping is the process of intersecting the triangle against the view frustum—the pyramidal region of space visible by the camera. Any part of a triangle that extends outside the frustum is discarded; any part that extends inside is kept. Naively, this sounds expensive: for each triangle, you might need to test whether it intersects the six planes of the frustum, compute intersection points, and potentially subdivide the triangle into multiple smaller triangles.
+
+In practice, GPUs implement hierarchical clipping. First, a quick bounding-box test determines whether the triangle is entirely inside, entirely outside, or partially overlapping the frustum. If the triangle is entirely inside, it proceeds unchanged to the next stage. If it is entirely outside, it is discarded immediately. Only triangles that partially overlap require expensive per-plane clipping.
+
+When a triangle does clip against a plane, the GPU computes the intersection points where triangle edges cross the plane boundary, then generates new vertices at those intersection points. The clipped triangle may now have more or fewer vertices than the original three. For example, a triangle that clips against a near-plane might become a quadrilateral, which is then decomposed into two triangles for rasterization. This clipping operation is deterministic and is performed in fixed hardware on the GPU; you cannot customize it from your shaders.
+
+### Scan Conversion and Coverage Determination
+
+After clipping, triangles are in screen space—their x and y coordinates now correspond directly to pixel positions on the output render target. The rasterizer must now determine which pixels are covered by each triangle. This scan-conversion process is the heart of rasterization.
+
+The standard algorithm uses edge functions. For each pixel on the screen, the rasterizer tests whether that pixel's center lies inside the triangle by evaluating three edge functions—one for each edge of the triangle. An edge function compares the pixel's position against a line defined by two triangle vertices. If the pixel is on the correct side of all three edges, it is inside the triangle and generates a fragment.
+
+Modern GPUs accelerate this process using a hierarchical approach. Rather than testing every pixel individually, the GPU first tests 2×2 blocks of pixels, then 4×4 blocks, and so on. Only blocks that overlap the triangle proceed to finer-grain testing. Additionally, modern GPUs implement *early rejection*: if a block of pixels is entirely outside the triangle, it is rejected immediately without further processing. This hierarchical early rejection can eliminate 50–90% of pixels before they reach expensive per-pixel operations.
+
+During scan conversion, the rasterizer also computes interpolation coefficients for varying data. If you have a color value stored at each vertex of the triangle, that color value must be interpolated smoothly across the interior of the triangle. The rasterizer computes barycentric coordinates—three weights that sum to one—which define the position of each fragment relative to the three vertices. These barycentric weights are then used to interpolate any varying data (color, texture coordinates, normals) from the vertices to the fragment.
+
+Barycentric interpolation is not simply a linear blend in screen space. Because of perspective distortion, texture coordinates and other varying data must be interpolated in a perspective-correct manner. This is where the homogeneous w coordinate from the vertex shader becomes critical. The rasterizer divides varying data by w at each vertex, interpolates linearly in screen space, then divides by the interpolated w value to recover the correct perspective-correct value. This perspective-correction step is automatic in modern APIs; you do not need to think about it explicitly, but it is essential for correct rendering of textured surfaces.
+
+### Fragment Generation and Processing
+
+Once the rasterizer determines that a pixel is covered by a triangle, it generates a fragment. A fragment is a potential pixel—it carries the position of the pixel, the interpolated varying data from the vertices, and all the information needed by the fragment shader to compute a final color.
+
+The fragment shader is where you implement custom material effects, lighting calculations, texture sampling, and any other per-pixel processing. The fragment shader runs independently on each fragment in parallel. It receives as input the interpolated position, normal, texture coordinates, and any custom data you defined in your vertex shader. It outputs a color (usually RGBA) and optionally a modified depth value for depth-writing.
+
+In a physically-based rendering pipeline, the fragment shader typically samples from multiple textures (albedo, normal map, roughness, metallic), performs light calculations for multiple light sources, and outputs a final radiance value. The computational complexity of the fragment shader directly impacts GPU utilization and frame rate; overly complex fragment shaders can become a rendering bottleneck if they execute too many instructions or memory operations per pixel.
+
+One crucial optimization in modern GPUs is early z-testing. Before the fragment shader executes, the GPU can optionally test the fragment's depth against the depth buffer. If the fragment is behind an already-rendered surface (a higher depth value), it is rejected immediately, and the expensive fragment shader is never executed. This early z-rejection can skip shader execution for 50–80% of fragments in typical scenes, providing a massive performance win. To maximize early z-rejection effectiveness, you should structure your rendering to draw opaque geometry front-to-back (closest to farthest), allowing earlier fragments to reject later, farther fragments before they reach the fragment shader.
+
+### Depth Buffering and Fragment Operations
+
+Once the fragment shader completes and produces a color, the fragment must pass through several fixed-function operations before it updates the framebuffer. The first and most critical is the depth test.
+
+The depth buffer (z-buffer) is a 2D array with the same resolution as the render target. Each element in the depth buffer stores a single floating-point depth value representing the depth of the closest geometry processed so far at that pixel. When a new fragment arrives at a pixel, the GPU compares the fragment's depth against the stored depth using a configurable comparison function (less-than, less-than-or-equal, greater-than, etc.). If the comparison passes, the fragment is the new closest surface at that pixel, so both the depth buffer and the color buffer are updated. If the comparison fails, the fragment is occluded by closer geometry and is discarded.
+
+The depth buffer is perhaps the single most important data structure in real-time rendering. Without it, you would need to sort all geometry in back-to-front order before rendering, a process that becomes expensive with millions of triangles. With the depth buffer, you can render geometry in any order, and the correct visibility is guaranteed by depth testing.
+
+Depth buffering introduces one important consideration: precision. Depth values are typically stored as either 16-bit, 24-bit, or 32-bit floating-point or fixed-point values. The near and far planes of your camera define the depth range; geometry between the near and far planes is mapped to the available depth precision. If your near plane is too close or your far plane too far, depth precision suffers, and you may see z-fighting artifacts where two surfaces at nearly the same depth appear to flicker as one surface occludes the other randomly. To avoid z-fighting, you should set your camera's near and far planes as close together as practically possible while still encompassing all geometry you need to render.
+
+After the depth test passes, the fragment proceeds to the stencil test (if enabled) and then to blending. Blending is a fixed-function operation that combines the fragment's output color with the color already stored in the framebuffer. For opaque geometry, blending is typically disabled, and the fragment simply overwrites the framebuffer. For transparent geometry, blending is enabled, and the GPU combines the fragment color with the background color using an alpha-compositing formula. The standard formula is:
+
+output = fragment_color × fragment_alpha + framebuffer_color × (1 − fragment_alpha)
+
+This formula implements simple alpha-blending, where the fragment's alpha value determines its opacity. More complex blending modes (additive, multiplicative, screen, multiply, overlay) are also available, each implemented as a different combination of blend factors.
+
+Blending introduces an important constraint: transparent geometry must be rendered in back-to-front order. Unlike opaque geometry, which is order-independent due to depth testing, transparent fragments all contribute to the final pixel color, and the order of contribution matters. Modern techniques like weighted blended order-independent transparency (OIT) attempt to address this limitation, but traditional alpha-blending requires manual depth sorting.
+
+### Frame Buffer and Output
+
+The final stage of the rasterization pipeline is writing to the framebuffer. The framebuffer is a collection of buffers: the color buffer (storing RGB or RGBA values for each pixel), the depth buffer (storing depth values), the stencil buffer (storing stencil values for masking operations), and potentially additional buffers like normal buffers or material ID buffers in more advanced rendering techniques.
+
+Once a fragment passes all tests and blending, its color is written to the color buffer at the corresponding pixel coordinate. If depth writing is enabled, the fragment's depth is also written to the depth buffer. The color buffer is typically resolved to the display at the end of each frame, either directly or through an intermediate compositing step in postprocessing.
+
+Modern rendering often employs multisampling antialiasing (MSAA), where each pixel is sampled at multiple sub-pixel locations. Rather than a single depth and color value per pixel, MSAA stores multiple samples per pixel. The rasterizer tests coverage and runs the fragment shader for each sample independently, then resolves all samples into a single output pixel at the end of the frame. This approach significantly reduces aliasing artifacts (jagged edges) while maintaining reasonable performance, though it requires more memory and more shader execution.
+
+## 3. High-Performance Optimization & Failure Modes
+
+Understanding the rasterization pipeline's internal mechanics is only half the battle; the other half is optimizing rendering performance and diagnosing visual artifacts when things go wrong.
+
+### GPU Bottleneck Analysis and Pipeline Stages
+
+The rasterization pipeline has several potential bottlenecks, and identifying which bottleneck is limiting your frame rate is essential for optimization. The main categories are vertex-limited, geometry-limited, rasterization-limited, and fragment-limited.
+
+A vertex-limited scene has complex vertex shaders or a very high vertex count. If your vertex shader performs many calculations or memory operations per vertex, it can consume substantial GPU bandwidth and computation time. Similarly, if your mesh has millions of vertices, even a simple vertex shader becomes expensive. To optimize vertex-limited scenes, you can reduce the vertex count through mesh simplification or LOD (level-of-detail) systems, or you can simplify the vertex shader by moving calculations to a precompute step or to the fragment shader.
+
+A geometry-limited scene has so many triangles that the primitive assembly and rasterization stages become the bottleneck. This can occur with highly detailed meshes or scenes with very high geometric complexity. Optimization strategies include culling (removing triangles that are outside the view frustum or are backfacing), using LOD systems to reduce geometry at distance, or using instancing to share geometry across multiple objects.
+
+A rasterization-limited scene has a bottleneck in the scan-conversion and coverage determination stages. This typically occurs when rendering at very high screen resolutions (4K or higher) or when using extreme levels of multisampling antialiasing (8× or 16× MSAA). Optimization strategies include rendering at a lower internal resolution and upsampling, using temporal antialiasing instead of MSAA, or accepting some aliasing at high resolutions.
+
+A fragment-limited scene has so many pixels to process that the fragment shader becomes the bottleneck. This occurs when fragment shaders are very complex, when using many light sources in forward rendering, or when rendering at high resolutions with complex effects. Optimization strategies include using deferred rendering to decouple light count from fragment shader complexity, simplifying material calculations, reducing texture lookups, or using lower precision computations where acceptable.
+
+In practice, most modern rendering engines are tuned to be roughly balanced across all stages—if one stage is significantly slower than others, they adjust geometry complexity, shader complexity, or rendering resolution to balance the load. Advanced profiling tools (like NVIDIA's Nsight, AMD's Radeon GPU Profiler, or Metal's GPU counters) can measure how much time is spent in each stage, allowing you to identify and target the true bottleneck.
+
+### Common Artifacts and Diagnostic Strategies
+
+Visual artifacts in rasterization rendering fall into several categories, each with characteristic appearance and well-established fixes.
+
+Z-fighting appears as flickering or striped patterns on surfaces that should appear solid. This artifact occurs when two surfaces are at nearly identical depths, and rounding errors or precision loss cause the depth test to alternate between accepting and rejecting fragments. The primary cause is insufficient depth buffer precision, usually due to a near-plane that is too close or a far-plane that is too far. The fix is to increase the depth buffer precision (from 16-bit to 24-bit or 32-bit if available) or to adjust the camera's near and far planes to bracket geometry more tightly. In Blender, you can inspect and adjust camera settings directly; set the near plane as close as possible to your nearest geometry and the far plane as close as possible to your farthest geometry.
+
+Aliasing (jagged edges) appears as stair-stepping or jaggedness on silhouettes and thin features. This occurs because rasterization samples geometry at discrete pixel centers, and coverage is binary (a pixel is either covered or not). If a triangle edge passes between two pixel centers, coverage is undefined and produces aliasing. Multisampling antialiasing (MSAA) solves this by testing coverage at multiple sub-pixel samples per pixel. Temporal antialiasing solves it by slightly jittering the camera position across frames and filtering temporally. In Blender, MSAA is typically enabled in the render settings.
+
+Perspective distortion appears as texture stretching or warping on surfaces viewed at extreme angles. This does not occur in standard rasterization pipelines because the rasterizer automatically performs perspective-correct interpolation using the homogeneous w coordinate. However, if you implement custom interpolation or attempt to manually interpolate texture coordinates, you may incorrectly interpolate linearly in screen space without perspective correction, causing this artifact.
+
+Backface culling artifacts appear as missing geometry or holes in meshes. Backface culling is an optimization where triangles facing away from the camera (backfacing triangles) are discarded before rasterization to avoid wasting GPU resources on invisible surfaces. However, if your mesh has inconsistent vertex winding order (some triangles wind clockwise, others counterclockwise), some front-facing triangles may be incorrectly culled, creating holes. The fix is to ensure consistent vertex winding throughout your mesh. In Blender, you can enable "Backface Culling" in the viewport shading options to visualize which faces are considered front-facing; any unexpected holes indicate winding order problems that can be fixed with Mesh > Normals > Recalculate.
+
+Near-plane clipping artifacts appear as geometry disappearing as the camera moves close to it. This occurs when geometry is clipped against the camera's near plane. If the near plane is set too close to the camera
