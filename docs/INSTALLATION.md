@@ -12,16 +12,36 @@ Download pre-compiled Release Candidate binaries from the **[Releases](https://g
 
 | Platform | Download Format | Installation Instructions |
 | :--- | :--- | :--- |
+| **Windows (Portable)** | **`.exe` (Standalone Portable App)** | Download `Synapse-Workbench-Portable-1.0.0.exe`. Place your `./topics/` curriculum folder alongside the executable and double-click to launch! No Python or installation required. |
 | **macOS (Apple Silicon)** | **`.dmg` (Disk Image Installer)** | Open `Synapse-Workbench-1.0.0-arm64.dmg`, drag **Synapse Workbench** to `/Applications`, and launch from Spotlight or Launchpad. |
 | **macOS (Portable Bundle)** | **`.zip` (App Archive)** | Decompress `Synapse-Workbench-1.0.0-arm64-mac.zip` and launch **Synapse Workbench.app** directly. |
-| **Linux / Windows (WSL2)** | **`.whl` (Python Wheel)** | See Python Wheel Installation below. |
+| **Linux (CLI / Server)** | **`.whl` (Python Wheel)** | See Python Wheel Installation below. |
 | **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
-*The native desktop shell includes automatic background sidecar lifecycle management, native window framing, and connects automatically to your local Ollama cluster on `127.0.0.1:11434`.*
+*The native desktop shell includes automatic background sidecar lifecycle management, native window framing, and connects automatically to your local Ollama cluster on `127.0.0.1:11434` or cloud inference gateways.*
 
 ---
 
-## 📦 2. Python Wheel (`.whl`) Installation (Linux, macOS & Windows WSL2)
+## 🪟 2. Windows Portable Binary & Topics Addon Architecture
+
+The Windows distribution is fully decoupled from Python environments:
+
+1. **Executable Structure:**
+   ```text
+   Synapse-Portable-Windows/
+   ├── Synapse-Workbench-Portable-1.0.0.exe
+   ├── README.txt
+   └── topics/                   <-- Curriculum Addon (Pure Markdown)
+       ├── arts/
+       ├── computing/
+       └── ...
+   ```
+2. **Platform-Independent Addon:** The curriculum content is strictly externalized. Synapse discovers `./topics/` next to the executable (or via `SYNAPSE_TOPICS_DIR`). You can upgrade or add topics without updating the `.exe`.
+3. **Native Shell Execution:** The terminal drawer features built-in Windows PowerShell/CMD bridging, allowing commands and labs to be executed directly without requiring WSL.
+
+---
+
+## 📦 3. Python Wheel (`.whl`) Installation (Linux, macOS & Windows WSL2)
 
 The `.whl` package (`synapse-1.0.0-py3-none-any.whl`) is pure Python and runs across **Linux**, **macOS**, and **Windows (via WSL2)**.
 
@@ -67,14 +87,15 @@ For full native terminal drawer support on Windows, run inside **WSL2** (Windows
 Once the wheel is installed, the global `synapse` command is available in your environment:
 ```bash
 synapse serve --port 8000       # Start the Socratic Workbench server
-synapse doctor                  # Run environment, GPU, and Ollama cluster diagnostics
-synapse audit                   # Run semantic linter & quality checks
-synapse generate --domain arts  # Autonomous curriculum generation
+synapse status                  # Show workspace curriculum completion statistics
+synapse lint --domain arts      # Run semantic linter & markdown quality checks
+synapse review computing/linux  # Run adversarial cross-model quality audit
+synapse export computing        # Compile complete domain into printable handbook
 ```
 
 ---
 
-## 🐳 3. 1-Click Docker Compose Deployment
+## 🐳 4. 1-Click Docker Compose Deployment
 
 Run the complete Socratic Workbench inside an isolated, multi-stage production container with zero local toolchain setup.
 

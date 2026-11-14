@@ -73,6 +73,17 @@ def is_topic_complete(subtopic_dir: Path) -> bool:
     has_labs = (subtopic_dir / "labs.md").exists()
     return has_lesson and has_labs
 
+def is_topic_enhanced(subtopic_id: str) -> bool:
+    """Checks if a masterclass enhancement has already been committed to git for this topic."""
+    try:
+        res = subprocess.run(
+            ["git", "log", f"--grep=enhance({subtopic_id}):", "-n", "1", "--format=%H"],
+            capture_output=True, text=True, cwd=str(WORKSPACE_ROOT)
+        )
+        return bool(res.stdout.strip())
+    except Exception:
+        return False
+
 def worker(task_queue: Queue, total_tasks: int, progress_counter: list, provider_override=None, enhance_mode=False):
     while True:
         task = task_queue.get()
@@ -116,6 +127,7 @@ def main():
     parser.add_argument("--model", type=str, default=None, help="Model override (e.g. claude-opus-5-5)")
     parser.add_argument("--domain", type=str, default=None, help="Target specific domain only")
     parser.add_argument("--enhance", action="store_true", help="Enhance existing (completed) topics instead of generating new ones")
+    parser.add_argument("--force", action="store_true", help="Force re-processing even if already completed or enhanced")
     args = parser.parse_args()
 
     provider_override = None
@@ -140,7 +152,8 @@ def main():
                 is_complete = is_topic_complete(p)
                 
                 if args.enhance and is_complete:
-                    tasks.append((domain, disc, sub_slug, p))
+                    if args.force or not is_topic_enhanced(sub_slug):
+                        tasks.append((domain, disc, sub_slug, p))
                 elif not args.enhance and not is_complete:
                     tasks.append((domain, disc, sub_slug, p))
 

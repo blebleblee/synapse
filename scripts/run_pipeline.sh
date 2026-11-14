@@ -10,8 +10,8 @@ echo "=================================================="
 
 # Phase 1A: Arts Masterclass Enhancement (33 existing music topics)
 echo ""
-echo "[*] [Phase 1A/3] Enhancing Arts domain (33 topics) with Claude Opus 5.5..."
-python3 scripts/generate_all.py --domain arts --enhance
+echo "[*] [Phase 1A/3] Enhancing Arts domain (33 topics) with Claude Sonnet 5..."
+python3 scripts/generate_all.py --domain arts --enhance --model claude-sonnet-5
 
 echo ""
 echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published to Gitea!"
@@ -19,7 +19,7 @@ echo "[✔] Phase 1A Complete: All 33 music topics enhanced and published to Git
 # Phase 1B: Generate Unwritten Arts Topics (34 missing visual arts, 3D graphics, and modular audio topics)
 echo ""
 echo "[*] [Phase 1B/3] Generating unwritten Arts topics (34 courses: Blender, DaVinci, Modular Synthesis, ZBrush)..."
-python3 scripts/generate_all.py --domain arts
+python3 scripts/generate_all.py --domain arts --model claude-sonnet-5
 
 echo ""
 echo "[✔] Phase 1B Complete: All 34 missing Arts topics generated and published!"
@@ -27,7 +27,7 @@ echo "[✔] Phase 1B Complete: All 34 missing Arts topics generated and publishe
 # Phase 2: Frontier Computing Generation (117 unwritten topics)
 echo ""
 echo "[*] [Phase 2/3] Generating Frontier & Software Computing topics (117 courses: Quantum, Swarms, Web3, Cilium, ArgoCD)..."
-python3 scripts/generate_all.py --domain computing
+python3 scripts/generate_all.py --domain computing --model claude-sonnet-5
 
 echo ""
 echo "=================================================="

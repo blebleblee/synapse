@@ -30,8 +30,7 @@ When operating a distributed Ollama cluster across local LAN machines (e.g. Mac 
 ### Configuration File: `.synapse_node_pins.json`
 ```json
 {
-  "192.168.200.60": "qwopus3.6-27b-coder-mtp:latest",
-  "192.168.201.18:11434": "qwen2.5-coder:32b",
+  "192.168.1.100:11434": "qwen2.5-coder:32b",
   "127.0.0.1:11434": "qwen2.5-coder:7b"
 }
 ```

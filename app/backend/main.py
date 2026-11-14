@@ -5,11 +5,8 @@ Provides REST APIs for topics/curricula, AI persona chat, and a WebSocket PTY te
 
 import sys
 import os
-import pty
 import select
 import struct
-import fcntl
-import termios
 import signal
 import asyncio
 import json
@@ -20,6 +17,17 @@ import shutil
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from collections import deque
+
+try:
+    import pty
+    import fcntl
+    import termios
+    HAS_POSIX_PTY = True
+except ImportError:
+    pty = None
+    fcntl = None
+    termios = None
+    HAS_POSIX_PTY = False
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -1295,36 +1303,43 @@ async def terminal_websocket(websocket: WebSocket):
 
     env_type = websocket.query_params.get("env", "host")
 
-    pty_available = True
+    pty_available = HAS_POSIX_PTY
     master = -1
     slave = -1
-    try:
-        master, slave = pty.openpty()
-        # Default terminal size (80 cols, 24 rows)
-        winsize = struct.pack("HHHH", 24, 80, 0, 0)
-        fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
-
+    if HAS_POSIX_PTY:
         try:
-            attrs = termios.tcgetattr(slave)
-            attrs[0] |= termios.ICRNL
-            termios.tcsetattr(slave, termios.TCSANOW, attrs)
-        except Exception:
-            pass
-    except OSError:
-        pty_available = False
+            master, slave = pty.openpty()
+            # Default terminal size (80 cols, 24 rows)
+            winsize = struct.pack("HHHH", 24, 80, 0, 0)
+            fcntl.ioctl(slave, termios.TIOCSWINSZ, winsize)
 
-    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached
+            try:
+                attrs = termios.tcgetattr(slave)
+                attrs[0] |= termios.ICRNL
+                termios.tcsetattr(slave, termios.TCSANOW, attrs)
+            except Exception:
+                pass
+        except OSError:
+            pty_available = False
+
+    # Resilient Pipe Bridge Fallback if host kern.tty.ptmx_max limit is reached or on Windows
     if not pty_available:
-        shell = os.environ.get("SHELL", "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/bash")
+        if sys.platform == "win32":
+            shell = os.environ.get("COMSPEC", "powershell.exe")
+            args = []
+        else:
+            shell = os.environ.get("SHELL", "/bin/zsh" if os.path.exists("/bin/zsh") else "/bin/bash")
+            args = ["-i"]
+
         proc = await asyncio.create_subprocess_exec(
-            shell, "-i",
+            shell, *args,
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             cwd=str(WORKSPACE_ROOT),
             env=os.environ.copy()
         )
-        notice = "\r\n\x1b[1;32m[i] Connected to Synapse Interactive Shell (Pipe Mode - Host PTY ceiling reached)\x1b[0m\r\n"
+        notice = "\r\n\x1b[1;32m[i] Connected to Synapse Interactive Shell (Cross-Platform Pipe Mode)\x1b[0m\r\n"
         await websocket.send_text(notice)
 
         async def pipe_read_loop():

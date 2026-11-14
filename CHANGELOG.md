@@ -38,7 +38,7 @@ Curriculum domains are distributed modularly via the Synapse Package Manager (`s
 
 #### 2. Learning Engine & Distributed Inference
 * **Multi-Node Cluster & Cloud Gateway:**
-  * Seamlessly connects to local Ollama clusters (`127.0.0.1`, LAN nodes) and low-latency cloud gateways (`apikey.vnaipro.app` routed to Claude Opus 5.5).
+  * Seamlessly connects to local Ollama clusters (`127.0.0.1`, LAN nodes) and low-latency cloud gateways routed to Anthropic Claude Sonnet & Opus.
   * Dynamic cluster host normalization and node-specific model pinning saved to `.synapse_node_pins.json`.
 * **Parallel Content Enhancement Pipeline (`enhancer.py`):**
   * Concurrent thread pool engine with automated exponential backoff retries and 600-second socket timeouts to handle massive 8,192-token masterclass files.
@@ -55,6 +55,7 @@ Curriculum domains are distributed modularly via the Synapse Package Manager (`s
 ---
 
 ### Packaging & Binaries Included
+* **Windows Portable Desktop App:** `Synapse-Workbench-Portable-1.0.0.exe` (Zero-dependency portable executable with embedded backend sidecar; curriculum topics loaded as an external, platform-independent addon folder `./topics` alongside the `.exe`).
 * **macOS Desktop App:** `Synapse Workbench-1.0.0-arm64.dmg` & `Synapse Workbench-1.0.0-arm64-mac.zip`
 * **Python Distribution:** `synapse-1.0.0-py3-none-any.whl` & `synapse-1.0.0.tar.gz`
-* **CLI Utility:** `bin/synapse` (`serve`, `doctor`, `audit`, `generate`, `enhance`, `pack`)
+* **CLI Utility:** `bin/synapse` (`serve`, `status`, `lint`, `review`, `search`, `export`, `flashcards`, `mastery`)

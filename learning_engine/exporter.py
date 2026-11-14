@@ -5,10 +5,9 @@ Stitches canonical masterclass topics and lessons into unified printable handboo
 
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+from .security import WORKSPACE_ROOT, TOPICS_DIR
 from .topic_manager import get_topic_tree, get_unit_lessons
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
 EXPORTS_DIR = WORKSPACE_ROOT / "exports"
 
 def export_handbook(domain: str, level: Optional[str] = None) -> Path:

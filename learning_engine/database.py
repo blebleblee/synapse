@@ -2,8 +2,9 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 from contextlib import contextmanager
+from .security import WORKSPACE_ROOT
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "synapse.db"
+DB_PATH = WORKSPACE_ROOT / "data" / "synapse.db"
 
 def get_connection() -> sqlite3.Connection:
     CONFIG_DIR = DB_PATH.parent

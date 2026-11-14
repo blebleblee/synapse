@@ -5,6 +5,7 @@
 
 const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const { spawn } = require('child_process');
 
@@ -43,13 +44,63 @@ async function ensureBackendRunning() {
   }
 
   console.log(`[Desktop] Spawning local Synapse backend service on port ${BACKEND_PORT}...`);
-  const pythonBin = path.join(WORKSPACE_ROOT, '.venv/bin/python');
-  const synapseBin = path.join(WORKSPACE_ROOT, 'bin/synapse');
+
+  const isWin = process.platform === 'win32';
+  const exeName = isWin ? 'synapse.exe' : 'synapse';
+
+  // Candidate paths for standalone portable binary sidecar
+  const candidateBins = [
+    path.join(process.resourcesPath || '', 'bin', exeName),
+    path.join(process.resourcesPath || '', exeName),
+    path.join(path.dirname(process.execPath), 'bin', exeName),
+    path.join(path.dirname(process.execPath), exeName),
+    path.join(WORKSPACE_ROOT, 'dist', 'bin', exeName),
+  ];
+
+  let spawnCmd = null;
+  let spawnArgs = ['serve', '--port', String(BACKEND_PORT)];
+
+  for (const binPath of candidateBins) {
+    if (fs.existsSync(binPath)) {
+      spawnCmd = binPath;
+      console.log(`[Desktop] Found standalone backend sidecar: ${spawnCmd}`);
+      break;
+    }
+  }
+
+  // Fallback to Python venv in development mode
+  if (!spawnCmd) {
+    const pythonBin = isWin
+      ? path.join(WORKSPACE_ROOT, '.venv', 'Scripts', 'python.exe')
+      : path.join(WORKSPACE_ROOT, '.venv', 'bin', 'python');
+    const synapseBin = path.join(WORKSPACE_ROOT, 'bin', 'synapse');
+
+    if (fs.existsSync(pythonBin)) {
+      spawnCmd = pythonBin;
+      spawnArgs = [synapseBin, 'serve', '--port', String(BACKEND_PORT)];
+    } else {
+      spawnCmd = isWin ? 'python' : 'python3';
+      spawnArgs = ['-m', 'learning_engine.cli', 'serve', '--port', String(BACKEND_PORT)];
+    }
+  }
+
+  // Resolve external addon topics directory next to portable executable or workspace
+  const portableTopics = path.join(path.dirname(process.execPath), 'topics');
+  const topicsDir = fs.existsSync(portableTopics)
+    ? portableTopics
+    : path.join(WORKSPACE_ROOT, 'topics');
+
+  const spawnEnv = {
+    ...process.env,
+    PYTHONUNBUFFERED: '1',
+    SYNAPSE_WORKSPACE: path.dirname(process.execPath),
+    SYNAPSE_TOPICS_DIR: topicsDir,
+  };
 
   try {
-    backendProcess = spawn(pythonBin, [synapseBin, 'serve', '--port', String(BACKEND_PORT)], {
-      cwd: WORKSPACE_ROOT,
-      env: { ...process.env, PYTHONUNBUFFERED: '1' },
+    backendProcess = spawn(spawnCmd, spawnArgs, {
+      cwd: path.dirname(process.execPath),
+      env: spawnEnv,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
     });

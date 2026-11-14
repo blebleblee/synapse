@@ -44,10 +44,23 @@
     },
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        "portable",
+        "nsis"
       ]
     },
+    "portable": {
+      "artifactName": "Synapse-Workbench-Portable-${version}.exe"
+    },
+    "extraResources": [
+      {
+        "from": "../../dist/bin",
+        "to": "bin",
+        "filter": [
+          "synapse*",
+          "synapse.exe"
+        ]
+      }
+    ],
     "linux": {
       "target": [
         "AppImage",

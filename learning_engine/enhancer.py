@@ -47,9 +47,9 @@ ORIGINAL CONTENT:
 Output the full, enhanced, publication-ready raw Markdown document directly (do NOT wrap the entire document in an outer ```markdown code fence). Start directly with the top-level '# ...' title. No preambles.
 """
     
-    for attempt in range(1, 3):
+    for attempt in range(1, 4):
         try:
-            attempt_str = f" (attempt {attempt}/2)" if attempt > 1 else ""
+            attempt_str = f" (attempt {attempt}/3)" if attempt > 1 else ""
             print(f"      [~] Enhancing {file_path.name} via {provider.model}{attempt_str}...", flush=True)
             t0 = time.time()
             enhanced = provider.generate(prompt, system_instruction=system_instruction)
@@ -65,9 +65,10 @@ Output the full, enhanced, publication-ready raw Markdown document directly (do 
             print(f"      [✔] Enhanced {file_path.name} in {elapsed:.1f}s", flush=True)
             return True
         except Exception as e:
-            if attempt < 2:
-                print(f"      [!] Retrying {file_path.name} after timeout/error: {e}", flush=True)
-                time.sleep(3)
+            if attempt < 3:
+                backoff = attempt * 4
+                print(f"      [!] Retrying {file_path.name} after timeout/error: {e} (waiting {backoff}s)", flush=True)
+                time.sleep(backoff)
                 continue
             print(f"      [✘] Failed to enhance {file_path.name}: {e}", flush=True)
             return False
@@ -75,7 +76,7 @@ Output the full, enhanced, publication-ready raw Markdown document directly (do 
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def enhance_existing_topic(domain: str, subtopic_id: str, subtopic_dir: Path, provider: LLMProvider, max_workers: int = 3):
+def enhance_existing_topic(domain: str, subtopic_id: str, subtopic_dir: Path, provider: LLMProvider, max_workers: int = 2):
     """Enhances markdown files in a topic concurrently using a thread pool."""
     md_files = sorted(list(subtopic_dir.glob("*.md")))
     if not md_files:

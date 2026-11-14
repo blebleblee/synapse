@@ -8,11 +8,9 @@ import tarfile
 import hashlib
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from .security import validate_workspace_path
+from .security import validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR
 from .database import get_db_connection
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
 PACKS_DIR = WORKSPACE_ROOT / "exports" / "packages"
 
 def compute_checksum(file_path: Path) -> str:

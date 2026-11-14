@@ -15,18 +15,18 @@ from app.backend.main import app
 client = TestClient(app)
 
 def test_normalize_host_key():
-    assert normalize_host_key("http://192.168.200.60:8080/") == "192.168.200.60:8080"
-    assert normalize_host_key("https://studio.2464.cz:11434") == "studio.2464.cz:11434"
+    assert normalize_host_key("http://192.168.1.100:8080/") == "192.168.1.100:8080"
+    assert normalize_host_key("https://studio.example.internal:11434") == "studio.example.internal:11434"
     assert normalize_host_key("localhost:11434") == "localhost:11434"
 
 def test_get_node_pin_default_mapping():
-    """Verifies that 192.168.200.60 has a pinned model."""
-    pin = get_node_pin("http://192.168.200.60:8080")
-    assert pin == "qwopus3.6-27b-coder-mtp:latest"
+    """Verifies that 192.168.1.100 has a pinned model."""
+    pin = get_node_pin("http://192.168.1.100:8080")
+    assert pin == "qwen2.5-coder:32b"
 
     # Also works without protocol or with port stripped
-    assert get_node_pin("192.168.200.60:8080") == "qwopus3.6-27b-coder-mtp:latest"
-    assert get_node_pin("192.168.200.60") == "qwopus3.6-27b-coder-mtp:latest"
+    assert get_node_pin("192.168.1.100:8080") == "qwen2.5-coder:32b"
+    assert get_node_pin("192.168.1.100") == "qwen2.5-coder:32b"
 
 def test_api_cluster_pins_endpoint():
     """Functional tests for GET and POST /api/settings/cluster-pins."""
@@ -35,7 +35,7 @@ def test_api_cluster_pins_endpoint():
     data = res.json()
     assert "pins" in data
     assert isinstance(data["pins"], dict)
-    assert "192.168.200.60:8080" in data["pins"] or "192.168.200.60" in data["pins"]
+    assert "192.168.1.100:8080" in data["pins"] or "192.168.1.100" in data["pins"]
 
     # Test saving custom pin
     save_res = client.post("/api/settings/cluster-pins", json={

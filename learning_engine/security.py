@@ -1,9 +1,43 @@
+import os
+import sys
 import re
 from pathlib import Path
 from typing import Union, Optional
 
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
+def get_workspace_root() -> Path:
+    """
+    Returns the root directory for the workspace.
+    Supports:
+    1. SYNAPSE_WORKSPACE environment variable override.
+    2. Frozen binary (PyInstaller / Electron portable sidecar): resolves to folder containing executable.
+    3. Normal Python development mode: Path(__file__).resolve().parent.parent.
+    """
+    if os.environ.get("SYNAPSE_WORKSPACE"):
+        return Path(os.environ["SYNAPSE_WORKSPACE"]).resolve()
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent
+
+def get_topics_dir() -> Path:
+    """
+    Returns the external, platform-independent topics addon directory.
+    Supports:
+    1. SYNAPSE_TOPICS_DIR environment variable override.
+    2. Addon directory './topics' next to the portable executable or workspace root.
+    3. Addon directory './topics' in current working directory.
+    """
+    if os.environ.get("SYNAPSE_TOPICS_DIR"):
+        return Path(os.environ["SYNAPSE_TOPICS_DIR"]).resolve()
+    ws = get_workspace_root()
+    if (ws / "topics").exists():
+        return (ws / "topics").resolve()
+    cwd_topics = Path.cwd() / "topics"
+    if cwd_topics.exists():
+        return cwd_topics.resolve()
+    return (ws / "topics").resolve()
+
+WORKSPACE_ROOT = get_workspace_root()
+TOPICS_DIR = get_topics_dir()
 
 def sanitize_topic_path(domain: str, category: str, subtopic_id: str) -> tuple[str, str, str]:
     """Strict whitelist validation for topic path components."""

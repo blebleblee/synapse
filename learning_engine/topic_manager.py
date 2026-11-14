@@ -9,14 +9,8 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
 from learning_engine.mastery import get_completed_lessons
-from learning_engine.security import sanitize_topic_path, validate_workspace_path
+from learning_engine.security import sanitize_topic_path, validate_workspace_path, WORKSPACE_ROOT, TOPICS_DIR, get_topics_dir
 from learning_engine.utils import scan_subtopic_status as utils_scan, get_unit_lessons as utils_get_lessons
-
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = validate_workspace_path(WORKSPACE_ROOT, WORKSPACE_ROOT / "topics")
-
-def get_topics_dir() -> Path:
-    return TOPICS_DIR
 
 def sanitize_rel_path(rel_path: str) -> Path:
     """Deprecated: Use validate_workspace_path instead."""

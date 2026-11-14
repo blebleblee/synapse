@@ -116,10 +116,19 @@ Download the standalone, zero-dependency desktop application from the **[Release
 
 | Platform | Download | Instructions |
 | :--- | :--- | :--- |
+| **Windows (Portable)** | **[`Synapse-Workbench-Portable-1.0.0.exe`](https://gitea.2464.cz/ai/synapse/releases)** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
 | **macOS (Apple Silicon)** | **[`Synapse-Workbench-1.0.0-arm64.dmg`](https://gitea.2464.cz/ai/synapse/releases)** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
 | **macOS (Portable)** | **[`Synapse-Workbench-1.0.0-arm64-mac.zip`](https://gitea.2464.cz/ai/synapse/releases)** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Linux / Windows (WSL2)** | **[`synapse-1.0.0-py3-none-any.whl`](https://gitea.2464.cz/ai/synapse/releases)** | See Python Wheel Installation below. |
+| **Linux (CLI / Server)** | **[`synapse-1.0.0-py3-none-any.whl`](https://gitea.2464.cz/ai/synapse/releases)** | See Python Wheel Installation below. |
 | **Any Platform** | **Docker Compose** | See Docker Deployment below. |
+
+---
+
+### Windows Portable App & Modular Topics Addon
+The Windows desktop distribution is packaged as a **standalone portable binary** (`Synapse-Workbench-Portable-1.0.0.exe`).
+- **Zero Dependencies:** Bundles the native Electron desktop shell and Python backend sidecar. No Python installation or build tools required.
+- **External Topics Addon:** Curriculum topics remain pure, platform-independent Markdown files. Keep the `topics/` folder directly alongside `Synapse-Workbench-Portable.exe`. You can edit, update, or drop in new topic packs without touching or rebuilding the executable.
+- **Cross-Platform Shell Bridge:** Features native Windows shell integration (`powershell.exe`/`cmd.exe`) for terminal drawer execution.
 
 ---
 
@@ -141,8 +150,8 @@ synapse serve --port 8000
 ```
 
 * **Linux:** 100% native support out of the box with embedded POSIX PTY terminal drivers.
-* **Windows:** Run inside **WSL2** (`wsl --install`) for full terminal PTY and Docker sandbox capabilities.
-* **CLI Utilities:** Once installed, use `synapse doctor` for system diagnostics or `synapse audit` for curriculum verification.
+* **Windows:** Use the Portable Windows Binary above for native execution, or WSL2 (`wsl --install`) for POSIX environments.
+* **CLI Utilities:** Once installed, use `synapse status` for curriculum completion stats or `synapse lint` for quality auditing.
 
 ---
 

@@ -126,11 +126,10 @@ def get_configured_node_pins() -> Dict[str, str]:
     """
     Returns mapping of normalized host/node key -> pinned model name.
     Loaded from environment, .synapse_node_pins.json, or SQLite settings.
-    Includes default model pin for known local cluster nodes (e.g. 192.168.200.60).
     """
     pins: Dict[str, str] = {
-        "192.168.200.60:8080": "qwopus3.6-27b-coder-mtp:latest",
-        "192.168.200.60": "qwopus3.6-27b-coder-mtp:latest",
+        "192.168.1.100:8080": "qwen2.5-coder:32b",
+        "192.168.1.100": "qwen2.5-coder:32b",
     }
 
     if NODE_PINS_CONFIG_PATH.exists():
@@ -655,7 +654,7 @@ class AnthropicProvider(LLMProvider):
             base_url or 
             os.environ.get("ANTHROPIC_BASE_URL") or 
             anthropic_cfg.get("base_url") or 
-            "https://aiapiflow.com"
+            "https://api.anthropic.com"
         ).rstrip("/")
 
         self.api_key = (
@@ -664,11 +663,11 @@ class AnthropicProvider(LLMProvider):
             os.environ.get("ANTHROPIC_AUTH_TOKEN") or 
             anthropic_cfg.get("api_key")
         )
-        resolved_req_model = model or os.environ.get("ANTHROPIC_MODEL") or anthropic_cfg.get("model") or "claude-opus-5-5"
+        resolved_req_model = model or os.environ.get("ANTHROPIC_MODEL") or anthropic_cfg.get("model") or "claude-sonnet-5"
         self.model = self._resolve_model_name(resolved_req_model)
 
     def _resolve_model_name(self, model: str) -> str:
-        if "aiapiflow" in self.base_url or "vnaipro" in self.base_url:
+        if not self.base_url.startswith("https://api.anthropic.com"):
             m_lower = model.lower()
             if "opus" in m_lower:
                 return "claude-opus-5-5"
@@ -676,7 +675,7 @@ class AnthropicProvider(LLMProvider):
                 return "claude-fable-5"
             if "sonnet" in m_lower:
                 return "claude-sonnet-5"
-            return "claude-opus-5-5"
+            return "claude-sonnet-5"
         return model
 
     def _get_url(self) -> str:
@@ -695,7 +694,7 @@ class AnthropicProvider(LLMProvider):
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
-    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 8192, retries: int = 3) -> str:
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 8192, retries: int = 5) -> str:
         """
         Generates full completion by consuming generate_stream with automatic retry
         on transient network or read timeouts.
@@ -710,7 +709,8 @@ class AnthropicProvider(LLMProvider):
             except Exception as e:
                 last_err = e
                 if attempt < retries:
-                    time.sleep(attempt * 2)
+                    # Exponential backoff with stagger
+                    time.sleep((2 ** attempt) + attempt)
                     continue
         raise last_err or RuntimeError("Anthropic generation failed after retries")
 
@@ -750,10 +750,15 @@ class AnthropicProvider(LLMProvider):
                             break
                         try:
                             event = json.loads(json_str)
+                            if event.get("type") == "error":
+                                err_msg = event.get("error", {}).get("message", "Upstream streaming error")
+                                raise RuntimeError(f"Anthropic streaming error: {err_msg}")
                             if event.get("type") == "content_block_delta":
                                 delta = event.get("delta", {})
                                 if delta.get("type") == "text_delta":
                                     yield delta.get("text", "")
+                        except RuntimeError:
+                            raise
                         except Exception:
                             continue
         except urllib.error.HTTPError as e:

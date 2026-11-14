@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
-User=radovan.varga
-WorkingDirectory=/Users/radovan.varga/repos/synapse
-ExecStart=/opt/homebrew/opt/python@3.15/bin/python3.15 -m uvicorn app.backend.main:app --host 0.0.0.0 --port 8000
+User=synapse
+WorkingDirectory=/opt/synapse
+ExecStart=/usr/bin/python3 -m uvicorn app.backend.main:app --host 127.0.0.1 --port 8000
 Restart=always
 RestartSec=5
-Environment=PATH=/Users/radovan.varga/repos/synapse/.venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/opt/synapse/.venv/bin:/usr/local/bin:/usr/bin:/bin
 
 [Install]
 WantedBy=multi-user.target

@@ -6,9 +6,7 @@ Indexes and searches across all generated curriculum markdown units.
 import re
 from pathlib import Path
 from typing import List, Dict, Any
-
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
+from .security import WORKSPACE_ROOT, TOPICS_DIR
 
 def clean_snippet(text: str, match_pos: int, snippet_len: int = 160) -> str:
     start = max(0, match_pos - snippet_len // 2)

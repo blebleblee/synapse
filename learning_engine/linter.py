@@ -7,9 +7,7 @@ Mermaid diagram syntax, and cross-domain tool bleed.
 import re
 from pathlib import Path
 from typing import Dict, List, Any
-
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TOPICS_DIR = WORKSPACE_ROOT / "topics"
+from .security import WORKSPACE_ROOT, TOPICS_DIR
 
 FORBIDDEN_PLACEHOLDERS = [
     r"//\s*TODO",
