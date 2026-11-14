@@ -1,93 +1,74 @@
 # Acoustic Guitar Masterclass: Chords, Strumming & Fretboard Mastery
 
-## 1. First-Principles Intuition: Why the Guitar Works
+## 1. First-Principles Intuition: Why the Guitar Works (Read Once, Internalize, Move On)
 
-### Resonance, Tension, and Tone in 60 Seconds
+### Resonance, Tension, and Tone
 
-When you pluck a string, you set it vibrating at a fundamental frequency determined by three things: **length** (scale length minus the fretted point), **tension** (how tight the string is), and **mass** (string gauge). That vibrating string pushes air through the soundhole and flexes the spruce top, which acts as a coupled resonator amplifying certain frequencies over others. Heavier-bodied guitars (dreadnoughts, jumbos) emphasize bass frequencies; smaller-bodied guitars (OO, parlor) are more balanced and responsive to light touch.
+When you pluck a string, it vibrates at a fundamental frequency set by three things: **length** (nut to bridge, shortened by fretting), **tension** (tuning tightness), and **mass** (string gauge). That vibration drives the spruce or cedar top through the bridge, and the top plus the air cavity inside the body act as a coupled resonator — amplifying some frequencies more than others depending on body size and bracing. Dreadnoughts and jumbos push more low-end because they move more air; OO and parlor bodies respond faster to light touch and emphasize mids, which is why they record well for fingerstyle.
 
-One useful physical intuition: pressing the 12th fret **halves** the vibrating string length, which **doubles** the frequency — an octave up. The 7th fret produces 2/3 of the string length, giving you the natural harmonic at a perfect fifth above. You don't need the formula tattooed on your wrist — just understand that **up the neck = shorter string = higher pitch**, and that this relationship is exponential, not linear, which is why fret spacing narrows as you ascend.
+Practical takeaway, no formula needed: **fretting halfway up the neck (12th fret) doubles the pitch** — one octave. The 7th fret gives you a natural harmonic a perfect fifth above the open string, which is why it's your go-to spot for quick tuning checks by ear (harmonic at fret 5 on one string against harmonic at fret 7 on the adjacent string). Fret spacing narrows as you go up the neck because the length-to-pitch relationship is exponential, not linear — that's also why capoing higher up makes chords feel tighter under the fingers.
 
-### Why Chords Sound the Way They Do
+### Why Chords Feel the Way They Do
 
-A major chord (root, major 3rd, perfect 5th) mirrors the 4th, 5th, and 6th harmonics of the natural overtone series. These intervals are acoustically "at home" with each other — they don't beat or clash — which is why major chords sound bright and resolved. A minor chord swaps the major 3rd (4 semitones) for a minor 3rd (3 semitones), landing between natural overtones. That slight misalignment is what gives minor chords their introspective, darker quality. It's not dissonance; it's a subtle departure from the overtone series.
+A major chord (root–3rd–5th) echoes the natural overtone series closely, which is why it sounds settled and bright. Flatten the 3rd by one semitone and you get a minor chord — the notes drift slightly out of alignment with that overtone series, producing the moodier, introspective color. Neither is "right" — it's just proximity to acoustic consonance versus a deliberate step away from it, and composers use that gap for emotional effect.
 
-**Equal temperament** means every fret represents exactly 1/12 of an octave (a frequency ratio of ≈1.05946). It's a mathematical compromise that lets you play in every key on the same guitar without retuning — but it means every interval except the octave is very slightly "out of pure tune." Your ear accepts this because the deviations are small and consistent.
+Equal temperament is the compromise that lets all this work on a single fretted instrument: every fret is an equal frequency step, so you can play in any key without re-tuning, at the tiny cost of every interval except the octave being very slightly impure. Your ear doesn't care. Moving on to actually playing the thing.
 
 ---
 
 ## 2. Posture, Ergonomics & Hand Mechanics
 
-Getting your body position right before touching a chord prevents injuries and directly determines how good you'll sound. No amount of practice fixes bad posture — it just deepens it.
+Fix your setup before you fix your playing. Bad posture doesn't just slow progress — it actively builds the wrong muscle memory, and every hour of practice reinforces it.
 
-### Classical vs. Casual Seated Position
+### Seated Position Options
 
-**Classical position** (right leg, guitar tilted back):
-- Left foot elevated on footstool or guitar support
-- Guitar waist rests on left thigh, neck angled up 30–45°
-- Right forearm rests on the lower bout, wrist floating free
-- Best for: fingerstyle, classical, complex chord work
+**Classical position** (footstool, guitar on left thigh):
+- Left foot elevated 10–15 cm on a footstool or guitar support
+- Waist of the guitar rests on left thigh, neck angled up 30–45°
+- Right forearm contacts the lower bout near the elbow, wrist hangs free and loose
+- Use for: fingerstyle, Travis picking, anything needing fretting-hand reach up high
 
-**Casual/Folk position** (right leg, neck roughly horizontal):
-- Guitar sits on right thigh, neck roughly parallel to floor
-- Right forearm rests on the upper bout curve
-- Fine for strumming-dominant playing, but watch the wrist — if the neck dips below horizontal, your fretting wrist hyperextends to compensate
+**Casual/folk position** (guitar on right thigh):
+- Neck roughly parallel to the floor
+- Right forearm rests along the upper bout
+- Fine for strumming-heavy playing. Watch for the neck dipping below horizontal — that forces your fretting wrist into hyperextension to compensate, which is a direct path to wrist strain
 
-**Standing with strap:**
-- Strap height matters enormously — too low forces your fretting wrist into extreme flexion
-- Target strap height: guitar at the same position as your seated playing position
-- A strap that lets the guitar hang at your knees looks cool and destroys your technique
+**Standing with a strap:**
+- Set the strap so the guitar sits at the same height and angle as your seated position — stand up, play a chord, note where the neck is, adjust strap to match
+- Dropping the guitar to hip/knee height forces your fretting elbow out and wrist into extreme flexion. Looks good in photos, ruins barre chords live
 
-### Fretting Hand Mechanics
+### Fretting Hand: The Arch
 
-```
-Correct finger arch (side view):
+Your fingers contact the string at the tip, with the first knuckle (closest to the fingertip) staying upright, not collapsed flat. A collapsed knuckle lays the finger pad flat across the fretboard, which mutes the string underneath it — this is the single most common cause of a "dead" adjacent string in beginner chord shapes.
 
-    Fingertip contact point
-           |
-    ┌──────▼──────┐
-    │  ○            │   ← Curved arch — 1st knuckle stays UP
-    │   \           │
-    │    ──────────│   ← String plane
-    │      Fretboard│
-    └──────────────┘
+**Self-check**: fret a note on the D string with your middle finger. Without moving anything else, try to pluck the G string right next to it. If it's muted, your knuckle collapsed. Rebuild the arch — bring the fingertip in steeper, more perpendicular to the fretboard.
 
-Collapsed knuckle (WRONG):
+**Thumb placement**:
+- Default: thumb pad (not the side, not the tip) centered on the back of the neck, roughly opposite your 2nd finger
+- Open chords: thumb can creep slightly over the top edge to help mute the low E string — common in blues and folk fingerings
+- Barre chords: thumb drops to dead-center back of the neck, directly behind the index finger, acting as the lever arm the index finger presses against
 
-    ┌───────────────┐
-    │  ___________  │   ← Flat finger mutes adjacent strings
-    │             \ │
-    │    ──────────│
-    └──────────────┘
-```
+**Minimum effective pressure**: fret a note, then slowly release pressure until it just starts to buzz. That threshold is your minimum. Practice fretting at roughly 10% more than that threshold, no more. Overgripping is the single biggest cause of forearm fatigue, tendinitis, and chronically sharp (overbent) pitch on sustained notes.
 
-**Thumb placement on the back of the neck:**
-- Thumb tip rests roughly behind the 2nd finger, centered on the back of the neck
-- Thumb pad, not the side of the thumb — this keeps the wrist low and fingers arched
-- For open chords: thumb can wrap slightly over the top to assist muting the low E string (blues/folk technique)
-- For barre chords: thumb drops to center-back of neck, providing the lever arm against your index finger
+### Picking/Strumming Hand: Wrist as the Engine
 
-**Minimum effective pressure** is the most important concept a beginner needs. Press just hard enough for a clean note — then consciously back off 10%. Over-squeezing is the #1 cause of fatigue, tendinitis, and sharp intonation. Test: fret a note, gradually release pressure. The moment it buzzes, that's slightly below the threshold. Work just above it.
+The strum comes from wrist rotation, not elbow pumping. Forearm rests lightly on the lower bout as a stable pivot; the hand and pick rotate around the wrist like a hinge.
 
-### Picking/Strumming Hand Mechanics
-
-The motion source for strumming is the **wrist**, not the elbow or shoulder. The forearm rests on the guitar body as a pivot point. Think of your wrist as a door hinge — the door (hand and pick) swings; the frame (forearm) stays relatively still.
-
-- **Pick angle**: 15–25° relative to the string plane for most acoustic strumming. Zero degrees (pick parallel to strings) gives the brightest, thinnest attack. 45° gives a fuller, slightly warmer attack with more string resistance.
-- **Pick grip**: Thumb pad to index side, pick protruding 5–8mm. Firm enough that it won't fly out at speed, loose enough that it flexes slightly on contact. If your forearm tenses when you strum, your grip is too tight.
-- **Attack position**: Strum over the soundhole for a full, balanced tone. Move toward the bridge for a bright, cutting tone. Move toward the neck for a warm, pillowy tone.
+- **Pick angle**: 15–25° off the string plane for standard acoustic strumming. Flatter (near 0°) = bright, thin, fast attack. Steeper (up to 40°) = fuller, warmer, slightly slower attack with more string resistance felt in the hand.
+- **Pick grip**: pick between thumb pad and the side of the index finger, 5–8mm of tip exposed beyond the fingers. Firm enough to survive fast strumming, loose enough to flex slightly on contact. If your forearm tenses while strumming, loosen the grip first — tension almost always starts in the fingers and travels up.
+- **Attack position** changes tone directly: over the soundhole = full and balanced (default), toward the bridge = bright and cutting, toward the neck = warm and dark. More in Section 11.
 
 ---
 
 ## 3. The CAGED System: Your Fretboard Map
 
-The CAGED system is the most important organizational framework for acoustic guitar. Five movable shapes — derived from the five open-position chords — tile the entire neck in a continuous cycle. Learn these five shapes, and every major chord in every position is accessible.
+CAGED is five movable chord shapes, named after the open chords they're derived from, that tile the entire fretboard in a repeating cycle. Learn these five shapes cold and every major (and with small adjustments, minor and dominant) chord becomes reachable in any position.
 
 ```mermaid
 graph LR
-    subgraph sub_caged ["CAGED Cycle — Major Chords (Chromatic Ascent)"]
-        C["C Shape<br/>Root: 5th string<br/>Open pos: fret 0"]
-        A["A Shape<br/>Root: 5th string<br/>Barre pos"]
+    subgraph sub_caged ["CAGED Cycle — Major Chords (Ascending the Neck)"]
+        C["C Shape<br/>Root: 5th string<br/>Open position"]
+        A["A Shape<br/>Root: 5th string<br/>Barre shape"]
         G["G Shape<br/>Root: 6th string<br/>Partial barre"]
         E["E Shape<br/>Root: 6th string<br/>Full barre"]
         D["D Shape<br/>Root: 4th string<br/>Upper neck"]
@@ -106,347 +87,302 @@ graph LR
     style D fill:#ffffd4,stroke:#888822
 ```
 
-### C Major Across the Full Neck
-
-Every chord position below sounds C–E–G (C major), just in different voicings and registers:
+### C Major Across the Full Neck (Same Pitches, Five Locations)
 
 ```
-Position 1: C Shape (open)        Position 2: A Shape (barre 3)
+Position 1: C Shape (open)        Position 2: A Shape (barre, fret 3)
 e |--0--                          e |--3--
-B |--1--  ← index                 B |--5--  ← barre (index)
-G |--0--                          G |--5--  ← barre (index)
-D |--2--  ← middle                D |--5--  ← barre (index)
-A |--3--  ← ring                  A |--3--  ← not played / muted
+B |--1--  index                   B |--5--  barre (index)
+G |--0--                          G |--5--  barre (index)
+D |--2--  middle                  D |--5--  barre (index)
+A |--3--  ring                    A |--3--  (open within barre)
 E |--x--                          E |--x--
 
-Position 3: G Shape (5th fret)    Position 4: E Shape (8th fret)
-e |--8--  ← pinky                 e |--8--  ← barre (index)
-B |--8--  ← ring                  B |--8--  ← barre (index)
-G |--9--  ← pinky alt             G |--9--  ← middle
-D |--10-- ← barre partial         D |--10-- ← ring
-A |--10-- ← barre partial         A |--10-- ← pinky
-E |--8--  ← index                 E |--8--  ← barre (index)
+Position 3: G Shape (fret 5)      Position 4: E Shape (fret 8)
+e |--8--  pinky                   e |--8--  barre (index)
+B |--8--  ring                    B |--8--  barre (index)
+G |--9--  middle                  G |--9--  middle
+D |--10-- barre (index)           D |--10-- ring
+A |--10-- barre (index)           A |--10-- pinky
+E |--8--  index                   E |--8--  barre (index)
 
-Position 5: D Shape (10th fret)
-e |--12--  ← pinky
-B |--13--  ← (not played in D shape typically)
-G |--12--  ← middle
-D |--10--  ← open (capo reference)
+Position 5: D Shape (fret 10)
+e |--12-- pinky
+B |--13-- ring (often omitted live for a thinner voicing)
+G |--12-- middle
+D |--10-- barre (index)
 A |--x--
 E |--x--
 ```
 
-**Practical drill**: Pick any single note on the fretboard. Name the CAGED shape whose root sits closest to that note. This trains you to see the neck as interconnected shapes rather than isolated dots.
+**Drill**: pick any fretted note at random on strings 5 or 6. Name which CAGED shape's root sits there, then build the full chord shape around it from memory. Do this for five minutes daily — it's what converts CAGED from a chart you've seen into a map you actually use while improvising chord voicings on the fly.
 
 ---
 
 ## 4. Open Chord Vocabulary: Exact Fingerings
 
-Every chord diagram below uses this convention:
-- Strings: **E A D G B e** (low to high)
-- Numbers: fret position
-- **x** = muted (don't strike), **0** = open string
-- Finger numbers: 1=index, 2=middle, 3=ring, 4=pinky, T=thumb
-
-### The Core Open Chords (Campfire Set)
+Diagram convention used throughout: strings listed low to high (**E A D G B e**), numbers are fret positions, **x** = don't play that string, **0** = open string, finger numbers 1=index, 2=middle, 3=ring, 4=pinky.
 
 ```
 E Major (022100)          E Minor (022000)
 e |--0--                  e |--0--
 B |--0--                  B |--0--
-G |--1-- ← 1 (index)      G |--0--
-D |--2-- ← 2 (middle)     D |--2-- ← 2 (middle)
-A |--2-- ← 3 (ring)       A |--2-- ← 3 (ring)
+G |--1-- (1)               G |--0--
+D |--2-- (2)               D |--2-- (2)
+A |--2-- (3)               A |--2-- (3)
 E |--0--                  E |--0--
-Fingers: x 2 3 1 x x      Fingers: x 2 3 x x x
 
 A Major (x02220)          A Minor (x02210)
 e |--0--                  e |--0--
-B |--2-- ← 3 (ring)       B |--1-- ← 1 (index)
-G |--2-- ← 2 (middle)     G |--2-- ← 2 (middle)
-D |--2-- ← 1 (index)      D |--2-- ← 3 (ring)
+B |--2-- (3)               B |--1-- (1)
+G |--2-- (2)               G |--2-- (2)
+D |--2-- (1)               D |--2-- (3)
 A |--0--                  A |--0--
 E |--x--                  E |--x--
-Alt: barre 2nd fret       Fingers: x x 3 2 1 x
-with 1 finger (index)
+(Alt: barre fingers 1-2-3 flat across fret 2 with one finger)
 
 D Major (xx0232)          D Minor (xx0231)
-e |--2-- ← 2 (middle)     e |--1-- ← 1 (index)
-B |--3-- ← 3 (ring)       B |--3-- ← 3 (ring)
-G |--2-- ← 1 (index)      G |--2-- ← 2 (middle)
+e |--2-- (2)               e |--1-- (1)
+B |--3-- (3)               B |--3-- (3)
+G |--2-- (1)               G |--2-- (2)
 D |--0--                  D |--0--
 A |--x--                  A |--x--
 E |--x--                  E |--x--
 
 G Major (320003)          C Major (x32010)
-e |--3-- ← 4 (pinky)      e |--0--
-B |--0--                  B |--1-- ← 1 (index)
+e |--3-- (4 pinky)        e |--0--
+B |--0--                  B |--1-- (1)
 G |--0--                  G |--0--
-D |--0--                  D |--2-- ← 2 (middle)
-A |--2-- ← 2 (middle)     A |--3-- ← 3 (ring)
-E |--3-- ← 3 (ring)       E |--x--
-Alt low: 2 (middle) on A
-         1 (index) on E
+D |--0--                  D |--2-- (2)
+A |--2-- (2)               A |--3-- (3)
+E |--3-- (3)               E |--x--
+(Alt low voicing: swap fingers 2/3 on A and E
+to free the pinky for pull-offs or added notes)
 
-F Major (133211) — Barre   G7 (320001)
-e |--1-- ← 1 barre        e |--1-- ← 1 (index)
-B |--1-- ← 1 barre        B |--0--
-G |--2-- ← 2 (middle)     G |--0--
-D |--3-- ← 3 (ring)       D |--0--
-A |--3-- ← 4 (pinky)      A |--2-- ← 2 (middle)
-E |--1-- ← 1 barre        E |--3-- ← 3 (ring)
+F Major (133211) — Full Barre      G7 (320001)
+e |--1-- barre (1)                  e |--1-- (1)
+B |--1-- barre (1)                  B |--0--
+G |--2-- (2)                        G |--0--
+D |--3-- (3)                        D |--0--
+A |--3-- (4)                        A |--2-- (2)
+E |--1-- barre (1)                  E |--3-- (3)
 ```
 
 ---
 
 ## 5. Barre Chord Mechanics: Building the F
 
-The F major barre chord at the 1st fret is the wall most guitarists hit and either climb or give up at. Here's the biomechanics of climbing it.
+F major at the 1st fret is the technical wall most players hit. It's purely mechanical — fix the geometry and the chord opens up in days, not months.
 
-### Index Finger Placement (The Barre)
+### Index Finger as a Ridge, Not a Pad
 
-Your index finger is not a flat pad — it's a ridge. Roll it very slightly toward the headstock (toward your thumb side) so the **bony edge** of the finger, not the soft fingerprint pad, contacts the strings. This edge is firmer and requires less force for a clean press.
-
-```
-Index finger cross-section (looking from headstock end):
-
-     ← Toward headstock    Toward body →
-     
-     Soft pad side         Bony edge side
-         ⌒                      |
-        /  \                    |   ← USE THIS EDGE
-       /    \                   |
-      └──────┘
-      
-Roll 10–15° toward bony edge.
-Not so much that pain occurs — just enough to feel the firmer surface.
-```
-
-**Checklist for a clean F barre:**
-
-1. **Thumb position**: Directly behind the index finger on the back of the neck, centered — not hooked over the top
-2. **Wrist**: Dropped slightly away from the neck, creating a forward bow that naturally arches fingers 2, 3, 4
-3. **Index finger**: Pressed as close behind the 1st fret wire as possible without touching it
-4. **Arch in fingers 2–4**: Each additional finger must stay arched — collapsed knuckles on the ring or pinky kill the G or B string
-5. **Check each string individually**: Press the full chord, then pick strings one at a time, low to high. Identify exactly which string buzzes and adjust that specific finger
-
-### Barre Chord Progressive Approach
-
-Don't start at the 1st fret. The nut adds extra resistance — start at the 5th fret where string action is easier and move down as strength builds.
+Roll the index finger slightly toward the headstock so the firmer, bony edge of the finger contacts the strings instead of the soft fingerprint pad. The bony edge transmits pressure more efficiently, meaning less total squeeze for the same clean note.
 
 ```
-Week 1: Barre at 7th fret (easiest)   → A major shape = E major chord
-Week 2: Barre at 5th fret             → E major shape = A major chord
-Week 3: Barre at 3rd fret             → E major shape = G major chord
-Week 4: Barre at 1st fret             → E major shape = F major chord
+Index finger, viewed from the headstock end:
+
+   Soft pad (avoid)         Bony edge (use this)
+        ⌒                         |
+       /  \                       |  ← roll finger 10–15°
+      /    \                      |     toward headstock until
+     └──────┘                     |     this edge meets the strings
 ```
 
-**Daily barre builder drill**: 2 minutes per day, every day.
-Hold the barre at your current comfortable fret. Press, check each string, release, re-press. Repeat 20 times. No strumming — pure placement and release. This builds targeted endurance without fatigue.
+**Clean F checklist:**
+
+1. Thumb directly behind the index, centered on the back of the neck — not hooked over the top
+2. Wrist dropped slightly away from the neck so fingers 2–4 arch naturally without extra effort
+3. Index finger pressed as close behind the fret wire as possible without touching it
+4. Fingers 2–4 stay arched — a collapsed ring or pinky knuckle is the usual culprit when the G or B string dies
+5. Isolate: play the chord, then pick each string individually from low to high. Whichever string buzzes tells you exactly which finger needs adjusting — don't guess, test string by string every time
+
+### Progressive Barre Approach — Build Strength Where It's Easiest First
+
+The nut end of the neck has the highest string tension and widest fret spacing, making it the hardest place to barre. Start higher up where it's physically easier, then work down.
+
+```
+Week 1: Barre at fret 7  (easiest)  → A-shape fingering = B major chord
+Week 2: Barre at fret 5             → E-shape fingering = A major chord
+Week 3: Barre at fret 3             → E-shape fingering = G major chord
+Week 4: Barre at fret 1  (hardest)  → E-shape fingering = F major chord
+```
+
+**Daily barre builder** (2 minutes, every day, separate from your main practice session): barre your current comfortable fret, pick each string to confirm clean, release completely, re-press. 20 reps. No strumming involved — this is pure placement-and-release endurance training, and it builds strength without the fatigue of playing full songs on a chord you haven't mastered yet.
 
 ---
 
 ## 6. Essential Chord Progressions: Real Music, Real Context
 
-Theory means nothing until it sounds like a song. These progressions cover the vast majority of folk, rock, pop, and country guitar.
+### I–V–vi–IV ("The Axis Progression")
 
-### The I–V–vi–IV (The Axis Progression)
-
-In the key of G: **G – D – Em – C**
+Key of G: **G – D – Em – C**
 
 ```
 G (320003) → D (xx0232) → Em (022000) → C (x32010)
-  3 fr          3 fr          2 fr          3 fr
 
-Beat: 1 2 3 4 | 1 2 3 4 | 1 2 3 4 | 1 2 3 4
-Strum: D D U D U | D D U D U | D D U D U | D D U D U
+Strum (one bar each, 4/4):
+Beat:   1   &   2   &   3   &   4   &
+Strum:  D   .   D   U   .   D   U   .
 ```
 
-Covers: *Let Her Go, Someone Like You, No Woman No Cry, Africa* (thousands more)
+Covers: *Let Her Go, Someone Like You, No Woman No Cry, Africa*, and thousands more — this four-chord loop is the most commercially used progression in modern popular music.
 
-**Key of C:** C – G – Am – F *(same harmonic function, different shapes)*
+Same progression, key of C: **C – G – Am – F**
 
-### The I–IV–V (Blues and Rock Foundation)
+### I–IV–V (Blues and Rock Backbone)
 
-In the key of E: **E – A – B7**
+Key of E: **E – A – B7**
 
 ```
 E (022100) → A (x02220) → B7 (x21202)
 
 B7 fingering:
-e |--2-- ← 1 (index)
+e |--2-- (1)
 B |--0--
-G |--2-- ← 2 (middle)
-D |--1-- ← 1 (index, same barre position)
-A |--2-- ← 3 (ring)
+G |--2-- (2)
+D |--1-- (1, flat against same fret as B string — roll slightly)
+A |--2-- (3)
 E |--x--
 
-Strum pattern (12-bar feel):
-Beat: 1  &  2  &  3  &  4  &
-      D  .  D  U  .  U  D  U
+12-bar shuffle feel:
+Beat:   1  &  2  &  3  &  4  &
+Strum:  D  .  D  U  .  U  D  U
 ```
 
-### The I–vi–IV–V (50s Doo-Wop / Classic Rock)
+### I–vi–IV–V (50s Progression / Doo-Wop)
 
-In C: **C – Am – F – G**
+Key of C: **C – Am – F – G**
 
 ```
 C (x32010) → Am (x02210) → F (133211) → G (320003)
-     ↑              ↑              ↑           ↑
-  Pivot: ring    Pivot: ring  Barre index   Shift
-  stays on A5    stays on A5
 ```
 
-Notice the pivot finger: your ring finger stays on the 3rd fret of the A string through the C-to-Am change. Only the index and middle fingers move. This is **efficient chord geometry**.
+Notice the pivot: ring finger stays planted on the 3rd fret of the A string through the entire C-to-Am change — only the index and middle fingers lift and reposition. This is efficient chord geometry: the fewer fingers that move, the faster and cleaner the transition.
 
-### The ii–V–I (Jazz Foundation)
+### ii–V–I (Jazz Cadence)
 
-In G: **Am7 – D7 – G major 7**
+Key of G: **Am7 – D7 – Gmaj7**
 
 ```
-Am7 (x02010)         D7 (xx0212)          Gmaj7 (320002)
-e |--0--             e |--2-- ← 2(mid)    e |--2-- ← 2(mid)
-B |--1-- ← 1(idx)   B |--1-- ← 1(idx)   B |--0--
-G |--0--             G |--2-- ← 3(ring)   G |--0--
-D |--2-- ← 2(mid)   D |--0--             D |--0--
-A |--0--             A |--x--             A |--2-- ← 1(idx)
-E |--x--             E |--x--             E |--3-- ← 3(ring)
+Am7 (x02010)          D7 (xx0212)           Gmaj7 (320002)
+e |--0--              e |--2-- (2)           e |--2-- (2)
+B |--1-- (1)           B |--1-- (1)           B |--0--
+G |--0--              G |--2-- (3)           G |--0--
+D |--2-- (2)           D |--0--              D |--0--
+A |--0--              A |--x--              A |--2-- (1)
+E |--x--              E |--x--              E |--3-- (3)
 ```
 
 ---
 
 ## 7. Strumming: Patterns, Mechanics, and Rhythm Feel
 
-### The Four Core Patterns (Build These First)
+### Four Core Patterns — Learn in This Order
 
-**Pattern 1 — All Downstrokes (Quarter notes)**
+**Pattern 1 — All Downstrokes**
 ```
-Beat:    1       2       3       4
-         D       D       D       D
-Target: 60 BPM → 80 BPM → 100 BPM
-Feel: solid, driving, country/rock ballad
+Beat:   1    2    3    4
+        D    D    D    D
+Metronome: 60 → 80 → 100 BPM
+Feel: driving, locked — country and rock ballad foundation
 ```
 
 **Pattern 2 — 8th Note Down-Up**
 ```
-Beat:    1   &   2   &   3   &   4   &
-         D   U   D   U   D   U   D   U
-Target: 60 BPM → 90 BPM → 120 BPM
-Feel: even, flowing — the foundation pattern
+Beat:   1   &   2   &   3   &   4   &
+        D   U   D   U   D   U   D   U
+Metronome: 60 → 90 → 120 BPM
+Feel: even and flowing — the pattern everything else builds from
 ```
 
-**Pattern 3 — The "Skip" Pattern (most common pop/folk feel)**
+**Pattern 3 — "Skip" Pattern (the most common pop/folk feel)**
 ```
-Beat:    1   &   2   &   3   &   4   &
-         D   .   D   U   .   U   D   U
-         ↓       ↓   ↑       ↑   ↓   ↑
-         hit  skip  hit  skip skip hit hit
-Target: 70 BPM → 90 BPM → 110 BPM
-Feel: syncopated — this is in thousands of songs
+Beat:   1   &   2   &   3   &   4   &
+        D   .   D   U   .   U   D   U
+Metronome: 70 → 90 → 110 BPM
+Feel: syncopated, appears in thousands of recorded songs
 ```
 
-**Pattern 4 — 16th Note Syncopation (strumming with ghost strokes)**
+**Pattern 4 — 16th Note Syncopation with Ghost Strokes**
 ```
-Beat:    1  e  &  a  2  e  &  a  3  e  &  a  4  e  &  a
-         D  .  U  .  D  .  U  U  D  .  U  .  D  U  .  U
-         ↓     ↑     ↓     ↑  ↑  ↓     ↑     ↓  ↑     ↑
-Target: 60 BPM → 80 BPM (16th notes feel fast — start slow)
-Feel: funk/R&B, contemporary acoustic pop
-```
-
-> **The ghost stroke rule**: Your strumming hand moves in constant 8th-note or 16th-note pendulum motion. When you see a rest or a "skip," your hand still swings through — it just doesn't contact the strings. This keeps your time locked. Never stop the pendulum motion.
-
-### Strumming with Muted Percussive Hits ("Chucks")
-
-Mid-stroke, loosely release fretting-hand pressure so fingers still touch strings but don't fret them cleanly. Strum across those strings — they produce a percussive "chk" sound with no pitch. Notated with **X**.
-
-```
-Beat:    1   &   2   &   3   &   4   &
-         D   X   D   U   X   U   D   X
-         ↓   ✕   ↓   ↑   ✕   ↑   ↓   ✕
-
-The X hits provide rhythmic punctuation — this is the basis
-of "strumming grooves" in folk and pop.
+Beat:   1  e  &  a  2  e  &  a  3  e  &  a  4  e  &  a
+        D  .  U  .  D  .  U  U  D  .  U  .  D  U  .  U
+Metronome: 60 → 80 BPM (16ths feel fast — do not rush this)
+Feel: funk/R&B-tinged contemporary acoustic pop
 ```
 
-### The Strum-Timing Sequence (What Happens Each Hit)
+> **Ghost stroke rule**: your strumming hand moves in a continuous, unbroken pendulum of 8th or 16th notes. On a rest or "skip," the hand still swings through the same arc — it just doesn't touch the strings. Stopping the pendulum to wait for the next hit is the #1 cause of rushed, uneven strumming. Keep it moving even through silence.
+
+### Percussive Muted Hits ("Chucks")
+
+Mid-phrase, relax fretting-hand pressure just enough that fingers stay on the strings but don't fret a clean note. Strum through — you get a percussive "chk" with no pitch, notated **X**.
+
+```
+Beat:   1   &   2   &   3   &   4   &
+        D   X   D   U   X   U   D   X
+```
+
+These punctuate strumming grooves across folk and pop and are often the difference between a strum pattern that sounds "programmed" and one that grooves.
+
+### Timing: Motion Precedes the Beat
 
 ```mermaid
 sequenceDiagram
-    participant Beat as Metronome Beat
-    participant WR as Wrist Rotation
-    participant Pick as Pick-String Contact
-    participant Sound as Acoustic Output
+    participant Beat as Metronome Click
+    participant Wrist as Wrist Rotation
+    participant Pick as Pick–String Contact
 
-    Note over Beat,Sound: Downstroke cycle at 90 BPM (quarter note = 667ms)
-
-    Beat->>WR: Beat 1 impulse (0ms)
-    WR->>Pick: Stroke initiation begins -30ms before beat
-    Pick->>Sound: String contact ON the beat (0ms)
-    Sound-->>Sound: Tone develops over next 20–50ms
-
-    Beat->>WR: & (333ms upstroke cue)
-    WR->>Pick: Upstroke initiation -20ms before &
-    Pick->>Sound: Strings contact at 333ms
+    Note over Beat,Pick: Downstroke at 90 BPM (quarter note ≈ 667ms)
+    Beat->>Wrist: Beat 1 click (0ms)
+    Wrist->>Pick: Motion already started ~30ms before the click
+    Pick->>Pick: String contact lands exactly on the beat
+    Note over Wrist,Pick: Upstroke prep begins ~20ms before the "&" (333ms)
+    Beat->>Wrist: "&" click (333ms)
+    Wrist->>Pick: Contact lands on the "&"
 ```
 
-**Key takeaway**: Your physical motion must **precede** the beat. The pick touches strings *on* the beat, but your arm/wrist moves *before* it. This predictive timing, not reactive timing, is what separates locked-in players from rushed/dragging ones.
+**Takeaway**: the pick touches the strings exactly on the beat, but the wrist starts moving slightly before it. Players who wait for the click before moving are always late — this predictive, not reactive, motion is what separates locked-in rhythm playing from dragging or rushing.
 
 ---
 
 ## 8. Chord Transition Drills: The Engine Room
 
-Clean, fast chord changes are built through **deliberate isolation drills**, not just playing through songs and hoping it improves.
-
 ### The One-Minute Chord Change Drill
 
-Pick two chords. Set a metronome to a tempo where you can change cleanly, even if slow. Play each chord for one beat, then switch. Count every clean change in 60 seconds. Record your score. This is your baseline.
+Pick two chords. Set a metronome to a tempo where you can change cleanly even if slow. Play each chord for one beat, switch, repeat for 60 seconds, count every clean change. That number is your baseline — write it down.
 
 ```
-Week 1 targets (clean changes per minute):
-- C → G:  20+ changes at 60 BPM
-- G → D:  20+ changes at 60 BPM
-- D → Em: 20+ changes at 60 BPM
-- Em → C: 20+ changes at 60 BPM
+Week 1 target (clean changes per minute, 60 BPM):
+  C ↔ G:  20+
+  G ↔ D:  20+
+  D ↔ Em: 20+
+  Em ↔ C: 20+
 
-Week 4 targets:
-- All pairs above: 30+ changes at 80 BPM
-
-Week 8 targets:
-- All pairs above: 40+ changes at 100 BPM
+Week 4 target: 30+ at 80 BPM
+Week 8 target: 40+ at 100 BPM
 ```
 
-### Pivot Finger Strategy: Work Smarter
+### Pivot Finger Strategy
 
-Before switching chords, identify which finger (if any) stays on the same string and fret. Keep that finger down during the transition — it's your anchor.
+Before switching, find any finger that lands on the same string and fret in both chords. That finger stays down through the transition — it's your anchor and your timing reference.
 
 ```
-C → Am transition:
-C (x32010): index on B1, middle on D2, ring on A3
-Am(x02210): index on B1, middle on D2, ring on A2
-
-Pivot: index (B, 1st fret) STAYS
-       middle (D, 2nd fret) STAYS
-       Only ring moves: A3 → A2 (one fret!)
-
-This is a nearly effortless change — you're only moving one finger one fret.
+C → Am:
+  C  (x32010): index on B1, middle on D2, ring on A3
+  Am (x02210): index on B1, middle on D2, ring on A2
+  → Index and middle never move. Only the ring finger shifts one fret (A3 → A2).
 ```
 
 ```
-G → Cadd9 (x32033) transition:
-G (320003):   middle on A2, ring on E3, pinky on e3
-Cadd9(x32033): ring on A3, middle on D2, pinky on B3, ring on G0
-
-Better approach: use G with pinky on e (320004 fingering):
-G pinky version: ring on A2, middle on E3, pinky on e3
-Cadd9: ring stays on A3 (shift 1 fret), pinky stays on e3 (open)
-       Add middle on D2
-
-The pinky becomes the pivot across G → Cadd9 → Em7 → Dsus4 —
-this is the classic "millennial whoop" open voicing technique.
+G → Cadd9, using the pinky G voicing (320004):
+  G (pinky on e, ring on A2, middle on E3)
+  Cadd9 (x32033): ring shifts to A3, pinky stays open on e,
+  add middle on D2
+  → Pinky becomes the through-line across G → Cadd9 → Em7 → Dsus4,
+    a common open-voicing move in contemporary acoustic pop.
 ```
 
-### Chord Change State Map (Common Transitions)
+### Chord Change Map (Common Transitions)
 
 ```mermaid
 stateDiagram-v2
@@ -460,132 +396,122 @@ stateDiagram-v2
     state "D (xx0232)" as D_shape
     state "F (133211)" as F_shape
 
-    C_shape --> Am_shape : Pivot: idx+mid stay\nOnly ring shifts A3→A2
-    C_shape --> G_shape : Lift all / reform\nUse pinky-G shape
-    C_shape --> F_shape : Index barre 1st fret\nretains relative shape
-    G_shape --> D_shape : Lift all / triangle\nstrings 1–3 target
-    G_shape --> Em_shape : Release ring+pinky\nKeep middle on A2
-    Am_shape --> Em_shape : Release ring\nKeep idx+mid
-    D_shape --> C_shape : Pivot middle on D2\nrotate ring to A3
+    C_shape --> Am_shape : Pivot idx+mid, ring shifts A3→A2
+    C_shape --> G_shape : Full reform, use pinky-G shape
+    C_shape --> F_shape : Index rolls into barre position
+    G_shape --> D_shape : Full reform, triangle shape strings 1-3
+    G_shape --> Em_shape : Release ring+pinky, keep middle on A2
+    Am_shape --> Em_shape : Release ring, keep idx+mid
+    D_shape --> C_shape : Pivot middle on D2, ring rotates to A3
 ```
 
 ---
 
 ## 9. Fingerstyle Foundation: Travis Picking
 
-Travis picking is the backbone of folk, country, and acoustic fingerstyle. The thumb alternates between two bass strings while fingers pluck the treble strings — two independent rhythmic streams happening simultaneously.
+Travis picking is the backbone of folk, country, and solo acoustic fingerstyle. The thumb runs an independent alternating bass line while the fingers pick out a separate treble pattern on top — two rhythmic voices at once, which is what gives it that "more than one guitar" sound from a single player.
 
-### Right Hand Assignment (Standard Travis)
+### Right Hand Assignment
 
 ```
-Thumb (p) → alternates between 6th and 4th strings (or 5th and 4th for A-root chords)
-Index (i) → 3rd string
+Thumb  (p) → alternates between 6th and 4th strings
+             (use 5th and 4th instead for A-root chords like Am, C)
+Index  (i) → 3rd string
 Middle (m) → 2nd string
-Ring (a) → 1st string
+Ring   (a) → 1st string
 ```
 
-### Basic Pattern on G Major (320003)
+### Basic Pattern on G Major
 
 ```
-G major Travis pattern — 4/4, one measure:
-
-Strings:  E  A  D  G  B  e
-Beat:     1     &     2     &     3     &     4     &
-
-          p        i  m     p        i  m     p        i  m     p        i  m
-          ↓        ↓  ↓     ↓        ↓  ↓     ↓        ↓  ↓     ↓        ↓  ↓
-E(6th):   ×                 ×                 ×                 ×
-D(4th):         ×                   ×                   ×                   ×
-G(3rd):               ×                   ×                   ×                   ×
-B(2nd):         ×                   ×                   ×                   ×
-
-Tab form:
 e |--------3---------3---------3---------3--|
 B |------0---0-----0---0-----0---0-----0---0|
 G |----0-------0-0-------0-0-------0-0-------|
 D |--0---------0-----------0-----------0-----|
-A |------------------------------------------|
+A |-------------------------------------------|
 E |3-----------3-----------3-----------3-----|
+
+Right hand:  p      i  m   p      i  m   p      i  m   p      i  m
 ```
 
-### Travis Picking Metronome Progression
+Thumb hits E6 on beat 1, D4 on beat 3; index and middle fill in the off-beats on the top three strings, creating a rolling, syncopated texture even though the chord never changes.
+
+### Travis Metronome Progression
 
 ```
-Phase 1 (Thumb-only): 50 BPM
-  - Thumb alternates E6–D4 on every beat with no other fingers
-  - Goal: rock-solid alternating bass, no hesitation
+Phase 1 — Thumb only, 50 BPM
+  Alternate E6–D4 every beat, no other fingers playing.
+  Goal: the bass line is rock solid with zero hesitation before
+  you add anything on top.
 
-Phase 2 (Thumb + pinch on beat 1): 50 BPM
-  - On beat 1: thumb AND middle finger pluck simultaneously (pinch)
-  - Remaining beats: thumb-only alternation
-  - Goal: feel the two-voice texture
+Phase 2 — Thumb + pinch on beat 1, 50 BPM
+  Beat 1: thumb and middle finger strike together (a "pinch").
+  All other beats: thumb alone.
+  Goal: feel the two voices as genuinely separate motions.
 
-Phase 3 (Full pattern): 50 BPM → 70 BPM → 90 BPM
-  - Full Travis pattern as notated above
-  - Add chord changes only after pattern is automatic at 70 BPM
+Phase 3 — Full pattern, 50 → 70 → 90 BPM
+  Play the complete pattern above. Only introduce chord changes
+  once the pattern is fully automatic at 70 BPM — adding chord
+  changes too early is the most common reason Travis picking
+  stalls out for beginners.
 ```
 
 ---
 
 ## 10. Failure Modes, Diagnostics & Fixes
 
-### Failure Mode 1: Muted or Buzzing Strings
+### Muted or Buzzing Strings
 
-**Cause A**: Finger not arched — collapsed 1st knuckle mutes adjacent string.
-**Cause B**: Finger not close enough behind the fret wire — pressing mid-fret requires more force and buzzes easily.
-**Cause C**: Thumb too high on neck — forces wrist forward, flattening finger approach angle.
+**Causes**: collapsed first knuckle muting the adjacent string; finger positioned mid-fret instead of close behind the fret wire (requires more pressure, buzzes more easily at the same force); thumb riding too high on the neck, flattening the fretting angle of the fingers.
 
-**Diagnostic**: Press the full chord, then pick each string individually, low to high. The buzzing/muted string tells you exactly which finger to fix.
+**Diagnostic**: play the full chord, then pick each string individually, low to high. The string that buzzes or goes dead tells you exactly which finger to fix — don't re-fret the whole chord blindly.
 
-**Fix**: For the offending finger — hover it over the correct position, then press **only that finger** until you hear a clean note. Then add the remaining fingers. This isolates the bad habit.
+**Fix**: isolate the offending finger. Hover it over the correct spot, press alone until the note rings clean, then rebuild the rest of the chord around it.
 
-### Failure Mode 2: Slow Chord Changes
+### Slow Chord Changes
 
-**Cause**: Lifting all fingers simultaneously and placing them one-by-one on the new chord ("serial" transitions instead of "parallel").
+**Cause**: lifting every finger simultaneously and placing them one at a time on the new shape ("serial" transition) instead of moving all non-pivot fingers together as one unit ("parallel" transition).
 
-**Fix**: Identify the pivot finger(s) and anchor them. Practice the transition in slow motion — literally 2 seconds per chord — focusing on moving all non-pivot fingers simultaneously as one unit toward the target position. Speed follows precision.
+**Fix**: find the pivot finger(s) from Section 8 and anchor them. Practice the change in slow motion — two full seconds per chord — moving everything else as a single coordinated shift, not finger by finger. Speed comes after the motion is unified, not before.
 
-### Failure Mode 3: Strumming Out of Time
+### Strumming Out of Time
 
-**Cause A**: Reactive timing — waiting for the metronome click to start the strum motion. By the time your hand starts moving, the beat has passed.
-**Cause B**: Stopping the pendulum motion on rests instead of ghosting through.
+**Causes**: reactive timing (waiting for the click before starting the stroke, which means you're always late); stopping the pendulum motion during rests instead of ghosting through them.
 
-**Diagnostic**: Record yourself with a metronome. Import the audio into any DAW (GarageBand, Audacity, or similar). Zoom in on the waveform. Your strum attacks should sit exactly on the grid lines. If they're consistently late, you're being reactive. If they're early, you're rushing.
+**Diagnostic**: record yourself against a metronome, import into Audacity or GarageBand, zoom into the waveform. Strum attacks should land exactly on the grid. Consistently late means reactive timing; consistently early means rushing.
 
-**Fix**: Set the metronome to click only on beats 2 and 4 (the backbeat). This forces you to maintain internal subdivision. Start at 50 BPM "2 and 4" (which feels like 100 BPM quarter notes). Keep the full pendulum swing going through every rest.
+**Fix**: set the metronome to click only on beats 2 and 4. This forces you to hold the subdivision internally rather than relying on the click for every beat. Start at 50 BPM on "2 and 4" (which feels like 100 BPM in quarters), and keep the full pendulum motion running through every rest.
 
-### Failure Mode 4: Arm-Dominant Strumming
+### Arm-Dominant Strumming
 
-**Cause**: Large elbow movement substituting for wrist rotation, creating slow, inaccurate strumming that falls apart above 100 BPM.
+**Cause**: large elbow movement substituting for wrist rotation — slow, imprecise, and falls apart above roughly 100 BPM.
 
-**Diagnostic**: Watch your elbow while strumming. It should move less than 1–2 cm. If your whole forearm is pumping up and down, your elbow is doing the work.
+**Diagnostic**: watch your elbow in a mirror while strumming. It should barely move (1–2 cm). If the whole forearm is pumping, the elbow is doing work that belongs to the wrist.
 
-**Fix**: Rest your elbow lightly against the guitar body as a tactile anchor. Practice 10-minute sessions of pure wrist-rotation strumming at 60 BPM — downstrokes only, focusing on the wrist hinging while the forearm rests still. Add upstrokes only after wrist-dominant downstrokes feel natural.
+**Fix**: rest the elbow lightly against the guitar body as a physical anchor. Spend 10 minutes at 60 BPM doing downstrokes only, wrist hinging, forearm still. Only add upstrokes once the downstroke motion feels automatic.
 
-### Failure Mode 5: Barre Chord Partial Muting
+### Barre Chord Partial Muting
 
-**Cause A**: Index finger landing on a fret wire seam — the gap between the pad's sections mutes a string.
-**Cause B**: Not enough counter-pressure from the thumb.
-**Cause C**: Index finger insufficiently rolled to the bony edge.
+**Causes**: index finger landing on a fret-wire seam where a gap in finger contact mutes a string; insufficient thumb counter-pressure from behind the neck; index finger not rolled enough onto its bony edge.
 
 **Fix protocol**:
-1. Fret the barre only (no other fingers). Pick strings one at a time.
-2. Rotate the index slightly toward headstock until a buzzing string clears.
-3. Add thumb counter-pressure — push the neck into the barre.
-4. If one string still buzzes: shift that segment of the index finger 1–2mm and recheck.
-5. Only then add fingers 2, 3, 4.
+1. Barre alone, no other fingers. Pick each string individually.
+2. Roll the index slightly more toward the headstock until the buzzing string clears.
+3. Add thumb counter-pressure, pushing the neck forward into the barre.
+4. If a string still buzzes, shift that part of the index finger 1–2mm and recheck.
+5. Only then layer in fingers 2, 3, 4.
 
 ```mermaid
 flowchart TD
     subgraph sub_barre_debug ["Barre Chord Debug Flow"]
-        A["Play full barre chord"] --> B{All 6 strings clean?}
-        B -->|Yes| Z["✓ Chord complete"]
-        B -->|No| C["Pick strings individually — identify the buzzing string"]
-        C --> D{Which string buzzes?}
-        D -->|"e or B string"| E["Roll index toward headstock\nIncrease pressure on that string segment"]
-        D -->|"G string"| F["Middle finger may be\ntouching G — re-arch it"]
-        D -->|"D or A string"| G["Ring/pinky not arched\nCheck collapsed knuckles"]
-        D -->|"Low E string"| H["Thumb counter-pressure\nneeds to increase"]
+        A["Play full barre chord"] --> B{"All 6 strings clean?"}
+        B -->|Yes| Z["Chord complete"]
+        B -->|No| C["Pick strings individually to find the buzzing string"]
+        C --> D{"Which string buzzes?"}
+        D -->|"e or B"| E["Roll index toward headstock,<br/>increase pressure on that segment"]
+        D -->|"G"| F["Middle finger likely touching G,<br/>re-arch it"]
+        D -->|"D or A"| G["Ring or pinky not arched,<br/>check for collapsed knuckle"]
+        D -->|"Low E"| H["Increase thumb counter-pressure"]
         E --> A
         F --> A
         G --> A
@@ -593,143 +519,128 @@ flowchart TD
     end
 ```
 
-### Failure Mode 6: Injury Warning Signs
+### Injury Warning Signs
 
-**Stop playing immediately if you feel:**
-- Sharp or shooting pain (not muscle soreness)
-- Tingling or numbness in fingers or palm
-- Pain that persists more than 24 hours after playing
+**Stop immediately if you feel**: sharp or shooting pain (distinct from normal muscle fatigue), tingling or numbness in fingers or palm, or any pain lasting more than 24 hours after playing. These are nerve or tendon signals, not something to practice through.
 
-**Preventive protocol:**
-
+**Pre-practice warm-up (5 minutes, every session):**
 ```
-Pre-practice warm-up (5 minutes):
-1. Wrist circles: 10 slow rotations each direction, both wrists
-2. Finger spreads: splay all fingers wide, hold 5 sec × 5 reps
-3. Forearm extensor stretch: arm extended, palm down, 
-   gently pull fingers back with other hand — hold 20 sec each arm
-4. Prayer stretch: palms together in front of chest,
-   slowly lower hands while keeping palms together — hold 15 sec
-5. Light chromatic scale: frets 1–4 across all strings, very slowly
-
-Take a 5-minute break every 25–30 minutes of playing.
-Never play through pain.
+1. Wrist circles — 10 slow rotations each direction, both wrists
+2. Finger spreads — splay fingers wide, hold 5 sec, 5 reps
+3. Forearm extensor stretch — arm out, palm down, gently
+   pull fingers back with the other hand, hold 20 sec per arm
+4. Prayer stretch — palms together at chest height, lower
+   hands slowly while keeping palms touching, hold 15 sec
+5. Light chromatic crawl — frets 1–4 across all strings, slow
 ```
+
+Take a 5-minute break every 25–30 minutes of playing. Never push through pain.
 
 ---
 
-## 11. Tone Production: 90% Is Your Hands
+## 11. Tone Production: Mostly in Your Hands
 
-Two guitarists playing the same guitar will sound fundamentally different. Here's what determines your acoustic tone:
+Two players on the same guitar sound different because of three variables entirely under your control, independent of gear.
 
-### The Three Tone Variables You Control Right Now
-
-**1. Attack position** — where you strum relative to the soundhole:
+### Attack Position
 
 ```
-←─── Neck ───┤ Soundhole ├─── Bridge ───→
+←── Neck ──┤ Soundhole ├── Bridge ──→
 
-Dark, woody,   Full, balanced   Bright, nasal,
-pillow tone    (default zone)   cutting tone
-
-Best for:      Best for:        Best for:
-fingerstyle,   strumming,       leads, cutting
-ballads        most songs       through a mix
+Dark, woody     Full, balanced     Bright, cutting
+(fingerstyle,    (default —         (leads, anything
+ballads)         most strumming)    needing to cut a mix)
 ```
 
-**2. Pick angle** — how the pick face meets the string:
+### Pick Angle
 
 ```
-15° (nearly parallel):  Thin, bright, fast attack — bluegrass lead
-25° (moderate angle):   Balanced warmth and clarity — general strumming  
-40° (steep angle):      Full, round, slower attack — ballads, singer-songwriter
+15° (near parallel):  thin, bright, fast attack — bluegrass lead feel
+25° (moderate):        balanced warmth and clarity — general strumming
+40° (steep):           full, round, slightly slower attack — ballads
 ```
 
-**3. Dynamic range** — varying your strumming force within a song. A verse played at 30% force followed by a chorus at 80% creates automatic emotional arc without changing a single note.
+### Dynamic Range
 
-### Experiment Protocol (10 minutes, one-time calibration)
+Varying strum force within a song — a verse at roughly 30% intensity building to a chorus at 80% — creates emotional lift without changing a single chord or note. This is the cheapest, most immediate expressive tool you have, and most beginners never touch it because they're focused entirely on getting chords right.
 
-Play the same 4-bar G–D–Em–C loop nine times with a voice recorder running. Vary one variable at a time:
-- Three positions: neck, soundhole, bridge
-- Three angles: 15°, 25°, 40°
+### Calibration Exercise (10 minutes, once)
 
-Listen back immediately. Your ears will tell you which combinations feel like "your sound." This builds tone palette awareness that no amount of gear shopping can substitute for.
+Loop a 4-bar G–D–Em–C progression nine times with a voice recorder running, changing one variable per pass: three attack positions (neck, soundhole, bridge) × three pick angles (15°, 25°, 40°). Listen back immediately. You're building a mental map of your own tonal palette — something no amount of gear shopping replaces.
 
 ---
 
 ## 12. Progressive Practice System: 30 Days to Real Playing
 
-### Daily Practice Structure (20–45 minutes)
+### Daily Session Structure (20–45 minutes)
 
 ```mermaid
 flowchart LR
     subgraph sub_practice ["Daily Practice Session Structure"]
-        A["Warm-Up\n5 min\nStretches +\nchromatic crawl"] --> B["Chord Mechanics\n8 min\nOne-minute drill\nfor 2–3 chord pairs"]
-        B --> C["Strumming Pattern\n7 min\nIsolate current\npattern at tempo"]
-        C --> D["Song Application\n10 min\nApply chords + pattern\nto a real progression"]
-        D --> E["Weak Point\n5 min\nIdentify the hardest\nmoment from D — drill it"]
-        E --> F["Cool Down\n5 min\nSlow fingerstyle\nor improvisation"]
+        A["Warm-Up<br/>5 min<br/>Stretches +<br/>chromatic crawl"] --> B["Chord Mechanics<br/>8 min<br/>One-minute drill<br/>on 2-3 chord pairs"]
+        B --> C["Strumming Pattern<br/>7 min<br/>Isolate current<br/>pattern at tempo"]
+        C --> D["Song Application<br/>10 min<br/>Apply chords + pattern<br/>to a real progression"]
+        D --> E["Weak Point<br/>5 min<br/>Isolate the hardest<br/>moment from D and drill it"]
+        E --> F["Cool Down<br/>5 min<br/>Slow fingerstyle<br/>or free improvisation"]
     end
 ```
 
-### 4-Week Progressive Curriculum
+### 4-Week Curriculum
 
 **Week 1 — Foundation (60–70 BPM)**
-- Chords: Em, Am, E, A (single-note-per-beat changes)
-- Pattern: All-downstrokes, quarter notes
+- Chords: Em, Am, E, A
+- Pattern: all downstrokes, quarter notes
 - Progression: Em – Am – E – Am
-- Goal: Every string rings clean on every chord
+- Goal: every string rings clean on every chord, no exceptions
 
 **Week 2 — Open Set (70–80 BPM)**
-- Chords: Add C, G, D, Dm
-- Pattern: 8th-note down-up (Pattern 2)
+- Add: C, G, D, Dm
+- Pattern: 8th note down-up (Pattern 2)
 - Progression: G – D – Em – C
-- Goal: Transitions under 0.5 seconds (smooth at tempo)
+- Goal: transitions under 0.5 seconds, smooth at tempo
 
 **Week 3 — Syncopation (75–90 BPM)**
-- Chords: Add G7, Am7, Dsus2
-- Pattern: "Skip" pattern (Pattern 3)
-- Progression: C – Am – F – G (intro the F barre)
-- Goal: Percussive mute hits land cleanly on the & of 2 and & of 4
+- Add: G7, Am7, Dsus2
+- Pattern: Skip pattern (Pattern 3)
+- Progression: C – Am – F – G (introduce the F barre here)
+- Goal: muted percussive hits land cleanly on the "&" of 2 and "&" of 4
 
 **Week 4 — Integration (85–100 BPM)**
-- Chords: Full open set + F barre chord
-- Patterns: Mix Pattern 2, 3 — switch patterns between verse/chorus
-- Progressions: I–V–vi–IV in G and C; ii–V–I in G (Am7–D7–Gmaj7)
-- Goal: 3-minute song performance, no stopping
+- Full open chord set plus F barre chord
+- Patterns: switch between Pattern 2 and Pattern 3 across verse/chorus
+- Progressions: I–V–vi–IV in both G and C; ii–V–I in G (Am7–D7–Gmaj7)
+- Goal: play a complete 3-minute song with no stopping
 
-### Tracking Your Progress
-
-Keep a simple log. Numbers don't lie:
+### Progress Log
 
 ```
-Date        | Chord Pair    | Tempo | Clean Changes/min | Target
-------------|---------------|-------|-------------------|---------
-Day 1       | C → G         | 60    | 14                | 20
-Day 7       | C → G         | 60    | 21                | 25
-Day 14      | C → G         | 70    | 18                | 25
-Day 21      | C → G         | 80    | 20                | 25
-Day 28      | C → G         | 90    | 20                | 25
+Date      | Chord Pair | Tempo | Clean Changes/min | Target
+----------|-------------|-------|--------------------|--------
+Day 1     | C → G       | 60    | 14                 | 20
+Day 7     | C → G       | 60    | 21                 | 25
+Day 14    | C → G       | 70    | 18                 | 25
+Day 21    | C → G       | 80    | 20                 | 25
+Day 28    | C → G       | 90    | 20                 | 25
 ```
 
-The tempo where you hit 25 clean changes per minute is your "mastery tempo" for that pair. Raise the target, raise the tempo.
+The tempo where you consistently hit 25 clean changes per minute is your "mastery tempo" for that pair. Once reached, raise both the target count and the tempo.
 
 ---
 
 ## 13. Next Steps: Expanding the Vocabulary
 
-Once the core open chords and two strumming patterns are solid at 90 BPM, the natural expansion path:
+Once the core open chords and two strumming patterns are solid at 90 BPM:
 
 ```mermaid
 graph TD
     subgraph sub_roadmap ["Acoustic Guitar Development Roadmap"]
-        A["Core Open Chords\nC G D Em Am F\n+ 2 strum patterns"] --> B["Barre Chord Fluency\nE-shape + A-shape\nall 12 keys"]
-        A --> C["Fingerstyle\nTravis picking\nbasic fingerpicking patterns"]
-        B --> D["CAGED System\nFull neck mapping\nchord shapes in 5 positions"]
+        A["Core Open Chords<br/>C G D Em Am F<br/>+ 2 strum patterns"] --> B["Barre Chord Fluency<br/>E-shape + A-shape<br/>all 12 keys"]
+        A --> C["Fingerstyle<br/>Travis picking,<br/>basic fingerpicking patterns"]
+        B --> D["CAGED System<br/>Full neck mapping,<br/>5 shapes per chord"]
         C --> D
-        D --> E["Music Theory Application\nNashville Number System\nModal playing\nSong analysis"]
-        D --> F["Capo Work\nTransposition\nOpen tunings\nDrop D / DADGAD"]
-        E --> G["Intermediate Repertoire\nArrangement skills\nSolo guitar\nSinger-songwriter technique"]
+        D --> E["Theory Application<br/>Nashville Number System,<br/>modal playing, song analysis"]
+        D --> F["Capo Work<br/>Transposition,<br/>open tunings, Drop D / DADGAD"]
+        E --> G["Intermediate Repertoire<br/>Arrangement skills,<br/>solo guitar, songwriter technique"]
         F --> G
     end
 
@@ -742,8 +653,9 @@ graph TD
     style G fill:#d4d4ff,stroke:#2222aa
 ```
 
-The two most high-leverage next moves after open chords:
-1. **Barre chords**: unlock every key and move your existing patterns anywhere on the neck
-2. **Travis picking**: the most expressive solo acoustic texture — once it's automatic, you sound like a complete musician rather than an accompanist
+The two highest-leverage next moves after open chords:
 
-Both reward consistent daily practice at comfortable tempos far more than grinding at fast tempos with sloppy technique. Slow and clean compounds. Fast and sloppy just entrenches bad habits.
+1. **Barre chords** — unlock every key and let you move existing patterns anywhere on the neck instead of being tied to open position
+2. **Travis picking** — the most expressive solo acoustic texture; once automatic, you function as a complete musician rather than someone who just strums along
+
+Both reward slow, consistent daily practice far more than grinding at speed with sloppy technique. Slow and clean compounds into real skill. Fast and sloppy just entrenches the habits you'll have to unlearn later.
