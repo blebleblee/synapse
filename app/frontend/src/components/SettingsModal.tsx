@@ -14,7 +14,8 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Search
+  Search,
+  Coffee
 } from 'lucide-react';
 
 export interface AppSettings {
@@ -1109,13 +1110,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
           </div>
 
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary">
-              {savedMessage ? 'Saved!' : 'Save Settings'}
-            </button>
+          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <a
+              href="https://buymeacoffee.com/blebleblee"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-coffee-donate"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(251, 191, 36, 0.12)',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
+                color: '#fbbf24',
+                fontSize: '12px',
+                fontWeight: 600,
+                textDecoration: 'none',
+                transition: 'all 0.15s ease'
+              }}
+              title="Support Synapse open-source development"
+            >
+              <Coffee size={14} />
+              <span>Buy Me a Coffee</span>
+            </a>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button type="button" className="btn-secondary" onClick={onClose}>
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                {savedMessage ? 'Saved!' : 'Save Settings'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

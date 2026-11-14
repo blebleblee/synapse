@@ -21,6 +21,9 @@
   <a href="https://anthropic.com">
     <img src="https://img.shields.io/badge/Claude%20Opus-5.5-orange" alt="Claude Opus 5.5">
   </a>
+  <a href="https://buymeacoffee.com/blebleblee" target="_blank">
+    <img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow.svg?style=flat&logo=buy-me-a-coffee" alt="Buy Me A Coffee">
+  </a>
 </div>
 
 <br />
@@ -250,6 +253,18 @@ For detailed guides, see the `docs/` directory:
 - [Installation & Multi-Platform Guide](docs/INSTALLATION.md)
 - [SynPack Distributions & Addon Store](docs/PACKAGES_AND_STORE.md)
 - [Clean Packaging & Workspace Data Management](docs/CLEANUP_AND_DATA_MANAGEMENT.md)
+
+---
+
+## ☕ Support the Project
+
+Synapse is **100% free, private, and open-source**. If you find this learning workbench or the generated curricula valuable for your daily engineering practice, studies, or team training, consider buying me a coffee to support continued development, model inference, and infrastructure costs:
+
+<p align="center">
+  <a href="https://buymeacoffee.com/blebleblee" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="180" />
+  </a>
+</p>
 
 ---
 
