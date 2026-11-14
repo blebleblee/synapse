@@ -1,330 +1,374 @@
-# Lesson 3: Advanced Notational Techniques
+# Lesson 3: Advanced Notational Techniques — Reading, Writing, and Performing Complex Scores
 
-## 1. First-Principles Intuition & Invariants
+## 1. Why Notation Works: The Minimum Theory You Need
 
-Musical notation is a symbolic system that maps physical acoustic events—vibrating strings, air columns, drumheads—onto a visual grid where vertical position encodes pitch and horizontal position encodes time. The staff is not an arbitrary invention; it exploits the human visual system's ability to process spatial relationships quickly. Five lines create four spaces, giving nine distinct positions within a narrow visual field—enough to encode a diatonic scale plus one chromatic neighbor.
+A staff is a coordinate grid: vertical position = pitch, horizontal position = time. Five lines, four spaces = nine slots your eye can read at a glance without counting — enough for a diatonic scale plus one neighbor tone before you need a ledger line. That's the entire reason staff notation beat out every rival system for 400 years: it's fast to read under tempo.
 
-The invariant underlying all notation systems is **one-to-one correspondence**: each symbol must map unambiguously to a musical event, and each musical event must have a unique representation within the system's constraints. When this breaks down—when a single symbol could mean multiple things, or when a musical idea has no clear notation—the system fails. Advanced techniques extend this mapping to handle phenomena that simple notation cannot: microtones, complex rhythms, extended instrumental techniques, and real-time improvisation frameworks.
+The one rule that governs every notation decision in this lesson: **a trained performer must be able to look at the symbol once and know exactly what to do with their hands, at tempo, without re-reading it.** If a notation choice forces a second look, it's wrong — simplify it or add a legend.
 
-The equal-tempered tuning system divides the octave into twelve logarithmically equal steps: $f_n = f_0 \cdot 2^{n/12}$, where each semitone is approximately 1.0595 times the frequency of the previous. This logarithmic spacing matches human pitch perception and enables transposition across keys. Notation must preserve these relationships: transposing a melody up a perfect fifth means shifting every note seven semitones, which corresponds to moving every notehead four staff positions plus accounting for key signature changes.
+Equal temperament divides the octave into 12 equal ratio-steps (each semitone ≈ 5.95% higher in frequency than the last). You don't need the exponential formula to use this — you need to know what it *means* for your hands: every semitone up is one fret, one half-step on the keyboard, one slide position closer on trombone. Transposing up a perfect fifth = shift every notehead up 4 staff positions and adjust the key signature; it is not "add 3.5 to the frequency," it's a spatial shift you can see and finger immediately.
 
-When notation extends beyond twelve-tone equal temperament—into microtonal systems, just intonation, or non-Western pitch structures—the symbols must encode both the pitch deviation and its context. A quarter-tone sharp is meaningless without knowing whether it sits within a 24-tone equal temperament system, a just-intonated harmonic series, or an arbitrary pitch modification.
+Everything below is built on that correspondence: **one symbol, one unambiguous physical action.** Advanced notation exists because standard notation runs out of symbols before some composers run out of ideas — microtones, polymeter, extended technique, improvisation frameworks. Each technique below adds exactly the symbol needed and nothing more.
 
-## 2. Core Architecture & Mechanics
+---
 
-### Staff, Clef, and Pitch Mapping
+## 2. Core Architecture — What Every Symbol Costs You at the Stand
 
-The staff provides a spatial grid for pitch. Each line and space represents a specific pitch class determined by the clef. The treble clef (G-clef) anchors the second line from the bottom as G4 (approximately 392 Hz). The bass clef (F-clef) anchors the second line from the top as F3 (approximately 175 Hz). Ledger lines extend the range above and below the staff without requiring an impractical number of permanent lines.
+### Clef selection and why it matters to your eyes, not just the composer's intent
 
-For instruments with ranges that do not fit comfortably in treble or bass clefs, use alto clef (middle C on the middle line, standard for viola) or tenor clef (middle C on the second line from the top, used for upper-register cello and bassoon). Instrument-specific clefs are not arbitrary; they minimize ledger lines for the instrument's typical working range.
+The clef's job is to keep the instrument's working range centered on the staff with the fewest ledger lines, because **ledger lines are where sight-reading errors happen.** Every ledger line above the 5th line or below the 1st line adds a half-second of counting-lines-from-the-staff that a trained reader doesn't want to do mid-phrase.
 
-**Practical clef selection:**
-- Piano: Grand staff (treble + bass clefs) with middle C (C4) on the ledger line between staves
-- Guitar: Treble clef, sounding one octave lower than written (transposing instrument)
-- Bass guitar: Bass clef, sounding one octave lower than written
-- Viola: Alto clef to center its C3–C6 range on the staff
-- Cello: Bass clef for low register, tenor clef for thumb position (C4 and above)
+| Instrument | Clef | Why |
+|---|---|---|
+| Piano | Grand staff (treble + bass) | Spans both hands' full range with middle C bridging the gap |
+| Guitar | Treble, sounds 1 octave lower | Written range would need constant ledger lines in bass clef |
+| Bass guitar | Bass, sounds 1 octave lower | Centers E1–G3 range on the staff |
+| Violin | Treble | Range sits naturally above middle C |
+| Viola | Alto (middle C = middle line) | Centers C3–C6 without constant clef changes |
+| Cello (low) | Bass | Low register |
+| Cello (thumb position, high) | Switches to tenor mid-score | Avoids 4+ ledger lines above bass staff when playing above C4 |
+| Trombone | Bass (tenor for some solo lit) | Matches slide-position low range |
 
-### Rhythmic Notation and Metric Hierarchy
+**Practical rule for composers/arrangers:** if a passage needs more than 3 ledger lines for more than 2 beats, change the clef instead. Performers will thank you — three ledger lines is the threshold where sight-reading speed measurably drops.
 
-Rhythm encodes time through nested subdivisions. A whole note divides into two half notes, four quarter notes, eight eighth notes, and so on. Each division halves the duration. Time signatures establish the metric grid: 4/4 means four quarter-note beats per measure, 6/8 means six eighth-note beats grouped in two dotted-quarter pulses, 5/4 means five quarter-note beats creating asymmetric phrasing.
+### Rhythmic notation: beaming is a readability tool, not decoration
 
-**Beaming rules** visually encode metric hierarchy:
-- In 4/4, beam eighth notes in groups of four (two beats) or two (one beat) to show beat subdivision
-- In 6/8, beam eighth notes in groups of three to show the dotted-quarter pulse structure
-- Do not beam across beats unless the passage is continuous sixteenths or faster and the beat structure is clear from other voices
-- Use rests to clarify beat placement: in 4/4, a quarter rest on beat 2 followed by a quarter note on beat 3 is clearer than a half note starting on beat 2
+Beaming exists so a performer can see the beat structure without counting flags. Get this wrong and you create a sight-reading trap.
 
-**Tuplets** encode non-binary subdivisions. A triplet (3:2) divides two equal durations into three equal parts: three eighth-note triplets fit in the space of one quarter note. A quintuplet (5:4) fits five notes into the space of four. Bracket the group and mark with the ratio number. For extended tuplets (seven, nine, eleven notes), write out the complete ratio to avoid ambiguity: "7:6" or "9:8."
+**4/4 beaming — correct vs. trap:**
+```
+Correct (shows beat 1, beat 2 clearly):
+♫♫ ♫♫ | two beamed pairs, beat divisions visible at a glance
 
-### Articulation and Performance Technique Symbols
+Trap (hides the beat 2 downbeat):
+♫♫♫♫  | one beam of 4 across the barline's middle — performer has to
+         count instead of seeing the beat
+```
 
-Articulation symbols modify how a note is attacked and released:
-- **Staccato (dot above/below):** Shorten the note to approximately half its written duration, with a distinct separation from the next note
-- **Tenuto (horizontal line):** Hold the note for its full written duration with slight emphasis
-- **Accent (>):** Emphasize the attack with increased volume and weight
-- **Marcato (^):** Heavy accent with an emphatic attack, often implying a slight shortening
-- **Legato (slur):** Connect notes smoothly without re-articulation; on wind instruments, articulate only the first note under the slur
+**6/8 beaming rule:** always beam in groups of 3 (shows the two dotted-quarter pulses). Never beam 6/8 as two groups of... anything else. This single rule is why jigs and compound-time grooves read instantly once you've drilled it.
 
-For strings, bowing articulations are critical:
-- **Down-bow (П symbol):** Bow moves from frog to tip, naturally produces stronger attack
-- **Up-bow (V symbol):** Bow moves from tip to frog, naturally produces lighter attack
-- **Sul ponticello:** Bow near the bridge for a glassy, brittle tone with emphasized upper harmonics
-- **Sul tasto:** Bow over the fingerboard for a soft, flute-like tone with suppressed upper harmonics
-- **Col legno:** Strike the string with the wood of the bow for a percussive, dead tone
+**Rest placement rule:** a half rest starting on beat 2 of 4/4 is wrong notation even though it's rhythmically "correct" — it obscures beat 3. Always write beat-2 and beat-3 as separate rests/notes so the beat grid stays visible:
+```
+Wrong:  [half rest spanning beats 2-3]
+Right:  [quarter rest, beat 2][quarter note, beat 3]
+```
 
-For piano:
-- **Pedal markings:** Ped. with release asterisk (*), or continuous line with teeth showing partial pedal lifts
-- **Una corda:** Left pedal, shifts hammers to strike fewer strings for a softer, veiled tone
-- **Sostenuto:** Middle pedal, sustains only notes already held when pedal is pressed
+**Tuplet drill — internalizing a 7:6 without a click track:**
+1. Say the tuplet number as a spoken phrase that fits the pulse: for 5:4, say "1-2-3-4-5" evenly across one beat while tapping the beat with your foot at 60 BPM.
+2. Clap the tuplet rhythm while the foot keeps simple quarters — isolate 30 seconds a day until it's automatic.
+3. Move metronome to 80 BPM, same drill.
+4. Only then add it into musical context at performance tempo.
+5. For 7-against-4 or 9-against-8, use a polyrhythm app (e.g., Polyrhythm Metronome, Soundbrenner) that clicks both layers simultaneously — do not try to calculate it mentally in performance.
 
-### Voice Leading and Part Writing in Score Notation
+### Articulation — the physical instruction behind each symbol
 
-When writing for multiple voices on a single staff, stem direction indicates voice:
-- **Upper voice:** Stems up
-- **Lower voice:** Stems down
-- **Shared noteheads:** When both voices share the same pitch, write a single notehead with stems extending both directions
+| Symbol | What it means on paper | What your body actually does |
+|---|---|---|
+| Staccato `.` | Note ≈ half written duration | Release early; on strings, stop the bow; on winds, stop air with tongue or diaphragm, not throat |
+| Tenuto `-` | Full value, slight weight | Lean into the note with sustained air/bow pressure, no decay |
+| Accent `>` | Louder attack | Sudden increase in bow speed/pressure or air pressure at the onset only, then normal |
+| Marcato `^` | Accent + short | Hard attack, immediate decay — think "stab" |
+| Slur `⌢` | Legato, no re-articulation | Winds: tongue only the first note, keep air column continuous; strings: one bow stroke across all slurred notes; piano: finger legato, no pedal needed if fingers overlap |
 
-For independent rhythms in two voices on one staff:
-- Align noteheads vertically when events are simultaneous
-- If the upper voice has a half note and the lower voice has two quarter notes, write the half note with stem up, and two quarter notes with stems down
-- Use a second layer of rests when one voice is silent and the other continues, but only if rhythmic clarity requires it; often, missing rests are implied
+**String bowing — physical execution, not just symbols:**
+- **Down-bow (⊓):** Start at the frog (where your hand is). Naturally heavier because gravity and arm weight assist — use for downbeats and accents.
+- **Up-bow (V):** Start at the tip. Naturally lighter — use for upbeats, soft passages, or when you need to "save bow" to get back to the frog for an upcoming down-bow accent.
+- **Sul ponticello:** Move contact point to within 1cm of the bridge. Reduce bow speed, increase pressure slightly. Sounds glassy because you're exciting higher harmonics preferentially.
+- **Sul tasto:** Move contact point over the fingerboard, 5-8cm from the bridge. Light pressure, fast bow. Sounds flutey because higher harmonics are suppressed.
+- **Col legno:** Flip the bow, strike (don't drag) with the wood. Practice over a towel first — this is the technique most likely to chip varnish if done carelessly.
 
-For full orchestral scores:
-- Order instruments from highest to lowest: woodwinds (flutes, oboes, clarinets, bassoons), brass (horns, trumpets, trombones, tuba), percussion, keyboards, harp, and strings (violins I, violins II, violas, cellos, basses)
-- Align barlines across all staves
-- Bracket instrument families with a vertical bracket to show grouping
-- Barline thickness: thin for internal measures, thick-thin for final barlines, double thin for section divisions
+**Piano pedal markings — the physical foot action:**
+- `Ped. ... *` : depress at the dotted line start, release sharply at the asterisk. The release must be clean — a sloppy release smears into the next harmony.
+- Continuous pedal line with "teeth" (short vertical notches): half-pedal — release just enough to clear the dampers partway (quarter-inch of pedal travel) without fully stopping the sustain, used to clear mud in a wash of harmony while keeping some resonance.
+- **Una corda:** Left pedal shifts the whole action right so hammers strike 2 of 3 strings instead of 3 (or 1 of 2 on upright spinets). Physically: press fully down before the passage starts, release cleanly at the marked point — don't ride it in and out.
+- **Sostenuto (middle pedal):** Only sustains notes *already down* when pressed. Practical use: hold a bass note with the middle pedal while your hands are free to play staccato material above it without blurring.
 
-## 3. Advanced Techniques: Microtonal Notation
+### Multi-voice notation on one staff — stem direction as a reading shortcut
 
-Standard notation encodes only twelve pitches per octave. To notate microtones—pitches between the semitones—you need symbols for fractional pitch deviations.
+Stem direction is not decorative — it lets a pianist's eye track two independent lines without re-reading note-by-note.
 
-### Quarter-Tone Accidentals
+```
+Rule: Upper voice = stems up, always, regardless of actual pitch position
+      Lower voice = stems down, always
+      Shared pitch, same rhythm = one notehead, stems both directions
+```
 
-Quarter-tone systems divide each semitone into two equal parts (24 pitches per octave):
-- **Half-sharp (‡ or ♯ with vertical line bisecting it):** Raises pitch by 50 cents (half a semitone)
-- **Half-flat (♭ with diagonal slash or ♭ with horizontal line):** Lowers pitch by 50 cents
-- **Three-quarter-sharp:** Sharp with additional upward arrow or separate glyph
-- **Three-quarter-flat:** Flat with additional downward arrow
+**Drill:** take any Bach two-part invention excerpt and cover one voice with a card. Play only the stems-up notes with the right hand, stems-down with the left, regardless of which staff they're printed on if it's a cross-staff passage. This trains your eye to parse by stem direction, not staff position — the actual skill professional sight-readers use.
 
-**Practical fingering for quarter-tones:**
-- **String instruments:** Place finger halfway between normal positions; on cello, a quartertone sharp of A on the A-string is halfway between first and second finger positions
-- **Trombone:** Extend slide approximately half the distance between adjacent positions
-- **Winds with half-hole keys:** Use alternate fingerings that produce intermediate pitches; consult instrument-specific microtonal fingering charts
-- **Fixed-pitch instruments (piano, guitar):** Quarter-tones require retuning, scordatura, or electronic pitch-shifting
+### Orchestral score order — read it top to bottom, every time
 
-### Cent Deviation Notation
+```
+Woodwinds (Fl, Ob, Cl, Bsn)
+Brass (Hn, Tpt, Trb, Tba)
+Percussion
+Keyboards / Harp
+Strings (Vln I, Vln II, Vla, Vcl, Db)
+```
 
-For precise pitch specifications beyond quarter-tones, annotate the deviation in cents (100 cents = one semitone). Write the deviation as a number above or below the notehead: "+35" means 35 cents sharp, "−20" means 20 cents flat. This is the standard for contemporary music that uses just intonation or other non-equal-tempered systems.
+Memorize this order cold — a conductor or score-reader who has to search for an instrument's staff loses tempo tracking. Barlines align vertically across every staff; family brackets group related instruments visually so your eye jumps families, not individual staves, when scanning for an entrance.
 
-**Justly intoned intervals:** If composing in just intonation, specify the integer frequency ratio and/or cent deviation:
-- Pure major third: 5:4 ratio = 386 cents (14 cents flat of equal-tempered major third)
-- Pure perfect fifth: 3:2 ratio = 702 cents (2 cents sharp of equal-tempered fifth)
-- Harmonic seventh: 7:4 ratio = 969 cents (31 cents flat of equal-tempered minor seventh)
+---
 
-Performers need either electronic tuners displaying cent deviations or extensive ear training to execute these pitches accurately.
+## 3. Microtonal Notation — Symbols, Fingerings, and Tuning by Ear
 
-### Notation Systems for Non-Western Tunings
+### Quarter-tone accidentals and what they cost on each instrument
 
-For maqam (Arabic/Turkish music), notate using Westernized staff notation with accidentals indicating microtonal inflections. Each maqam has specific interval structures that do not align with twelve-tone equal temperament. Provide a tuning legend at the beginning of the score showing cent deviations for each altered pitch.
+| Symbol | Effect | Cents |
+|---|---|---|
+| Half-sharp (sharp with vertical slash through stem) | Raise | +50 |
+| Half-flat (flat with single slash) | Lower | -50 |
+| Three-quarter-sharp (sharp + arrow up) | Raise | +150 |
+| Three-quarter-flat (flat + arrow down) | Lower | -150 |
 
-For Indian classical music (ragas), Western staff notation is ill-suited. Use sargam notation (Sa Re Ga Ma Pa Dha Ni) with komal (flat) and tivra (sharp) markings, or provide a hybrid system with staff notation supplemented by annotations for gamakas (ornamental pitch slides) and microtonal inflections.
+**Fretless/continuous-pitch instruments — where the finger actually goes:**
 
-## 4. Advanced Techniques: Complex Rhythms and Polymeter
+- **Cello/violin:** A quarter-tone sharp D on the A-string sits exactly halfway between standard 1st-finger D and 2nd-finger E. Practice by first locking in both reference pitches with a drone, then splitting the distance by ear, confirming with a tuner showing ±50 cents from D.
+- **Trombone:** Slide positions are roughly 3.5 inches apart for a semitone in the lower-middle range (varies by position number — closer together in higher positions). A quarter-tone is roughly half that distance — around 1.75 inches. Mark your slide with removable tape at quarter-tone points during the learning phase; remove once internalized.
+- **Fretted guitar/bass:** True quarter tones require either a fretless conversion, a quarter-tone fretboard (extra frets between standard ones — exists as a specialty build), or bending a standard fretted pitch up 50 cents with finger pressure (reliable on wound strings, less so on plain high strings).
+- **Winds with standard keys:** You need an instrument-specific microtonal fingering chart (published charts exist for flute, oboe, clarinet, saxophone from composers like Bruno Bartolozzi). Don't guess — alternate fingerings that "sound close" are often 15-30 cents off and will beat audibly against an equal-tempered drone.
 
-### Nested Tuplets and Irrational Rhythms
+### Cent-deviation notation for just intonation
 
-When a tuplet contains another tuplet, multiply the ratios. For example, a quintuplet (5:4) where each note is further subdivided into triplets results in 15 notes in the space of 8 (5 × 3 : 4 × 2). Bracket each level of tuplet separately and clearly mark the ratio for each nested layer.
+Write the deviation as a number directly above the notehead. This is how you notate pitches a quarter-tone accidental can't represent.
 
-For **irrational rhythms**—where the subdivision does not resolve to a simple integer ratio—use approximate tuplet values and provide a tempo marking or time code. For example, a passage where seven notes must be played in the time of five quarter notes is a 7:5 tuplet. If further subdivided, this becomes computationally complex and may require a click track or conductor.
+| Interval | Ratio | Cents | Deviation from 12-TET |
+|---|---|---|---|
+| Pure major third | 5:4 | 386 | −14 cents |
+| Pure perfect fifth | 3:2 | 702 | +2 cents |
+| Harmonic 7th | 7:4 | 969 | −31 cents |
 
-**Practical drill for complex tuplets:**
-1. Isolate the inner tuplet first: practice the subdivision in isolation against a metronome
-2. Clap the outer tuplet structure without the inner subdivision
-3. Combine layers slowly, internalizing how the inner subdivision aligns with the outer pulse
-4. Use a click track with both the base pulse and the tuplet subdivision if available
+**Ear-training drill for just intonation (do this before attempting performance):**
+1. Play a drone on the root using a tuner app or drone generator.
+2. Sing or play the target interval, adjusting by ear until the beating between your note and the drone *disappears*. Beating = you're not locked in yet; a pure interval has zero audible beats.
+3. Check against the tuner — you should land within ±3 cents of the target if the beats have genuinely vanished.
+4. Repeat for each interval in the piece before attempting ensemble performance. This cannot be rushed — allow real practice weeks for ensembles tackling just-intonation repertoire for the first time.
 
-### Polymeter and Metric Modulation
+### Non-Western systems — notate the system, not just the pitch
 
-**Polymeter:** Two or more voices operate in different meters simultaneously. For example, one voice in 3/4 and another in 4/4 creates a cycle that repeats every 12 quarter notes (the least common multiple of 3 and 4). Notate each voice in its own time signature, with barlines staggered to show the independent meters. Align the start of each phrase and mark a shared downbeat for synchronization.
+For **maqam**, provide a tuning legend at the top of the score listing every altered scale degree's cent deviation from 12-TET for that specific maqam (they differ — Rast and Hijaz use different deviations even on shared scale degrees). Without the legend, a Western-trained performer will default to the nearest equal-tempered pitch and the modal color is lost.
 
-**Metric modulation:** The tempo changes by redefining which note value receives the beat. Notate with an equation: "♩ = ♩. previous" means the new quarter note equals the previous dotted quarter, effectively multiplying the tempo by 1.5. This is common in Elliott Carter's music and requires precise internalization of the modulating pulse.
+For **raga**, Western staff notation alone is inadequate — it cannot show gamakas (continuous pitch ornamentation between notes). Use sargam (Sa Re Ga Ma Pa Dha Ni, with komal/flat and tivra/sharp markers below/above the syllable) as the primary system, and only add staff notation as a secondary reference for non-Indian-trained performers, with gamaka curves drawn as connecting lines between syllables.
 
-**Practical execution of metric modulation:**
-1. Subdivide the previous tempo into its smallest common unit (e.g., eighth notes or sixteenth notes)
-2. Find the equivalence between the old and new pulse
-3. Practice the transition with a metronome that produces both the old and new pulses simultaneously
-4. Mark the exact point of modulation in the score and feel the shift as a change in subdivision density, not as an abrupt tempo jump
+---
 
-### Proportional and Graphic Notation
+## 4. Complex Rhythm, Polymeter, and Metric Modulation — Execution Drills
 
-When rhythmic precision is less critical than gestural timing, use **proportional notation**: notehead spacing encodes approximate time. A staff with no barlines where space equals time, calibrated with a time ruler (e.g., 1 inch = 1 second). This is standard in Lutosławski, Penderecki, and Cage.
+### Nested tuplets — practice from the inside out, always
 
-**Graphic notation** uses non-traditional symbols to encode musical gestures. A rising squiggle might indicate a glissando, a cluster of dots a rapid tremolo, or a thick horizontal band a sustained cluster chord. Include a legend at the beginning of the score defining each symbol. This system works for extended techniques and aleatoric (chance-based) music but requires performer interpretation.
+A quintuplet where each note subdivides into a triplet = 15 notes in the space of 8 (5×3 : 4×2). You cannot learn this top-down.
 
-## 5. Advanced Techniques: Extended Instrumental Techniques
+**The only drill that works:**
+1. Practice the *inner* triplet subdivision alone against a metronome click, until it's reflexive (2-3 minutes daily for a week, not one long session).
+2. Separately, clap the outer 5:4 quintuplet shape with no inner subdivision, against the same click.
+3. Combine at half tempo — accept that this will feel wrong for several days. Nested tuplets are a motor-skill problem, not a counting problem; your hands need the repetition more than your brain needs the math.
+4. Only increase tempo once the combined pattern is clean at the slow tempo for 3 consecutive run-throughs.
 
-### String Techniques Beyond Standard Bowing
+### Polymeter drill: 3/4 against 4/4 (LCM = 12 quarter notes)
 
-- **Scratch tone (bow pressure + slow speed):** Produce a gritty, noisy sound by pressing the bow heavily while moving slowly; notate with "scratch tone" or wavy line through the staff
-- **Bartók pizzicato (snap pizzicato):** Pull the string perpendicular to the fingerboard and release so it snaps against the fingerboard; notate with circle with vertical line through it above the note
-- **Behind-the-bridge bowing:** Bow the string segment between the bridge and tailpiece for a high, metallic screech; notate "dietro il ponticello" or "behind bridge"
-- **Subharmonics (flageolet tones below fundamental):** Produced by specific bow pressure and speed combinations; notate pitch as written with "subharmonic" marking
+```
+Voice 1 (3/4): | 1 2 3 | 1 2 3 | 1 2 3 | 1 2 3 |
+Voice 2 (4/4): | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 |
+Realignment point: beat 1 of measure 4 (voice 1) = beat 1 of measure 3 (voice 2)
+```
 
-### Wind and Brass Extended Techniques
+**Metronome setup:** program a click on every quarter note (the common denominator pulse). Both voices lock to that single click; neither hand adjusts tempo to "feel" the other hand's meter. This is the single most important instruction in polymetric practice — **you are not synchronizing two tempos, you are performing two different barline groupings over one shared, unchanging pulse.**
 
-- **Multiphonics:** Produce multiple pitches simultaneously by using alternate fingerings and embouchure adjustments; provide fingering charts for each multiphonic, as these are instrument-specific
-- **Flutter-tonguing:** Roll the tongue (like a rolled "r") while blowing to create a tremolo-like texture; notate with "flz." or three diagonal lines through the stem
-- **Jet whistle (wind tone):** Blow across the mouthpiece without producing a clear pitch, creating a breathy wind sound; notate with "X" noteheads on a single-line staff or above staff
-- **Slap-tongue (percussion key clicks):** Slap the tongue against the reed while fingering a pitch for a percussive attack; notate with triangle noteheads
+Practice sequence:
+1. Tap voice 1's meter with your right hand against the click only, no voice 2, for 2 minutes.
+2. Tap voice 2's meter with your left hand against the click only, no voice 1, for 2 minutes.
+3. Combine both hands against the click at 60 BPM.
+4. Increase in 10 BPM steps only after 4 clean repetitions of the realignment bar.
 
-### Piano Extended Techniques
+### Metric modulation — the equation is a instruction for your internal subdivision, not an abstraction
 
-- **String glissando:** Slide fingernail or plectrum along piano string inside the piano; notate pitches as approximate range with wavy line
-- **Muted strings (palm muting):** Place palm on strings to dampen while playing keys for a dead, percussive tone; notate "mute strings" with specific pitch range
-- **Prepared piano:** Insert objects (screws, rubber, felt) between strings to alter timbre; provide preparation diagram showing exactly which strings to prepare and with what materials
+`♩ = ♩.` (new quarter equals previous dotted quarter) means: whatever subdivision you were feeling as 3 small units per beat, you now feel as 2 units per beat at the identical physical speed. The *pulse rate* of the smallest subdivision doesn't change at the modulation point — only what you call the beat changes.
 
-## 6. Lab: Notate and Perform a Microtonal Canon
+**Drill:**
+1. Before the modulation, subdivide the old tempo into its smallest common unit out loud (count eighth notes if the old beat was a dotted quarter = 3 eighths).
+2. At the modulation bar, keep that eighth-note pulse rate *physically identical* — do not speed up or slow down your hand/foot at the moment of the bar.
+3. Relabel: the eighth notes you were counting in groups of 3 are now counted in groups of 2. The tempo number changes on paper; nothing changes in your body except the mental grouping.
+4. Metronome drill: set metronome to click the *subdivision* (eighth notes), not the beat. Practice feeling the beat reinterpretation while the click never changes. This is the only reliable way to nail Elliott Carter-style modulations in rehearsal.
 
-**Objective:** Write a two-voice canon in 24-tone equal temperament (quarter-tone system) and perform it with precise intonation.
+### Proportional and graphic notation — reading space as time
 
-**Materials:**
-- Staff paper or notation software with microtonal accidental support (MuseScore, Dorico, Sibelius with plugins)
-- Chromatic tuner with cent-deviation display
-- Instrument capable of continuous pitch adjustment (voice, trombone, fretless strings, or synthesizer)
+Proportional notation: no barlines, notehead spacing = elapsed time, calibrated against a printed ruler (e.g., 1 inch = 1 second). **Practical reading technique:** place an actual ruler or a printed timeline strip against the score and track your position with a finger moving at the indicated rate — don't try to internalize the spacing by eye alone until you've rehearsed with the physical ruler at least once.
+
+Graphic notation legends must define, with zero ambiguity, the physical action for every symbol before rehearsal starts — treat the legend like a fingering chart, not program notes.
+
+---
+
+## 5. Extended Technique Notation — Symbol, Instruction, Physical Action
+
+### Strings
+
+| Technique | Notation | Physical execution |
+|---|---|---|
+| Scratch tone | Wavy line through staff, label "scratch tone" | Heavy arm weight into the bow, very slow bow speed — you want to hear the bow hair catching and releasing, not a clean pitch |
+| Bartók (snap) pizzicato | Circle with vertical line through the notehead | Hook finger under string, pull perpendicular away from fingerboard, release so string slaps back against the wood |
+| Behind-the-bridge | "dietro il ponticello" or "behind bridge" | Bow the short string segment between bridge and tailpiece — no fingered pitch, result is a high metallic noise band |
+| Subharmonics | Written pitch + "subharmonic" label | Very light left-hand pressure + specific bow pressure/speed combo found by trial on each instrument — not reliably notatable as exact pitch, treat as approximate and let performer find the sweet spot |
+
+### Winds and brass
+
+| Technique | Notation | Physical execution |
+|---|---|---|
+| Multiphonics | Instrument-specific fingering chart printed in the part | Non-standard fingering + embouchure adjustment; always supply the chart, never assume a performer can derive it |
+| Flutter-tongue | "flz." + 3 diagonal lines through stem | Rolled "r" tongue position while sustaining air stream |
+| Jet whistle | X noteheads on single-line staff | Blow across (not into) the mouthpiece/embouchure hole with no pitch-focused air column |
+| Slap-tongue | Triangle noteheads | Tongue seals against reed, releases sharply to create a pop, with or without pitched air behind it |
+
+### Piano interior techniques
+
+| Technique | Notation | Physical execution |
+|---|---|---|
+| String glissando | Wavy line + approximate pitch range | Fingernail or guitar pick dragged along the wound bass strings inside the case — practice on an instrument you're allowed to open, never on a rented concert instrument without explicit permission |
+| Muted strings | "mute strings" + pitch range | Flat palm or forearm rests directly on strings near the dampers while the other hand plays keys |
+| Prepared piano | Preparation diagram (string number + material + placement distance from damper) | Follow John Cage's published preparation charts as a model — specify exact materials (bolt size, rubber type) and placement in centimeters from the damper, because results vary enormously with position |
+
+---
+
+## 6. Lab — Notate and Perform a Quarter-Tone Canon
+
+**Objective:** Write and perform a 2-voice canon in 24-TET with reliable intonation, verified against a cent-reading tuner.
+
+**Materials:** MuseScore 4 (free, built-in quarter-tone accidentals) or Dorico; chromatic tuner with cent display (free apps: GuitarTuna, Tunable, or a hardware Peterson StroboClip); instrument with continuous pitch (voice, trombone, fretless bass/cello, or any synth with pitch-bend).
 
 **Procedure:**
 
-1. **Compose the subject:**
-   - Write a 4-measure melody in C major using quarter-tone inflections
-   - Use at least two half-sharps and one half-flat per measure
-   - Keep rhythms simple: quarter notes and eighth notes only
-   - Example starting pitches: C, D half-sharp, E, F half-flat, G
+1. **Compose the subject (4 measures, C major base):**
+```
+Measure 1: C4 (q) – D4+50¢ (q) – E4 (q) – F4-50¢ (q)
+Measure 2: G4 (q) – A4+50¢ (q) – B4 (q) – C5 (q)
+Measure 3: C5-50¢ (q) – B4 (q) – A4 (q) – G4+50¢ (q)
+Measure 4: F4 (q) – E4-50¢ (q) – D4 (q) – C4 (half)
+```
+Simple rhythm on purpose — quarters and halves only, so intonation is the entire technical challenge, not rhythm.
 
-2. **Add the canon voice:**
-   - Duplicate the subject starting 2 measures later
-   - Transpose the follower up or down by a quartertone-adjusted interval (e.g., up a perfect fifth plus half-sharp)
-   - Notate both voices on separate staves with stems up for voice 1, stems down for voice 2
+2. **Add the canon voice:** duplicate the subject starting at measure 3 (2-measure delay), transposed up a perfect fifth plus a quarter-tone sharp (G + 50¢). Stems up for voice 1, stems down for voice 2 if sharing a staff; separate staves are clearer for a first attempt.
 
-3. **Tune the quarter-tone pitches:**
-   - If using a tuner, locate each pitch by finding the equal-tempered pitch and adjusting ±50 cents
-   - For D half-sharp: start at D (approximately 293.66 Hz in A=440), then raise by 50 cents
-   - Practice each microtonal pitch in isolation until tuner shows ±5 cents accuracy
+3. **Tune each quarter-tone pitch before attempting the canon:**
+   - Find the 12-TET reference pitch on the tuner (e.g., D4 = 293.66 Hz).
+   - Adjust until the tuner reads exactly +50 cents from that reference.
+   - Hold the pitch for 10 full seconds without the tuner reading drifting beyond ±5 cents — this is your accuracy target before moving to the next pitch.
+   - Repeat for every microtonal pitch in the subject, in isolation, before attempting the full phrase.
 
-4. **Perform the canon:**
-   - Record voice 1 as a reference track
-   - Perform voice 2 against the recording, checking tuning with the tuner
-   - Listen for beats between the two voices: perfect quarter-tone unisons should produce a distinct beating pattern different from equal-tempered unisons
+4. **Perform:**
+   - Record voice 1 clean as a reference track.
+   - Perform voice 2 against the recording with the tuner visible.
+   - Listen specifically for beating between the two voices on the quarter-tone unisons at the canon's overlap points — a true quarter-tone interval produces a distinctly different beat rate than an out-of-tune 12-TET interval, and you want to learn to hear that difference, not just see it on the tuner.
 
-5. **Analyze the results:**
-   - Where did intonation drift occur?
-   - Which quarter-tone intervals were hardest to tune?
-   - How does the canon sound compared to a twelve-tone version?
+5. **Debrief questions to answer in writing:** which specific pitch drifted most during the take? Was it approached from above or below? Does the canon's dissonance read as "exotic" or just "out of tune" to a listener blind to the score — and if the latter, which intervals need retuning?
 
-**Extension:** Expand to 72-tone equal temperament (twelfth-tones) or just intonation, and notate with cent deviations instead of standardized accidentals.
+**Extension:** rebuild the same canon in 72-TET (twelfth-tones) using cent numbers above each notehead instead of accidentals, and repeat the tuning drill with a ±5-cent target tightened to ±3 cents.
 
-## 7. Lab: Polymetric Ostinato with Metric Modulation
+---
 
-**Objective:** Write and perform a two-hand piano piece where the left hand plays a 5/8 ostinato and the right hand plays a 4/4 melody, followed by a metric modulation.
+## 7. Lab — Polymetric Ostinato with Metric Modulation (Piano)
 
-**Materials:**
-- Piano or MIDI keyboard
-- Metronome with programmable subdivisions
-- Notation software or staff paper
+**Objective:** Perform independent left-hand 5/8 and right-hand 4/4 parts against a shared pulse, then execute a notated metric modulation.
+
+**Materials:** Piano/MIDI keyboard; metronome app with polyrhythm/subdivision programming (Soundbrenner, Polyrhythm Metronome, or a DAW click track with two MIDI channels).
 
 **Procedure:**
 
-1. **Compose the 5/8 ostinato (left hand):**
-   - Create a repeating bass pattern: root, fifth, octave, fifth, third (five eighth notes)
-   - Use pitches: C2, G2, C3, G2, E2
-   - Mark the time signature as 5/8
-   - Write 8 measures of continuous repetition
+1. **Left hand — 5/8 ostinato, 8 measures, continuous:**
+```
+Beat:   1   2   3   4   5  (eighth notes)
+Note:   C2  G2  C3  G2  E2
+```
+Lock this into muscle memory alone first — metronome at ♪=120, repeat until it runs without conscious counting.
 
-2. **Compose the 4/4 melody (right hand):**
-   - Write a simple melody in 4/4 using quarter notes and half notes
-   - Align the notation so that the right-hand 4/4 measures start at the same time as the left-hand 5/8 measures
-   - The cycle repeats every 20 eighth notes (LCM of 5 and 8): after 4 measures of 5/8, the hands re-align
+2. **Right hand — 4/4 melody**, quarter notes and half notes only, composed so its downbeats land at musically sensible points relative to the shared eighth-note pulse (don't force alignment with left hand's downbeat every measure — that's the point of polymeter).
 
-3. **Set up the metronome:**
-   - Program a 5-against-4 polyrhythm: base tempo 120 BPM, with clicks on every eighth note
-   - Alternatively, count in sixteenth notes and map both patterns onto the sixteenth-note grid: 5/8 = 10 sixteenths, 4/4 = 16 sixteenths, LCM = 80 sixteenths (5 measures of 4/4)
+3. **Shared pulse setup:** LCM of 5 and 8 eighth-note cycles = 40 eighth notes (5 measures of 4/4 against 8 measures of 5/8). Program the metronome to click every eighth note at a single steady rate — this is the only click you use. Both hands reference this single pulse; neither hand's "measure" dictates the other's tempo.
 
-4. **Practice each hand separately:**
-   - Left hand: lock into the 5/8 groove with metronome at ♪ = 120 BPM
-   - Right hand: practice the 4/4 melody against the same metronome, feeling where the downbeats of 4/4 fall relative to the eighth-note pulse
+4. **Practice sequence:**
+   - Left hand alone against click, 2 minutes, ♪=80.
+   - Right hand alone against the *same* click, 2 minutes, ♪=80.
+   - Combine at ♪=80. Expect this to fall apart in the first attempt — that's normal. Isolate wherever it breaks and loop that one measure in both hands together 10 times before continuing.
+   - Increase in 10 BPM steps to ♪=120 only once a full 5-measure cycle is clean twice in a row.
 
-5. **Combine hands:**
-   - Start at ♪ = 80 BPM, then increase by 10 BPM increments to 120 BPM
-   - Focus on the points where the hands synchronize (every 20 eighth notes)
-   - Do not adjust either hand's tempo to match the other; maintain independent meters
+5. **Metric modulation at measure 9:** notate `♪(5/8) = ♩(new 4/4)`, meaning the old eighth-note pulse becomes the new quarter-note beat — tempo effectively doubles (♪=120 becomes ♩=120, so the new ♪=240).
+   - Practice this transition in isolation: play 2 measures of the old 5/8 pattern, then on the modulation downbeat, immediately feel the previous eighth-note speed as your new quarter-note speed. Nothing about your hand speed changes at the instant of modulation — only the notated grouping does.
+   - Write 4 measures in the new, faster 4/4 and rehearse the transition bar in isolation at least 10 times before attempting the full piece start-to-finish.
 
-6. **Add metric modulation:**
-   - At measure 9, write a modulation: "♪ (5/8) = ♩ (new 4/4)"
-   - The eighth note of the 5/8 pattern becomes the quarter note of the new 4/4 section
-   - This multiplies the tempo by 2 (if ♪ = 120, the new ♩ = 120, so ♪ = 240)
-   - Write 4 measures of new material in the faster 4/4 tempo
+6. **Full take:** record start to finish. Check the realignment point (measure 5 of the cycle) and the modulation bar against a metronome reference afterward — the modulation should sound like a sudden doubling of rhythmic density, not a tempo lurch.
 
-7. **Perform the complete piece:**
-   - Record a full take and check synchronization at the polymetric re-alignment points
-   - Verify that the metric modulation produces the correct tempo change by comparing metronome markings before and after the modulation
+**Extension:** add a third voice in 7/8 for a 5:4:7 simultaneous polymeter, or replace the 5/8 ostinato's final beat with a 7:5 tuplet for added internal complexity.
 
-**Extension:** Add a third voice in 7/8 in the middle register, creating a 5:4:7 polymeter, or use irrational tuplets (7:5) within the 5/8 ostinato.
+---
 
-## 8. Lab: Graphic Score for Improvised Extended Techniques
+## 8. Lab — Graphic Score for Improvised Extended Technique (Solo String)
 
-**Objective:** Create a graphic score for a solo string instrument that uses extended techniques, then perform and record it.
+**Objective:** Design, notate, and perform a graphic score using extended techniques, with synchronization cues that don't rely on fixed pitch/rhythm.
 
-**Materials:**
-- String instrument (violin, viola, cello, or bass)
-- Blank paper or vector graphics software
-- Recording device
+**Materials:** String instrument; vector software (Illustrator, Inkscape, or even presentation software) or paper and ruler; recording device.
 
 **Procedure:**
 
-1. **Design the graphic notation symbols:**
-   - Rising diagonal line: upward glissando
-   - Falling diagonal line: downward glissando
-   - Jagged zigzag: rapid bow tremolo
-   - Circle with X inside: scratch tone (heavy bow pressure, slow speed)
-   - Wavy horizontal line: sul ponticello (bowing near bridge)
-   - Solid black rectangle: sustained pitch cluster (play multiple strings simultaneously)
-   - Scattered dots: pizzicato with randomized rhythm
+1. **Define your symbol legend first, in writing, before drawing anything** — this is the single most important step, because an undefined graphic symbol is not notation, it's abstract art the performer has to guess at:
 
-2. **Create the score layout:**
-   - Use proportional notation: 1 inch = 2 seconds
-   - Draw a horizontal timeline across the page marked at 2-second intervals (0, 2, 4, 6, 8, 10 seconds)
-   - Place graphic symbols along the timeline to indicate when each technique should begin
-   - Use vertical positioning to suggest approximate pitch: higher on page = higher pitch
+| Symbol | Technique | Physical action |
+|---|---|---|
+| Rising diagonal | Upward glissando | Slide left hand continuously up the fingerboard while bowing |
+| Falling diagonal | Downward glissando | Reverse of above |
+| Jagged zigzag | Rapid bow tremolo | Short, fast back-and-forth bow strokes, loose wrist |
+| Circle with X | Scratch tone | Heavy pressure, slow bow speed |
+| Wavy horizontal line | Sul ponticello | Bow within 1cm of bridge |
+| Solid black rectangle | Sustained cluster | Bow 2-3 strings simultaneously, flat bow hair angle |
+| Scattered dots | Random-rhythm pizzicato | Pluck at indicated approximate pitches, no fixed rhythm |
 
-3. **Example score (10-second excerpt):**
-   - 0–2 sec: Rising diagonal line from bottom-left to mid-right (glissando from low register to mid-register)
-   - 2–4 sec: Solid black rectangle in mid-range (sustain cluster chord)
-   - 4–6 sec: Wavy horizontal line at top of page (sul ponticello on high string)
-   - 6–8 sec: Circle with X in mid-range (scratch tone)
-   - 8–10 sec: Scattered dots across entire vertical range (pizzicato bursts at various pitches)
+2. **Layout:** proportional timeline, 1 inch = 2 seconds, timeline marked at every 2-second interval across the page. Vertical position on the page = relative pitch height (higher on page = higher pitch, no exact pitch implied).
 
-4. **Perform and record:**
-   - Interpret the score, using the timeline for pacing but allowing freedom in exact pitch choices
-   - Record three takes with different interpretations
-   - Compare: how much variation occurred between takes?
+3. **Build a 10-second excerpt** following the timeline:
+```
+0-2s:  rising diagonal, bottom-left to mid-right
+2-4s:  solid black rectangle, mid-range
+4-6s:  wavy horizontal line, top of page
+6-8s:  circle-X, mid-range
+8-10s: scattered dots, full vertical range
+```
 
-5. **Notate a second performer's part:**
-   - Create a second graphic score for a different instrument
-   - Align both scores on the same timeline so they can be performed as a duet
-   - The graphic notation provides synchronization cues without rigid pitch or rhythm constraints
+4. **Perform three takes.** Use a stopwatch or metronome click only at the 2-second marks as pacing reference — everything inside each 2-second window is interpretive.
 
-**Extension:** Expand to a full 2-minute graphic score for string quartet, or create an animated graphic score that scrolls across a screen during performance.
+5. **Compare takes:** note pitch choices, exact timing of technique changes, and dynamic shape. Significant variation between takes is expected and correct — if all three takes are nearly identical, the notation was effectively over-specified for a piece meant to be open-form.
 
-## 9. Notation Software and Digital Engraving Best Practices
+6. **Add a second performer's part** on the same timeline for duet performance — the shared timeline is the only synchronization mechanism; neither part specifies the other's pitch or rhythm.
 
-### Software Tools
+**Extension:** scale to a 2-minute string quartet score, or build a scrolling digital version (a simple looping video or a slide deck timed to advance automatically) so performers read from a shared moving timeline instead of a printed page.
 
-- **MuseScore (free, open-source):** Full-featured notation editor with MIDI playback, VST support, and extensive plugin ecosystem; supports quarter-tone accidentals and tuplet customization
-- **Dorico (professional, paid):** Industry-standard engraving quality; advanced features include automatic spacing, condensing scores, and flexible layout control; best for orchestral and contemporary music
-- **Sibelius (professional, paid):** Long-established notation software with deep feature set; magnetic layout and dynamic parts extraction
-- **LilyPond (free, open-source, code-based):** Text-based notation language; outputs publication-quality engraving; steep learning curve but maximum control over every detail
+---
 
-### Engraving Rules for Professional Legibility
+## 9. Notation Software and Engraving — Working Settings, Not Just Opinions
 
-- **Stem direction:** Notes above the middle line of the staff have stems down; notes below have stems up; middle-line notes default to stem down unless context requires otherwise
-- **Beam angles:** Keep beam slopes shallow (≤30 degrees); avoid horizontal beams for melodic motion; use standard beam groupings that reflect meter
-- **Staff spacing:** Increase spacing when multiple ledger lines are present; ensure no collisions between noteheads, accidentals, and articulations
-- **Page turns:** Arrange page breaks so performers have at least two measures of rest before a turn; for solo parts, avoid page turns in the middle of phrases
-- **Cue notes:** Use small noteheads to indicate another instrument's part for coordination; mark "cue: [instrument name]"
-- **Rehearsal marks:** Use boxed letters or numbers at phrase boundaries; place every 8–16 measures or at major structural divisions; align rehearsal marks across all parts
+### Software quick-reference
 
-### MIDI and MusicXML Export for Digital Performance
+| Software | Cost | Best for | Microtonal support |
+|---|---|---|---|
+| MuseScore 4 | Free | Students, drafts, quick parts | Built-in quarter-tone accidentals; custom key signatures via plugin for other EDOs |
+| Dorico | ~$300 (Pro) | Professional orchestral/contemporary engraving | Native support for arbitrary EDO systems and custom accidentals via Properties panel |
+| Sibelius | ~$150-800/yr | Professional, especially film/TV workflows | Microtonal plugins available, less native than Dorico |
+| LilyPond | Free, code-based | Publication-quality engraving at zero cost, full automation | Full microtonal support via `\include "makam.ly"` or custom accidental definitions in source code |
 
-- Export scores as MusicXML for interchange between notation software
-- Generate MIDI files for playback in DAWs (Digital Audio Workstations) or for use with sample libraries
-- When exporting MIDI, assign correct program changes (instrument patches) and controller data (dynamics, expression) for realistic playback
-- For microtonal MIDI, use pitch-bend messages to encode cent deviations; standard MIDI pitch-bend range is ±2 semitones, requiring pitch-bend sensitivity adjustment in the receiving synthesizer
+### Engraving rules that actually affect readability
 
-## 10. Further Study and Real-World Applications
+- **Stem direction default:** notes on or above the middle staff line get stems down; below, stems up. Breaking this without a part-writing reason (voice separation) signals an error to experienced readers.
+- **Beam slope:** keep under 30 degrees. A steep beam angle makes the eye misjudge relative pitch distance between beamed notes — flatten it even if it means the beam doesn't perfectly track the melodic contour.
+- **Ledger line spacing:** increase staff spacing automatically (most software does this) wherever 3+ ledger lines appear consecutively — cramped ledger lines are the #1 cause of sight-reading pitch errors in professional parts.
+- **Page turns:** never inside a phrase for a solo part; always leave 2+ measures of rest before a turn. If the piece doesn't have a natural rest there, add a short breath/rest bar or use a page-turn-friendly layout (landscape spread, or a III-page foldout) rather than forcing a bad turn.
+- **Rehearsal marks:** boxed letters/numbers every 8-16 measures or at structural divisions, aligned at the identical bar across every single part — misaligned rehearsal marks between parts is the single most common professional engraving error reported by orchestral librarians.
 
-- **Study scores:** Analyze Bartók String Quartets (extended techniques), Ligeti Études (complex rhythms), Crumb Black Angels (graphic notation), Stockhausen Klavierstücke (proportional notation)
-- **Commission notation projects:** Work with living composers to prepare clean, performance-ready parts for premiere performances
-- **Transcription work:** Transcribe complex jazz solos, microtonal field recordings, or non-Western music into Western notation, adapting notation systems as needed
-- **Film and game scoring:** Use notation software to create cue sheets for orchestral recording sessions; export MIDI for layering with electronic production
-- **Music publishing:** Prepare engraved editions of public-domain works or original compositions for sale; follow engraving standards (G. Henle Verlag, Bärenreiter) for professional quality
+### MIDI/MusicXML — concrete export settings
+
+- Export **MusicXML** (not MIDI) when moving a score between MuseScore/Dorico/Sibelius/Finale — MIDI loses notation-specific data (beaming, articulation symbols, lyrics placement); MusicXML preserves it.
+- Export **MIDI** only for DAW playback or sample-library rendering. Set program change numbers to match your target sample library's patch list exactly — a mismatched program change silently loads the wrong instrument in many sample players.
+- For **microtonal MIDI**, pitch-bend is your only standard-MIDI tool. Default pitch-bend range is ±2 semitones (±200 cents) — at the receiving synth, set pitch-bend sensitivity (often an RPN message, `0x6401 0x6500` sequence, or a GUI slider in soft-synths) to match your intended range before sending bend data, or your quarter-tones will bend by the wrong amount.
+
+---
+
+## 10. Further Study
+
+- **Scores to analyze, in this order of difficulty:** Bartók String Quartet No. 4 (extended string technique), Ligeti Études pour piano (complex polyrhythm notation), Crumb *Black Angels* (graphic + extended technique hybrid), Stockhausen *Klavierstücke* (proportional notation).
+- **Transcription practice:** transcribe one microtonal field recording (maqam or blues-inflected jazz solo with bent pitches) per month into staff notation with cent annotations — this is the fastest way to internalize microtonal notation's practical limits.
+- **Engraving standards to study directly:** G. Henle Verlag and Bärenreiter critical editions — compare their spacing and beaming choices against your own software's defaults to calibrate your eye for professional engraving quality.
+- **Commission or volunteer work:** offer to prepare performance parts for a local new-music ensemble's premiere — nothing teaches practical notation faster than a professional player returning a part with "this beaming is unreadable at tempo" written on it.
