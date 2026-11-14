@@ -1,230 +1,277 @@
-# Operational Verification Labs: Orchestration
+# Orchestration Masterclass: Scoring for Real Ensembles
 
-## Objective & Lab Setup
+## Who This Is For and What You Need
 
-This laboratory provides rigorous, hands-on training in orchestration—the art and science of assigning musical material to instruments within an ensemble to achieve specific timbral, textural, and expressive outcomes. Unlike simple instrumentation (choosing which instruments to use), orchestration concerns itself with *how* those instruments interact: their range utilization, dynamic layering, spectral balance, transient characteristics, and temporal alignment. These exercises bridge theoretical principles with empirical verification, employing digital audio workstations (DAWs) and sample libraries as proxies for live orchestral forces. By manipulating orchestration parameters systematically and measuring their acoustic and perceptual effects, you will develop an intuition for why certain combinations produce clarity, blend, or masking—and how to control those outcomes.
+This is a hands-on course in orchestration — deciding which instrument plays which note, in which register, with which articulation, so the music says what you want it to say. You will write real voicings, play them on a keyboard controller into a DAW, and fix the three problems that wreck 90% of amateur scores: muddy bass register, buried middle voices, and smeared unison attacks.
 
-The laboratory is structured around three operational paradigms: foundational implementation (building correct, idiomatic voicings), parameter variation (isolating variables to observe their acoustic impact), and fault injection (stress-testing workflows and understanding failure modes in both technical and musical domains). Each exercise concludes with measurable outputs—waveforms, spectrograms, LUFS measurements—allowing you to verify hypotheses about orchestration empirically rather than relying solely on subjective judgment.
+**You need:**
+- A DAW with per-track MIDI and CC automation (Logic, Cubase, Live, Reaper — any works)
+- One orchestral sample library with dynamic layers and legato/staccato articulations (Spitfire BBC/Symphonic, VSL Synchron, Orchestral Tools Berlin, EastWest Hollywood — any works, but have at least strings + winds + brass)
+- A MIDI keyboard, 61 keys minimum, with a mod wheel or expression pedal
+- A free spectrum analyzer (Voxengo SPAN) and a free LUFS meter (Youlean Loudness Meter) — both zero-cost VST/AU plugins
+- Manuscript paper or a notation program (Dorico, Sibelius, MuseScore) for writing voicings on real staves before you program them — **do this every time**, it's faster than hunting for wrong notes in a piano-roll
 
-### Required Domain-Specific Tools, Environments, Packages, or Simulators
+**How to practice this material:** read the physical reasoning in each section (short, never more than a paragraph), write the voicing on paper in the correct clefs with correct transpositions, program it, listen, measure it with the analyzer, and fix what's wrong. Measurement is not optional — your ear is good at telling you something's off; the spectrum analyzer tells you where and by how much.
 
-To execute the exercises in this laboratory, assemble the following environment:
+---
 
-**Digital Audio Workstation (DAW):** Select a DAW with robust MIDI editing, automation, and plugin hosting. Recommended platforms include Ableton Live 12 Suite (for its flexible clip-based workflow and Max for Live integration), Logic Pro 11 (for its native orchestral template and articulation management via Smart Controls), Cubase Pro 13 (for its Expression Maps and VST Expression support), or Reaper (for its lightweight, scriptable architecture). Ensure your DAW supports per-note articulation switching, continuous controller (CC) automation, and high-resolution audio export (minimum 48 kHz / 24-bit).
+## Part 1: String Orchestration
 
-**Orchestral Sample Libraries:** Acquire at least one professional sample library with multiple dynamic layers, round-robin variations, and legato scripting. Tier-one options include Spitfire Audio Symphonic Orchestra Professional (comprehensive articulation coverage with extensive microphone positions), Vienna Symphonic Library (VSL) with Synchron Player (precise control over attack, release, and humanization), Orchestral Tools Berlin Series (dry scoring-stage recordings with convolution-based room modeling), or EastWest Hollywood Orchestra Diamond (broad articulation palette with WordBuilder for choral integration). Ensure the library supports keyswitches or UACC (Universal Articulation and Controller Convention) for articulation switching.
+### 1.1 Why Strings Blend and How to Voice Them
 
-**MIDI Controller:** A weighted 61- or 88-key MIDI keyboard with velocity sensitivity and at least one continuous controller (mod wheel, expression pedal, or breath controller) is essential. Controllers with aftertouch (channel pressure) enable real-time dynamic shaping. Examples: Arturia KeyLab 88 MkII, Native Instruments Komplete Kontrol S61, or M-Audio Hammer 88 Pro.
+A bowed string's tone is a sawtooth-like spectrum: strong fundamental, full set of harmonics decaying smoothly above it. When two violins play the same written pitch, no two players have identical pitch, bow speed, or vibrato phase — you get a natural ±5–10 cent spread and a 5–7 Hz vibrato rate that doesn't lock between players. That mismatch is *constructive*: it widens the sound without killing the attack, because the attack transients (bow catching the string) line up within a few milliseconds even though the sustained pitch wobbles independently. This is why doubled strings sound "bigger," not "flangier" — and why doing the same trick with a single sampled line pitch-shifted a few cents sounds synthetic: there's no independent vibrato on the copy.
 
-**Analysis and Measurement Tools:** Install plugins and software for acoustic analysis. Voxengo SPAN (free spectrum analyzer), iZotope Insight 2 (metering suite with spectral analysis and LUFS measurement), MeldaProduction MMultiAnalyzer (comparative spectral analysis across tracks), and Sonic Visualiser (open-source waveform and spectrogram viewer with annotation capabilities). For graphing and data analysis, use Python with matplotlib and librosa, MATLAB with the Audio Toolbox, or even Excel/Google Sheets for simple visualizations.
+**The spacing rule that actually matters:** below about 500 Hz, two notes closer than a minor third tend to fuse into one blurry pitch instead of being heard as a chord — harmonics from the lower note crowd the upper note's fundamental. Above 1 kHz, your ear resolves even a semitone cleanly because the ear's critical bands widen in Hz but shrink in perceived size as frequency rises. Practical consequence for voicing a string chord bottom-to-top:
 
-**Audio Interface:** A low-latency audio interface (≤10 ms round-trip latency at 48 kHz) with balanced outputs for studio monitors or high-impedance headphone output. Examples: Focusrite Scarlett 4i4 (4th Gen), Universal Audio Volt 276, or RME Babyface Pro FS.
+- **Bass (cello/bass):** space wide — 5ths, octaves, 12ths. Never put a 2nd or 3rd between the two lowest voices.
+- **Middle (viola, 2nd violin):** 3rds and 4ths are fine.
+- **Top (1st violin):** close spacing is fine, even 2nds, as long as you stay above middle C (C4).
 
-**Reference Recordings and Scores:** Obtain high-quality recordings and published scores of orchestral works. Essential references include Ravel's *Daphnis et Chloé* (exemplary impressionist orchestration), Stravinsky's *The Rite of Spring* (extreme register usage and instrumental color), Rimsky-Korsakov's *Scheherazade* (textbook idiomatic writing), and scores published by Bärenreiter, Eulenburg, or Dover. These serve as ground truth for comparing your realizations.
+### 1.2 Four-Part Chorale, Written Out
 
-## Exercise 1: Foundational Practical Implementation
+Here's a spaced C major chorale, string quartet voicing, correctly spaced by the rule above.
 
-### Step-by-Step Runnable Exercise Demonstrating the Core Concept
+| Voice | Clef | Note | MIDI | Interval above voice below |
+|---|---|---|---|---|
+| Violin I | Treble | C5 | 72 | minor 6th above Vln II |
+| Violin II | Treble | E4 | 64 | major 6th above Viola |
+| Viola | Alto | G3 | 55 | perfect 12th above Cello |
+| Cello | Bass | C2 | 36 | — |
 
-This exercise demonstrates fundamental orchestration principles: register distribution, spectral spacing, and dynamic balance. You will construct a four-voice chorale texture using orchestral strings, then verify that the voicing adheres to acoustic and perceptual principles governing blend and clarity.
+```
+Violin I   : ----------------●---
+Violin II  : -----------●-------
+Viola      : -------●-----------
+Cello      : ---●---------------
+             (low)        (high)
+```
 
-#### Architectural Foundation: Why Strings Blend and How Doubling Works
+Notice the 12th between cello and viola — that's a 5th plus an octave, deliberately wide, so the cello's upper harmonics (which land around 130, 195, 260 Hz) don't crowd the viola's fundamental at 196 Hz. If you instead wrote cello C2 and viola E3 (a major 3rd), the chord would sound thick and indistinct even though it's "correct" harmony on paper. **Try both voicings back to back — this is the single fastest ear-training exercise for spacing.**
 
-Orchestral strings blend effectively because they share similar harmonic spectra: a fundamental with a series of overtones that decay smoothly at higher frequencies. When two string instruments play in unison, their slight differences in tuning (±5-10 cents), attack timing (±5-15 ms), and vibrato rate (5-7 Hz) produce a **chorus effect**—a natural widening and enrichment of the composite sound without destructive phase cancellation. This is distinct from synthesized unison detuning; orchestral doubling preserves transient clarity because the attack envelopes remain correlated while the sustain phase diverges slightly.
+### 1.3 Programming It: Fader and Pan Starting Points
 
-Register spacing matters because the ear's critical bandwidth varies with frequency. Below 500 Hz, intervals smaller than a minor third risk perceptual fusion (losing individual voices); above 1 kHz, even semitones can coexist clearly. The "Acoustic Sweet Spot" for orchestral voicing places the bass (cellos/basses) in wide intervals (fifths, octaves), mid-range (violas, lower violins) in moderate spacing (thirds, fourths), and upper voices (violins) in closer intervals without crowding below middle C.
+Set up seven tracks (doubling Violin I and II for a chorus effect):
 
-#### Step-by-Step Implementation
+| Track | Part | Fader | Pan |
+|---|---|---|---|
+| 1 | Violin I | −6 dB | L30 |
+| 2 | Violin II | −6 dB | L20 |
+| 3 | Viola | −8 dB | center |
+| 4 | Cello | −10 dB | center |
+| 5 | Violin I (dup.) | −6 dB | R30 |
+| 6 | Violin II (dup.) | −6 dB | R20 |
+| 7 | Double Bass | −13 dB | center |
 
-**1. Project Initialization and Template Construction**
+For the doubled tracks (5 and 6): copy the MIDI, but **don't just duplicate it exactly** — nudge the region 8–12 ms later, and if your library has multiple mic positions or round-robin samples, switch them. This recreates the natural player-to-player timing variance described above. A perfectly identical duplicate at 0 ms offset doesn't widen the sound — it risks phase cancellation (see Part 4).
 
-Launch your DAW and create a new project at 48 kHz sample rate, 24-bit depth. Set the tempo to 60 BPM (one beat per second, simplifying timing measurements) and the time signature to 4/4. Enable a metronome with a clear attack transient for alignment verification.
+Double bass: write C2 if your library auto-transposes basses down an octave from written pitch (most do, matching real bass notation); otherwise write C1 directly. Keep it 3 dB under the cello so it reinforces the fundamental without stepping on the cello's midrange color.
 
-**2. Instrument Track Setup and Articulation Mapping**
+**Spectrum analyzer check** (SPAN on the master bus, after rendering):
+- 60–200 Hz: solid energy, this is your cello + bass fundamental — if this region is clipping or dominating, pull the bass fader down 2–3 dB
+- 300 Hz–1 kHz: viola/2nd violin body — should sit visibly under the bass hump, not above it
+- 1–5 kHz: violin I brilliance — a small shelf here is fine, but if it peaks more than 3 dB over everything else, cut a gentle high shelf at 4 kHz, −1.5 dB
 
-Insert four instrument tracks:
-- **Track 1:** Violin I (soprano voice)
-- **Track 2:** Violin II (alto voice)
-- **Track 3:** Viola (tenor voice)
-- **Track 4:** Cello (bass voice)
+### 1.4 Dynamics: Why Linear CC11 Automation Sounds Wrong
 
-For each track, load your orchestral sample library plugin. Assign the following patches:
-- Violin I: Sustained long notes (legato or sustain articulation)
-- Violin II: Sustained long notes
-- Viola: Sustained long notes
-- Cello: Sustained long notes
+If you draw a straight-line crescendo in CC11 (expression) from 40 to 100 over four beats, the audio *doesn't* sound like a smooth, even crescendo — it jumps loud early and barely moves at the top. This is because loudness perception is compressive (the same physics behind the Fletcher-Munson curves): equal increments in physical intensity produce shrinking increments in perceived loudness as you get louder. Sample libraries compound this with their own velocity-layer crossfades, which are rarely linear either.
 
-Configure MIDI articulation switching if your library uses keyswitches. Typically, C0 or C1 triggers sustain articulations. Verify that CC1 (mod wheel) or CC11 (expression) controls dynamics; many libraries use CC1 for vibrato intensity and CC11 for volume. Test this by recording a MIDI note, drawing automation, and confirming audio response.
+**Fix:** use an S-curve, not a straight ramp. In most DAWs you can right-click an automation ramp and select an S-curve or exponential curve shape. If your DAW only allows straight ramps, draw it manually with more breakpoints bunched toward the loud end:
 
-**3. Voicing a Four-Part Chorale: Register and Spacing**
+```
+CC11
+127 |                              ●
+100 |                        ●
+ 80 |                   ●
+ 60 |              ●
+ 40 |         ●
+ 20 |   ●
+  0 |●
+    +---+---+---+---+---+---+---+---+
+     beat1    beat2    beat3    beat4
+```
 
-Enter the following MIDI notes, each lasting four beats (four quarter notes at 60 BPM = four seconds per chord):
+Dense points near the bottom, sparse near the top — this compensates for the ear's compression and produces an audibly even crescendo. Verify with a LUFS meter in short-term mode: measure loudness every 0.5 seconds across the swell; the LUFS values should increase in roughly equal steps if your curve is shaped correctly. If the measured steps are uneven (big jumps early, tiny moves late), adjust the curve further.
 
-**Chord 1: C Major in root position, spaced voicing**
-- Cello (Track 4): C2 (MIDI note 36, ~65 Hz)
-- Viola (Track 3): G3 (MIDI note 55, ~196 Hz)
-- Violin II (Track 2): E4 (MIDI note 64, ~330 Hz)
-- Violin I (Track 1): C5 (MIDI note 72, ~523 Hz)
+### 1.5 Practice Drill: Masking in the Low Register
 
-This voicing places the bass on the root, spans a perfect fifth to the tenor (viola), a major sixth to the alto (Violin II), and a minor sixth to the soprano (Violin I). The wide spacing in the lower register (C2 to G3 is a perfect twelfth) prevents muddiness; the closer spacing above (E4 to C5 is a minor sixth) maintains clarity because those frequencies occupy narrower critical bands.
+Play a solo cello C2, note its apparent loudness. Mute it, play a solo viola C4, note its loudness. Now play both together. The combined sound is almost always *quieter in the viola* than you'd expect from simple addition — this is called upward spread of masking: a loud low note's harmonics extend upward and bury a softer note sitting above it, even though a note of the *same* pitch an octave higher wouldn't mask it nearly as much.
 
-**4. Dynamic Shaping and Expression**
+**Drill:** write a passage where cello and viola must both be heard clearly (e.g., cello pedal tone under a viola melodic line). Start the cello at mf and the viola at mf — listen for burying. Pull the cello back to mp, or move the viola line up an octave, or widen the interval between them. Re-listen after each change until the viola is clearly audible without raising its own volume. This one physical fact — low loud notes mask mid notes more than high notes do — is why Rimsky-Korsakov's orchestration treatise insists on never doubling a melody's inner harmony in the bass register at full strength.
 
-For each track, draw CC11 (expression) automation as follows:
-- Start at value 40 (piano, ~40% velocity)
-- Ramp linearly to value 100 (forte, ~79% velocity) over the first two beats
-- Hold at 100 for one beat
-- Ramp down to value 40 over the final beat
+---
 
-This crescendo-diminuendo contour tests the dynamic response of the sample library and ensures that layered instruments maintain phase coherence across dynamic levels.
+## Part 2: Woodwind Orchestration
 
-**5. Adding Doubled Violins for Chorus Effect**
+### 2.1 Why Woodwinds Don't Blend the Way Strings Do
 
-Insert two additional tracks:
-- **Track 5:** Violin I (duplicate)
-- **Track 6:** Violin II (duplicate)
+A clarinet's cylindrical, closed-at-one-end bore suppresses even harmonics — its spectrum is dominated by the fundamental, 3rd, 5th, 7th partials, giving it that hollow, "woody" character. An oboe or bassoon's conical bore produces a full harmonic series, odd and even, which is why they sound brighter and more nasal. Because these overtone *shapes* differ, two different woodwinds playing the same unison pitch never truly fuse the way two violins do — you always hear "a clarinet and an oboe," not "one bigger instrument." That's not a flaw to fix; it's the color palette. Blend in woodwinds comes from balance and register matching, not from acoustic fusion.
 
-Copy the MIDI from Tracks 1 and 2 to Tracks 5 and 6 respectively. In the sample library plugin on Tracks 5 and 6, select a different microphone position or round-robin sample set if available (e.g., switch from "Decca Tree" to "Close" mic, or enable round-robin advance). This introduces timbral variety without changing pitch or timing.
+### 2.2 Written Woodwind Quartet: Diminished Seventh Voicing
 
-Adjust timing offset: Nudge the MIDI regions on Tracks 5 and 6 forward by 8-12 milliseconds. This simulates the natural timing discrepancies between players and enhances the chorus effect. Use your DAW's track delay or manually shift the MIDI region.
+A Bo7 chord (B♭–D♭–F♭–A♭, respelled B♭–D♭–E–G♯), voiced bottom to top in a standard flute/oboe/clarinet/bassoon quartet:
 
-Pan the original Violin I (Track 1) to L30, the doubled Violin I (Track 5) to R30. Pan Violin II (Track 2) to L20, the doubled Violin II (Track 6) to R20. This stereo spread mimics orchestral seating and increases spatial impression.
+| Voice | Transposition | Sounding pitch | Written pitch (for performer) |
+|---|---|---|---|
+| Flute | none | A♭5 | A♭5 |
+| Oboe | none | F4 | F4 |
+| Clarinet in B♭ | sounds M2 lower than written | D♭4 | E♭4 |
+| Bassoon | none | B♭2 | B♭2 |
 
-**6. Bass Reinforcement with Double Bass**
+**The one transposition rule you must never get backward:** a B♭ clarinet, when the player reads a written C, produces a sounding B♭ — a major second *lower*. So to get the clarinet to sound D♭4, you write E♭4 on the clarinet's part (or enter the sounding pitch D♭4 directly if your sample library auto-transposes, which most modern libraries do — check this once per library and write it on a sticky note on your monitor).
 
-Insert **Track 7: Double Bass**. Assign a double bass sustain patch. Enter the same note as the cello (C2, MIDI note 36) but in the double bass patch, this typically sounds an octave lower (C1, ~32 Hz) if the library implements standard orchestral transposition. If your library does not transpose automatically, enter C1 (MIDI note 24).
+Spacing: bassoon to clarinet is a minor 10th (wide, correctly avoiding bass-register mud), oboe to flute is a major 10th (also wide at the top, avoiding woodwind shrillness from crowding).
 
-Balance the double bass level to sit approximately 3 dB below the cello. This reinforces the fundamental without masking the cello's richer mid-range overtones.
+### 2.3 Staggered Dynamics — The Real Fix for Woodwind Balance
 
-**7. Mixing and Spectral Balance**
+Put a bassoon, clarinet, oboe, and flute all at the same CC11 value and the oboe will dominate every time — its conical bore and reed give it far more perceived cutting power per unit of physical loudness than the flute's breathy, nearly sine-wave tone in its low register. The fix used by every working orchestrator is to *stagger* the written dynamic by instrument, not to rely on the mixer fader after the fact (fader balancing kills the natural attack-to-sustain dynamic shape baked into the samples).
 
-Open your DAW's mixer. Set initial fader positions:
-- Violin I (Tracks 1 & 5): -6 dB (combined)
-- Violin II (Tracks 2 & 6): -6 dB (combined)
-- Viola (Track 3): -8 dB
-- Cello (Track 4): -10 dB
-- Double Bass (Track 7): -13 dB
+Practical starting dynamics for a balanced sustained chord, loudest instrument first in perceived cutting power:
 
-These values are starting points; adjust by ear and with spectral analysis. Load a spectrum analyzer plugin on the master bus. Verify that the spectral energy distribution shows:
-- A strong fundamental region (60-200 Hz) dominated by cello and double bass
-- A balanced mid-range (300-1000 Hz) where viola and Violin II contribute body
-- A clear upper-mid and treble (1-5 kHz) where Violin I provides brilliance
+| Instrument | CC11 target (mid-chord) | Why |
+|---|---|---|
+| Oboe | 70–80 | Most piercing per unit loudness — written softer than it sounds |
+| Bassoon | 85–90 | Loud in low register, needs no boost but shouldn't overpower |
+| Clarinet | 80–85 | Warm, blends easily, moderate level |
+| Flute | 70–75 in low register / 90+ above C5 | Weak below middle C, strong and piercing above the staff — adjust by register, not a flat number |
 
-If the low end is too heavy (spectral analyzer shows >6 dB excess below 150 Hz), reduce the double bass or cello faders. If the high end is too bright (>3 dB peak above 3 kHz), reduce Violin I faders or apply gentle high-frequency shelving EQ (e.g., -1.5 dB above 4 kHz).
+Write these into the CC11 lane as the *baseline*, then shape your crescendo/diminuendo on top of each track's own baseline, not identical automation curves copy-pasted across all four parts.
 
-**8. Rendering and Waveform Verification**
+### 2.4 Blend vs. Separation: A Panning Drill
 
-Solo all seven tracks and render (bounce/export) the project to a WAV file at 48 kHz / 24-bit. Load the rendered file into Sonic Visualiser or your DAW's audio editor. Zoom into the waveform to verify:
-- The crescendo produces a smooth amplitude envelope without clipping (peaks should remain below -6 dBFS)
-- The attack transients of all instruments align within ±20 ms (visible as a single sharp wavefront)
-- The sustain phase shows micro-fluctuations (vibrato and natural variation), not a static plateau
+Render the same four-part woodwind chord twice:
+1. **Blended:** all four parts panned dead center
+2. **Separated:** bassoon center, clarinet L25, oboe R25, flute R45
 
-Generate a spectrogram (FFT size 4096, Hann window). Confirm that harmonic partials are visible as horizontal bands at integer multiples of the fundamental frequency (C2 = 65 Hz, so harmonics at 130, 195, 260 Hz, etc.). The presence of these partials indicates proper sample playback and summation.
+Listen to both with your eyes closed. The blended version reads as "one woodwind chord" — useful for a sustained pad under a melody elsewhere. The separated version reads as "four distinct lines" — useful whenever the four parts have independent contrapuntal motion (imitative entries, hocketing, call and response). **Rule of thumb:** pan for texture, not for habit. Block chords (homophony) → blend tight. Independent lines (counterpoint) → spread wide. Mixing styles without matching your panning to the texture is one of the most common amateur-mockup mistakes.
 
-#### Verification Checklist
+---
 
-- [ ] All MIDI notes are within the idiomatic playing range of each instrument (Violin: G3-A7; Viola: C3-E6; Cello: C2-C6; Double Bass: E1-G4)
-- [ ] Dynamic automation produces audible crescendo and diminuendo without distortion
-- [ ] Doubled tracks produce a perceptibly wider, richer sound compared to single tracks (A/B test by muting Tracks 5 and 6)
-- [ ] Spectral analysis shows balanced energy distribution without excessive low-end buildup or harsh high-frequency peaks
-- [ ] Rendered audio peaks between -12 and -6 dBFS, leaving headroom for mastering
+## Part 3: Brass Orchestration
 
-## Exercise 2: Parameter Variation & Empirical Analysis
+### 3.1 Transient Mismatch — The Brass-Specific Problem
 
-### Testing Different Configurations, Measuring Outputs, and Graphing Responses
+Brass tone starts with the player's lips buzzing against the mouthpiece — a sharp pressure spike that strings and winds don't produce the same way. But different brass instruments take different amounts of time to "speak":
 
-Orchestration decisions—articulation, dynamic, register, and timbre—produce measurable acoustic differences. This exercise isolates each parameter, records its effect, and graphs the results, transforming subjective preferences into objective data.
+| Instrument | Typical attack time | Why |
+|---|---|---|
+| Trumpet | 10–30 ms | Tight embouchure, small mouthpiece, fast response |
+| Trombone | 20–50 ms | Larger mouthpiece, slide slightly slower to commit than valves |
+| Tuba | 30–60 ms | Huge air column, slow to pressurize |
+| Horn | 30–80 ms | Soft embouchure by design — horn players deliberately play "behind" the beat relative to trumpet to get their characteristic warmth |
 
-#### Experiment 2A: Dynamic Range and Perceptual Loudness
+If you write a brass chorale and all four parts attack at literally the same MIDI tick, the horn's slower natural speech means its note audibly *lags* the trumpet by up to 50–70 ms — the chord "blurs in" instead of hitting together. This is the single most common reason amateur brass mockups sound mushy compared to a real section, which locks together because professional players subconsciously compensate their attack timing for each other.
 
-**Hypothesis:** Orchestral instruments exhibit non-linear dynamic response; a linear increase in MIDI velocity or CC11 value does not produce a linear increase in perceived loudness (measured in LUFS or dB SPL).
+### 3.2 Written Brass Chorale: E♭ Major with Doubled Root
+
+| Voice | Transposition | Sounding pitch | Written pitch |
+|---|---|---|---|
+| Trumpet in B♭ | sounds M2 lower | E♭5 | F5 |
+| Horn in F | sounds P5 lower | G4 | D5 |
+| Trombone | none (bass clef, concert pitch) | B♭2 | B♭2 |
+| Tuba | none | E♭2 | E♭2 |
+
+Spacing: tuba to trombone is a perfect 5th (wide bass, correct), trombone to horn is a major 6th, horn to trumpet is a minor 6th (close top, correct). Trumpet doubles the tuba's root two octaves up, reinforcing E♭ as the clear tonal center.
+
+### 3.3 Fixing Attack Mismatch: Velocity Compensation
+
+Most sample libraries trigger a faster, sharper attack sample at higher velocities and a softer, slower one at lower velocities (velocity-layer crossfading). You can exploit this to pull a naturally slow instrument's *perceived* attack forward without touching the actual note start time:
+
+| Instrument | Velocity | Purpose |
+|---|---|---|
+| Trumpet | 100 | Baseline — fastest natural attack, no compensation needed |
+| Trombone | 105 | Slight boost, moderate attack |
+| Tuba | 105 | Slight boost, moderate attack |
+| Horn | 110 | Largest boost — horn is the slowest instrument, needs the most help triggering a fast attack layer |
+
+Render, then zoom into the waveform at the downbeat in your DAW's sample editor. Drag the cursor from true silence to the first visible peak for each track soloed. If the horn's peak still lands more than 15 ms after the trumpet's, you have two more tools, in order of preference:
+
+1. **Nudge the horn's MIDI note 10–15 ms earlier** than the other three parts. This is exactly what a horn player does instinctively in a live section — they "lean in" ahead of the beat.
+2. If your library offers it, switch the horn to a dedicated "marcato" or "accented" articulation instead of a plain sustain — these are built with faster attack transients specifically for chorale writing.
+
+Never use a legato articulation for a brass chorale attack — legato patches are built around slurred, connected note transitions and have a slow, rounded onset unsuitable for a unified chord hit. Use marcato, accent, or straight sustain-with-attack patches.
+
+### 3.4 Spectral Check for Brass Balance
+
+After rendering the chorale, SPAN on the master bus should show:
+
+- 70–150 Hz: tuba fundamental, smooth, no sharp spike
+- 150–300 Hz: trombone/tuba overtones — if the tuba's harmonics spike here more than 6 dB over the trombone, high-pass the tuba gently below 100 Hz (6 dB/octave) to tighten the sub-bass without losing the fundamental
+- 300–800 Hz: horn formant region — the horn should sit audibly present here, not buried
+- 800–2500 Hz: trumpet brilliance — if it peaks more than 6 dB above the horn/trombone region, back the trumpet velocity down 5–10 points rather than reaching for EQ first; EQ on brass samples tends to reveal sample artifacts the velocity layers were designed to hide
+
+---
+
+## Part 4: Fault Diagnosis — Three Failures Every Orchestrator Hits and How to Fix Them
+
+### 4.1 Fault: Phase Cancellation from Lazy Doubling
+
+**Symptom:** you double a line to make it bigger, and it comes out thinner, hollower, or barely louder than the solo version.
+
+**Cause:** two identical MIDI notes, same velocity, same mic position, same timing, both panned center. The waveforms are near-identical copies, and summing two near-identical waveforms doesn't double the amplitude the way you'd expect — it creates comb filtering, where certain frequencies cancel because the two copies' phases line up destructively at those frequencies.
+
+**Diagnose it:** load both tracks into a correlation meter (SPAN has one, or any free phase-correlation plugin). A reading near **+1.0** means the two signals are near-identical copies — not a good sign for a "doubling" effect, even though it sounds satisfyingly simple on the meter. Check the amplitude gain at the note's fundamental frequency: true doubling of two *independent* sources gives roughly +3 dB (correlated) to +6 dB (anti-correlated handled right) depending on correlation — if you're getting less than +3 dB of gain where you expected +6 dB, you've got partial cancellation eating your doubling.
+
+**Fix (apply at least two):**
+1. Shift the duplicate's MIDI region 10–15 ms later
+2. Switch the duplicate to a different mic position in the library, or a different round robin
+3. Pan the two copies apart (L30/R30 rather than both center)
+4. Use a different articulation variant if the library offers one (e.g., a different legato transition sample)
+
+Re-measure: correlation should drop to roughly **+0.3 to +0.7** — this is what *real* two-player doubling measures as, and it's the sound of genuine width rather than mono mush.
+
+### 4.2 Fault: A Middle Voice Disappears in a Full Tutti
+
+**Symptom:** you write a thick 8-part string texture — doubled violins, doubled violas, doubled cellos, doubled basses, all forte — and the violas vanish even though you can see their MIDI notes clearly in the piano roll.
+
+**Diagnose it:** solo the violas — they sound fine. Bring back the full texture — they're gone. Load SPAN and compare RMS energy in three bands: 60–150 Hz (bass/cello fundamentals), 150–500 Hz (viola/cello overtone region), 500–1500 Hz (violin fundamentals). If the middle band reads 6–10 dB quieter than the outer two bands relative to where the viola's actual pitch sits, that's masking: the viola's fundamental is getting buried between the cello/bass harmonic buildup below and the violin energy above.
+
+**Fix — pick one:**
+1. **Move the violas up an octave.** The single most effective fix; it moves the viola's fundamental out of the crowded harmonic shadow of the bass instruments entirely.
+2. **Boost the violas' CC11** by 15–20 points relative to the rest of the section — brute-force but works when register change isn't musically appropriate.
+3. **Carve space for them with EQ on the instruments masking them** — a gentle −3 dB cut at 250 Hz (Q≈1.0) on cellos/basses removes exactly the overtone energy sitting on top of the viola's register, without touching the cello's own fundamental.
+
+Re-measure: the middle band should land within about 3 dB of the violin band once the fix is applied — close enough that the ear perceives all three registers as present and balanced.
+
+### 4.3 Fault: Blurred Unison from Mismatched Articulations
+
+**Symptom:** you write the same line on two instruments in unison for extra weight — say two trumpets — but one track got left on a legato patch and the other on staccato. The unison doesn't sound "bigger," it sounds smeared, like a bad reverb.
+
+**Diagnose it:** solo each track. The staccato track attacks in 10–20 ms. The legato track takes 50–100 ms to reach full amplitude. Combined, the onset you hear is neither — it's a mushy average that can stretch past 60 ms of ambiguous attack.
+
+**Fix:** match the articulation across both unison tracks. If the musical context calls for legato phrasing, put *both* tracks on legato. If it calls for a sharp hit, put both on staccato or marcato. If you have a specific reason to keep them different (rare, but sometimes used deliberately for a "doubled but slightly blurred" character on purpose, e.g. in film scoring for a dreamlike effect), you can instead pre-compensate: shift the slower (legato) track's MIDI note 30–40 ms earlier so its *perceived* onset — not its literal MIDI start time — lines up with the staccato track's onset. Verify by ear and by waveform cursor until the two attacks visually and audibly converge into one transient rather than two staggered ones.
+
+---
+
+## Part 5: Score Study Drill — Learn From the Masters by Measuring Them
+
+The fastest way to internalize real orchestration decisions is to compare a published score against its recording, bar by bar, with your eyes on a spectrogram.
 
 **Procedure:**
+1. Pick a 20–30 second passage with a full score available (Ravel's *Daphnis et Chloé* Suite No. 2 opening, Rimsky-Korsakov's *Scheherazade* 2nd movement opening, or Stravinsky's *Rite of Spring* "Augurs of Spring" — all in cheap Dover or Eulenburg study-score editions).
+2. Load the recording into a spectrogram viewer (Sonic Visualiser, free) with an FFT size of 8192 and Hann window — this gives you fine frequency resolution appropriate for identifying which instrument family sits in which band.
+3. With score in hand, mark on the spectrogram which instrument occupies which frequency region at each moment: who's carrying the bass line, who's doubling the melody an octave up, where the inner voices sit.
+4. **Now recreate the passage yourself** in your DAW using your own sample library, matching the score's instrumentation, articulation markings, and dynamics exactly.
+5. Render your version, load it next to the original recording, and compare spectrograms directly. Where does your mix have more or less energy than the original in a given band? That gap is where your orchestration instinct (or your sample library) deviated from what the composer actually wrote and what a real orchestra actually produces.
 
-Create a new project at 48 kHz, 60 BPM. Insert a Violin I track. Enter a sustained A4 (MIDI note 69, 440 Hz) lasting 8 beats.
+This single exercise, repeated across a dozen passages from different composers, teaches you more about real-world voicing decisions than any amount of reading about orchestration theory — because you are forced to reconcile what's on the page with what you actually hear.
 
-Divide the note into eight one-beat segments. Assign the following CC11 values to each segment:
-- Beat 1: CC11 = 16 (ppp)
-- Beat 2: CC11 = 32 (pp)
-- Beat 3: CC11 = 48 (p)
-- Beat 4: CC11 = 64 (mp)
-- Beat 5: CC11 = 80 (mf)
-- Beat 6: CC11 = 96 (f)
-- Beat 7: CC11 = 112 (ff)
-- Beat 8: CC11 = 127 (fff)
+---
 
-Render the track. Load the audio file into a LUFS meter (e.g., iZotope Insight 2, Youlean Loudness Meter, or the `pyloudnorm` Python library). Measure the integrated LUFS for each one-second segment.
+## Mastery Checklist
 
-**Data Collection:**
+You're operating at a competent working level when you can, without stopping to look anything up:
 
-Record the results in a table:
+- [ ] Voice a four-part string, woodwind, or brass chorale with correct transpositions and idiomatic spacing (wide bass, moderate middle, close top) on the first pass
+- [ ] Recognize by ear when a middle voice is being masked, and fix it by register, dynamics, or EQ without needing to be told which one to use
+- [ ] Shape a crescendo with a curved (not linear) automation lane and explain why a straight ramp sounds uneven
+- [ ] Diagnose phase cancellation from a doubled line by ear, then confirm and fix it with a correlation meter
+- [ ] Align a brass chorale's attacks within roughly 10 ms using velocity and articulation choice, not just by quantizing note starts
+- [ ] Choose panning (blended vs. spread) based on whether the texture is homophonic or contrapuntal, as a deliberate decision rather than a default habit
+- [ ] Pull a real score and recording apart by ear and by spectrogram, and explain in plain terms why the composer made each registration choice
 
-| CC11 Value | Dynamic Marking | Integrated LUFS | Peak dBFS |
-|------------|-----------------|-----------------|-----------|
-| 16         | ppp             | [measure]       | [measure] |
-| 32         | pp              | [measure]       | [measure] |
-| 48         | p               | [measure]       | [measure] |
-| 64         | mp              | [measure]       | [measure] |
-| 80         | mf              | [measure]       | [measure] |
-| 96         | f               | [measure]       | [measure] |
-| 112        | ff              | [measure]       | [measure] |
-| 127        | fff             | [measure]       | [measure] |
+## Where to Go Next
 
-**Graphing:**
-
-Using Python with matplotlib, MATLAB, or Excel, plot CC11 value (x-axis) versus integrated LUFS (y-axis). Fit a logarithmic or power-law curve to the data. Typical results show a logarithmic relationship: perceived loudness increases rapidly at low CC11 values, then plateaus at high values. This reflects the compressive nature of both human loudness perception (Fletcher-Munson curves) and sample library velocity layers.
-
-**Interpretation:**
-
-If the curve is logarithmic, orchestrating a smooth crescendo requires non-linear CC11 automation—denser increments at low dynamics, sparse at high dynamics. If your library shows a linear response, it may lack sufficient dynamic layers, requiring external dynamics processing (compression or volume automation) to achieve realistic results.
-
-#### Experiment 2B: Articulation and Spectral Centroid
-
-**Hypothesis:** Different articulations (legato, staccato, spiccato, pizzicato) exhibit distinct spectral centroids and attack times, measurable via spectral analysis.
-
-**Procedure:**
-
-Create four tracks, each with a Violin I patch. Enter the same four-note ascending scale (C5-D5-E5-F5, quarter notes) on each track, but assign different articulations:
-- Track 1: Legato
-- Track 2: Staccato
-- Track 3: Spiccato (bouncing bow)
-- Track 4: Pizzicato (plucked)
-
-Render each track separately. Load each audio file into a spectral analysis tool (librosa in Python, MATLAB's `spectralCentroid` function, or Sonic Visualiser's spectral centroid plugin).
-
-**Data Collection:**
-
-Measure the following for each articulation:
-- **Attack Time:** Time from note onset to peak amplitude (measured in milliseconds)
-- **Spectral Centroid:** Frequency-weighted average of the spectrum, indicating perceived brightness (measured in Hz)
-- **Decay Time:** Time from peak amplitude to -20 dB (for staccato/pizzicato)
-
-| Articulation | Attack Time (ms) | Spectral Centroid (Hz) | Decay Time (ms) |
-|--------------|------------------|------------------------|-----------------|
-| Legato       | [measure]        | [measure]              | N/A (sustained) |
-| Staccato     | [measure]        | [measure]              | [measure]       |
-| Spiccato     | [measure]        | [measure]              | [measure]       |
-| Pizzicato    | [measure]        | [measure]              | [measure]       |
-
-**Expected Results:**
-
-- **Legato:** Slowest attack (50-100 ms), lowest spectral centroid (~800-1200 Hz), no decay (sustained)
-- **Staccato:** Fast attack (10-30 ms), moderate spectral centroid (~1200-1800 Hz), moderate decay (200-400 ms)
-- **Spiccato:** Very fast attack (5-15 ms), high spectral centroid (~1500-2500 Hz), short decay (100-250 ms)
-- **Pizzicato:** Extremely fast attack (2-8 ms), highest spectral centroid (~2000-4000 Hz), shortest decay (50-150 ms)
-
-**Graphing:**
-
-Create a scatter plot with spectral centroid (x-axis) and attack time (y-axis). Each articulation should cluster in a distinct region, visualizing the trade-off between attack speed and brightness.
-
-**Orchestration Implication:**
-
-When orchestrating rhythmic material, pizzicato and spiccato provide the fastest transients and clearest attacks, ideal for fast passages or percussive accents. Legato articulations merge note boundaries, suitable for lyrical lines. Mixing articulations within a section (e.g., some violins playing legato, others playing spiccato) can create textural complexity but risks phase incoherence—test by measuring comb filtering in the summed output.
-
-#### Experiment 2C: Register and Masking Effects
-
-**Hypothesis:** Low-register instruments mask mid-register instruments more than high-register instruments do, due to upward spread of masking in the auditory system.
-
-**Procedure:**
-
-Create a project with two tracks
+- **Counterpoint and voice leading** — how to write the individual lines that orchestration then dresses in color (species counterpoint, suspensions, parallel-motion avoidance)
+- **Extended and divisi string writing** — splitting a section into independent sub-parts for denser harmonic textures
+- **Percussion and color instruments** — harp, celesta, tuned percussion, and how they cut through or blend with the rest of the orchestra
+- **Mixing and mastering orchestral mockups** — convolution reverb for hall placement, EQ matching against reference recordings, and gain-staging a full virtual orchestra so nothing clips at the final mixdown
