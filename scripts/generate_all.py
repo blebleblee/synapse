@@ -39,8 +39,9 @@ sys.stderr = sys.stdout
 
 from learning_engine.topic_manager import get_topic_tree
 from learning_engine.generator import generate_subtopic_content
-from learning_engine.models import OllamaCluster, AnthropicProvider
+from learning_engine.models import OllamaCluster, AnthropicProvider, load_env_file
 from learning_engine.enhancer import enhance_existing_topic
+load_env_file()
 TOPICS_DIR = WORKSPACE_ROOT / "topics"
 GIT_QUEUE = Queue()
 

@@ -7,6 +7,7 @@ Usage:
   python3 scripts/monitor.py --tail    # Follow generator.log directly
 """
 
+import os
 import sys
 import re
 import time
@@ -14,6 +15,11 @@ import subprocess
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+if str(WORKSPACE_ROOT) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_ROOT))
+
+from learning_engine.models import load_env_file
+load_env_file()
 LOG_FILE = WORKSPACE_ROOT / "generator.log"
 GIT_CWD = str(WORKSPACE_ROOT)
 
@@ -74,6 +80,8 @@ def get_latest_log_lines(n=8):
 
 def get_engine_info():
     """Dynamically extracts active model and concurrency details from the engine logs."""
+    if os.environ.get("VNAIPRO_API_KEY"):
+        return "Anthropic Claude [claude-sonnet-5] (4x Parallel Pool: 3 VNAIPRO + 1 AIAPIFLOW)"
     if not LOG_FILE.exists():
         return "Anthropic Claude [claude-sonnet-5] (Sequential Cloud Stream)"
     try:
