@@ -1,7 +1,7 @@
 # Organ Masterclass: Performance Practice, Registration & Technique
 
 ## Table of Contents
-1. [First-Principles Intuition: How Pipes Speak](#1-first-principles-intuition)
+1. [First-Principles Intuition: How Pipes Speak](#1-first-principles-intuition-how-pipes-speak)
 2. [Console Geography & Physical Ergonomics](#2-console-geography--physical-ergonomics)
 3. [Keyboard & Pedalboard Technique](#3-keyboard--pedalboard-technique)
 4. [Registration Craft: Building Sounds from Stops](#4-registration-craft-building-sounds-from-stops)
@@ -11,20 +11,23 @@
 8. [Environmental Control & Tuning Stability](#8-environmental-control--tuning-stability)
 9. [Troubleshooting: Ciphers, Dead Notes & Wind Faults](#9-troubleshooting-ciphers-dead-notes--wind-faults)
 10. [Performance Workflow: Concert Preparation](#10-performance-workflow-concert-preparation)
+11. [Hymn Playing & Service Craft](#11-hymn-playing--service-craft)
+12. [Sight-Reading Open Score & Transposition](#12-sight-reading-open-score--transposition)
 
 ---
 
-## 1. First-Principles Intuition
+## 1. First-Principles Intuition: How Pipes Speak
 
 ### How a Pipe Speaks
 
-Every organ pipe is an aeromechanical resonator. Pressurized air enters through the toe hole, strikes the languid (a horizontal shelf), splits at the upper lip, and sets an air column into vibration. That vibrating column—not a speaker cone, not a string—is the sound source. Everything in organ technique flows from this physical reality.
+Every organ pipe is an aeromechanical resonator. Pressurized air enters through the toe hole, strikes the languid (a horizontal shelf), splits at the upper lip, and sets an air column vibrating against the mouth edge. That vibrating column — not a speaker cone, not a string — is the sound source. Open flue pipes (Principal, Octave) produce the full harmonic series; stopped pipes (Bourdon, Gedeckt) behave as a closed air column, sounding an octave lower than their physical length and favoring odd harmonics, which is why stopped flutes sound darker and rounder than open principals of the same pitch. Everything in organ technique flows from this physical reality.
 
 **What you need to know as a player (not a builder):** The pipe is binary. It is either speaking at full pressure or silent. There is no velocity sensitivity, no "play harder for louder." Your only dynamic controls are:
 
 - Which stops you draw (timbre + amplitude together)
 - Expression pedal position (Swell box shutters)
 - Articulation: how long each note sounds within the beat
+- Density of texture (number of simultaneous voices/couplers active)
 
 **Stop pitch families at a glance:**
 
@@ -38,7 +41,9 @@ Every organ pipe is an aeromechanical resonator. Pressurized air enters through 
 | Mixture IV | Multiple high partials | 6th–8th | Choral brilliance |
 | Trumpet 8' | Unison | Full spectrum | Assertive, cuts ensemble |
 
-**Practical rule:** Mutations (2⅔', 1⅗') never stand alone—they reinforce partials already present in foundation stops. Drawing Nazard 2⅔' with Principal 8' and Octave 4' makes the ensemble shimmer. Drawing it alone produces a hollow, disembodied nasal sound. The ear needs the fundamental to anchor the mutation as a harmonic color.
+**Practical rule:** Mutations (2⅔', 1⅗') never stand alone — they reinforce partials already present in foundation stops. Drawing Nazard 2⅔' with Principal 8' and Octave 4' makes the ensemble shimmer. Drawing it alone produces a hollow, disembodied nasal sound. The ear needs the fundamental to anchor the mutation as a harmonic color.
+
+**Why mixtures "break back":** A Mixture rank does not keep ascending in pitch across the whole keyboard — it would run out of usable frequency range in the treble. Around specific break points (commonly C25, C37, C49 on a typical Mixture IV) the rank drops back down an octave on one or more ranks. Players hear a subtle timbral shift at these breaks; it is normal, not a fault. Knowing your instrument's break points helps you anticipate tonal color changes within a single melodic line played high on the keyboard.
 
 ---
 
@@ -48,13 +53,13 @@ Every organ pipe is an aeromechanical resonator. Pressurized air enters through 
 
 A wrong bench position cascades into tension throughout your entire body. Get this right before touching a key.
 
-**Bench height:** Adjust so your thighs slope gently downward toward your knees when your heels rest on the pedal C. If your thighs are level or tilting upward, the bench is too high and you lose leverage over the pedals. Too low, and hip flexors strain during long passages. Target range: **520–540mm** from floor to bench surface.
+**Bench height:** Adjust so your thighs slope gently downward toward your knees when your heels rest on pedal C. If your thighs are level or tilt upward, the bench is too high and you lose leverage over the pedals. Too low, and hip flexors strain during long passages. Target range: **520–540mm** from floor to bench surface.
 
 **Bench distance from pedalboard:** Sit far enough back that you can reach the top octave of the pedalboard (high C, 25th note) with your right toe without leaning. A common error is sitting too close, which prevents full extension and forces awkward ankle angles.
 
-**Spine posture:** Sit on the front third of the bench—not the back. This engages your core and prevents slumping into the keys. Your torso should be upright but not rigid; the sternum is lifted, shoulders relaxed and wide. Think of a string pulling the crown of your head toward the ceiling.
+**Spine posture:** Sit on the front third of the bench — not the back. This engages your core and prevents slumping into the keys. Your torso should be upright but not rigid; the sternum is lifted, shoulders relaxed and wide. Think of a string pulling the crown of your head toward the ceiling.
 
-**Arm geometry:** Upper arms hang close to the body, elbows at approximately keyboard height or just below. Forearms approach the keys from a nearly horizontal angle. Wrists stay level or slightly elevated—never collapsed below the keyboard surface. Collapsing wrists block forearm weight transfer and cause fatigue within minutes.
+**Arm geometry:** Upper arms hang close to the body, elbows at approximately keyboard height or just below. Forearms approach the keys from a nearly horizontal angle. Wrists stay level or slightly elevated — never collapsed below the keyboard surface. Collapsing wrists blocks forearm weight transfer and causes fatigue within minutes.
 
 ```mermaid
 graph LR
@@ -78,9 +83,13 @@ The organ console stacks manuals vertically. A typical three-manual instrument h
 - **Swell (Schwellwerk):** Middle manual — enclosed in expression box, widest dynamic range
 - **Choir (Positiv/Brustwerk):** Top manual — chamber organ sound, accompanying voices
 
+A four-manual adds **Solo** above Choir: high-pressure melodic reeds (Tuba, French Horn) and orchestral color stops, meant for a single melodic line to project over a full ensemble.
+
 **Practical implication:** The Great is your anchor. Start registrations there. Swell gives you dynamic shape. Choir provides contrast and accompaniment textures.
 
-**Stop jambs:** Stops are arranged left and right of the manuals, typically by division. Before any session, run your eye across both jambs and confirm you know which side controls which division. Accidentally pulling a Great stop when you intend Swell is a common error that ruins entrances.
+**Vertical manual-shift mechanics:** Moving between manuals mid-phrase requires a controlled forearm drop or lift, not a wrist flick. The vertical gap between manual surfaces is typically 85–95mm. Practice the shift in isolation: place RH five-finger position on Great, lift the forearm (not just the hand) 90mm, land on the same five-finger shape on Swell, without looking. Do this 20 times slowly before attempting it inside a piece — the muscle memory for manual distance has to be built independently of musical context.
+
+**Stop jambs:** Stops are arranged left and right of the manuals, typically by division. Before any session, run your eye across both jambs and confirm you know which side controls which division. Accidentally pulling a Great stop when you intend Swell is a common error that ruins entrances. On consoles with a combination action, also locate the General Cancel button and your preset pistons (thumb pistons under each manual, toe studs above the pedalboard) before you start — you will need to find them without looking during a concert.
 
 ---
 
@@ -90,7 +99,7 @@ The organ console stacks manuals vertically. A typical three-manual instrument h
 
 The organ has no damper pedal. Sound continues as long as the key is depressed. This means **your fingers are the dampers.** Legato on the organ is physically different from piano legato:
 
-- On piano: overlap keys freely, sustain pedal handles connection
+- On piano: overlap keys freely, sustain pedal handles connection.
 - On organ: **the releasing finger must hold its key until the new finger is completely depressed.** Zero gap between notes, zero overlap beyond one or two milliseconds.
 
 This is called **finger legato** and it is the fundamental technical skill of organ playing. Practice it slowly and obsessively before attempting any literature.
@@ -113,7 +122,7 @@ BPM targets:
   Week 4: ♩= 84 — gaps will creep in; return to 60 and rebuild
 ```
 
-**Hand posture for legato:** Curved fingers, not flat. The key contact point is the fleshy pad of the fingertip, not the flat of the finger. Flat fingers cannot transfer cleanly between adjacent keys—they create overlaps and smears. Curved fingers allow precise onset and release timing.
+**Hand posture for legato:** Curved fingers, not flat. The key contact point is the fleshy pad of the fingertip, not the flat of the finger. Flat fingers cannot transfer cleanly between adjacent keys — they create overlaps and smears. Curved fingers allow precise onset and release timing.
 
 ### Finger Substitution
 
@@ -133,6 +142,8 @@ Common substitution pairs:
   2→1 or 3→1 (ascending to a held bass)
   5→4, 5→3 (thumb crosses in inner voices)
 ```
+
+**Finger crossing without accent:** Organ thumb-unders and finger-overs must happen with zero dynamic bump, since there is no touch sensitivity to mask an uneven crossing on piano. Practice crossings isolated from rhythm first: hold the crossing note, slide the next finger into position while the key is still down, then transfer — listen for a perfectly smooth dynamic line with no audible "thud" from a finger landing too hard.
 
 ### Pedalboard Technique: Toe, Heel, and Substitution
 
@@ -174,6 +185,21 @@ G2(T-R) A2(T-L) B2(T-R) C3(T-L) D3(T-R) E3(T-L) F#3(T-R) G3(T-L)
 
 **Pedalboard position memory:** Unlike piano, you cannot look down at your feet during performance without losing your place in the score. Practice **blind pedaling** — feel the gaps between black notes (C–D–E gap, B–C gap) and use them as tactile landmarks. The gap between E and F# is your most useful reference point in the natural position.
 
+**Pedal legato drill with substitution:**
+
+```
+Pedal, one foot only, C2 held while changing toe to heel:
+
+1. Depress C2 with right toe
+2. Without releasing, pivot the ankle and place right heel on C2
+3. Confirm the pipe keeps sounding without a gap (listen, don't look)
+4. Lift toe, heel remains, continue to D2 with left toe
+
+This simulates real repertoire where a sustained pedal note must pass
+from toe to heel because the next note requires the toe free.
+Target: zero audible gap at ♩= 50, then 65, then 80.
+```
+
 ### Four-Limb Independence: The Organ's Core Challenge
 
 Playing melody on Swell, accompaniment on Great, bass line on Choir (with left hand), and a pedal line simultaneously is the fundamental independence challenge. Build it in layers:
@@ -196,6 +222,8 @@ Layer 4 — Full independence: Add expression pedal movement with RH
            Swell opens on phrase peak (bar 2, beat 3)
            Add this only when Layer 3 is automatic at ♩= 60
 ```
+
+**Why this layering works:** Each added limb competes for the same attentional bandwidth as the others. Isolating pedal-alone and hand-alone practice first builds each motor pattern into procedural (automatic) memory before combining them. If you try full four-limb coordination from bar 1, you are training all four limbs simultaneously at low competence, which takes far longer to consolidate than sequential layering.
 
 ---
 
@@ -249,6 +277,32 @@ Step 5: + Trumpet 8' (or Oboe) → Reed cap; adds cutting edge and warmth
 **Error 3 — Reeds before mixtures:** Trumpet 8' added before Mixture results in reed dominance; the mixture gets swallowed. **Fix:** Always add mixtures before reeds so the chorus provides a spectral bed for the reed to crown.
 
 **Error 4 — Over-drawing Swell for all dynamics:** Beginners use the Swell expression pedal as the only dynamic control, riding it continuously like a volume knob. This produces an unnatural swelling/receding effect detached from phrase architecture. **Fix:** Plan Swell openings to coincide with phrase peaks; use registration changes for structural dynamic shifts.
+
+**Error 5 — Ignoring pedal-to-manual balance:** A full Great registration over a thin pedal (just 16' Bourdon) produces a top-heavy sound with no grounding. **Fix:** Pedal foundation should be perceptibly present but not dominant — roughly matching the combined loudness of one manual's foundation stops, reinforced at 16' and 8' pitch. If you can't clearly hear the bass line under full organ, add Pedal Octave 4' or couple a manual reed to pedal.
+
+### Using the Combination Action (Pistons)
+
+Modern consoles have programmable combination action: thumb pistons under each manual and toe studs above the pedalboard, each storable with a specific stop combination.
+
+```
+Practical piston workflow for a recital:
+
+1. Before rehearsal, write out your FULL registration plan bar-by-bar
+2. Assign piston numbers in performance order: General 1, 2, 3...
+   (Generals change multiple divisions; Divisionals change one manual only)
+3. Program pistons at the console (hold "Set" + desired piston while
+   stops are drawn — exact procedure varies by console manufacturer)
+4. Mark piston numbers directly in your score at the change point,
+   ahead of the beat by enough time to execute the thumb/toe motion
+5. Rehearse piston changes in isolation: hands on keys, press piston
+   on the marked beat, confirm the registration change is audible
+   and correctly timed — silent pistons should produce zero
+   disruption to the ongoing line
+
+Toe studs: reserve for pedal-foot-free moments, typically during
+long sustained pedal notes or rests. Never attempt a toe stud change
+while actively playing a pedal line — you will miss the next note.
+```
 
 ---
 
@@ -315,6 +369,10 @@ Practice parameter:
   ♩= 60, Principal 8' only, one manual
   Exaggerate phrase silences first (200ms) then reduce to natural (80ms)
 ```
+
+### Agogic Shaping Without Dynamics
+
+Since you cannot crescendo through a single note, phrase climax must be shown through **micro-timing**, not volume. Lean fractionally (a few milliseconds) into the metrically strong note of a phrase's peak, and allow the note immediately following a leap to land slightly later than a strict metronome would dictate — this is the organist's equivalent of a string player's bow emphasis. Practice this with a metronome running audibly underneath, deliberately and consciously placing the peak note 10–20ms late, then checking by ear that it still reads as "in time" rather than "sloppy." This agogic accent is the single most important expressive tool organists have beyond registration and articulation.
 
 ---
 
@@ -427,6 +485,29 @@ Portato correction (correct):
 BPM adjustment: Reduce from ♩= 72 (dry room) → ♩= 60 (reverberant room)
 ```
 
+### Drill 6: Manual-Change Agility Under Tempo
+
+```
+Setup: Great — Principal 8', Swell — Flute 8', box fixed half-open
+
+Exercise: Alternate hands between manuals every bar, same melodic
+          fragment transposed up a 4th on the second manual
+
+Bar 1 (Great, RH): C4-D4-E4-F4 (quarter notes)
+Bar 2 (Swell, RH): F4-G4-A4-Bb4
+Bar 3 (Great, RH): C4-D4-E4-F4
+Bar 4 (Swell, RH): F4-G4-A4-Bb4
+
+Rule: The manual shift happens DURING the bar-line rest, not after it.
+      Forearm lifts 90mm, lands on correct manual, finger 1 ready
+      before the downbeat of the new bar.
+
+Progressive targets: ♩= 56 → 72 → 90
+Common failure: rushing the first note of the new manual because
+the hand arrives late. Fix by practicing the shift 5 beats ahead
+of where you think you need to start moving.
+```
+
 ---
 
 ## 7. Stop Architecture & Windchest Mechanics
@@ -438,12 +519,12 @@ Understanding how air gets from the blower to the pipe helps you diagnose proble
 ```mermaid
 graph TB
     subgraph sub_slider_chest ["Slider Chest: Two-Axis Gating Matrix"]
-        A["Blower\n(Pressurized Air)"] --> B["Windchest Plenum\n(Constant Pressure, 75–150mm H₂O)"]
+        A["Blower\n(Pressurized Air)"] --> B["Windchest Plenum\n(Constant Pressure, 75-150mm H2O)"]
         B --> C["Pallet Box\n(Key-controlled valves)"]
-        C -->|"Key depressed\nopens pallet"| D["Wind Channel\n(Pressurizes per note)"]
-        D --> E["Slider\n(Stop drawer — shifts L/R)"]
-        E -->|"Holes aligned:\nstop IS drawn"| F["Pipe Foot\n(Air enters pipe)"]
-        E -->|"Holes misaligned:\nstop NOT drawn"| G["Blocked —\nno sound"]
+        C -->|"Key depressed opens pallet"| D["Wind Channel\n(Pressurizes per note)"]
+        D --> E["Slider\n(Stop drawer, shifts L/R)"]
+        E -->|"Holes aligned: stop IS drawn"| F["Pipe Foot\n(Air enters pipe)"]
+        E -->|"Holes misaligned: stop NOT drawn"| G["Blocked, no sound"]
         F --> H["Pipe Resonator\n(Sound produced)"]
     end
 
@@ -452,7 +533,7 @@ graph TB
         J --> K["Pneumatic Motor\n(Inflates, opens valve)"]
         L["Stop Tablet\n(Electric contact)"] --> M["Stop Relay\n(Energizes)"]
         M --> N["Rank Enable Circuit"]
-        K --> O["Air to Pipe\n(Latency: 20–50ms)"]
+        K --> O["Air to Pipe\n(Latency 20-50ms)"]
         N --> O
     end
 ```
@@ -470,6 +551,8 @@ graph TB
 
 **Tracker action practice note:** On a tracker organ, you will feel the exact moment each pallet opens — a small "click" or resistance change under the finger. Skilled players exploit this to control chiff (pipe speech onset). A quick, decisive key attack produces a bright chiff transient. A slower, more gradual depression produces a smoother onset. This tactile feedback is unique to mechanical action and central to Baroque performance practice.
 
+**Compensating for electro-pneumatic latency:** On an EP console you lose the tactile pallet feedback that tells your fingers exactly when the pipe will speak. The fix is not mechanical but rhythmic: internalize a consistent 20–30ms "lead" in your attack timing relative to a tracker instrument, so the audible onset still lands on the beat. Practice by recording yourself (phone audio is sufficient), overlaying a metronome click, and checking whether pipe onset — not finger contact — aligns with the beat. Adjust your anticipation until it does.
+
 ### Coupler Logic
 
 Couplers route notes from one division to play simultaneously on another. Understanding the signal flow prevents mistakes.
@@ -478,11 +561,11 @@ Couplers route notes from one division to play simultaneously on another. Unders
 graph LR
     subgraph sub_coupler_routing ["Coupler Signal Flow"]
         A["Swell Manual\n(Keys depressed)"] -->|"SW to GT 8'"| B["Great Windchest\n(Swell notes play on Great stops)"]
-        A -->|"SW to GT 4'\n(Super octave coupler)"| C["Great Windchest\n(Swell notes + octave higher)"]
-        A -->|"SW to SW 16'\n(Sub octave coupler)"| D["Swell Windchest\n(Swell notes + octave lower)"]
-        B --> E["Combined Sound\nat Great"]
+        A -->|"SW to GT 4' (super octave)"| C["Great Windchest\n(Swell notes + octave higher)"]
+        A -->|"SW to SW 16' (sub octave)"| D["Swell Windchest\n(Swell notes + octave lower)"]
+        B --> E["Combined Sound at Great"]
         C --> E
-        D --> F["Combined Sound\nat Swell"]
+        D --> F["Combined Sound at Swell"]
     end
 ```
 
@@ -503,12 +586,12 @@ You will not tune the organ — that is the tuner's job. But you need to underst
 ```
 □ Organ blower ON minimum 2 hours before rehearsal
   → Circulates air through pipes, stabilizes temperature distribution
-□ Building temperature: target 18–22°C, locked before arrival
+□ Building temperature: target 18-22C, locked before arrival
 □ Check beat rate between Principal 8' and Octave 4' (listen for wobble)
   → Fast beats (>1 per second) indicate problematic temperature differential
 □ Test any exposed reed stops (Trumpet, Trombone) against a stable flue
   → Detuned reed = call the tuner, do not perform with it
-□ Note where stage lighting is aimed — direct heat on a reed rank
+□ Note where stage lighting is aimed, direct heat on a reed rank
   means that rank will drift sharp during performance
 ```
 
@@ -531,13 +614,13 @@ A cipher is the organ's most disruptive failure — an uncontrolled note that ca
 ```mermaid
 flowchart TD
     subgraph sub_cipher_diagnosis ["Cipher Diagnosis Workflow"]
-        A["Continuous note sounding"] --> B{"Silenced by\nclosing stop?"}
-        B -->|"Yes — goes silent\nwhen stop closed"| C["Stop-specific cipher\nSlider chest: slider misaligned\nCheck: draw/release that stop repeatedly"]
-        B -->|"No — continues\nregardless of stops"| D{"Silenced by\nreleasing all\ncouplers?"}
+        A["Continuous note sounding"] --> B{"Silenced by closing stop?"}
+        B -->|"Yes, goes silent when stop closed"| C["Stop-specific cipher\nSlider chest: slider misaligned\nCheck: draw/release that stop repeatedly"]
+        B -->|"No, continues regardless of stops"| D{"Silenced by releasing all couplers?"}
         D -->|"Yes"| E["Coupler-induced cipher\nNote from another division\npassing through coupler"]
-        D -->|"No"| F{"Same note in\nall stops on\nthat division?"}
+        D -->|"No"| F{"Same note in all stops on that division?"}
         F -->|"Yes"| G["Pallet stuck open\nForeign object or warped wood\nCall organ technician"]
-        F -->|"No — single pipe only"| H["EP/direct electric:\nMagnet or pneumatic motor\nfailed to release\nCall organ technician"]
+        F -->|"No, single pipe only"| H["EP/direct electric:\nMagnet or pneumatic motor\nfailed to release\nCall organ technician"]
     end
 ```
 
@@ -549,24 +632,24 @@ flowchart TD
 Diagnosis sequence:
 
 1. Does the key feel lighter than normal?
-   YES → Tracker disconnection (mechanical action)
-         The tracker has broken or detached from the pallet abstraction
-         → Continue with remaining notes; call technician
+   YES -> Tracker disconnection (mechanical action)
+          The tracker has broken or detached from the pallet abstraction
+          -> Continue with remaining notes; call technician
 
 2. Does the note work on some stops but not others?
-   YES → Pipe obstruction or individual pipe cipher (coincidentally blocked)
-         Check by drawing only the non-working stop → if silent, pipe issue
-         Common cause: wasp nest in summer, pipe toe plug shifted
+   YES -> Pipe obstruction or individual pipe cipher (coincidentally blocked)
+          Check by drawing only the non-working stop -> if silent, pipe issue
+          Common cause: wasp nest in summer, pipe toe plug shifted
 
 3. Does NO note work on a whole section of the keyboard?
-   YES → Pallet box depressurization
-         Wind supply failure to that portion of windchest
-         Check: Is the division's wind indicator (if present) showing pressure?
+   YES -> Pallet box depressurization
+          Wind supply failure to that portion of windchest
+          Check: Is the division's wind indicator (if present) showing pressure?
 
 4. Electric action: Measure DC voltage at the pallet magnet terminals
-   (if accessible) — should read 12V or 24V (depending on organ)
-   No voltage when key depressed → console contact or wiring fault
-   Voltage present, pipe silent → magnet or pneumatic motor failure
+   (if accessible) - should read 12V or 24V (depending on organ)
+   No voltage when key depressed -> console contact or wiring fault
+   Voltage present, pipe silent -> magnet or pneumatic motor failure
 ```
 
 ### Wind System Faults
@@ -579,6 +662,31 @@ Diagnosis sequence:
 | Soft pipes (flutes) slow to speak | Low wind pressure | Check if wind switch is fully open |
 | Hum audible at 50/60 Hz | Blower motor vibration coupling to structure | Isolate concern; note for technician |
 
+### Live-Performance Recovery Protocol
+
+When a fault occurs mid-performance, the single worst response is stopping. Organists train specific recovery behaviors:
+
+```
+1. A cipher appears on a sustained chord:
+   -> Keep playing the remaining voices; let the audience perceive
+      it as an unusual sustained pedal point if registration allows
+   -> At the next structural break, cut registration on the affected
+      division entirely (close that division's expression/wind if
+      accessible) and continue on the remaining divisions
+
+2. A dead note appears mid-phrase:
+   -> Substitute the adjacent chord tone or octave displacement
+      if harmonically plausible (e.g., missing D, play D an octave
+      up on the same manual, or omit and let the harmony imply it)
+   -> Never stop to "fix" it physically during the piece
+
+3. Registration malfunction (stop fails to engage on piston press):
+   -> Have a backup manual draw-knob plan memorized for your 3
+      most critical registration changes in the program
+   -> If a piston fails, your hand should already know which
+      physical knobs to pull as Plan B
+```
+
 ---
 
 ## 10. Performance Workflow: Concert Preparation
@@ -588,17 +696,17 @@ Diagnosis sequence:
 ```mermaid
 flowchart TD
     subgraph sub_concert_prep ["Concert Preparation Workflow"]
-        A["48 Hours Before\nBuilding temp set 18–22°C\nBlower schedule confirmed"] --> B["Day of Concert:\n2hrs before — Blower ON\nBuilding at target temp"]
-        B --> C["Registration Prep\n(60 min before):\nDraw planned registrations\nTest each division\nVerify coupler routing"]
-        C --> D["Acoustic Calibration\n(45 min before):\nPlay from audience position\nAdjust for RT60 realities\nFine-tune Swell box position"]
-        D --> E{"Cipher or\nDead Note\nDetected?"}
+        A["48 Hours Before\nBuilding temp set 18-22C\nBlower schedule confirmed"] --> B["Day of Concert:\n2hrs before, Blower ON\nBuilding at target temp"]
+        B --> C["Registration Prep (60 min before):\nDraw planned registrations\nTest each division\nVerify coupler routing"]
+        C --> D["Acoustic Calibration (45 min before):\nPlay from audience position\nAdjust for RT60 realities\nFine-tune Swell box position"]
+        D --> E{"Cipher or Dead Note Detected?"}
         E -->|"Yes"| F["Isolate faulty note/division\nRevise program if necessary\nNotify presenter"]
         E -->|"No"| G["Tempo Calibration:\nTest actual performance\ntempos in-room\nAdjust for reverberation"]
         G --> H["Reed Stability Check:\nPlay long sustained note\non each reed stop\nListen for wobble or beats"]
-        H --> I{"Reeds\nStable?"}
-        I -->|"No — detuned"| J["Remove reed from\nregistration plan\nSubstitute flue alternative"]
+        H --> I{"Reeds Stable?"}
+        I -->|"No, detuned"| J["Remove reed from\nregistration plan\nSubstitute flue alternative"]
         I -->|"Yes"| K["30 min before:\nFinal run-through\nof difficult passages only"]
-        K --> L["5 min before:\nSilence — let organ\nsit at temperature\nDo not play"]
+        K --> L["5 min before:\nSilence, let organ\nsit at temperature\nDo not play"]
         L --> M["Performance"]
     end
 ```
@@ -610,12 +718,12 @@ This is one of the most common errors in live organ performance: playing at the 
 ```
 RT60 Correction Table:
 
-RT60 (seconds) | Tempo multiplier | Example: ♩= 80 becomes...
-1.0 – 1.5      | ×1.00            | ♩= 80  (no change)
-1.5 – 2.5      | ×0.90            | ♩= 72
-2.5 – 3.5      | ×0.82            | ♩= 66
-3.5 – 5.0      | ×0.75            | ♩= 60
-> 5.0          | ×0.65            | ♩= 52  (Gothic cathedral range)
+RT60 (seconds) | Tempo multiplier | Example: J=80 becomes...
+1.0 - 1.5      | x1.00            | J=80  (no change)
+1.5 - 2.5      | x0.90            | J=72
+2.5 - 3.5      | x0.82            | J=66
+3.5 - 5.0      | x0.75            | J=60
+> 5.0          | x0.65            | J=52  (Gothic cathedral range)
 
 Apply this correction BEFORE the first rehearsal in a new space.
 Trying to slow down after you have internalized a faster tempo
@@ -626,11 +734,11 @@ causes rhythmic instability.
 
 ```
 BAROQUE (Bach, Buxtehude, Frescobaldi):
-  Small-scale works:    Principal 8' alone → pure, transparent
+  Small-scale works:    Principal 8' alone, pure, transparent
   Trio sonatas:         Differentiated stops on each manual + pedal
                         (no duplicated timbres between voices)
   Full-organ chorale:   Principals 8'+4'+2' + Mixture, no reeds
-  Toccatas/Fantasias:   Start light, build by section — reeds for final climax
+  Toccatas/Fantasias:   Start light, build by section, reeds for final climax
 
 ROMANTIC (Franck, Vierne, Widor):
   Opening:              Foundations 8'+4', Swell box 2/3 open
@@ -642,40 +750,134 @@ ROMANTIC (Franck, Vierne, Widor):
 
 CONTEMPORARY (Messiaen, Langlais):
   Colors, not choruses: Individual timbres of unusual combinations
-  Example Messiaen:     Montée — Swell: Tierce 1⅗' + Nazard 2⅔' + Flute 4'
-                                  (no foundation stop — deliberately spectral)
-                        Pédale: Bourdon 16' + Contrebasse 16' (no octave)
+  Example Messiaen:     Montee, Swell: Tierce 1 3/5' + Nazard 2 2/3' + Flute 4'
+                                  (no foundation stop, deliberately spectral)
+                        Pedale: Bourdon 16' + Contrebasse 16' (no octave)
                         Great: Cor de nuit 8' (wide-scaled flute, ghostly)
 ```
 
 ### Practice Session Structure (90-Minute Template)
 
 ```
-0:00 – 0:10  Physical warm-up
+0:00 - 0:10  Physical warm-up
               Legato five-finger patterns, both hands separately
               Pedal alternating-toe scales, C major and G major
-              No music — just hands and feet, slow tempo
+              No music, just hands and feet, slow tempo
 
-0:10 – 0:30  Technical drill focus
+0:10 - 0:30  Technical drill focus
               Choose ONE drill from Section 6
               Work at 70% target tempo for 10 min
               Increase to 85% for 10 min
-              Stop when accuracy degrades — do not push through errors
+              Stop when accuracy degrades, do not push through errors
 
-0:30 – 1:00  Repertoire work
-              Difficult passages only — not run-throughs
-              Isolate problem bars (typically 2–4 bars around the difficulty)
+0:30 - 1:00  Repertoire work
+              Difficult passages only, not run-throughs
+              Isolate problem bars (typically 2-4 bars around the difficulty)
               Fix articulation, fingering, and registration changes separately
               Combine only after each element is solid alone
 
-1:00 – 1:20  Sight-reading or new material
+1:00 - 1:20  Sight-reading or new material
               Essential for long-term musicianship development
               Easy pieces at slow tempo, no stopping, observe all markings
 
-1:20 – 1:30  Slow, meditative play-through
+1:20 - 1:30  Slow, meditative play-through
               One piece you know well, at 60% tempo
               Focus entirely on sound quality and phrase shaping
-              No technical goals — just listening to what you produce
+              No technical goals, just listening to what you produce
+```
+
+---
+
+## 11. Hymn Playing & Service Craft
+
+This is the organist's most frequent real-world job and it has its own technical demands distinct from recital repertoire.
+
+### Introductions and Leading Congregational Singing
+
+```
+Standard hymn introduction structure:
+  - Play the final phrase of the hymn (not the first) as the introduction
+    if the congregation knows the tune, OR
+  - Play the full first verse if the tune is unfamiliar
+  - Tempo of the introduction MUST equal the tempo you intend to lead at
+    (a common error is playing the intro faster than the sung tempo
+    that follows — the congregation locks onto your intro tempo)
+
+Registration for congregational leading:
+  Great: Principal 8' + Octave 4' + Fifteenth 2' (clear, present, not harsh)
+  Pedal: Principal 16' + 8' (audible but not overwhelming the voices)
+  Avoid heavy reeds for straight congregational accompaniment —
+  reeds are for descants, final verses, or instrumental interludes
+```
+
+### Breathing with the Congregation
+
+Unlike solo repertoire, hymn playing requires a **slightly early release before each line** (comma breath, ~100–150ms) so singers have time to breathe before the next phrase. This is non-negotiable: failing to leave this gap causes the congregation to rush or drop out at phrase ends. Practice by singing the hymn text aloud yourself first — your own breath points are a reliable guide to where the gap belongs.
+
+### Varying Verses: The Standard Toolkit
+
+```
+Verse 1: Full congregation registration (as above), straightforward harmony
+Verse 2: Reduce to Swell only (softer, reflective text verses)
+Verse 3 (if a descant or alternate harmonization exists):
+  - Add Great reed or Solo Trumpet for a soprano descant line
+  - Pedal may drop to 16' alone for lighter texture under the descant
+Final verse: Full organ, add couplers (Swell to Great, Swell to Pedal),
+  add 32' pedal if available, raise registration one further step
+  than verse 1 for a clear structural climax
+```
+
+---
+
+## 12. Sight-Reading Open Score & Transposition
+
+### Reading Three and Four Staves Simultaneously
+
+Organ repertoire, especially trio sonatas and much modern music, is frequently printed on three staves (two manual staves plus a pedal staff in bass clef, sometimes with a C clef for an inner voice). Fluency here is a distinct skill from piano two-stave reading.
+
+```
+Building the skill, progressive drill:
+
+Stage 1: Read pedal line alone, silently, naming notes aloud
+          while tapping the rhythm with your foot (no organ needed)
+          5 min daily, different excerpts, bass clef only
+
+Stage 2: Play pedal line alone on the instrument while reading
+          from the full three-stave texture (eyes trained to
+          isolate the bottom stave while hands rest)
+
+Stage 3: Add LH from the lower manual stave, pedal continuing
+          Keep tempo slow enough that no errors occur: J=40-50
+
+Stage 4: Add RH from the upper manual stave
+          Full three-stave reading, J=40, increase only when
+          zero-error runs of 8 consecutive bars are achieved
+
+Progression rule: do not increase tempo until you can sight-read
+new unfamiliar material at the current tempo with fewer than
+2 errors per page.
+```
+
+### Transposition at the Console
+
+Service playing frequently requires on-the-spot transposition (a cantor pitches a verse differently, or an instrumentalist requests a key change). The practical method is interval mapping, not key-signature analysis:
+
+```
+Quick method for transposing up a whole step (common request):
+
+1. Identify the key signature shift (e.g., C major -> D major:
+   add F# and C# mentally)
+2. Do NOT think "add two sharps" in the abstract — instead,
+   mentally shift your hand SHAPE up by a major 2nd and let
+   muscle memory from the original key carry the fingering pattern
+3. Practice shifting a simple hymn tune up a step, then down a
+   step, in real time, daily, for 10 minutes, until the shift
+   requires no conscious note-naming at all
+
+This is a slow-built skill. Expect several months of daily
+short practice before transposition feels reliable under
+service pressure. Start with transposing by a 2nd only; add
+3rds and other intervals after the 2nd is automatic.
 ```
 
 ---
@@ -693,3 +895,5 @@ CONTEMPORARY (Messiaen, Langlais):
 | Expression pedal dynamic range | 8–12 dB | Supplement with registration changes for larger shifts |
 | Flue speech onset | 30–120ms | Account for in polyphonic rhythmic precision |
 | Reed speech onset | 10–40ms | Faster than flues — reeds cut through ensemble |
+| Finger legato tolerance | <20ms gap | Audible gaps above this break the legato illusion |
+| Hymn phrase-breath gap | 100–150ms | Leave space before each new line for congregational breath |

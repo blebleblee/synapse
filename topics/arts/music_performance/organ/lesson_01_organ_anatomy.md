@@ -10,161 +10,123 @@
 6. [Practical Voicing and Instrument Maintenance](#6-practical-voicing-and-instrument-maintenance)
 7. [Practice Methodology and Progressive Drills](#7-practice-methodology-and-progressive-drills)
 8. [Representative Repertoire and Style Analysis](#8-representative-repertoire-and-style-analysis)
+9. [Troubleshooting at the Console: A Field Guide](#9-troubleshooting-at-the-console-a-field-guide)
 
 ---
 
 ## 1. Instrument Architecture and Pipe Acoustics
 
-### 1.1 Acoustical First Principles (The 15%)
+### 1.1 Acoustical First Principles (the 15%)
 
-A pipe organ generates sound through **aeroacoustic resonance**: a controlled airstream excites a standing wave inside a resonant cavity. You need this intuition because every tonal decision—choosing a 4' Flute over an 8' Principal, pulling a reed stop, adjusting expression—flows directly from understanding what physics is happening inside the pipe.
+A pipe speaks because a thin sheet of air blown across a mouth edge (flue pipes) or a vibrating brass tongue (reed pipes) excites a standing wave in a resonant tube. You need only one working intuition from this: **length and whether the top is open or stopped determine pitch and color; everything else is detail.**
 
-Three governing principles:
+- **Open pipe:** fundamental = speed of sound / (2 × length). An open 8' C pipe (~65 Hz) is physically close to 8 feet long. Halve the pipe length, the pitch jumps an octave — this is why a 4' stop sits an octave above an 8' stop of the same name.
+- **Stopped pipe:** capping the top forces the wave to "fold back," producing a pitch one octave lower than an open pipe of the same length, and favoring odd harmonics only (1st, 3rd, 5th). That's the hollow, covered sound of a Bourdon or Gedackt — and why builders use stopped pipes to fit 16' pitch into an 8'-tall case.
 
-**Open pipe resonance:** Fundamental frequency f₀ = v / (2L), where v ≈ 343 m/s and L is the effective acoustic length. An open C pipe sounding at 65.4 Hz (8' C) requires L ≈ 2.62 m — close to 8 feet. Halve the length, double the frequency: one octave higher, the 4' register.
+That's the whole physics lesson. Everything below is about what you do with your hands, feet, and ears.
 
-**Stopped pipe resonance:** A stopped (closed-top) pipe resonates at f₀ = v / (4L), producing a pitch one octave lower than an open pipe of the same physical length, and speaking only odd harmonics (1st, 3rd, 5th). This hollowness is the characteristic Bourdon/Gedackt sound. Builders exploit this to fit 16' tone in an 8' pipe — critical for instruments in low-ceiling galleries.
-
-**Harmonic content by pipe geometry:**
-
-| Pipe Shape | Harmonics Present | Tonal Character |
-|---|---|---|
-| Open cylinder (Principal) | All harmonics | Full, balanced chorus |
-| Stopped cylinder (Bourdon) | Odd harmonics only | Hollow, flute-like, dark |
-| Open cone (Spitz/Geigen) | Bright even harmonics | Stringy, penetrating |
-| Reed + cylindrical resonator | Odd harmonics, bright peaks | Trumpet-like, assertive |
-| Reed + conical resonator | Rich complex spectrum | Oboe, Bassoon character |
-
-That's enough physics. The rest of this lesson is about how to actually play and register the instrument.
+| Pipe Shape | Harmonics Present | Tonal Character | What You'll Recognize by Ear |
+|---|---|---|---|
+| Open cylinder (Principal) | All harmonics | Full, balanced chorus | The organ's "default" sound — neither bright nor dark |
+| Stopped cylinder (Bourdon) | Odd harmonics only | Hollow, flute-like, dark | Covered, slightly woody, blends into silence |
+| Open cone (Spitz/Geigen) | Strong upper partials | Stringy, penetrating | Narrow and edgy, cuts through texture |
+| Reed + cylindrical resonator | Odd harmonics, bright peaks | Trumpet-like, assertive | Buzzy attack, brassy sustain |
+| Reed + conical resonator | Dense, complex spectrum | Oboe, Bassoon character | Nasal, vocal quality |
 
 ### 1.2 Pipe Families: What You're Hearing and Why
 
-When you sit at a console, every stop drawer you pull triggers a rank of pipes — typically 56–61 pipes, one per note. Knowing the family tells you immediately how that stop will blend, project, and behave under your fingers.
+Every stop knob you pull controls one rank — 56 to 61 pipes, one per key. Knowing the family tells you instantly how a stop will blend and how loud you can push it before it dominates.
 
-**Principal (Diapason) Chorus — the organ's backbone:**
-These are the defining sound of the pipe organ. Open metal cylinders of moderate scale, they produce a full harmonic spectrum neither bright like strings nor dark like flutes. Every complete registration starts here.
+**Principal (Diapason) Chorus — the backbone.** Open metal cylinders, moderate scale. Every full registration starts here because this is the sound the room is tuned to absorb evenly across the spectrum.
 
-- 16' Principal / Contrebasse (Pedal): deep foundation, rarely used without 8' above it
-- 8' Principal / Open Diapason (Great/Hauptwerk): unison pitch, your registration anchor
-- 4' Octave / Principal: one octave above written pitch, adds clarity and presence
-- 2' Super Octave: two octaves up, essential for chorus brilliance
-- Mixture II–VI (1⅓', 1', ⅔', ½'): multiple ranks simultaneously, breaks back in treble
+- 16' Principal/Contrebasse (Pedal) — foundation, almost never alone
+- 8' Principal/Open Diapason (Great) — your registration anchor
+- 4' Octave — adds clarity without changing character
+- 2' Super Octave — brilliance
+- Mixture II–VI — several ranks at once, reinforcing the harmonic series; breaks back (jumps down an octave) in the treble to avoid shrillness
 
-**Flute Family — round, fundamental-dominant:**
-Wide-scaled or stopped pipes. Soft, blending, harmonic-poor. Great for accompaniment voices and solo cantabile lines.
+**Flute Family — round, fundamental-heavy.** Wide-scaled or stopped pipes, soft and blending.
 
-- 16' Bourdon: stopped wood, essential pedal color
-- 8' Gedackt / Flûte Harmonique: accompaniment flute
-- 4' Rohrflöte (Chimney Flute): partial stopper adds a subtle 8' harmonic, slightly rounder than open flute
-- 2⅔' Nazard: sounds a 12th above written pitch; never use alone — it's a mutation stop, always combine with 8' + 4'
-- 2' Block Flute / Flageolet: gentle, airy treble
+- 16' Bourdon — stopped wood, standard pedal color
+- 8' Gedackt/Flûte Harmonique — the workhorse accompaniment voice
+- 4' Rohrflöte — partially stopped, slightly rounder than an open 4' flute
+- 2⅔' Nazard — a mutation sounding a 12th above written pitch. **Never alone** — always on top of an 8'+4' foundation
+- 2' Block Flute/Flageolet — airy treble color
 
-**String Family — narrow-scale, harmonically rich:**
-Thin metal pipes with complex spectra and slow, shimmering attack. Dangerous to over-use; they cloud the principal chorus.
+**String Family — narrow scale, harmonically dense, slow attack.** Use sparingly; too much strings clouds a principal chorus.
 
-- 8' Viola da Gamba: moderate string with presence
-- 8' Salicional: gentle, receding string
-- 8' Voix Céleste (undulating stop): **always paired with Salicional** — detuned by 1-2 cents to create the characteristic undulating beat frequency. Ethereal, impressionistic.
-- 8' Geigenprincipal: hybrid between string and principal — useful bridge stop
+- 8' Viola da Gamba — present, assertive string
+- 8' Salicional — gentle, recedes into texture
+- 8' Voix Céleste — always paired with the Salicional, tuned 1–2 cents sharp or flat to create a slow shimmering beat. This beating is the entire point of the stop — never use it solo.
+- 8' Geigenprincipal — a bridge voice between string and principal
 
-**Reed Family — lip-vibrating brass tongue:**
-Most assertive stops on the instrument. The resonator shapes, not the tongue frequency, determines the harmonic profile.
+**Reed Family — brass tongue vibrating against a shallot.** Most assertive stops on the instrument; the resonator shape, not the reed, determines character.
 
 | Reed Stop | Resonator | Character |
 |---|---|---|
-| Trompette / Trumpet | Full-length cylindrical | Bright, fanfare, orchestral |
-| Posaune / Trombone | Full-length wide conical | Broad, heroic (Pedal) |
-| Hautbois / Oboe | Half-length inverted cone | Reedy, nasal, plaintive |
-| Clarinet | Full-length cylindrical, narrow | Smooth, woodwind-like |
-| Vox Humana | Short fractional resonator | Wavy, throat-like, requires tremulant |
-| Tuba Mirabilis | High-pressure, wide cylindrical | Overwhelming power, solo only |
+| Trompette/Trumpet | Full-length cylindrical | Bright, fanfare |
+| Posaune/Trombone | Full-length wide conical | Broad, heroic (Pedal) |
+| Hautbois/Oboe | Half-length inverted cone | Reedy, nasal |
+| Clarinet | Full-length narrow cylindrical | Smooth, woodwind |
+| Vox Humana | Short fractional resonator | Wavy, vocal — pairs with tremulant |
+| Tuba Mirabilis | High-pressure wide cylindrical | Overwhelming, solo only |
 
 ### 1.3 Wind System Architecture
 
 ```mermaid
 graph TD
     subgraph sub_wind_path ["Wind Path: Blower to Pipe"]
-        A["Electric Blower\n(1000–5000 CFM)"] --> B["Primary Reservoir\n(Weighted / Spring-loaded)"]
+        A["Electric Blower (1000-5000 CFM)"] --> B["Primary Reservoir"]
         B --> C["Wind Trunks"]
-        C --> D1["Division Reservoir\n(Low Pressure 2–3″ WC)\nFlutes & Strings"]
-        C --> D2["Division Reservoir\n(Medium Pressure 4–6″ WC)\nPrincipals & Mixtures"]
-        C --> D3["High-Pressure Reservoir\n(10–25″ WC)\nTubas & Heroic Reeds"]
-        D1 --> E1["Windchest: Positiv / Choir"]
-        D2 --> E2["Windchest: Great / Hauptwerk"]
-        D3 --> E3["Windchest: Solo / Orchestral"]
+        C --> D1["Low Pressure 2-3in WC: Flutes/Strings"]
+        C --> D2["Medium Pressure 4-6in WC: Principals/Mixtures"]
+        C --> D3["High Pressure 10-25in WC: Tubas/Heroic Reeds"]
+        D1 --> E1["Windchest: Choir/Positiv"]
+        D2 --> E2["Windchest: Great/Hauptwerk"]
+        D3 --> E3["Windchest: Solo/Orchestral"]
         E1 --> F["Pipe Ranks"]
         E2 --> F
         E3 --> F
     end
-
-    style A fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style B fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style C fill:#161D2B,stroke:#38BDF8,stroke-width:1px
-    style D1 fill:#0A0D12,stroke:#6EE7B7,stroke-width:2px
-    style D2 fill:#0A0D12,stroke:#38BDF8,stroke-width:2px
-    style D3 fill:#0A0D12,stroke:#E9A568,stroke-width:2px
-    style E1 fill:#1E2636,stroke:#6EE7B7,stroke-width:2px
-    style E2 fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style E3 fill:#1E2636,stroke:#E9A568,stroke-width:2px
-    style F fill:#0F131C,stroke:#FACC15,stroke-width:2px
 ```
 
-**Practical implication:** When you draw multiple loud stops simultaneously, the reservoir momentarily dips in pressure as demand spikes — this causes slight pitch flattening on fast repeated notes. Good organs combat this with **concussion bellows** (small local reservoirs mounted directly on the windchest). If you're playing a heavy reed chorus and notice slight wavering on fast passages, this is the cause, not a voicing problem.
+**What this means for your hands:** draw a heavy reed chorus and play a fast repeated figure, and you may hear a slight pitch wobble. That is a momentary pressure dip under demand, not mistuning. Instruments fight this with **concussion bellows** — small local reservoirs bolted directly to the windchest to absorb the spike. If you hear wavering only on loud, fast passages and it disappears when you play softly, this is the cause — don't ask the tuner to "fix" it.
 
 ### 1.4 Windchest Architectures
 
 ```mermaid
 graph TB
-    subgraph sub_slider_windchest ["Slider Windchest (Classic Tracker Organ)"]
-        WS["Wind Supply\nunder constant pressure"] --> PV["Pallet Valve\n(opens on key press)"]
-        PV --> NC["Note Channel\n(one per key)"]
-        NC --> SL1["Stop Slider: Principal\n● open = ranks speaks\n○ closed = rank muted"]
+    subgraph sub_slider_windchest ["Slider Windchest (Tracker Organ)"]
+        WS["Wind Supply (constant pressure)"] --> PV["Pallet Valve - opens on key press"]
+        PV --> NC["Note Channel - one per key"]
+        NC --> SL1["Stop Slider: Principal"]
         NC --> SL2["Stop Slider: Flute"]
         NC --> SL3["Stop Slider: Reed"]
         SL1 --> P1["Principal Pipe"]
         SL2 --> P2["Flute Pipe"]
         SL3 --> P3["Reed Pipe"]
     end
-
-    style WS fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style PV fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style NC fill:#161D2B,stroke:#38BDF8,stroke-width:2px
-    style SL1 fill:#0A0D12,stroke:#FACC15,stroke-width:2px
-    style SL2 fill:#0A0D12,stroke:#FACC15,stroke-width:2px
-    style SL3 fill:#0A0D12,stroke:#FACC15,stroke-width:2px
-    style P1 fill:#1E2636,stroke:#6EE7B7,stroke-width:2px
-    style P2 fill:#1E2636,stroke:#6EE7B7,stroke-width:2px
-    style P3 fill:#1E2636,stroke:#E9A568,stroke-width:2px
 ```
 
-**Slider windchest** (classical, tracker): When you press a key, a pallet opens and pressurizes the note channel. Wind reaches a pipe only where the slider hole aligns. This architecture produces the characteristic **chiff** — a slight consonant at note onset — because there's a brief hydraulic transient before the pipe fully speaks. The chiff is a feature, not a defect: it provides clarity and definition in polyphonic Bach.
+- **Slider windchest** (tracker): pressing a key opens a pallet that pressurizes a whole note channel; wind reaches a pipe only where the stop slider hole lines up. This produces **chiff** — a tiny consonant-like transient at note onset, caused by the brief moment before the pipe fully speaks. Chiff is a feature in contrapuntal Baroque music: it defines entries and keeps inner voices audible.
+- **Unit windchest** (theater organ): each pipe has its own valve, and a single rank can be "borrowed" to sound at 16', 8', and 4' simultaneously. Economical, but one pipe can't serve two roles in the same chord without compromise.
+- **Pitman windchest** (Skinner, Aeolian-Skinner, most American 20th-century organs): each pipe gets an individually controlled electro-pneumatic pallet. No chiff, smoother speech, built for Romantic/orchestral literature.
 
-**Unit windchest** (theater organ, digital MIDI hybrids): Each pipe has its own valve. One rank of 8' Trompette pipes can be borrowed to play at 16', 8', 4' pitch simultaneously. Economical but tonally compromised in complex chords where a single pipe must simultaneously serve multiple "stops."
-
-**Pitman windchest** (American organ building tradition, Skinner/Aeolian-Skinner): Each pipe gets an individual pallet controlled by an electric pouch. Flexible, reliable, works at large scale. No chiff, smoother speech — favored for orchestral and romantic repertoire.
-
-### 1.5 Action Systems Comparison
+### 1.5 Action Systems — What You Feel Under Your Fingers
 
 ```mermaid
 graph LR
     subgraph sub_action_comparison ["Key-to-Pipe Action Systems"]
-        K["Key Pressed"] --> T["Mechanical Tracker\n• Immediate: 0–5ms\n• Tactile feedback\n• Distance limit ~25 ft\n• No power required"]
-        K --> PN["Pneumatic Tubular\n• Delay: 50–150ms\n• Complex tubing network\n• Historically unreliable"]
-        K --> EL["Electric Action\n• Delay: 10–20ms\n• Unlimited distance\n• Combination memories\n• MIDI integration"]
-
+        K["Key Pressed"] --> T["Mechanical Tracker: 0-5ms, tactile, no power needed"]
+        K --> PN["Pneumatic Tubular: 50-150ms delay, historically unreliable"]
+        K --> EL["Electric Action: 10-20ms, unlimited distance, combination memory"]
         T --> PIP["Pipe Speaks"]
         PN --> PIP
         EL --> PIP
     end
-
-    style K fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style T fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style PN fill:#0F131C,stroke:#E9A568,stroke-width:2px
-    style EL fill:#0F131C,stroke:#3B6DFF,stroke-width:2px
-    style PIP fill:#1E2636,stroke:#FACC15,stroke-width:2px
 ```
 
-**What this means for your playing:** On a tracker organ, key weight tells you the pallet state — you can half-press a key to control pipe speech timing. This is unavailable on electric-action instruments. When switching between tracker and electric organs, your articulation technique must adapt. See Section 5 for details.
+On tracker action, key resistance *is* information — you feel the pallet begin to open partway through the key dip, and a trained hand can nudge the timing of speech with the last millimeter of travel. That control disappears on electric action, where the switch is binary: fully open or fully closed. When you move from a tracker instrument to an electric-action instrument (or a digital one), your articulation has to do the work your fingertip used to do. See Section 5.4.
 
 ---
 
@@ -175,467 +137,397 @@ graph LR
 ```mermaid
 graph TB
     subgraph sub_console_layout ["Standard 3-Manual Console Layout"]
-        subgraph sub_manuals ["Manuals (top to bottom)"]
-            M3["Manual III — Swell / Schwellwerk\n56–61 keys, C–c⁴\nEnclosed: expression pedal controls shades"]
-            M2["Manual II — Great / Hauptwerk\n56–61 keys, C–c⁴\nPrimary chorus, unenclosed"]
-            M1["Manual I — Choir / Positiv\n56–61 keys, C–c⁴\nCompanion, accompaniment, solo flutes"]
+        subgraph sub_manuals ["Manuals, top to bottom"]
+            M3["Manual III - Swell/Schwellwerk: enclosed, expression pedal"]
+            M2["Manual II - Great/Hauptwerk: primary chorus, unenclosed"]
+            M1["Manual I - Choir/Positiv: accompaniment, solo flutes"]
         end
         subgraph sub_pedal ["Pedalboard"]
-            PED["Pedal — 30–32 notes, C–f¹ or g¹\nAGO standard: concave/radiating\nBritish standard: flat/parallel"]
+            PED["Pedal: 30-32 notes, AGO concave/radiating or flat/parallel"]
         end
         subgraph sub_controls ["Control Surfaces"]
-            ST["Stop Knobs / Tablets\n(grouped by division)"]
-            CP["Coupler Tablets\nSwell/Great, Choir/Great,\nSwell/Choir, all to Pedal"]
-            EXP["Expression Pedals\n(rocker — not a volume knob,\nbut a swell shade controller)"]
-            COMB["Combination Pistons\n(thumb pistons below each manual,\ntoe pistons above pedalboard)"]
-            TOE["Toe Pistons\nGeneral combinations, Sforzando,\nTutti / Full Organ"]
+            ST["Stop Knobs/Tablets"]
+            CP["Coupler Tablets"]
+            EXP["Expression Pedals (swell shade control)"]
+            COMB["Thumb Pistons"]
+            TOE["Toe Pistons"]
         end
-        sub_manuals --> sub_pedal
-        sub_pedal --> sub_controls
+        sub_manuals --> sub_pedal --> sub_controls
     end
-
-    style M3 fill:#0F131C,stroke:#38BDF8,stroke-width:2px
-    style M2 fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style M1 fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style PED fill:#1E2636,stroke:#E9A568,stroke-width:2px
-    style ST fill:#0A0D12,stroke:#FACC15,stroke-width:2px
-    style CP fill:#0A0D12,stroke:#FACC15,stroke-width:2px
-    style EXP fill:#0A0D12,stroke:#3B6DFF,stroke-width:2px
-    style COMB fill:#0A0D12,stroke:#38BDF8,stroke-width:2px
-    style TOE fill:#0A0D12,stroke:#E9A568,stroke-width:2px
 ```
 
 ### 2.2 Divisional Functions and Hierarchy
 
-| Division | German | French | English | Tonal Function |
-|---|---|---|---|---|
-| Great | Hauptwerk | Grand-Orgue | Great | Main chorus anchor, full principal chorus |
-| Swell | Schwellwerk | Récit | Swell | Enclosed; dynamic shading; orchestral reeds |
-| Choir | Positiv / Rückpositiv | Positif | Choir | Accompaniment, secondary chorus, solo flutes |
-| Solo | — | Solo | Solo | High-pressure solos; Tuba; orchestral colors |
-| Pedal | Pedal | Pédale | Pedal | Bass foundation; 32', 16', 8' chorus + reeds |
+| Division | German | French | Tonal Function |
+|---|---|---|---|
+| Great | Hauptwerk | Grand-Orgue | Main chorus anchor |
+| Swell | Schwellwerk | Récit | Enclosed, dynamic shading, orchestral reeds |
+| Choir | Positiv/Rückpositiv | Positif | Accompaniment, secondary chorus, solo flutes |
+| Solo | — | Solo | High-pressure solo colors, Tuba |
+| Pedal | Pedal | Pédale | Bass foundation, 32'/16'/8' chorus + reeds |
 
-**Rückpositiv:** In German Baroque organs, the Positiv division is physically located behind the organist in the rear gallery railing. Its natural acoustic projection toward the audience — separate from the main Hauptwerk above — creates a spatial stereo effect exploited in antiphonal writing (Bach's Passacaglia and Fugue, Buxtehude's Praeludia).
+**Rückpositiv:** in German Baroque instruments this division sits in the rail behind the organist, facing the congregation directly. It creates a genuine spatial effect — sound arrives from a different point in the room than the Hauptwerk above — which Bach and Buxtehude exploit with deliberate antiphonal writing (compare the dialoguing manual changes in Buxtehude's Praeludia).
 
-### 2.3 Coupler Logic — Reading a Coupler Specification
+### 2.3 Coupler Logic
 
-A "Swell to Great 8'" coupler routes all depressed Swell keys to the Great windchest at unison pitch. Here's the full matrix:
+A "Swell to Great 8'" coupler routes every depressed Swell key into the Great windchest at unison pitch, so pressing one key on the Great now sounds both the Great pipe and the corresponding Swell pipe.
 
 ```
-Swell/Great 16'   — Swell adds 16' (sub-octave) to Great keys
-Swell/Great 8'    — Swell at unison added to Great
-Swell/Great 4'    — Swell adds 4' (super-octave) to Great keys
-
-Choir/Great 8'    — Choir at unison added to Great
-Choir/Great 4'    — Choir octave above added to Great
-
-Swell/Choir 8'    — Swell at unison added to Choir
-Swell/Pedal 8'    — Swell at unison added to Pedal
-Great/Pedal 8'    — Great at unison added to Pedal (most common)
-Choir/Pedal 8'    — Choir at unison added to Pedal
+Swell/Great 16'   - Swell adds sub-octave to Great keys
+Swell/Great 8'    - Swell unison added to Great
+Swell/Great 4'    - Swell super-octave added to Great
+Choir/Great 8'    - Choir unison added to Great
+Choir/Great 4'    - Choir octave above added to Great
+Swell/Choir 8'    - Swell unison added to Choir
+Swell/Pedal 8'    - Swell unison added to Pedal
+Great/Pedal 8'    - Great unison added to Pedal (most common coupler on the instrument)
+Choir/Pedal 8'    - Choir unison added to Pedal
 ```
 
-**Common beginner mistake:** Engaging Great/Pedal 8' and Swell/Great 8' simultaneously without realizing that Swell is now also sounding in the Pedal via the chain. This causes balance problems — the pedal becomes much louder than intended. Chain-coupling requires deliberate registration planning.
+**Beginner trap:** engage Great/Pedal 8' and Swell/Great 8' at the same time, and the Swell is now *also* sounding in the Pedal, chained through the Great. Your bass line suddenly gets louder than you registered it, for no apparent reason. Trace coupler chains before blaming the voicing.
 
-### 2.4 Expression Pedals: Dynamics vs. Touch
+### 2.4 Expression Pedal: Dynamics *and* Timbre
 
-The expression pedal (swell pedal) moves wooden shutters (swell shades) that form the front wall of an enclosed division box. This is not a volume knob — it simultaneously:
+The swell pedal moves wooden shutters forming one wall of the enclosed division's box. It is not a volume knob. Closing it does three things at once:
 
-1. Attenuates overall amplitude (up to 15–18 dB)
-2. Filters high frequencies when closed (high-frequency energy trapped inside box)
-3. Changes the reverberant character perceived by the listener
+1. Attenuates loudness, typically 15–18 dB from fully open to fully closed
+2. Absorbs high frequencies preferentially when closed, so the tone darkens, not just quiets
+3. Changes the perceived room ambience, because less direct sound escapes the box
 
-**Practice this:** Set up Swell division with 8' Oboe + 8' Flute Harmonique. Play a slow sustained chord. Move the swell pedal from fully closed to fully open over 8 beats. Notice the dramatic timbral change — it's not just louder, it's tonally brighter. Then reverse. Use this effect for phrase shaping, not just volume management.
+**Drill:** Draw Swell 8' Oboe + 8' Flûte Harmonique. Hold a sustained chord. Move the pedal from fully closed to fully open over 8 slow beats, then reverse. Listen for the brightening, not just the loudening — that's the real effect you're using when you shape a phrase, not merely "louder here, softer there."
 
 ---
 
 ## 3. Registration Craft and Stop Palette Mastery
 
-Registration is the art of selecting and combining stops to serve the music's expressive and structural demands. It is the organ's equivalent of orchestration.
+### 3.1 Building a Principal Chorus from the Foundation
 
-### 3.1 The Principal Chorus: Building from the Foundation
-
-Always build a principal chorus from the bottom up. Add ranks in order:
+Always add ranks bottom-up. Each new rank should reinforce, not compete with, what's already sounding.
 
 ```
-Step 1: 8' Principal / Open Diapason        → foundation, unison pitch
-Step 2: 4' Octave / Principal               → clarity, cuts through acoustics
-Step 3: 2' Super Octave                     → adds brilliance
-Step 4: 1⅓' Larigot (optional mutation)    → enriches upper spectrum
-Step 5: Mixture III–V                       → full chorus, brightness, definition
-Step 6: 8' Trumpet (optional)              → power and assertiveness
+Step 1: 8' Principal/Open Diapason     -> foundation, unison pitch
+Step 2: 4' Octave                      -> clarity, cuts through room reverb
+Step 3: 2' Super Octave                -> brilliance
+Step 4: 1⅓' Larigot (optional)        -> shimmer, upper spectrum
+Step 5: Mixture III-V                  -> full chorus definition
+Step 6: 8' Trumpet (optional)          -> power, assertiveness
 ```
 
-Each added rank should reinforce the existing sound and increase brilliance without sounding like a separate voice until the full chorus is assembled. If the 4' octave jumps out as noticeably separate from the 8', the voicing is imbalanced or the pipes need tuning adjustment.
+**Diagnostic ear-test:** if the 4' Octave "pokes out" as a separate voice rather than disappearing into the 8', either the pipes are out of scale for the room or they need tuning. A well-balanced chorus should sound like one instrument getting brighter, not like two stops arguing.
 
-**Registration Rule:** Never add a mutation (2⅔' Nazard, 1⅗' Tierce) without at least an 8' and 4' foundation. Mutations reinforce upper partials that already exist in the foundation tone — without that foundation, they sound like an out-of-tune wrong note.
+**Rule:** never draw a mutation (2⅔' Nazard, 1⅗' Tierce) without an 8' and 4' foundation underneath it. A mutation reinforces a harmonic that's supposed to already be faintly present in the fundamental tone. Without that fundamental, it just sounds like a wrong note a fifth or a third away.
 
-### 3.2 Tonal Families and Their Blending Hierarchy
+### 3.2 Tonal Pyramid
 
 ```mermaid
 graph TD
     subgraph sub_tonal_pyramid ["Registration Pyramid: Building from Foundation"]
-        A["32' / 16' Pedal Foundation\n(Resultant bass, Sub-Principal, Bourdon 16')"]
-        B["8' Unison Layer\n(Principal, Gedackt, Flute Harmonique, Viole)"]
-        C["4' Octave Layer\n(Octave, Fifteenth, Flute 4', Spitz 4')"]
-        D["2⅔' + 2' Mutation Layer\n(Nazard + Fifteenth, or Larigot + Super Octave)"]
-        E["Mixture Ranks\n(Mixture III–VI, Fourniture, Scharf)"]
-        F["Reeds (added last)\n(Trumpet 8', Oboe 8', Cromorne 8', Trombone 16')"]
-
+        A["32'/16' Pedal Foundation"]
+        B["8' Unison Layer"]
+        C["4' Octave Layer"]
+        D["2⅔ + 2' Mutation Layer"]
+        E["Mixture Ranks"]
+        F["Reeds, added last"]
         A --> B --> C --> D --> E --> F
     end
-
-    style A fill:#1E2636,stroke:#E9A568,stroke-width:2px
-    style B fill:#0F131C,stroke:#38BDF8,stroke-width:2px
-    style C fill:#161D2B,stroke:#38BDF8,stroke-width:2px
-    style D fill:#0A0D12,stroke:#6EE7B7,stroke-width:2px
-    style E fill:#1E2636,stroke:#6EE7B7,stroke-width:2px
-    style F fill:#0F131C,stroke:#E9A568,stroke-width:2px
 ```
 
-### 3.3 Practical Registration Recipes
+### 3.3 Registration Recipes You Can Use Today
 
-**Bach Chorale Prelude (e.g., BWV 659, Nun komm der Heiden Heiland):**
-- Great: 8' Principal + 8' Gedackt (or Bourdon 8')
-- Pedal: 16' Subbass + 8' Principal + Great/Pedal coupler
-- Swell: 8' Oboe or Cromorne for cantus firmus melody
-- No tremulant, no mixture on accompaniment voices
+**Bach chorale prelude (e.g. BWV 659):**
+- Great: 8' Principal + 8' Gedackt
+- Pedal: 16' Subbass + 8' Principal + Great/Pedal
+- Swell: 8' Oboe or Cromorne for the cantus firmus line
+- No tremulant, no mixture on accompanying voices
 
-**French Symphonic Plenum (Vierne, Widor):**
-- Great: Full principal chorus (16' + 8' + 4' + 2' + Mixture) + Trompette 8'
-- Swell: Full chorus (8' + 4' + 2' + Mixture) + Trompette 8', swell box open
-- Choir: 8' + 4' Principals, Choir/Great coupler
-- Pedal: 32' Resultant (if available) + 16' + 8' + 4' Principals + 16' Trombone
-- Swell/Great + Choir/Great + Great/Pedal + Swell/Pedal
+**French symphonic plenum (Vierne, Widor):**
+- Great: full principal chorus (16'+8'+4'+2'+Mixture) + Trompette 8'
+- Swell: full chorus (8'+4'+2'+Mixture) + Trompette 8', box open
+- Choir: 8'+4' Principals, Choir/Great coupled
+- Pedal: 32' resultant if available, + 16'+8'+4' Principals + 16' Trombone
+- Couplers: Swell/Great, Choir/Great, Great/Pedal, Swell/Pedal
 
-**Soft Legato Hymn Accompaniment:**
-- Great: 8' Flute Harmonique alone (or Gedackt 8')
-- Pedal: 16' Bourdon + Great/Pedal coupler
-- Swell: Closed box, 8' Salicional + 8' Voix Céleste (undulating pair)
+**Soft legato hymn accompaniment:**
+- Great: 8' Flûte Harmonique alone
+- Pedal: 16' Bourdon + Great/Pedal
+- Swell (closed): 8' Salicional + 8' Voix Céleste
 - No reeds, no mixtures
 
-**Cornet Combination (French solo texture, Clérambault, Couperin):**
-- Swell or Choir: 8' Flute Harmonique + 4' Flute Douce + 2⅔' Nazard + 2' Flute + 1⅗' Tierce
-- Used for single-voice solo lines only — never in polyphonic texture
-- The Tierce (1⅗') is the characteristic French couleur; it adds a sweet, slightly nasal edge
+**Cornet combination (French solo texture — Couperin, Clérambault):**
+- Swell or Choir: 8' Flûte Harmonique + 4' Flûte Douce + 2⅔' Nazard + 2' Flûte + 1⅗' Tierce
+- Solo line only, never in polyphonic texture — the Tierce's nasal edge is the identifying color of the French "Cornet"
 
-**Toccata Climax (Widor, Reger, Dupré):**
-- Great: Full principal chorus + Mixture + Trumpet 8'
-- Swell/Great coupler, Swell open with Trompette + Plein Jeu
-- Pedal: 32' + 16' + 8' + 4' full principal chorus + 16' Trombone + 8' Trumpet
+**Toccata climax (Widor, Reger, Dupré):**
+- Great: full principal chorus + Mixture + Trumpet 8'
+- Swell/Great coupled, Swell open with Trompette + Plein Jeu
+- Pedal: 32'+16'+8'+4' chorus + 16' Trombone + 8' Trumpet
 - Tutti piston engaged
 
-### 3.4 Combination Action: Programming and Using Pistons
-
-Modern organs have 128–999 combination memories per level. Here is a systematic approach to setting up combinations before a performance:
+### 3.4 Combination Action: Setting Pistons Before You Play
 
 ```
-Memory Level: 1 (service, general worship)
-P1 → Soft accompaniment: Swell Salicional + Voix Céleste, Pedal Bourdon 16'
-P2 → Medium: add Great 8' Principal, Flute; Great/Pedal coupler
-P3 → Full without reeds: principals 8'+4'+2'+Mixture on Great, Swell Plein Jeu
-P4 → Full with reeds: add Trompettes Great + Swell, Trombone 16' Pedal
-P5 → Tutti: everything plus Mixtures
+Memory Level 1 (general worship service)
+P1 -> Soft: Swell Salicional + Céleste, Pedal Bourdon 16'
+P2 -> Medium: add Great 8' Principal + Flute, Great/Pedal coupler
+P3 -> Full without reeds: Great principals 8'+4'+2'+Mixture, Swell Plein Jeu
+P4 -> Full with reeds: add Trompettes (Great + Swell), Pedal 16' Trombone
+P5 -> Tutti: everything plus all Mixtures
 
-Memory Level: 2 (specific repertoire, e.g. Bach recital)
-P1–P8 → Program in advance, pre-sequence using Next/Previous buttons
+Memory Level 2 (specific recital piece)
+P1-P8 -> Pre-sequenced for the piece, stepped through with Next/Previous
 ```
 
-**Piston technique during performance:** Use thumb pistons with the thumb that is not currently playing. The standard protocol is: set the registration change just before the barline, engage the piston on the last beat of the previous phrase (while the fingers are still depressing notes), then proceed. Never lift hands between piston push and next note onset.
+**Piston technique:** engage a thumb piston with whichever thumb is not currently needed for a note, timed to the *last beat of the outgoing phrase*, while the other hand is still physically holding its notes down. Never lift both hands to change registration — the gap will be audible and will sound like a mistake, not a musical choice.
 
 ---
 
 ## 4. Keyboard and Pedalboard Technique
 
-### 4.1 Hand Position and Ergonomics
+### 4.1 Hand Position: Unlearn Piano Pressure
 
-The organ keyboard demands a fundamentally different hand posture than the piano. There is **no dynamic control via key velocity** — the organ does not respond to how hard or fast you press a key. Only timing controls the sound.
+The organ has **no velocity response.** Pressing a key harder or faster produces no change in volume or tone — the pallet is either fully open or not. This changes everything about hand mechanics.
 
-**Correct hand position:**
-- Fingers curved but slightly flatter than piano technique — the keys are shallower (10–12 mm key dip vs. 10 mm piano, but organ keys are wider and require more lateral precision)
-- Wrist level, neither raised nor dropped
-- Forearm roughly horizontal to keyboard level
-- No arm weight transfer — unlike piano, organ keys require only light pressure to depress. The goal is **precision of timing**, not depth of pressure
-- Thumbs cross under or over smoothly; pivoting on the thumb for position shifts is standard
+- Fingers curved, slightly flatter than piano hand shape; organ keys are shallower in dip but wider, so lateral accuracy matters more than depth
+- Wrist level — not raised, not dropped
+- Forearm roughly horizontal
+- Minimal pressure: push only enough to fully depress the key, then stop adding force. The goal is timing precision, not power.
+- Thumbs pivot smoothly under or over adjacent fingers for position shifts — this is a core organ-specific skill with no piano equivalent at this frequency
 
-**Common error — organ-at-piano pressure:** Many pianists initially press organ keys with far too much force, which causes hand tension and imprecision in legato connections. The organ pallet opens fully at the bottom of key travel whether you press gently or hard.
+**Most common pianist error:** pressing organ keys with piano-level force. This tenses the hand, slows finger substitution, and makes legato connections sloppy because the extra force makes it harder to feel exactly when a key reaches the bottom of its travel.
 
-### 4.2 Legato Technique: The Default Organ Touch
+### 4.2 Legato: The Default Touch, and Why Milliseconds Matter
 
-On the organ, silence is articulation. Notes speak the entire duration they are held — there is no decay. This means:
+Organ tone has no decay — a held note sounds at full volume for its entire duration, then stops instantly when released. Consequences:
 
-- **Connection between notes must be managed to within milliseconds.** A tiny gap between notes that would be imperceptible on piano is audible and stylistically meaningful on organ.
-- **True legato** requires the previous finger to remain depressed until the precise moment the next key reaches the bottom of its travel. Release too early → gap. Release too late → unwanted overlap.
+- A gap between notes that's inaudible on piano (because of piano's natural decay) is clearly audible on organ.
+- True legato means the previous key stays down until the instant the next key reaches the bottom of *its* travel — not a fraction of a second before, not after.
 
-**Finger substitution:** Because the organ sustains indefinitely, substituting fingers on a held key (without audible gap or change) is a primary technical tool:
-
-```
-Example: Hold note G with finger 3
-         Silently slide/substitute finger 2 (or 1) onto the same key
-         Use freed finger 3 to reach the next note
-         This allows long sustained voices while navigating complex polyphony
-```
-
-Finger substitution is essential for pedal-point passages, Bach chorale preludes, and any texture requiring one voice held while others move.
-
-### 4.3 Pedalboard Technique: Foundational Exercises
-
-The pedalboard is a 30–32 note keyboard played with feet. AGO (American Guild of Organists) standard: concave, radiating design following the natural arc of the leg. British standard: flat and parallel.
-
-**Foot anatomy for pedaling:**
-- **Toe** — plays most notes; primary contact point for treble and middle register
-- **Heel** — used for sustained bass notes, heel-toe legato, and crossing passages
-- **Heel-toe legato** is the foundation technique: alternating heel and toe on successive notes creates smooth connected bass lines
-
-**Basic pedal position rules:**
-- Both feet in front of your hip width; ankles roughly below your knees
-- Feet parallel (toes pointing forward), not splayed outward
-- Never look down — develop pedal muscle memory through deliberate slow practice
-
-**Pedal fingering notation:**
-- T = Toe (R = right toe, L = left toe)
-- H = Heel (rH = right heel, lH = left heel)
+**Finger substitution — the core tool for sustaining a voice while freeing a finger:**
 
 ```
-C Major Scale in Pedal (Right foot led):
+Hold note G with finger 3.
+Silently slide finger 2 (or 1) onto the same key, no audible change in tone.
+Finger 3 is now free to reach the next note.
+```
+
+Practice this on a single held note first, completely divorced from any piece: hold middle C with finger 3, substitute to finger 2, substitute to finger 1, substitute back to 3, for two full minutes without a single audible bump or silence. Only once this is silent and automatic should you use it inside real repertoire — it is the technique behind every sustained inner voice in a Bach chorale prelude.
+
+### 4.3 Pedalboard Technique
+
+AGO standard pedalboards are concave and radiating (following the natural arc of the leg from the hip); British pedalboards are flat and parallel. Learn whichever your home instrument uses first, then adapt.
+
+**Foot contact points:**
+- **Toe** — the default contact point for most notes, treble and middle register
+- **Heel** — used for sustained bass notes and heel-toe legato chains
+- **Heel-toe legato** — alternating heel and toe on consecutive notes is how you get a smoothly connected bass line without lifting the whole foot
+
+**Position fundamentals:**
+- Feet roughly hip-width apart, ankles tracking below the knees
+- Toes pointing forward, not splayed
+- Never look down at the pedals during performance — build placement by feel, using the gaps between sharps as physical landmarks
+
+**Notation used below:** `RT` = right toe, `LT` = left toe, `RH` = right heel, `LH` = left heel.
+
+```
+C major scale, right foot led:
 C  D  E  F  G  A  B  C
 RT LT RT LT RT LT LH RT
-
-Or heel-toe on right alone (slower passages):
-C  D  E  F
-RT RH RT RH
 ```
 
-**Pedal independence drill — Foundational:**
-
-Set up: Pedal 16' Subbass only. Hands rest on keys but play nothing. Practice pedal alone.
+**Pedal progression — practice in this order, each line until comfortable before moving on:**
 
 ```
-Exercise 1: Whole notes, single foot (RT only)
-C (4 beats) — D (4 beats) — E (4 beats) — F (4 beats)
-♩=50 BPM. No looking down. Repeat until 100% accurate placement.
+Drill 1 - single foot, whole notes (draw 16' Subbass alone, hands silent on keys)
+C (hold 4 beats) D (4) E (4) F (4)      ♩=50, no looking down.
 
-Exercise 2: Alternating toe (RT / LT)
+Drill 2 - alternating toes
 C  D  E  F  G  A  B  C
-RT LT RT LT RT LT RT LT
-♩=50 → 70 BPM
+RT LT RT LT RT LT RT LT                  ♩=50 -> 70
 
-Exercise 3: Heel-toe (RH / RT)
+Drill 3 - heel-toe on one foot
 C  D  E  F  G  F  E  D  C
-RH RT RH RT RH RT RH RT RH
-♩=50 → 80 BPM
+RH RT RH RT RH RT RH RT RH               ♩=50 -> 80
 
-Exercise 4: Two-octave scale with crossover
-C (RT) D (LT) E (RT) F (LT) G (RT) A (LH) B (RT) C (LT) D (RT) E (LT) F (RT) G (LT) A (RT)
-♩=40 → 60 BPM — requires lateral hip rotation, not ankle flexion alone
+Drill 4 - two-octave scale with crossover (needs hip rotation, not just ankle motion)
+C(RT) D(LT) E(RT) F(LT) G(RT) A(LH) B(RT) C(LT) D(RT) E(LT) F(RT) G(LT) A(RT)
+♩=40 -> 60
 ```
 
-### 4.4 Hand-Foot Independence: The Core Challenge
+### 4.4 Hand-Foot Independence
 
-The fundamental technical challenge of the organ is coordinating three independent voices: two hands on different manuals + pedal bass line. Each voice may have different rhythms, articulations, and phrase shapes simultaneously.
-
-**Three-layer independence drill:**
+The central technical problem of organ playing: coordinating two hands on different manuals plus an independent pedal bass line, often in three different rhythms and articulations at once.
 
 ```
-Pedal:   C — — — G — — — C — — — G — — —    (whole notes, legato)
-LH:      C E G E  C E G E  C E G E  C E G E   (quarter notes, Alberti-ish, staccato)
-RH:      Melody: C D E F  G A B C  ...        (legato cantabile)
+Pedal:   C --- --- --- G --- --- --- C --- --- --- G --- --- ---   (whole notes, legato)
+LH:      C E G E  C E G E  C E G E  C E G E                         (quarters, staccato)
+RH:      C D E F  G A B C  ...                                      (melody, legato)
 
-BPM: Start ♩=40.
+Build order:
 Step 1: Pedal alone until perfect.
 Step 2: LH + Pedal together until perfect.
-Step 3: RH alone until phrase is musical.
-Step 4: All three together at ♩=40 → 60 → 80.
+Step 3: RH alone until the phrase is musically shaped.
+Step 4: All three together: ♩=40 -> 60 -> 80.
 ```
 
-**Always practice layers in isolation before combining.** Combining before each layer is secure wastes time and builds bad coordination habits.
+Do not skip the isolation steps. Combining layers before each one is individually secure doesn't save time — it builds coordination errors that are far harder to undo later than they were to prevent now.
 
-### 4.5 Manual-to-Manual Transfers and Echo Effects
+### 4.5 Manual Transfers and Echo Effects
 
 ```
-Echo Registration Setup:
 Great (mf): 8' Principal + 4' Octave
 Choir (pp): 8' Gedackt alone
 
-Play phrase on Great. 
-Repeat phrase immediately on Choir.
-Result: Echo dynamic contrast — Baroque terraced dynamics.
+Play a phrase on Great, repeat it immediately on Choir -> terraced-dynamic echo,
+the defining gesture of Baroque "echo" movements.
 
-Smooth manual transfer technique:
-— Last note of Great phrase: hold until Choir hand is in position
-— Depress Choir key first (overlapping by 1–2 ms)
-— Release Great key immediately after
-— Listener hears no gap, but tonal character shifts
+Smooth transfer mechanics:
+1. Hold the last Great note until the Choir-hand is physically in position.
+2. Depress the Choir key first, overlapping the Great note by 1-2ms.
+3. Release the Great key immediately after.
+Result: no audible gap, but an instant tonal color shift.
 ```
 
-This technique is essential for Italian Baroque (Frescobaldi), French Classical (Couperin, Clérambault), and North German Baroque (Buxtehude) repertoire.
+Essential for Italian Baroque (Frescobaldi), French Classical (Couperin, Clérambault), and North German Baroque (Buxtehude) repertoire.
 
 ---
 
 ## 5. Articulation, Phrasing, and Touch on the Organ
 
-### 5.1 Articulation: The Organist's Primary Expressive Tool
+### 5.1 Articulation as the Primary Expressive Tool
 
-Because the organ has no dynamic response to key velocity and no natural decay, **articulation is the primary means of musical expression.** The organist controls note duration — specifically how much silence exists between notes — to shape rhythm, character, and phrase.
+With no velocity response and no natural decay, the only thing you control expressively note-to-note is **duration — specifically, how much silence sits between notes.**
 
-**Four primary touch categories:**
+| Touch | Description | Typical Use |
+|---|---|---|
+| Legato | Minimal gap between notes | Chorale melodies, sustained lines |
+| Portato | Each note ~80-90% of written value | Default Baroque touch |
+| Staccato | Notes clipped to ≤50% value | Brisk rhythmic, scherzando passages |
+| Legatissimo | Deliberately overlapping | Romantic/impressionist sustained melody |
 
-| Touch | Symbol | Description | Use |
-|---|---|---|---|
-| Legato | — | Notes connected with minimal gap | Chorale melodies, sustained voices |
-| Portato | ◦ | Each note slightly detached (~80–90% value) | Standard non-legato default for Baroque |
-| Staccato | • | Notes clipped to 50% value or less | Brisk rhythmic passages, scherzando |
-| Legatissimo | ≈ | Overlapping connections, maximally connected | Romantic sustained melody, impressionist |
+**The Baroque default is portato, not legato** — this surprises most pianists arriving at the organ. Bach, Buxtehude, and Frescobaldi expected a natural lift between most notes, giving phrases rhythmic spring without full detachment. Continuous piano-style legato in a reverberant stone church turns contrapuntal lines into mud; the room is already doing the connecting work for you.
 
-**The Baroque default is portato, not legato.** This surprises pianists. Bach, Buxtehude, and Frescobaldi expected a slight separation between most notes — not full staccato, but a natural lifting that gives melodic lines shape and rhythmic spring. Continuous piano-style legato on a tracker organ produces a muddy blur in reverberant acoustics.
+### 5.2 Independent Voice Articulation in Polyphony
 
-### 5.2 Articulaton in Polyphonic Texture: Independent Voice Articulation
+In a Bach fugue, each voice ideally keeps its own articulation character even while the other hand plays something entirely different.
 
-In a Bach three-voice invention or fugue, each voice ideally has its own articulation character:
-
-```
-Subject (RH): portato — detached 8th notes with spring
-Answer (LH):  portato — matching the subject
-Countersubject: longer note values, slight legato
-Pedal: bass line — legato 16th-note walking motion
-```
-
-**Exercise: BWV 578 (Little G minor Fugue), subject entry**
+**BWV 578 ("Little" G minor Fugue), subject entry drill:**
 
 ```
-Subject (manual): G A Bb C | D Eb — —
-Touch:             P  P  P  P | P  P  hold
-(P = portato: each note ~85% of its written value)
+Subject (one hand):         G  A  Bb  C | D  Eb — —
+Touch:                      P  P  P   P | P  P  hold
+                            (P = portato, ~85% of written value)
 
-Countersubject: D — C Bb | A Bb C D
-Touch:          L  L  L  L | L  L  L  L
-(L = legato: fully connected, no gaps)
+Countersubject (other hand): D — C  Bb | A  Bb  C  D
+Touch:                       L  L  L  L | L   L  L  L
+                            (L = full legato, no gap)
 ```
 
-Playing this correctly requires the two hands to simultaneously maintain different articulation styles — a technique requiring dedicated practice.
+Practice each hand's articulation alone and exaggerated first — make the portato noticeably short and the legato noticeably connected — before combining. Once combined, dial the portato back toward 85% so it reads as "shaped," not "chopped."
 
-### 5.3 Phrase Shaping Without Dynamics: Silence Architecture
+### 5.3 Phrase Shaping Without Dynamics
 
-Since you cannot swell a single note or add an accent through key velocity, phrase shapes are created by:
+You can't swell a single note with finger pressure. Phrase shape instead comes from:
 
-1. **Strategic rests / lifts** at phrase cadences — a slight comma breath before a new phrase
-2. **Progressive articulation tightening** — beginning a phrase with portato, moving toward legato at the climax
-3. **Expression pedal** (swell box only) — the only real dynamic available; use it continuously, not just at marked crescendos
-4. **Registration swells** (terraced dynamics) — engage pistons at structural cadences, never mid-phrase unless specifically required
+1. **A lift at cadences** — a slight breath before the next phrase, not a full stop
+2. **Progressive articulation tightening** — open with portato, tighten toward legato as the phrase climbs to its climax
+3. **Continuous, not stepped, swell pedal movement** on the Swell division — use it throughout a phrase, not just at the marked crescendo
+4. **Registration swells at structural cadences** — piston changes belong at section boundaries, not mid-phrase, unless the score specifically demands it
 
-**The architectural rest:** At the end of a phrase, lift the hands slightly — not to full staccato, but enough to create a punctuation. In reverberant acoustics (1.5–3 seconds RT60), this rest is absorbed by the room and becomes a natural breath. In dry acoustics (< 0.8 seconds), you must reduce rest duration or the music sounds choppy.
+**Matching rest length to the room:** in a reverberant space (1.5–3 second RT60), a brief lift is absorbed and reads as a natural breath. In a dry room (under 0.8 seconds RT60), the same lift sounds like a hard stop — shorten it or the phrase will sound choppy rather than shaped.
 
 ### 5.4 Adapting Touch to Action Type
 
 ```mermaid
 graph LR
     subgraph sub_touch_adaptation ["Touch Adaptation by Action Type"]
-        TR["Tracker Action\n• Half-press possible\n• Pre-sense pallet opening\n• Lightest touch: greatest control\n• Key dip feedback is musical"]
-        EL["Electric Action\n• Binary: fully open or closed\n• Cannot control pipe speech timing\n• Compensation: use registration\n  and articulation instead\n• Faster repeated notes possible"]
-        DIG["Digital / MIDI Organ\n• Instant response, no lag\n• Velocity may be mappable\n• Reverb/sample characteristics\n  differ from real pipe acoustics"]
+        TR["Tracker Action: half-press possible, lightest touch gives most control"]
+        EL["Electric Action: binary on/off, compensate with articulation and registration"]
+        DIG["Digital/MIDI: instant response, may have mappable velocity, sample-based reverb"]
     end
-
-    style TR fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style EL fill:#0F131C,stroke:#38BDF8,stroke-width:2px
-    style DIG fill:#0F131C,stroke:#E9A568,stroke-width:2px
 ```
+
+On tracker action you can feel the pallet begin to open and fine-tune speech timing with fingertip pressure. On electric action that channel is gone — the valve is a switch, not a variable. Compensate by exaggerating articulation slightly and leaning more on registration contrast for expressive effect, since the console itself won't give you that last millimeter of feedback.
 
 ---
 
 ## 6. Practical Voicing and Instrument Maintenance
 
-This section gives you enough knowledge to understand what a voicer is doing, to have intelligent conversations with an organ technician, and to identify common problems on instruments you play.
+This section won't make you a voicer, but it will let you talk intelligently with your organ technician and recognize problems before a performance.
 
 ### 6.1 Flue Pipe Voicing Parameters
 
 ```mermaid
 graph TB
     subgraph sub_voicing_parameters ["Flue Pipe Voicing Parameters and Effects"]
-        TOE["Toe Hole Diameter\n↑ larger = more wind = louder, faster speech\n↓ smaller = softer, more refined"]
-        CUT["Cut-Up Height\n(languid to upper lip distance)\n↑ higher = brighter, more harmonics\n↓ lower = fundamental-rich, darker"]
-        NICK["Languid Nicking\n↑ more nicks = smoother, less chiff\n↓ fewer nicks = more chiff, definition"]
-        EAR["Ears (metal tabs)\n• Adjust to prevent overblowing\n• Stabilize harmonic mode"]
-        TUNE["Tuning Slot\n• Slide up = sharpen\n• Slide down = flatten\n• Quarter-tone at a time maximum"]
-
+        TOE["Toe Hole Diameter: larger = louder, faster speech"]
+        CUT["Cut-Up Height: higher = brighter; lower = darker, fundamental-rich"]
+        NICK["Languid Nicking: more nicks = smoother, less chiff"]
+        EAR["Ears: stabilize harmonic mode, prevent overblowing"]
+        TUNE["Tuning Slot: slide up sharpens, down flattens"]
         TOE --> TONE["Resulting Tone Character"]
         CUT --> TONE
         NICK --> TONE
         EAR --> TONE
         TUNE --> PITCH["Resulting Pitch"]
     end
-
-    style TOE fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style CUT fill:#0F131C,stroke:#6EE7B7,stroke-width:2px
-    style NICK fill:#161D2B,stroke:#38BDF8,stroke-width:2px
-    style EAR fill:#0A0D12,stroke:#E9A568,stroke-width:2px
-    style TUNE fill:#1E2636,stroke:#FACC15,stroke-width:2px
-    style TONE fill:#0F131C,stroke:#6EE7B7,stroke-width:3px
-    style PITCH fill:#0F131C,stroke:#FACC15,stroke-width:3px
 ```
 
-### 6.2 Reed Pipe Voicing and Maintenance
-
-Reed stops require periodic maintenance more than flue pipes. Common problems and their causes:
+### 6.2 Reed Pipe Problems and Fixes
 
 | Symptom | Likely Cause | Remedy |
 |---|---|---|
-| Reed cipher (note sounds without pressing key) | Reed tongue touching shallot | Gently bend tongue tip away from shallot |
-| Reed note sharp or flat | Tuning wire position | Slide wire down (flatten) or up (sharpen) |
-| Reed speaks slowly / sluggish | Reed tongue corroded or dirty | Clean shallot and tongue with soft brush |
-| Reed rattles or buzzes unmusically | Foreign particle on reed tongue | Remove particle; inspect with penlight |
-| Reed overblows to octave | Tongue tip too long or too flat | Voicer adjustment required |
+| Reed cipher (sounds without a key press) | Tongue touching the shallot | Gently bend tongue tip away from the shallot |
+| Reed sharp or flat | Tuning wire position drifted | Slide wire down to flatten, up to sharpen |
+| Reed slow/sluggish to speak | Tongue corroded or dirty | Clean shallot and tongue with a soft brush |
+| Reed rattles or buzzes | Foreign particle on the tongue | Remove with a penlight inspection; don't force it |
+| Reed overblows to the octave | Tongue tip too long or flat | Needs a trained voicer, not a DIY fix |
 
-**Never touch the reed tongue curvature with bare hands.** Skin oils corrode the brass. Use clean cotton gloves or wooden tool handles when inspecting reed tongues.
+**Never touch reed tongue curvature with bare fingers** — skin oils corrode brass over time. Use cotton gloves or a wooden tool if you're inspecting a reed.
 
-### 6.3 Common Cipher Diagnosis (Notes Sounding Without Key Press)
-
-A cipher — a note sounding continuously — has three possible causes:
+### 6.3 Cipher Diagnosis — A Note Sounds Without Being Played
 
 ```
-1. Mechanical cipher: tracker/pallet stuck open
-   Test: Does it stop if you press the key and release slowly? → Mechanical
-   Fix: Locate the pallet, check for warped wood (humidity change common cause)
+1. Mechanical cipher (tracker/pallet stuck open)
+   Test: does it stop if you slowly press and release that key?
+   If yes -> mechanical. Fix: locate the pallet, check for a warped board
+   (common after sudden humidity swings).
 
-2. Electric cipher: solenoid valve stuck engaged
-   Test: Check combination action — did a stop suddenly disappear from a piston?
-   Fix: Identify the specific solenoid; tap the windchest near the sounding pipe
-         (vibration sometimes releases a sticking valve temporarily)
-   Permanent fix: Technician replaces solenoid
+2. Electric cipher (solenoid stuck engaged)
+   Test: did a stop vanish from a combination that used to include it?
+   Fix: tap the windchest near the sounding pipe - vibration sometimes
+   frees a sticking valve temporarily. Permanent fix needs a technician.
 
-3. Wind cipher: pipe overblowing or cross-wind
-   Test: Is it a harmonic of a note being played? → Likely cross-wind
-   Fix: Check toe hole voicing; check slider alignment
+3. Wind cipher (cross-wind or overblowing pipe)
+   Test: is the cipher a harmonic of a note currently being played?
+   If yes -> likely cross-wind. Check toe-hole voicing and slider alignment.
 ```
 
-**Emergency performance protocol:** If a cipher occurs mid-performance, pull the stop drawer for that rank immediately. This cuts wind to the entire rank. Continue playing with that stop silent. Address the mechanical problem in the next break.
+**Mid-performance emergency protocol:** if a cipher starts during a service or recital, pull the stop knob for that entire rank immediately — this silences the whole rank, not just the offending pipe. Keep playing without that stop. Deal with the mechanical cause at intermission, not mid-piece.
 
 ### 6.4 Temperature and Tuning Stability
 
-Pipe pitch rises approximately 1.7 cents per 1°C temperature increase. In a stone church that varies from 8°C (winter morning) to 22°C (summer afternoon), pitch can drift nearly 24 cents — almost a quarter-tone. This is why:
+Pipe pitch rises roughly 1.7 cents per 1°C of temperature increase. A stone church swinging from 8°C on a winter morning to 22°C by afternoon can drift pitch by nearly 24 cents — close to a quarter tone. Practical consequences:
 
-- **Allow the organ to blow wind for 30 minutes before tuning** — pipes must reach thermal equilibrium with the building
-- **Tune reed stops last** — they are most temperature-sensitive
-- **Never tune on a cold morning if the afternoon performance is in a warm room** — the instrument will be sharp by concert time
-- **Mutation stops and mixtures are tuned to the fundamental** — if the 8' ranks drift, all upper work drifts with them proportionally, maintaining blend
+- Run the blower for 30 minutes before tuning so pipes reach thermal equilibrium with the room
+- Tune reed stops last — they are the most temperature-sensitive
+- Never tune cold if the performance will happen in a warm room later — by concert time the whole instrument will sit sharp
+- Mutations and mixtures are tuned relative to the fundamental, not to an absolute pitch standard — if the 8' ranks drift with temperature, the upper work should drift proportionally and stay in blend
 
 ---
 
 ## 7. Practice Methodology and Progressive Drills
 
-### 7.1 The Layered Practice System for Organ
-
-The organ requires a strict layered practice approach because combining three independent limb streams prematurely creates coordination confusion that is very hard to unlearn.
+### 7.1 Layered Practice System
 
 ```mermaid
 graph TD
     subgraph sub_practice_layers ["Organ Practice Layer System"]
-        L1["Layer 1: Pedal alone\nLearn bass line fingering\nAchieve target tempo: ♩=60"]
-        L2["Layer 2: LH alone\nLearn left-hand voice\nArticulation set: ♩=60"]
-        L3["Layer 3: RH alone\nLearn melody/soprano\nPhrase shapes locked in: ♩=60"]
-        L4["Layer 4: LH + Pedal\nCoordinate two layers\n♩=50 → 60 → 70"]
-        L5["Layer 5: RH + LH (no pedal)\nManual coordination\n♩=50 → 70"]
-        L6["Layer 6: All three\nSlow: ♩=40 → target tempo\nRegistration applied last"]
-
+        L1["Layer 1: Pedal alone, target quarter note=60"]
+        L2["Layer 2: LH alone, articulation locked at 60"]
+        L3["Layer 3: RH alone, phrase shape locked at 60"]
+        L4["Layer 4: LH plus Pedal, 50 to 70"]
+        L5["Layer 5: RH plus LH, 50 to 70"]
+        L6["Layer 6: All three together, 40 up to target tempo"]
         L1 --> L4
         L2 --> L4
         L2 --> L5
@@ -643,73 +535,44 @@ graph TD
         L4 --> L6
         L5 --> L6
     end
-
-    style L1 fill:#1E2636,stroke:#E9A568,stroke-width:2px
-    style L2 fill:#1E2636,stroke:#38BDF8,stroke-width:2px
-    style L3 fill:#1E2636,stroke:#6EE7B7,stroke-width:2px
-    style L4 fill:#0F131C,stroke:#E9A568,stroke-width:2px
-    style L5 fill:#0F131C,stroke:#38BDF8,stroke-width:2px
-    style L6 fill:#0A0D12,stroke:#FACC15,stroke-width:3px
 ```
 
-### 7.2 Pedal Technique Progression: 8-Week Curriculum
+Register the piece only at Layer 6, once coordination is secure. Registering too early tempts you to rush technique because the piece "sounds finished."
 
-**Week 1–2: Single-foot toe exercises**
+### 7.2 Pedal Progression — 8-Week Curriculum
 
+**Weeks 1–2, single-foot toe exercises:**
 ```
-Exercise A: Right-toe C major scale (one octave)
-C D E F G A B C
-RT RT RT RT RT RT RT RT  (all right toe, heel lifted)
-♩=40 BPM. Never look down. 10 repetitions per session.
-
-Exercise B: Left-toe C major scale
-Same as above, left foot only.
-♩=40 BPM.
+Right toe, one-octave C major scale, all RT, heel lifted. ♩=40. 10 reps/session.
+Repeat left toe only.
 ```
 
-**Week 3–4: Heel-toe alternation**
-
+**Weeks 3–4, heel-toe alternation:**
 ```
-Exercise C: Right heel-toe ascending
-C  D  E  F  G  A  B  C
-RH RT RH RT RH RT RH RT
-♩=50 → 70 BPM over two weeks
-
-Exercise D: Left heel-toe
-LH LT LH LT LH LT LH LT
-Same pitch sequence, left foot.
+Right heel-toe ascending:  C  D  E  F  G  A  B  C
+                            RH RT RH RT RH RT RH RT    ♩=50 -> 70
+Repeat with left heel-toe.
 ```
 
-**Week 5–6: Two-foot alternation and crossing**
-
+**Weeks 5–6, two-foot alternation and crossing:**
 ```
-Exercise E: Alternating feet, C major
-C  D  E  F  G  A  B  C
-RT LT RT LT RT LT RT LT
-♩=60 → 80 BPM
+Alternating feet:  C  D  E  F  G  A  B  C
+                    RT LT RT LT RT LT RT LT             ♩=60 -> 80
 
-Exercise F: Crossing in bass line (Baroque bass common)
-C  B  A  G  F  E  D  C
-RT LT RT LT  LH RT LT RT
-(noticing the LH on F helps navigate the crossover — common Bach Pedal technique)
-♩=50 → 70 BPM
+Crossing drill (common Bach bass pattern):
+C  B  A  G  F   E  D  C
+RT LT RT LT LH  RT LT RT                                ♩=50 -> 70
 ```
 
-**Week 7–8: Legato pedal with hands**
-
+**Weeks 7–8, legato pedal with hands:**
 ```
-Exercise G: Alberti bass (LH) + pedal root
-LH: C E G E  C E G E  F A C A  G B D B
-Pedal: C — — — C — — — F — — — G — — —
-       RT        RT        LT        RT
-♩=50 → 80 BPM
-
-Add RH melody (simple stepwise) in Week 8.
+LH (Alberti): C E G E  C E G E  F A C A  G B D B
+Pedal:        C --- --- --- C --- --- --- F --- --- --- G --- --- ---
+              RT              RT              LT              RT
+♩=50 -> 80. Add simple stepwise RH melody in week 8.
 ```
 
-### 7.3 Polyphonic Independence Drills
-
-**Four-voice chorale harmonization drill (target: Bach chorale style):**
+### 7.3 Four-Voice Chorale Drill
 
 ```
 Soprano (RH):  C  D  E  F  E  D  C
@@ -717,159 +580,183 @@ Alto (RH):     G  F  G  A  G  F  E
 Tenor (LH):    E  A  C  C  C  A  G
 Bass (Pedal):  C  D  C  F  C  D  C
 
-Registration: 8' Principal (Great), 16' Subbass + 8' Principal (Pedal)
-Articulation: Portato throughout — slight separation between each chord
-♩=52 BPM sustained for comfort, then ♩=63 BPM (comfortable hymn tempo)
+Registration: 8' Principal (Great); 16' Subbass + 8' Principal (Pedal)
+Touch: portato throughout, slight separation between successive chords
+Tempo: ♩=52 to establish, then ♩=63 (comfortable hymn tempo)
 ```
 
-**Key rule for chorale playing:** All four voices move at once; there must be no note-to-note delay between voices within a chord. The chord changes on the beat and the fingers must arrive simultaneously.
+**Key rule:** all four voices change together on the beat. There is no "roll" between voices in a chord — every finger and the pedal foot arrive at the same instant.
 
-### 7.4 Articulation Isolation Drill
-
-This drill trains independent articulation in two voices played by one hand:
+### 7.4 Articulation Isolation Drill (One Hand, Two Voices)
 
 ```
-RH plays two voices:
-  Soprano: C — C — C — C —   (held whole notes, legato)
-  Alto:    E F G F E F G F    (8th notes, staccato)
+Soprano (held): C --- C --- C --- C ---     (legato, sustained)
+Alto (moving):  E  F  G  F  E  F  G  F       (staccato eighths)
 
-Practice until the sustained soprano note does not interrupt when the staccato alto moves.
-♩=60 → 80 → 100 BPM
+Goal: the staccato alto must not disturb the sustained soprano.
+♩=60 -> 80 -> 100
 
-Then switch:
-  Soprano: C D E F G F E D   (legato line)
-  Alto:    G — — —  F — — —   (held pedal point)
+Reversed version:
+Soprano (moving): C  D  E  F  G  F  E  D    (legato line)
+Alto (held):       G --- --- ---  F --- --- ---   (pedal point)
 
-This is the finger-substitution scenario — hold the alto with RH-5 (pinky),
-substitute to RH-4 when thumb needs to move for soprano.
+This is the finger-substitution scenario: hold the alto with finger 5,
+substitute to finger 4 when the thumb needs to move for the soprano line.
 ```
 
-### 7.5 Registration Change Drill (Piston Coordination)
+### 7.5 Registration Change (Piston) Drill
 
 ```
-Setup:
 P1 = Soft (8' Flute alone)
 P2 = Medium (8' + 4' Principal)
 P3 = Full (Principals + Mixture + Trumpet)
 
-Exercise: 4-bar phrases, change registration on beat 4 of bar 4 (last beat before new phrase)
-Bar 1–4:   Play phrase on P1 registration
-Beat 4 of bar 4: Depress P2 piston with RH thumb (while LH holds the last chord + pedal continues)
-Bar 5–8:   New phrase begins on P2 immediately
-Beat 4 of bar 8: Depress P3 piston
-Bar 9–12:  Climax phrase on full registration
+Bars 1-4:   play on P1
+Beat 4, bar 4: thumb depresses P2 while other hand still holds last chord, pedal continues
+Bars 5-8:   new phrase begins immediately on P2
+Beat 4, bar 8: depress P3
+Bars 9-12:  climax on full registration
 
-This is the standard performance piston technique. The goal: zero audible gap between registration change and new phrase.
-♩=60 target. Practice 20× until piston timing is automatic.
+Goal: zero audible gap between the piston press and the new phrase.
+♩=60. Repeat 20x until the timing is automatic, not deliberate.
 ```
 
 ---
 
 ## 8. Representative Repertoire and Style Analysis
 
-### 8.1 Baroque Repertoire: German North and South
+### 8.1 German Baroque
 
 **J.S. Bach — Prelude and Fugue in D major, BWV 532**
-
-Performance considerations:
-- North German Werkprinzip registration: Great (Hauptwerk) full principal chorus 8'+4'+2'+Mixture, no reeds for the Fugue
-- Prelude: heroic opening benefits from Trumpet 8' on Great; remove for the sustained middle section
-- Fugue: clean principal chorus without reeds preserves contrapuntal clarity; individual voices must be clearly audible at ♩=76–84
-- Pedal: the pedal entries are as structurally important as manual voices — balance pedal so it speaks clearly but doesn't overwhelm the manual texture
-- Articulation: portato default throughout; subject entries slightly more detached for clarity
+- Great: full principal chorus 8'+4'+2'+Mixture, no reeds, for the Fugue
+- Prelude's heroic opening can take Great 8' Trumpet; remove it for the sustained middle section
+- Fugue clarity depends on a clean principal chorus — reeds blur inner-voice entries at ♩=76–84
+- Pedal entries carry as much structural weight as manual voices; balance so the pedal is clear without swamping the texture
+- Portato default throughout; make subject entries slightly more detached than surrounding material for audibility
 
 **Dieterich Buxtehude — Praeludium in E minor, BuxWV 142**
+- Exploits the Rückpositiv for antiphonal dialogue with the Hauptwerk
+- Toccata sections: full chorus, manuals coupled or alternating antiphonally
+- Contrapuntal sections: reduce to 8'+4' principal for transparency
+- Frequent manual changes mid-phrase are characteristic — mark every change in the score during preparation, don't improvise them in performance
 
-- Exploits Rückpositiv (rear Positiv): antiphonal registration between Hauptwerk and Positiv
-- Toccata sections: full principal chorus, both manuals coupled or antiphonal
-- Contrapuntal sections: reduce to 8' + 4' principal for transparency
-- Characteristic North German feature: frequent manual changes within a single phrase — plan these in advance and mark in the score
-
-### 8.2 French Classical Repertoire (Grand Siècle)
+### 8.2 French Classical (Grand Siècle)
 
 **François Couperin — Messe pour les Couvents (1690)**
-
-- Requires specific French Classical stop combinations, written out in historical treatises (Nivers, Raison, Boyvin)
-- Plein Jeu: Foundations 16'+8'+4'+2' Principals + Fourniture + Cymbale (French mixture, top-pitched)
-- Grand Jeu: Trompette + Clairon (4' Trumpet) + Cornet V + Tierce + Nazard
-- Tierce en Taille: Cornet in tenor register of LH, while RH plays treble melody
+- Specific registrations drawn from French treatises (Nivers, Raison, Boyvin)
+- Plein Jeu: Principals 16'+8'+4'+2' + Fourniture + Cymbale
+- Grand Jeu: Trompette + Clairon 4' + Cornet V + Tierce + Nazard
+- Tierce en Taille: Cornet combination in the tenor register, LH plays the solo melody there while RH accompanies
 
 ```
-Tierce en Taille registration (Récit/Positif):
+Tierce en Taille setup:
 8' Flûte + 4' Flûte + 2⅔' Nazard + 2' Doublette + 1⅗' Tierce
-LH plays the solo melody in tenor (C3–B3 range)
-RH accompanies on Grand-Orgue with Plein Jeu
+LH: solo melody in tenor range (C3-B3)
+RH: Grand-Orgue with Plein Jeu accompaniment
 Pedal: 16' Flûte or Bourdon, soft foundation only
 ```
 
-### 8.3 French Romantic/Symphonic Repertoire
+### 8.3 French Romantic/Symphonic
 
 **Charles-Marie Widor — Symphony No. 5, Toccata (F minor)**
+- Written for a Cavaillé-Coll-type instrument or equivalent
+- Target tempo ♩=138–152 — faster than many recordings suggest
+- Full organ throughout the climax; Récit carries 8' Flûte Harmonique + Voix Humana (with tremulant) in the quieter middle theme
+- Relentless pedal-point C alternating with bass motion requires secure heel-toe and both-feet crossing patterns
+- **Main technical hurdle:** the LH broken-chord pattern must stay even at full tempo. Isolate LH alone: ♩=80 → 100 → 120 → 138 before adding anything else.
 
-- Must be played on a large French symphonic organ (Cavaillé-Coll type) or equivalent
-- Tempo: ♩= 138–152 (Widor reportedly played it fast — not the funereal tempos of some recordings)
-- Registration: Full organ engaged throughout the climax sections; the Récit (Swell) has a critical accompanying role with 8' Flûte Harmonique + Voix Humana (with tremulant) in the quieter middle theme
-- Pedal technique: relentless pedal-point C, alternating with bass line motion — requires secure heel-toe and both-feet patterns
-- **Main technical challenge:** The LH broken-chord patterns must be absolutely even at speed (♩=138) — isolate and drill LH alone at ♩=80 → 100 → 120 → 138 before combining
+**Louis Vierne — Pièces de Fantaisie, Clair de Lune, Op. 53 No. 5**
+- Demands fine continuous swell-pedal control
+- Registration: Swell nearly closed, 8' Viole de Gambe + Voix Céleste + 8' Flûte Harmonique
+- Move the swell pedal in continuous small increments matching the melodic phrase, never in discrete steps
+- Pedal: extremely soft 16' Bourdon only, essentially a harmonic shadow
 
-**Louis Vierne — Pièces de Fantaisie, Clair de Lune (Op. 53 No. 5)**
-
-- Requires maximum expression pedal control and sensitivity
-- Registration: Swell box nearly closed, 8' Viole de Gambe + Voix Céleste (undulating) + 8' Flûte Harmonique
-- The swell pedal must move in continuous small increments — not stepped changes — matching the ebb and flow of the melodic phrase
-- Pedal: extremely soft 16' Bourdon only — barely audible, purely harmonic bass
-
-### 8.4 20th-Century Repertoire
+### 8.4 20th Century
 
 **Olivier Messiaen — La Nativité du Seigneur: Le Verbe (1935)**
-
-- Requires a large 3–4 manual organ with comprehensive resources
-- Registrations are specifically notated by Messiaen and must be followed closely
-- Characteristic timbres: Voix Humana with tremulant, solo Hautbois, full Plein Jeu
-- Rhythmic complexity: added values and non-retrogradable rhythms require precise internalization — subdivide in practice at ♩=52, work up to ♩=72–80
+- Needs a large 3–4 manual instrument with full resources
+- Registrations are specifically notated by Messiaen — follow them, don't substitute by ear
+- Characteristic colors: Voix Humana with tremulant, solo Hautbois, full Plein Jeu
+- Added-value rhythms and non-retrogradable patterns need deliberate subdivision in slow practice (♩=52) before pushing to performance tempo (♩=72–80)
 
 **Marcel Dupré — Prélude and Fugue in G minor, Op. 7**
+- Opens with full principal chorus plus Great reeds from the very first note — theatrical, unambiguous registration
+- Double pedal passages (each foot playing an independent voice) require each foot's heel-toe technique to be fully secure alone before combining
 
-- Opening requires full principal chorus with great-work reeds from the first note — Dupré's registration is theatrical and unambiguous
-- Double pedal passages (both feet playing independent voices simultaneously): these require that each foot's heel-toe technique is completely secure independently before attempting together
-- Double pedal drill:
 ```
-  RH: Sustained harmony (simple chords)
-  LH: Rest or simple melody
-  Pedal: Two independent voices
-  — Right foot: soprano bass line
-  — Left foot: bass root motion (whole notes)
-  ♩=40 → 52 → 60 BPM
+Double pedal drill:
+RH: sustained simple harmony
+LH: rest, or simple melody
+Pedal: two independent voices
+  - right foot: upper pedal line
+  - left foot: bass root motion, whole notes
+♩=40 -> 52 -> 60
 ```
 
 ---
 
-## Quick Reference: Organ Console Checklist Before Playing
+## 9. Troubleshooting at the Console: A Field Guide
+
+Fast diagnosis under performance pressure, organized by symptom.
 
 ```
-□ Check bench height: thighs horizontal, feet reaching pedals with ankle flexibility
-□ Confirm memory level is correct for the repertoire
-□ Check expression pedals: Swell box closed for soft start
-□ Test combination pistons P1–P5 to confirm programming
-□ Verify coupler status: unintended couplers engaged from previous player
-□ Blow wind for 10 minutes before playing if organ has been off
-□ Check for any ciphers (notes sounding without key press) — pull offending stop immediately if found
-□ Set initial registration on each manual before sitting down
-□ Adjust music rack height so score is readable without tilting head
-□ Release all stops to closed position, then set opening registration fresh
+SYMPTOM: Note sustains after releasing the key
+  -> Cipher. Pull that stop's knob immediately. Diagnose per Section 6.3 later.
+
+SYMPTOM: Pitch sounds "wrong" only on one note across every stop
+  -> Single pipe out of tune, not a system fault. Flag for the technician;
+     avoid exposed solo passages on that note if possible, otherwise continue.
+
+SYMPTOM: Pedal is unexpectedly loud/full relative to what you registered
+  -> Check for chain-coupling (Section 2.3) - likely Swell/Great + Great/Pedal
+     both engaged, routing Swell into the Pedal unintentionally.
+
+SYMPTOM: A stop you set on a piston isn't sounding
+  -> Check coupler status first - the stop may be drawn on a division
+     that isn't currently coupled to the manual you're playing.
+
+SYMPTOM: Slight pitch wavering only during loud, fast passages
+  -> Wind supply demand spike (Section 1.3), not a tuning problem.
+     Reduce registration density if it's objectionable; otherwise ignore.
+
+SYMPTOM: Legato lines sound muddy in a reverberant room
+  -> You are likely playing true legato where portato is stylistically
+     correct (Section 5.1). Add slight separation, especially in Baroque
+     polyphony.
+
+SYMPTOM: Instrument feels "sharp" or "flat" compared to rehearsal
+  -> Temperature drift since the last tuning (Section 6.4). Nothing to fix
+     mid-performance; note it for the next tuning session.
+```
+
+---
+
+## Quick Reference: Console Checklist Before Playing
+
+```
+[ ] Bench height: thighs horizontal, feet reach pedals with ankle flexibility
+[ ] Confirm correct memory level for the repertoire
+[ ] Swell box closed for a soft opening, if that's the intended start
+[ ] Test pistons P1-P5 to confirm programming matches your plan
+[ ] Check for stray couplers left engaged by the previous player
+[ ] Blow wind 10 minutes before playing if the organ has been off
+[ ] Listen for ciphers before starting; pull the offending stop if found
+[ ] Set the opening registration on each manual before sitting down
+[ ] Adjust music rack height so the score is readable without tilting the head
+[ ] Cancel all stops, then set your opening registration fresh (don't trust leftovers)
 ```
 
 ## Quick Reference: Stop Footage and Pitch Relationships
 
 ```
-Footage   Pitch Relationship         Example Stop Names
-  32'     Two octaves below 8'       Sub-Principal, Contra Bourdon, Resultant (acoustic)
-  16'     One octave below 8'        Principal, Sub-Bass, Bourdon, Contra Fagotto
-   8'     Unison (written pitch)     Principal, Open Diapason, Gedackt, Trompette, Oboe
-   4'     One octave above           Octave, Flute 4', Fifteenth, Clairon
- 2⅔'     Twelfth (octave + fifth)   Nazard, Twelfth — ALWAYS use with 8' + 4'
-   2'     Two octaves above          Super Octave, Block Flute, Fifteenth
- 1⅗'     Seventeenth (2 oct + 3rd)  Tierce — ALWAYS use with 8' + 4' + 2⅔' + 2'
- 1⅓'     Nineteenth                 Larigot — use sparingly, adds shimmer
-   1'     Three octaves above        Sifflöte, Mixture component
-Mixture   Multiple simultaneous      Mixture, Fourniture, Cymbale, Scharf, Zimbel
+Footage   Pitch Relationship          Example Stops
+  32'     Two octaves below 8'        Sub-Principal, Contra Bourdon, Resultant
+  16'     One octave below 8'         Principal, Sub-Bass, Bourdon, Contra Fagotto
+   8'     Unison (written pitch)      Principal, Open Diapason, Gedackt, Trompette, Oboe
+   4'     One octave above            Octave, Flute 4', Fifteenth, Clairon
+ 2⅔'      Twelfth                     Nazard, Twelfth - always with 8'+4'
+   2'     Two octaves above           Super Octave, Block Flute, Fifteenth
+ 1⅗'      Seventeenth                 Tierce - always with 8'+4'+2⅔'+2'
+ 1⅓'      Nineteenth                  Larigot - use sparingly
+   1'     Three octaves above         Sifflöte, Mixture component
+Mixture   Multiple ranks at once      Mixture, Fourniture, Cymbale, Scharf, Zimbel
