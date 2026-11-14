@@ -72,6 +72,20 @@ def get_latest_log_lines(n=8):
     except Exception as e:
         return [f"(Log read error: {type(e).__name__})"]
 
+def get_engine_info():
+    """Dynamically extracts active model and concurrency details from the engine logs."""
+    if not LOG_FILE.exists():
+        return "Anthropic Claude [claude-sonnet-5] (Sequential Cloud Stream)"
+    try:
+        content = LOG_FILE.read_text(encoding="utf-8", errors="replace")
+        engine_matches = re.findall(r"\[\*\] Engine: ([^\n\r]+)", content)
+        if engine_matches:
+            engine_str = engine_matches[-1].split("via")[0].strip()
+            return f"{engine_str} (Sequential Cloud Stream)"
+    except Exception:
+        pass
+    return "Anthropic Claude [claude-sonnet-5] (Sequential Cloud Stream)"
+
 def render():
     procs = get_process_status()
     curr, total, topic_from_log = get_batch_progress()
@@ -90,7 +104,8 @@ def render():
 
     if procs:
         pid = procs[0].split()[0]
-        output.append(f" Engine Status:  🟢 ACTIVE (PID: {pid}) - 3 Parallel Claude Opus Workers")
+        engine_info = get_engine_info()
+        output.append(f" Engine Status:  🟢 ACTIVE (PID: {pid}) — {engine_info}")
     else:
         output.append(" Engine Status:  🏁 COMPLETE / IDLE")
 
