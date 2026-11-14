@@ -238,9 +238,9 @@ def generate_topic_parallel(
                 print(f"          [✘] [{host_label:9s}] Failed {mod_item['filename']}: {e}", flush=True)
                 return mod_item["filename"], False, None, mod_item, host_label, w_host, time.time() - t0, str(e)
 
-        # Phase 1: Concurrently draft all modules without cross-node lock contention
+        # Phase 1: Draft modules (sequential for cloud proxies to avoid rate limits, or parallel across local cluster nodes)
         is_cloud = any("anthropic" in w[0].lower() or "gemini" in w[0].lower() for w in workers)
-        pool_size = min(3, len(tasks_to_run)) if is_cloud else min(len(workers), len(tasks_to_run))
+        pool_size = 1 if is_cloud else min(len(workers), len(tasks_to_run))
         with ThreadPoolExecutor(max_workers=pool_size) as executor:
             future_to_mod = {executor.submit(run_draft_job, job): job[0]["filename"] for job in jobs}
             for fut in as_completed(future_to_mod):

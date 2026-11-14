@@ -76,8 +76,8 @@ Output the full, enhanced, publication-ready raw Markdown document directly (do 
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def enhance_existing_topic(domain: str, subtopic_id: str, subtopic_dir: Path, provider: LLMProvider, max_workers: int = 2):
-    """Enhances markdown files in a topic concurrently using a thread pool."""
+def enhance_existing_topic(domain: str, subtopic_id: str, subtopic_dir: Path, provider: LLMProvider, max_workers: int = 1):
+    """Enhances markdown files in a topic sequentially or concurrently."""
     md_files = sorted(list(subtopic_dir.glob("*.md")))
     if not md_files:
         return False

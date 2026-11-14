@@ -48,6 +48,7 @@ def git_worker():
     while True:
         task = GIT_QUEUE.get()
         if task is None:
+            GIT_QUEUE.task_done()
             break
         subtopic_dir, subtopic_id, prefix = task
         published = False
