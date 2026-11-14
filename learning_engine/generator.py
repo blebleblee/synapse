@@ -362,7 +362,8 @@ def generate_subtopic_content(
     subtopic_dir = validate_canonical_topic_path(subtopic_dir)
     workers = None
     if provider:
-        workers = [("custom", "override", provider)]
+        p_model = getattr(provider, "model", "custom")
+        workers = [(p_model, p_model, provider)]
     return generate_topic_parallel(
         domain=domain,
         category=category,
