@@ -1,21 +1,23 @@
 /**
  * Socratic Audio / Voice Synthesis Helper
- * Utilizes native browser Web Speech API (speechSynthesis) for zero-latency, private TTS.
+ * Streams studio-grade Neural Audio (MP3) from the Synapse backend (/api/audio/narrate)
+ * with automatic fallback to native Web Speech API (speechSynthesis) if offline.
  */
 
+let activeAudio: HTMLAudioElement | null = null;
+let activeAudioUrl: string | null = null;
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 
-export const speakText = (
+function fallbackWebSpeech(
   text: string,
   onStart?: () => void,
   onEnd?: () => void
-) => {
-  if (!('speechSynthesis' in window)) {
-    console.warn('Web Speech API is not supported in this browser.');
+) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    if (onEnd) onEnd();
     return;
   }
 
-  // Cancel any ongoing speech
   window.speechSynthesis.cancel();
 
   // Strip markdown formatting, code blocks, and math for natural speech
@@ -29,13 +31,15 @@ export const speakText = (
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .trim();
 
-  if (!clean) return;
+  if (!clean) {
+    if (onEnd) onEnd();
+    return;
+  }
 
   const utterance = new SpeechSynthesisUtterance(clean);
-  utterance.rate = 1.02;
-  utterance.pitch = 1.0;
+  utterance.rate = 1.0;
+  utterance.pitch = 0.95;
 
-  // Pick preferred natural voice if available
   const voices = window.speechSynthesis.getVoices();
   const preferredVoice = voices.find(
     (v) =>
@@ -66,15 +70,85 @@ export const speakText = (
 
   activeUtterance = utterance;
   window.speechSynthesis.speak(utterance);
+}
+
+export const speakText = async (
+  text: string,
+  onStart?: () => void,
+  onEnd?: () => void
+) => {
+  stopSpeaking();
+
+  const preferredVoice = typeof window !== 'undefined'
+    ? localStorage.getItem('synapse_narrator_voice') || 'en-US-GuyNeural'
+    : 'en-US-GuyNeural';
+
+  try {
+    const response = await fetch('/api/audio/narrate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        voice: preferredVoice,
+        pitch: '-10Hz',
+        rate: '-4%'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Neural audio endpoint returned status ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    if (blob.size < 500) {
+      throw new Error('Received invalid audio response');
+    }
+
+    const audioUrl = URL.createObjectURL(blob);
+    activeAudioUrl = audioUrl;
+    const audio = new Audio(audioUrl);
+    activeAudio = audio;
+
+    audio.onplay = () => {
+      if (onStart) onStart();
+    };
+
+    audio.onended = () => {
+      stopSpeaking();
+      if (onEnd) onEnd();
+    };
+
+    audio.onerror = (e) => {
+      console.warn('[Audio] Streaming error, falling back to browser synthesis:', e);
+      stopSpeaking();
+      fallbackWebSpeech(text, onStart, onEnd);
+    };
+
+    await audio.play();
+  } catch (err) {
+    console.warn('[Audio] Backend neural speech unavailable, falling back:', err);
+    fallbackWebSpeech(text, onStart, onEnd);
+  }
 };
 
 export const stopSpeaking = () => {
-  if ('speechSynthesis' in window) {
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.currentTime = 0;
+    activeAudio = null;
+  }
+  if (activeAudioUrl) {
+    URL.revokeObjectURL(activeAudioUrl);
+    activeAudioUrl = null;
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
   activeUtterance = null;
 };
 
 export const isSpeaking = () => {
-  return 'speechSynthesis' in window && (window.speechSynthesis.speaking || activeUtterance !== null);
+  const isAudioPlaying = activeAudio !== null && !activeAudio.paused && !activeAudio.ended;
+  const isSynthSpeaking = typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
+  return Boolean(isAudioPlaying || isSynthSpeaking || activeUtterance !== null);
 };

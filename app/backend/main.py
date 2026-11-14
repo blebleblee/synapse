@@ -614,6 +614,74 @@ Text to translate:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# -----------------------------------------------------------------------------
+# Neural Audio Narration (Edge-TTS with Guy Baritone Voice & MP3 Disk Cache)
+# -----------------------------------------------------------------------------
+import hashlib
+
+AUDIO_CACHE_DIR = WORKSPACE_ROOT / "data" / "audio_cache"
+AUDIO_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+class AudioNarrateRequest(BaseModel):
+    text: str
+    voice: Optional[str] = "en-US-GuyNeural"
+    pitch: Optional[str] = "-10Hz"
+    rate: Optional[str] = "-4%"
+
+@app.post("/api/audio/narrate")
+async def api_audio_narrate(req: AudioNarrateRequest):
+    """
+    Synthesizes markdown lesson text into studio-grade neural audio (MP3).
+    Caches audio to disk so repeated listens are instant with 0ms latency.
+    """
+    raw_text = req.text.strip()
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Text is empty.")
+
+    # Clean markdown for natural, human speech:
+    clean = re.sub(r"```[\s\S]*?```", " Code snippet omitted. ", raw_text)
+    clean = re.sub(r"`([^`]+)`", r"\1", clean)
+    clean = re.sub(r"\$\$[\s\S]*?\$\$", " Mathematical formulation omitted. ", clean)
+    clean = re.sub(r"\$([^$]+)\$", r"\1", clean)
+    clean = re.sub(r"^#+\s*", "", clean, flags=re.MULTILINE)
+    clean = re.sub(r"\*{1,3}([^*]+)\*{1,3}", r"\1", clean)
+    clean = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", clean)
+    clean = re.sub(r"<!--[\s\S]*?-->", "", clean)
+    clean = re.sub(r"\s+", " ", clean).strip()
+
+    if not clean:
+        raise HTTPException(status_code=400, detail="No readable text after markdown stripping.")
+
+    # Unique cache key based on content, voice, pitch, rate
+    cache_str = f"{clean}:{req.voice}:{req.pitch}:{req.rate}"
+    cache_hash = hashlib.sha256(cache_str.encode("utf-8")).hexdigest()
+    cache_file = AUDIO_CACHE_DIR / f"{cache_hash}.mp3"
+
+    if cache_file.exists() and cache_file.stat().st_size > 1000:
+        return FileResponse(
+            str(cache_file),
+            media_type="audio/mpeg",
+            headers={"X-Audio-Cache": "HIT"}
+        )
+
+    try:
+        import edge_tts
+        communicate = edge_tts.Communicate(
+            text=clean,
+            voice=req.voice or "en-US-GuyNeural",
+            pitch=req.pitch or "-10Hz",
+            rate=req.rate or "-4%"
+        )
+        await communicate.save(str(cache_file))
+        return FileResponse(
+            str(cache_file),
+            media_type="audio/mpeg",
+            headers={"X-Audio-Cache": "MISS"}
+        )
+    except Exception as e:
+        print(f"[!] Neural TTS generation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Neural speech synthesis error: {e}")
+
 @app.get("/api/topic")
 def get_topic_details(
     query: str = Query(..., description="Subtopic query e.g. 'ebpf'"),
