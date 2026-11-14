@@ -1,1106 +1,453 @@
-# Lesson 1: Guitar Fundamentals — Physics, Architecture, and Performance Engineering
+# Guitar Masterclass: Fretboard Mechanics, Right/Left Hand Technique, and Performance Engineering
 
-## 1. First-Principles Physics: Vibrating Strings and Harmonic Series
+## 1. How the Guitar Makes Sound (Just Enough Physics to Use It)
 
-The guitar transforms mechanical energy into acoustic waves through tension, mass, and geometry. Understanding this starts with the physics of vibrating strings and the harmonic series that defines musical intervals.
+A plucked string vibrates at a fundamental frequency set by length, tension, and mass, plus a stack of harmonics above it (2×, 3×, 4× the fundamental). Fretting shortens the string, which raises pitch. The 12th fret is the exact halfway point of the scale length — pressing there produces the octave. This is the one piece of physics you need to internalize, because it governs intonation, fret spacing, and why plucking position changes tone. Everything else in this section is applied, not derived.
 
-### String Vibration Fundamentals
+**Plucking position controls timbre by filtering harmonics.** Where you pick suppresses whichever harmonic has a node at that point. You don't need the math — you need the ear and hand result:
 
-When you pluck a string, it vibrates in a standing wave pattern. The frequency depends on three physical parameters:
+- **Near the bridge** (ponticello): bright, nasal, cutting. Flamenco rasgueado, metal palm-mute zone.
+- **Over the soundhole/pickup**: balanced, the "default" tone.
+- **Near the neck** (tasto): warm, flutey, fewer highs. Jazz and lyrical passages.
+- **Directly over the 12th fret**: hollow, woody — kills the octave harmonic.
 
-\[ f = \frac{1}{2L} \sqrt{\frac{T}{\mu}} \]
+**Drill (2 minutes):** Pick the open low E repeatedly, sliding your picking hand slowly from the bridge to over the 12th fret and back. Keep dynamics constant. Listen only to brightness changing. This is the move you'll make mid-phrase on records to add or remove edge from a note — do it consciously once, then it becomes an instinctive color choice.
 
-where \( L \) is the vibrating length, \( T \) is tension (typically 60–90 N per string on acoustic guitars), and \( \mu \) is mass per unit length. This relationship explains why:
+**Why intonation adjustments exist:** fretting a string stretches it slightly, sharpening the pitch a few cents. Saddle compensation (moving the saddle a millimeter or two back from the theoretical scale length) corrects this per string. You'll use this directly in Section 6.
 
-- **Thicker strings sound lower**: Higher \( \mu \) decreases frequency
-- **Tighter strings sound higher**: Greater \( T \) increases frequency  
-- **Shorter strings sound higher**: Reduced \( L \) increases frequency (what happens when you fret)
+---
 
-The string vibrates not just at the fundamental frequency \( f_1 \), but simultaneously at integer multiples \( 2f_1, 3f_1, 4f_1, \ldots \) called harmonics. This harmonic series is why musical intervals work: the octave (2:1 ratio), perfect fifth (3:2), and perfect fourth (4:3) correspond to low-integer ratios naturally present in the overtone structure.
+## 2. Instrument Setup Baseline (Do This Before Anything Else)
 
-**Practical implication**: When you play the 12th fret, you halve the string length, doubling the frequency and producing an octave. The 5th fret gives a 3:2 ratio (perfect fourth above the open string when accounting for guitar tuning intervals). The 7th fret gives 4:3 (perfect fifth). These physical facts underlie all fretboard interval patterns.
+You cannot build clean technique on a guitar that fights you. Spend 20 minutes on this checklist before starting any practice plan below.
 
-### Fret Placement Mathematics
+### 2.1 Action measurement and targets
 
-Western music divides the octave into 12 equal semitones, each representing a frequency ratio of \( 2^{1/12} \approx 1.05946 \). The distance from the nut to the \( n \)-th fret is:
+Measure string height at the 12th fret, string to top of fret, with a precision ruler or feeler gauge.
 
-\[ d_n = L_0 \left(1 - \frac{1}{2^{n/12}}\right) \]
+| Action | High E | Low E | Use case |
+|---|---|---|---|
+| Low | 1.5 mm | 2.0 mm | Shred, fast legato, light touch |
+| Medium | 2.0 mm | 2.5 mm | All-around, most players start here |
+| High | 2.5 mm | 3.5 mm | Slide, heavy strumming, bluegrass flatpicking |
 
-where \( L_0 \) is scale length (25.5" on Fender Stratocasters, 24.75" on Gibson Les Pauls). This logarithmic spacing compresses as you move up the neck:
+**Adjustment, electric (bridge saddle screws):** turn clockwise to lower, counter-clockwise to raise, in quarter-turn increments per saddle. Recheck after every adjustment — don't stack more than two turns before measuring.
 
-- 1st fret: ~1.43" from nut (on 25.5" scale)
-- 12th fret: exactly 12.75" from nut (half the scale length)
-- 24th fret: 19.125" from nut (three-quarters of scale length)
+**Adjustment, acoustic (bridge saddle):** action change here means removing the saddle and sanding its base flat and even. Removing 0.3 mm of material from the bottom lowers 12th-fret action by roughly 0.3 mm (1:1, unlike the nut). Sand on 220-grit paper on a flat surface, check level with a straightedge across the saddle top, test-fit frequently. This is irreversible in one direction — work in small passes.
 
-**Critical setup insight**: The 12th fret must sit at exactly \( L_0/2 \), or intonation across the entire neck will be compromised. This is why bridge saddles are individually adjustable—compensating for the slight pitch sharpening that occurs when you press strings down.
+### 2.2 Neck relief (truss rod)
 
-### Timbre Control Through Plucking Position
+Relief is the slight forward bow that keeps strings from buzzing against the fretboard under pick attack in the lower-middle frets.
 
-Where you pluck dramatically affects tone. Plucking at position \( x_p \) from the bridge suppresses harmonics where \( x_p \) coincides with a node. Specifically, harmonic \( n \) is suppressed when \( x_p = L/n \).
+**Check:** Capo the 1st fret. Fret the high E at the 15th fret with your other hand. Look at the gap between the string and the 7th fret.
 
-**Practical application**:
-- **Bridge position** (classical: ponticello): Excites many high harmonics. Bright, nasal, aggressive tone. Used in flamenco for percussive rasgueados.
-- **Over the sound hole** (classical: natural): Balanced harmonic content. Standard classical and fingerstyle position.
-- **Neck position** (classical: tasto): Suppresses high harmonics. Warm, mellow, flute-like tone. Used for lyrical passages.
-- **Exactly at 12th fret**: Suppresses the 2nd harmonic (octave). Creates a hollow, woody tone used in jazz and some classical passages.
+- Target gap: 0.25–0.38 mm (a business card is about 0.3 mm — use one as a quick field gauge).
+- Gap too big → neck is too bowed → tighten truss rod (clockwise) 1/4 turn.
+- Gap near zero or string touches fret → neck too straight/back-bowed → loosen (counter-clockwise) 1/4 turn.
 
-Try this drill: Play an open G string (3rd string) while moving your plucking position from bridge to 12th fret. Notice the tonal transformation from bright to dark. This is pure physics—you're filtering the harmonic series through geometry.
+**Rules:** detune strings slightly before adjusting, move in 1/4-turn steps only, wait 15–30 minutes for the wood/metal to settle before rechecking, never force a stuck nut — stop and see a tech.
 
-## 2. Guitar Architecture and Body Acoustics
+### 2.3 Intonation
 
-### The Soundboard as an Acoustic Transducer
+**Check:** tune the open string accurately. Play the 12th-fret harmonic (touch lightly over the fret wire, pluck, lift finger). Compare to the fretted 12th-fret note on a tuner.
 
-The string alone produces almost no audible sound because its cross-section is too small to move significant air. The bridge mechanically couples string vibration to the soundboard (top plate), which has ~1000× greater surface area. The soundboard's motion becomes the acoustic source.
+- Fretted note sharp vs. harmonic → saddle too far forward → move it back, away from the neck (lengthen the string).
+- Fretted note flat → move saddle forward, toward the neck (shorten the string).
 
-The soundboard is a thin wooden plate (2.5–3.5 mm spruce) supported by braces. This structure resonates at multiple frequencies:
+Wound strings (low E, A, D, usually G) need more backward compensation than plain strings because they sharpen more when fretted — expect 2.5–3.5 mm of saddle offset versus 2.0 mm on the plain high E and B.
 
-**Helmholtz resonance** (80–120 Hz): Air pumps in and out of the sound hole like blowing across a bottle. This is the fundamental body resonance. To feel it, cup your hand over the sound hole while playing a low E. The air pulse is tangible.
+### 2.4 Buzz diagnostic table
 
-**Top plate modes** (200–500 Hz): The soundboard flexes in complex patterns with nodal lines (stationary regions) and antinodal regions (maximum motion). When a string frequency matches a plate resonance, that note blooms with enhanced volume and sustain.
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Buzzes on open strings only | Nut slots cut too low | Shim or replace nut |
+| Buzzes frets 1–5 | Not enough relief | Loosen truss rod 1/4 turn |
+| Buzzes frets 7–12 specifically | Flat/high spot in neck or a raised fret | Check relief first, then suspect frets needing level |
+| Buzzes above 12th fret only | Too much relief or neck heel angle | Tighten truss rod; if unresolved, see a tech about neck angle/fret level |
 
-**Cross-grain modes** (500–800 Hz): Higher-order vibrations that color midrange response.
+Do this setup pass monthly if you practice daily, or any time string gauge changes — different tension reshapes the neck.
 
-**Practical implications**:
-- **Dead spots**: Notes that sound choked or weak occur when string frequency falls on an anti-resonance (destructive interference between modes). On most dreadnoughts, F#2 (low E, 2nd fret) often exhibits this.
-- **Wolf tones**: Excessively strong resonances that cause pitch instability. The note "growls" as the body resonance fights the string frequency. More common in cellos, but large-body guitars occasionally exhibit this around 100–110 Hz.
+---
 
-### Body Shape and Tonal Architecture
+## 3. Left-Hand Mechanics: Posture, Force, and the Fretboard Map
 
-Different body geometries produce distinct acoustic signatures:
+### 3.1 Hand posture (get this right before any speed work)
 
-| Body Style | Air Volume | Helmholtz Freq | Bass Response | Midrange | Treble | Typical Use |
-|------------|------------|----------------|---------------|----------|--------|-------------|
-| **Dreadnought** | ~13–14 L | 85–100 Hz | Very strong | Scooped | Bright | Bluegrass, flatpicking, strumming |
-| **OM/Auditorium** | ~11–12 L | 100–110 Hz | Balanced | Clear | Articulate | Fingerstyle, light strumming |
-| **Parlor** | ~8–9 L | 110–130 Hz | Focused | Strong | Present | Blues, folk, recording |
-| **Jumbo** | ~15–16 L | 80–95 Hz | Deep | Full | Warm | Singer-songwriter, big chords |
-| **Classical** | ~12–13 L | 90–110 Hz | Warm | Mellow | Soft | Classical, nylon strings |
+- **Thumb:** resting on the back of the neck, roughly opposite your middle finger, not wrapped over the top (except for intentional muting/bass-note grabs, covered below). The thumb is a brace, not a clamp — squeezing harder doesn't help your fretting finger, it just tires your forearm.
+- **Wrist:** straight, not cocked back sharply. A broken wrist angle under repetitive fretting is the single biggest cause of tendon strain in self-taught players.
+- **Fingers:** curved, approaching the string close to perpendicular, contacting with the fingertip, not the pad. Fingertip contact gives a smaller, more precise pressure point and keeps adjacent strings from being muted by accident.
+- **Fret placement:** press just behind the fret wire (1–2 mm toward the headstock from it), not in the middle of the fret space. Right behind the fret, the string needs the least force to stop a clean buzz-free note — you're using the fret itself as the stopping edge.
 
-**Choosing for your playing style**:
-- **Heavy strummer, flat pick, bluegrass**: Dreadnought. The scooped mids and strong bass cut through a band mix. The large soundboard projects volume.
-- **Fingerstyle, Travis picking, complex arrangements**: OM/Auditorium. Clear note separation and balanced frequency response prevent muddiness.
-- **Studio recording, intimate settings**: Parlor. Focused tone with less low-end rumble sits well in a mix. Comfortable body size for long sessions.
-- **Big open tunings, slide guitar**: Jumbo. Extended bass response supports alternate tunings (DADGAD, Open G). The large body resonates sympathetically.
+**Required pressure is low.** On a well-set-up guitar you need roughly 0.5–2 N per finger — about the weight of a couple of coins. If your hand aches after ten minutes, you are almost certainly pressing far harder than necessary. Fix: play a note, then consciously back off pressure until it just starts to buzz, then add back the smallest amount that clears it. Repeat on every finger. This recalibrates your "clean note" pressure sense.
 
-### Electric Guitar: Magnetic Pickups and Tone Shaping
+### 3.2 Hand-frame positions
 
-Electric guitars replace acoustic resonance with electromagnetic transduction. A pickup consists of magnetized pole pieces wrapped with ~8,000 turns of 42 AWG copper wire. The steel strings disturb the magnetic field as they vibrate, inducing voltage in the coil:
-
-\[ V(t) \propto \frac{dx}{dt} \]
-
-The output voltage is proportional to string **velocity**, not displacement. This gives pickups inherent high-pass character that emphasizes attack transients.
-
-**Single-coil pickups** (Fender Stratocaster, Telecaster):
-- One coil per string group
-- ~5–7 kΩ DC resistance
-- Bright, articulate tone with pronounced highs
-- Susceptible to 50/60 Hz hum from power lines
-- **Iconic tones**: Jimi Hendrix, Eric Clapton, Stevie Ray Vaughan
-
-**Humbucker pickups** (Gibson Les Paul, SG):
-- Two coils in series, reverse-wound with opposite magnetic polarity
-- ~7–10 kΩ DC resistance
-- String signal (common-mode) adds; interference (common-mode noise) cancels
-- Thicker, darker tone with higher output
-- **Iconic tones**: Jimmy Page, Slash, Carlos Santana
-
-**Pickup position effects**:
-- **Bridge pickup**: Samples string motion closer to the fixed endpoint. Less amplitude, more high-frequency content, faster attack. Bright, cutting tone for lead work and rhythm punch.
-- **Neck pickup**: Samples where string amplitude is greater. More fundamental, fewer harmonics. Warm, smooth tone for jazz, blues leads, and chord melody.
-- **Middle position** (Strat): Activates both pickups. Hollow, scooped tone due to phase cancellation of certain harmonics. Classic "quack" used in funk and R&B.
-
-**Practical tone shaping exercise**:
-
-Play the same phrase (e.g., a blues lick in A) through all pickup positions and document the tonal differences:
-
-1. Bridge: Attack snaps, highs cut through
-2. Bridge + Middle: Slightly hollower, good for clean rhythm
-3. Middle: Glassy, chimey, excellent for funky chords
-4. Middle + Neck: Fuller than middle alone, smooth leads
-5. Neck: Warm and vocal, perfect for sustained bends
-
-This hands-on exploration internalizes how pickup selection shapes your voice on the instrument.
-
-## 3. Material Science: Tonewoods and String Metallurgy
-
-### Soundboard Wood Selection
-
-The soundboard is the primary sound generator. The ideal tonewood combines high stiffness-to-weight ratio (fast sound propagation) with controlled damping (overtone decay). Key properties:
-
-| Wood | Density (g/cm³) | Stiffness (GPa) | Sound | Character |
-|------|----------------|-----------------|-------|-----------|
-| **Sitka Spruce** | 0.43 | 12.0 | Fast, balanced | Industry standard. Strong fundamentals, clear treble, good headroom. Versatile. |
-| **Adirondack Spruce** | 0.40 | 13.0 | Very fast, loud | Greater volume and dynamic range. Favored in bluegrass. Takes years to "open up." |
-| **European Spruce** | 0.42 | 11.5 | Complex, sweet | More overtones, slightly darker than Sitka. Classical and fingerstyle. |
-| **Western Red Cedar** | 0.36 | 8.5 | Warm, immediate | High damping. Responds easily to light touch. Less headroom before compression. |
-| **Engelmann Spruce** | 0.38 | 10.5 | Delicate, airy | Light and responsive. Preferred by fingerstyle players. Less projection than Sitka. |
-
-**Practical implications**:
-- **Hard strummer, flat pick**: Choose Sitka or Adirondack. The stiffness handles aggressive attack without overdriving.
-- **Soft fingerstyle, classical technique**: Cedar or Engelmann. Responds to delicate touch without requiring heavy attack.
-- **Recording, studio work**: European spruce. Complex overtones add richness in close-mic'd environments.
-
-### Back and Side Woods
-
-Back and sides contribute less to fundamental tone but affect sustain, bass response, and overtone color:
-
-| Wood | Density (g/cm³) | Character | Tonal Effect |
-|------|----------------|-----------|--------------|
-| **Indian Rosewood** | 0.85 | Traditional standard | Strong, complex bass. Long sustain. Scooped mids. Wide dynamic range. |
-| **Mahogany** | 0.55 | Midrange focused | Warm, woody. Fast attack, shorter decay. Emphasizes fundamentals over overtones. |
-| **Maple** | 0.70 | Reflective, bright | Reflects highs back to soundboard. Clear note separation. Focused, direct tone. Archtop jazz standard. |
-| **Walnut** | 0.65 | Middle ground | Between mahogany and rosewood. Balanced, slightly warm. |
-| **Koa** | 0.60 | Vintage character | Starts bright, mellows with play. Midrange focus with shimmering highs. Hawaiian tradition. |
-
-**Building a tonal signature**:
-- **Bluegrass cannon**: Adirondack spruce top + Indian rosewood back/sides. Maximum volume and bass projection.
-- **Fingerstyle clarity**: Engelmann spruce top + maple back/sides. Note separation and articulation.
-- **Blues warmth**: Cedar top + mahogany back/sides. Immediate response with vocal midrange.
-
-### String Materials and Gauge Selection
-
-**Acoustic guitar strings**:
-- **80/20 Bronze** (80% copper, 20% zinc): Bright, crisp highs. Aggressive attack. Short lifespan (~2–4 weeks of daily play).
-- **Phosphor Bronze** (92% copper, 8% tin with phosphorus): Warmer than 80/20. Longer lifespan (~4–8 weeks). Industry standard.
-- **Silk & Steel**: Nylon-wrapped core with light-gauge steel. Very low tension. Gentle on vintage guitars. Folk and fingerstyle.
-
-**Gauge selection trade-offs**:
-
-| Gauge | Tension | Volume | Sustain | Playability | Best For |
-|-------|---------|--------|---------|-------------|----------|
-| **Extra Light (.010–.047)** | Low | Moderate | Short | Easy bending, low finger fatigue | Beginners, electric players transitioning to acoustic |
-| **Light (.012–.053)** | Medium | Good | Moderate | Balanced | Fingerstyle, light strumming |
-| **Medium (.013–.056)** | High | Strong | Long | Requires finger strength | Flatpicking, bluegrass, drop tunings |
-| **Heavy (.014–.059)** | Very high | Maximum | Maximum | Challenging | Alternate tunings, slide guitar, professional bluegrass |
-
-**Electric guitar strings**:
-- **Nickel-plated steel**: Bright, aggressive. Strong magnetic output. Standard for rock, metal, blues.
-- **Pure nickel**: Warmer, vintage tone. Lower output. Smoother feel. Preferred for classic rock, jazz, blues.
-- **Stainless steel**: Extremely bright and long-lasting. Harsh on frets. Used in metal and some jazz.
-
-**Practical string change protocol**:
-1. Change one string at a time (maintains neck tension and bridge position)
-2. Stretch new strings: Fret at 12th, pull gently upward (away from body). Repeat 3–4 times until tuning stabilizes.
-3. Tune to pitch, let settle 10–15 minutes, retune
-4. New strings sound bright for 2–4 hours, then settle into stable tone
-5. Wipe strings after playing to extend life 2–3×
-
-## 4. Left-Hand Biomechanics and Fretting Technique
-
-### Finger Placement and Force Optimization
-
-Efficient fretting minimizes force while ensuring clean contact. Typical required force: 0.5–2.0 N per finger, depending on action and string gauge.
-
-**Optimal finger position**:
-- **Just behind the fret** (toward the nut by 1–2 mm): Minimizes force required. Too close causes buzz. Too far wastes energy.
-- **Perpendicular to fretboard**: Maximizes pressure efficiency. Angled fingers require more force.
-- **Fingertip contact** (not pad): Creates small, precise contact point. Pads mute adjacent strings.
-
-**Thumb position**:
-- **Classical technique**: Thumb centered on back of neck, opposite middle finger. Provides stable fulcrum. Best for complex fingerings and rapid position shifts.
-- **Electric/blues technique**: Thumb wraps over top edge to mute low E or fret bass notes (Hendrix grip). Sacrifices mechanical efficiency but enables voice-leading options impossible in classical position.
-
-### The CAGED System: Fretboard Mastery Framework
-
-The CAGED system maps five fundamental chord shapes across the entire fretboard. Each shape is named after the open chord it resembles:
+In any fixed position, each finger owns one fret, no shifting:
 
 ```
-C Shape (root on A string, 5th string):
-e|---0---|
-B|---1---|
-G|---0---|
-D|---2---|
-A|---3---|
-E|-------|
-
-A Shape (root on A string, 5th string):
-e|---0---|
-B|---2---|
-G|---2---|
-D|---2---|
-A|---0---|
-E|-------|
-
-G Shape (root on E string, 6th string):
-e|---3---|
-B|---0---|
-G|---0---|
-D|---0---|
-A|---2---|
-E|---3---|
-
-E Shape (root on E string, 6th string):
-e|---0---|
-B|---0---|
-G|---1---|
-D|---2---|
-A|---2---|
-E|---0---|
-
-D Shape (root on D string, 4th string):
-e|---2---|
-B|---3---|
-G|---2---|
-D|---0---|
-A|-------|
-E|-------|
+5th position:  finger 1 → fret 5
+               finger 2 → fret 6
+               finger 3 → fret 7
+               finger 4 → fret 8
 ```
 
-**Practical drill: G Major CAGED sequence**
+**Extension** (reaching finger 1 back a fret, or finger 4 forward a fret) is fine occasionally but shouldn't be your default — repeated extension under tension is a strain risk. If a passage demands constant extension, that's a signal to shift position instead.
 
-Play G major chord in all five positions ascending the neck:
+**Shifting mechanically:**
+1. Pick a guide finger (usually finger 1) to lead the move.
+2. Look at the target fret before you move, don't feel around blind.
+3. For legato connections, slide the guide finger along the string. For a clean break between phrases, lift and replant.
+4. The thumb travels with the hand as one unit — it should never lag behind or anchor you to the old position.
 
-1. **G shape** (open position, root on 6th string, 3rd fret)
-2. **E shape** (3rd position, root on 6th string, 3rd fret)
-3. **D shape** (5th position, root on 4th string, 5th fret)
-4. **C shape** (7th position, root on 5th string, 10th fret)
-5. **A shape** (10th position, root on 5th string, 10th fret)
-6. **G shape** (12th position, root on 6th string, 15th fret — one octave higher)
+### 3.3 The CAGED system: one shape becomes five
 
-**Connecting arpeggios**:
+CAGED maps the five open-chord shapes (C, A, G, E, D) as movable templates covering the entire neck. Learn these as *shapes you already know*, just slid up the neck and barred.
 
-Each CAGED shape contains the root, 3rd, 5th, and octave. Practice connecting shapes by finding common tones:
-
-```
-G Major arpeggio across CAGED shapes:
-E|---3----|-------|----3---|--------|-----5---|--------|
-B|--------|----3--|--------|-----3--|---------|-----5--|
-G|--------|-------|-----4--|--------|-----4---|--------|
-D|--------|----5--|--------|-----5--|---------|--------|
-A|--------|-------|-----5--|--------|---------|--------|
-E|---3----|-------|--------|--------|---------|--------|
-   G        E        D         C         A         G
-```
-
-Spend 10 minutes daily moving through CAGED shapes in one key. After two weeks, you'll visualize chord tones across the entire fretboard.
-
-### Position Playing and Shifting
-
-**Four-fret hand frame**: In any position, assign fingers 1–4 to consecutive frets. Example: 5th position means 1=5th fret, 2=6th fret, 3=7th fret, 4=8th fret.
-
-**Extension**: Stretch finger 1 back one fret or finger 4 forward one fret without shifting the entire hand. Use sparingly to avoid tension.
-
-**Shifting mechanics**:
-1. **Anticipate**: Look ahead to the target position
-2. **Guide finger**: Choose one finger to lead the shift (often finger 1)
-3. **Slide or lift**: For legato, slide the guide finger along the string. For clean articulation, lift and replant.
-4. **Thumb moves with hand**: Keep thumb position consistent relative to fingers
-
-**Shifting exercise** (C major scale, two octaves):
+**G major, all five CAGED positions, ascending the neck:**
 
 ```
-Position:    I          III         V          VII        IX
-E|----------|----------|-----------|-------0-1-3------3-1-0---|
-B|----------|-------0-1-3-----3-1-0-3----------------3--------|
-G|-------0-2-4-2-0-2----------------2-0-2--------------------|
-D|---0-2-3----------------------------------------3-2-0------|
-A|-3----------------------------------------------------------------|
-E|------------------------------------------------------------------|
-    1 2 4             1 2 4
+G-shape (open, root 6th string open):
+e|--3--|
+B|--0--|
+G|--0--|
+D|--0--|
+A|--2--|
+E|--3--|
+Root: open E string
+
+E-shape (barre at fret 3, root 6th string):
+e|--3--|
+B|--3--|
+G|--4--|
+D|--5--|
+A|--5--|
+E|--3--|
+Root: 3rd fret, 6th string
+
+D-shape (root 4th string, fret 5):
+e|--7--|
+B|--8--|
+G|--7--|
+D|--5--|
+A|------
+E|------
+Root: 5th fret, 4th string (barre not needed, open-style shape)
+
+C-shape (root 5th string, fret 10):
+e|---8---|
+B|---8---|
+G|---9---|
+D|--10---|
+A|--10---|
+E|-------
+Root: 10th fret, 5th string
+
+A-shape (root 5th string, fret 10, A-shape fingering):
+e|--10--|
+B|--12--|
+G|--12--|
+D|--12--|
+A|--10--|
+E|------
+Root: 10th fret, 5th string
 ```
 
-Practice at 60 BPM, emphasizing smooth shifts without glissando (unintentional sliding). Once clean, increase to 80, 100, 120 BPM.
+Each shape overlaps the next by two or three strings. The chord tones don't change — only the fingering template does.
 
-## 5. Right-Hand Technique and Tone Production
+**Drill (15 min/day):** play G major ascending through G→E→D→C→A→G(octave) shapes, one strum each, let it ring, check for buzz on every string before moving on. Once clean at a crawl, play the sequence in time at 60 BPM, one chord per bar. Change keys weekly — same five shapes, different root.
 
-### Fingerstyle Mechanics: Rest Stroke vs. Free Stroke
-
-**Rest stroke** (apoyando):
-- Finger plucks through string and comes to rest on adjacent lower string
-- Maximum volume and tonal weight
-- Used for melody notes requiring projection
-- Example: Opening melody of "Asturias" (Albéniz), flamenco falsetas
-
-**Free stroke** (tirando):
-- Finger plucks and follows through into palm space without touching adjacent string
-- Lighter, more delicate tone
-- Used for arpeggios, accompaniment, polyphonic textures
-- Example: "Recuerdos de la Alhambra" tremolo passage
-
-**Tone production sequence**:
-1. **Preparation**: Fingertip positioned on string at ~45° angle
-2. **Engagement**: Finger pad makes initial contact, then nail engages
-3. **Release**: Nail ramp releases string with controlled snap
-4. **Follow-through**: Finger continues motion toward palm (free stroke) or rests on next string (rest stroke)
-
-**Nail shaping**:
-- **Right side** (thumb side): Slight ramp from flesh to tip
-- **Left side**: Shorter to prevent catching
-- **Tip**: Smooth, polished to 2000-grit or higher
-- **Length**: 1–2 mm past fingertip
-- **Test**: Drag nail across silk or fine fabric. Should glide without catching.
-
-### Classical Fingerstyle Patterns
-
-**Pattern 1: Basic arpeggio** (p-i-m-a)
-
-```
-Thumb (p) = bass note on beats 1 and 3
-Index (i) = 1st string
-Middle (m) = 2nd string  
-Ring (a) = 3rd string
-
-C Major:
-E|-----0-------0-------|
-B|-------1-------1-----|
-G|---0-------0---------|
-D|--------------------- |
-A|-3-------3-----------|
-E|---------------------|
-  p   i m a   p i m a
-  1   + 2 +   3 + 4 +
+```mermaid
+graph LR
+    subgraph caged_map ["CAGED Shape Sequence Up the Neck (Key of G)"]
+        g1["G-shape, open position<br/>root = open E"] --> e1["E-shape, fret 3<br/>root = fret 3, 6th string"]
+        e1 --> d1["D-shape, fret 5<br/>root = fret 5, 4th string"]
+        d1 --> c1["C-shape, fret 10<br/>root = fret 10, 5th string"]
+        c1 --> a1["A-shape, fret 10<br/>root = fret 10, 5th string"]
+        a1 --> g2["G-shape, fret 15<br/>root = fret 15, 6th string (octave up)"]
+    end
 ```
 
-**Pattern 2: Travis picking** (alternating bass)
+### 3.4 Thumb-over technique (blues/rock)
 
-```
-Thumb alternates between two bass notes
-Fingers pluck melody/harmony on offbeats
+Wrapping the thumb over the top edge of the neck to fret or mute the low E is standard in blues/rock rhythm playing (Hendrix-style). It sacrifices classical reach efficiency but lets you grab bass notes while fingers voice chord tones above — essential for solo acoustic blues and funk rhythm comping. Use classical thumb position for scale runs and fast position changes; switch to thumb-over for chord-melody and bass-note muting on the low E/A strings.
 
-C Major:
-E|-----0-------0-------|
-B|-------1-------1-----|
-G|---0-------0---------|
-D|--------------------- |
-A|-3---------------3---|
-E|-------3-------3-----|
-  p   i   p   i p   i
-  1   +   2   +  3   +
-```
+---
 
-**Progressive drill**:
-1. Week 1: Pattern at 50 BPM, focus on thumb independence
-2. Week 2: 60 BPM, add dynamics (thumb slightly louder than fingers)
-3. Week 3: 70 BPM, switch between C–Am–F–G progression
-4. Week 4: 80 BPM, improvise melody over pattern
+## 4. Right-Hand Technique: Pick and Fingers
 
-### Flatpicking: Mechanics and Speed Development
+### 4.1 Pick grip and motion
 
-**Pick grip**:
-- Hold pick between thumb pad and side of index finger
-- ~45° angle to string plane
-- Exposed tip: 2–3 mm (more = brighter tone, less = darker tone)
-- Wrist relaxed, forearm lightly anchored on guitar body
+- Grip the pick between thumb pad and the side of the index finger, roughly a 45° angle to the strings.
+- Expose 2–3 mm of tip past your fingers. More exposed tip = brighter, sharper attack; less = darker, rounder.
+- Motion hierarchy, from large to small: **forearm rotation** (strumming) → **wrist deviation** (the primary engine for single-note alternate picking) → **finger motion** (fine control, rarely the main driver).
+- The pick must "escape" the string plane after each stroke — if you feel the pick getting trapped against the next string, your wrist angle is too flat; rotate it slightly.
 
-**Picking motion hierarchy** (from most to least motion):
-1. **Forearm rotation**: Used for strumming, large sweeps
-2. **Wrist deviation**: Primary motion for alternate picking, single-note lines
-3. **Finger motion**: Minimal; used for tremolo picking or rapid repeated notes on one string
+### 4.2 Alternate picking speed drill
 
-**Alternate picking fundamentals**:
-- **Downstroke** (∏): Attack from above, moving toward floor
-- **Upstroke** (V): Attack from below, moving toward ceiling
-- **Escape motion**: Pick must clear the string plane after each stroke to avoid getting "trapped"
-
-**Speed development exercise** (chromatic alternate picking):
+Chromatic exercise, one string, strict down-up alternation:
 
 ```
 E|--5-6-7-8--5-6-7-8--5-6-7-8--5-6-7-8--|
-B|--------------------------------------|
-G|--------------------------------------|
-D|--------------------------------------|
-A|--------------------------------------|
-E|--------------------------------------|
-  ∏ V ∏ V  ∏ V ∏ V  ∏ V ∏ V  ∏ V ∏ V
-
-Metronome progression:
-Week 1: 80 BPM (16th notes) = 320 notes per minute
-Week 2: 90 BPM = 360 notes per minute
-Week 3: 100 BPM = 400 notes per minute
-Week 4: 110 BPM = 440 notes per minute
-Week 5: 120 BPM = 480 notes per minute (professional bluegrass speed)
+   ∏ V ∏ V   ∏ V ∏ V   ∏ V ∏ V   ∏ V ∏ V
 ```
 
-**Key principles**:
-- Start slow enough to maintain perfect technique (no tension, clean articulation)
-- Increase tempo only when 3 consecutive perfect repetitions achieved
-- Practice with metronome; subdivide (16ths against quarter-note click)
-- If tension appears, drop tempo 20 BPM and rebuild
+Metronome ladder (16th notes against the click):
 
-### Economy Picking and Sweep Arpeggios
+| Week | BPM | Notes/min |
+|---|---|---|
+| 1 | 80 | 320 |
+| 2 | 90 | 360 |
+| 3 | 100 | 400 |
+| 4 | 110 | 440 |
+| 5 | 120 | 480 (bluegrass cruising speed) |
 
-**Economy picking**: When changing strings, sweep the pick in the direction of string-to-string motion rather than strictly alternating. Reduces pick strokes.
+**Rule:** only move up a tempo tier after three clean, tension-free repetitions in a row. If tension creeps into your forearm or shoulder, drop 20 BPM immediately and rebuild — speed gained through tension is fake speed that collapses under pressure.
 
-**Example: E minor arpeggio** (ascending)
+### 4.3 Economy picking (sweeping)
 
-```
-Standard alternate picking (6 strokes):
-E|----12-----|
-B|--12-------|
-G|-----------| 
-D|-----------|
-A|-----------|
-E|-----------|
-  V  ∏  V
+When a passage moves across strings in one direction, sweep the pick through in that direction instead of alternating strictly. Fewer motions, less wasted travel.
 
-Economy picking (3 strokes):
-E|----12-----|
-B|--12-------|
-G|-----------| 
-D|-----------|
-A|-----------|
-E|-----------|
-  ∏  ∏  ∏  (sweep down)
-```
-
-**Five-string sweep arpeggio drill** (A minor):
+**A minor five-string sweep arpeggio:**
 
 ```
 E|--------------------------------17-|
 B|---------------------------17-20---|
 G|---------------------17-19---------|
 D|--------------17-19----------------|
-A|--------17-19----------------------|
-E|--17-20----------------------------|
-  ∏  ∏  ∏  ∏  ∏  V  V  V  V  V  V
-  (Sweep down, sweep up)
+A|--------17-19-----------------------|
+E|--17-20-----------------------------|
+   ∏  ∏  ∏  ∏  ∏    V   V   V   V   V
+   (sweep down ascending, sweep up descending)
 ```
 
-**Critical technique points**:
-1. **Mute immediately**: Left hand releases pressure immediately after each note to prevent ringing notes from blurring together
-2. **One continuous motion**: The pick should feel like it's rolling across strings, not jabbing
-3. **Thumb-finger pivot**: Slight rotation of pick between thumb and finger maintains optimal pick angle as you cross strings
-4. **Start at 40 BPM**: Build speed only after motion is fluid
+**Critical technique points:**
+1. Mute each fretted note immediately after it sounds (lift finger pressure right after picking) so notes don't bleed together into mush.
+2. Feel the pick rolling through the strings in one continuous arc, not jabbing at each string individually.
+3. Start at 40 BPM. Fluid motion first, speed later — sweeping rewards patience and punishes rushing harder than almost any other technique.
 
-**Realistic progression**:
-- Month 1–2: Three-string shapes (triads), 60 BPM
-- Month 3–4: Four-string shapes, 80 BPM
-- Month 5–6: Five-string shapes, 100 BPM
-- Month 7–12: Six-string shapes, integrate into musical contexts
+**Realistic timeline:** three-string triad sweeps at 60 BPM (months 1–2) → four-string shapes at 80 BPM (months 3–4) → five-string shapes at 100 BPM (months 5–6) → six-string sweeps integrated into solos (months 7–12). This is not a technique that compresses into weeks.
 
-## 6. Setup, Intonation, and Diagnostic Troubleshooting
+### 4.4 Fingerstyle: rest stroke vs. free stroke
 
-### Action Adjustment: Playability vs. Tone Trade-offs
+- **Rest stroke (apoyando):** finger plucks through the string and lands resting on the next lower string. Maximum volume and weight — use for melody notes that need to project over accompaniment.
+- **Free stroke (tirando):** finger plucks and follows through into open air, not touching the next string. Lighter, used for arpeggios and independent polyphonic lines where you can't afford to dampen an adjacent string.
 
-Action is the string height above the fretboard, measured at the 12th fret. Standard measurements:
-
-| Action | High E | Low E | Playability | Tone | Typical Use |
-|--------|--------|-------|-------------|------|-------------|
-| **Low** | 1.5 mm | 2.0 mm | Easy bending, low finger fatigue | Reduced volume, potential buzz | Electric guitar, shred, fast runs |
-| **Medium** | 2.0 mm | 2.5 mm | Balanced | Balanced | General purpose, most players |
-| **High** | 2.5 mm | 3.5 mm | Requires finger strength | Maximum volume, sustain | Bluegrass, slide, heavy strumming |
-
-**Adjustment procedure**:
-
-1. **Measure current action**: Use a precision ruler at 12th fret, fret pressed down on 1st fret
-2. **Determine change needed**: Each 0.1 mm at nut translates to ~0.2 mm at 12th fret
-3. **Saddle adjustment** (acoustic): Remove saddle, sand bottom evenly. Remove 0.3 mm of material to lower action 0.3 mm.
-4. **Bridge adjustment** (electric): Turn saddle height screws. Clockwise lowers, counter-clockwise raises.
-5. **Recheck**: Measure again, play test all positions for buzz
-
-**Buzz diagnosis**:
-- **Buzz at open strings only**: Nut slots too low. Replace or shim nut.
-- **Buzz in first 5 frets**: Insufficient neck relief. Loosen truss rod 1/4 turn.
-- **Buzz in middle positions (7th–12th frets)**: Neck too straight or high frets. Check relief; if correct, frets need leveling.
-- **Buzz at high frets only**: Neck has too much relief. Tighten truss rod 1/4 turn.
-
-### Truss Rod Adjustment: Controlling Neck Relief
-
-The truss rod is a steel rod running through the neck, adjustable to counteract string tension and introduce controlled bow (relief).
-
-**Checking relief**:
-1. Capo 1st fret
-2. Fret high E string at 15th fret with right hand
-3. Check gap between string and 7th fret with feeler gauge
-4. Optimal relief: 0.010"–0.015" (0.25–0.38 mm)
-
-**Adjustment**:
-- **Too much relief** (gap > 0.015"): Tighten truss rod (clockwise) 1/4 turn. Wait 30 minutes, recheck.
-- **Too little relief** (gap < 0.010"): Loosen truss rod (counter-clockwise) 1/4 turn. Wait 30 minutes, recheck.
-
-**Critical safety rules**:
-- Loosen strings 1–2 full turns before major truss rod adjustments
-- Never force. If resistance is high, stop.
-- Adjust in 1/4-turn increments
-- Wait 15–30 minutes between adjustments for wood to stabilize
-- If adjustment has no effect after 1 full turn, consult a luthier (neck may be warped or truss rod maxed out)
-
-### Intonation: Saddle Compensation and Tuning Accuracy
-
-Intonation ensures fretted notes match their theoretical pitch across the fretboard. The primary adjustment is bridge saddle position.
-
-**Checking intonation**:
-1. Tune open string to pitch with accurate tuner
-2. Play 12th fret harmonic (touch string lightly directly above 12th fret wire, pluck, release finger)
-3. Compare to fretted 12th fret note
-
-**Adjustment**:
-- **Fretted note is sharp** (higher than harmonic): Saddle too close to nut. Move saddle away from nut (increase scale length). Turn screw counter-clockwise on Fender-style bridges, adjust individual saddle on acoustic.
-- **Fretted note is flat** (lower than harmonic): Saddle too far from nut. Move saddle toward nut (decrease scale length). Turn screw clockwise on Fender-style bridges.
-
-**Compensation per string** (typical on 25.5" scale electric):
-
-| String | Typical Compensation | Reason |
-|--------|---------------------|---------|
-| High E | +2.0 mm | Thin, low tension, minimal sharpening when fretted |
-| B | +2.5 mm | Slightly more mass |
-| G | +3.5 mm | Wound string, greater mass, more sharpening |
-| D | +3.0 mm | Similar to G but higher tension balances |
-| A | +2.5 mm | Higher tension reduces effect |
-| Low E | +2.0 mm | Highest tension, less sharpening |
-
-**Advanced compensation**: Some guitars (Earvana nut, Buzz Feiten Tuning System, True Temperament frets) compensate at the nut or use wavy fret patterns for superior intonation. These systems address the inherent compromise of 12-tone equal temperament.
-
-### String Breakage: Diagnosis and Prevention
-
-Strings break at stress concentration points where repeated bending causes metal fatigue.
-
-**Common failure points**:
-1. **Bridge saddle**: Sharp edge cuts string during vibration
-2. **Nut**: Improperly filed slot creates sharp edge or binding point
-3. **Fret edge**: Rough fret end cuts string during bending
-4. **Tuning post**: Kinked string from improper winding
-
-**Prevention protocol**:
-1. **Inspect contact points**: Run fingernail along saddle, nut slots, fret ends. Any sharp edge is a failure point.
-2. **Smooth saddle**: Use 400-grit sandpaper to radius sharp edges
-3. **Nut slot filing**: Slots should be 1.5× string diameter, with smooth radiused bottom. Use nut files matched to string gauge.
-4. **Fret end dressing**: Luthier service; files and polishes fret ends to smooth radius
-5. **Proper string winding**: 2–3 wraps on tuning post, winding downward toward headstock face. Prevents kinking.
-
-**String life extension**:
-- Wipe strings after playing (removes perspiration salts and oils)
-- Wash hands before playing
-- Use coated strings (Elixir, D'Addario EXP) for 3–5× life
-- Store guitar in case (humidity control prevents corrosion)
-- Replace before strings become dull or show discoloration (oxidation weakens metal)
-
-### Fret Leveling, Crowning, and Polishing
-
-Frets wear unevenly under repeated play, creating high spots that cause buzz and intonation errors. Professional fret work is a multi-step process:
-
-**1. Leveling**:
-- Straighten neck with truss rod adjustment
-- Mask fretboard with tape, exposing only fret crowns
-- Use long leveling beam (12"–16") with 320-grit sandpaper
-- Sand frets until all show flat spots on crown (indicates level plane)
-- Fret height loss: ~0.1–0.3 mm
-
-**2. Crowning**:
-- Use fret crowning file to restore rounded profile to each fret
-- Center the crown; remove material from sides to re-establish peak
-- Check with straightedge; fret top should be rounded, not flat
-
-**3. Polishing**:
-- Progress through 400, 600, 800, 1000, 2000-grit wet/dry sandpaper
-- Final polish with 0000 steel wool or Micromesh pads
-- Frets should be mirror-smooth for effortless bending
-
-**When to level frets**:
-- Visible divots in fret crowns from string contact
-- Uneven buzzing that doesn't resolve with setup adjustment
-- Intonation errors that don't correct with saddle adjustment
-- Typical interval: Every 5–10 years of regular play, or every 2–3 years for professional touring musicians
-
-**DIY vs. professional**: Fret leveling requires specialized tools (leveling beam, crowning files, fret rocker) and skill. First-time fret work on a valuable instrument is not recommended. Budget $150–$300 for professional fret dress.
-
-### Acoustic Feedback: Mitigation Strategies
-
-Acoustic guitars amplified at high volume couple soundboard resonance to speaker output, creating self-sustaining oscillation (feedback). The Helmholtz resonance (80–120 Hz) is most susceptible.
-
-**Feedback frequency identification**:
-1. Gradually increase volume until feedback begins
-2. Note the pitch (typically F2–B2 range on dreadnoughts)
-3. This is the primary body resonance frequency
-
-**Mitigation strategies**:
-
-| Technique | Implementation | Effectiveness | Trade-offs |
-|-----------|---------------|---------------|-----------|
-| **Notch filter** | Parametric EQ: Cut 6–12 dB at feedback frequency, Q=5–10 | High | Removes fundamental body resonance from tone |
-| **Sound hole cover** | Rubber cover (D'Addario, Planet Waves) | Moderate | Disrupts Helmholtz mode; alters acoustic tone |
-| **Feedback suppressor** | Fishman, Behringer pedals | Moderate | Automatic notch filters; some latency |
-| **Guitar positioning** | Angle guitar away from speaker; reduce direct coupling | Moderate | Limits stage movement |
-| **Phase inversion** | DI box or mixer channel phase flip | Variable | Only effective if feedback is phase-related |
-| **Soundhole bracing** | Internal "sound board" (Fishman Pro-Rep-102) | High | Professional installation required |
-
-**EQ strategy for live acoustic**:
-1. High-pass filter at 80–100 Hz (removes sub-bass rumble)
-2. Notch at primary Helmholtz frequency (90–110 Hz typically)
-3. Slight cut at 200–300 Hz (reduces boxiness)
-4. Presence boost at 3–5 kHz (restores clarity lost to filtering)
-
-**Pickup selection**: Undersaddle piezo pickups (B-Band, Fishman) are less prone to feedback than soundhole magnetic pickups but exhibit more "quack." Dual-source systems (piezo + internal mic) blend body tone with feedback resistance.
-
-## 7. Practice Methodology and Skill Acquisition
-
-### Deliberate Practice Protocol
-
-Effective practice targets specific weaknesses with focused, analytical attention. Passive repetition ("noodling") builds minimal skill.
-
-**Structured session template** (90 minutes):
-
-**1. Warm-up (15 minutes)**
-- Slow chromatic scales, all positions (60 BPM, 16th notes)
-- Spider exercises (finger independence)
-- Chord transitions (common progressions, focus on smooth changes)
-
-**2. Technical development (30 minutes)**
-- Metronome-driven drills targeting current weakness
-- Examples: Alternate picking speed, sweep arpeggios, left-hand stretches
-- Start at comfortable tempo, push to edge of ability, back off 10%
-- 5-minute focus blocks with 1-minute rest
-
-**3. Musical application (30 minutes)**
-- Learn new repertoire or refine existing pieces
-- Apply technical skills in musical context
-- Record yourself; compare to target performance
-
-**4. Creative exploration (15 minutes)**
-- Improvisation, composition, or free experimentation
-- No metronome, no judgment
-- Reinforces joy and intrinsic motivation
-
-**Error correction loop**:
-1. Identify error (missed note, rhythmic hesitation, tonal inconsistency)
-2. Isolate smallest unit containing error (2–4 notes, one measure)
-3. Slow tempo 50% until execution is perfect
-4. Repeat 10× correctly at slow tempo
-5. Increase tempo 10 BPM, repeat
-6. Return to full phrase; integrate correction
-
-### Metronome Training and Rhythmic Accuracy
-
-Rhythmic precision is the foundation of ensemble playing. Metronome training develops internal pulse accuracy.
-
-**Progressive subdivision drill**:
-
-**Week 1: Quarter notes** (60 BPM)
-- Play one note per click
-- Focus: Landing exactly with click, not before or after
-
-**Week 2: Eighth notes** (60 BPM)
-- Play two notes per click: "1 and 2 and 3 and 4 and"
-- Focus: Even spacing, subdivision accuracy
-
-**Week 3: Triplet eighths** (60 BPM)
-- Play three notes per click: "1 trip let 2 trip let"
-- Focus: Ternary subdivision feel (not two sixteenth notes + eighth)
-
-**Week 4: Sixteenth notes** (60 BPM)
-- Play four notes per click: "1 e and a 2 e and a"
-- Focus: Quaternary subdivision, maintaining relaxation
-
-**Week 5: Displacement challenge**
-- Metronome on beats 2 and 4 only (backbeat)
-- Play quarter notes; internalize beats 1 and 3
-- Tests true internal pulse
-
-**Week 6: Changing subdivisions**
-- Quarter notes for 4 beats → eighth notes for 4 beats → sixteenths for 4 beats → back to quarters
-- Simulates real musical phrase structures
-
-**Advanced rhythmic concepts**:
-- **Polyrhythms**: 3 against 2 (triplet eighths against quarter notes), 4 against 3 (sixteenth notes against triplet eighths)
-- **Syncopation**: Accenting offbeats (the "and" of beats)
-- **Odd time signatures**: 5/4, 7/8, 11/8 (common in progressive rock, jazz fusion)
-
-### Recording and Self-Assessment
-
-Recording reveals errors inaudible during performance due to auditory masking and motor feedback. Weekly recording is essential for intermediate to advanced progress.
-
-**Recording protocol**:
-1. **Simple setup**: Smartphone voice memo app 3–4 feet from guitar. No need for professional gear initially.
-2. **Play target passage 3× without stopping**: Captures consistency (or lack thereof)
-3. **Listen critically**: Note timing errors, tonal inconsistencies, dynamic imbalances
-4. **Document observations**: Written list of 2–3 specific corrections
-5. **Practice corrections for 15 minutes**: Apply error correction loop
-6. **Record again**: Compare to initial recording
-
-**Comparison benchmarks**:
-- **Timing**: Do you rush or drag? Are note values consistent?
-- **Tone**: Is attack even? Are there unintentional volume spikes or dead notes?
-- **Articulation**: Are legato passages smooth? Are staccato notes crisp?
-- **Musicality**: Does phrasing breathe, or is it mechanical?
-
-**Video recording** (monthly):
-- Reveals postural issues, tension, inefficient motion
-- Position camera to show both hands
-- Watch with sound muted initially; focus only on physical mechanics
-- Common discoveries: Excessive left-hand grip tension, rigid right-hand wrist, hunched shoulders
-
-## 8. Harmonic Foundation: Scales, Modes, and Chord Construction
-
-### The Major Scale: Template for All Tonality
-
-The major scale is the reference structure for Western music. All other scales and chords derive from it through alteration or selection.
-
-**C Major scale formula**: W-W-H-W-W-W-H (W=whole step, H=half step)
+**p-i-m-a arpeggio pattern (classical basic form):**
 
 ```
-Fret:     0   2   3   5   7   8   10  12
-Note:     C   D   E   F   G   A   B   C
-Degree:   1   2   3   4   5   6   7   1
+C major:
+e|-----0-------0-----|
+B|-------1-------1---|
+G|---0-------0-------|
+D|--------------------|
+A|-3-------3----------|
+E|---------------------|
+  p   i m a   p i m a
 ```
 
-**Scale degrees and harmonic function**:
-- **1 (Tonic)**: Home, resolution, stability
-- **2 (Supertonic)**: Pre-dominant, moves toward 5
-- **3 (Mediant)**: Defines major quality
-- **4 (Subdominant)**: Pre-dominant, tension seeking resolution
-- **5 (Dominant)**: Maximum tension, demands resolution to 1
-- **6 (Submediant)**: Relative minor, color chord
-- **7 (Leading tone)**: Strong pull toward 1 (half step below)
+Thumb (p) takes the bass note, index (i), middle (m), ring (a) take the top three strings in sequence. Practice at 50 BPM for a full week before increasing tempo — thumb/finger independence breaks down under speed pushed too early.
 
-**Five positions for C Major scale across fretboard**:
+**Nail care for nail-based tone:** file the nail into a gentle ramp on the string side, polish to 2000-grit or higher (even a glass/crystal nail file works), length 1–2 mm past the fingertip. Test by dragging the nail across a silk scarf or microfiber cloth — it should glide without catching. A catching nail means an audible click on every pluck.
+
+---
+
+## 5. Harmonic Vocabulary You Actually Use on the Neck
+
+### 5.1 Major scale, five positions
+
+C major formula: W-W-H-W-W-W-H. Learn it as five overlapping box shapes so you're never stuck in one patch of the neck.
 
 ```
 Position I (open):
-E|---0---1---3---|
+e|---0---1---3---|
 B|---0---1---3---|
 G|---0---2-------|
 D|---0---2---3---|
 A|---0---2---3---|
 E|---0---1---3---|
 
-Position II (2nd fret root):
-E|---3---5---7---8---|
+Position II (root area, fret 3):
+e|---3---5---7---8---|
 B|---3---5---6---8---|
 G|---2---4---5-------|
 D|---2---3---5-------|
-A|---3---5-----------|
-E|---3---5-----------|
-
-[Continue through Position V, ending at 12th fret]
+A|---3---5------------|
+E|---3---5------------|
 ```
 
-**Practice drill**: Play major scale in one key through all five positions, ascending and descending, at 80 BPM eighth notes. Cycle through all 12 keys weekly.
+Continue mapping positions III–V by sliding the same interval skeleton up; each new box starts where the previous one's highest finger left off. **Drill:** one key, all five positions, ascending then descending, 80 BPM eighth notes. Rotate to a new key each week — twelve weeks gets you through every key once.
 
-### Modes: Recontextualizing the Major Scale
+### 5.2 Modes as color, not just scale spelling
 
-Modes are the major scale starting on different degrees. Each has a unique sound and application.
+| Mode | Formula vs. major | Character | Where you'll hear/use it |
+|---|---|---|---|
+| Ionian | 1-2-3-4-5-6-7 | bright | pop, country |
+| Dorian | ♭3 ♭7 | minor but open, not sad | funk, Santana, modal jazz |
+| Phrygian | ♭2 ♭3 ♭6 ♭7 | dark, Spanish | flamenco, metal |
+| Lydian | ♯4 | floating, dreamlike | film score, fusion, Steve Vai |
+| Mixolydian | ♭7 | bluesy dominant | blues-rock, Southern rock |
+| Aeolian | ♭3 ♭6 ♭7 | natural minor, sad | rock ballads, metal |
+| Locrian | ♭2 ♭3 ♭5 ♭6 ♭7 | unstable | rare — avant-garde, some metal |
 
-| Mode | Formula | Character | Application |
-|------|---------|-----------|-------------|
-| **Ionian** (Major) | 1-2-3-4-5-6-7 | Bright, happy | Pop, country, folk |
-| **Dorian** | 1-2-♭3-4-5-6-♭7 | Minor with brightness | Jazz, funk, rock ballads |
-| **Phrygian** | 1-♭2-♭3-4-5-♭6-♭7 | Dark, Spanish | Flamenco, metal, Middle Eastern |
-| **Lydian** | 1-2-3-♯4-5-6-7 | Dreamy, floating | Film scores, fusion, progressive |
-| **Mixolydian** | 1-2-3-4-5-6-♭7 | Dominant, bluesy | Rock, blues, country, folk |
-| **Aeolian** (Natural Minor) | 1-2-♭3-4-5-♭6-♭7 | Sad, dark | Classical, rock, metal |
-| **Locrian** | 1-♭2-♭3-4-♭5-♭6-♭7 | Unstable, dissonant | Rarely used; metal, avant-garde |
+The move that actually makes modes audible: play the mode over a single-chord drone (loop pedal or backing track holding one chord), and lean hard on the note that differs from the parallel major/minor. For D Dorian over a static Dm chord, that note is B natural (the natural 6th) — hit it on a strong beat and the Dorian color snaps into focus. Without the drone, modes just sound like "the minor scale starting somewhere else" and the ear can't track the difference.
 
-**Modal application example: D Dorian**
+### 5.3 Chords from the scale: triads and 7ths
 
-D Dorian shares notes with C Major but emphasizes D as tonic:
-```
-D-E-F-G-A-B-C-D
-1-2-♭3-4-5-6-♭7
-```
+Triads in C major (stack root-3rd-5th on each scale degree):
 
-**Characteristic lick** (Dorian over Dm7 vamp):
-```
-E|---10--13--10-----------|
-B|-12-----------12--10----|
-G|--------------------12--|
-D|------------------------|
-A|------------------------|
-E|------------------------|
-```
+| Degree | Chord | Notes | Quality |
+|---|---|---|---|
+| I | C | C-E-G | major |
+| ii | Dm | D-F-A | minor |
+| iii | Em | E-G-B | minor |
+| IV | F | F-A-C | major |
+| V | G | G-B-D | major |
+| vi | Am | A-C-E | minor |
+| vii° | Bdim | B-D-F | diminished |
 
-The major 6th (B natural) defines Dorian character. In D natural minor (Aeolian), that B would be B♭.
+Add the 7th (another third stacked on top) for jazz/soul harmony:
 
-**Modal practice strategy**:
-1. Play the mode over a drone (one-chord vamp on backing track)
-2. Emphasize the tonic and characteristic tones (e.g., ♯4 in Lydian, ♭2 in Phrygian)
-3. Create short melodies highlighting modal color
-4. Identify modal sounds in real music (Santana uses Dorian heavily; Steve Vai favors Lydian)
+| Degree | Chord | Notes |
+|---|---|---|
+| Imaj7 | Cmaj7 | C-E-G-B |
+| ii7 | Dm7 | D-F-A-C |
+| V7 | G7 | G-B-D-F |
+| vi7 | Am7 | A-C-E-G |
 
-### Chord Construction from Scale Degrees
+**Progressions worth having under your fingers in every key:**
 
-Chords are built by stacking thirds from scale degrees.
+- I–IV–V–I: `C | F | G | C` — the bedrock rock/blues/folk cadence.
+- I–vi–IV–V ("50s progression"): `C | Am | F | G` — doo-wop, "Stand By Me."
+- ii–V–I (jazz cadence): `Dm7 | G7 | Cmaj7` — the single most important three-chord unit in jazz vocabulary.
 
-**Triads in C Major** (1-3-5 of each scale degree):
+**Drill:** run each progression through all five CAGED positions, picking the closest chord shape to the previous one rather than jumping to the nearest open-position chord — this trains voice-leading (minimal finger movement between chords), which is what makes chord changes sound connected instead of chopped.
 
-| Degree | Chord | Notes | Quality | Roman Numeral | Function |
-|--------|-------|-------|---------|---------------|----------|
-| I | C | C-E-G | Major | I | Tonic (home) |
-| ii | Dm | D-F-A | Minor | ii | Pre-dominant |
-| iii | Em | E-G-B | Minor | iii | Tonic substitute |
-| IV | F | F-A-C | Major | IV | Subdominant |
-| V | G | G-B-D | Major | V | Dominant |
-| vi | Am | A-C-E | Minor | vi | Relative minor |
-| vii° | Bdim | B-D-F | Diminished | vii° | Leading-tone |
+### 5.4 Secondary dominants (borrowed tension)
 
-**Seventh chords** (add the 7th scale degree):
-
-| Degree | Chord | Notes | Quality | Roman Numeral |
-|--------|-------|-------|---------|---------------|
-| I | Cmaj7 | C-E-G-B | Major 7 | Imaj7 |
-| ii | Dm7 | D-F-A-C | Minor 7 | ii7 |
-| iii | Em7 | E-G-B-D | Minor 7 | iii7 |
-| IV | Fmaj7 | F-A-C-E | Major 7 | IVmaj7 |
-| V | G7 | G-B-D-F | Dominant 7 | V7 |
-| vi | Am7 | A-C-E-G | Minor 7 | vi7 |
-| vii° | Bm7♭5 | B-D-F-A | Half-diminished | viiø7 |
-
-**Functional harmony progressions**:
-
-**I-IV-V-I** (foundational cadence):
-```
-| C | F | G | C |
-```
-Used in thousands of songs: "Wild Thing," "La Bamba," "Twist and Shout"
-
-**I-vi-IV-V** ("50s progression"):
-```
-| C | Am | F | G |
-```
-"Stand By Me," "Every Breath You Take," "Don't Stop Believin'"
-
-**ii-V-I** (jazz standard):
-```
-| Dm7 | G7 | Cmaj7 |
-```
-Pre-dominant → Dominant → Tonic. Foundation of jazz harmony.
-
-**Practice**: Play these progressions in all 12 keys using CAGED chord shapes. Focus on smooth voice leading (minimal finger movement between chords).
-
-## 9. Music Theory in Action: Analysis and Application
-
-### Roman Numeral Analysis
-
-Roman numeral analysis identifies chord function regardless of key. Uppercase = major, lowercase = minor, ° = diminished.
-
-**Example: "Let It Be" by The Beatles (C Major)**
+A secondary dominant briefly treats a non-tonic chord as if it were a new tonic, using its own V7 to approach it. Notation: `V7/x` ("five-seven of x").
 
 ```
-Verse:
-| C     | G     | Am    | F     |
-| I     | V     | vi    | IV    |
-| C     | G     | F     | C     |
-| I     | V     | IV    | I     |
+Key of C:  | C  | D7      | G  | C |
+            I     V7/V      V    I
 ```
 
-**Functional analysis**:
-- **C (I)**: Tonic, home base
-- **G (V)**: Dominant, creates tension
-- **Am (vi)**: Relative minor, adds color
-- **F (IV)**: Subdominant, pre-dominant function
+D7 contains F♯, outside the C major key — that borrowed tension pulls strongly into G, making the arrival on G feel earned rather than just "next chord in the list." Common ones to drill: `A7→Dm` (V7/ii), `D7→G` (V7/V), `E7→Am` (V7/vi). Practice I–V7/V–V–I in every key; it's one pattern transposed twelve times.
 
-This progression works in **any key**. Transpose to A Major:
-```
-| A     | E     | F#m   | D     |
-| I     | V     | vi    | IV    |
-```
+### 5.5 Borrowed chords (modal interchange)
 
-Same harmonic function, different pitch center.
-
-### Secondary Dominants: Tonicization
-
-A **secondary dominant** is a dominant chord (V7) temporarily tonicizing a chord other than the tonic. Notation: V7/x ("five-seven of x").
-
-**Example: V7/V in C Major**
-
-To tonicize G (V chord), treat G temporarily as if it's the I chord. What's the V7 of G? D7.
+Borrowing a chord from the parallel minor key injects a quick shadow of darkness into a major progression.
 
 ```
-| C     | D7    | G     | C     |
-| I     | V7/V  | V     | I     |
+Standard:  | C | F  | G | C |
+Borrowed:  | C | Fm | G | C |   (iv borrowed from C minor)
 ```
 
-The D7 (D-F#-A-C) contains F#, a note not in C Major. This chromaticism creates forward motion.
-
-**Common secondary dominants in major keys**:
-- **V7/ii**: Dominant of ii (e.g., A7 → Dm in C Major)
-- **V7/iii**: Dominant of iii (e.g., B7 → Em in C Major)
-- **V7/IV**: Dominant of IV (e.g., C7 → F in C Major)
-- **V7/V**: Dominant of V (e.g., D7 → G in C Major)
-- **V7/vi**: Dominant of vi (e.g., E7 → Am in C Major)
-
-**Practical application drill**:
-
-Play I–V7/V–V–I in all 12 keys:
-```
-Key of C: | C | D7 | G | C |
-Key of G: | G | A7 | D | G |
-Key of D: | D | E7 | A | D |
-[Continue through all keys]
-```
-
-Notice how the secondary dominant "points" toward the next chord, creating stronger harmonic motion.
-
-### Modal Interchange (Borrowed Chords)
-
-**Modal interchange** borrows chords from parallel modes. Example: C Major borrows from C Minor.
-
-**C Major diatonic chords**: C, Dm, Em, F, G, Am, Bdim
-
-**C Minor diatonic chords**: Cm, Ddim, E♭, Fm, Gm, A♭, B♭
-
-**Common borrowed chords in major keys**:
-- **♭VI** (A♭ in C): Borrowed from Aeolian (minor). Creates dark, expansive sound.
-- **♭VII** (B♭ in C): Borrowed from Mixolydian. Common in rock.
-- **iv** (Fm in C): Borrowed from Aeolian. Minor subdominant, poignant quality.
-
-**Example: "Creep" by Radiohead (G Major)**
-
-```
-| G     | B     | C     | Cm    |
-| I     | III   | IV    | iv    |
-```
-
-The Cm is borrowed from G minor. The C (major) to Cm (minor) shift creates the signature melancholy.
-
-**Practice**: Take a I–IV–V–I progression and substitute one borrowed chord:
-```
-Original:  | C | F  | G | C |
-Borrowed:  | C | Fm | G | C |  (iv borrowed from C minor)
-```
-
-Notice the emotional shift.
-
-## 10. Repertoire Development and Musical Expression
-
-### Learning a New Piece: Systematic Approach
-
-**Phase 1: Analysis (No guitar, 10 minutes)**
-1. Listen to recording 3× (target artist, then 2 other interpretations)
-2. Identify key, time signature, form (verse, chorus, bridge)
-3. Note technical challenges (difficult fingerings, fast passages, chord stretches)
-4. Set learning goals (performance-ready in 2 weeks? 4 weeks?)
-
-**Phase 2: Segmentation (With guitar, 20 minutes)**
-1. Divide piece into 4–8 bar phrases
-2. Learn each phrase in isolation
-3. Identify optimal fingerings (write in TAB or standard notation)
-4. Map to CAGED positions or scale patterns
-
-**Phase 3: Slow Practice (Days 1–7, 30 min/day)**
-1. Practice each phrase at 50% tempo
-2. Metronome on quarters, then eighths
-3. Focus on accuracy over speed
-4. Record daily; track improvement
-
-**Phase 4: Integration (Days 8–14, 30 min/day)**
-1. Connect phrases: A+B, B+C, etc.
-2. Increase tempo 10 BPM every 2 days
-3. Identify transitions that break flow; isolate and drill
-4. Play along with backing track
-
-**Phase 5: Musical Interpretation (Days 15–21, 30 min/day)**
-1. Add dynamics (volume contours)
-2. Refine articulation (staccato, legato, accents)
-3. Experiment with tone (pick position, attack angle)
-4. Internalize phrasing (where to breathe, where to push forward)
-
-**Phase 6: Performance Readiness (Days 22–30, 30 min/day)**
-1. Play from memory (no TAB or sheet music)
-2. Simulate performance pressure (record video, play for friend)
-3. Recover from errors gracefully (don't stop mid-performance)
-4. Polish weak sections at 90% of target tempo
-
-### Dynamics and Articulation
-
-**Dynamics**: Volume contours that shape musical narrative.
-
-| Symbol | Term | Volume | Usage |
-|--------|------|--------|-------|
-| pp | Pianissimo | Very soft | Intimate, delicate passages |
-| p | Piano | Soft | Gentle, lyrical |
-| mp | Mezzo-piano | Moderately soft | Conversational |
-| mf | Mezzo-forte | Moderately loud | Standard baseline |
-| f | Forte | Loud | Strong, assertive |
-| ff | Fortissimo | Very loud | Climactic, dramatic |
-| < | Crescendo | Getting louder | Building intensity |
-| > | Diminuendo | Getting softer | Releasing tension |
-
-**Articulation**: How notes are attacked and released.
-
-- **Legato**: Smooth, connected. On guitar: hammer-ons, pull-offs, slides.
-- **Staccato**: Short, detached. On guitar: palm muting or abrupt finger release.
-- **Accent (>)**: Emphasized attack. Stronger pick stroke or finger pluck.
-- **Tenuto (−)**: Full note value, slight emphasis. Sustain without shortening.
-
-**Dynamic shaping example: Phrase from "Asturias" (Albéniz)**
-
-```
-Dynamic:     mp     <      f       >      p       <     mf
-Measure:   |-------|-------|-------|-------|-------|-------|
-
-Technique: Start soft (mp), gradually increase to strong climax (f), 
-release tension (p), rebuild to moderate finish (mf).
-```
-
-**Practice**: Take a simple scale or melody. Play it with three different dynamic contours:
-1. Steady mf throughout (boring, mechanical)
-2. Crescendo from p to f (building excitement)
-3. f → p → f (tension and release)
-
-Record each. Notice how dynamics transform the same notes into different emotional statements.
-
-### Vibrato: Pitch Modulation for Expression
-
-Vibrato is periodic pitch variation that adds warmth, intensity, and vocal quality to sustained notes.
-
-**Classical vibrato** (longitudinal):
-- Finger rocks string parallel to frets (toward and away from nut)
-- Pitch oscillates slightly sharp, returns to center
-- Width: ~10–30 cents (1 cent = 1/100 of a semitone)
-- Rate: 5–7 oscillations per second
-
-**Rock/blues vibrato** (lateral):
-- Finger pulls string perpendicular to frets (toward floor or ceiling)
-- More aggressive, wider pitch variation
-- Width: 30–100 cents (can approach quarter-tone)
-- Rate: 3–6 oscillations per second
-
-**Vibrato technique drill**:
-1. Fret 3rd string, 7th fret (D note)
-2. Rock finger toward nut and back, 5× slowly
-3. Focus: Pitch rises slightly, returns to center (not flat)
-4. Increase rate gradually: 2 oscillations/sec → 4 → 6
-5. Experiment with width: Narrow (subtle shimmer) to wide (B.B. King style)
-
-**Musical application**: Vibrato is applied to notes you want to emphasize—melody peaks, phrase endings, emotionally charged moments. Not every note needs vibrato. Overuse dilutes impact.
-
-### Phrasing: Musical Sentences and Breathing
-
-Phrasing is the organization of notes into coherent musical statements, analogous to sentences in language.
-
-**Antecedent-consequent structure**:
-- **Antecedent** (question): Creates tension, ends on non-tonic harmony
-- **Consequent** (answer): Resolves tension, ends on tonic
-
-**Example: "Happy Birthday"**
-
-```
-Phrase 1 (Antecedent): "Happy birthday to you" — ends on V, feels incomplete
-Phrase 2 (Consequent): "Happy birthday to you" — ends on I, resolves
-```
-
-**Guitarist's breathing**: Even though guitar doesn't require breath like wind instruments, musical phrasing demands internal "breath." Slight pause or dynamic dip between phrases creates space.
-
-**Phrasing exercise**:
-1. Play a major scale, 2 octaves, as one continuous phrase (no pauses)
-2. Now divide into two phrases: First octave ends on 5, pause, second octave ends on 1
-3. Notice how the pause creates structure
-
-Apply this to repertoire: Identify phrase boundaries. Add subtle dynamic dip or slight ritard at phrase endings. Record and compare to version without phrasing—structured version sounds infinitely more musical.
+Radiohead's "Creep" (in G) does exactly this: `G | B | C | Cm` — the C-to-Cm move (IV to iv) is the entire emotional hook of the song. Take any I-IV-V-I you already play and swap the IV for iv once, listen to the shift, then try ♭VI (Ab in the key of C) or ♭VII (Bb in C) as alternate substitutions in the same slot.
 
 ---
 
-## Summary: Integration and Next Steps
+## 6. Practice Architecture That Actually Builds Skill
 
-This lesson establishes foundational physics, ergonomics, and musical theory that underlie all guitar performance. The key integration points:
+### 6.1 Session template (90 minutes)
 
-1. **Physics informs technique**: Understanding string vibration and harmonic series explains why plucking position, fret placement, and intonation matter.
-2. **Biomechanics enable efficiency**: Correct hand posture and minimal force prevent injury and maximize speed.
-3. **Theory unlocks the fretboard**: CAGED system, modes, and chord construction provide a navigational framework.
-4. **Setup affects playability**: Action, relief, and intonation must be optimized for your playing style.
-5. **Practice methodology accelerates progress**: Slow, deliberate repetition with metronome builds skill faster than mindless noodling.
+```mermaid
+graph TD
+    subgraph session_90 ["90-Minute Practice Session"]
+        warm["Warm-up — 15 min<br/>chromatic scales 60 BPM,<br/>finger independence, chord changes"]
+        tech["Technical work — 30 min<br/>metronome drills on current weak link<br/>(picking speed, sweeps, stretches)"]
+        music["Musical application — 30 min<br/>repertoire, apply technique in context,<br/>record and compare"]
+        creative["Creative time — 15 min<br/>improvise, no metronome, no judgment"]
+        warm --> tech --> music --> creative
+    end
+```
 
-**Immediate action items**:
-1. **Setup check**: Measure action at 12th fret, check neck relief, verify intonation. Adjust as needed or consult a tech.
-2. **CAGED drill**: Spend 15 minutes daily mapping one major scale through all five positions. Change keys weekly.
-3. **Metronome discipline**: Every technical drill uses metronome. Start at 60% of target tempo. Perfect technique, then speed.
-4. **Record weekly**: One 2-minute recording per week. Document progress, identify weak areas.
-5. **Learn one song per month**: Apply systematic learning phases. Build repertoire deliberately.
+Passive repetition without a specific target ("noodling") builds almost no transferable skill — it feels productive because time passes, but the hand isn't being asked to correct anything. Every block above should have a named target before you start the timer.
 
-**Next lesson topics**:
-- **Advanced harmony**: Extended chords (9ths, 11ths, 13ths), altered dominants, chord-scale relationships
-- **Genre-specific techniques**: Blues bending and phrasing, jazz comping and voice leading, classical tremolo and rasgueado, flamenco compás and palmas
-- **Improvisation frameworks**: Pentatonic and blues scales, chord-tone soloing, modal improvisation, harmonic substitution
-- **Transcription skills**: Ear training, lifting solos by ear, transcribing to standard notation and TAB
+### 6.2 Error correction loop
 
-The foundation is set. Now build the house.
+1. Identify the exact error (missed note, rushed beat, buzzing string, tonal dropout).
+2. Isolate the smallest unit containing it — two to four notes, not the whole phrase.
+3. Slow to 50% tempo. Play it perfectly ten times in a row at that speed.
+4. Raise 10 BPM. Repeat until clean.
+5. Drop the isolated fragment back into the full phrase.
+
+This loop is faster than it feels. Running a bad four-bar passage at full speed twenty times teaches your hand the mistake twenty times; isolating two notes and fixing them at half speed for two minutes actually rewires the motion.
+
+### 6.3 Metronome subdivision ladder
+
+| Week | Subdivision | Click pattern | Focus |
+|---|---|---|---|
+| 1 | Quarter notes | 1 note/click, 60 BPM | land exactly on the click |
+| 2 | Eighth notes | 2 notes/click | even spacing |
+| 3 | Triplet eighths | 3 notes/click | true ternary feel, not 2+1 |
+| 4 | Sixteenth notes | 4 notes/click | stay relaxed at higher density |
+| 5 | Backbeat displacement | click only on 2 & 4 | internalize beats 1 & 3 without hearing them |
+| 6 | Mixed subdivisions | quarters→eighths→sixteenths→quarters, 4 beats each | simulate real phrase structure |
+
+Week 5 is the one most players skip and most need — if you can only find the beat when the click is on it, you don't yet have independent time.
+
+### 6.4 Recording as a diagnostic tool
+
+Record weekly with a phone 3–4 feet away, nothing fancier needed at first. Play the target passage three times without stopping, then listen back for: rushing or dragging, uneven note volume, dead/choked notes, mechanical vs. breathing phrasing. Write down two or three specific fixes, drill them for fifteen minutes using the error correction loop, record again, compare.
+
+Record video monthly with both hands in frame, watch with sound muted first. This isolates posture and tension problems your ears normally mask — hunched shoulders, a locked right wrist, a left thumb clamping instead of bracing. These are easy to miss by feel and obvious on video.
+
+---
+
+## 7. Vibrato, Dynamics, and Phrasing
+
+### 7.1 Vibrato
+
+**Classical (longitudinal):** rock the fretting finger along the string's length, toward and away from the nut. Subtle pitch bend, centered, around 5–7 oscillations per second. Used in nylon-string classical repertoire.
+
+**Blues/rock (lateral):** pull the string sideways, perpendicular to the frets, toward floor or ceiling. Wider, more aggressive pitch swing, 3–6 oscillations per second — B.B. King wide vibrato sits at the extreme end of this range.
+
+**Drill:** fret the D on the 3rd string, 7th fret. Rock the finger slowly five times, listening for the pitch rising and returning to center, not dipping flat. Build rate gradually: 2 oscillations/sec → 4 → 6, then try width — narrow shimmer first, wide blues bend second. Apply vibrato to notes that matter (phrase endings, melodic peaks) — vibrato on every note flattens expression instead of adding it.
+
+### 7.2 Dynamics and articulation
+
+| Marking | Meaning | Guitar execution |
+|---|---|---|
+| p / mp / mf / f | soft → loud | pick/finger attack force, distance from bridge |
+| crescendo (<) | gradual louder | gradually increase attack force across a phrase |
+| legato | smooth, connected | hammer-ons, pull-offs, slides |
+| staccato | short, detached | palm mute or quick finger lift right after the note |
+| accent (>) | emphasized | sharper attack on that specific note only |
+
+**Drill:** play a two-octave major scale three ways — flat mf throughout (control baseline), crescendo p→f ascending, then f→p→f with a dip in the middle. Record all three. The notes are identical; only the dynamic shape differs, and that shape is most of what separates "playing the right notes" from "playing music."
+
+### 7.3 Phrasing
+
+Think in musical sentences: an antecedent phrase that creates tension (often landing on V or a non-tonic note) answered by a consequent phrase that resolves (landing on I). "Happy Birthday" is the clearest possible example — the first "happy birthday to you" feels unfinished, the second resolves.
+
+**Drill:** play a two-octave scale as one unbroken run, then replay it split into two phrases with a deliberate breath (slight pause, slight dynamic dip) between the first octave's ending and the second's beginning. Record both. The paused version will sound musical; the unbroken version will sound like a technical exercise, even though the notes are identical. Apply this same breath-finding process to any piece you're learning: mark where the phrases end before you worry about dynamics or tone.
+
+---
+
+## 8. Learning a Piece: A Working Process
+
+**Phase 1 — Analysis, no guitar (10 min):** listen to the recording several times, identify key/time signature/form, flag the technically hard spots, set a realistic target date.
+
+**Phase 2 — Segmentation (20 min):** break the piece into 4–8 bar phrases, work out fingerings for each, map them onto CAGED positions or scale boxes you already know.
+
+**Phase 3 — Slow practice (days 1–7, 30 min/day):** each phrase at 50% tempo, metronome on, accuracy over speed, record daily.
+
+**Phase 4 — Integration (days 8–14):** connect adjacent phrases, raise tempo 10 BPM every two days, isolate any transition that breaks the flow and drill it alone.
+
+**Phase 5 — Interpretation (days 15–21):** add dynamics, refine articulation, adjust tone via pick/finger position, decide where the phrase breathes.
+
+**Phase 6 — Performance readiness (days 22–30):** play from memory, record video or play for someone else to simulate pressure, practice recovering from a slip without stopping, polish weak bars at 90% of final tempo.
+
+This is a four-week framework, not a rulebook — compress or extend phases based on the piece's difficulty, but don't skip Phase 1. Players who go straight to the guitar without analyzing the piece first spend far more total hours getting to the same result.
+
+---
+
+## Summary and Immediate Action Items
+
+1. **Setup first.** Measure action at the 12th fret, check relief with the capo/feeler-gauge method, verify intonation against the 12th-fret harmonic. A guitar fighting you caps every other skill below it.
+2. **CAGED, 15 minutes daily.** One key through all five shapes, new key each week.
+3. **Every technical drill runs on a metronome**, starting at roughly 60% of target tempo. Add speed only after three clean reps in a row.
+4. **Record weekly**, video monthly. Your ears and eyes catch different problems than your hands feel in the moment.
+5. **Learn one piece per month** using the six-phase process — deliberate repertoire building beats random practicing.
+
+**Next lesson:** extended jazz harmony (9ths, 11ths, 13ths, altered dominants), genre technique deep dives (blues bending/phrasing, jazz comping, flamenco compás), improvisation frameworks (pentatonic/blues scales, chord-tone soloing, modal improv), and ear-training/transcription method.
