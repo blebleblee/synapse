@@ -1,0 +1,140 @@
+# Lesson 2: Weight Transfer, Load Distribution, Chassis Balance
+
+## 1. First-Principles Intuition & Invariants
+
+Every lap a racing car turns is a negotiation between the tires and the pavement, mediated entirely by vertical load. The tire's ability to generate lateral or longitudinal grip is not linear with the vertical force pressing it into the track. As you load a tire harder, its grip increases, but at a diminishing rate. This is the tire load sensitivity curve—the most important physical invariant in all of vehicle dynamics. It is the reason weight transfer hurts cornering grip. It is the reason a balanced car is faster than a symmetrically loaded one. It is the reason every chassis adjustment you will ever make at the track is ultimately an attempt to redistribute vertical load across four contact patches, each roughly the size of a postcard.
+
+Consider a car cornering at 1.0 G of lateral acceleration. If the car weighs 1,200 kg with a center of gravity height of 500 mm and a track width of 1,600 mm, the total lateral load transfer—the sum of weight shifted from the inside pair of tires to the outside pair—is approximately 375 kg. That load does not disappear; it moves. The outside tires gain it, the inside tires lose it. Because of tire load sensitivity, the gain in grip on the outside tires is less than the loss of grip on the inside tires. The net cornering force of the axle drops. The more load you transfer, the more total grip you sacrifice. This is immutable. You cannot eliminate load transfer without lowering the center of gravity to zero or widening the track to infinity. You can only manage where it goes and how quickly it arrives.
+
+The driver feels this as the car rolls onto its outside suspension in a corner, the steering weight builds, and the chassis settles into a steady-state yaw attitude. The race engineer sees it in the telemetry as the outside suspension potentiometers compress, the inside ones extend, and the lateral accelerometer traces a plateau. The challenge for both is the same: distribute the inevitable load transfer front-to-rear in a proportion that keeps both axles near their peak grip simultaneously, so the car rotates predictably at corner entry, holds a neutral line at the apex, and puts power down cleanly on exit.
+
+Three forms of load transfer act on the chassis. Longitudinal transfer occurs under braking and acceleration, shifting load front-to-rear along the wheelbase. Lateral transfer occurs during cornering, shifting load across the track width from inside to outside. Vertical or "geometric" transfer comes from the suspension links themselves—control arms, tie rods, and their pickup points physically push or pull on the chassis as they articulate, generating a reaction force that bypasses the springs entirely. The relative proportion of geometric versus elastic (spring- and anti-roll-bar-mediated) load transfer at each axle determines how sharply the car responds to a steering or pedal input and how stable it is once settled.
+
+The center of gravity height is the single most powerful geometric parameter in this system. Halve the CG height and you halve total lateral load transfer at every G, at every speed, in every corner. This is why formula cars sit as low as their plank and legality plank wear allow, why GT teams chase every millimeter of rake and ride height, and why moving heavy components like the battery, fuel cell, or ballast to the floor of the chassis pays direct dividends in cornering grip. Track width matters equally for lateral transfer, and wheelbase matters for longitudinal transfer, but both are typically fixed by regulations. The CG height is the parameter the engineer can still influence through packaging and setup, and its effect compounds across every phase of every corner.
+
+Total load transfer is fixed by physics for a given acceleration, CG height, track width, and wheelbase. What the engineer controls is the distribution of that transfer between front and rear axles. This is the chassis balance. Push more of the lateral transfer to the front axle and the front tires lose more of their combined grip relative to the rears, producing understeer. Push more to the rear and the rear axle loses relatively more grip, producing oversteer. The tools for shifting this distribution are the spring rates, anti-roll bar stiffnesses, roll center heights, and damper settings at each axle. These are the levers. The rest of this chapter is about how to pull them.
+
+## 2. Core Architecture & Mechanics
+
+### The Load Transfer Equation in Practice
+
+The lateral load transfer on a single axle is governed by a relationship that every race engineer should be able to recite from memory. The total lateral load transfer at an axle equals the lateral acceleration times the total vehicle mass times the CG height, multiplied by the ratio of that axle's roll resistance to the total roll resistance of the car, plus a term for the geometric load transfer generated by the suspension links' instantaneous centers. In practice, most setup work happens at the level of the elastic distribution: the springs and anti-roll bars.
+
+```
+ΔW_front = (m · ay · hCG / t) × [K_roll_front / (K_roll_front + K_roll_rear)] + ΔW_geo_front
+ΔW_rear  = (m · ay · hCG / t) × [K_roll_rear / (K_roll_front + K_roll_rear)] + ΔW_geo_rear
+
+Where:
+  m       = vehicle mass (kg)
+  ay      = lateral acceleration (m/s²)
+  hCG     = center of gravity height (m)
+  t       = track width (m)
+  K_roll  = roll stiffness (N·m/rad)
+  ΔW_geo  = geometric load transfer via suspension links (N)
+```
+
+The key insight is the roll stiffness ratio. If the front axle accounts for 60% of the car's total roll stiffness, then roughly 60% of the elastic load transfer goes through the front. Stiffen the front spring or anti-roll bar and you push more load transfer to the front tires, which reduces their net grip and introduces understeer. Stiffen the rear and you shift transfer to the back, loosening the car into oversteer. This is the fundamental tuning dial, and almost every handling complaint at the track maps back to it.
+
+The roll stiffness of a single axle comes from two sources in parallel: the wheel rates of the springs and the effective wheel rate of the anti-roll bar. A 400 lb/in front spring on a motion-ratio-1.5 damper produces a wheel rate of approximately 178 lb/in. A 1.5-inch solid front anti-roll bar with a 12-inch lever arm adds another 120 lb/in of effective wheel rate in roll only (not in heave or pitch). Together they define how many Newton-meters of roll moment are required to rotate the chassis body by one radian. The spring acts in both roll and heave; the anti-roll bar acts only in roll, which is what makes it such a surgical tool for balance tuning without affecting ride quality or pitch behavior.
+
+### Anti-Roll Bars: The Primary Balance Lever
+
+The anti-roll bar is a torsion spring that links the left and right wheels of an axle. When both wheels move up equally (heave over a crest), the bar does nothing. When one wheel compresses and the other extends (roll), the bar twists, resisting the motion and transferring load from the inside wheel to the outside. It is the most commonly adjusted component on any race car because it directly changes the elastic load transfer distribution without altering the static ride height, the spring rates, or the pitch behavior under braking.
+
+Most production-based race cars and club racing platforms use blade-type adjustable anti-roll bars, where rotating a flat blade at the bar's end link changes the lever arm and thus the torsional stiffness. The adjustment is indexed in clicks or half-turns, and the effective rate change per click depends on the blade geometry. A typical front blade adjuster on a GT4-class car might vary from 80 lb/in to 220 lb/in of equivalent wheel rate across its six-position range, a nearly 3:1 change in roll contribution from the front bar alone. This is why bar adjustments are the first thing changed in a pit-lane setup change: the effect is large, fast to execute, and does not require re-corner-weighting the car.
+
+The practical tuning rule is straightforward. If the car understeers on corner entry and at the apex, soften the front bar or stiffen the rear bar. If it oversteers, do the opposite. The nuance is in distinguishing steady-state from transient behavior. Anti-roll bars primarily affect steady-state balance, because their force builds with chassis roll angle, which takes time to develop. Dampers affect the transient phase, because their force is velocity-dependent and acts immediately when the chassis starts to roll. A car that turns in sharply then pushes at the apex has a damper issue on entry and a bar issue at mid-corner. Reading this distinction from the steering trace and the lateral G trace in the data is a core skill.
+
+### Roll Centers and Geometric Load Transfer
+
+The roll center is the point about which the chassis body rotates laterally, defined by the suspension geometry. It is located by drawing lines through the suspension's instantaneous centers of rotation to the tire contact patch. For a double wishbone suspension, the inboard pickup points and the control arm lengths determine where the roll center sits vertically and laterally. For a MacPherson strut, the upper mount replaces the upper control arm, and the geometry produces a lower roll center, typically near ground level or slightly below.
+
+The roll center height determines how much geometric load transfer occurs at that axle independent of the springs. A high roll center means more of the load transfer bypasses the springs, creating an immediate, stiff response to steering input. A low roll center means more of the load transfer goes through the springs and bars, creating a softer, more progressive response. The lateral distance from the roll center to the contact patch centerline also affects the jacking force—a vertical force that pushes the entire chassis body up or pulls it down during cornering, which is why some suspension geometries exhibit visible chassis heave in high-G corners.
+
+Roll center migration is the change in roll center location as the suspension articulates through its travel. A well-designed kinematic suspension keeps the roll center relatively stable, shifting only a few millimeters through the normal range of compression and rebound. A poorly designed or poorly setup suspension can see the roll center move laterally by 50 mm or more through bump and rebound, creating asymmetric jacking forces that produce unpredictable mid-corner balance changes. This is particularly problematic on production-based MacPh strut cars, where camber gain is limited and the roll center tends to drop significantly under compression, increasing geometric understeer exactly when the outside front tire is most heavily loaded.
+
+### Longitudinal Load Transfer and Pitch Platform
+
+Under braking, load shifts from the rear to the front. The magnitude is the same equation as lateral transfer but along the wheelbase instead of the track. A 1,200 kg car braking at 1.2 G with a 500 mm CG height and a 2,600 mm wheelbase transfers approximately 274 kg to the front axle. This is why the front tires do most of the braking work and why front brake bias is typically 55-65% front in most configurations. It is also why the front suspension compresses and the rear extends under braking—the pitch angle that the dampers must control.
+
+The pitch platform is the dynamic ride height and attitude of the chassis under longitudinal acceleration. It matters because aerodynamic platforms are extremely sensitive to ride height, particularly at the front splitter and rear diffuser. A GT3 car running 45 mm front ride height and 55 mm rear (10 mm of rake) may gain 30-40% more front downforce than at 55 mm front. But if the car dives 10 mm under braking, the splitter drops to 35 mm, stalling the front aero flow and producing sudden understeer at precisely the moment the driver is trail-braking into the corner. Controlling pitch through spring rate, bump stop engagement, and damper bump stiffness is the most critical setup task for any aero-dependent car.
+
+The brake bias knob in the cockpit is the driver's real-time longitudinal load transfer management tool. Moving bias forward uses the front tires harder, which is necessary under heavy braking when load is forward, but creates turn-in understeer as the driver releases brake pressure and the front tires are asked to both decelerate and turn simultaneously. Moving bias rearward helps the car rotate on corner entry by asking the rear tires to do more braking, which destabilizes them and initiates yaw. The optimal bias changes throughout a braking zone and across a lap as fuel burns off and tire temperatures shift, which is why adjustable bias is one of the most powerful tools in the cockpit.
+
+### Diagonal Weight and Static Setup
+
+Static corner weighting is the foundation of chassis setup and the most overlooked at club level. The goal is to have the left-side weight match the right-side weight as closely as possible on a car that corners symmetrically, or to bias it deliberately for a track with predominantly one direction. More importantly, the cross-weight—or diagonal weight—must be set so that the car turns left and right with equal mechanical grip. Cross-weight is the sum of the left-front and right-rear corner weights expressed as a percentage of total vehicle weight.
+
+```
+Cross-weight (%) = [(LF + RR) / Total] × 100
+
+Target: 50.0% for symmetric tracks
+        49-52% for road courses with dominant corner direction
+```
+
+A car with 50% cross-weight will turn left and right with identical balance. A car with 52% cross-weight will understeer in left turns and oversteer in right turns, because the heavy diagonal (LF + RR) loads the outside front tire harder in left turns (reducing its net grip via load sensitivity) while the outside rear is relatively under-loaded in left turns. This asymmetry is sometimes deliberate on oval tracks, where you only turn left and want the left-front and right-rear corners to carry more static load to counteract the lateral transfer. On a road course, it is almost always unintentional and harmful.
+
+Cross-weight is adjusted by raising or lowering individual spring perches, which changes the ride height at that corner. Raising the left-front perch increases LF weight, but it also decreases RR weight by the same amount through the chassis torsion. The wrench action is small: one full turn of a standard 5/8-18 threaded perch on a typical 600 lb/in spring changes corner weight by approximately 6-8 lbs, shifting cross-weight by roughly 0.3%. The setup sheet target for a balanced race car on a road course is 50.0 ± 0.5% cross-weight, with the total left-side weight matched to the track's dominant corner direction within 1%.
+
+### Weight Jacking and Dynamic Redistribution
+
+Weight jacking refers to the deliberate shifting of static corner weights to influence dynamic balance. On production-based cars with coil-over conversions, this is done at the spring perches. On cars with pushrod suspension, it is done with shims on the torsion bars or spring packs. The principle is the same: changing ride height at one corner twists the chassis, redistributing weight across all four corners.
+
+The critical insight is that weight jacking changes static load but also preloads the springs, which changes their effective working range. If you add 50 lbs to the right-rear by raising its perch, you compress that spring slightly more, which means it starts further up its rate curve. Under dynamic load, the right-rear spring will resist compression more firmly, which shifts load transfer toward that corner during cornering. This is why weight jacking is a powerful tool but one that interacts with spring rates and damper settings in complex ways that only telemetry can fully reveal.
+
+## 3. High-Performance Optimization & Failure Modes
+
+### Combined Inputs and the Friction Circle
+
+The real world of driving rarely presents pure lateral or pure longitudinal acceleration. A corner is a continuous flow from braking through turn-in to apex to throttle application to exit, and the tires are asked to deliver combined forces throughout. The friction circle—the G-G diagram—maps the total force vector the contact patch can produce in any direction. The envelope is roughly elliptical, slightly larger in pure lateral than in pure longitudinal for most racing slicks, and the driver's job is to trace the edge of that ellipse as smoothly as possible through every phase of the corner.
+
+Weight transfer under combined inputs is not simply the sum of lateral and longitudinal transfer. When the car is simultaneously braking and turning, the outside front tire is loaded by both the longitudinal transfer (braking) and the lateral transfer (cornering). The inside rear is unloaded by both. The total load on the outside front can exceed its static load by 150-200% in heavy trail braking zones, pushing the tire beyond its peak grip and into sliding. The driver feels this as the steering goes light and the car pushes wide at turn-in. The race engineer sees it in the data as the front wheel speed drops below the rears (the front tires are sliding) and the steering angle exceeds the yaw rate's implied value.
+
+Managing combined transfer is the core skill of performance driving and the core challenge of setup. The driver controls it through trail braking technique: gradually releasing brake pressure as steering angle increases, so the longitudinal and lateral force vectors sum to stay near the edge of the friction circle without exceeding it. The engineer controls it through brake bias (how much of the braking load is on the front), damper settings (how quickly the pitch platform settles during the brake release), and anti-roll bar stiffness (how quickly roll builds during the steering input). A car that is well-balanced under combined inputs will let the driver trail brake deep into the corner without the front washing out, then transition smoothly to power without the rear stepping out. A car that is not will force the driver to either brake earlier and lose time or carry more speed into the corner and risk a spin.
+
+### Damper Tuning for Transient Platform Control
+
+Dampers are the most misunderstood and misadjusted component in club racing. They do not change steady-state balance. A damper only generates force when the suspension is moving. At steady-state cornering, the chassis has finished rolling, the suspension is stationary, and the dampers are doing nothing. Their entire purpose is controlling the transient phase: how quickly the chassis pitches under braking, how quickly it rolls at turn-in, and how quickly it settles when the driver releases the brakes or picks up the throttle.
+
+```
+Damper Setup Reference (Typical GT4-class, 4-way adjustable):
+
+Phase          | Bump    | Rebound  | Effect
+---------------|---------|----------|----------------------------------
+Corner entry   | Front:  | Front:   | More front rebound = faster pitch
+               |  6      |  12      | recovery, less entry understeer
+               | Rear:   | Rear:    | More rear bump = slower rear
+               |  4      |  8       | extension, more entry rotation
+
+Mid-corner     | -- no effect at steady state --
+
+Corner exit    | Front:  | Front:   | More front bump = resists squat,
+               |  8      |  10      | keeps front splitter up under power
+               | Rear:   | Rear:    | More rear rebound = controls
+               |  5      |  14      | power-induced rear compression
+
+Brake release  | Front:  | Front:   | Front rebound controls how fast
+               |  6→4    | 12→8     | the nose lifts off the tires
+```
+
+The bump adjustment controls the damper's resistance to compression. More front bump means the front suspension resists diving under braking, keeping the splitter higher and the front tires from being overloaded. But too much front bump makes the car skate over bumps and lose contact with the track surface, because the damper force resists the tire's ability to follow the road. The rebound adjustment controls the damper's resistance to extension. More front rebound means the front springs push back against the chassis more slowly after braking, which delays the recovery of front downforce and can create a moment of understeer as the driver turns in. Too much rebound anywhere on the car prevents the suspension from extending fast enough to keep the tire in contact with the track over crests and bumps, and in extreme cases the damper hydraulic lock prevents the suspension from extending at all, making the car behave as if it has no suspension.
+
+The practical tuning process starts with a baseline. Run the car with all dampers at their middle setting. Look at the lateral G trace and the steering angle trace in the data. If the lateral G builds slowly relative to the steering input, the car is lazy on turn-in, which means either too little front bump (the chassis is rolling too slowly) or too much front rebound (the front is not settling onto the tires). If the lateral G builds quickly but then drops off mid-corner, the car is pitching and settling, which means the dampers are too soft in rebound and the chassis is oscillating. If the car is nervous and twitchy on entry, the front bump is too high and the tire is being bounced off the track surface. Every damper adjustment should be one click at a time, with a full data run between changes, because the interactions are nonlinear and the driver's adaptability can mask small changes.
+
+### Spring Rate Selection and Platform Stiffness
+
+Spring rates are the foundation of the setup, chosen first in the process and changed least often. They determine the static ride height, the pitch attitude under braking, the roll angle in corners, and the frequency at which the chassis responds to road inputs. The spring rate must be soft enough to keep the tires in contact with the track over bumps and kerbs, but stiff enough to control the pitch platform for aerodynamic consistency and to keep the roll angle within a range the anti-roll bars can tune.
+
+A typical GT3-class car runs 800-1000 lb/in front springs and 600-800 lb/in rear springs, with a motion ratio around 0.65-0.75 on the front and 0.80-0.90 on the rear. The front is typically stiffer because the front carries more static weight (engine forward) and must resist dive under braking without collapsing the splitter onto the ground. The rear is softer to allow the rear tires to follow the track under power and to let the rear diffuser maintain a consistent expansion ratio relative to the floor.
+
+Spring rate changes affect everything downstream. Stiffen the front springs and you increase front roll stiffness, which pushes more load transfer to the front and creates understeer, but you also reduce pitch dive under braking, which may improve front aero. The two effects can cancel each other or compound, depending on the track. At a high-downforce circuit like Suzuka or Spa, stiffer front springs to control splitter height may be worth the understeer penalty. At a low-downforce mechanical-grip circuit like Tsukuba or a tight street circuit, softer front springs to maximize tire contact may be faster despite the increased pitch dive. The setup decision is always a compromise across the specific corners of a specific track, which is why setup sheets are never universal.
+
+### Failure Modes and Diagnostic Patterns
+
+The most common setup failure is a car that understeers on corner entry, is neutral at the apex, and oversteers on corner exit. This pattern is not a single balance problem but a combination of three: too little front bite on entry (soft front bump, too much front rebound, or front brake bias too far rearward), correct steady-state balance (anti-roll bars are right), and too much rear power-on oversteer (limited-slip diff lock too aggressive, or rear springs too soft allowing the rear to squat and unload the inside rear tire). The fix is three separate adjustments, not one, and misdiagnosing the pattern as a single bar adjustment will make one phase better and another worse.
+
+The second common failure is a car that is fast for two laps then becomes undrivable. This is almost always tire temperature management. Aggressive front bar settings generate heat in the outside front tire quickly, but they also overload the tire's carcass, causing the contact patch to distort and the grip to drop off after the tire exceeds its optimal temperature window. The fix is not to soften the bar, which would cost corner speed, but to reduce the static camber slightly to spread the load across more of the tire face, or to adjust the tire pressures down by 0.5-1.0 psi to bring the operating temperature down by 10-15°C. Reading tire temperatures across the face of the tire—inner, middle, outer—is the only way to diagnose this, and the readings must be taken immediately after the car stops, before the tires cool.
+
+The third failure is asymmetric balance: the car turns left well and right poorly, or vice versa. Check cross-weight first. If it is off by more than 0.5%, re-corner-weight the car. If cross-weight is correct, check for a bent suspension member, a damaged damper, or a tire with a pressure or temperature difference from its diagonal partner. A 2 psi pressure difference between the left-front and right-front tires will create a noticeable pull to one side under braking and a balance difference between left and right corners. A damper that has lost its gas charge will behave as if it has no rebound on one corner, creating asymmetric transient behavior that is invisible in static setup checks but obvious in the data as a different roll rate left versus right.
+
+The final and most subtle failure is a car that is balanced but slow. The setup feels right, the driver is confident, but the lap times are not competitive. This is almost always too much total load transfer. The springs and bars are too stiff, transferring too much load in every corner and sacrificing total grip through tire load sensitivity. The car feels responsive and precise because the roll angle is small and the transient response is fast, but the cornering G is lower than it could be because the inside tires are too lightly loaded to contribute. The fix is to soften everything—lower spring rates, softer bars, less damper—until the car starts to feel lazy and imprecise, then add back stiffness one axle at a time until the response returns. The fastest setup is usually the softest one that still gives the driver confidence, because it transfers the least load and keeps all four tires working at their most efficient point on the load sensitivity curve.
