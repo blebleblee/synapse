@@ -1,0 +1,127 @@
+# Lesson 2: Industrial Sensors, Actuators, Signal Conditioning
+
+## 1. First-Principles Intuition & Invariants
+
+The industrial control landscape is fundamentally a conversation between the physical world and digital computation. That conversation is mediated by transducers—devices that convert energy from one domain to another—and the conditioning circuits that translate raw physical phenomena into signals that microcontrollers, PLCs, and embedded systems can reliably interpret. Before we wade into register configurations and circuit topologies, we must first understand what we are actually measuring, why measurement is deceptively difficult, and what happens when we fail to respect the physics.
+
+Every industrial measurement begins with a transducer: a sensor that responds to a physical stimulus—temperature, pressure, displacement, force, light intensity, or rotation—and converts it into an electrical quantity. That conversion is rarely linear, always noisy, and frequently dependent on environmental factors we did not anticipate. A thermocouple generates a millivolt-level signal that varies nonlinearly with temperature and is susceptible to electromagnetic interference from nearby welding equipment. A pressure transducer outputs a 4–20 mA current loop signal that must be converted to voltage, filtered, sampled, and scaled before it becomes meaningful to control logic. An inductive proximity sensor switches a digital output that is nevertheless corrupted by switch bounce and crosstalk from high-current motor drives.
+
+The core invariant is this: *raw sensor outputs are almost never immediately usable*. They must be conditioned. Signal conditioning is the engineering discipline of taking a weak, noisy, nonlinear, or otherwise problematic electrical signal and transforming it into something that an analog-to-digital converter (ADC) or digital input circuit can reliably sample and convert into a meaningful digital value. This requires understanding transducer physics, circuit design, and the statistical and temporal properties of noise.
+
+Industrial environments are hostile to precision measurement. Factory floors contain switching power supplies, variable-frequency drives, arc welders, and induction furnaces—all of which emit electromagnetic radiation across a wide spectrum. Twisted shielded pairs, differential signal transmission, filtering at multiple stages, and grounding discipline are not optional refinements; they are the difference between a system that works and one that produces garbage data on every acquisition cycle.
+
+The second-order invariant is that *calibration is not a one-time event*. A pressure transducer that reads correctly today may drift tomorrow due to thermal effects, mechanical hysteresis, or long-term material degradation. Sophisticated industrial systems employ periodic recalibration procedures, dual-sensor redundancy, and statistical outlier rejection to maintain measurement integrity over months or years of continuous operation. Understanding how to design for calibration—how to structure firmware and hardware so that correction factors can be updated without taking the system offline—is as important as understanding the initial transducer selection.
+
+The third invariant concerns actuator dynamics: *actuators are not ideal amplifiers*. When you command a solenoid valve to open or a motor to accelerate, the actual output does not follow your command instantaneously. Electromagnets have inductance; motors have inertia; hydraulic cylinders have damping and lag. The control system must account for these dynamics, either through sophisticated feedback loops or through carefully measured feedforward compensation. A naive controller that ignores actuator lag will overshoot, ring, and potentially damage both the actuator and the process it controls.
+
+## 2. Core Architecture & Mechanics
+
+### 2.1 Transducer Physics and Selection
+
+Every sensor is characterized by a transfer function that maps the input physical quantity to an output electrical quantity. For a simple resistance temperature detector (RTD), this relationship is approximately linear: $R(T) = R_0(1 + \alpha T)$, where $R_0$ is the resistance at 0°C, $\alpha$ is the temperature coefficient of resistance (typically 0.00385 Ω/Ω/°C for platinum), and $T$ is temperature in degrees Celsius. For a thermocouple, the relationship is nonlinear and requires polynomial fitting or lookup tables; a Type K thermocouple generates roughly 41 microvolts per degree Celsius near room temperature, but this sensitivity changes with absolute temperature.
+
+The practical implication is profound: when you design a signal conditioning circuit, you must know not just the nominal output range of your sensor, but also its nonlinearity, its temperature coefficient, its long-term drift, and its immunity to environmental interference. A Type J thermocouple specified to ±2.2°C accuracy at 0°C might degrade to ±3.7°C at 600°C. If your process control algorithm assumes constant sensitivity, you will accumulate systematic errors that worsen with temperature.
+
+Industrial transducers fall into several families, each with distinct conditioning requirements. *Current loop transducers*—typified by the 4–20 mA transmitter—represent the physical quantity as a DC current flowing through a 24 V loop. The beauty of this approach is noise immunity: currents flowing through twisted pairs and long cable runs are far less susceptible to electromagnetic pickup than voltages. The downside is that you must convert the current into a voltage for ADC conversion, which requires precision shunt resistors and careful grounding.
+
+*Voltage output transducers* produce a voltage signal proportional to the measured quantity, typically 0–10 V or ±5 V. These are easier to interface directly to an ADC but offer less noise immunity in electrically noisy environments. *Frequency output transducers* encode the measurement as the frequency of a digital pulse train; a flow meter might output 1 kHz for 0 GPM and 10 kHz for 100 GPM. These require a timer/counter peripheral to measure the frequency, which introduces inherent latency and quantization error.
+
+*Resistance output transducers*—like RTDs, thermistors, and strain gauges—require excitation current or voltage to produce a measurable output. An RTD is typically excited with a constant current source (often 1 mA) and the voltage drop across the RTD is measured. This measurement is vulnerable to errors from contact resistance in the sensor leads unless the sensor is wired using the four-wire technique: two wires carry the excitation current, and two separate wires measure the voltage drop across the sensing element, eliminating lead resistance from the measurement. This is not a luxury; it is standard practice in precision industrial measurement.
+
+*Digital output transducers* communicate over standardized buses: I²C, SPI, Modbus, HART, or Ethernet. These eliminate the analog conditioning problem entirely but introduce communication latency, protocol overhead, and the need for digital signal processing. A digital temperature sensor over I²C can be read with a simple register read, but the data is available only as often as you poll the sensor—typically once per second or slower, depending on the sensor's conversion time.
+
+### 2.2 Signal Conditioning Architecture
+
+A complete industrial measurement chain consists of several stages, each with a specific purpose. Understanding this cascade and the specifications at each stage is essential for successful system design.
+
+```
+[Sensor] → [Transimpedance/Bridge] → [Filter] → [PGA] → [ADC] → [Digital Filter & Scaling]
+```
+
+The first stage is often a transimpedance amplifier (for current-to-voltage conversion) or a bridge completion circuit (for resistance-based sensors). A 4–20 mA transducer feeding a signal conditioning module must have that current converted to a voltage. The standard approach is to use a precision resistor and an instrumentation amplifier. If the 4–20 mA signal feeds a 250 Ω resistor, the voltage range becomes 1–5 V—a convenient range for 3.3 V or 5 V ADCs. The instrumentation amplifier provides high input impedance (so it does not load the current source), high common-mode rejection ratio (CMRR) to reject ground loop interference, and low output impedance to drive the next stage.
+
+For bridge-based sensors—strain gauges, load cells, and pressure transducers often use Wheatstone bridge topologies—the conditioning stage must complete the bridge and amplify the small differential voltage. An unexcited bridge might have all four arms at 1000 Ω. When strained, one arm might change to 1010 Ω and an adjacent arm to 990 Ω, creating a differential signal of tens of millivolts across a 2 V or more common-mode voltage. An instrumentation amplifier with high CMRR is essential; a CMRR of 80 dB means the amplifier rejects 10,000:1 of the common-mode voltage, but on a 2 V common-mode signal, that is still 200 μV of error—which might be comparable to your signal itself.
+
+The second stage is filtering. Without filtering, the ADC will sample not only the desired signal but also high-frequency noise, power-line interference (50/60 Hz and harmonics), and switching noise from nearby electronics. An analog low-pass filter—typically a first- or second-order Sallen-Key topology or a higher-order active filter—attenuates frequencies above the Nyquist frequency of your ADC. If you are sampling at 1 kHz, your Nyquist frequency is 500 Hz; a filter with a −3 dB corner frequency around 100–200 Hz will attenuate high-frequency noise while preserving the signal bandwidth. The filter response must be chosen carefully: a sharp cutoff (high-order filter) introduces phase lag that can destabilize feedback control loops, while a gentle rolloff (first-order filter) allows more noise to pass through.
+
+Anti-aliasing filtering is not optional. The Nyquist-Shannon sampling theorem states that if you sample a signal at a rate $f_s$, you can accurately reconstruct frequencies up to $f_s / 2$. Any frequency component above $f_s / 2$ will alias—fold back—into the measurement band as a false lower-frequency signal. A 1 kHz sine wave sampled at 800 Hz will appear as a 200 Hz sine wave. In an industrial environment where 10 kHz switching noise is common, sampling at 1 kHz without filtering will produce a measurement corrupted by aliased noise that cannot be removed by any digital post-processing.
+
+The third stage is a programmable-gain amplifier (PGA). An ADC typically has a fixed input range—say, 0–3.3 V for a 3.3 V microcontroller. If your sensor output ranges only from 1–2 V, you are using less than one-third of the ADC's resolution. By amplifying the signal to use the full 0–3.3 V range, you improve measurement resolution. A PGA with selectable gains (typically 1×, 2×, 5×, 10×, 100×) allows a single ADC to accommodate sensors with widely varying output ranges. The PGA is controlled by software, so the gain can be changed dynamically to optimize resolution based on the expected signal level.
+
+The fourth stage is the ADC itself. We will discuss ADC internals in detail below, but at this point, understand that the ADC samples the conditioned analog voltage at discrete time intervals and converts each sample into a digital word. The resolution (bits), sampling rate (samples per second), and conversion time (how long a single conversion takes) determine the maximum speed and precision of your measurement.
+
+The fifth stage is digital post-processing. Even after analog filtering, the digitized samples contain noise. Firmware typically applies additional digital filters—exponential moving average, median filters, or Kalman filters—to smooth out remaining high-frequency noise and reduce quantization error. For slowly-changing quantities like temperature, averaging 100 consecutive samples (or running an exponential average with a time constant of tens of seconds) can dramatically improve noise performance at the cost of measurement latency.
+
+### 2.3 ADC and DAC Conversion Fundamentals
+
+An analog-to-digital converter transforms a continuous voltage (typically in the range 0–3.3 V or ±5 V) into a discrete digital word. The relationship is:
+
+$$D = \text{round}\left( \frac{V_{\text{in}} - V_{\text{ref,low}}}{V_{\text{ref,high}} - V_{\text{ref,low}}} \times (2^N - 1) \right)$$
+
+where $D$ is the digital output word (ranging from 0 to $2^N - 1$ for an N-bit ADC), $V_{\text{in}}$ is the input voltage, and $V_{\text{ref,low}}$ and $V_{\text{ref,high}}$ are the lower and upper reference voltages. For a 12-bit ADC with 0–3.3 V range, the least significant bit (LSB) represents $3.3 / 4096 \approx 0.81$ mV. If your input is 1.65 V (midscale), the digital output should be approximately 2048.
+
+The practical ADC has several sources of error. *Quantization error* arises because the ADC output is discrete; an input voltage of 1.6505 V and 1.6515 V will both quantize to the same digital value, introducing an error of up to ±0.5 LSB. *Offset error* means the ADC's zero point is not exactly at $V_{\text{ref,low}}$; a reading of 0 V might produce a digital output of 5 instead of 0. *Gain error* means the ADC's sensitivity is not exactly as specified; the slope of the transfer function is slightly higher or lower than ideal. *Integral nonlinearity (INL)* describes how the actual transfer function deviates from the ideal straight line across the entire input range. *Differential nonlinearity (DNL)* describes whether each step in the transfer function (the difference between consecutive digital outputs for sequential input voltages) is uniform. A DNL worse than 1 LSB creates missing codes—digital values that the ADC will never produce, no matter what input voltage is applied.
+
+Modern microcontroller ADCs (like those in STM32, NXP LPC, or ARM Cortex-M devices) typically have DNL ≤ 0.5 LSB and INL ≤ 1 LSB, but these specifications apply under ideal conditions: stable reference voltage, clean power supplies, and thermally stable environments. In a real factory floor, temperature variations and power-supply ripple will degrade ADC performance.
+
+The ADC conversion process itself takes time. A successive-approximation ADC (SAR ADC), the most common topology in microcontrollers, operates in phases. A sample-and-hold circuit captures the analog voltage at a specific instant. The SAR logic then performs a binary search: it tries setting each bit of the output word from MSB to LSB, comparing the resulting voltage (via a DAC) to the held input voltage, and deciding whether each bit should be 0 or 1. For a 12-bit ADC, this takes 12 clock cycles plus overhead. A 12 MHz ADC clock thus requires roughly 1.5 microseconds per conversion. If your microcontroller's ADC runs at 1 MHz (a common choice to reduce power consumption and EMI), each conversion takes ~15 microseconds.
+
+Successive-approximation ADCs are inherently serial: they complete one conversion before starting the next. If you need to sample multiple channels, you must either multiplex the input (switching the ADC input between channels between conversions) or use multiple ADCs. Multiplexing introduces settling time: after switching to a new channel, you must wait for the input buffer to stabilize before initiating the next conversion, typically 1–10 microseconds depending on the source impedance.
+
+*Direct memory access (DMA)* is essential for industrial control systems. Rather than having the CPU poll the ADC after each conversion, a DMA controller automatically transfers completed ADC results into memory whenever they become available. The CPU is interrupted only when a fixed number of samples have been collected. This approach reduces latency, improves determinism, and frees the CPU to perform other tasks.
+
+A digital-to-analog converter (DAC) performs the inverse operation: converting a digital word into an analog voltage. The fundamental relationship is:
+
+$$V_{\text{out}} = V_{\text{ref,low}} + \frac{D}{2^N - 1} \times (V_{\text{ref,high}} - V_{\text{ref,low}})$$
+
+Most microcontroller DACs are current-source DACs (also called R-2R ladder DACs): they switch binary-weighted current sources in and out of a summing node, and the resulting current is converted back to voltage via an output buffer amplifier. Like ADCs, DACs have offset error, gain error, and nonlinearity. A 12-bit DAC with INL of 1 LSB means that the actual output voltage can deviate from the ideal by up to 0.81 mV across the range.
+
+DAC outputs are rarely used directly to drive actuators. A DAC output is typically a low-impedance voltage (a few hundred millivolts to a few volts) that must be scaled and amplified to match the actuator's requirements. If you need to command a 0–10 V solenoid valve driver, you must amplify the 0–3.3 V DAC output by a factor of 3. This is typically done with a precision op-amp buffer and scaling resistors.
+
+### 2.4 Calibration: Theory and Practice
+
+Calibration is the process of determining and correcting for systematic errors in a measurement system. A pressure transducer might read 5.02 V at 0 PSI and 4.95 V at 100 PSI when the ideal relationship is 5 V at 0 PSI and 5 V at 100 PSI. The offset error is +0.02 V and the gain error is −0.05 V. Calibration must determine these errors and apply corrections.
+
+The simplest calibration approach is two-point calibration. You apply two known reference values to the sensor—typically the minimum and maximum of the intended operating range—measure the sensor's output at each point, and solve for offset and gain correction factors. If the sensor reads $A_0$ at reference value $R_0$ and $A_1$ at reference value $R_1$, then the corrected measurement is:
+
+$$\text{Corrected} = R_0 + \frac{(\text{Raw} - A_0)(R_1 - R_0)}{A_1 - A_0}$$
+
+This approach assumes the sensor's transfer function is perfectly linear, which is often false. A better approach is multi-point calibration: apply five or more reference values across the operating range, collect measurements at each point, and fit a polynomial (usually quadratic or cubic) to the data. The corrected measurement is then:
+
+$$\text{Corrected} = c_0 + c_1 \cdot \text{Raw} + c_2 \cdot \text{Raw}^2 + c_3 \cdot \text{Raw}^3 + \ldots$$
+
+The coefficients $c_0, c_1, c_2, \ldots$ are determined by least-squares fitting. This approach compensates for nonlinearity and provides better accuracy across the full range.
+
+Thermal calibration is more complex. Many transducers exhibit significant temperature coefficients: a pressure transducer's sensitivity might change by 0.1% per °C. If your system must operate from 0°C to 50°C, ignoring temperature effects introduces errors up to ±5%. Sophisticated industrial transmitters include built-in thermistors to measure their own case temperature and apply temperature-dependent correction factors. In your firmware, you would store calibration coefficients at multiple temperature points (e.g., 0°C, 25°C, 50°C) and interpolate between them based on the measured transducer temperature.
+
+In-service calibration—the ability to recalibrate the system without disassembly or downtime—is essential in industrial practice. Your firmware must store calibration coefficients in non-volatile memory (flash) in such a way that they can be updated. A typical approach uses a reserved flash page or external EEPROM; a diagnostic command allows an operator to apply reference values and the system automatically recomputes and stores new calibration coefficients. Some systems periodically perform self-tests by comparing measurements from redundant sensors or from a sensor at a known constant value (e.g., measuring ambient temperature when the system is idle) and alerting maintenance if drift exceeds a threshold.
+
+### 2.5 Noise Analysis and Filtering
+
+Industrial environments contain numerous sources of electrical noise. Mains power-line noise (50 Hz in Europe, 60 Hz in North America, and harmonics) couples into signal wiring. Switching power supplies operating at tens of kilohertz generate broadband noise. Variable-frequency drives (VFDs) controlling large motors emit noise across a wide spectrum, particularly during switching transients. Arc welders create impulsive noise. Radio transmitters (walkie-talkies, cell phones) in the factory emit RF interference. Understanding these sources and designing for robustness is essential.
+
+Noise couples into signal wiring through two mechanisms: *capacitive coupling* (electric field coupling) and *inductive coupling* (magnetic field coupling). Power-line noise couples capacitively through the dielectric between mains wiring and signal cables. Motor cable switching transients couple inductively through the magnetic field around the cable run. The first line of defense is physical separation: keep signal cables away from power cables. The second defense is shielding: wrap signal cables in a conductive shield connected to ground. The shield intercepts electric fields and provides a low-impedance path to ground for induced currents.
+
+For differential signals (two-wire systems where the actual signal is the voltage difference between the two wires), differential-mode noise is noise that appears on both wires equally and cancels out in the differential measurement. Common-mode noise is noise that appears on the "common" reference point. An instrumentation amplifier with high CMRR rejects common-mode noise. The CMRR (in decibels) is defined as:
+
+$$\text{CMRR} = 20 \log_{10}\left( \frac{A_d}{A_{cm}} \right)$$
+
+where $A_d$ is the differential-mode gain and $A_{cm}$ is the common-mode gain. A CMRR of 100 dB means the amplifier amplifies the desired differential signal 10 million times while amplifying common-mode interference only once. On a 1 V differential signal and 100 V common-mode noise, the amplifier produces a strong desired signal and a residual common-mode error of 100 μV—still problematic if the desired signal is a few millivolts.
+
+Analog low-pass filters are essential but must be chosen carefully. The filter attenuates high-frequency noise but also introduces phase lag. A first-order filter with corner frequency $f_c$ has a phase lag that increases with frequency: at $f_c$, the phase lag is 45°; at 10×$f_c$, it approaches 90°. In a feedback control loop, excessive phase lag can destabilize the loop and cause oscillation. The design rule is to choose $f_c$ high enough that the useful signal bandwidth is not attenuated, but low enough that high-frequency noise is significantly attenuated.
+
+For industrial control, a commonly used filter is the second-order Sallen-Key low-pass filter. The transfer function is:
+
+$$H(s) = \frac{\omega_c^2}{s^2 + \sqrt{2} \omega_c s + \omega_c^2}$$
+
+where $\omega_c = 2 \pi f_c$ and $f_c$ is the corner frequency. This filter has a phase lag of 90° at the corner frequency. Above the corner frequency, attenuation increases at 40 dB/decade (−12 dB/octave), which is much sharper than a first-order filter's 20 dB/decade.
+
+An example design for an industrial temperature measurement using a 10 kΩ thermistor might use a second-order Sallen-Key filter with $f_c = 50$ Hz. The component values for a Butterworth Sallen-Key filter are derived from standard tables; for a unity-gain configuration with $f_c = 50$ Hz, typical values are $R = 63.6$ kΩ and $C = 50$ nF. Two identical RC stages are cascaded through a unity-gain buffer amplifier. This filter attenuates 50 Hz power-line noise by roughly 6 dB (slightly less than a factor of 2) and 60 Hz by slightly more, reducing power-line interference from tens of millivolts to a few millivolts. Higher-frequency noise (1 kHz and above) is attenuated much more strongly.
+
+Digital filtering provides additional noise rejection without the phase lag of analog filtering. An exponential moving average (EMA) is simple to implement:
+
+$$y_n = \alpha \cdot x_n + (1 - \alpha) \cdot y_{n-1}$$
+
+where $x_n$ is the new ADC sample, $y_n$ is the filtered output, and $\alpha$ (ranging from 0 to 1) is the smoothing factor. A small $\alpha$ (e.g., 0.05) produces heavy smoothing and low-frequency noise rejection but also introduces latency; the filter's response time is roughly $1 / \alpha$ samples. For measurement latencies of a second or less, this is often acceptable.
+
+A median filter is effective at removing impulsive noise (outliers): collect $n$ consecutive samples (typically 3, 5,
