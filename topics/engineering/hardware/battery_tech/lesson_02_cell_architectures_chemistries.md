@@ -1,0 +1,133 @@
+# Lesson 2: Cell Architectures, Chemistries, Material Selection
+
+## 1. First-Principles Intuition & Invariants
+
+The electrochemical cell is fundamentally a controlled chemical reaction system engineered to convert chemical potential energy into electrical energy with maximum efficiency and minimum parasitic loss. Unlike passive chemical reactions that dissipate energy as heat, a galvanic cell constrains reactants within a physical compartment that forces electron transfer through an external circuit, creating a measurable potential difference and useful current delivery.
+
+At the deepest level, every electrochemical cell operates on a principle discovered by Galvani and formalized by Nernst: when two dissimilar materials (the anode and cathode) are immersed in an ionic medium (the electrolyte), a voltage difference emerges proportional to the logarithm of the ratio of ion concentrations across the cell. This voltage—the open-circuit potential or OCP—is thermodynamically fixed by the standard reduction potentials of the anode and cathode materials, defined by the Gibbs free energy change of the half-reactions occurring at each electrode.
+
+The Nernst equation quantifies this relationship:
+
+$$E = E° + \frac{RT}{nF} \ln\left(\frac{[\text{oxidized}]}{[\text{reduced}]}\right)$$
+
+where *E°* is the standard cell potential, *R* is the gas constant, *T* is absolute temperature in Kelvin, *n* is the number of electrons transferred per formula unit, and *F* is Faraday's constant (96,485 C/mol). This relationship tells us immediately that cell voltage depends on chemistry (E°), temperature, and the concentrations of oxidized and reduced species. In practical battery engineering, this means that voltage stability under load depends critically on maintaining concentration gradients within acceptable bounds and managing thermal drift.
+
+The cell voltage is not the only figure of merit. Energy density—measured in watt-hours per kilogram (Wh/kg) or watt-hours per liter (Wh/L)—determines the runtime or range of a device for a fixed weight or volume budget. Energy density is the product of cell voltage and specific charge (amp-hours per kilogram). A 3.7 V lithium-ion cell with a specific charge of 250 Ah/kg yields roughly 925 Wh/kg theoretical maximum; practical cells achieve 150–250 Wh/kg after accounting for packaging, thermal management, and the inactive mass of the cell structure itself.
+
+Power density—measured in watts per kilogram or watts per liter—governs how quickly the battery can deliver energy. A cell with high energy density but poor power density (high internal impedance) cannot support high discharge currents without excessive voltage sag and heat generation. This distinction explains why alkaline AA batteries can power a digital clock for months but cannot sustain a camera flash: the energy is present, but the internal resistance prevents rapid current delivery.
+
+The cycle life of a battery—the number of complete charge-discharge cycles before capacity drops to 80% of the initial value—is determined by irreversible chemical changes at the electrode-electrolyte interface and within the bulk electrode material. Every charge-discharge cycle involves the insertion and extraction of lithium ions (in lithium-ion cells) or other charge carriers into a host crystal structure. Repeated insertion-extraction causes lattice strain, particle cracking, dissolution of active material, and growth of resistive surface films. Understanding and mitigating these degradation mechanisms is the central challenge in cell chemistry selection and electrode material design.
+
+Temperature is perhaps the most critical environmental variable. At elevated temperatures, diffusion rates increase, reaction kinetics accelerate, and parasitic side reactions dominate. At low temperatures, ionic conductivity in the electrolyte plummets, internal resistance rises sharply, and the cell voltage sags under load. A lithium-ion cell rated for discharge at 25°C may deliver only 50% of its nominal current at 0°C and risk permanent damage if charged below −10°C because lithium plating occurs on the anode surface, creating a low-melting metallic dendrite that short-circuits the cell and creates a thermal runaway hazard.
+
+The electrochemical impedance spectrum (EIS) of a cell—the frequency-dependent impedance measured by applying a small AC voltage perturbation—reveals the underlying physical processes governing cell performance. At high frequencies, you measure the ohmic resistance of the electrolyte and electrode bulk materials. At intermediate frequencies, you see the charge-transfer resistance at the electrode-electrolyte interface and the mass-transport impedance of ions diffusing through the electrolyte. At low frequencies, you measure diffusion impedance within the electrode material itself. Each of these impedance contributions grows with cycle count, temperature, and state-of-charge (SOC), making EIS a powerful diagnostic tool for predicting cell aging.
+
+## 2. Core Architecture & Mechanics
+
+### Galvanic Cell Construction: The Physical Stack
+
+A practical galvanic cell is a layered composite structure optimized for ion transport perpendicular to the layers and electron transport prevented within the cell (forced through the external circuit). The canonical stack, reading from one terminal to the other, consists of:
+
+1. **Current Collector (Anode)**: typically copper foil 10–20 μm thick, serving as the mechanical substrate and electron conduit for the anode. Copper is chosen for its high electrical conductivity (5.96 × 10⁷ S/m), low cost, and low electrochemical reactivity with the anode material.
+
+2. **Anode Active Material**: a composite layer 50–150 μm thick containing the electrochemically active particles (graphite in lithium-ion cells, lead in lead-acid cells, nickel-metal hydride alloys in NiMH cells) suspended in a polymeric binder (typically polyvinylidene fluoride, PVDF) with conductive carbon additives to enhance electron percolation through the particle network.
+
+3. **Separator**: a microporous polymer membrane (polyethylene or polypropylene) 20–40 μm thick with pore sizes of 0.1–1 μm. The separator is soaked with electrolyte and provides ionic conductivity while mechanically preventing electrode contact and dendritic shorts. The porosity must be high enough (40–60%) to minimize ion-transport resistance, yet the pores must be small enough to block particulate migration and dendrite penetration.
+
+4. **Electrolyte**: a liquid or solid ionic conductor occupying the pores of the separator and filling voids in the electrode structure. In lithium-ion cells, the electrolyte is typically lithium hexafluorophosphate (LiPF₆) dissolved in a mixture of organic carbonates (ethylene carbonate, dimethyl carbonate, diethyl carbonate) at a concentration of 0.9–1.2 mol/L. The electrolyte must have high ionic conductivity (typically 1–10 mS/cm at 25°C) and negligible electronic conductivity to minimize self-discharge.
+
+5. **Cathode Active Material**: a composite layer 50–150 μm thick containing lithium metal oxides (LiCoO₂, LiNi₀.₃Mn₀.₃Co₀.₃O₂, LiFePO₄, etc.), carbon additives, and binder. The cathode material determines the cell voltage (cobalt oxides yield ~4 V vs. Li/Li⁺, iron phosphates yield ~3.4 V) and the specific charge capacity.
+
+6. **Current Collector (Cathode)**: typically aluminum foil 10–20 μm thick. Aluminum is chosen despite its lower conductivity than copper (3.77 × 10⁷ S/m) because it forms a passivating oxide layer that prevents reaction with the lithium-containing electrolyte, whereas copper would dissolve in the oxidizing environment of the cathode.
+
+The entire stack is housed in a steel or aluminum canister (a cylindrical 18650 cell or pouch bag) with electrical terminals welded to the anode and cathode current collectors. The internal cavity is backfilled with electrolyte and sealed to prevent oxygen and moisture ingress, which would degrade the active materials and increase self-discharge.
+
+### Electrochemical Processes During Discharge
+
+When an external load is connected across the cell terminals, the galvanic reaction proceeds: the anode is oxidized (loses electrons), the cathode is reduced (gains electrons), and ions flow through the electrolyte to complete the circuit. Consider a lithium-ion cell discharging. At the anode (graphite), lithium ions that were previously intercalated (inserted) into the graphite crystal structure are extracted:
+
+$$\text{Li}_x\text{C}_6 \to x\text{Li}^+ + x e^- + \text{C}_6$$
+
+The released electrons traverse the external circuit, performing work in the load. Simultaneously, at the cathode (e.g., lithium cobalt oxide), lithium ions are inserted into the cathode structure:
+
+$$\text{Li}_y\text{CoO}_2 + y\text{Li}^+ + y e^- \to \text{Li}_{y+x}\text{CoO}_2$$
+
+The lithium ions travel through the electrolyte and separator to balance the charge transfer. The cell potential during discharge is the difference between the cathode potential and the anode potential, each measured against a reference (typically Li/Li⁺):
+
+$$E_{\text{cell}} = E_{\text{cathode}} - E_{\text{anode}} - I \cdot R_{\text{internal}}$$
+
+where $I \cdot R_{\text{internal}}$ is the voltage drop due to ionic resistance in the electrolyte and electronic resistance in the electrodes. This ohmic loss increases with discharge current and temperature, causing voltage sag under load.
+
+The capacity of the cell is limited by the amount of electrochemically active material that can be cycled: if the anode can intercalate 0.5 moles of lithium per mole of graphite, and the cell contains 10 grams of graphite, then the capacity is bounded by (10 g / 12 g/mol) × 0.5 mol × 96,485 C/mol ≈ 4,000 coulombs or about 1.1 Ah. In practice, practical capacity is lower because not all of the lithium can be extracted without causing irreversible structural changes or triggering voltage cutoff thresholds set to prevent electrode damage.
+
+### Material Phase Diagrams and Insertion Electrodes
+
+The fundamental difference between lithium-ion chemistry and earlier battery types lies in the use of insertion (or intercalation) electrodes, where charge carriers embed themselves into the crystal structure of the host material rather than forming a new phase. This design dramatically improves cycle life and energy density because the host material remains mechanically intact and only undergoes modest lattice contraction or expansion as ions are added or removed.
+
+The thermodynamic stability of an insertion compound is captured by its phase diagram—a plot of Gibbs free energy versus lithium content. For lithium cobalt oxide (LiCoO₂), the phase diagram shows a nearly linear decrease in potential as lithium content decreases from 1.0 to approximately 0.5 moles of lithium per mole of CoO₂. At lower lithium contents, the potential rises sharply, indicating instability of the delithiated phase. This plateau or "voltage curve" is the cell voltage as a function of state-of-charge (SOC), and the shape of this curve determines the power delivery characteristics: a flat voltage curve (like LiFePO₄) maintains stable power output across the discharge cycle, while a sloped curve (like LiCoO₂) causes voltage sag as the cell is depleted.
+
+The electrochemical window—the range of potentials over which the electrolyte remains stable—is a critical constraint. Most organic carbonate-based electrolytes are stable from approximately 0 V to 4.3 V versus Li/Li⁺. Cathode materials exceeding 4.3 V decompose the electrolyte oxidatively, forming resistive films that increase impedance and reduce cycle life. Anode materials below 0 V reduce the electrolyte reductively, with similar consequences. This window narrows at elevated temperatures and shrinks further with extended cycling due to electrolyte decomposition and the growth of surface passivation films.
+
+### Lithium-Ion Chemistry Variants: A Practitioner's Classification
+
+**Lithium Cobalt Oxide (LCO)** was the first commercially viable lithium-ion chemistry, deployed by Sony in 1991 and still the workhorse for consumer electronics. LCO offers a nominal cell voltage of 3.7 V (4.2 V at full charge), specific energy of 150–200 Wh/kg, and excellent cycle life (>1,000 cycles) when cycled within a conservative state-of-charge window (20–80%). The phase diagram of LiCoO₂ exhibits a gentle slope from Li₁.₀CoO₂ to Li₀.₅CoO₂, yielding approximately 140 Ah/kg of specific charge. The primary disadvantages are cost (cobalt is expensive and ethically problematic to source), limited energy density compared to newer chemistries, and thermal stability concerns: at elevated temperatures (>60°C) or at high states of charge (>4.2 V), cobalt oxide becomes thermodynamically unstable, triggering oxygen loss and exothermic decomposition.
+
+**Nickel-Manganese-Cobalt Oxide (NMC)** emerged in the 2000s as a more energy-dense alternative. The canonical composition is LiNi₀.₃Mn₀.₃Co₀.₃O₂, where the nickel contributes capacity, manganese stabilizes the crystal structure and reduces cost, and cobalt mitigates impedance growth. By increasing nickel content to 0.6 or 0.8 (yielding NMC 622 or NMC 811), manufacturers push specific energy to 200–250 Wh/kg at the cost of reduced cycle life and increased thermal instability. The voltage curve of NMC is slightly steeper than LCO, and the voltage plateau near 3.8 V is where most of the capacity is delivered. NMC is the current de facto standard for automotive applications because it balances energy density, cost, and thermal stability reasonably well. Thermally, NMC begins to show significant oxygen loss above 200°C, but the onset of exothermic reactions is shifted to higher temperatures than LCO.
+
+**Lithium Iron Phosphate (LFP)** represents a fundamentally different structural class. Instead of a layered rock-salt oxide, LFP is an orthorhombic phosphate with the formula LiFePO₄. The Fe–O and P–O bonds are stronger than the transition metal–oxygen bonds in oxide cathodes, making LFP inherently more thermally stable. The voltage curve is notably flat, centered at 3.2 V (3.6 V at full charge), with little voltage change between full and 20% state-of-charge. This flatness is mechanically beneficial because it reduces stress-induced cracking in the electrode particles, improving cycle life dramatically: commercial LFP cells easily exceed 3,000 cycles and approach 5,000 cycles in carefully managed conditions. The specific energy is lower (approximately 160 Wh/kg) due to the lower cell voltage, but the superior cycle life and thermal safety make LFP attractive for stationary energy storage and increasingly for electric vehicles prioritizing lifespan over maximum range.
+
+**Lithium Nickel Cobalt Aluminum Oxide (NCA)** is used primarily in Tesla vehicles and some premium consumer electronics. The composition LiNi₀.₈Co₀.₁₅Al₀.₀₅O₂ achieves very high energy density (250+ Wh/kg) by maximizing the nickel content, which increases specific capacity, while the small cobalt and aluminum fractions stabilize the structure and improve cycle life compared to pure nickel oxide. The nominal voltage is 3.7 V. NCA requires tight thermal management and careful charging protocols because of its reduced thermal stability, but under controlled conditions (limited SOC window, modest temperature), NCA cells can deliver 1,000+ cycles with good energy retention.
+
+### Lead-Acid Batteries: The Mature Workhorse
+
+Lead-acid chemistry, invented by Gaston Planté in 1859, remains the dominant battery type for automotive starting, lighting, and ignition (SLI) applications, stationary backup power, and heavy industrial uses. The architecture differs fundamentally from lithium-ion because lead-acid batteries do not employ insertion electrodes. Instead, the anode is lead metal (Pb), and the cathode is lead dioxide (PbO₂), both in contact with a sulfuric acid electrolyte (H₂SO₄) at a concentration of 4–5 mol/L.
+
+During discharge, the lead anode undergoes oxidation to lead sulfate:
+
+$$\text{Pb} + \text{SO}_4^{2-} \to \text{PbSO}_4 + 2e^-$$
+
+Simultaneously, the lead dioxide cathode is reduced to lead sulfate:
+
+$$\text{PbO}_2 + 4\text{H}^+ + \text{SO}_4^{2-} + 2e^- \to \text{PbSO}_4 + 2\text{H}_2\text{O}$$
+
+The net cell reaction is the formation of lead sulfate on both electrodes. The cell voltage drops from 2.1 V at full charge to approximately 1.75 V when substantially discharged. A 12 V automotive battery comprises six lead-acid cells in series, yielding a nominal 12 V output. Lead-acid batteries are remarkable for their ability to deliver extremely high currents (100+ amps) for short durations because the sulfuric acid electrolyte has high conductivity (~0.6 S/cm at 25°C) and the electrode-electrolyte interface has low impedance. This capability makes lead-acid ideal for starting automotive engines. However, lead-acid suffers from low energy density (30–40 Wh/kg), short cycle life when discharged deeply (200–500 cycles to 80% retention if cycled to 50% depth-of-discharge), and sulfation: if a lead-acid battery is left partially discharged for extended periods, lead sulfate crystals grow larger and become electrochemically inactive, permanently reducing capacity. The thermal runaway risk is lower than lithium-ion because the exothermic reactions are confined to electrolyte oxidation, but thermal runaway can still occur during overcharge if the battery vents flammable hydrogen gas and an ignition source is present.
+
+### Nickel-Metal Hydride (NiMH) Batteries
+
+NiMH batteries represented the state-of-the-art in portable electronics and hybrid electric vehicles from the 1990s through the 2000s, before lithium-ion dominance. The anode is a hydrogen-absorbing metal alloy (typically based on lanthanum or mischmetal combined with nickel and cobalt), and the cathode is nickel oxide hydroxide (NiOOH). The electrolyte is an alkaline solution (potassium hydroxide, KOH) at 6–8 mol/L.
+
+During discharge, the metal hydride anode releases hydrogen:
+
+$$\text{MH} + \text{OH}^- \to \text{M} + \text{H}_2\text{O} + e^-$$
+
+The nickel oxide hydroxide cathode is reduced:
+
+$$\text{NiOOH} + \text{H}_2\text{O} + e^- \to \text{Ni(OH)}_2 + \text{OH}^-$$
+
+The nominal cell voltage is 1.2 V. NiMH cells are often arranged in four-cell packs (4.8 V) or ten-cell packs (12 V). The energy density of NiMH is approximately 40–100 Wh/kg, significantly lower than lithium-ion but substantially higher than lead-acid. NiMH offers excellent cycle life (1,000–2,000 cycles with proper management) and is remarkably robust to overcharge and abuse: if overcharged, the oxygen evolution reaction occurs at the cathode and hydrogen evolution at the anode, forming water that is safely contained within the cell. This oxygen-hydrogen recombination mechanism, combined with the high conductivity of alkaline electrolyte, makes NiMH batteries nearly impossible to thermally runaway under normal use. However, the self-discharge rate of NiMH is substantially higher than lithium-ion (15–20% per month at 20°C compared to 2–3% per month for lithium-ion), making it unsuitable for applications where the device will sit unused for months. NiMH remains in production for hybrid vehicles (Toyota Prius) and wireless appliances where the high self-discharge is acceptable.
+
+### Solid-State Batteries: Emerging Architecture
+
+Solid-state batteries replace the liquid organic electrolyte with a solid ionic conductor, typically a ceramic (such as yttria-stabilized zirconia, YSZ, or garnet-type lithium-aluminate oxides like Li₇La₃Zr₂O₁₂, LLZO) or a polymer gel. The theoretical advantages are substantial: solid electrolytes can simultaneously block dendrite penetration (unlike porous separators saturated with liquid electrolyte) and prevent lithium metal plating on the anode, allowing the anode to be pure lithium metal instead of a carbon composite. Lithium metal anode electrodes have theoretical specific charges exceeding 3,800 Ah/kg, compared to 360 Ah/kg for graphite anodes, potentially doubling the energy density of the entire cell. Solid electrolytes also eliminate electrolyte decomposition and flammability concerns, dramatically improving thermal safety.
+
+In practice, solid-state batteries face severe engineering challenges. The solid-liquid interface impedance at the electrode-electrolyte boundary is often higher than in liquid cells because there is no ionic liquid wetting and no facile charge transfer pathways. Contact pressure and thermal expansion mismatch between the solid electrolyte, active materials, and current collectors cause mechanical stress and interfacial delamination during cycling. Dendrite growth, while slowed compared to liquid electrolyte systems, is not entirely prevented; lithium can propagate through grain boundaries and defects in the solid electrolyte. At the time of writing, solid-state batteries remain primarily in research and early pilot production phases, with energy densities of 400–500 Wh/kg being demonstrated in laboratory prototypes but not yet achieving commercial cycle life and cost targets. Leading development efforts by Toyota, Samsung, and emerging companies like QuantumScape aim for deployment in premium electric vehicles by 2027–2030.
+
+## 3. High-Performance Optimization & Failure Modes
+
+### Voltage, Capacity, and State-of-Charge Relationships
+
+The practical capacity of a battery cell is not a fixed quantity but rather a function of discharge rate, temperature, and state-of-charge window. The relationship between discharge current and delivered capacity is captured by Peukert's law, which empirically states that the capacity decreases with higher discharge rates according to:
+
+$$C_p = I^k \cdot t$$
+
+where $C_p$ is a capacity coefficient (Ah), $I$ is the discharge current (A), $k$ is the Peukert exponent (typically 1.1–1.35 for lead-acid, 1.0–1.05 for lithium-ion), and $t$ is the discharge time in hours. For a lithium-ion cell with a nominal capacity of 2,600 mAh at a 1C discharge rate (2.6 A), discharging at 10C (26 A) might deliver only 85–90% of the rated capacity because the cell voltage drops more rapidly under high current, triggering low-voltage cutoff before all the active material has been fully utilized. This effect is most pronounced at low temperatures where ionic conductivity and charge-transfer kinetics are slowed.
+
+State-of-charge (SOC) is formally defined as the amount of charge extracted from a fully charged cell, normalized to the rated capacity. An 80% SOC cell has delivered 20% of its rated charge and retains 80% of its energy. Practical battery management systems (BMS) estimate SOC using one of three methods: coulomb counting (integrating current over time), open-circuit voltage (OCV) lookup tables, and Kalman filtering (a state observer that fuses voltage, current, and temperature measurements). Each method has tradeoffs: coulomb counting accumulates integration error over many charge-discharge cycles; OCV lookup is accurate but slow (requires the cell to rest); Kalman filtering is computationally intensive but achieves real-time estimation with lower error than either method alone.
+
+The relationship between SOC and OCV (the voltage curve) is chemistry-specific and used to design charge-discharge protocols. For lithium cobalt oxide cells, the OCV ranges from approximately 2.75 V (0% SOC) to 4.2 V (100% SOC), with the steepest slope between 20% and 80% SOC. This steep slope means that small changes in OCV correspond to large SOC changes, making voltage-based SOC estimation relatively accurate in the midrange but poor at low or high SOC. For lithium iron phosphate cells, the OCV curve is nearly flat at 3.2–3.3 V across 10–90% SOC, then rises steeply below 5% SOC. This flatness means that voltage-based SOC estimation is highly inaccurate for LFP batteries; coulomb counting or Kalman filtering is essential.
+
+### Thermal Management and Temperature Derating
+
+Temperature profoundly affects battery performance through two mechanisms: thermodynamic (changing the Nernst potential) and kinetic (changing reaction rates and diffusion coefficients).
+
+Thermodynamically, the Nernst equation shows that cell voltage decreases with temperature at a rate of approximately −0.3 to −0.5 mV/°C for most lithium
