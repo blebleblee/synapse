@@ -1,0 +1,131 @@
+# Lesson 2: Light Emitting Devices
+
+## 1. First-Principles Intuition & Invariants
+
+Light emission from a semiconductor junction represents one of the most direct manifestations of quantum mechanics in practical electronics. Unlike the passive behavior of a resistor or capacitor, a forward-biased p-n junction under electrical drive becomes a controlled photon factory—converting electrical current into coherent or incoherent electromagnetic radiation across wavelengths ranging from the deep ultraviolet (200 nm) through the infrared (10 μm and beyond). To understand this phenomenon with the precision required for laboratory work and circuit design, we must first establish the physical invariants that govern photon generation in semiconductors.
+
+The fundamental process underlying light emission is recombination. Within an undoped semiconductor crystal at thermal equilibrium, electrons occupy states in the valence band (the highest occupied band of electrons in a neutral atom), and the conduction band (the lowest band of states where electrons are free to conduct) remains empty at absolute zero. This gap between bands—the bandgap energy *E*_g—defines the minimum photon energy required to excite an electron from the valence band into the conduction band. When we forward-bias a p-n junction by applying a positive voltage to the p-type region and ground to the n-type region, we inject carriers across the junction: electrons from the n-side diffuse toward the p-side, and holes from the p-side diffuse toward the n-side. In the narrow depletion region where these carriers meet, recombination becomes probable. An electron in the conduction band falls back into an empty state (a hole) in the valence band, and the energy released—approximately equal to the bandgap—must be dissipated. In an indirect bandgap semiconductor (like silicon), this energy is released primarily as heat through phonon emission, making such materials poor light sources. In a direct bandgap semiconductor (like gallium arsenide, GaAs), the recombination event directly produces a photon carrying away the bandgap energy.
+
+The photon energy *E* emitted from recombination satisfies the relation *E* = *h*ν = *h*c/*λ*, where *h* is Planck's constant (6.626 × 10^−34 J·s), ν is the photon frequency, *c* is the speed of light (3 × 10^8 m/s), and *λ* is the wavelength. For a semiconductor with bandgap *E*_g, the dominant emission wavelength is approximately *λ* = *h*c/*E*_g. This relationship is the foundation of semiconductor color engineering: by selecting different semiconductor materials or engineering artificial bandgaps through heterostructures and quantum confinement, we can tune the emission wavelength from the ultraviolet into the infrared. A GaAs junction (bandgap 1.42 eV) emits near 870 nm in the near-infrared; a GaN junction (bandgap 3.4 eV) emits in the deep blue around 365 nm; an InP junction emits in the near-infrared around 920 nm.
+
+The efficiency of this conversion process—the quantum efficiency—is defined as the ratio of photons emitted to electrons injected. In the ideal case, if every injected electron produces one photon, the internal quantum efficiency (IQE) would be 100%. In practice, IQE is degraded by non-radiative recombination pathways: Auger recombination (where the energy released is transferred to a third carrier rather than emitted as a photon), Shockley-Read-Hall recombination (via defect centers within the bandgap), and surface recombination at crystal boundaries. The external quantum efficiency (EQE) further accounts for photons that are generated but then reabsorbed within the semiconductor or trapped by total internal reflection at the semiconductor-air interface. For a typical LED junction, IQE might be 60–80%, and EQE might be 40–60% after accounting for photon extraction losses.
+
+The rate of radiative recombination is proportional to the product of electron and hole concentrations: *R*_rad = *B*·*n*·*p*, where *B* is the radiative recombination coefficient (on the order of 10^−11 cm³/s for direct bandgap semiconductors) and *n* and *p* are electron and hole concentrations. Under forward bias, the junction develops a built-in electric field that sweeps carriers into the active region, where injection current drives the carrier concentrations far above equilibrium values. The relationship between injected current *I* and radiative recombination rate is direct: *I* = *q*·*A*·*d*·*R*_rad, where *q* is the elementary charge (1.602 × 10^−19 C), *A* is the junction area, and *d* is the thickness of the active recombination region. Thus, the emitted optical power is *P*_opt = *hν*·*R*_rad·*A*·*d* = (*hν*/*q*)·*I*·η_IQE, where η_IQE is the internal quantum efficiency. This is why LEDs with larger junction areas and lower series resistance can achieve higher optical power output at a given drive current: the current *I* is higher, and the active region volume is larger.
+
+The spectral distribution of emitted light is determined by the density of electronic states at the band edges and the Boltzmann distribution of carriers near the Fermi level. In thermal equilibrium at temperature *T*, the probability that a state at energy *E* is occupied follows the Fermi-Dirac distribution. Under heavy forward bias in an LED, the quasi-Fermi levels of electrons and holes separate significantly (by approximately *qV*, where *V* is the applied bias voltage). The emission spectrum becomes approximately Gaussian, centered near the bandgap energy, with a spectral width (FWHM) given roughly by Δν ≈ 2.355·*k*_B·*T*/*h*, where *k*_B is Boltzmann's constant. At room temperature (300 K), this produces a spectral linewidth of approximately 1.3 THz or 10–15 nm in wavelength space, depending on the center wavelength. This broad spontaneous emission spectrum is a defining characteristic of LEDs and distinguishes them fundamentally from laser diodes, which operate in a regime of stimulated emission and produce narrow spectral lines.
+
+A critical invariant for practical LED design is the temperature dependence of emission wavelength and bandgap. As temperature increases, the bandgap of most semiconductors decreases slightly, causing the emission wavelength to shift toward longer wavelengths (lower energy). For GaAs, this shift is approximately 0.36 nm/K; for GaN, approximately 0.05 nm/K. This temperature-wavelength coupling means that an LED designed to emit at 470 nm (blue) at room temperature will shift toward 475–480 nm if junction temperature rises to 50–70°C during operation. For color-critical applications (display backlighting, photometric instrumentation), this drift must be compensated through temperature feedback or current adjustment. Additionally, the forward voltage of an LED decreases approximately 2–3 mV/K as temperature rises, a consequence of reduced bandgap. This negative temperature coefficient can lead to thermal runaway if an LED is driven by a constant-voltage source: as *V*_f decreases with rising temperature, current increases, generating more heat, which further reduces *V*_f, causing current to increase still more. This is why current sources (or constant-current regulators) are mandatory for stable LED operation.
+
+## 2. Core Architecture & Mechanics
+
+The progression from a simple p-n junction to a practical, high-efficiency light-emitting device involves layering multiple physical mechanisms: bandgap engineering through heterostructures, carrier confinement through quantum wells, photon extraction optimization through geometry and surface treatment, and thermal management to maintain junction temperature within operating limits.
+
+### The Double-Heterojunction LED
+
+The fundamental limitation of a homojunction LED (where the active region is a simple p-n junction in a single semiconductor material) is twofold: (1) carriers injected into the active region quickly diffuse away into the bulk material, reducing their probability of recombining in the active region, and (2) photons generated in the active region may be reabsorbed by the surrounding semiconductor material if that material's bandgap is smaller than the photon energy. These losses degrade both the radiative efficiency and the external quantum efficiency.
+
+The heterojunction LED solves both problems through materials engineering. Consider a GaAs active layer sandwiched between two layers of AlGaAs (aluminum gallium arsenide). The bandgap of AlGaAs is larger than that of GaAs; thus, the conduction band edge of AlGaAs lies above that of GaAs (for the electron population), and the valence band edge of AlGaAs lies below that of GaAs (for the hole population). When viewed as an energy diagram, this creates potential wells—the conduction band forms a potential well for electrons, and the valence band forms a potential well for holes. Electrons injected into the GaAs active layer cannot easily escape into the AlGaAs layers because the potential barrier blocks their motion. The same is true for holes. This carrier confinement dramatically increases the recombination rate within the active GaAs layer and thus increases the radiative recombination efficiency.
+
+Additionally, because AlGaAs has a larger bandgap, photons generated in the GaAs layer (with energy near the GaAs bandgap of 1.42 eV) cannot excite electrons across the AlGaAs bandgap (1.8 eV or higher, depending on aluminum content). Thus, these photons are not reabsorbed in the confining layers and can escape from the device. This transparency of the confining layers to the generated photons is crucial for external quantum efficiency.
+
+In practice, a high-efficiency double-heterojunction LED consists of the following layer stack, grown via metal-organic chemical vapor deposition (MOCVD) or molecular beam epitaxy (MBE) on a GaAs substrate:
+
+1. **p-type AlGaAs window layer** (0.5–2 μm thick, bandgap ~1.9 eV): This confines holes and is transparent to the emitted photons.
+2. **p-type GaAs active layer** (0.1–0.5 μm thick, bandgap 1.42 eV): This is where radiative recombination occurs.
+3. **n-type AlGaAs confining layer** (0.5–2 μm thick, bandgap ~1.9 eV): This confines electrons and is transparent to emitted photons.
+4. **n-type GaAs substrate**: This provides mechanical support and forms the bottom electrical contact.
+
+The key dimensions are the active layer thickness (*d*_active, typically 0.2–0.5 μm) and the junction area (*A*_junction, ranging from 1 mm² for a large-area indicator LED down to 100 μm² for a chip in a surface-mount package). The product *A*·*d* determines the total volume where recombination can occur and thus has a direct impact on optical power output.
+
+To construct an actual device, the entire layer stack is grown in an epitaxial reactor. After growth, the wafer is cleaved along crystal planes to create mirrors, and individual die are separated. A metallic p-contact is deposited on the top surface (typically gold or nickel), and an n-contact is deposited on the bottom surface. The entire device is often mounted in a package with a lens or diffuser to control the radiation pattern and enhance light extraction.
+
+### Quantum Wells and Narrow-Bandgap Engineering
+
+For applications requiring higher efficiency or shorter wavelengths (blue and ultraviolet LEDs), further refinement is necessary. The quantum well LED replaces the simple active layer with a sequence of alternating thin layers of two different semiconductor materials. Consider a structure of alternating GaN (bandgap 3.4 eV) and AlGaN (bandgap varying from 3.4 to ~6 eV depending on aluminum content). When the AlGaN layer is sufficiently thin (typically 2–10 nm), electrons and holes confined within it occupy discrete quantum energy levels rather than the continuous band structure of bulk material. This quantum confinement raises the effective bandgap slightly, and more importantly, it concentrates the electron and hole wavefunctions in a thin region, dramatically increasing the overlap integral—the spatial integral of the product of electron and hole probability densities. This increased overlap integral increases the radiative recombination rate by several orders of magnitude.
+
+A practical blue LED uses a multiple quantum well (MQW) structure: typically three to five layers of 3 nm GaN wells separated by 10–15 nm AlGaN barriers. Electrons injected into this structure are confined vertically by the AlGaN barriers and thus spend significant time in the narrow GaN wells where holes also reside. The combination of quantum confinement and material composition engineering shifts the emission wavelength into the blue (450–470 nm) and dramatically improves the internal quantum efficiency (reaching 70–80% in modern devices).
+
+The energy diagram for an MQW structure illustrates this confinement. The conduction band of AlGaN lies above that of GaN, forming an electron confinement potential. Similarly, the valence band structure creates a hole confinement potential. Within each GaN well, both electrons and holes experience discrete bound states rather than continuous bands. The ground state energy of an electron in a well of width *W* in a uniform potential is approximately *E* = π²*ℏ*²/(2*m**e**W*²), where *ℏ* is the reduced Planck constant and *m*_e is the effective electron mass. For a 3 nm GaN well, this confinement energy is on the order of 100 meV—significant compared to the thermal energy at room temperature (26 meV)—ensuring that injected carriers remain confined in the wells rather than thermalizing into the barriers.
+
+### Stimulated Emission and Laser Diodes
+
+If we increase the optical feedback within an LED structure by adding optical mirrors, we enter the regime of stimulated emission and create a laser diode. The distinction between an LED and a laser diode is not merely a matter of added components but represents a transition in the fundamental physics of light generation.
+
+In an LED, electrons and holes recombine spontaneously, each recombination event independent of others. The emitted photons are incoherent, traveling in random directions, with random phases. The optical power scales linearly with injection current: doubling the current doubles the photon flux.
+
+In a laser diode, a fraction of the emitted photons is reflected back into the active region by mirrors (typically formed by cleaving along natural crystal planes, which have mirror-quality reflectivity due to the abrupt change in refractive index at the semiconductor-air boundary). These photons can stimulate additional recombination events in which an electron-hole pair recombines, emitting a new photon that is in phase with the incident photon and travels in the same direction. This stimulated emission process is governed by the fundamental relation for stimulated emission: the rate of stimulated recombination is proportional to the product of the carrier population and the photon intensity.
+
+Mathematically, the intensity of light propagating through an active medium satisfies the differential equation:
+
+d*I*/d*x* = (g(*I*) − α)*I*
+
+where g(*I*) is the gain (stimulated emission rate minus absorption) and α is the background absorption. At low intensities, g is proportional to the carrier density *N*: g(*I*) = σ(*N* − *N*_tr)*I*, where σ is the stimulated emission cross-section and *N*_tr is the transparency carrier density (the carrier density at which gain equals absorption). As intensity increases, gain saturates because carriers are depleted by stimulated emission. The system reaches a steady state when gain equals cavity loss (the loss per round trip including mirror transmission and scattering).
+
+The threshold condition for laser operation occurs when the modal gain equals the cavity loss: g(*N*_th) = α_m, where *N*_th is the threshold carrier density and α_m is the modal loss. Below threshold, the device operates as an LED, emitting incoherent light with power increasing linearly with current. At threshold, the carrier density reaches *N*_th, and the gain provides sufficient amplification to overcome cavity loss. Above threshold, further increases in carrier density produce only small increases in carrier population (because the excess carriers are consumed by stimulated emission), but the optical power increases dramatically, limited primarily by gain saturation. The laser output becomes a narrow, coherent beam.
+
+The threshold current *I*_th is the injection current required to establish threshold carrier density. It depends on the active region volume (larger volume requires more total carriers but lower carrier density), the transparency carrier density, and the non-radiative recombination rate (higher non-radiative loss requires higher injection to compensate). Typical threshold currents for GaAs laser diodes are 1–10 mA; for GaN blue laser diodes, 10–50 mA. The linewidth of the laser output above threshold is typically 1–5 nm for Fabry-Pérot cavities (where feedback is provided by facet mirrors alone) and can be reduced to 0.1 nm or narrower using distributed feedback (DFB) gratings.
+
+The cavity modes of a Fabry-Pérot laser diode are longitudinal modes spaced by Δν = c/(2*n*_eff*L*), where *n*_eff is the effective refractive index and *L* is the cavity length (the distance between the mirrors, typically 200–500 μm). For a GaAs device with *n*_eff ≈ 3.6 and *L* = 300 μm, the mode spacing is approximately 0.2 nm in wavelength space. Below and near threshold, many of these modes oscillate simultaneously (multimode operation). As current is increased above threshold, temperature effects and gain saturation typically cause the laser to operate in fewer modes; often, in a single dominant mode. This behavior can be engineered through wavelength-selective structures like chirped grating mirrors to produce single-frequency output.
+
+### Heterojunction LED Detailed Energy Diagram
+
+The following ASCII energy diagram illustrates the band structure of a double-heterojunction LED operating under forward bias. Solid lines represent band edges; the Fermi level is shown for both electrons and holes under applied bias.
+
+```
+Conduction Band (EC):
+
+                p-AlGaAs    |   p-GaAs       |   n-AlGaAs
+         _____________      |   _______      |   ___________
+        /             \     |  /       \     |  /
+  EC   |               |    | |         |    | |
+       |_____    ______|    |_|    _____|    |_|
+             EC_AlGaAs            EC_GaAs         EC_AlGaAs
+                                  (lower)
+
+Valence Band (EV) [shown inverted for clarity]:
+
+       |_____    ______|    |_|    _____|    |_|
+            EV_AlGaAs            EV_GaAs         EV_AlGaAs
+       |               |    | |         |    | |
+  EV   |_______________|    |_|_________|    |_|___________
+
+Quasi-Fermi Levels (under forward bias, separated by qV):
+
+       ----- EF_holes (p-side)
+       
+       ===== EF_electrons (n-side)
+       
+       [Separation ≈ qV_forward]
+
+Active Region (GaAs):
+Electrons confined in EC well, holes confined in EV well.
+Photons emitted: Eγ ≈ EG_GaAs ≈ 1.42 eV (870 nm)
+```
+
+In this diagram, the confining layers (AlGaAs) have larger bandgaps, forming potential wells for both electrons and holes. The quasi-Fermi level separation under forward bias drives injection of electrons and holes into the active region. The spatial overlap of electron and hole probability densities in the active GaAs layer maximizes the radiative recombination rate.
+
+## 3. High-Performance Optimization & Failure Modes
+
+### Current Distribution and Junction Heating
+
+In practical LEDs, the current density is not uniform across the junction area. Metallic contacts have finite sheet resistance, and variations in contact quality or substrate resistivity can cause current crowding—regions of high current density surrounded by regions of lower density. A high-current-density region generates heat at a rate proportional to *I*²*R* (Joule heating) plus optical power loss. This localized heating raises junction temperature in that region, which further reduces forward voltage and increases current density through positive feedback. Eventually, a narrow current path may reach elevated temperatures, reducing device efficiency and accelerating degradation.
+
+To mitigate current crowding, high-power LEDs employ structured contact geometries: grid patterns, concentric rings, or interdigitated fingers that distribute current more uniformly across the junction. Additionally, high-conductivity substrates (such as heavily doped GaAs for AlGaAs devices, or GaN templates for GaN devices) reduce voltage drop and current crowding. For the most demanding applications (laser diodes, high-power LEDs for automotive or industrial use), the substrate itself may be thinned to 50–100 μm and mounted p-side up on a high-conductivity submount (copper or molybdenum) to provide efficient heat extraction directly from the active region.
+
+The junction temperature *T*_j under steady-state operation is governed by thermal resistance:
+
+*T*_j = *T*_ambient + Θ_jc·(*P*_dissipated)
+
+where Θ_jc is the junction-to-case thermal resistance (in units of K/W or °C/W), and *P*_dissipated is the total power dissipated (electrical power input minus optical power output). For a typical indicator LED in a through-hole package, Θ_jc might be 200–500 K/W, meaning that 100 mW of dissipated power raises junction temperature by 20–50°C above ambient. For a high-power LED mounted directly on a copper submount within a thermally optimized package, Θ_jc can be reduced to 5–20 K/W. This thermal optimization is critical because the efficiency of an LED (the external quantum efficiency) degrades with increasing temperature, and spectral properties shift. For a blue LED operating at elevated temperature, efficiency drops approximately 0.3% per degree Celsius above 25°C—a significant penalty for an LED designed to operate in an automobile or industrial environment.
+
+### Photon Extraction and Anti-Reflection Coatings
+
+A fundamental limitation of LED performance is total internal reflection. Photons generated within the semiconductor (with high refractive index, typically 3.2–3.6) traveling toward the semiconductor-air interface encounter a critical angle beyond which they are totally reflected back into the semiconductor. The critical angle θ_c is given by sin(θ_c) = 1/*n*, where *n* is the refractive index. For GaAs (*n* = 3.6), θ_c ≈ 16°; for GaN (*n* = 3.4), θ_c ≈ 17°. This means that only photons traveling nearly perpendicular to the junction surface (within ±16° of the normal) can escape; photons at larger angles are trapped and eventually reabsorbed, converting their energy to heat.
+
+Historically, a significant fraction of generated photons were lost to total internal reflection, reducing external quantum efficiency. Modern high-efficiency LEDs employ photon extraction enhancement techniques:
+
+**Textured Surfaces**: Instead of a flat, polished junction surface, the semiconductor-air interface is textured with microscopic pyramids or cones (typically 1–10 μm in size) formed by reactive ion etching or chemical wet etching. These textured surfaces scatter photons in all directions; a photon that would be totally reflected at a flat interface may scatter from a textured surface and exit at a favorable angle. Photon extraction efficiency is improved from ~30% to 70–80% through texturing.
+
+**Encapsulation in High-Refractive-Index Resins**: The textured semiconductor is then encapsulated in a clear epoxy or silicone resin with refractive index close to the semiconductor (typically 1.5–1.8). This reduces the refractive index mismatch at the semiconductor-encapsulant interface, reducing the critical angle and improving extraction efficiency. Advanced encapsulant materials with index ~1.8 can recover an additional 10–15% of photons.
+
+**Distributed Bragg Reflectors (DBRs)**: For laser diodes and high-efficiency LEDs, a DBR mirror (a periodic stack of high- and low-refractive-index layers designed to reflect photons of the desired wavelength) is sometimes integrated beneath the active region. Photons generated in the active layer and traveling downward toward the substrate encounter the DBR, which reflects them back up and out through the top surface. This approach,
