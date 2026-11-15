@@ -1,0 +1,135 @@
+# Lesson 4: Swaps, Interest Rate Derivatives, Curve Construction
+
+## 1. First-Principles Intuition & Invariants
+
+An interest rate swap represents one of the most elegant instruments in modern finance: a bilateral agreement in which two counterparties exchange cash flows according to different interest rate formulas applied to a shared notional principal amount. The notional principal itself never changes hands—it exists purely as a reference quantity for computing the magnitude of periodic payments. One party typically pays a fixed rate multiplied by the notional; the other pays a floating rate (most commonly LIBOR, SOFR, or another reference index) plus a negotiated spread, also multiplied by the notional. This conceptual simplicity masks profound complexity: swaps are the backbone of modern fixed-income markets, serving as the primary mechanism through which borrowers transform their liability profiles, asset managers hedge duration exposure, and traders arbitrage the term structure of interest rates.
+
+The fundamental economic intuition rests on two pillars. First, swaps enable borrowers with comparative advantages in different funding markets to exploit those advantages and pass the benefits through to end users. A triple-A-rated multinational corporation might issue fixed-rate debt cheaply but wish to fund at floating rates; simultaneously, a bank might have superior access to floating-rate funding but wish to lock in fixed costs. Through a swap, both parties can access markets at lower all-in costs than they could independently. Second, swaps are mechanisms for transforming cash flow timing and rate-type exposure without requiring actual refinancing. A pension fund holding a portfolio of short-duration floating-rate assets can enter a pay-fixed swap to synthetically create the duration profile of a long-term bond portfolio, without selling assets or incurring transaction costs.
+
+The valuation of a swap flows directly from a core invariant: a swap is mathematically equivalent to a portfolio of two bonds. Specifically, a vanilla fixed-for-floating interest rate swap is equivalent to the simultaneous purchase of a floating-rate bond and the sale of a fixed-rate bond, both with notional principal equal to the swap's notional and payment schedules matching the swap's schedule. On any given valuation date, the swap's value equals the market value of the long floating-rate bond minus the market value of the short fixed-rate bond. This bond equivalence transforms swap valuation from an abstract exercise into a concrete exercise in bond pricing, which in turn depends critically on the construction and shape of the yield curve.
+
+The yield curve—the function mapping tenor (time to maturity) to zero-coupon discount rates—is the foundational data structure from which all other fixed-income valuations cascade. A smooth, arbitrage-free curve is essential because every swap payment must be discounted using the appropriate zero-coupon rate for that payment date. The process of constructing a curve from market data (deposit rates, futures contracts, swap rates, and bond yields) is neither mechanical nor trivial; it requires careful treatment of different market instruments with different payment frequencies, day-count conventions, and liquidity characteristics. Curve construction is where theory meets market practice in its most unforgiving form.
+
+The transition from LIBOR (London Interbank Offered Rate) to alternative reference rates like SOFR (Secured Overnight Financing Rate) in the United States, SONIA in the UK, and €STR in the Eurozone represents one of the most significant structural shifts in derivatives markets in decades. LIBOR was fundamentally a fiat-based rate constructed from polling a panel of banks; SOFR is a transaction-based rate derived from actual overnight repurchase agreement volumes. This shift introduces technical complications in swap mechanics (compounding conventions, term rates, basis adjustments) but also reshapes market microstructure and counterparty credit exposure. Understanding both the legacy LIBOR-based framework and the new risk-free rate ecosystem is essential for practitioners who must manage existing portfolios while originating new trades under different conventions.
+
+## 2. Core Architecture & Mechanics
+
+### 2.1 The Anatomy of a Vanilla Interest Rate Swap
+
+A vanilla fixed-for-floating swap specifies the following immutable parameters at inception: notional principal (measured in base currency, typically $10 million to $1 billion for institutional trades), fixed rate (expressed as an annual percentage, e.g., 3.50%), floating reference rate (e.g., 3-month USD LIBOR), floating spread (e.g., +15 basis points), payment frequency (typically semi-annual for fixed legs and quarterly for floating legs in USD swaps), day-count convention (Actual/360 for floating legs, 30/360 for fixed legs in USD conventions), and maturity date. Both legs reset and pay on specified dates; the floating leg resets each period to the prevailing fixing of the reference rate plus the spread.
+
+Consider a concrete example: a $100 million, 5-year USD swap paying fixed at 3.50% semi-annually against 3-month USD LIBOR plus 15 basis points quarterly. The fixed-leg payer establishes a cash flow schedule: on each semi-annual anniversary (e.g., June 15 and December 15), the payer remits $100M × 3.50% × 182/360 (accounting for day-count conventions) to the floating-leg payer. The floating-leg payer, in turn, resets quarterly and pays $100M × (LIBOR₃M + 0.15%) × 91/360 (or 92/360 depending on the number of days in the quarter).
+
+The fixed-floating exchange creates a dynamic imbalance: on each settlement date, the parties compare the fixed coupon to the floating coupon and settle the net difference in cash. If fixed leg exceeds floating leg, the fixed-leg payer remits cash; if floating leg exceeds fixed, the floating-leg payer remits cash. No principal exchanges occur at initiation, during the life of the swap, or at maturity. The notional serves purely as a scaling factor.
+
+From the fixed-leg payer's perspective, entering this swap is economically equivalent to borrowing $100 million at a floating rate and lending it at 3.50% fixed. From the floating-leg payer's perspective, the economics are inverted: lending at floating and borrowing at fixed. Typically, the fixed-leg payer is a corporate borrower seeking to convert floating-rate debt into fixed-rate obligations, while the floating-leg payer is a bank or asset manager seeking to extend duration or hedge long positions.
+
+### 2.2 Bond Equivalence and Swap Valuation
+
+The valuation framework hinges on recognizing that a swap is a portfolio of two bonds. Formally, the value of a swap to the fixed-leg payer at time $t$ is:
+
+$$V_{\text{swap}}(t) = PV_{\text{floating}}(t) - PV_{\text{fixed}}(t)$$
+
+where $PV_{\text{floating}}(t)$ is the present value of all future floating-leg cash flows, and $PV_{\text{fixed}}(t)$ is the present value of all future fixed-leg cash flows. Both present values are computed using zero-coupon discount factors derived from the yield curve.
+
+To compute the present value of the floating leg, we recognize a critical mechanical property: on any reset date, a floating-rate bond paying LIBOR plus a spread is worth approximately par (ignoring credit spread changes). This occurs because the coupon resets to market rates; immediately after the reset, the bond trades at face value until the next reset date. Therefore, the present value of the floating leg simplifies to the present value of the next floating coupon plus the notional repayment:
+
+$$PV_{\text{floating}}(t) = \frac{\text{Notional} \times (L_t + s) \times \tau + \text{Notional}}{1 + (L_t + s) \times \tau}$$
+
+where $L_t$ is the current floating rate fixing, $s$ is the spread, and $\tau$ is the day-count fraction. For a fresh reset, this expression simplifies to approximately the notional principal, because the coupon exactly matches the discount rate. The key insight is that the floating leg always has a value close to par on reset dates, independent of market movements, because it reprices continuously.
+
+The present value of the fixed leg is a straightforward bond valuation:
+
+$$PV_{\text{fixed}}(t) = \sum_{i=1}^{n} \frac{C \times \tau_i}{[1 + z(t_i)]^{t_i - t}} + \frac{\text{Notional}}{[1 + z(t_n)]^{t_n - t}}$$
+
+where $C$ is the fixed coupon rate, $\tau_i$ is the day-count fraction for period $i$, $z(t_i)$ is the zero-coupon rate (forward rate) for maturity $t_i$, and $n$ is the total number of periods. This is standard bond mathematics: discount each cash flow back to the present using the appropriate zero-coupon rate.
+
+The swap value is the difference. If the fixed leg is worth less than the floating leg, the swap has positive value to the fixed-leg payer; if the fixed leg is worth more, the swap has negative value. At initiation, the fixed rate is set such that the present value of the fixed leg equals the present value of the floating leg (approximately par for the floating leg), resulting in zero swap value. This ensures neither party overpays or underpays at inception—the swap is priced fairly.
+
+After inception, as rates move and time elapses, the swap value changes. If rates rise, the present value of the fixed-leg cash flows falls (discount rates increase), making the swap more valuable to the fixed-leg payer. If rates fall, the fixed-leg present value rises, making the swap more valuable to the floating-leg payer. This dynamic is the source of both hedging benefit and risk.
+
+### 2.3 Forward Rate Agreements and the Term Structure
+
+A forward rate agreement (FRA) is a bilateral contract that locks in an interest rate for a specific time period in the future. Unlike a swap, which comprises multiple exchanges, an FRA is a single cash flow exchange. An FRA specified as "3v6" (read "three-versus-six") establishes a rate for the 3-month period beginning in 3 months from today. At the maturity of the FRA, the actual 3-month reference rate (e.g., 3-month LIBOR) is compared to the locked-in FRA rate, and the difference multiplied by the notional principal is exchanged in cash.
+
+FRAs are foundational to understanding the forward rate term structure. The forward rate $f(t_1, t_2)$ for the period from time $t_1$ to time $t_2$ is the rate that, when locked in today via an FRA, has zero net present value to both parties. FRAs are frequently used as building blocks in curve construction because they provide direct market-quoted information about future rate expectations.
+
+The mathematical relationship between spot rates (zero-coupon yields) and forward rates is the core of term structure mechanics. If $z(0, T)$ is the zero-coupon rate for maturity $T$ and $z(0, t)$ is the zero-coupon rate for maturity $t < T$, then the implied forward rate for the period from $t$ to $T$ is:
+
+$$f(t, T) = \frac{z(0, T) \times T - z(0, t) \times t}{T - t}$$
+
+This relationship arises from the no-arbitrage principle: an investor who purchases a zero-coupon bond maturing at time $T$ should earn the same return as an investor who purchases a bond maturing at time $t$ and simultaneously enters an FRA to lock in reinvestment rates from $t$ to $T$. If the returns differed, an arbitrage opportunity would exist.
+
+Forward rates are upward-sloping when the yield curve is steep (long-term rates exceed short-term rates), perfectly flat when the yield curve is flat, and downward-sloping when the curve is inverted. During normal economic conditions, forward rates are positive and increasing, reflecting a term premium that compensates investors for the duration risk of holding longer-maturity assets. During financial stress, the curve inverts, and forward rates can briefly turn negative, reflecting flight-to-quality demand for long-term safe assets.
+
+### 2.4 Yield Curve Construction: From Market Instruments to Zero Rates
+
+The yield curve does not exist a priori as a continuous, smooth function. Instead, it must be constructed from discrete market prices of various fixed-income instruments. The primary instruments used in curve construction are deposit rates (for the shortest maturities, typically overnight to 12 months), Eurodollar futures contracts (for the 1-year to 2-year segment), and interest rate swaps (for the 2-year to 30-year segment).
+
+Deposit rates are the simplest: a bank quotes a rate at which it will accept deposits (or lend funds) for a specific term, e.g., 3-month USD LIBOR at 5.32%. The zero-coupon rate for a 3-month maturity is derived directly from this quote using the simple interest formula:
+
+$$z(0, 0.25) = \frac{r}{0.25}$$
+
+where $r$ is the 3-month deposit rate and 0.25 represents the year fraction. This zero-coupon rate represents the discount factor for cash flows due in 3 months.
+
+Eurodollar futures contracts are exchange-traded instruments that standardize the FRA market. Each contract represents a 3-month forward LIBOR fixing 90 days in the future. The contract is quoted as 100 minus the implied LIBOR rate; a contract quote of 95.50 implies an expected 3-month LIBOR of 4.50% for the relevant period. By extracting the implied rates from a sequence of Eurodollar futures contracts spanning multiple years, traders construct the forward curve in granular 3-month increments. These forward rates are then bootstrapped (iteratively solved) to extract zero-coupon rates using the forward rate formula above.
+
+Interest rate swaps provide the most extensive market data. A 5-year swap rate, for example, represents the fixed rate that a dealer is willing to pay (or receive) in exchange for receiving (or paying) 3-month LIBOR plus a spread, on a $100 million notional. Swap rates are quoted for standard tenors: 2-year, 3-year, 5-year, 7-year, 10-year, 15-year, 20-year, and 30-year. Each swap rate is a single data point that encapsulates information about the average level of forward rates over that tenor.
+
+The curve construction process, known as bootstrapping, operates sequentially from short to long maturities. For the shortest maturity (e.g., 1-month), the zero-coupon rate is derived directly from the 1-month deposit rate. For the 3-month zero rate, the rate is extracted from the 3-month deposit rate. For the 6-month zero rate, the procedure becomes more complex: a 6-month deposit rate is used if available; if not, an FRA or futures contract quote is used, and the 6-month zero is extracted using the relationship between the 6-month forward rate and the already-known 3-month zero rate.
+
+For longer maturities (e.g., 2-year), the bootstrap procedure uses swap quotes. A 2-year swap rate of 4.25% tells us that paying fixed at 4.25% for 2 years is fair value when receiving 3-month LIBOR. This information is insufficient in isolation to extract all zero-coupon rates up to 2 years; however, combined with the already-known zero rates for intermediate periods (3-month, 6-month, 1-year), the 2-year zero rate can be solved iteratively.
+
+Formally, the bootstrap for a 2-year swap works as follows. Let $z_1, z_2, z_3, z_4$ denote the zero-coupon rates for the four 6-month periods within the 2-year swap (i.e., maturities at 0.5, 1.0, 1.5, and 2.0 years). The first three rates are already known from earlier bootstrap steps. The swap quote tells us:
+
+$$\sum_{i=1}^{4} \frac{r_s \times 0.5}{1 + z_i \times 0.5} + \frac{1}{1 + z_4 \times 0.5} = PV_{\text{floating}}$$
+
+where $r_s$ is the swap rate and $PV_{\text{floating}}$ is the present value of the floating leg (approximately par, or more precisely, the present value of the next floating coupon plus the notional). Solving this equation for $z_4$ yields the 2-year zero-coupon rate. This rate is then used in the bootstrap for the 3-year swap, and the procedure repeats.
+
+The resulting zero-coupon curve is a discrete set of points (typically one point per payment date of the liquid swap market instruments). Practitioners then interpolate between these points to construct a continuous curve suitable for discounting arbitrary cash flow dates. Common interpolation methods include linear interpolation of log-discounts (which preserves the absence of arbitrage across neighboring discount factors) and cubic spline interpolation (which smooths the curve but requires careful treatment of boundary conditions).
+
+### 2.5 Curve Construction Under Different Day-Count and Payment Conventions
+
+The mechanical complexity of curve construction is amplified by the fact that different market instruments operate under different day-count and payment conventions. USD LIBOR deposits use Actual/360 day counting (the actual number of days in the period divided by 360), while US Treasury bonds use Actual/Actual. EUR swap floating legs often reset annually (unlike USD, which resets quarterly), and GBP swaps have different payment frequencies again. These differences are not merely cosmetic; they affect the precise timing of cash flows and the magnitude of discounting effects.
+
+When constructing a multi-currency or multi-asset-class curve, the practitioner must reconcile these differences by converting all instruments to a common day-count convention. A standard approach is to compute accrual fractions (the precise year fraction for each period accounting for leap years and day-count rules) separately for each instrument, then feed these fractions into the bootstrap equations. Failing to account for these details introduces small but cumulative errors that compound across the curve, distorting valuations in systematic ways.
+
+### 2.6 Forward Rate Agreements and Swap Valuation in Practice
+
+The relationship between FRAs and swaps is direct and operationally critical. A 5-year swap can be viewed as a portfolio of twenty 3-month FRAs, each locking in a forward rate for a specific 3-month period in the future. The swap rate (the fixed rate the dealer quotes) is a weighted average of all underlying forward rates, with weights determined by the present value of each period's cash flows.
+
+Operationally, market makers construct swap quotes from the forward curve as follows. Given a constructed zero-coupon curve and the implied forward rates, the fixed rate on an $n$-year swap is:
+
+$$r_s = \frac{\sum_{i=1}^{n} \frac{f_i \times d_i \times \tau_i}{1 + z_i \times \tau_i}}{\sum_{i=1}^{n} \frac{d_i \times \tau_i}{1 + z_i \times \tau_i}}$$
+
+where $f_i$ is the forward rate for period $i$, $d_i$ is the discount factor for period $i$, $z_i$ is the zero-coupon rate, and $\tau_i$ is the day-count fraction. The numerator is the present value of the forward leg (weighted by discount factors); the denominator is the present value of an annuity of the fixed rate. The swap rate emerges as the IRR (internal rate of return) that equates the present values of both legs.
+
+When market conditions shift—when new data arrives, volatility spikes, or credit spreads widen—the curve must be updated, and all swap rates must be recalculated. Market makers perform this calculation continuously, updating their quote screens in real time. The lag between observed market prices and quoted swap rates can be a source of profit for astute traders who detect mispricings before market makers update their curves.
+
+### 2.7 The LIBOR-to-SOFR Transition: Technical and Operational Mechanics
+
+For decades, LIBOR served as the reference rate for trillions of dollars of derivatives contracts. LIBOR is a surveyed rate: a panel of major banks is polled daily and asked "At what rate could you lend funds to other prime banks for a specified tenor?" The reported rates are compiled, outliers are removed, and an average is published as LIBOR. This methodology has a critical flaw: it is based on hypothetical transactions that may not actually occur, opening the door to manipulation. The 2008 financial crisis exposed this vulnerability; numerous banks were later found to have submitted false LIBOR quotes to manipulate derivatives prices for profit.
+
+Regulators responded by mandating a transition to "risk-free rates" (RFRs) constructed from actual transaction data. In the United States, the replacement is the Secured Overnight Financing Rate (SOFR), calculated daily from actual volumes in the overnight repurchase market. SOFR is published by the Federal Reserve and is computed as a volume-weighted average of overnight repo rates. SOFR is "overnight" by nature, meaning it reflects financing costs for a single day; it does not directly correspond to the 3-month or 6-month LIBOR rates that dominated swap markets.
+
+The transition introduces three technical challenges. First, legacy LIBOR-based swaps must be converted to SOFR-based mechanics. This conversion typically involves adding a "spread adjustment" to SOFR to preserve the economic value at the time of transition. The spread adjustment, derived from historical LIBOR-SOFR basis, is typically in the range of 11 to 26 basis points depending on the tenor. Operationally, this means a legacy 5-year swap paying 3-month LIBOR is converted to a swap paying 1-month compounded SOFR (often compounded in arrears, meaning the rate is published after the period ends) plus a spread of approximately 15 basis points.
+
+Second, the compounding mechanics differ. LIBOR for a tenor is simply published once per day as a single rate. SOFR, being overnight, must be compounded over a period to produce a multi-day rate. There are two approaches: compounded in advance (known at the beginning of the period) and compounded in arrears (published at the end of the period). Compounding in arrears is more market-standard because it matches actual financing costs, but it creates operational complexity for systems designed around known-in-advance LIBOR-based rates.
+
+Third, term SOFR (a synthetic forward-looking rate for multi-day periods, such as 3-month SOFR) is newer and less liquid than term LIBOR. The CME publishes a term SOFR rate derived from futures markets, but it carries wider bid-offer spreads and exhibits basis with compounded SOFR. Market participants must decide whether to use compounded SOFR (more granular, requires daily compounding calculations) or term SOFR (less liquid, but simpler operationally).
+
+## 3. High-Performance Optimization & Failure Modes
+
+### 3.1 Real-Time Curve Construction and Latency Optimization
+
+In modern trading environments, the curve must be updated multiple times per minute as new market data arrives. Deposit rates shift as banks adjust funding costs, futures contracts tick as traders reposition, and swap quotes update as dealers reset their marks. A fraction-of-a-second delay in curve updates can result in stale pricing, missed arbitrage opportunities, or erroneous P&L calculations.
+
+High-performance curve construction systems are typically architected as follows. Market data is ingested from multiple sources (exchange feeds for futures, broker networks for swap quotes, bank feeds for deposits) and combined into a unified data structure. A curve construction algorithm—implemented in compiled languages (C++, Rust) rather than interpreted languages—receives this data and performs a fast bootstrap. The bootstrap exploits the sequential nature of curve construction: only the most recent data points need to be reprocessed, while older data points are cached. A production curve update on a typical tier-1 bank's infrastructure completes in less than 50 milliseconds from data arrival to output.
+
+The optimization further exploits the fact that many of the computations are vector operations: discounting an array of cash flows, for instance, can be parallelized across CPU cores. SIMD (Single Instruction, Multiple Data) operations, available on modern processors, allow a single CPU instruction to process multiple floating-point values in parallel, accelerating discounting operations by 2–4x compared to naive serial implementations.
+
+Memory bandwidth becomes another constraint. A full curve construction may involve thousands of instruments and millions of cash flows. Efficient cache utilization is critical; algorithms must be structured to maximize cache hits and minimize memory latency. Practitioners optimize by storing curve data in contiguous memory blocks (avoiding pointer chasing) and leveraging CPU prefetching hints.
+
+### 3.2 Multi-Curve Frameworks and Basis Risk
+
+A critical failure mode in swap valuation emerges when practitioners assume a single curve applies to both discounting and rate projections. In reality, different instruments exist on di
