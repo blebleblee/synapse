@@ -104,6 +104,7 @@ Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop i
     print(f"\n[*] Uploading {len(valid_assets)} release assets to GitHub:")
     for p in valid_assets:
         sz_mb = p.stat().st_size / (1024 * 1024)
+        sz_bytes = p.stat().st_size
         if p.name in existing_assets:
             print(f"  • {p.name} ({sz_mb:.2f} MB) already uploaded. Skipping.")
             continue
@@ -112,20 +113,31 @@ Download and sideload curriculum addons via Settings ⚙ → Sideload, or drop i
         up_headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/octet-stream",
+            "Content-Length": str(sz_bytes),
             "Accept": "application/vnd.github+json"
         }
-        with open(p, "rb") as f:
-            up_res = requests.post(
-                upload_url,
-                headers=up_headers,
-                params={"name": p.name},
-                data=f,
-                timeout=300
-            )
-            if up_res.status_code in [200, 201]:
-                print(" [✔ Done]")
-            else:
-                print(f" [✘ Failed: {up_res.status_code}]")
+        uploaded = False
+        for attempt in range(1, 4):
+            try:
+                with open(p, "rb") as f:
+                    up_res = requests.post(
+                        upload_url,
+                        headers=up_headers,
+                        params={"name": p.name},
+                        data=f,
+                        timeout=600
+                    )
+                    if up_res.status_code in [200, 201]:
+                        print(" [✔ Done]")
+                        uploaded = True
+                        break
+                    else:
+                        print(f" [Retry {attempt}: {up_res.status_code}]", end="", flush=True)
+            except Exception as e:
+                print(f" [Retry {attempt}: {e.__class__.__name__}]", end="", flush=True)
+                import time; time.sleep(3)
+        if not uploaded:
+            print(" [✘ Failed after 3 attempts]")
 
     print("\n" + "=" * 60)
     print(f" [✔] All assets uploaded to: {rel_data.get('html_url')}")
