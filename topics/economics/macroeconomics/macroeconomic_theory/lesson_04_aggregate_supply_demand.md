@@ -1,0 +1,129 @@
+# Lesson 4: Aggregate Supply-Demand Synthesis Across Time Horizons
+
+## 1. First-Principles Intuition & Invariants
+
+The aggregate supply-demand framework represents one of macroeconomics' most consequential—and most contested—intellectual battlegrounds. At its core lies a deceptively simple question: why do real economies exhibit persistent unemployment and output fluctuations in the short run, yet appear to gravitate toward stable price levels and full employment over decades? The answer hinges on understanding how price and wage adjustment mechanisms operate across different time horizons, and crucially, how expectations about future inflation shape the dynamic adjustment path itself.
+
+Classical macroeconomic theory, descended from Adam Smith and refined by David Ricardo and John Stuart Mill, posited that markets clear instantaneously through flexible prices and wages. In this frictionless world, the quantity of money determines only the price level—a principle known as the classical dichotomy, which cleanly separates real variables (output, employment, real wages) from nominal variables (prices, wages expressed in currency units). Supply and demand for labor equalize at full employment, aggregate output reaches its potential level determined by factor endowments and technology, and monetary policy merely inflates or deflates the overall price level without real economic consequence. This classical long-run equilibrium, while intellectually elegant, proved catastrophically inadequate during the Great Depression, when economies settled into persistent unemployment despite supposedly flexible wages and prices.
+
+John Maynard Keynes fundamentally challenged the classical synthesis by arguing that wage and price rigidities—particularly downward rigidity—could trap economies in equilibrium unemployment. Sticky wages prevented real wage adjustment; sticky prices created demand-driven unemployment rather than market-clearing adjustments. In Keynes's vision, aggregate demand itself became the constraining force determining output and employment in the short run, not the supply-side capacity of the economy. This insight reversed the classical causal chain: monetary and fiscal policy, by shifting aggregate demand, could move the economy toward full employment.
+
+Yet Keynes left unresolved a critical theoretical tension: if prices and wages are sticky in the short run, what determines their stickiness? On what timescale do expectations adjust? Does policy effectiveness depend on whether economic agents anticipate policy changes? These questions remained dormant in macroeconomic practice for decades, treated as empirical regularities rather than deep structural features requiring theoretical explanation. The Phillips curve—discovered empirically by A.W. Phillips in 1958, documenting a stable inverse relationship between wage inflation and unemployment in postwar UK data—seemed to codify the Keynesian trade-off: policymakers could choose along a menu of inflation-unemployment combinations, accepting higher inflation to achieve lower unemployment.
+
+The empirical Phillips curve relationship dominated postwar macroeconomic policy until the stagflation of the 1970s shattered its assumed stability. As unemployment and inflation rose simultaneously—contradicting the Phillips curve menu—Milton Friedman and Edmund Phelps independently proposed a revolutionary insight: the Phillips curve relationship depends critically on expectations of inflation. Workers and firms do not care about nominal wages or prices in isolation; they care about purchasing power. If inflation expectations rise, workers demand higher nominal wage increases to maintain their real wage aspirations. Firms, anticipating higher input costs and expecting higher prices for their output, willingly grant those increases. The result: inflation accelerates while unemployment remains sticky. The Phillips curve, rather than being a stable policy menu, shifts upward whenever inflation expectations rise. This expectations-augmented Phillips curve reframed the entire problem: the trade-off between inflation and unemployment is not permanent, but rather a temporary disequilibrium feature that dissolves as expectations adjust.
+
+The expectations-augmented Phillips curve opened the door to the monetarist counter-revolution and ultimately to the rational expectations revolution. If agents form expectations rationally—incorporating all available information and the structure of the economy itself—then systematic monetary policy loses its power to create surprise inflation-unemployment trade-offs. Robert Lucas's policy ineffectiveness proposition argued that anticipated monetary policy changes would be fully reflected in wage and price expectations, leaving only nominal outcomes altered while real outcomes (employment, output) remained unaffected. Unanticipated policy might move the economy temporarily off its equilibrium employment path through information confusion, but persistent unemployment could not be engineered through predictable policy patterns.
+
+These competing theoretical frameworks—classical long-run dichotomy, Keynesian short-run demand-driven adjustment, monetarist expectations augmentation, and rational expectations policy ineffectiveness—do not represent mutually exclusive descriptions of reality. Rather, they illuminate different operational time horizons and institutional mechanisms through which economies adjust. Modern macroeconomic practice integrates these insights into a unified framework distinguishing short-run (sticky-price) from medium-run (expectations-adjusting) from long-run (equilibrium-restoring) horizons, each with distinct supply-demand dynamics and policy implications.
+
+Understanding this synthesis requires grasping two fundamental invariants. First, the aggregate supply curve is not a static relationship but rather a dynamically evolving surface whose slope and position depend on inflation expectations and the perceived sustainability of current output levels. Second, the policy effectiveness of any monetary or fiscal intervention depends fundamentally on the expectation formation mechanism—whether agents view policy as transitory or permanent, anticipated or surprising, credible or suspect. These invariants, properly understood, allow practitioners to diagnose when demand-driven stimulus will durably raise output versus when it will merely accelerate inflation, and how central bank credibility and forward guidance shape the real effectiveness of monetary policy transmission.
+
+## 2. Core Architecture & Mechanics
+
+The aggregate supply-demand system can be decomposed into three foundational layers, each capturing economic behavior at different adjustment horizons and information sets. These layers are not separate models but rather nested descriptions of how the same underlying economy operates as time unfolds and expectations crystallize.
+
+**The Short-Run Sticky-Price Layer: Demand-Driven Equilibrium**
+
+In the shortest operational horizon—typically measured in quarters to one or two years—assume that prices and nominal wages exhibit downward rigidity and change sluggishly in response to demand shocks. This stickiness arises from multiple sources: menu costs (physical and informational costs of repricing), customer relationships that firms hesitate to disrupt through abrupt price changes, long-term wage contracts that fix nominal compensation, and reservation wages below which workers refuse employment. Critically, firms and workers form expectations about current and future inflation based on recent history and current policy signals; these expectations do not instantly jump to rational expectations of future policy but rather adjust gradually as evidence accumulates.
+
+Under these conditions, the short-run aggregate supply (SRAS) curve relates the price level $P_t$ to real output $Y_t$ conditional on an expected price level $P_t^e$ that agents held when making wage and investment decisions:
+
+$$Y_t = Y^* + \alpha(P_t - P_t^e)$$
+
+where $Y^*$ denotes the economy's potential output (the level sustainable with stable inflation), and $\alpha > 0$ is the supply elasticity parameter capturing how responsive firms are to surprise price movements. This formulation embeds a critical insight: firms produce more than potential when the actual price level exceeds the expected price level, because workers and input suppliers, fooled by unanticipated inflation, accept lower real wages than they anticipated. Conversely, when prices fall below expectations (deflation surprise), firms contract production below potential as real input costs rise unexpectedly.
+
+The aggregate demand (AD) curve derives from the economy's expenditure identity and monetary transmission mechanisms. Consumers, firms, and government authorities demand goods and services based on real income, interest rates, expectations, and policy parameters. Through consumption functions, investment decisions responding to real interest rates and profit expectations, and government spending decisions, aggregate demand traces a downward-sloping relationship between the price level and real output:
+
+$$Y_t = \bar{C}(i_t, \mathbb{E}_t \pi_{t+1}, W_t) + \bar{I}(i_t, r_t, z_t) + G_t$$
+
+where $i_t$ denotes the nominal interest rate set by the central bank, $\mathbb{E}_t \pi_{t+1}$ captures inflation expectations affecting real purchasing power, $W_t$ represents real wealth from asset holdings, $r_t$ denotes the real interest rate ($r_t = i_t - \mathbb{E}_t \pi_{t+1}$), and $z_t$ captures productivity and profit expectations. A monetary expansion that lowers the nominal interest rate raises investment and consumption demand; a fiscal expansion through government spending $G_t$ directly raises aggregate demand. Conversely, any force that reduces wealth or raises uncertainty depresses aggregate demand.
+
+The short-run equilibrium occurs where SRAS and AD intersect. If aggregate demand shifts rightward—due to monetary expansion or fiscal stimulus—the demand curve moves outward. Since prices cannot adjust instantly, firms interpret the increased quantity demanded at the previous price as a favorable demand shock. They expand production, hiring more workers at the sticky nominal wage that employees expected. Output rises above potential, and unemployment falls below the natural rate (sometimes called the non-accelerating inflation rate of unemployment, or NAIRU). Conversely, a contractionary demand shock shifts AD leftward, output falls below potential, and unemployment rises above the natural rate.
+
+This short-run demand-driven mechanism captures why Keynesian fiscal and monetary policy tools have real effects. Central bank interest rate reductions increase investment and consumption; fiscal spending increases aggregate demand directly. Government deficits, rather than crowding out investment dollar-for-dollar, can raise overall demand and employment when aggregate demand is deficient relative to supply capacity. This is the core insight animating policy responses to recessions and financial crises: when sticky prices prevent wage and price adjustment from restoring full employment, demand-side policy activism can reduce the duration and depth of unemployment.
+
+**The Medium-Run Expectations-Adjustment Layer: Phillips Curve Dynamics**
+
+As months extend into years, inflation expectations begin adjusting based on actual inflation outcomes. Workers who agreed to nominal wage contracts based on expectations of 2% inflation grow dissatisfied when actual inflation runs at 5%; at contract renegotiation, they demand higher nominal wage growth to restore their real wage expectations. Firms that priced goods based on expected input cost growth revise their pricing strategies when actual costs diverge from expectations. This expectations adjustment mechanism is captured through the expectations-augmented Phillips curve, which relates inflation to the unemployment gap (the difference between actual unemployment $u_t$ and the natural rate $\bar{u}$):
+
+$$\pi_t = \mathbb{E}_{t-1} \pi_t + \gamma(u_t - \bar{u})$$
+
+This formulation encodes a powerful mechanism: inflation depends on lagged inflation expectations (representing the inherited momentum from prior wage and price-setting) plus a demand-pressure term capturing how tight labor markets push wages and prices higher. When unemployment falls below the natural rate, tight labor markets generate wage pressure; workers have better outside options, firms must offer higher real wages to attract workers, and this wage pressure transmits into price inflation. The parameter $\gamma > 0$ captures the sensitivity of inflation to labor market tightness.
+
+Crucially, this Phillips curve relationship is not immutable but shifts with inflation expectations. Suppose the central bank, having inherited an economy with stable 2% inflation and corresponding expectations $\mathbb{E}_{t-1} \pi_t = 2\%$, suddenly embarks on an aggressive monetary expansion. In the first period, the demand shock reduces unemployment below the natural rate. The Phillips curve predicts $\pi_t = 2\% + \gamma(u_t - \bar{u}) > 2\%$, so inflation rises above expectations. But as quarters pass, inflation expectations adjust upward. Workers observing that actual inflation has risen to 3-4% adjust their wage demands accordingly; firms observing higher input cost growth revise pricing strategies upward. By the next period, $\mathbb{E}_t \pi_{t+1}$ has risen toward the new inflation level, shifting the Phillips curve upward. To maintain unemployment below the natural rate, the central bank must accelerate monetary expansion further, pushing inflation even higher and triggering further expectations adjustment.
+
+This dynamic reveals the critical difference between temporary and permanent policy shifts. A one-time monetary expansion, holding expectations constant, can temporarily reduce unemployment but only at the cost of higher inflation. As expectations adjust, the unemployment gain evaporates while the inflation cost persists. To achieve permanently lower unemployment, the central bank would need to maintain perpetually accelerating inflation—a unsustainable path. This reasoning explains why the 1970s stagflation emerged: central banks attempting to exploit the Phillips curve trade-off through persistent inflation overexpanded money, expectations adjusted, unemployment rose back toward the natural rate while inflation persisted at elevated levels.
+
+The expectations-adjustment mechanism operates through multiple channels simultaneously. Wage-setting workers demand higher nominal increases to restore anticipated real wage levels; price-setting firms anticipate higher wage bills and competing firms' prices, so they raise their own prices preemptively; financial market participants observing persistent excess demand anticipate future inflation and demand higher nominal returns on bonds and other assets, pushing up long-term interest rates; central bank credibility determines the speed of expectations adjustment, with credible central banks seeing expectations anchor at their inflation target even during temporary demand shocks, while less-credible central banks see expectations drift more dynamically toward recent inflation outcomes.
+
+The mechanism through which expectations feed back into current inflation is formally captured through the forward-looking expectations term. Modern New Keynesian Phillips curves incorporate both lagged and forward-looking components:
+
+$$\pi_t = \lambda s_t + \beta \mathbb{E}_t \pi_{t+1} + \mathbb{E}_{t-1} \pi_t$$
+
+where $s_t$ denotes the output gap (actual output minus potential), $\beta \in (0,1)$ discounts future inflation, and the weights sum to unity. This specification captures how current inflation depends on the present demand pressure ($\lambda s_t$), expectations of future inflation ($\mathbb{E}_t \pi_{t+1}$), and inherited inflation momentum ($\mathbb{E}_{t-1} \pi_t$). The forward-looking component is critical: if firms and workers believe future inflation will be higher, they will raise current wages and prices in anticipation, making the belief self-fulfilling. Conversely, a credible central bank commitment to low future inflation can anchor expectations, reducing the current inflation response to output gaps.
+
+**The Long-Run Classical Layer: Dichotomy and Equilibrium Restoration**
+
+Beyond the medium-term horizon—typically five to ten years and beyond—two mechanisms operate to restore the economy to the classical long-run equilibrium. First, prices and wages become sufficiently flexible that nominal rigidities cease constraining real outcomes. Second, agents' inflation expectations fully adjust to the actual long-run inflation determined by monetary policy, so inflation uncertainty diminishes and real relationships stabilize.
+
+In long-run equilibrium, the economy attains its natural rate of unemployment and potential output level, both determined by real factors: the labor force size and participation rate, the capital stock and its productivity, technological capabilities, and the degree of labor market friction determining frictional unemployment. The nominal wage and price level adjust to whatever level is consistent with the money supply and monetary policy regime. The real interest rate returns to the natural rate—the rate at which investment demand equals saving supply at full employment. Monetary policy determines only the price level and nominal interest rates; real interest rates, real wages, output, and employment are determined entirely by real factors.
+
+This long-run dichotomy can be formalized through the quantity theory of money. The money supply $M_t$, multiplied by the velocity of money $V$ (the number of times money changes hands), equals the price level $P_t$ times real output $Y_t$:
+
+$$M_t V = P_t Y_t$$
+
+In the long run, velocity $V$ stabilizes as payments habits crystallize, and real output $Y_t$ reaches potential $Y^*$ as factor utilization normalizes and unemployment returns to the natural rate. Thus:
+
+$$P^* = \frac{M_t V}{Y^*}$$
+
+The long-run price level becomes purely a monetary phenomenon—determined by the central bank's money supply decision and the real economy's fundamental constraints. The central bank cannot, through monetary expansion alone, permanently raise real output or reduce unemployment below the natural rate. Any attempt to do so merely sets in motion inflation expectations adjustment and wage-price dynamics that ultimately restore unemployment to the natural rate while leaving inflation permanently higher.
+
+The classical dichotomy principle also implies that long-run real interest rates are independent of monetary policy. The real interest rate must equate investment and saving at full employment. This natural real interest rate $r^*$ is determined by time preference (impatience), productivity of capital, demographic structure, and other real fundamentals. If the central bank holds the nominal interest rate below $r^*$ for an extended period, inflation accelerates until the real interest rate $r_t = i_t - \pi_t$ rises back to $r^*$. Conversely, sustained nominal rate elevation above $r^*$ generates deflation until the real rate normalizes.
+
+```
+TIME HORIZON DECOMPOSITION: AGGREGATE SUPPLY DYNAMICS
+
+Short-Run (Quarters to 1-2 Years):
+- Nominal and real wages sticky
+- Inflation expectations inherited from past
+- Aggregate demand drives output and employment
+- SRAS: Y = Y* + α(P - P^e)
+- Policy effectiveness: HIGH
+
+↓ [Expectations Adjustment]
+
+Medium-Run (1-5 Years):
+- Inflation expectations drift toward actual inflation
+- Phillips curve shifts as expectations adjust
+- Supply gradually tightens as unemployment impacts wage growth
+- Policy stimulates inflation more than output
+- Policy effectiveness: MODERATE, DECLINING
+
+↓ [Price-Wage Flexibility]
+
+Long-Run (5+ Years):
+- Prices and wages fully flexible
+- Expectations stabilize at steady-state inflation
+- Classical dichotomy: Money determines prices, real factors determine output
+- Unemployment returns to natural rate
+- Output at potential
+- Policy effectiveness: ZERO (nominal effects only)
+```
+
+## 3. High-Performance Optimization & Failure Modes
+
+**Diagnosing Adjustment Horizons: When is Policy Effective?**
+
+The practitioner's primary challenge lies in correctly diagnosing which adjustment horizon an economy currently inhabits. Policy appropriate for the short-run demand-constrained environment becomes dangerously destabilizing if applied when the economy already operates at full employment and medium-run expectations adjustment is active. Conversely, assuming long-run dichotomy when demand-deficiency persists leads to austerity and prolonged unemployment.
+
+Several diagnostic indicators reveal which horizon dominates. The unemployment rate relative to estimates of the natural rate indicates whether slack remains. Estimates of the natural rate derive from multiple sources: demographic trends (aging populations face higher structural unemployment), measured wage growth and Phillips curve regressions (tight labor markets exhibit steeper wage growth), and surveys of inflation expectations (if expectations are drifting upward, agents perceive sustained tightness ahead). When actual unemployment significantly exceeds the natural rate—the output gap is negative—substantial demand slack persists, and policy stimulation can raise output with limited inflation cost. The Phillips curve relationship remains flat because expectations have not yet adjusted; inflation remains stable even as demand expands. Central bank forward guidance that credibly commits to patience further flattens the Phillips curve by anchoring expectations.
+
+Conversely, when unemployment approaches or falls below the natural rate, the indicator switches. Wage growth accelerates beyond what productivity growth can sustain; the Phillips curve steepens as labor market tightness translates directly into wage pressure. Financial market inflation expectations begin rising, reflected in widening breakeven inflation rates on inflation-protected securities and rising long-term nominal interest rates. If the central bank continues stimulating when full employment has been reached, inflation expectations unanchoring becomes the binding constraint. Policy loses real effectiveness, transmitting primarily into nominal outcomes.
+
+A second diagnostic involves examining inflation expectations directly. Breakeven inflation rates derived from Treasury Inflation-Protected Securities (TIPS) spreads, household survey inflation expectations, and professional forecaster surveys all provide windows into expectation formation. Stable expectations centered near the central bank's target indicate strong credibility and suggest the economy remains in the short-run regime where policy is most effective. Drifting expectations, particularly when long-term expectations rise while short-term inflation remains stable, signal that agents perceive a persistent monetary policy shift that will ultimately raise inflation. This expectation drift is often a leading indicator that the central bank has moved beyond offsetting demand shortfall into creating excess demand.
+
+A third diagnostic examines financial market signals. When real interest rates (nominal rates minus inflation expectations) remain elevated, investment demand is constrained, and demand-side stimulus remains appropriate. When real rates compress toward zero or negative territory while inflation expectations rise, markets are pricing in future tightness, and further stimulus risks destabilizing expectations. The slope of the yield curve—the difference between long-term and short-term interest rates—summarizes market expectations about future short-term rates and economic tightness. An inverted yield curve (long-term rates below short-term rates) historically precedes recessions, as markets anticipate future rate cuts.
+
+**Policy Credibility and Expectations Anchoring: The Non-Linear Response**
+
+A critical frontier in modern macroeconomic practice involves understanding how central bank credibility and forward guidance shape expectations adjustment and thus policy eff
