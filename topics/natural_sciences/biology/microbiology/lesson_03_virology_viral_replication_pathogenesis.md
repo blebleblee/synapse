@@ -1,0 +1,7 @@
+# Lesson 3: Virology, Viral Architecture, Replication Strategies, Pathogenesis
+
+## 1. First-Principles Intuition & Invariants
+
+Viruses occupy a peculiar conceptual boundary in biology, existing at the intersection of chemistry and life. They are obligate intracellular parasites that cannot perform independent metabolism, lack ribosomes for protein synthesis, and possess no inherent energy production machinery. Yet they encode genetic information, evolve under selective pressure, and orchestrate the complete hijacking of cellular biosynthetic apparatus with extraordinary molecular precision. This duality—chemically inert outside cells yet biologically active within host cytoplasm—defines the fundamental nature of viral existence.
+
+The minimal viral architecture consists of a nucleic acid genome enclosed within a protective protein shell called the capsid. This genome may be DNA or RNA, single-stranded or double-stranded, linear or circular, segmented or continuous. The capsid serves multiple functions: it protects the fragile nucleic acid from environmental nucleases and mechanical shear, mediates specific attachment to host cell surface receptors, and in many cases contains enzymatic activities required for genome uncoating and replication initiation. Some viruses acquire an additional lipid envelope derived from host cell membranes during budding, studded with viral glycoproteins that determine host range and immun
