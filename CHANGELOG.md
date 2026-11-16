@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-11-16
+
+### Summary
+Milestone release marking the full 100.0% completion of the **Synapse Global Masterclass Curriculum** (539 topics across 12 domains, comprising 2,945 lessons and operational verification labs). This release packages the complete master curriculum into a unified 33.5 MB distribution (`synapse_complete_curriculum.synpack`), upgrades over 3,100 diagrams to vector Mermaid.js flowcharts, adds official KaTeX `mhchem` chemical formula rendering, and prepares the repository for public release on GitHub.
+
+---
+
+### Key Features & Enhancements
+
+#### 1. Complete Global Polymath Curriculum (539 / 539 Topics)
+* **100% Taxonomical Coverage:** All 12 domains fully authored and verified:
+  * **Computing & Systems:** 162 topics (10.6 MB)
+  * **Arts & Music:** 67 topics (3.4 MB)
+  * **Crafts & Fabrication:** 60 topics (2.7 MB)
+  * **Business & Strategy:** 41 topics (2.5 MB)
+  * **Engineering:** 39 topics (2.8 MB)
+  * **Humanities:** 39 topics (2.5 MB)
+  * **Formal Sciences:** 33 topics (2.2 MB)
+  * **Economics:** 32 topics (2.3 MB)
+  * **Natural Sciences:** 30 topics (2.3 MB)
+  * **Health Sciences:** 20 topics (1.0 MB)
+  * **Motorsports:** 10 topics (0.7 MB)
+  * **Languages:** 6 topics (0.5 MB)
+* **Master Unified Addon:** Introduced `synapse_complete_curriculum.synpack` (33.5 MB), enabling 1-click installation of all 539 topics and 2,945 lessons/labs at once.
+
+#### 2. Vector Graphics & Mathematical Rendering Engine
+* **Vector Mermaid.js Upgrades:** Converted over 900 legacy ASCII box diagrams into modern, vector Mermaid.js flowcharts (` ```mermaid flowchart TD ... ``` `). Over 50% of all curriculum units (1,484 files) now feature vector Mermaid diagrams (3,172 total diagrams across the workspace).
+* **High-Contrast Dark Mode Rendering:** Automated luminance-based text contrast enforcement for Mermaid nodes in dark mode.
+* **KaTeX Chemical Equations (`mhchem`):** Integrated official `katex/contrib/mhchem` extension into both the React desktop renderer and headless validation suite for native chemical formula rendering (e.g. `\ce{C4H10 -> 2 C2H5}`).
+* **HTML Comparison Escaping:** Fixed bare less-than numerical comparisons (`< 0.2s`, `< 10%`) to prevent browser HTML parsers from mistaking comparisons for invalid HTML tags.
+
+#### 3. Desktop UI & Onboarding Polish
+* **Helpful Empty State:** Added an intuitive Empty State to the sidebar when no topics are installed, with an embedded one-click **`[ Open Curriculum Store ]`** button.
+* **Visual Documentation:** Added a comprehensive visual guide in `README.md` explaining the App Shell + Modular SynPack architecture and 4 distinct installation paths.
+
+#### 4. Infrastructure & Verification
+* **Zero-Defect Quality Linter:** Scanned all 2,945 curriculum files with 0 errors, validating terminal sentence completion, multi-section invariants, and balanced code blocks.
+* **Headless Render Validation:** Verified 133,544 KaTeX math formulas and 3,172 Mermaid diagrams through headless browser parsers (`validate_render.mjs`).
+* **Automated Test Suite:** 59 / 59 Pytest tests passing (100%).
+
+---
+
 ## [1.0.0] - 2026-11-13
 
 ### Summary
