@@ -4,7 +4,7 @@
   <p><strong>AI Learning Workspace & Socratic Curriculum Engine</strong></p>
 
   <a href="CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-1.0.0-emerald?style=flat" alt="Version 1.0.0">
+    <img src="https://img.shields.io/badge/version-1.1.0-emerald?style=flat" alt="Version 1.1.0">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
@@ -116,10 +116,10 @@ Download the standalone, zero-dependency desktop application from the project re
 
 | Platform | Download | Instructions |
 | :--- | :--- | :--- |
-| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.0.0.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
-| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.0.0-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
-| **macOS (Portable)** | **`Synapse-Workbench-1.0.0-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
-| **Linux (CLI / Server)** | **`synapse-1.0.0-py3-none-any.whl`** | See Python Wheel Installation below. |
+| **Windows (Portable)** | **`Synapse-Workbench-Portable-1.1.0.exe`** | Standalone portable `.exe` (no Python or installation required). Place `./topics/` alongside the executable and launch! |
+| **macOS (Apple Silicon)** | **`Synapse-Workbench-1.1.0-arm64.dmg`** | Open the `.dmg`, drag **Synapse Workbench** to `Applications`, and launch! |
+| **macOS (Portable)** | **`Synapse-Workbench-1.1.0-arm64-mac.zip`** | Unzip and launch **Synapse Workbench.app** directly. |
+| **Linux (CLI / Server)** | **`synapse-1.1.0-py3-none-any.whl`** | See Python Wheel Installation below. |
 | **Any Platform** | **Docker Compose** | See Docker Deployment below. |
 
 ---
@@ -193,7 +193,7 @@ python3 -m venv synapse-env
 source synapse-env/bin/activate
 
 # 2. Install the official wheel
-pip install dist/python/synapse-1.0.0-py3-none-any.whl
+pip install dist/python/synapse-1.1.0-py3-none-any.whl
 
 # 3. Launch the Socratic Workbench
 synapse serve --port 8000

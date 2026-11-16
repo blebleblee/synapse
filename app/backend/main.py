@@ -120,7 +120,7 @@ from learning_engine.packages import (
     get_domain_pack_info
 )
 
-app = FastAPI(title="AI Learning Workbench Backend", version="1.0.0")
+app = FastAPI(title="AI Learning Workbench Backend", version="1.1.0")
 
 app.add_middleware(
     CORSMiddleware,
