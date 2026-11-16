@@ -1,0 +1,124 @@
+# Lesson 4: Intertemporal Choice with Self-Control
+
+## 1. First-Principles Intuition & Invariants
+
+The classical economic agent is a perfectly rational automaton, discounting future consumption at a constant exponential rate and making consumption and savings decisions that maximize a lifetime utility function. This idealized figure—the homo economicus of textbooks—arrives at decisions through a transparent mental calculus: compare the marginal utility gained today against the discounted marginal utility of tomorrow, adjust behavior accordingly, and stick to that plan. Yet anyone who has struggled with a gym membership they never use, a savings goal perpetually postponed, or the decision to check email "just once more" before returning to deep work recognizes that actual human intertemporal choice bears little resemblance to this frictionless model.
+
+The gap between intention and action in intertemporal decision-making is not random noise or simple irrationality—it is a systematic, predictable phenomenon rooted in the structure of human motivation itself. When we make choices about the distant future, we reason like philosophers: we commit to exercise regimens, craft ambitious savings plans, and resolve to reduce consumption. But as the moment of execution approaches and the future becomes present, our psychology shifts. The warm comfort of the sofa competes with the abstract promise of future fitness. The pleasures available today loom larger than the statistical improvement in lifetime health outcomes. We experience what behavioral economists term *present bias*: a systematic preference for immediate consumption over delayed gratification that grows more pronounced as the moment of action arrives.
+
+This temporal inconsistency—the fact that our preferences over consumption streams reverse as time progresses—lies at the heart of behavioral intertemporal choice theory. A decision made today about behavior tomorrow remains stable only if that decision is implemented *before* the moment of choice arrives. The moment we arrive at the decision point itself, our preferences shift, and we abandon the plan we confidently made in the cooler moments of abstract deliberation.
+
+To formalize this intuition, consider the classical exponential discounting model, which assumes that an agent values consumption at time $t$ relative to consumption at time $s$ according to a constant discount factor:
+
+$$V_t = \sum_{\tau=0}^{\infty} \delta^\tau u(c_{t+\tau})$$
+
+where $\delta \in (0,1)$ is the constant discount factor and $u(\cdot)$ is the instantaneous utility function. This model possesses a powerful property: *time consistency*. If at time $t$ an agent prefers consumption bundle $A$ over bundle $B$, and at time $t+1$ both bundles are still available in the future, the agent will continue to prefer $A$ over $B$. The preference ordering is invariant to the passage of time.
+
+Empirical evidence systematically violates this prediction. When offered a choice between $100 today or $110 in one week, many individuals choose the immediate payment. Yet when offered the same choice reframed as $100 in 52 weeks or $110 in 53 weeks—the same objective time interval, but further in the future—many switch to preferring the delayed option. This reversal of preference cannot occur under exponential discounting; it reveals that the discount rate itself is not constant but rather depends on the *temporal distance* to the reward.
+
+Hyperbolic discounting provides a mathematical framework that captures this pattern. Rather than assuming a constant discount factor $\delta$, hyperbolic models posit that present value decays according to a functional form that is steep near the present and flattens as we move into the distant future. The canonical formulation, proposed by George Ainslie and later refined by David Laibson and others, takes the form:
+
+$$V_t = u(c_t) + \beta \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+\tau})$$
+
+where $0 < \beta < 1$ is a "present bias" parameter that applies an additional discount to all future consumption relative to immediate consumption. The parameter $\delta$ continues to govern the discounting of consumption further in the future relative to the near future. This formulation captures the key empirical pattern: the present looms disproportionately large, creating a kink in the discount function at the boundary between now and later.
+
+The mechanics of hyperbolic discounting generate predictable dynamics of time inconsistency. Consider an agent who must choose between an immediate reward $R_s$ (small but available now) and a larger delayed reward $R_l$ available at time $T$ in the future. At time $t$ far in the past, the agent compares:
+
+$$\text{Immediate: } R_s + \beta \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+\tau})$$
+$$\text{Delayed: } \beta \delta^{T-t} R_l + \beta \sum_{\tau=T+1-t}^{\infty} \delta^\tau u(c_{t+\tau})$$
+
+When $t$ is sufficiently far from $T$, the discount factor $\delta^{T-t}$ is very small, and the delayed reward appears unappealingly distant. The agent commits to waiting. But as time progresses and $T$ approaches, the discount factor $\delta^{T-1}$ looms larger. The delayed reward now appears nearly immediate, while the immediate reward still carries no additional discount. The agent's preference reverses, and they abandon their previous commitment.
+
+This theoretical framework generates a taxonomy of behavioral phenomena that practitioners encounter constantly in policy design, financial advisory, public health, and organizational management. Present bias explains why smokers express genuine regret about their consumption even as they continue to smoke—they are not irrational in the moment; rather, they face a persistent conflict between their deliberative long-term goals and their immediate affective preferences. Time inconsistency explains why gym memberships are purchased with optimism and abandoned with regularity, why tax refunds—despite being economically equivalent to a loan to the government—feel like unexpected windfalls that people spend rather than save, and why individuals accumulate high-interest debt even when they understand its mathematical logic.
+
+The empirical magnitudes of these effects are substantial and consistent across populations. Studies of temporal choice reveal that discount rates for immediate versus one-year-delayed consumption often imply annual effective discount rates exceeding 100 percent—rates far above any market interest rate available to consumers. Yet these same individuals apply much lower discount rates to choices between consumption five years hence and six years hence. The implication is clear: the hyperbolic model is not merely a mathematical curiosity but a description of a fundamental architectural feature of human motivation.
+
+Understanding intertemporal choice with self-control requires moving beyond the standard model in another crucial dimension: recognizing that the agent is not a unitary decision-maker but rather a collection of conflicting motivational systems. The "dual-self" or "two-systems" framework, articulated most influentially by Richard Thaler and Hersh Shefrin in their theory of behavioral life-cycle consumption and by Daniel Kahneman's distinction between System 1 (fast, affective, intuitive) and System 2 (slow, deliberative, logical) reasoning, posits that human decision-making emerges from the interaction between a patient, forward-looking planner and an impatient, myopic doer. The planner formulates long-term goals and commits to plans; the doer experiences immediate temptations and makes moment-to-moment choices. Conflict arises when the doer's preferences diverge from the planner's objectives.
+
+This dual-self architecture explains phenomena that simple hyperbolic discounting alone cannot capture. It accounts for the "hot-cold empathy gap," the systematic failure of people in a cold cognitive state to predict how their preferences will shift when they enter a hot affective state. An individual deliberating about dietary choices while sated confidently asserts that they will resist sugary foods when hungry; yet when actual hunger arrives, the affective intensity of the craving overwhelms the remembered resolution. The gap between predicted and actual behavior reflects not stupidity but the genuine difference between abstract reasoning about incentives and the immediate experiential reality of temptation.
+
+The practical implication of this theoretical framework is profound: rational agents facing self-control problems will actively seek restrictions on their own future choice sets. They will purchase commitment devices—mechanisms that bind their future behavior and make deviation costly or impossible. A smoker who throws away cigarettes, a student who disables social media during study hours, an investor who directs savings to an illiquid retirement account with early withdrawal penalties—all are engaging in sophisticated strategic behavior. They recognize that their future selves will be tempted and act preemptively to constrain those future choices.
+
+Commitment devices come in diverse forms, and their effectiveness depends on the specific structure of the self-control problem they address. Some operate by raising the cost of deviation from the intended behavior: a financial penalty, social shame, or physical inconvenience. Others operate by making the intended behavior automatic or the default, requiring active effort to deviate rather than to comply. Still others operate through information architecture, making salient the long-term consequences of choices or the contrast between current and desired future selves. The most effective commitment devices typically combine multiple mechanisms and exploit the architecture of choice itself.
+
+The phenomenon of choice architecture—the observation that the structure, presentation, and framing of options substantially influences decisions—emerges as a central concern in behavioral intertemporal choice. When individuals face decisions embedded in poorly designed choice environments, their behavior often diverges from their stated long-term objectives. But when choice architecture is redesigned to align the path of least resistance with the agent's long-term goals, behavior often shifts dramatically. The introduction of automatic enrollment in retirement savings plans, with the option to opt out rather than opt in, increased participation rates from roughly 40 percent to over 90 percent—a transformation driven not by coercion but by a subtle alteration in the default.
+
+These insights have profound implications for policy design, organizational management, and personal finance. Rather than assuming that individuals will naturally gravitate toward choices aligned with their long-term interests, practitioners must recognize that present bias, time inconsistency, and affective temptation are features of human motivation that cannot be overcome by information provision alone. Instead, the design challenge becomes one of creating choice architectures, commitment devices, and institutional frameworks that harness the actual structure of human preferences rather than assume it away.
+
+## 2. Core Architecture & Mechanics
+
+To operationalize intertemporal choice with self-control, we must construct a formal model that captures the interaction between multiple motivational systems, time-varying preferences, and available commitment mechanisms. The architecture comprises three interconnected layers: the preference structure (how the agent values consumption across time), the motivational dynamics (how preferences shift as time progresses), and the commitment apparatus (how agents constrain their future choices).
+
+### The Preference Structure: Quasi-Hyperbolic Discounting
+
+The quasi-hyperbolic model serves as the workhorse framework for applied behavioral intertemporal choice analysis. Unlike purely hyperbolic formulations, it maintains tractability for empirical estimation and policy simulation while capturing the essential present bias phenomenon. The lifetime utility function takes the form:
+
+$$U_t = u(c_t) + \beta \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+\tau})$$
+
+where $u(c)$ represents instantaneous utility, $\delta \in (0,1)$ is the standard discount factor governing time preference over distant consumption, and $\beta \in (0,1)$ is the present bias parameter. When $\beta = 1$, the model reduces to standard exponential discounting. When $\beta < 1$, all future consumption receives an additional multiplicative discount relative to immediate consumption, capturing the disproportionate weight assigned to the present moment.
+
+The empirical measurement of these parameters reveals the magnitude of present bias in actual populations. Experimental and field studies employing choice experiments—offering subjects various combinations of immediate and delayed monetary rewards—consistently estimate $\beta$ in the range of 0.6 to 0.8, implying that agents effectively apply an additional 20 to 40 percent discount to all future consumption relative to immediate consumption. The standard discount factor $\delta$, measured over annual intervals, typically falls in the range of 0.95 to 0.99, corresponding to annual real discount rates of 1 to 5 percent. These parameter values are remarkably stable across diverse populations and choice contexts, suggesting a robust feature of human motivation rather than context-dependent preference.
+
+The critical insight emerges when we examine the time-consistency properties of this model. At time $t$, an agent prefers consumption pattern $A$ over pattern $B$ if $U_t(A) > U_t(B)$. At time $t+1$, the agent reranks the same consumption patterns using the updated utility function:
+
+$$U_{t+1} = u(c_{t+1}) + \beta \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+1+\tau})$$
+
+The crucial observation is that the present bias parameter $\beta$ applies to all consumption from $t+1$ onward relative to consumption at $t+1$. As a result, the weight assigned to consumption at $t+1$ relative to consumption at $t$ shifts upward as time progresses and $t+1$ transitions from the distant future to the immediate present. This generates systematic preference reversals: choices that appeared optimal when distant in time may become suboptimal when the moment of execution arrives.
+
+To operationalize this, consider the choice between a small immediate reward $S$ and a larger delayed reward $L$ available after a delay $D$. Define the present value of each option at time $t$ (measured relative to when the choice between $S$ and $L$ must be made):
+
+$$\text{PV}_t(S) = S$$
+$$\text{PV}_t(L) = \beta \delta^D L$$
+
+The agent prefers $L$ if $\beta \delta^D L > S$, which requires $D > \frac{\ln(S/L)}{\ln(\delta)} - \frac{\ln(\beta)}{\ln(\delta)}$. The second term, $-\frac{\ln(\beta)}{\ln(\delta)}$, represents the effective "present bias delay"—the additional periods of delay required to make the larger reward attractive when present bias is present. For typical parameter values ($\beta = 0.7$, $\delta = 0.96$), this effect is substantial, requiring roughly 8 to 12 additional periods of delay to offset the present bias effect.
+
+However, as the moment of choice approaches and time advances to $t+1$ (now the current period), the calculation shifts:
+
+$$\text{PV}_{t+1}(S) = S$$
+$$\text{PV}_{t+1}(L) = \delta^{D-1} L$$
+
+Note the critical difference: the present bias parameter $\beta$ no longer discounts the delayed reward because we are now comparing current consumption (at $t+1$) with future consumption. The effective discount factor for the delayed reward has jumped from $\beta \delta^D$ to $\delta^{D-1}$, which is substantially larger (since $\beta < 1$). The agent's preference may reverse: if the delay $D$ was short enough that $\beta \delta^D L < S$ but $\delta^{D-1} L > S$, the agent will abandon the plan to wait for the larger reward.
+
+This time-inconsistency mechanism is the fundamental driver of self-control problems. It explains why commitment devices, which constrain future choice sets and impose costs on deviation, can increase welfare from the ex-ante perspective even if they reduce choice flexibility ex-post.
+
+### The Motivational Dynamics: Dual-Self Framework
+
+The dual-self model structures the agent as comprising two interacting decision-makers: the planner and the doer. The planner makes commitments and formulates long-term plans, operating under the quasi-hyperbolic utility function described above. The doer makes moment-to-moment choices, but faces constraints imposed by the planner's earlier decisions and by the affective state generated by immediate circumstances.
+
+The planner recognizes that the doer will face temptations and designs commitment devices accordingly. At time $t$, the planner chooses both a consumption plan $(c_t, c_{t+1}, \ldots)$ and a set of commitment mechanisms that constrain the doer's choices at future times. The planner's optimization problem takes the form:
+
+$$\max_{c_t, c_{t+1}, \ldots, \text{commitment devices}} U_t = u(c_t) + \beta \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+\tau}) - \gamma(\text{commitment costs})$$
+
+where the final term reflects the fact that commitment devices are themselves costly—they restrict choice flexibility, impose monitoring burdens, and may incur direct financial penalties for violation.
+
+The doer, when faced with a decision at time $t+1$, maximizes:
+
+$$\max_{c_{t+1}} u(c_{t+1}) + \sum_{\tau=1}^{\infty} \delta^\tau u(c_{t+1+\tau})$$
+
+subject to constraints imposed by the planner's earlier commitments. Critically, the doer does not apply the present bias parameter $\beta$ to the immediate choice—only to future choices beyond the current period. This generates the time-inconsistency: the doer's preference for immediate gratification looms larger than the planner anticipated.
+
+The hot-cold empathy gap emerges naturally from this framework. When the planner deliberates about future behavior in a cold cognitive and affective state, they underestimate the intensity of temptation the doer will experience in a hot affective state. The planner commits to a diet based on abstract knowledge that high-calorie foods increase long-term disease risk; the doer experiences immediate hunger and the visceral pleasure of food consumption. The gap between the planner's prediction and the doer's actual behavior reflects not irrationality but the genuine difference in information and affective state between the deliberative and implementational stages.
+
+### Commitment Devices: Structure and Mechanics
+
+Commitment devices operate through several distinct mechanisms, each addressing different aspects of the self-control problem. A practical taxonomy distinguishes among devices that operate through financial incentives, information architecture, behavioral defaults, and social mechanisms.
+
+**Financial commitment devices** raise the direct economic cost of deviation from the intended behavior. A smoker who gambles money on quitting, losing the stake if they relapse, faces a direct penalty that shifts the economic calculus. An employee who opens an illiquid retirement account that imposes a 10 percent early withdrawal penalty faces a substantial cost to accessing savings before the designated retirement date. The mechanism is straightforward: the penalty increases the effective price of the tempting behavior, shifting the doer's moment-to-moment calculus toward compliance.
+
+The design challenge with financial commitment devices involves calibrating the penalty to be large enough to deter the tempting behavior but not so large that it creates welfare losses through actual deviation (which, despite the penalty, sometimes occurs). Empirical evidence suggests that penalties of 10 to 25 percent of the relevant monetary amount are often effective, but diminishing returns set in quickly—doubling the penalty does not reliably double the behavioral effect.
+
+**Default and automaticity mechanisms** operate by changing the baseline action required to pursue each option. Rather than requiring active effort to save (opt-in), the default becomes automatic enrollment with the option to opt-out. Rather than requiring active effort to consume a tempting food, the tempting food is physically unavailable unless deliberate effort is expended to acquire it. The mechanism leverages what behavioral economists term "status quo bias" and loss aversion: individuals strongly prefer not to make active changes to their environment, so shifting the default substantially shifts behavior.
+
+The empirical effects of reframing choices as opt-out rather than opt-in are dramatic. When retirement savings required active enrollment, participation rates in the United States hovered around 40 to 50 percent, even when the employer offered substantial matching contributions. When the default was switched to automatic enrollment, participation rates jumped to 85 to 95 percent, with most employees accepting the default savings rate and investment allocations. No change in incentives occurred; only the structure of choice changed. This mechanism works particularly effectively for intertemporal choices where the doer faces a continuous stream of decisions, and the planner wishes to establish a persistent pattern of behavior.
+
+**Information architecture mechanisms** operate by making salient the long-term consequences of choices or the discrepancy between current behavior and stated long-term objectives. When individuals are shown the cumulative financial impact of daily coffee purchases over a lifetime—$150,000 at typical spending rates—savings rates increase modestly. When gym members are shown a detailed record of their exercise frequency and reminded of their membership cost per visit, utilization increases. The mechanism operates through making available to the doer information that the planner possesses but that is easily forgotten or mentally discounted in the immediate moment.
+
+**Social commitment mechanisms** leverage reputational concerns and the power of public commitment. Individuals are more likely to comply with dietary or exercise goals if they have publicly announced them to social referents or if their progress is monitored and reported. The mechanism operates through two pathways: the direct reputational cost of public failure and the psychological power of consistency—humans exhibit a strong preference for their actions to align with their publicly stated commitments.
+
+### The Choice Architecture Framework
+
+The systematic design of choice environments to influence intertemporal decisions requires integrating insights about present bias, time inconsistency, and commitment devices into a practical framework. The choice architecture framework specifies how options should be structured, presented, and sequenced to align behavior with long-term objectives.
+
+The fundamental principle is that the structure of choices matters as much as the substantive options available. An identical set of savings vehicles presented as "set aside from your paycheck" (automaticity) rather than "apply to open an account" (active decision) generates substantially different outcomes. A pension system structured with automatic enrollment, default contribution rates, and default investment allocations (typically a target-date fund) produces dramatically higher savings rates and more appropriate investment allocations than a system requiring individual decisions at each step.
+
+Effective choice architecture for intertemporal decisions incorporates several design principles. First, **establish clear defaults aligned with long-term objectives**. The default should represent a reasonable estimate of what the agent would choose if making a fully deliberative decision free from present bias. Second, **require active decisions only for high-stakes customization**. Allow individuals to deviate from the default, but require them to articulate their reasoning and perhaps to affirm the deviance multiple times. Third, **make the long-term consequences salient**. Provide information about cumulative effects, make visible the discrepancy between current and desired future selves, and frame choices in ways that activate long-term thinking. Fourth, **implement feedback mechanisms** that provide ongoing information abo
